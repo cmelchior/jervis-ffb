@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -14,6 +15,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -171,7 +173,10 @@ object ResolveMoveTypeStep : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                ExitProcedure()
+            )
         }
     }
 }

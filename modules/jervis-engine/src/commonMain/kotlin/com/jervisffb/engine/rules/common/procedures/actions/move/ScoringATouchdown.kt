@@ -8,7 +8,6 @@ import com.jervisffb.engine.commands.AddGoal
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -18,11 +17,10 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isOnHomeTeam
@@ -32,15 +30,12 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
-data class ScoringATouchDownContext(
-    val player: Player,
-    val isTouchdownScored: Boolean = false
-): ProcedureContext
-
 /**
  * Procedure responsible for checking if a touchdown was scored as per page 64
  * in the rulebook. This procedure should be called every time a player with the
  * ball moves, or a player receives a ball (and doesn't fall over).
+ *
+ * It is up to the caller of this procedure to delete [ScoringATouchDownContext].
  *
  * Moving into the End Zone would normally result in an immediate touchdown, but
  * some things can impact it:
@@ -59,7 +54,7 @@ data class ScoringATouchDownContext(
  *   their turn as if nothing has happened.
  *
  * The reason for this is this phrase "A touchdown is scored.....No touchdown
- *  * is scored". But the exact timing is under-documented, so a valid argument
+ *  is scored". But the exact timing is under-documented, so a valid argument
  *  could be made that the player's turn ends as well. So for now, the choice is
  *  somewhat arbitrary.
  *
@@ -69,7 +64,7 @@ data class ScoringATouchDownContext(
 object ScoringATouchdown : Procedure() {
     override val initialNode: Node = CheckForTouchdown
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<ScoringATouchDownContext>()
         return if (context.isTouchdownScored) {
             val turnover = if (context.player.team == state.activeTeamOrThrow()) {
@@ -87,9 +82,8 @@ object ScoringATouchdown : Procedure() {
                 SetTurnOver(turnover),
             )
         } else {
-            RemoveContext<ScoringATouchDownContext>()
+            null
         }
-
     }
     override fun isValid(state: Game, rules: Rules) {
         val player = state.getContext<ScoringATouchDownContext>().player

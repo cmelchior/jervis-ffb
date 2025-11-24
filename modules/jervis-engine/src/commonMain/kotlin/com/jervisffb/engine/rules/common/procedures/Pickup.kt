@@ -15,12 +15,12 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PickupRollContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchDownContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.tables.Weather
 
@@ -127,7 +127,10 @@ object Pickup : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                ExitProcedure()
+            )
         }
     }
 }

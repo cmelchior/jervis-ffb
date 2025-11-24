@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.modifiers.CatchModifier
@@ -23,7 +24,6 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportCatch
 import com.jervisffb.engine.reports.ReportInterception
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchDownContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -227,7 +227,10 @@ object Catch : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                ExitProcedure()
+            )
         }
     }
 }

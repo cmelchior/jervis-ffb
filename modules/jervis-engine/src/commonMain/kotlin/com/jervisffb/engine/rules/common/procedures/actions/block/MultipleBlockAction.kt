@@ -34,6 +34,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
@@ -43,7 +44,6 @@ import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockRerollDice
 import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
-import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchDownContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

@@ -38,6 +38,7 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.PickupRollContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LandingModifier
@@ -59,7 +60,6 @@ import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoSquare
-import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchDownContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
@@ -577,7 +577,10 @@ object ThrowPlayerStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                ExitProcedure()
+            )
         }
     }
 
