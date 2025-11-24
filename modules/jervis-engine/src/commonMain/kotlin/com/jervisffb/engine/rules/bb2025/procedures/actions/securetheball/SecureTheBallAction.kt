@@ -18,13 +18,11 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
-import com.jervisffb.engine.model.context.SecureTheBallRollContext
+import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
@@ -33,14 +31,6 @@ import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-
-
-data class SecureTheBallContext(
-    val player: Player,
-    val hasMoved: Boolean = false,
-    val roll: SecureTheBallRollContext? = null,
-    val securedTheBall: Boolean = false
-) : ProcedureContext
 
 /**
  * Procedure for controlling a player's Secure the Ball action.

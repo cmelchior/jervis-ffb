@@ -15,6 +15,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PickupRollContext
+import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
@@ -23,7 +24,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
 
 /**
- * Procedure for when a player moved into the ball, and must now attempt to
+ * Procedure for when a player moved into the ball and must now attempt to
  * secure it.
  *
  * The result is stored in [SecureTheBallContext], it is up to the caller to
