@@ -26,6 +26,10 @@ value class DieId(val id: String) {
     }
 }
 
+@JvmInline
+@Serializable
+value class DicePoolId(val value: Int)
+
 /**
  * Unique identifier for a player.
  * This must be unique across all players playing a game.

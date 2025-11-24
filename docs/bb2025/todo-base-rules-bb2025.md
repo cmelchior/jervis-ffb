@@ -180,6 +180,7 @@ book.
     - [x] 3 or less, allowed to select player on LoS
     - [x] All players on LoS
     - [x] Place Kick: Only locations on the opponent side
+    - [ ] No players on the field to kick off from.
 - [ ] The Kick-off Event
     - [x] Get the Ref
     - [x] Time-out

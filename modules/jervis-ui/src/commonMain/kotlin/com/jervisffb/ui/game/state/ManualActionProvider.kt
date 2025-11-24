@@ -32,6 +32,7 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -411,7 +412,7 @@ open class ManualActionProvider(
             val choices = (actions.first() as SelectDicePoolResult).pools
             if (choices.size == 1 && choices.first().dice.size == 1) {
                 return DicePoolResultsSelected(listOf(
-                    DicePoolChoice(id = 0, listOf(choices.first().dice.single().result))
+                    DicePoolChoice(id = 0.dicePoolId, listOf(choices.first().dice.single().let { DicePoolChoice.SelectedDiceRoll(it.id, it.result) }))
                 ))
             }
         }

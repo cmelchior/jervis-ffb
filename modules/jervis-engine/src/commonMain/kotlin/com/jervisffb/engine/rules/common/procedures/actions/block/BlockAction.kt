@@ -100,7 +100,7 @@ object BlockAction : Procedure() {
                     .filter { state.field[it].player!!.team != attacker.team }
                     .map { state.field[it].player!! }
                     .filter { it.state == PlayerState.STANDING }
-                    .map { player -> SelectPlayer(player) }
+                    .let { listOf(SelectPlayer.fromPlayers(it)) }
 
             return end + eligibleDefenders
         }

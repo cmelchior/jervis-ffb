@@ -35,8 +35,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  * is thread-safe. As it is not thread-safe by itself.
  *
  * The generator is tied to a specific [Game] instance. Ids are always incremental
- * even if actions are undone. This ensures that we all connected clients can
- * agree on the sequence of events even with [com.jervisffb.engine.actions.Undo] in
+ * even if actions are undone. This ensures that all connected clients can agree
+ * on the sequence of events even with [com.jervisffb.engine.actions.Undo] in
  * the mix.
  */
 class IdGenerator {

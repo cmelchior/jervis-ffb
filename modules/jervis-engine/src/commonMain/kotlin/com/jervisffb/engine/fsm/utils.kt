@@ -115,14 +115,14 @@ inline fun <reified D1 : DieResult> ActionNode.checkDicePool(
     if (action !is DicePoolResultsSelected) INVALID_ACTION(action)
     if (action.results.size != 1) INVALID_ACTION(action, "Expected single dice pool result, got ${action.results.size}")
     action.results.single().let {
-        if (it.id != 0) INVALID_ACTION(action)
+        if (it.id.value != 0) INVALID_ACTION(action)
         if (it.diceSelected.size != 1) INVALID_ACTION(action)
     }
     val first = action.results.first().diceSelected.single()
-    if (first !is D1) {
+    if (first.result !is D1) {
         INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${first::class}")
     }
-    return function(first)
+    return function(first.result)
 }
 
 
@@ -177,11 +177,11 @@ inline fun <reified D1 : DieResult, reified D2 : DieResult> ActionNode.checkDice
     if (action !is DicePoolResultsSelected) INVALID_ACTION(action)
     if (action.results.size != 2) INVALID_ACTION(action, "Expected 2 dice pool results, got ${action.results.size}")
     action.results.first().let {
-        if (it.id != 0) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
+        if (it.id.value != 0) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
         if (it.diceSelected.size != 1) INVALID_ACTION(action)
     }
     action.results.last().let {
-        if (it.id != 1) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
+        if (it.id.value != 1) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
         if (it.diceSelected.size != 1) INVALID_ACTION(action)
     }
     val first = action.results.first().diceSelected.single()

@@ -128,7 +128,7 @@ fun DicePoolSelectorDialog(
                         val selectedResultsAction = DicePoolResultsSelected(
                             dialog.dice.mapIndexed { i, el: Pair<Dice, DicePool<*, *>> ->
                                 val selectedRoll = el.second.dice[selectedRollIndex[i]]
-                                DicePoolChoice(el.second.id, listOf(selectedRoll.result))
+                                DicePoolChoice(el.second.id, listOf(DicePoolChoice.SelectedDiceRoll(selectedRoll)))
                             }
                         )
                         vm.userActionSelected(selectedResultsAction)

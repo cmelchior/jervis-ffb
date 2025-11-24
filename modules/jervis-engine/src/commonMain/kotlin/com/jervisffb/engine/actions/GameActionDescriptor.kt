@@ -147,7 +147,8 @@ data object TossCoin : GameActionDescriptor {
     override fun createAll(): List<GameAction> = CoinTossResult.allOptions()
 }
 
-// Roll a number of dice and return their result
+// Roll a number of dice and return their result. Returned results must be in the same order
+// as the types defined here.
 data class RollDice(
     val dice: List<Dice>
 ) : GameActionDescriptor {
@@ -297,7 +298,7 @@ data class SelectDicePoolResult(
         val availableChoicesPrPool = pools.map { pool ->
             val combinations = pool.dice.combinations(pool.selectDice)
             combinations.map { randomChoice ->
-                DicePoolChoice(pool.id, randomChoice.toList().map { it.result })
+                DicePoolChoice(pool.id, randomChoice.toList().map { DicePoolChoice.SelectedDiceRoll(it.id, it.result)})
             }
         }
         return cartesianProduct(availableChoicesPrPool).map {
@@ -312,7 +313,8 @@ data object SelectDogout : GameActionDescriptor {
     override fun createAll(): List<GameAction> = listOf(DogoutSelected)
 }
 
-data class SelectPlayer(
+@ConsistentCopyVisibility
+data class SelectPlayer private constructor(
     val players: List<PlayerId>
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player.id))
@@ -329,10 +331,12 @@ data class SelectPlayer(
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
 
     companion object {
+        fun single(player: Player): SelectPlayer = SelectPlayer(listOf(player.id))
         fun fromPlayers(players: List<Player>): SelectPlayer {
             return SelectPlayer(players.map { it.id })
         }
         fun fromPlayers(players: Set<Player>): SelectPlayer = fromPlayers(players.toList())
+        fun fromPlayersOrNull(players: List<Player>) = if (players.isNotEmpty()) fromPlayers(players) else null
     }
 }
 

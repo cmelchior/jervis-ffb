@@ -148,13 +148,13 @@ object ThrowTeamMateAction : Procedure() {
                         && player.hasSkill(SkillType.RIGHT_STUFF)
                         && player.strength <= maxStrength
                     if (canBeThrown) {
-                        player.id
+                        player
                     } else {
                         null
                     }
                 }
                 if (eligiblePlayers.isNotEmpty()) {
-                    options.add(SelectPlayer(eligiblePlayers))
+                    options.add(SelectPlayer.fromPlayers(eligiblePlayers))
                 }
             }
 

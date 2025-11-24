@@ -43,14 +43,16 @@ object BlessedStatueOfNuffle : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
-            val availablePlayers = context.team
+            val requestedAction = context.team
                 .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
                 .filter { !it.hasSkill(SkillType.LONER) && !it.hasSkill(SkillType.PRO) }
-                .map { SelectPlayer(it) }
-
-            return availablePlayers.ifEmpty {
-                listOf(ContinueWhenReady)
-            }
+                .let {
+                    when (it.isNotEmpty()) {
+                        true -> com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)
+                        false -> ContinueWhenReady
+                    }
+                }
+            return listOf(requestedAction)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

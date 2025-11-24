@@ -87,8 +87,10 @@ object HandOffAction : Procedure() {
                 context.thrower.coordinates.getSurroundingCoordinates(rules, 1)
                     .mapNotNull { state.field[it].player }
                     .filter { it.team == context.thrower.team && it.state == PlayerState.STANDING }
-                    .forEach {
-                        options.add(SelectPlayer(it))
+                    .let {
+                        if (it.isNotEmpty()) {
+                            options.add(SelectPlayer.fromPlayers(it))
+                        }
                     }
             }
 

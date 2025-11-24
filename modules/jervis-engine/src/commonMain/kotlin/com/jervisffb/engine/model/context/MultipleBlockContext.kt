@@ -8,6 +8,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
@@ -44,7 +45,7 @@ data class MultipleBlockDiceRoll(
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
             STAB -> TODO()
-            STANDARD -> BlockDicePool((rollContext as BlockContext).roll, selectDice = 1, id = id)
+            STANDARD -> BlockDicePool((rollContext as BlockContext).roll, selectDice = 1, id = DicePoolId(id))
         }
     }
 

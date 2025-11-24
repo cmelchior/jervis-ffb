@@ -120,6 +120,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             ),
             *defaultSetup(homeFirst = false),
             *defaultKickOffHomeTeam(
+                selectKicker = PlayerSelected("A10".playerId),
                 placeKick = FieldSquareSelected(0, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
@@ -153,6 +154,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             ),
             *defaultSetup(homeFirst = false),
             *defaultKickOffHomeTeam(
+                selectKicker = PlayerSelected("A10".playerId),
                 placeKick = FieldSquareSelected(0, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),

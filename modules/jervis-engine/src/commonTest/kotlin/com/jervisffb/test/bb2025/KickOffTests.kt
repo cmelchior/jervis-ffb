@@ -1,7 +1,6 @@
 package com.jervisffb.test.bb2025
 
 import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -18,6 +17,7 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -31,6 +31,7 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.teamSetup
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -132,11 +133,34 @@ class KickOffTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun selectKickingPlayer_noPlayersOnField() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultHomeSetup(),
+            *defaultAwaySetup(endSetup = false),
+        )
+
+        // Fake it by moving all kickoff players back to Dogout after setup
+        homeTeam.forEach {
+            it.state = PlayerState.RESERVE
+            it.location = DogOut
+        }
+
+        controller.rollForward(
+            EndSetup,
+            *defaultKickOffHomeTeam(
+                selectKicker = null,
+            )
+        )
+        assertEquals(FieldCoordinate(17, 7), state.singleBall().location)
+    }
+
+    @Test
     fun placeKick() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
-            PlayerSelected(PlayerId("H8")) // Select Kicker
+            PlayerSelected(PlayerId("H10")) // Select Kicker
         )
         val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         // All squares on the other side should be available
@@ -151,7 +175,7 @@ class KickOffTests: JervisGameBB2025Test() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
-            PlayerSelected(PlayerId("H8")) // Select Kicker
+            PlayerSelected(PlayerId("H10")) // Select Kicker
         )
         val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         assertEquals(13*15, squares.size)
@@ -424,7 +448,7 @@ class KickOffTests: JervisGameBB2025Test() {
             BlockTypeSelected(BlockType.STANDARD), // Select Block type
             1.dblock, // Roll Skull
             NoRerollSelected(0), // Do not reroll
-            DicePoolResultsSelected.fromSingleDice(1.dblock),  // Select Skull
+            SelectSingleBlockDieResult(),
             DiceRollResults(1.d6, 1.d6), // Armour roll
             5.d8 // Bounce
         )

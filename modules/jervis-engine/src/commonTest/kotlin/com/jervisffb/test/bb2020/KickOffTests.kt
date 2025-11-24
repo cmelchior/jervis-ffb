@@ -1,7 +1,6 @@
 package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -31,6 +30,7 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.teamSetup
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -135,7 +135,7 @@ class KickOffTests: JervisGameBB2020Test() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
-            PlayerSelected(PlayerId("H8")) // Select Kicker
+            PlayerSelected(PlayerId("H10")) // Select Kicker
         )
         val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         // All squares on the other side should be available
@@ -150,7 +150,7 @@ class KickOffTests: JervisGameBB2020Test() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
-            PlayerSelected(PlayerId("H8")) // Select Kicker
+            PlayerSelected(PlayerId("H10")) // Select Kicker
         )
         val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         assertEquals(13*15, squares.size)
@@ -446,7 +446,7 @@ class KickOffTests: JervisGameBB2020Test() {
             BlockTypeSelected(BlockType.STANDARD), // Select Block type
             1.dblock, // Roll Skull
             NoRerollSelected(0), // Do not reroll
-            DicePoolResultsSelected.fromSingleDice(1.dblock),  // Select Skull
+            SelectSingleBlockDieResult(),
             DiceRollResults(1.d6, 1.d6), // Armour roll
             5.d8 // Bounce
         )

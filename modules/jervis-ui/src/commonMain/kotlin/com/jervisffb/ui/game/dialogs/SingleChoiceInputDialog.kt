@@ -28,7 +28,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -81,14 +80,13 @@ data class SingleChoiceInputDialog(
                 Revert -> TODO()
                 is MoveTypeSelected -> action.moveType.toString()
                 is CompositeGameAction -> action.actionList.joinToString(prefix = "[", postfix = "]")
-                is PlayerSubActionSelected -> action.name
                 is SkillSelected -> action.skill.toString()
                 is InducementSelected -> action.name
                 is CalculatedAction -> TODO("Should only be used in tests")
                 is BlockTypeSelected -> action.type.name
                 is DicePoolResultsSelected -> action.results.toString()
                 is DirectionSelected -> action.direction.toString()
-                is ForegoActivationSelected -> "Forego Activation: ${action.playerId}"
+                is ForegoActivationSelected -> "Forego Activation: ${action.player}"
             }
         }
 

@@ -48,10 +48,14 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  *
  * @param initialActions Actions to run as soon as the controller is started using [startManualMode]
  * or [startTestMode]
+ * @param validateActions If `true`, all actions will be validated against [getAvailableActions]
+ * before [ActionNode.applyAction] is called. Illegal or invalid actions will throw an
+ * [InvalidActionException].
  */
 class GameEngineController(
     state: Game,
-    private val initialActions: List<GameAction> = emptyList()
+    private val initialActions: List<GameAction> = emptyList(),
+    private val validateActions: Boolean = true,
 ) {
 
     companion object {
@@ -330,6 +334,9 @@ class GameEngineController(
             currentProcedure.currentNode())
         logInternalEvent(ReportHandleAction(userAction))
         val currentNode: ActionNode = stack.currentNode() as ActionNode
+        if (validateActions) {
+            validateAction(userAction)
+        }
         val command = currentNode.applyAction(userAction, state, rules)
         executeCommand(command)
         rollForwardToNextActionNode()
@@ -337,6 +344,16 @@ class GameEngineController(
             logInternalEvent(ReportAvailableActions(getAvailableActions()))
         }
         deltaBuilder.endAction()
+    }
+
+    /**
+     * Check if an action will be accepted by [ActionNode.applyAction]. If not
+     * an [InvalidActionException] will be thrown.
+     */
+    private fun validateAction(action: GameAction) {
+        if (!getAvailableActions().isValid(action)) {
+            INVALID_ACTION(action, "Invalid action for ${stack.stateToPrettyString()}: $action")
+        }
     }
 
     private fun executeCommand(command: Command) {

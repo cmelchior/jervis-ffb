@@ -11,6 +11,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
+import com.jervisffb.engine.utils.singleInstanceOf
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.test.assertTrue
@@ -25,20 +26,6 @@ inline fun <reified T : Any> assertTypeOf(obj: Any?): T {
 }
 
 /**
- * Finds the first element of the expected type.
- */
-inline fun <reified T: Any> List<*>.firstInstanceOf(): T {
-    return first { it is T } as T
-}
-
-/**
- * Finds the first element of the expected type or `null` if no element matched.
- */
-inline fun <reified T: Any> List<*>.firstInstanceOfOrNull(): T? {
-    return firstOrNull { it is T } as T?
-}
-
-/**
  * Create a calculated game action that will determine which reroll to select
  * based on the provided skill type. If the given skill isn't available, an
  * error is thrown.
@@ -46,7 +33,7 @@ inline fun <reified T: Any> List<*>.firstInstanceOfOrNull(): T? {
 @Suppress("TestFunctionName")
 fun SelectSkillReroll(type: SkillType): GameAction {
     return CalculatedAction { state, rules ->
-        val selectRerolls = getAvailableActions().firstInstanceOf<SelectRerollOption>()
+        val selectRerolls = getAvailableActions().singleInstanceOf<SelectRerollOption>()
         val skillReroll = selectRerolls.options.first {
             val source = it.getRerollSource(state)
             // Only support single D6 dice rolls for now
@@ -68,7 +55,7 @@ fun SelectSkillReroll(type: SkillType): GameAction {
 @Suppress("TestFunctionName")
 inline fun <reified T : TeamReroll> SelectTeamReroll(): GameAction {
     return CalculatedAction { state, rules ->
-        val selectRerolls = getAvailableActions().firstInstanceOf<SelectRerollOption>()
+        val selectRerolls = getAvailableActions().singleInstanceOf<SelectRerollOption>()
         val teamReroll = selectRerolls.options.first {
             val source = it.getRerollSource(state)
             source is T
@@ -87,11 +74,11 @@ inline fun <reified T : TeamReroll> SelectTeamReroll(): GameAction {
 @Suppress("TestFunctionName")
 fun SelectSingleBlockDieResult(): GameAction {
     return CalculatedAction { _, _ ->
-        val dicePools = getAvailableActions().firstInstanceOf<SelectDicePoolResult>()
+        val dicePools = getAvailableActions().singleInstanceOf<SelectDicePoolResult>()
         if (dicePools.pools.size > 1) error("Too many dice pools: ${dicePools.pools.size}")
         val pool = dicePools.pools.first()
         if (pool.selectDice != 1) error("Only one dice is supported: ${pool.selectDice}")
-        val poolChoice  = DicePoolChoice(pool.id, pool.dice.map { it.result })
+        val poolChoice  = DicePoolChoice(pool.id, pool.dice.map { DicePoolChoice.SelectedDiceRoll(it.id, it.result) })
         DicePoolResultsSelected(listOf(poolChoice))
     }
 }

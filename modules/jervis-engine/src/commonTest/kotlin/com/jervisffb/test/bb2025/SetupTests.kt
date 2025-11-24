@@ -14,11 +14,11 @@ import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.setupPlayer
-import com.jervisffb.test.utils.firstInstanceOfOrNull
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -304,8 +304,8 @@ class SetupTests: JervisGameBB2025Test() {
     fun invalid_emptyField() {
         val brokenRules = rules.isSetupValid(state, state.homeTeam)
         assertEquals(2, brokenRules.size)
-        assertNotNull(brokenRules.firstInstanceOfOrNull<WrongAmountOfPlayersOnField>())
-        assertNotNull(brokenRules.firstInstanceOfOrNull<MissingPlayersOnLoS>())
+        assertNotNull(brokenRules.singleInstanceOfOrNull<WrongAmountOfPlayersOnField>())
+        assertNotNull(brokenRules.singleInstanceOfOrNull<MissingPlayersOnLoS>())
     }
 
     // Test for bug:

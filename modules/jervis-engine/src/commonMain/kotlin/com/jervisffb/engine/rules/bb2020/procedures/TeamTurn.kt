@@ -104,7 +104,9 @@ object TeamTurn : Procedure() {
             return if (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN) {
                 listOf(ContinueWhenReady)
             } else {
-                listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
+                listOfNotNull(
+                    EndTurnWhenReady,
+                    SelectPlayer.fromPlayersOrNull(getAvailablePlayers(state, rules)))
             }
         }
 

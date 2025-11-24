@@ -403,12 +403,12 @@ object PushStepInitialMoveSequence: Procedure() {
                 if (emptyFields.isNotEmpty()) {
                     SelectDirection(
                         origin = lastPushInChain.pushee.coordinates,
-                        directions = emptyFields.map { Direction.from(lastPushInChain.pushee.coordinates, it) }
+                        directions = emptyFields.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
                     )
                 } else {
                     SelectDirection(
                         origin = lastPushInChain.pushee.coordinates,
-                        directions = pushOptions.map { Direction.from(lastPushInChain.pushee.coordinates, it) }
+                        directions = pushOptions.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
                     )
                 }
             )

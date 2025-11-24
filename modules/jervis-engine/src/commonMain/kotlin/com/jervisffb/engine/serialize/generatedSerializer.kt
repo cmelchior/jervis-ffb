@@ -60,7 +60,6 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.PlayerActionSelected::class)
         subclass(com.jervisffb.engine.actions.PlayerDeselected::class)
         subclass(com.jervisffb.engine.actions.PlayerSelected::class)
-        subclass(com.jervisffb.engine.actions.PlayerSubActionSelected::class)
         subclass(com.jervisffb.engine.actions.RandomPlayersSelected::class)
         subclass(com.jervisffb.engine.actions.RerollOptionSelected::class)
         subclass(com.jervisffb.engine.actions.Revert::class)

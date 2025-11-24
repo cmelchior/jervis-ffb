@@ -40,7 +40,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -92,14 +91,13 @@ fun ActionSelector(
                             Undo -> TODO()
                             Revert -> TODO()
                             is CompositeGameAction -> action.actionList.joinToString(prefix = "[", postfix = "]")
-                            is PlayerSubActionSelected -> action.action.toString()
                             is SkillSelected -> action.skill.toString()
                             is InducementSelected -> action.name
                             is BlockTypeSelected -> action.type.toString()
                             is CalculatedAction -> TODO("Should only be used in tests")
                             is DicePoolResultsSelected -> "Dice pool: $action"
                             is DirectionSelected -> "Direction: ${action.direction}"
-                            is ForegoActivationSelected -> "Forego Activation: ${action.playerId}"
+                            is ForegoActivationSelected -> "Forego Activation: ${action.player}"
                         }
                     Text(text, fontSize = 10.sp)
                 }

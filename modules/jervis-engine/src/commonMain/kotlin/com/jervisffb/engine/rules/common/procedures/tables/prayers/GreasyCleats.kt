@@ -39,14 +39,17 @@ object GreasyCleats : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
-            val availablePlayers = context.team.otherTeam()
+            val requestedAction = context.team.otherTeam()
                 .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
-                .map { SelectPlayer(it) }
-
-            return availablePlayers.ifEmpty {
-                // This should only happen if _zero_ players are ready for the drive
-                listOf(ContinueWhenReady)
-            }
+                .let {
+                    if (it.isNotEmpty()) {
+                        com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)
+                    } else {
+                        // This should only happen if _zero_ players are ready for the drive
+                        ContinueWhenReady
+                    }
+                }
+            return listOf(requestedAction)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

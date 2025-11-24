@@ -20,12 +20,12 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
-import com.jervisffb.test.utils.firstInstanceOf
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,7 +52,7 @@ class PushbackTests: JervisGameBB2020Test() {
         )
 
         val actions = controller.getAvailableActions().actions
-        val availableDirections = actions.firstInstanceOf<SelectDirection>()
+        val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         val expectedTargets = setOf(
             FieldCoordinate(11, 5),
@@ -72,7 +72,7 @@ class PushbackTests: JervisGameBB2020Test() {
             *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
-        val availableDirections = actions.firstInstanceOf<SelectDirection>()
+        val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         val expectedTargets = setOf(
             FieldCoordinate(11, 4),
@@ -95,7 +95,7 @@ class PushbackTests: JervisGameBB2020Test() {
             *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
-        val availableDirections = actions.firstInstanceOf<SelectDirection>()
+        val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(2, availableDirections.directions.size)
         val expectedTargets = setOf(
             FieldCoordinate(11, 4),
@@ -177,7 +177,7 @@ class PushbackTests: JervisGameBB2020Test() {
             *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
-        val availableDirections = actions.firstInstanceOf<SelectDirection>()
+        val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(1, availableDirections.directions.size)
         val expectedTargets = setOf(
             FieldCoordinate(11, 0),
@@ -197,7 +197,7 @@ class PushbackTests: JervisGameBB2020Test() {
             *standardBlock("H8", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
-        val availableDirections = actions.firstInstanceOf<SelectDirection>()
+        val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         assertEquals(
             FieldCoordinate(0, 15),

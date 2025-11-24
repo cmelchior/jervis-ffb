@@ -2,13 +2,10 @@ package com.jervisffb.fumbbl.net.adapter.impl.block
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DBlockResult
-import com.jervisffb.engine.actions.DicePoolChoice
-import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseReroll
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -68,8 +65,9 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
             POW_PUSHBACK -> DBlockResult(5)
             POW -> DBlockResult(6)
         }
-        val action = DicePoolResultsSelected(listOf(DicePoolChoice(id = 0, diceSelected = listOf(selectedBlockDie))))
-        newActions.add(action, StandardBlockChooseResult.SelectBlockResult)
+        // TOOD: Fix DiceId
+        // val action = DicePoolResultsSelected(listOf(DicePoolChoice(id = 0, diceSelected = listOf(selectedBlockDie))))
+        // newActions.add(action, StandardBlockChooseResult.SelectBlockResult)
 
         // Automatically use block
         val attacker = fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)!!

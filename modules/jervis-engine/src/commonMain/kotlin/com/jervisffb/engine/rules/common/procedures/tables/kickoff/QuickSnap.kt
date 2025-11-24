@@ -84,7 +84,7 @@ object QuickSnap : Procedure() {
                     .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() - context.playersMoved.toSet()
-                eligiblePlayers.map { SelectPlayer(it) } + EndSetupWhenReady
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
             }
         }
 

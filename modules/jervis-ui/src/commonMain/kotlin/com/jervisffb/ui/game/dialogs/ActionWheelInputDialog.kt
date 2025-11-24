@@ -19,6 +19,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -367,8 +368,9 @@ class ActionWheelInputDialog(
                             preferLtr = true,
                             expandable = false,
                             onClick = { value: DieResult ->
-                                val action = DicePoolResultsSelected.fromSingleDice(value)
-                                provider.userActionSelected(action)
+                                TODO()
+                                // val action = DicePoolResultsSelected.fromSingleDice(value)
+                                // provider.userActionSelected(action)
                             },
                             animatingFrom = DBlockResult.random(),
                             onHover = { dblock ->
@@ -425,10 +427,10 @@ class ActionWheelInputDialog(
                                     actions.add(DiceRollResults(menu.menuItems.filterIsInstance<DiceMenuItem<*>>().map { it.value}))
                                 }
                                 if (chooseResultAfterReroll) {
-                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(dieResult)))))
+                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0.dicePoolId, listOf(DicePoolChoice.SelectedDiceRoll(die.id, dieResult))))))
                                 } else {
                                     actions.add(NoRerollSelected())
-                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(dieResult)))))
+                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0.dicePoolId, listOf(DicePoolChoice.SelectedDiceRoll(die.id, dieResult))))))
                                 }
                                 if (undo) {
                                     provider.userMultipleActionsSelected(listOf(Undo, CompositeGameAction(actions)), false)

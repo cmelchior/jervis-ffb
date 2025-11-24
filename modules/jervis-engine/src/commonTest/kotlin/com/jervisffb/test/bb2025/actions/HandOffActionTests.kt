@@ -13,13 +13,13 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
-import com.jervisffb.test.utils.firstInstanceOf
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,7 +48,7 @@ class HandOffActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SmartMoveTo(13, 4),
         )
-        val playerTargets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>().players
+        val playerTargets = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(1, playerTargets.size)
         assertEquals("A1".playerId, playerTargets.first())
     }

@@ -66,7 +66,7 @@ object SetupTeam : Procedure() {
                     inReserve || onField
                 }.let { players ->
                     if (players.isNotEmpty()) {
-                        SelectPlayer(players.map { it.id })
+                        SelectPlayer.fromPlayers(players)
                     } else {
                         null
                     }

@@ -83,10 +83,13 @@ object AnimationFactory {
             || (!firstCatch && firstBounce && isResolvingLanding)
             || touchBack
         ) {
-            // The kicking player might no longer be on the field. For example, in the case of a Pitch Invasion
-            // or a Blitz. For now, we just decide to animate the ball from the center of the end-zone, but maybe
+            // Find a location to kick from. Normally that is the kicking player, but there are two edge cases:
+            // 1) In the case of a Pitch Invasion or a Blitz.
+            // 2) If the team started with 0 players on the pitch.
+            //
+            // For these (for now), we just decide to animate the ball from the center of the end-zone, but maybe
             // some other solution would be funnier/better?
-            val from = when (val kickerLocation = state.kickingPlayer!!.location) {
+            val from = when (val kickerLocation = state.kickingPlayer?.location) {
                 is OnFieldLocation -> kickerLocation
                 else -> {
                     if (state.kickingPlayer!!.isOnHomeTeam()) {

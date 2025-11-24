@@ -1,6 +1,7 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import io.ktor.http.origin
 import kotlinx.serialization.Serializable
 
 /**
@@ -38,6 +39,7 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
          */
         fun from(origin: FieldCoordinate, destination: FieldCoordinate): Direction {
             return Direction(destination.x - origin.x, destination.y - origin.y)
+
         }
     }
 }

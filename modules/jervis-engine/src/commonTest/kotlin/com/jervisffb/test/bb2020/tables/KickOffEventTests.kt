@@ -2,9 +2,11 @@ package com.jervisffb.test.bb2020.tables
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
+import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -20,7 +22,10 @@ import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.common.tables.Weather
+import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2020Test
+import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
@@ -489,8 +494,11 @@ class KickOffEventTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
+
         // 6 players available to select + EndSetup
-        assertEquals(6 + 1, controller.getAvailableActions().actions.size)
+        val availableActions = controller.getAvailableActions().actions
+        assertEquals(6, availableActions.singleInstanceOfOrNull<SelectPlayer>()?.players.orEmpty().size)
+        assertTrue(availableActions.contains(EndSetupWhenReady))
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))
@@ -626,7 +634,8 @@ class KickOffEventTests: JervisGameBB2020Test() {
     fun officiousRef_noPlayersOnField() {
         controller.rollForward(
             *defaultPregame(),
-            *defaultSetup()
+            *defaultHomeSetup(),
+            *defaultAwaySetup(endSetup = false),
         )
 
         // Fake it, by moving all kickoff players back to Dogout after setup
@@ -634,8 +643,11 @@ class KickOffEventTests: JervisGameBB2020Test() {
             it.state = PlayerState.RESERVE
             it.location = DogOut
         }
+
         controller.rollForward(
+            EndSetup,
             *defaultKickOffHomeTeam(
+                selectKicker = null,
                 kickoffEvent = arrayOf(
                     DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
                     6.d6, // Home team rolls
@@ -701,17 +713,17 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup()
         )
-        // Fake it, by moving all kickoff players back to Dogout after setup
-        homeTeam.forEach {
+        // Fake it, by moving all players on affected team back to Dogout after setup
+        awayTeam.forEach {
             it.state = PlayerState.RESERVE
             it.location = DogOut
         }
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceRollResults(6.d6, 6.d6), // Roll Officious Ref
-                    1.d6, // Home team rolls
-                    6.d6, // Away team rolls
+                    DiceRollResults(6.d6, 6.d6), // Roll Pitch Invasion
+                    6.d6, // Home team rolls
+                    1.d6, // Away team rolls
                     3.d3 // 3 players affected, but none are available
                 )
             )

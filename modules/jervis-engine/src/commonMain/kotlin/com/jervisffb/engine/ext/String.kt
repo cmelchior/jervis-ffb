@@ -1,5 +1,6 @@
 package com.jervisffb.engine.ext
 
+import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 
@@ -9,3 +10,6 @@ inline val String.playerId: PlayerId
 
 inline val Int.playerNo: PlayerNo
     get() = PlayerNo(this)
+
+inline val Int.dicePoolId: DicePoolId
+    get() = DicePoolId(this)

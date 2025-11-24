@@ -7,6 +7,7 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Check that the UI works when kicking off when 0 players.
 - [ ] UI for pushing players into the crowd is not working (and have been disabled for now).
 - [ ] Add a "right-click" menu for players. We should combine "Edit Player" and "Forego Activation" in there.
 - [ ] Add a better error message when reporting invalid setup. Possibly adopt the BB3 approach where you are shown all the invariants during setup.

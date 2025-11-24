@@ -1,7 +1,5 @@
 package com.jervisffb.fumbbl.net.model
 
-import com.jervisffb.engine.actions.DBlockResult
-import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.fumbbl.net.api.serialization.FumbblEnum
 import com.jervisffb.fumbbl.net.api.serialization.FumbblEnumSerializer
@@ -20,32 +18,33 @@ enum class BlockResult(
     POW("POW");
 
     fun toJervisResult(): DicePoolResultsSelected {
-        return when (this) {
-            com.jervisffb.fumbbl.net.model.BlockResult.SKULL -> DicePoolResultsSelected(listOf(
-                DicePoolChoice(id = 0, diceSelected = listOf(
-                    DBlockResult(1)
-                ))
-            ))
-            com.jervisffb.fumbbl.net.model.BlockResult.BOTH_DOWN -> DicePoolResultsSelected(listOf(
-                DicePoolChoice(id = 0, diceSelected = listOf(
-                    DBlockResult(2)
-                ))
-            ))
-            com.jervisffb.fumbbl.net.model.BlockResult.PUSHBACK -> DicePoolResultsSelected(listOf(
-                DicePoolChoice(id = 0, diceSelected = listOf(
-                    DBlockResult(3)
-                ))
-            ))
-            com.jervisffb.fumbbl.net.model.BlockResult.POW_PUSHBACK -> DicePoolResultsSelected(listOf(
-                DicePoolChoice(id = 0, diceSelected = listOf(
-                    DBlockResult(5)
-                ))
-            ))
-            com.jervisffb.fumbbl.net.model.BlockResult.POW -> DicePoolResultsSelected(listOf(
-                DicePoolChoice(id = 0, diceSelected = listOf(
-                    DBlockResult(6)
-                ))
-            ))
-        }
+        TODO()
+//        return when (this) {
+//            com.jervisffb.fumbbl.net.model.BlockResult.SKULL -> DicePoolResultsSelected(listOf(
+//                DicePoolChoice(id = 0, diceSelected = listOf(
+//                    DBlockResult(1)
+//                ))
+//            ))
+//            com.jervisffb.fumbbl.net.model.BlockResult.BOTH_DOWN -> DicePoolResultsSelected(listOf(
+//                DicePoolChoice(id = 0, diceSelected = listOf(
+//                    DBlockResult(2)
+//                ))
+//            ))
+//            com.jervisffb.fumbbl.net.model.BlockResult.PUSHBACK -> DicePoolResultsSelected(listOf(
+//                DicePoolChoice(id = 0, diceSelected = listOf(
+//                    DBlockResult(3)
+//                ))
+//            ))
+//            com.jervisffb.fumbbl.net.model.BlockResult.POW_PUSHBACK -> DicePoolResultsSelected(listOf(
+//                DicePoolChoice(id = 0, diceSelected = listOf(
+//                    DBlockResult(5)
+//                ))
+//            ))
+//            com.jervisffb.fumbbl.net.model.BlockResult.POW -> DicePoolResultsSelected(listOf(
+//                DicePoolChoice(id = 0, diceSelected = listOf(
+//                    DBlockResult(6)
+//                ))
+//            ))
+//        }
     }
 }

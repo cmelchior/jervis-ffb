@@ -43,7 +43,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -159,7 +158,6 @@ fun GameAction.isRandomAction(): Boolean {
         is PlayerActionSelected -> false
         is PlayerDeselected -> false
         is PlayerSelected -> false
-        is PlayerSubActionSelected -> false
         is RandomPlayersSelected -> true
         is RerollOptionSelected -> false
         is SkillSelected -> false
@@ -358,4 +356,18 @@ fun <T> cartesianProduct(lists: List<List<T>>, n: Int = 1): List<List<T>> {
 
 fun MutableList<GameActionDescriptor>.addIfNotNull(descriptor: GameActionDescriptor?) {
     descriptor?.let { this.add(it)}
+}
+
+/**
+ * Finds the first element of the expected type.
+ */
+inline fun <reified T: Any> List<*>.singleInstanceOf(): T {
+    return single { it is T } as T
+}
+
+/**
+ * Finds the first element of the expected type or `null` if no element matched.
+ */
+inline fun <reified T: Any> List<*>.singleInstanceOfOrNull(): T? {
+    return singleOrNull { it is T } as T?
 }

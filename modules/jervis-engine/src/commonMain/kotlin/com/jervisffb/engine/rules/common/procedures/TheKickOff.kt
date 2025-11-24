@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.common.procedures
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
@@ -28,7 +30,6 @@ import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -85,25 +86,37 @@ object TheKickOff : Procedure() {
                     acc
                 }
 
-            val eligiblePlayers: List<PlayerId> =
-                if (players.inCenterField > 0) {
-                    players.playersInCenterField.map { it.id }
-                } else {
-                    players.playersOnLoS.map { it.id }
-                }
-            if (eligiblePlayers.isEmpty()) {
-                INVALID_GAME_STATE("No player available for kicking")
+            val eligiblePlayers: List<Player> = if (players.inCenterField > 0) {
+                players.playersInCenterField
+            } else {
+                players.playersOnLoS
             }
-            return listOf(SelectPlayer(eligiblePlayers))
+            return if (eligiblePlayers.isEmpty()) {
+                listOf(ContinueWhenReady)
+            } else {
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers))
+            }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<PlayerSelected>(action) {
-                compositeCommandOf(
-                    SetKickingPlayer(it.getPlayer(state)),
-                    ReportKickingPlayer(it.getPlayer(state)),
-                    GotoNode(PlaceTheKick),
-                )
+            return when (action) {
+                Continue -> {
+                    compositeCommandOf(
+                        SetKickingPlayer(null),
+                        ReportKickingPlayer(null),
+                        GotoNode(PlaceTheKick),
+                    )
+                }
+                is PlayerSelected -> {
+                    checkType<PlayerSelected>(action) {
+                        compositeCommandOf(
+                            SetKickingPlayer(it.getPlayer(state)),
+                            ReportKickingPlayer(it.getPlayer(state)),
+                            GotoNode(PlaceTheKick),
+                        )
+                    }
+                }
+                else -> INVALID_GAME_STATE("Unsupported action: $action")
             }
         }
     }

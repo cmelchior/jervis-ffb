@@ -7,6 +7,8 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.DicePoolId
+import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -16,6 +18,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
@@ -269,7 +272,17 @@ data class DBlockResult(override val value: Int) : DieResult() {
 }
 
 @Serializable
-data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
+data class DicePoolChoice(val id: DicePoolId, val diceSelected: List<SelectedDiceRoll>) {
+    @Serializable
+    data class SelectedDiceRoll(
+        val id: DieId,
+        val result: DieResult
+    ) {
+        constructor(roll: DieRoll<*>): this(roll.id, roll.result)
+    }
+
+}
+
 
 // TODO Is it safe to return DieResult from here? Shouldn't it be DieRoll instead?
 //  Otherwise there is no way to connect the result to the "exact" die, e.g. in case
@@ -281,14 +294,14 @@ data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
  */
 @Serializable
 data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
-    fun singleResult(): DieResult = results.single().diceSelected.single()
+    fun singleResult(): DieResult = results.single().diceSelected.single().result
     companion object {
         /**
          * Factory method for easily creating the simple case, where there is only
          * one dice pool with a single die.
          */
-        fun fromSingleDice(die: DieResult): DicePoolResultsSelected {
-            return DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(die))))
+        fun fromSingleDice(die: DieRoll<*>): DicePoolResultsSelected {
+            return DicePoolResultsSelected(listOf(DicePoolChoice(DicePoolId(0), listOf(DicePoolChoice.SelectedDiceRoll(die)))))
         }
     }
 }
@@ -318,18 +331,14 @@ data class PlayerDeselected(val playerId: PlayerId) : GameAction {
 }
 
 @Serializable
-data class ForegoActivationSelected(val playerId: PlayerId) : GameAction {
+data class ForegoActivationSelected(val player: PlayerId) : GameAction {
     fun getPlayer(state: Game): Player {
-        return state.getPlayerById(playerId)
+        return state.getPlayerById(player)
     }
 }
 
 @Serializable
 data class PlayerActionSelected(val action: ActionType) : GameAction
-
-// TODO Merge with PlayerActionSelected
-@Serializable
-data class PlayerSubActionSelected(val name: String, val action: GameAction) : GameAction
 
 @Serializable
 data object DogoutSelected : GameAction

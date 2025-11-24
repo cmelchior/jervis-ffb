@@ -107,9 +107,8 @@ object BlitzAction : Procedure() {
             val attacker = state.getContext<BlitzActionContext>().attacker
             val availableTargetPlayers = attacker.team.otherTeam()
                 .filter { it.location.isOnField(rules) && it.state == PlayerState.STANDING }
-                .map { it.id }
 
-            return listOf(SelectPlayer(availableTargetPlayers), EndActionWhenReady)
+            return listOf(SelectPlayer.fromPlayers(availableTargetPlayers), EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

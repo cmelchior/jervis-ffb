@@ -2,6 +2,7 @@ package com.jervisffb.test.bb2025.tables
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
+import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
@@ -23,12 +24,16 @@ import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.common.tables.Weather
+import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import kotlin.collections.orEmpty
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -526,7 +531,9 @@ class KickOffEventTests: JervisGameBB2025Test() {
             )
         )
         // 6 players available to select + EndSetup
-        assertEquals(6 + 1, controller.getAvailableActions().actions.size)
+        val availableActions = controller.getAvailableActions().actions
+        assertEquals(6, availableActions.singleInstanceOfOrNull<SelectPlayer>()?.players.orEmpty().size)
+        assertTrue(availableActions.contains(EndSetupWhenReady))
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))
@@ -800,15 +807,18 @@ class KickOffEventTests: JervisGameBB2025Test() {
     fun pitchInvasion_noPlayersOnField() {
         controller.rollForward(
             *defaultPregame(),
-            *defaultSetup()
+            *defaultHomeSetup(),
+            *defaultAwaySetup(endSetup = false)
         )
-        // Fake it, by moving all kickoff players back to Dogout after setup
+        // Fake it by moving all kickoff players back to Dogout after setup
         homeTeam.forEach {
             it.state = PlayerState.RESERVE
             it.location = DogOut
         }
         controller.rollForward(
+            EndSetup,
             *defaultKickOffHomeTeam(
+                selectKicker = null,
                 kickoffEvent = arrayOf(
                     DiceRollResults(6.d6, 6.d6), // Roll Officious Ref
                     1.d6, // Home team rolls

@@ -59,7 +59,7 @@ object PassingInterferenceStep: Procedure() {
                 .let { eligiblePlayers ->
                     if (eligiblePlayers.isNotEmpty()) {
                         listOf(
-                            SelectPlayer(eligiblePlayers.map { player -> player.id }),
+                            SelectPlayer.fromPlayers(eligiblePlayers),
                             CancelWhenReady
                         )
                     } else {

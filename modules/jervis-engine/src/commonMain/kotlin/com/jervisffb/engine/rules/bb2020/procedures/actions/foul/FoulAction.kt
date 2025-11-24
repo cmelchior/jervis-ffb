@@ -75,10 +75,10 @@ object FoulAction : Procedure() {
             val availableTargetPlayers = fouler.team.otherTeam().filter {
                 // You cannot foul your own players, so no need to check for STUNNED_OWN_TURN
                 it.location.isOnField(rules) && (it.state == PlayerState.PRONE || it.state == PlayerState.STUNNED)
-            }.map {
-                SelectPlayer(it)
+            }.let {
+                SelectPlayer.fromPlayers(it)
             }
-            return availableTargetPlayers + listOf(EndActionWhenReady)
+            return listOf(availableTargetPlayers, EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

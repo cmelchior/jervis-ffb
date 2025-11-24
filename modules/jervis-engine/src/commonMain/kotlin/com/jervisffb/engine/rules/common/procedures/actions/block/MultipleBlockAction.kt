@@ -390,7 +390,7 @@ object MultipleBlockAction: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             return listOf(
-                SelectPlayer(listOf(context.defender1!!.id, context.defender2!!.id)),
+                SelectPlayer.fromPlayers(listOf(context.defender1!!, context.defender2!!)),
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

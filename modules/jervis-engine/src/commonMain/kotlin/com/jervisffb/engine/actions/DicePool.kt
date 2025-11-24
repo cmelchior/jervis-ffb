@@ -1,5 +1,6 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.DieRoll
@@ -14,7 +15,7 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 sealed interface DicePool<D: DieResult, out T: DieRoll<D>> {
     // Unique identifier for the pool. This only needs to be unique within the
     // same action step
-    val id: Int
+    val id: DicePoolId
     // Which dice are part of the pool
     val dice: List<T>
     // How many dice from the pool should be selected in the end. This number
@@ -25,11 +26,11 @@ sealed interface DicePool<D: DieResult, out T: DieRoll<D>> {
 data class BlockDicePool(
     override val dice: List<BlockDieRoll>,
     override val selectDice: Int = 1,
-    override val id: Int = 0
+    override val id: DicePoolId = DicePoolId(0)
 ): DicePool<DBlockResult, DieRoll<DBlockResult>>
 
 data class D6DicePool(
     override val dice: List<D6DieRoll>,
     override val selectDice: Int = 1,
-    override val id: Int = 0,
+    override val id: DicePoolId = DicePoolId(0),
 ): DicePool<D6Result, DieRoll<D6Result>>

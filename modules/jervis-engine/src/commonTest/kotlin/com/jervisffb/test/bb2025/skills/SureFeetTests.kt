@@ -10,13 +10,13 @@ import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectSkillReroll
-import com.jervisffb.test.utils.firstInstanceOf
 import com.jervisffb.test.utils.getSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -83,7 +83,7 @@ class SureFeetTests: JervisGameBB2025Test() {
             1.d6, // Fail 2nd rush
         )
 
-        val availableRerolls = controller.getAvailableActions().firstInstanceOf<SelectRerollOption>()
+        val availableRerolls = controller.getAvailableActions().singleInstanceOf<SelectRerollOption>()
         assertEquals(1, availableRerolls.options.size)
         assertTrue(availableRerolls.options.first().getRerollSource(state) is RegularTeamReroll)
     }

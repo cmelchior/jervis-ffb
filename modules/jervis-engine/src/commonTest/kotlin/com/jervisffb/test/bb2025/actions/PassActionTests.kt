@@ -25,13 +25,13 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.tables.Range
+import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushTo
-import com.jervisffb.test.utils.firstInstanceOf
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -291,7 +291,7 @@ class PassActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             Confirm
         )
-        val targets = controller.getAvailableActions().firstInstanceOf<SelectFieldLocation>()
+        val targets = controller.getAvailableActions().singleInstanceOf<SelectFieldLocation>()
         assertTrue(targets.squares.all { it.type == TargetSquare.Type.THROW_TARGET })
         assertEquals(309, targets.squares.map { it.coordinate }.toSet().size)
     }
@@ -418,7 +418,7 @@ class PassActionTests: JervisGameBB2025Test() {
             6.d6, // Pass
             NoRerollSelected(),
         )
-        val interceptors = controller.getAvailableActions().firstInstanceOf<SelectPlayer>().players
+        val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(5, interceptors.size)
         controller.rollForward(
             PlayerSelected("H2".playerId),
@@ -441,7 +441,7 @@ class PassActionTests: JervisGameBB2025Test() {
             6.d6, // Pass
             NoRerollSelected(),
         )
-        val interceptors = controller.getAvailableActions().firstInstanceOf<SelectPlayer>().players
+        val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(5, interceptors.size)
 
         // Make some players invalid for selection
@@ -449,7 +449,7 @@ class PassActionTests: JervisGameBB2025Test() {
         homeTeam["H3".playerId].state = PlayerState.STUNNED
         homeTeam["H4".playerId].hasTackleZones = false
 
-        val modifiedInterceptors = controller.getAvailableActions().firstInstanceOf<SelectPlayer>().players
+        val modifiedInterceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(2, modifiedInterceptors.size)
     }
 

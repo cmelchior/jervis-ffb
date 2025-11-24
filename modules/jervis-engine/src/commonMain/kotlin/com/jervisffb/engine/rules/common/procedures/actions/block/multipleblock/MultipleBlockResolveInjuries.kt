@@ -56,11 +56,11 @@ object MultipleBlockResolveInjuries: Procedure() {
             val defender2Injury = context.defender2InjuryContext
 
             val injuredPlayers = buildList {
-                if (defender1Injury != null) add(context.defender1!!.id)
-                if (defender2Injury != null) add(context.defender2!!.id)
+                if (defender1Injury != null) add(context.defender1!!)
+                if (defender2Injury != null) add(context.defender2!!)
             }
             return if (injuredPlayers.isNotEmpty())
-                listOf(SelectPlayer(injuredPlayers))
+                listOf(SelectPlayer.fromPlayers(injuredPlayers))
             else {
                 listOf(ContinueWhenReady)
             }

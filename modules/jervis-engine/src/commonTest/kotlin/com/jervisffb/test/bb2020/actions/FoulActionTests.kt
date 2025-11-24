@@ -15,12 +15,12 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.firstInstanceOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -47,7 +47,7 @@ class FoulActionTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
         )
-        val targets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>()
+        val targets = controller.getAvailableActions().singleInstanceOf<SelectPlayer>()
         assertEquals(1, targets.size)
         assertEquals("H1".playerId, targets.players.first())
     }
@@ -58,7 +58,7 @@ class FoulActionTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
         )
-        val targets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>()
+        val targets = controller.getAvailableActions().singleInstanceOf<SelectPlayer>()
         assertEquals(1, targets.size)
         assertEquals("H1".playerId, targets.players.first())
     }
@@ -74,7 +74,7 @@ class FoulActionTests: JervisGameBB2020Test() {
             SmartMoveTo(13, 4),
         )
 
-        val targets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>()
+        val targets = controller.getAvailableActions().singleInstanceOf<SelectPlayer>()
         assertEquals(1, targets.size)
         assertEquals("H1".playerId, targets.players.first())
     }
