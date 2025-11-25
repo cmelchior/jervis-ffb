@@ -19,7 +19,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -137,7 +137,7 @@ object BlockAction : Procedure() {
             return when (action) {
                 is EndAction -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<BlockTypeSelected>(state, action) { typeSelected ->
+                    castAction<BlockTypeSelected>(action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
                             SetContext(context.copy(blockType = typeSelected.type)),

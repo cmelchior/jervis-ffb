@@ -15,7 +15,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -45,7 +45,7 @@ object PrayersToNuffleRoll : Procedure() {
             return listOf(RollDice(rules.prayersToNuffleTable.die))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<DieResult>(action) { dieRoll ->
+            return castDiceRoll<DieResult>(action) { dieRoll ->
                 val context = state.getContext<PrayersToNuffleRollContext>()
                 val result: PrayerToNuffle = rules.prayersToNuffleTable.roll(dieRoll)
 

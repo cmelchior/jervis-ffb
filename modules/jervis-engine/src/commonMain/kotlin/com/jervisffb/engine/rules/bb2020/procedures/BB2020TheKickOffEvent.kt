@@ -11,7 +11,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -53,7 +53,7 @@ object BB2020TheKickOffEvent {
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<PlayerSelected>(action) {
+            return castAction<PlayerSelected>(action) {
                 val player = it.getPlayer(state)
                 if (player.state == PlayerState.STANDING) {
                     return compositeCommandOf(

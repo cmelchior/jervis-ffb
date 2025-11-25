@@ -12,7 +12,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRollList
+import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -43,7 +43,7 @@ object StandardBlockRollDice: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
+            return castDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
                 val roll =
                     it.map { diceRoll: DBlockResult ->
                         BlockDieRoll.create(state, diceRoll)

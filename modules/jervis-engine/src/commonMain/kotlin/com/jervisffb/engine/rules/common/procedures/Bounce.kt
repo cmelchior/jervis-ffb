@@ -18,7 +18,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -54,7 +54,7 @@ object Bounce : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D8Result>(action) { d8 ->
+            return castDiceRoll<D8Result>(action) { d8 ->
                 val direction: Direction = rules.direction(d8)
                 val ball = state.currentBall()
                 val newLocation: FieldCoordinate = ball.location.move(direction, 1)

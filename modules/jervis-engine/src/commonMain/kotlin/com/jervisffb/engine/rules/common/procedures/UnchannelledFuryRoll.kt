@@ -23,7 +23,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ActivatePlayerContext
@@ -78,7 +78,7 @@ object UnchannelledFuryRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<ActivatePlayerContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()
                 val isSuccess = calculateSuccess(activateContext, d6)
                 val rollContext = UnchannelledFuryRollContext(
@@ -147,7 +147,7 @@ object UnchannelledFuryRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<UnchannelledFuryRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()
                 val rollResultContext = state.getContext<UnchannelledFuryRollContext>()
                 val isSuccess = calculateSuccess(activateContext, d6)

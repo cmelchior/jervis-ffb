@@ -13,7 +13,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -63,8 +63,7 @@ object KnuckleDusters : Procedure() {
                     )
                 }
                 else -> {
-                    return checkTypeAndValue<PlayerSelected>(state, action) {
-                        val context = state.getContext<PrayersToNuffleRollContext>()
+                    castAction<PlayerSelected>(action) {
                         val player = it.getPlayer(state)
                         compositeCommandOf(
                             AddPlayerSkill(

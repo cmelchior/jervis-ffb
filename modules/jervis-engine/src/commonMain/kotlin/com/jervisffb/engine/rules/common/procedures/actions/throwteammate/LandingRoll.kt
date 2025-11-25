@@ -20,7 +20,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -50,7 +50,7 @@ object LandingRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<LandingRollContext>().landingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<LandingRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.create(state, d6),
@@ -117,7 +117,7 @@ object LandingRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<LandingRollContext>().landingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val landingRollContext = state.getContext<LandingRollContext>()
                 val rerollResult = landingRollContext.copy(
                     roll = landingRollContext.roll!!.copyReroll(

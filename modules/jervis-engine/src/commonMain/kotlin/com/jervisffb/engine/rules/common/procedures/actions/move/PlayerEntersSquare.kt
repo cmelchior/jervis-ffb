@@ -21,7 +21,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
@@ -154,7 +154,7 @@ object MovePlayerIntoSquare : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<MovePlayerIntoSquareContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),

@@ -22,8 +22,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -59,7 +59,7 @@ object DodgySnack : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_ROLL_OFF, d6),
                     ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} ]"),
@@ -79,7 +79,7 @@ object DodgySnack : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_ROLL_OFF, d6),
                     ReportGameProgress("${state.receivingTeam.name} rolled [ ${d6.value} ]"),
@@ -117,7 +117,7 @@ object DodgySnack : Procedure() {
                 }
                 else -> {
                     val context = state.getContext<DodgySnackContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
+                    castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(kickingTeamPlayerSelected = player)),
@@ -138,7 +138,7 @@ object DodgySnack : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<DodgySnackContext>()
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.kickingTeamPlayerSelected!!
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_EFFECT, d6),
@@ -175,7 +175,7 @@ object DodgySnack : Procedure() {
                 }
                 else -> {
                     val context = state.getContext<DodgySnackContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
+                    castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(receivingTeamPlayerSelected = player)),
@@ -196,7 +196,7 @@ object DodgySnack : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<DodgySnackContext>()
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.receivingTeamPlayerSelected!!
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_EFFECT, d6),

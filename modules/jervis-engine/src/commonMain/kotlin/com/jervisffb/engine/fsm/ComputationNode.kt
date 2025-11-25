@@ -24,7 +24,7 @@ abstract class ComputationNode : ActionNode() {
     }
 
     override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-        return checkType<Continue>(action) {
+        return castAction<Continue>(action) {
             apply(state, rules)
         }
     }

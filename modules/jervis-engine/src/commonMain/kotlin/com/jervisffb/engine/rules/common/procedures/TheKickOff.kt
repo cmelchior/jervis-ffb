@@ -25,9 +25,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -108,13 +107,11 @@ object TheKickOff : Procedure() {
                     )
                 }
                 is PlayerSelected -> {
-                    checkType<PlayerSelected>(action) {
-                        compositeCommandOf(
-                            SetKickingPlayer(it.getPlayer(state)),
-                            ReportKickingPlayer(it.getPlayer(state)),
-                            GotoNode(PlaceTheKick),
-                        )
-                    }
+                    compositeCommandOf(
+                        SetKickingPlayer(action.getPlayer(state)),
+                        ReportKickingPlayer(action.getPlayer(state)),
+                        GotoNode(PlaceTheKick),
+                    )
                 }
                 else -> INVALID_GAME_STATE("Unsupported action: $action")
             }
@@ -133,7 +130,7 @@ object TheKickOff : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, action) {
+            return castAction<FieldSquareSelected>(action) {
                 val ball = state.balls.single()
                 compositeCommandOf(
                     SetBallState.inAir(ball),
@@ -244,7 +241,7 @@ object TheFUMBBLKickOff : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, action) {
+            return castAction<FieldSquareSelected>(action) {
                 val ball = state.balls.single()
                 compositeCommandOf(
                     SetBallState.inAir(ball),
@@ -263,7 +260,7 @@ object TheFUMBBLKickOff : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
+            return castDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.direction(d8)
                 val ball = state.currentBall()
                 val newLocation = ball.location.move(direction, d6.value)

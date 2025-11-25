@@ -18,7 +18,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -50,7 +50,7 @@ object DetermineKickingTeam : Procedure() {
             return listOf(com.jervisffb.engine.actions.SelectCoinSide)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<CoinSideSelected>(action) {
+            return castAction<CoinSideSelected>(action) {
                 compositeCommandOf(
                     SetContext(CoinTossContext(sideSelected = it.side)),
                     GotoNode(CoinToss),
@@ -63,7 +63,7 @@ object DetermineKickingTeam : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(TossCoin)
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<CoinTossResult>(action) { coinToss ->
+            return castAction<CoinTossResult>(action) { coinToss ->
                 val context = state.getContext<CoinTossContext>()
                 // It was the receiving team that selected the excepted coin result,
                 // so if it lands there, they get to choose first.

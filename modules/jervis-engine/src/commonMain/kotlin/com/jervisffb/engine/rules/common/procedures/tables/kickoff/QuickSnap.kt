@@ -22,8 +22,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.KickOffEventContext
@@ -58,7 +58,7 @@ object QuickSnap : Procedure() {
             return listOf(RollDice(Dice.D3))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUICK_SNAP, d3),
@@ -92,7 +92,7 @@ object QuickSnap : Procedure() {
             return when (action) {
                 EndSetup -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         val context = state.getContext<QuickSnapContext>()
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = it.getPlayer(state))),
@@ -119,7 +119,7 @@ object QuickSnap : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, action) { squareSelected ->
+            return castAction<FieldSquareSelected>(action) { squareSelected ->
                 val context = state.getContext<QuickSnapContext>()
                 return if (squareSelected.coordinate == context.currentPlayer!!.coordinates) {
                     // If the same field is selected, just treat the player as not having moved at all

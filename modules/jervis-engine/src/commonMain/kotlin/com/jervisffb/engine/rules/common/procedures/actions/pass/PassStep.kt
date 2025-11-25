@@ -22,7 +22,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -83,7 +83,7 @@ object PassStep: Procedure() {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    checkTypeAndValue<FieldSquareSelected>(state, action) {
+                    castAction<FieldSquareSelected>(action) {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower, it.coordinate)
                         val ball = context.thrower.ball!!

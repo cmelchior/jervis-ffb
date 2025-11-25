@@ -21,7 +21,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -74,7 +74,7 @@ object StandardMoveStep: Procedure() {
             return when (action) {
                 // If the player has not moved, this will not use their action
                 EndAction -> ExitProcedure()
-                else -> checkTypeAndValue<FieldSquareSelected>(state, action) {
+                else -> castAction<FieldSquareSelected>(action) {
                     compositeCommandOf(
                         SetContext(context.copy(target = it.coordinate, hasMoved = true)),
                         GotoNode(MovePlayer),

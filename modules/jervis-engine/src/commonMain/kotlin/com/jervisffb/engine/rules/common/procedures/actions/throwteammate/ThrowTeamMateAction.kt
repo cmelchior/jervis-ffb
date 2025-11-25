@@ -21,7 +21,6 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -168,29 +167,33 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return when (action) {
                 Continue, EndAction -> ExitProcedure()
-                is PlayerSelected -> checkTypeAndValue<PlayerSelected>(state, action) {
+                is PlayerSelected -> {
                     val context = state.getContext<ThrowTeamMateContext>()
-                    val thrownPlayer = it.getPlayer(state)
+                    val thrownPlayer = action.getPlayer(state)
                     val willCrashLand = !thrownPlayer.hasTackleZones
                         || thrownPlayer.state == PlayerState.PRONE
                         || thrownPlayer.state == PlayerState.STUNNED
                         || thrownPlayer.state == PlayerState.STUNNED_OWN_TURN
                     compositeCommandOf(
                         ReportPickingUpPlayerToThrow(context, thrownPlayer),
-                        SetContext(context.copy(
-                            thrownPlayer = thrownPlayer,
-                            willCrashLand = willCrashLand
-                        )),
+                        SetContext(
+                            context.copy(
+                                thrownPlayer = thrownPlayer,
+                                willCrashLand = willCrashLand
+                            )
+                        ),
                         GotoNode(ResolveThrowPlayer)
                     )
                 }
-                is MoveTypeSelected -> checkTypeAndValue<MoveTypeSelected>(state, action) { moveTypeAction ->
-                    val moveContext = MoveContext(context.thrower, moveTypeAction.moveType)
+
+                is MoveTypeSelected -> {
+                    val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
+
                 else -> INVALID_ACTION(action)
             }
         }

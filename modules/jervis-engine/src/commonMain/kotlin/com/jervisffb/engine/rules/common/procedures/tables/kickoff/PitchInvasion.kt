@@ -20,8 +20,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -32,7 +32,6 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.reports.ReportPitchInvasionRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.math.min
 
@@ -56,7 +55,7 @@ object PitchInvasion : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_FAN_FACTOR, d6),
@@ -72,7 +71,7 @@ object PitchInvasion : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PitchInvasionContext>()
                 val fanFactor = state.receivingTeam.fanFactor
                 val result = d6.value + fanFactor
@@ -96,7 +95,7 @@ object PitchInvasion : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
@@ -124,11 +123,7 @@ object PitchInvasion : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<RandomPlayersSelected>(action) { randomPlayersAction ->
-                        val requestedRandomPlayers = selectFromTeam(context.receivingPlayersAffected, state.receivingTeam, rules).first() as? SelectRandomPlayers
-                        if (requestedRandomPlayers != null && requestedRandomPlayers.count != randomPlayersAction.players.size) {
-                            INVALID_ACTION(action, "Wrong number of random players: ${randomPlayersAction.players.size} vs. ${requestedRandomPlayers.count}")
-                        }
+                    castAction<RandomPlayersSelected>(action) { randomPlayersAction ->
                         val playerCommands = randomPlayersAction.getPlayers(state).flatMap { player ->
                             listOf(
                                 SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
@@ -149,7 +144,7 @@ object PitchInvasion : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
@@ -176,11 +171,7 @@ object PitchInvasion : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<RandomPlayersSelected>(action) { randomPlayersAction ->
-                        val requestedRandomPlayers = selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules).first() as? SelectRandomPlayers
-                        if (requestedRandomPlayers != null && requestedRandomPlayers.count != randomPlayersAction.players.size) {
-                            INVALID_ACTION(action, "Wrong number of random players: ${randomPlayersAction.players.size} vs. ${requestedRandomPlayers.count}")
-                        }
+                    castAction<RandomPlayersSelected>(action) { randomPlayersAction ->
                         val playerCommands = randomPlayersAction.getPlayers(state).flatMap { player ->
                             listOf(
                                 SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),

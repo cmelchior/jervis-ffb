@@ -16,7 +16,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MoveContext
@@ -48,7 +48,7 @@ object RushStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is FieldSquareSelected -> {
-                    checkTypeAndValue<FieldSquareSelected>(state, action) {
+                    castAction<FieldSquareSelected>(action) {
                         val moveContext = state.getContext<MoveContext>()
                         val movingPlayer = moveContext.player
                         compositeCommandOf(

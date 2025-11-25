@@ -5,7 +5,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -13,7 +12,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportGameProgress
@@ -76,7 +75,7 @@ object HighKick : Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         compositeCommandOf(
                             SetPlayerLocation(it.getPlayer(state), state.currentBall().location),
                             ReportGameProgress("${it.getPlayer(state).name} had time to move under the ball due to a High Kick"),

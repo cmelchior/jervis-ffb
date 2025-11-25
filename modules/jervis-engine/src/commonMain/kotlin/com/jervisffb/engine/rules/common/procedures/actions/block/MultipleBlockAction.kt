@@ -27,7 +27,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
@@ -303,7 +303,7 @@ object MultipleBlockAction: Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<BlockTypeSelected>(state, action) { typeSelected ->
+                    castAction<BlockTypeSelected>(action) { typeSelected ->
                         val type = typeSelected.type
                         val updatedContext = context.copyAndSetBlockTypeForActiveDefender(type)
                         compositeCommandOf(
@@ -394,7 +394,7 @@ object MultipleBlockAction: Procedure() {
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
+            return castAction<PlayerSelected>(action) { playerSelected ->
                 val context = state.getContext<MultipleBlockContext>()
                 val activeDefenderIndex = when (val player = playerSelected.getPlayer(state)) {
                     context.defender1 -> 0

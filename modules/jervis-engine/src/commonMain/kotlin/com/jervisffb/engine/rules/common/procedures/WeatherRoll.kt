@@ -12,7 +12,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -41,7 +41,7 @@ object WeatherRoll : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
+            return castDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
                 val weather: Weather = rules.weatherTable.roll(firstD6, secondD6)
                 // We just store the weather type and let affected procedures handle the
                 // effect of it.

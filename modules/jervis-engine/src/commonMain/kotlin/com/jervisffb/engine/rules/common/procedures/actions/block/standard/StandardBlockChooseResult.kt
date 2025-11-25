@@ -12,7 +12,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDicePool
+import com.jervisffb.engine.fsm.castDicePool
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -51,7 +51,7 @@ object StandardBlockChooseResult: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDicePool<DBlockResult>(action) { selectedDie ->
+            return castDicePool<DBlockResult>(action) { selectedDie ->
                 val context = state.getContext<BlockContext>()
                 var selectedIndex = -1
                 for (i in context.roll.indices) {

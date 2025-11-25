@@ -21,7 +21,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.RushRollContext
@@ -121,7 +121,7 @@ object RushRoll: Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RushRollContext>()
                 val success = isRushSuccess(d6, context.modifiers)
                 compositeCommandOf(
@@ -197,7 +197,7 @@ object RushRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val rushContext = state.getContext<RushRollContext>()
                 val rerollContext = state.rerollContext!!
                 val rerollResult = rushContext.copy(

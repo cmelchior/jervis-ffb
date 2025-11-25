@@ -30,7 +30,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -417,7 +417,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
-            return checkTypeAndValue<DirectionSelected>(state, action) { squareSelected ->
+            return castAction<DirectionSelected>(action) { squareSelected ->
                 val context = state.getContext<PushContext>()
                 val origin = context.pushee().coordinates
                 val target = origin.move(squareSelected.direction, 1)

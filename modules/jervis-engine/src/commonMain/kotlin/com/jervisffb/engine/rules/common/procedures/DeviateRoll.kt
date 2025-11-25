@@ -14,7 +14,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
@@ -55,7 +55,7 @@ object DeviateRoll : Procedure() {
             return listOf(RollDice(Dice.D8, Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
+            return castDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val context = state.getContext<DeviateRollContext>()
                 val direction = rules.direction(d8)
                 val distance = d6.value

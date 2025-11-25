@@ -29,7 +29,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
@@ -111,7 +111,7 @@ object DodgeRoll: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<DodgeRollContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
@@ -417,7 +417,7 @@ object DodgeRoll: Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val dodgeContext = state.getContext<DodgeRollContext>()
                 val rerollContext = state.rerollContext!!
                 val rerolledDodgeRoll = dodgeContext.copy(

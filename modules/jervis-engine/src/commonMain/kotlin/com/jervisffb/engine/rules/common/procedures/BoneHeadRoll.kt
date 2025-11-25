@@ -24,7 +24,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ActivatePlayerContext
@@ -78,7 +78,7 @@ object BoneHeadRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<ActivatePlayerContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()
                 val isSuccess = calculateSuccess(d6)
                 val rollContext = BoneHeadRollContext(
@@ -147,7 +147,7 @@ object BoneHeadRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<BoneHeadRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()
                 val rollResultContext = state.getContext<BoneHeadRollContext>()
                 val isSuccess = calculateSuccess(d6)

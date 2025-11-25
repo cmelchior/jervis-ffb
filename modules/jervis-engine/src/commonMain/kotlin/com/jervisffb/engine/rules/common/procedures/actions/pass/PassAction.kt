@@ -22,7 +22,6 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -131,8 +130,8 @@ object PassAction : Procedure() {
                     GotoNode(ResolveThrow)
                 }
                 Continue, EndAction -> ExitProcedure()
-                is MoveTypeSelected -> checkTypeAndValue<MoveTypeSelected>(state, action) { moveTypeAction ->
-                    val moveContext = MoveContext(context.thrower, moveTypeAction.moveType)
+                is MoveTypeSelected -> {
+                    val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
                         SetContext(moveContext),
                         GotoNode(ResolveMove)

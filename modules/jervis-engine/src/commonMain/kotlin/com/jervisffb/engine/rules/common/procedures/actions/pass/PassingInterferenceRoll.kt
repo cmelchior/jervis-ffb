@@ -20,7 +20,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.PassingInterferenceRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -52,7 +52,7 @@ object PassingInterferenceRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassingInterferenceRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<PassingInterferenceRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.Companion.create(state, d6),
@@ -119,7 +119,7 @@ object PassingInterferenceRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassingInterferenceRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PassingInterferenceRollContext>()
                 val rerollResult = context.copy(
                     roll = context.roll!!.copyReroll(

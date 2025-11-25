@@ -5,7 +5,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -14,7 +13,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -61,7 +60,7 @@ object GreasyCleats : Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         compositeCommandOf(
                             AddPlayerStatModifier(it.getPlayer(state), PrayerStatModifier.GREASY_CLEATS),
                             SetContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),

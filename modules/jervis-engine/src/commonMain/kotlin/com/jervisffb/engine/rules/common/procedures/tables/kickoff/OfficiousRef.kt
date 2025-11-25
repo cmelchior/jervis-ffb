@@ -20,8 +20,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -71,7 +71,7 @@ object OfficiousRef : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
                 val result =  d6.value + fanFactor
                 compositeCommandOf(
@@ -97,7 +97,7 @@ object OfficiousRef : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.receivingTeam.fanFactor
                 val result =  d6.value + fanFactor
                 compositeCommandOf(
@@ -131,7 +131,7 @@ object OfficiousRef : Procedure() {
                 Continue -> GotoNode(SelectPlayerFromKickingTeam)
                 else -> {
                     val context = state.getContext<OfficiousRefContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
+                    castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(kickingTeamPlayerSelected = player)),
@@ -152,7 +152,7 @@ object OfficiousRef : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<OfficiousRefContext>()
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.kickingTeamPlayerSelected!!
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),
@@ -187,7 +187,7 @@ object OfficiousRef : Procedure() {
                 }
                 else -> {
                     val context = state.getContext<OfficiousRefContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
+                    castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(receivingTeamPlayerSelected = player)),
@@ -208,7 +208,7 @@ object OfficiousRef : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<OfficiousRefContext>()
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.receivingTeamPlayerSelected!!
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),

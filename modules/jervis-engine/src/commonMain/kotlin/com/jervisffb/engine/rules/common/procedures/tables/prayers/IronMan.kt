@@ -14,7 +14,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -63,10 +63,10 @@ object IronMan : Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
-                        return compositeCommandOf(
+                        compositeCommandOf(
                             AddPlayerStatModifier(player, PrayerStatModifier.IRON_MAN),
                             SetContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Iron Man (+1 AV)"),

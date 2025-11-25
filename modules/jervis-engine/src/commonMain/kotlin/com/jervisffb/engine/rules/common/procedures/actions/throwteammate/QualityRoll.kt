@@ -21,8 +21,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -57,7 +56,7 @@ object QualityRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateThrowTeamMateContext(state, rules, d6, false)
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUALITY, d6),
@@ -120,7 +119,7 @@ object QualityRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<ThrowTeamMateContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateThrowTeamMateContext(state, rules, d6, true)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUALITY, d6),

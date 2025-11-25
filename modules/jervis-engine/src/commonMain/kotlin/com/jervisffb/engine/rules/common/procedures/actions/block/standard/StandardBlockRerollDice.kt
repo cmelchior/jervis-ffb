@@ -16,7 +16,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRollList
+import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -66,7 +66,7 @@ object StandardBlockRerollDice: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRollList<DBlockResult>(action) { rerolls: List<DBlockResult> ->
+            return castDiceRollList<DBlockResult>(action) { rerolls: List<DBlockResult> ->
                 val rerollContext = state.rerollContext!!
                 val blockContext = state.getContext<BlockContext>()
                 val updatedRoll = blockContext.roll.mapIndexed { i, blockRoll: BlockDieRoll ->

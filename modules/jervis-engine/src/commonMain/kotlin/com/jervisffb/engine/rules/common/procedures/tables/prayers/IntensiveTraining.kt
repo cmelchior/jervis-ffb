@@ -17,8 +17,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -68,8 +67,8 @@ object IntensiveTraining : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<PlayerSelected>(action) {
-                        return compositeCommandOf(
+                    castAction<PlayerSelected>(action) {
+                        compositeCommandOf(
                             SetContext(IntensiveTrainingContext(it.getPlayer(state))),
                             GotoNode(SelectSkill)
                         )
@@ -89,7 +88,7 @@ object IntensiveTraining : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<SkillSelected>(state, action) {
+            return castAction<SkillSelected>(action) {
                 val context = state.getContext<IntensiveTrainingContext>()
                 val skill = rules.createSkill(context.player, it.skill, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(

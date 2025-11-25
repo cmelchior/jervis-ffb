@@ -24,8 +24,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -80,7 +80,7 @@ object SolidDefense : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SOLID_DEFENSE, d3),
@@ -117,7 +117,7 @@ object SolidDefense : Procedure() {
             return when (action) {
                 EndSetup -> GotoNode(EndSetupAndValidate)
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         val context = state.getContext<SolidDefenseContext>()
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = it.getPlayer(state))),
@@ -148,7 +148,7 @@ object SolidDefense : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, action) { squareSelected ->
+            return castAction<FieldSquareSelected>(action) { squareSelected ->
                 when (state.kickingTeam.isHomeTeam()) {
                     true -> if (squareSelected.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
                     false -> if (squareSelected.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)

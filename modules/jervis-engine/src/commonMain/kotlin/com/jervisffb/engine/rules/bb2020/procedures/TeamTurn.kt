@@ -27,7 +27,6 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -113,12 +112,10 @@ object TeamTurn : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is PlayerSelected -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
-                        compositeCommandOf(
-                            SetContext(ActivatePlayerContext(playerSelected.getPlayer(state))),
-                            GotoNode(ActivatePlayer),
-                        )
-                    }
+                    compositeCommandOf(
+                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
+                        GotoNode(ActivatePlayer),
+                    )
                 }
                 // We actually scored in the previous turn, but for some odd reason, the rulebook defines it
                 // as happening in the next turn (where the team is active).

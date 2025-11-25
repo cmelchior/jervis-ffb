@@ -17,8 +17,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkDiceRollList
+import com.jervisffb.engine.fsm.castDiceRoll
+import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
@@ -66,7 +66,7 @@ object ThrowIn : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<ThrowInContext>()
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
                 val ball = context.ball
@@ -88,7 +88,7 @@ object ThrowIn : Procedure() {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRollList<D6Result>(action) { dice ->
+            return castDiceRollList<D6Result>(action) { dice ->
                 assert(dice.size == 2)
                 val context = state.getContext<ThrowInContext>()
                 val distance = dice.sum()

@@ -21,7 +21,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -77,7 +77,7 @@ object PassingInterferenceStep: Procedure() {
             return when (action) {
                 Continue, Cancel -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
+                    castAction<PlayerSelected>(action) {
                         val context = state.getContext<PassingInterferenceContext>()
                         compositeCommandOf(
                             SetContext(context.copy(interferencePlayer = it.getPlayer(state))),

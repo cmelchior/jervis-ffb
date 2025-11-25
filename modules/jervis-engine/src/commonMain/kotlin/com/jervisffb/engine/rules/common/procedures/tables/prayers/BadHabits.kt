@@ -19,8 +19,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -36,7 +36,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlin.math.min
 
 /**
@@ -60,7 +59,7 @@ object BadHabits : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 // Figure out how many players match the roll, if less players are available,
                 // Use the lower of the dice roll or number of players available
                 val prayerContext = state.getContext<PrayersToNuffleRollContext>()
@@ -97,13 +96,8 @@ object BadHabits : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<RandomPlayersSelected>(action) {
+                    castAction<RandomPlayersSelected>(action) {
                         val prayerContext = state.getContext<PrayersToNuffleRollContext>()
-                        val badHabitsContext = state.getContext<BadHabitsContext>()
-                        if (it.players.size != badHabitsContext.mustSelectPlayers) {
-                            INVALID_ACTION(action,"Wrong number of players selected: ${it.players.size} vs. ${badHabitsContext.mustSelectPlayers}")
-                        }
-
                         val addLonerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
                                 ReportGameProgress("${player.name} received Loner (2+)"),

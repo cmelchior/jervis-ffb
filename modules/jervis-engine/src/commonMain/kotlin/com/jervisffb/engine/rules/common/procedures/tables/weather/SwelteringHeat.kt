@@ -18,8 +18,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -54,7 +54,7 @@ object SwelteringHeat : Procedure() {
             return listOf(RollDice(Dice.D3))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
                     SetContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
@@ -73,7 +73,7 @@ object SwelteringHeat : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<RandomPlayersSelected>(action) {
+            return castAction<RandomPlayersSelected>(action) {
                 val playersRemoved = it.getPlayers(state).flatMap { player ->
                     listOf(
                         SetPlayerState(player, PlayerState.FAINTED),
@@ -96,7 +96,7 @@ object SwelteringHeat : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
                     SetContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
@@ -115,7 +115,7 @@ object SwelteringHeat : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<RandomPlayersSelected>(action) {
+            return castAction<RandomPlayersSelected>(action) {
                 val playersRemoved = it.getPlayers(state).flatMap { player ->
                     listOf(
                         SetPlayerState(player, PlayerState.FAINTED),

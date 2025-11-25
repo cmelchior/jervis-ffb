@@ -12,7 +12,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRollList
+import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -62,7 +62,7 @@ object ScatterRoll : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRollList<D8Result>(action) { dice: List<D8Result> ->
+            return castDiceRollList<D8Result>(action) { dice: List<D8Result> ->
                 assert(dice.size == 3)
                 val context = state.getContext<ScatterRollContext>()
                 var scatteredLocation = context.from

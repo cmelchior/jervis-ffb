@@ -15,7 +15,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MultipleBlockContext
@@ -77,7 +77,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                     }
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
+                    castAction<PlayerSelected>(action) { playerSelected ->
                         val context = state.getContext<MultipleBlockContext>()
                         val selectedPlayer = playerSelected.getPlayer(state)
                         val index = when (selectedPlayer) {

@@ -19,7 +19,6 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -85,13 +84,11 @@ object FoulAction : Procedure() {
             return when (action) {
                 is EndAction -> ExitProcedure()
                 is PlayerSelected -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
-                        val context = state.getContext<FoulContext>()
-                        compositeCommandOf(
-                            SetContext(context.copy(victim = action.getPlayer(state))),
-                            GotoNode(MoveOrFoulOrEndAction)
-                        )
-                    }
+                    val context = state.getContext<FoulContext>()
+                    compositeCommandOf(
+                        SetContext(context.copy(victim = action.getPlayer(state))),
+                        GotoNode(MoveOrFoulOrEndAction)
+                    )
                 }
                 else -> INVALID_ACTION(action)
             }

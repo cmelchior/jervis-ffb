@@ -13,7 +13,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -38,7 +38,7 @@ object FanFactorRolls : Procedure() {
             return listOf(RollDice(Dice.D3))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D3Result>(action) { d3 ->
+            return castDiceRoll<D3Result>(action) { d3 ->
                 val dedicatedFans = state.homeTeam.dedicatedFans
                 val total = d3.value + dedicatedFans
                 compositeCommandOf(
@@ -58,7 +58,7 @@ object FanFactorRolls : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val dedicatedFans = state.awayTeam.dedicatedFans
-            return checkDiceRoll<D3Result>(action) {
+            return castDiceRoll<D3Result>(action) {
                 val total = it.value + dedicatedFans
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.FAN_FACTOR, it),

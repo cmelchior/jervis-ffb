@@ -16,7 +16,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BrilliantCoachingContext
@@ -46,7 +46,7 @@ object BrilliantCoaching : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
                     SetContext(BrilliantCoachingContext(d6, state.kickingTeam.brilliantCoachingModifiers)),
@@ -62,7 +62,7 @@ object BrilliantCoaching : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
                     SetContext(state.getContext<BrilliantCoachingContext>().copy(receivingTeamRoll = d6, receivingTeamModifiers = state.receivingTeam.brilliantCoachingModifiers)),

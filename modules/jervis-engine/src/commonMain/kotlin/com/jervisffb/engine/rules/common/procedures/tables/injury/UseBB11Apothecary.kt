@@ -22,7 +22,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -108,7 +108,7 @@ object UseBB11Apothecary: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D16Result>(action) { d16 ->
+            return castDiceRoll<D16Result>(action) { d16 ->
                 val context = state.getContext<RiskingInjuryContext>()
                 val result = rules.casualtyTable.roll(d16)
                 compositeCommandOf(
@@ -130,7 +130,7 @@ object UseBB11Apothecary: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) { d6 ->
+            return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RiskingInjuryContext>()
                 val result = rules.lastingInjuryTable.roll(d6)
                 compositeCommandOf(

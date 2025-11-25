@@ -10,7 +10,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkDicePool
+import com.jervisffb.engine.fsm.castDicePool
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MultipleBlockContext
@@ -50,7 +50,7 @@ object MultipleBlockChoseResults: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDicePool<DBlockResult, DBlockResult>(action) { pool1Die, pool2Die ->
+            return castDicePool<DBlockResult, DBlockResult>(action) { pool1Die, pool2Die ->
                 val context = state.getContext<MultipleBlockContext>()
                 val updatedRoll1 = context.roll1!!.setSelectedDieResult(pool1Die)
                 val updatedRoll2 = context.roll2!!.setSelectedDieResult(pool2Die)

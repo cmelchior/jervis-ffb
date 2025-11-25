@@ -27,8 +27,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkType
-import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -79,7 +78,7 @@ object SetupTeam : Procedure() {
             return when (action) {
                 EndSetup -> GotoNode(EndSetupAndValidate)
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
+                    castAction<PlayerSelected>(action) { playerSelected ->
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = playerSelected.getPlayer(state))),
                             GotoNode(PlacePlayer),
@@ -123,18 +122,16 @@ object SetupTeam : Procedure() {
                     )
                 }
                 is FieldSquareSelected -> {
-                    checkTypeAndValue<FieldSquareSelected>(state, action) {
-                        when (context.team.isHomeTeam()) {
-                            true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
-                            false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
-                        }
-                        compositeCommandOf(
-                            SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
-                            SetPlayerState(player, PlayerState.STANDING),
-                            SetContext(context.copy(currentPlayer = null)),
-                            GotoNode(SelectPlayerOrEndSetup),
-                        )
+                    when (context.team.isHomeTeam()) {
+                        true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
+                        false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
                     }
+                    compositeCommandOf(
+                        SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
+                        SetPlayerState(player, PlayerState.STANDING),
+                        SetContext(context.copy(currentPlayer = null)),
+                        GotoNode(SelectPlayerOrEndSetup),
+                    )
                 }
                 else -> INVALID_ACTION(action)
             }
@@ -170,7 +167,7 @@ object SetupTeam : Procedure() {
             return listOf(ConfirmWhenReady)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<Confirm>(action) {
+            return castAction<Confirm>(action) {
                 GotoNode(SelectPlayerOrEndSetup)
             }
         }
