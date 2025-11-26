@@ -252,11 +252,11 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
     }
 }
 
-fun List<Skill<*>>.getRerollOptions(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
+fun List<Skill<*>>.getRerollOptions(state: Game, type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
     return this.asSequence().filter { it is RerollSource }
         .map { it as RerollSource }
         .filter { !it.rerollUsed }
-        .filter { it.canReroll(type, listOf(roll), successOnFirstRoll) }
+        .filter { it.canReroll(state, type, listOf(roll), successOnFirstRoll) }
         .flatMap { it: RerollSource -> it.calculateRerollOptions(type, roll, successOnFirstRoll) }
         .toList()
 }
@@ -278,6 +278,7 @@ fun calculateAvailableRerollsFor(
 
     // Check any skills available to the player
     val skillRerolls: List<DiceRerollOption> = player.skills.getRerollOptions(
+        player.team.game,
         type,
         roll,
         firstRollWasSuccess

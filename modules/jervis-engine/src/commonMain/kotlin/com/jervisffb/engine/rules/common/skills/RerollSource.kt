@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.common.skills
 
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
@@ -14,7 +15,12 @@ interface RerollSource {
     val rerollProcedure: Procedure
 
     // Returns `true` if `calculateRerollOptions` will return a non-empty list
-    fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean? = null): Boolean
+    fun canReroll(
+        state: Game,
+        type: DiceRollType,
+        value: List<DieRoll<*>>,
+        wasSuccess: Boolean? = null
+    ): Boolean
 
     fun calculateRerollOptions(
         // What kind of dice roll

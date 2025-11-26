@@ -101,7 +101,7 @@ object StandardBlockRerollDice: Procedure() {
             attackingPlayer.skills
                 .filter { skill: Skill<*> -> skill is RerollSource }
                 .map { it as RerollSource }
-                .filter { it.canReroll(DiceRollType.BLOCK, diceRoll) }
+                .filter { it.canReroll(attackingPlayer.team.game, DiceRollType.BLOCK, diceRoll) }
                 .flatMap { it.calculateRerollOptions(DiceRollType.BLOCK, diceRoll) }
 
         val team = attackingPlayer.team

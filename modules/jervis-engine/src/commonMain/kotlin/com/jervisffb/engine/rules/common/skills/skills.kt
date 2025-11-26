@@ -18,6 +18,7 @@ sealed interface TeamReroll : RerollSource {
         get() = UseTeamReroll
 
     override fun canReroll(
+        state: Game,
         type: DiceRollType,
         value: List<DieRoll<*>>,
         wasSuccess: Boolean?,

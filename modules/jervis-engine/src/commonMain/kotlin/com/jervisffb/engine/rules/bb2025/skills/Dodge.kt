@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2025.skills
 
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
@@ -39,7 +40,7 @@ class Dodge(
         SkillKeyword.ELITE,
     )
 
-    override fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
+    override fun canReroll(state: Game, type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         return type == DiceRollType.DODGE
     }
 }
