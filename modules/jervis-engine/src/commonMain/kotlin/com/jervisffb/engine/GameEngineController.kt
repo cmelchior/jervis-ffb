@@ -51,11 +51,16 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * @param validateActions If `true`, all actions will be validated against [getAvailableActions]
  * before [ActionNode.applyAction] is called. Illegal or invalid actions will throw an
  * [InvalidActionException].
+ * @param cacheActionDescriptor If `true`, the result of [getAvailableActions] will be cached
+ * and reused for subsequent calls to [getAvailableActions]. This can be useful if
+ * [getAvailableActions] is called frequently, but the result is not expected to change.
+ * This should be `false` during unit tests as they are expected to modify the result.
  */
 class GameEngineController(
     state: Game,
     private val initialActions: List<GameAction> = emptyList(),
     private val validateActions: Boolean = true,
+    private val cacheActionDescriptor: Boolean = false,
 ) {
 
     companion object {
@@ -127,7 +132,7 @@ class GameEngineController(
      * current [Node] as well as who is responsible for providing it.
      */
     fun getAvailableActions(): ActionRequest {
-        if (cachedActionRequest?.id == currentActionIndex()) {
+        if (cacheActionDescriptor && cachedActionRequest?.id == currentActionIndex()) {
             return cachedActionRequest!!
         }
         if (stack.isEmpty()) return ActionRequest(nextActionIndex(), null, emptyList())
@@ -137,7 +142,9 @@ class GameEngineController(
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
         return ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions).also {
-            cachedActionRequest = it
+            if (cacheActionDescriptor) {
+                cachedActionRequest = it
+            }
         }
     }
 

@@ -35,7 +35,7 @@ abstract class JervisGameBB2025Test {
         state = createDefaultGameStateBB2025(rules, homeTeam, awayTeam)
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
-        controller = GameEngineController(state)
+        controller = GameEngineController(state, cacheActionDescriptor = false)
         controller.startTestMode(FullGame)
     }
 
