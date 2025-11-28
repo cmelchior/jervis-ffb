@@ -22,6 +22,9 @@ import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2025.createDefaultGameStateBB2025
+import com.jervisffb.utils.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -35,71 +38,76 @@ import kotlin.test.fail
  *
  * For now, this class has to be run manually.
  *
- * Note: If running many tests, there will be a huge performance penalty by
- * raising the log level to `Assert` in [com.jervisffb.utils.jervisLogger]
+ * Some notes about performance:
+ * - The log-level can have a huge impact on performance when running these
+ *   tests. It is recommended to set it to `Assert` in [com.jervisffb.utils.DEFAULT_LOG_LEVEL]
+ * - Disabling checking the validity can also help. See [GameEngineController] constructor.
+ * - The tests are highly parallizable, but memory can be an issue
  **/
 @Ignore // Comment out to run
 class FuzzTester {
 
     @Test
     fun runRandomBB2020Games() {
-        val games = 100
-        repeat(games) { gameNo ->
-            val seed = Random.nextLong()
+        runFuzzTest(games = 1000, batchSize = 100) { _: Int, seed: Long ->
             val random = Random(seed)
             val state = createDefaultGameStateBB2020(StandardBB2020Rules())
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
-            try {
-                while (controller.stack.isNotEmpty()) {
-                    val availableActions = controller.getAvailableActions()
-                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
-                    controller.handleAction(userAction)
-                }
-            } catch (e: Exception) {
-                fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+            while (controller.stack.isNotEmpty()) {
+                val availableActions = controller.getAvailableActions()
+                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                controller.handleAction(userAction)
             }
         }
     }
 
     @Test
     fun runRandomBB2025Games() {
-        val games = 10000
-        repeat(games) { gameNo ->
+        runFuzzTest(games = 100_000, batchSize = 5_000) { _, seed->
             val seed = Random.nextLong()
             val random = Random(seed)
             val state = createDefaultGameStateBB2025(StandardBB2025Rules())
-            val controller = GameEngineController(state)
+            val controller = GameEngineController(state, validateActions = false)
             controller.startManualMode(logAvailableActions = false)
-            try {
-                while (controller.stack.isNotEmpty()) {
-                    val availableActions = controller.getAvailableActions()
-                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
-                    controller.handleAction(userAction)
-                }
-            } catch (e: Exception) {
-                fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+            while (controller.stack.isNotEmpty()) {
+                val availableActions = controller.getAvailableActions()
+                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                controller.handleAction(userAction)
             }
         }
     }
 
     @Test
     fun runRandomBB7Games() {
-        val games = 100
-        repeat(games) { gameNo ->
-            val seed = Random.nextLong()
+        runFuzzTest(games = 1000, batchSize = 100) { gameNo, seed ->
             val random = Random(seed)
             val state = createDefaultGameStateBB2020(BB72020Rules())
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
-            try {
-                while (controller.stack.isNotEmpty()) {
-                    val availableActions = controller.getAvailableActions()
-                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
-                    controller.handleAction(userAction)
+            while (controller.stack.isNotEmpty()) {
+                val availableActions = controller.getAvailableActions()
+                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                controller.handleAction(userAction)
+            }
+        }
+    }
+
+    private fun runFuzzTest(games: Int = 100_000, batchSize: Int = 5_000, testFunc: (gameNo: Int, randomSeed: Long) -> Unit) {
+        runBlocking(Dispatchers.Default) {
+            (0 until games step batchSize).forEach { startIndex ->
+                launch {
+                    val endIndex = (startIndex + batchSize).coerceAtMost(games)
+                    for (gameNo in startIndex until endIndex) {
+                        val seed = Random.nextLong()
+                        try {
+                            testFunc(gameNo, seed)
+                        } catch (e: Exception) {
+                            fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+                        }
+
+                    }
                 }
-            } catch (e: Exception) {
-                fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
             }
         }
     }

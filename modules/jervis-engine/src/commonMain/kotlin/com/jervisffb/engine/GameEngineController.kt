@@ -88,6 +88,7 @@ class GameEngineController(
     val history: List<GameDelta> = _history
     private var lastGameActionId: GameActionId = GameActionId(0)
     private var deltaBuilder = DeltaBuilder(lastGameActionId + 1)
+    private var cachedActionRequest: ActionRequest? = null
     val state: Game = state
     val stack: MutableProcedureStack = state.stack // Shortcut for accessing the stack
     var actionMode = ActionMode.NOT_STARTED
@@ -126,13 +127,18 @@ class GameEngineController(
      * current [Node] as well as who is responsible for providing it.
      */
     fun getAvailableActions(): ActionRequest {
+        if (cachedActionRequest?.id == currentActionIndex()) {
+            return cachedActionRequest!!
+        }
         if (stack.isEmpty()) return ActionRequest(nextActionIndex(), null, emptyList())
         if (stack.currentNode() !is ActionNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        return ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions)
+        return ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions).also {
+            cachedActionRequest = it
+        }
     }
 
     /**
@@ -148,6 +154,7 @@ class GameEngineController(
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }
         try {
+            cachedActionRequest = null
             when (action) {
                 is Undo -> {
                     if (isUndoAvailable(null)) {
