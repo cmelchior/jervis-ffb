@@ -72,6 +72,7 @@ object TeamTurn : Procedure() {
         return compositeCommandOf(
             SetCanUseTeamRerolls(true),
             SetTurnMarker(state.activeTeamOrThrow(), turn),
+            // TODO Why are we setting these at the beginning of the turn, and not the end?
             getResetTurnActionCommands(state, rules),
             *resetPlayerTemporaryStats(state, rules),
             *getResetAvailablePlayers(state, rules),

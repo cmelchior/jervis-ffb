@@ -79,8 +79,17 @@ class TeamTurnData(private val game: Game) {
             PlayerStandardActionType.THROW_TEAM_MATE to 0,
             PlayerStandardActionType.SECURE_THE_BALL to 0,
         )
-
     val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
+    val usedStandardActions = mutableMapOf(
+        PlayerStandardActionType.MOVE to 0,
+        PlayerStandardActionType.PASS to 0,
+        PlayerStandardActionType.HAND_OFF to 0,
+        PlayerStandardActionType.BLOCK to 0,
+        PlayerStandardActionType.BLITZ to 0,
+        PlayerStandardActionType.FOUL to 0,
+        PlayerStandardActionType.THROW_TEAM_MATE to 0,
+        PlayerStandardActionType.SECURE_THE_BALL to 0,
+    )
 }
 
 /**

@@ -38,6 +38,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
@@ -73,10 +74,11 @@ fun Sidebar(
                 }
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                        Reserves(vm.reserves(), vm.sharedFieldData) {
+                        Reserves(vm.gameViewModel,vm.reserves(), vm.sharedFieldData) {
                             vm.hoverExit()
                         }
                         Injuries(
+                            vm.gameViewModel,
                             showIfEmpty = false,
                             vm.sharedFieldData,
                             vm.knockedOut(),
@@ -164,16 +166,22 @@ private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> 
 }
 
 @Composable
-private fun Reserves(reserves: Flow<List<UiSidebarPlayer>>, sharedData: LocalFieldDataWrapper, onExit: () -> Unit) {
+private fun Reserves(
+    screenModel: GameScreenModel,
+    reserves: Flow<List<UiSidebarPlayer>>,
+    sharedData: LocalFieldDataWrapper,
+    onExit: () -> Unit
+) {
     val list: List<UiSidebarPlayer> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
-        PlayerSection(list, sharedData, compactView = false, onExit = onExit)
+        PlayerSection(screenModel, list, sharedData, compactView = false, onExit = onExit)
     }
 }
 
 @Composable
 private fun Injuries(
+    screenModel: GameScreenModel,
     showIfEmpty: Boolean,
     sharedFieldData: LocalFieldDataWrapper,
     knockedOut: Flow<List<UiSidebarPlayer>>,
@@ -192,27 +200,27 @@ private fun Injuries(
         val specialList: List<UiSidebarPlayer> by special.collectAsState(emptyList())
         if (knockedOutList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Knocked Out")
-            PlayerSection(knockedOutList, sharedFieldData)
+            PlayerSection(screenModel, knockedOutList, sharedFieldData)
         }
         if (badlyHurtList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Badly Hurt")
-            PlayerSection(badlyHurtList, sharedFieldData)
+            PlayerSection(screenModel, badlyHurtList, sharedFieldData)
         }
         if (seriousInjuryList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Seriously Injured")
-            PlayerSection(seriousInjuryList, sharedFieldData)
+            PlayerSection(screenModel, seriousInjuryList, sharedFieldData)
         }
         if (deadList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Dead")
-            PlayerSection(deadList, sharedFieldData)
+            PlayerSection(screenModel, deadList, sharedFieldData)
         }
         if (bannedList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Banned")
-            PlayerSection(bannedList, sharedFieldData)
+            PlayerSection(screenModel, bannedList, sharedFieldData)
         }
         if (specialList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Special")
-            PlayerSection(specialList, sharedFieldData)
+            PlayerSection(screenModel, specialList, sharedFieldData)
         }
     }
 }
@@ -225,7 +233,13 @@ private fun Injuries(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun PlayerSection(list: List<UiSidebarPlayer>, sharedFieldData: LocalFieldDataWrapper, compactView: Boolean = true, onExit: () -> Unit = {}) {
+private fun PlayerSection(
+    screenModel: GameScreenModel,
+    list: List<UiSidebarPlayer>,
+    sharedFieldData: LocalFieldDataWrapper,
+    compactView: Boolean = true,
+    onExit: () -> Unit = {}
+) {
     val playersPrRow = 3
     val fieldSize = sharedFieldData.size
 
@@ -260,6 +274,7 @@ private fun PlayerSection(list: List<UiSidebarPlayer>, sharedFieldData: LocalFie
                                 val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
                                 Player(
                                     Modifier.pixelSize(playerSizePx),
+                                    screenModel,
                                     player,
                                     sortedList[index + x]!!.transientData,
                                     parentHandleClick = false,
@@ -293,6 +308,7 @@ private fun PlayerSection(list: List<UiSidebarPlayer>, sharedFieldData: LocalFie
                             val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
                             Player(
                                 modifier.pixelSize(playerSizePx),
+                                screenModel,
                                 player,
                                 list[index + x].transientData,
                                 parentHandleClick = false,

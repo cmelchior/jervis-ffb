@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.view.field.FieldPointerEventType
 import com.jervisffb.ui.game.view.field.jervisPointerEvent
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.toSkiaColor
 import org.jetbrains.skia.ImageFilter
@@ -64,6 +67,7 @@ private val playerAvailableDropShadowEffect: RenderEffect = ImageFilter.makeDrop
 @Composable
 fun Player(
     modifier: Modifier,
+    screenModel: GameScreenModel,
     player: UiFieldPlayer,
     transientData: UiPlayerTransientData?,
     parentHandleClick: Boolean,
@@ -71,12 +75,13 @@ fun Player(
 ) {
     val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
     val ballImage = IconFactory.getHeldBallOverlay()
+    var isTempSelected by player.isTemporarySelected
 
     var playerModifier: Modifier = modifier.aspectRatio(1f)
 
     if (player.isSelectable && !parentHandleClick) {
         playerModifier = playerModifier.clickable {
-            player.selectedAction!!()
+            player.selectedAction!!(screenModel, player)
         }
     }
     if (transientData?.onHover != null) {
@@ -123,6 +128,7 @@ fun Player(
         PlayerImage(
             bitmap = playerImage,
             isSelectable = player.isSelectable,
+            isTempSelected = isTempSelected,
             isActionWheelFocus = contextMenuShowing,
             isGoingDown = player.isGoingDown,
             alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
@@ -213,6 +219,10 @@ val playerDownBorderShader = playerBorderShaderTemplate.replace(
     oldValue = "%tintColor%",
     newValue = "vec4(198.0/255.0, 0.0/255.0, 0.0/255.0, 1.0); // JervisTheme.rulebookRed"
 )
+val playerTempSelectedShader = playerBorderShaderTemplate.replace(
+    oldValue = "%tintColor%",
+    newValue = "vec4(0.0/255.0, 119.0/255.0, 198.0/255.0, 1.0); // JervisTheme.rulebookBlue"
+)
 
 val playerInFocus = playerBorderShaderTemplate.replace(
     oldValue = "%tintColor%",
@@ -233,6 +243,7 @@ val playerInFocus = playerBorderShaderTemplate.replace(
 private fun PlayerImage(
     bitmap: ImageBitmap,
     isSelectable: Boolean,
+    isTempSelected: Boolean,
     isActionWheelFocus: Boolean,
     isGoingDown: Boolean,
     alpha: Float
@@ -243,6 +254,7 @@ private fun PlayerImage(
     val imageShader = remember(bitmap) { ImageShader(bitmap, TileMode.Decal, TileMode.Decal) }
     val playerBorderShader = when {
         isActionWheelFocus -> playerInFocus
+        isTempSelected -> playerTempSelectedShader
         isGoingDown -> playerDownBorderShader
         else -> playerSelectedBorderShader
     }

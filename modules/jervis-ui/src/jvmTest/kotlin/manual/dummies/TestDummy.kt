@@ -48,7 +48,7 @@ object TestDummy {
             uiController,
             dummyFieldWrapper,
             state.homeTeam,
-            gameModel.hoverPlayerFlow
+            gameModel.hoverPlayerFlow,
         )
     }
     val rightSidebar by lazy {
@@ -58,7 +58,7 @@ object TestDummy {
             uiController,
             dummyFieldWrapper,
             state.awayTeam,
-            gameModel.hoverPlayerFlow
+            gameModel.hoverPlayerFlow,
         )
     }
 }

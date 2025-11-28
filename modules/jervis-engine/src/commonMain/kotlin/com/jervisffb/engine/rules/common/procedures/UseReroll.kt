@@ -69,7 +69,7 @@ object UseTeamReroll : Procedure() {
             val result = UseRerollContext(context.roll, context.source, true)
             return compositeCommandOf(
                 SetOldContext(Game::rerollContext, result),
-                SetTeamRerollUsed(context.source),
+                SetTeamRerollUsed(state.activeTeamOrThrow(), context.source),
                 ExitProcedure(),
             )
         }

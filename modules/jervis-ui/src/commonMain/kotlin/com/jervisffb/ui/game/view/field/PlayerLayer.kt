@@ -21,6 +21,7 @@ import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.view.Player
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.pixelSize
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
@@ -69,6 +70,7 @@ fun PlayerLayer(
             ) {
                 if (coordinates.isOnField(snapshot!!.game.rules)) {
                     PlayerWithIndicators(
+                        vm.screenModel,
                         Modifier,
                         snapshot!!.squares[coordinates]!!,
                         player,
@@ -83,6 +85,7 @@ fun PlayerLayer(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PlayerWithIndicators(
+    screenModel: GameScreenModel,
     boxModifier: Modifier,
     square: UiFieldSquare,
     player: UiFieldPlayer? = null,
@@ -94,6 +97,7 @@ private fun PlayerWithIndicators(
         player?.let {
             Player(
                 boxModifier,
+                screenModel,
                 player,
                 playerTransientData,
                 true,

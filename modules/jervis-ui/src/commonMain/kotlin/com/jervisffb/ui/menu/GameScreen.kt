@@ -144,7 +144,7 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.uiState,
             viewModel.sharedFieldData,
             viewModel.homeTeam,
-            viewModel.hoverPlayerFlow
+            viewModel.hoverPlayerFlow,
         ),
         SidebarViewModel(
             viewModel,
@@ -152,9 +152,9 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.uiState,
             viewModel.sharedFieldData,
             viewModel.awayTeam,
-            viewModel.hoverPlayerFlow
+            viewModel.hoverPlayerFlow,
         ),
-        GameStatusViewModel(viewModel.uiState),
+        GameStatusViewModel(viewModel, viewModel.uiState),
         if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.uiState, viewModel) else null,
         if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
         ActionSelectorViewModel(viewModel.uiState),

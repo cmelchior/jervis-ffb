@@ -106,7 +106,7 @@ private fun SquareHighlightAndAction(
                     // Ideally, none should be configured anyway, but just in case.
                     if (square.contextMenuOptions.isEmpty()) {
                         pathfinderData?.hoverAction()
-                            ?: player?.selectedAction?.invoke()
+                            ?: player?.selectedAction?.invoke(vm.screenModel, player)
                             ?: square.selectedAction?.invoke()
                     }
                 }

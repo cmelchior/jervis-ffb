@@ -17,6 +17,7 @@ enum class DiceRollType {
     CASUALTY,
     CATCH,
     CHAINSAW,
+    CHARGE,
     CHEERING_FANS,
     FAN_FACTOR,
     DODGE,

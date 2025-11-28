@@ -164,6 +164,7 @@ class UiGameController(
                 squares = persistentMapOf(),
                 players = persistentMapOf(),
                 freeBalls = emptyMap(),
+                gameStatusText = null,
                 status = UiGameStatusUpdate.INITIAL,
                 unknownActions = persistentListOf(),
                 homeDogoutOnClickAction = null,

@@ -44,6 +44,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -59,6 +60,7 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
@@ -211,6 +213,12 @@ data class ActionRequest(
                 actions.singleInstanceOfOrNull<SelectSkill>()?.skills.orEmpty().contains(action.skill)
             }
             Undo -> (id.value >= 1)
+            is PlayersSelected -> {
+                actions.singleInstanceOfOrNull<SelectPlayers>()?.let {
+                    if (it.count != action.players.size) return false
+                    it.players.containsAll(action.players)
+                } ?: false
+            }
         }
     }
 

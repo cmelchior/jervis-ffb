@@ -23,6 +23,7 @@ class UiSnapshotAccumulator(
 ) {
     private val playersBuilder = previousSnapshot.players.builder()
     private val squaresBuilder = previousSnapshot.squares.builder()
+    private var gameStatusText: String? = null
     private var statusBuilder: UiGameStatusUpdate = UiGameStatusUpdate(uiController.state)
     private val unknownActionsBuilder = persistentListOf<GameAction>().builder()
     private val weather = uiController.state.weather
@@ -98,6 +99,9 @@ class UiSnapshotAccumulator(
         movesUsedBuilder.addAll(movesUsed)
     }
 
+    fun setGameStatusText(message: String?) {
+        this.gameStatusText = message
+    }
 
     fun build(): UiGameSnapshot {
         val freeBalls  = squares.filter { it.value.isBallOnGround }
@@ -107,6 +111,7 @@ class UiSnapshotAccumulator(
             squares = squaresBuilder.build(),
             players = playersBuilder.build(),
             freeBalls = freeBalls,
+            gameStatusText = gameStatusText,
             status = statusBuilder,
             unknownActions = unknownActionsBuilder.build(),
             homeDogoutOnClickAction = homeDogoutOnClickAction,

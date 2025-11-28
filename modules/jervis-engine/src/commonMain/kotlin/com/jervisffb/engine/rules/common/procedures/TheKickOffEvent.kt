@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -144,21 +145,25 @@ object TheKickOffEvent : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val ballLocation = state.singleBall().location
             val canCatch = state.field[ballLocation].player?.let { rules.canCatch(it) } ?: false
-            return if (!canCatch) {
-                SetBallState.bouncing(state.singleBall())
-            } else {
-                null
-            }
+            return compositeCommandOf(
+                if (!canCatch) {
+                    SetBallState.bouncing(state.singleBall())
+                } else {
+                    null
+                }
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return if (state.singleBall().state != BallState.BOUNCING) Catch else Bounce
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
-                GotoNode(SelectTouchBack)
-            } else {
-                ExitProcedure()
-            }
+            return compositeCommandOf(
+                if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
+                    GotoNode(SelectTouchBack)
+                } else {
+                    ExitProcedure()
+                }
+            )
         }
     }
 

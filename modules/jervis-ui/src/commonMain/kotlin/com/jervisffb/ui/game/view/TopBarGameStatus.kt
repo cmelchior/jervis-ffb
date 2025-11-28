@@ -82,6 +82,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.components.JervisTooltipArea
 import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.toRadians
@@ -138,7 +139,15 @@ fun TopBarGameStatus(
                     JervisTheme.rulebookRed,
                     vm.controller.state.activeTeam?.isHomeTeam() == true
                 )
-                ScoreCounter(Modifier.padding(top = topPadding), progress, homeTeamInfo, awayTeamInfo, angle, statusBoxWidth)
+                ScoreCounter(
+                    Modifier.padding(top = topPadding),
+                    vm.screenModel,
+                    progress,
+                    homeTeamInfo,
+                    awayTeamInfo,
+                    angle,
+                    statusBoxWidth
+                )
                 TurnTracker(
                     modifier = Modifier.padding(top = topPadding),
                     angle = angle, progress.turnMax,
@@ -370,6 +379,7 @@ private fun TurnTracker(
 @Composable
 private fun ScoreCounter(
     modifier: Modifier,
+    gameScreenModel: GameScreenModel,
     progress: UiGameStatusUpdate,
     homeTeamInfo: UiTeamInfoUpdate,
     awayTeamInfo: UiTeamInfoUpdate,
@@ -403,7 +413,15 @@ private fun ScoreCounter(
                 style = counterStyle
             )
         }
-        GameStatusBox(statusBoxWidth, smallPadding, angle, progress.centerBadgeText, progress.centerBadgeAction)
+        Spacer(modifier = Modifier.width(smallPadding))
+        GameStatusBox(
+            gameScreenModel,
+            statusBoxWidth,
+            smallPadding,
+            angle,
+            progress.centerBadgeAction,
+        )
+        Spacer(modifier = Modifier.width(smallPadding))
         ParallelogramButton(
             onClick = { },
             angleDegrees = angle,
@@ -427,41 +445,45 @@ private fun ScoreCounter(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun GameStatusBox(
+    gameScreenModel: GameScreenModel,
     statusBoxWidth: Dp,
     padding: Dp = 0.dp,
     angle: Float,
-    text: String,
-    action: (() -> Unit)? = null
+    action: ((GameScreenModel) -> Unit)? = null
 ) {
+    val isEnabled by gameScreenModel.isGameStatusBoxEnabled
+    val title by gameScreenModel.gameStatusBoxTitle
     val boxHeight = 72.jdp
     val shape = remember(angle) { TrapezoidShape(angle) }
     var color by remember { mutableStateOf(JervisTheme.gameStatusBackground) }
     var borderColor by remember { mutableStateOf(JervisTheme.white) }
     Box(
         modifier = Modifier
-            .padding(horizontal = padding)
             .width(statusBoxWidth)
             .height(boxHeight) // 76
             .shadow(elevation = if (action == null) 0.dp else 8.jdp, shape = shape, clip = false)
             .paperBackground(shape = shape, color = color)
-            .border(4.jdp, borderColor, shape)
-            .onClick(onClick = {
-                if (action != null) {
-                    action()
-                }
-            })
             .onPointerEvent(PointerEventType.Enter) {
-                if (action != null) {
+                if (action != null && isEnabled) {
                     color = JervisTheme.gameStatusBackground.darken(0.1f)
                     borderColor = JervisTheme.white.darken(0.1f)
                 }
             }
             .onPointerEvent(PointerEventType.Exit) {
-                if (action != null) {
+                if (action != null && isEnabled) {
                     color = JervisTheme.gameStatusBackground
                     borderColor = JervisTheme.white
                 }
             }
+            .applyIf(isEnabled) {
+                onClick(onClick = {
+                    if (action != null) {
+                        action(gameScreenModel)
+                    }
+                })
+            }
+            .border(4.jdp, borderColor, shape)
+
         ,
     ) {
         Column(
@@ -475,8 +497,9 @@ private fun GameStatusBox(
             val timer = "--:--"
             Text(
                 modifier = Modifier.offset(y = 3.jdp),
-                text = text.uppercase(),
-                color = JervisTheme.white,
+                text = title.uppercase(),
+                textAlign = TextAlign.Center,
+                color = if (isEnabled) JervisTheme.white else JervisTheme.white.copy(alpha = 0.5f),
                 lineHeight = 1.em,
                 letterSpacing = 2.jsp,
                 // fontFamily = JervisTheme.fontFamily(),
@@ -484,7 +507,7 @@ private fun GameStatusBox(
                     fontSize = 12.jsp,
                     fontWeight = FontWeight.Medium,
                     shadow = Shadow(
-                        color = Color.Black,
+                        color = if (isEnabled) JervisTheme.black else JervisTheme.black.copy(alpha = 0.5f),
                         offset = Offset(2f, 2f),
                         blurRadius = 0f
                     )

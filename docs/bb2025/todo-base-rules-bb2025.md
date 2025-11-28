@@ -193,12 +193,28 @@ book.
     - [x] Brilliant Coaching
     - [x] Changing Weather
     - [x] Quick Snap
-    - [ ] Charge
-        - [ ] All skills are available
-        - [ ] Rerolls are available
-    - [ ] Dodgy Snack
-        - [ ] On 2+, player stays on field with -1 AV, MA
-        - [ ] On 1, player is put in Reserves until end of drive.
+    - [x] Charge
+        - [x] Can only select Open players
+        - [x] Less open players than rolled
+        - [x] Skip Charge! if no available players to select.
+        - [x] Free move actions
+        - [x] 1 Blitz
+        - [x] 1 Throw Teammate
+        - [ ] 1 Kick Teammate
+        - [ ] Stab during Blitz
+        - [ ] Chainsaw during Blitz
+        - [x] No other actions or special actions
+        - [x] End when player Falls Over
+        - [x] Ends when player is knocked down
+        - [x] Can dodge 
+        - [x] Team Rerolls are not available
+        - [x] Can forego activations
+        - [x] Move player under ball on receiver side
+        - [x] Stunned players are marked as STUNNED after Charge ended
+    - [x] Dodgy Snack
+        - [x] On 2+, player stays on field with -1 AV, MA
+        - [x] On 1, player is put in Reserves until end of drive.
+        - [x] Skipped if no eligible players.
     - [x] Pitch Invasion
       - [x] No players on the field
       - [x] Less available players than needed

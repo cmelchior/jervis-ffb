@@ -8,37 +8,29 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 class SetAvailableActions(
     private val team: Team,
     private val type: PlayerStandardActionType,
-    private val availableActions: Int,
+    private val used: Int,
 ) : Command {
     private var originalActions: Int = 0
+    private var originalUsed: Int = 0
 
     override fun execute(state: Game) {
         originalActions = team.turnData.availableStandardActions[type] ?: INVALID_GAME_STATE("Type has not been configured: $type")
-        team.turnData.availableStandardActions[type] = availableActions
+        originalUsed = team.turnData.usedStandardActions[type] ?: 0
+        team.turnData.availableStandardActions[type] = originalActions - used
+        team.turnData.usedStandardActions[type] = originalUsed + used
     }
 
     override fun undo(state: Game) {
         team.turnData.availableStandardActions[type] = originalActions
+        team.turnData.usedStandardActions[type] = originalUsed
     }
 
     companion object {
         fun markAsUsed(team: Team, type: PlayerStandardActionType): SetAvailableActions {
-            val newValue = when (type) {
-                PlayerStandardActionType.MOVE -> team.turnData.moveActions - 1
-                PlayerStandardActionType.PASS -> team.turnData.passActions - 1
-                PlayerStandardActionType.HAND_OFF -> team.turnData.handOffActions - 1
-                PlayerStandardActionType.THROW_TEAM_MATE -> team.turnData.throwTeamMateActions - 1
-                PlayerStandardActionType.BLOCK -> team.turnData.blockActions - 1
-                PlayerStandardActionType.BLITZ -> team.turnData.blitzActions - 1
-                PlayerStandardActionType.FOUL -> team.turnData.foulActions - 1
-                PlayerStandardActionType.SPECIAL -> TODO()
-                PlayerStandardActionType.SECURE_THE_BALL -> team.turnData.secureTheBallActions - 1
-            }
-
             return SetAvailableActions(
-                team,
-                type,
-                newValue
+                team = team,
+                type = type,
+                used = 1
             )
         }
     }

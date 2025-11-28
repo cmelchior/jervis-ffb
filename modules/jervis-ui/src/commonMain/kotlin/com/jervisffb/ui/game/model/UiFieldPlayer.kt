@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.model
 
+import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
@@ -10,6 +11,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.ui.menu.GameScreenModel
 
 /**
  * Contains all the information needed to display a player on the field.
@@ -21,7 +23,7 @@ data class UiFieldPlayer(
     val number: PlayerNo,
     val team: TeamId,
     val size: PlayerSize,
-    val selectedAction: (() -> Unit)?,
+    val selectedAction: ((GameScreenModel, UiFieldPlayer) -> Unit)?,
     val carriesBall: Boolean,
     val state: PlayerState,
     val isOnHomeTeam: Boolean,
@@ -32,7 +34,7 @@ data class UiFieldPlayer(
     val dice: Int = 0, // Show block dice decorator
     val isBlocked: Boolean = false, // Show "blocked" indicator
 ) {
-    constructor(model: Player, selectAction: (() -> Unit)? = null) : this(
+    constructor(model: Player, selectAction: ((GameScreenModel, UiFieldPlayer) -> Unit)? = null) : this(
         id = model.id,
         location = model.location,
         number = model.number,
@@ -51,7 +53,7 @@ data class UiFieldPlayer(
         ),
         hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnField(model.team.game.rules)
     )
-
+    val isTemporarySelected = mutableStateOf<Boolean>(false)
     val isSelectable = (selectedAction != null)
     val isProne: Boolean = (state == PlayerState.PRONE)
     val isStunned: Boolean = (state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN)

@@ -120,6 +120,6 @@ class PassAnimation(val from: OnFieldLocation, val to: FieldCoordinate, val outO
      */
     private fun calculateDurationSeconds(velocity: Double, angle: Double): Double {
         val time = 2 * velocity * sin(angle) / g
-        return time
+        return if (time.isNaN()) 0.0 else time
     }
 }

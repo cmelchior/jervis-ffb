@@ -3,13 +3,15 @@ package com.jervisffb.ui.game.viewmodel
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiTeamInfoUpdate
+import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
  * View model for the top status bar that contains Team Info, inducements and general game status
  */
-class GameStatusViewModel(val controller: UiGameController) {
+class GameStatusViewModel(val screenModel: GameScreenModel, val controller: UiGameController) {
+
     fun progress(): Flow<UiGameStatusUpdate> {
         return controller.uiStateFlow.map { uiSnapshot -> uiSnapshot.status }
     }

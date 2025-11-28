@@ -31,6 +31,8 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.actions.SelectPlayers
+import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
@@ -59,6 +61,8 @@ import com.jervisffb.ui.game.state.decorators.SelectFieldLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerActionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
+import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
 import com.jervisffb.ui.game.view.DialogFactory
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -122,6 +126,8 @@ open class ManualActionProvider(
         SelectMoveType::class to SelectMoveTypeDecorator,
         SelectPlayer::class to SelectPlayerDecorator,
         SelectPlayerAction::class to SelectPlayerActionDecorator,
+        SelectPlayers::class to SelectPlayersDecorator,
+        SelectRandomPlayers::class to SelectRandomPlayersDecorator,
     )
 
     override fun startHandler() {

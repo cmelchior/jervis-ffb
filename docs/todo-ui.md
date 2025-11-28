@@ -7,6 +7,7 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Kick-off pass animation doesn't work during Charge, if the kicking team ends up catching the ball on the receiving side.
 - [ ] Check that the UI works when kicking off when 0 players.
 - [ ] UI for pushing players into the crowd is not working (and have been disabled for now).
 - [ ] Add a "right-click" menu for players. We should combine "Edit Player" and "Forego Activation" in there.

@@ -10,8 +10,10 @@ import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
+import com.jervisffb.ui.menu.GameScreenModel
 
 object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
     override fun decorate(
@@ -22,7 +24,7 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
-            val selectedAction = {
+            val selectedAction = { screenModel: GameScreenModel, player: UiFieldPlayer ->
                 actionProvider.userActionSelected(PlayerSelected(playerId))
             }
 

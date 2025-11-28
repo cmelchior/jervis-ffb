@@ -54,7 +54,7 @@ data class UiPathFinderData(
  * each single square on the field.
  */
 class FieldViewModel(
-    private val screenModel: GameScreenModel,
+    val screenModel: GameScreenModel,
     private val uiState: UiGameController,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {

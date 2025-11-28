@@ -313,6 +313,30 @@ data object SelectDogout : GameActionDescriptor {
     override fun createAll(): List<GameAction> = listOf(DogoutSelected)
 }
 
+data class SelectPlayers(
+    val count: Int,
+    val players: List<PlayerId>
+): GameActionDescriptor {
+    override val size: Int
+        get() {
+            var results = 0
+            for (i in 0 until count) {
+                results *= (players.size - i)
+            }
+            return results
+        }
+    override fun createRandom(random: Random): PlayersSelected {
+        players.shuffled(random).subList(0, count).let { selectedPlayers ->
+            return PlayersSelected(selectedPlayers)
+        }
+    }
+    override fun createAll(): List<PlayersSelected> {
+        return players.combinations(count).map { players ->
+            PlayersSelected(players.toList())
+        }
+    }
+}
+
 @ConsistentCopyVisibility
 data class SelectPlayer private constructor(
     val players: List<PlayerId>
@@ -360,6 +384,7 @@ data class SelectForgoActivation(
         fun fromPlayers(players: List<Player>): SelectForgoActivation {
             return SelectForgoActivation(players.map { it.id })
         }
+        fun fromPlayers(players: Set<Player>): SelectForgoActivation = fromPlayers(players.toList())
     }
 }
 

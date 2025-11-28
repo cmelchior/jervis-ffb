@@ -32,6 +32,8 @@ data class UiGameSnapshot(
     // Quick access to squares with known free balls and bombs
     val freeBalls: Map<FieldCoordinate, UiFieldSquare>,
     val status: UiGameStatusUpdate,
+    // Black text above the field
+    val gameStatusText: String?,
     val unknownActions: PersistentList<GameAction>,
     val homeDogoutOnClickAction: (() -> Unit)?,
     val awayDogoutOnClickAction: (() -> Unit)?,

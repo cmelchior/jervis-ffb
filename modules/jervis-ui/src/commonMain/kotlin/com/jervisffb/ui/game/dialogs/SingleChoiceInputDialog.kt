@@ -28,6 +28,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -87,6 +88,7 @@ data class SingleChoiceInputDialog(
                 is DicePoolResultsSelected -> action.results.toString()
                 is DirectionSelected -> action.direction.toString()
                 is ForegoActivationSelected -> "Forego Activation: ${action.player}"
+                is PlayersSelected -> "Select Players: $action"
             }
         }
 

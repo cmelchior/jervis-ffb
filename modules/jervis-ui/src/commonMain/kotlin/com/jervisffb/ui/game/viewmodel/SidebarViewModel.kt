@@ -31,7 +31,7 @@ data class ButtonData(
 )
 
 class SidebarViewModel(
-    private val gameViewModel: GameScreenModel,
+    val gameViewModel: GameScreenModel,
     private val menuViewModel: MenuViewModel,
     private val uiState: UiGameController,
     val sharedFieldData: LocalFieldDataWrapper,

@@ -26,10 +26,9 @@ class ResetAvailableTeamActions(
     var originalThrowTeamMateActions = 0
     var originalSecureTheBallActions = 0
     var originalSpecialActions = emptyMap<PlayerSpecialActionType, Int>()
+    var originalUsedActions = emptyMap<PlayerStandardActionType, Int>()
 
-    override fun execute(
-        state: Game,
-    ) {
+    override fun execute(state: Game) {
         originalMoveActions = team.turnData.availableStandardActions[PlayerStandardActionType.MOVE]!!
         originalPassActions = team.turnData.availableStandardActions[PlayerStandardActionType.PASS]!!
         originalHandOffActions = team.turnData.availableStandardActions[PlayerStandardActionType.HAND_OFF]!!
@@ -39,6 +38,7 @@ class ResetAvailableTeamActions(
         originalThrowTeamMateActions = team.turnData.availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE]!!
         originalSecureTheBallActions = team.turnData.availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL]!!
         originalSpecialActions = team.turnData.availableSpecialActions.toMap()
+        originalUsedActions = team.turnData.usedStandardActions.toMap()
         team.turnData.let {
             it.moveActions = moveActions
             it.passActions = passActions
@@ -53,9 +53,7 @@ class ResetAvailableTeamActions(
         }
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         team.turnData.let {
             it.moveActions = originalMoveActions
             it.passActions = originalPassActions
@@ -67,6 +65,8 @@ class ResetAvailableTeamActions(
             it.secureTheBallActions = originalSecureTheBallActions
             it.availableSpecialActions.clear()
             it.availableSpecialActions.putAll(originalSpecialActions)
+            it.usedStandardActions.clear()
+            it.usedStandardActions.putAll(originalUsedActions)
         }
     }
 }

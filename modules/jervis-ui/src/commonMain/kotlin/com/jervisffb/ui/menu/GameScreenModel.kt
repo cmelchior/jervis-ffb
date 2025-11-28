@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
@@ -136,6 +137,11 @@ class GameScreenModel(
         if (useFieldBackground) field.logBackground else FieldDetails.NICE.logBackground
     }
 
+    val selectedPlayersInUi = mutableListOf<PlayerId>()
+    var isGameStatusBoxEnabled = mutableStateOf(false)
+    var gameStatusTitle = mutableStateOf<String?>(null)
+    var gameStatusBoxTitle = mutableStateOf("")
+
     init {
         actionProvider.updateSharedData(sharedFieldData)
         menuViewModel.backgroundContext.launch {
@@ -178,6 +184,14 @@ class GameScreenModel(
             awayTeam.roster.name,
             formatCurrency(awayTeam.teamValue)
         )
+        screenModelScope.launch {
+            uiState.uiStateFlow.collect {
+                isGameStatusBoxEnabled.value = it.status.centerBadgeEnabled
+                gameStatusBoxTitle.value = it.status.centerBadgeText
+                gameStatusTitle.value = it.gameStatusText
+                selectedPlayersInUi.clear()
+            }
+        }
     }
 
     /**
@@ -238,5 +252,9 @@ class GameScreenModel(
     }
     fun hidePlayerContextMenu() {
         _contextMenuFlow.tryEmit(null)
+    }
+
+    fun getSelectedPlayers(): List<PlayerId> {
+        return selectedPlayersInUi.toList()
     }
 }

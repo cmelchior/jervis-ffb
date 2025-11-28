@@ -315,6 +315,17 @@ data class DiceRollResults(val rolls: List<DieResult>) : GameAction, List<DieRes
 }
 
 @Serializable
+data class PlayersSelected(
+    val players: List<PlayerId>,
+): GameAction {
+    fun getPlayers(state: Game): List<Player> {
+        return players.map {
+            state.getPlayerById(it)
+        }
+    }
+}
+
+@Serializable
 data class PlayerSelected(val playerId: PlayerId) : GameAction {
     constructor(player: Player): this(player.id)
     fun getPlayer(state: Game): Player {

@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.common.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 
 sealed interface TeamReroll : RerollSource {
+    val teamId: TeamId
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
     val duration: Duration
@@ -24,6 +25,8 @@ sealed interface TeamReroll : RerollSource {
         wasSuccess: Boolean?,
     ): Boolean {
         // TODO Some types cannot be rerolled
+        if (state.activeTeam?.id != teamId) return false
+        if (state.activeTeam?.usedRerollThisTurn == true && !state.rules.allowMultipleTeamRerollsPrTurn) return false
         return value.all { it.rerollSource == null }
     }
 
@@ -36,7 +39,7 @@ sealed interface TeamReroll : RerollSource {
     }
 }
 
-class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
+class RegularTeamReroll(override val teamId: TeamId, val index: Int) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
@@ -45,8 +48,8 @@ class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-class LeaderTeamReroll(val team: TeamId) : TeamReroll {
-    override val id: RerollSourceId = RerollSourceId("${team.value}-leader")
+class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("${teamId.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
     override val rerollResetAt: Duration = Duration.END_OF_HALF
@@ -54,7 +57,7 @@ class LeaderTeamReroll(val team: TeamId) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
+class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE

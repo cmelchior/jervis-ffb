@@ -43,6 +43,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
@@ -59,6 +60,7 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
@@ -113,6 +115,7 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
             is SelectSkill -> false
             TossCoin -> true
             is SelectForgoActivation -> false
+            is SelectPlayers -> false
         }
     }
     if (randomActions.contains(true) && randomActions.contains(false)) {
@@ -164,6 +167,7 @@ fun GameAction.isRandomAction(): Boolean {
         Undo -> false
         Revert -> false
         is ForegoActivationSelected -> false
+        is PlayersSelected -> false
     }
 }
 
@@ -367,7 +371,7 @@ inline fun <reified T: Any> List<*>.singleInstanceOf(): T {
 }
 
 /**
- * Finds the first element of the expected type or `null` if no element matched.
+ * Finds the first element of the expected type or `null` if it couldn't be found.
  */
 inline fun <reified T: Any> List<*>.singleInstanceOfOrNull(): T? {
     return singleOrNull { it is T } as T?

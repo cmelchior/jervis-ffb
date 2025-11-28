@@ -159,7 +159,8 @@ class Game(
     // Active/Inactive indicates a teams "active turn".
     // These terms are not applicable during the pre-game sequence, setup or
     // post-game sequence.
-    // See page 42 in the rulebook.
+    // See page 42 in the BB2020 rulebook.
+    // See page 50 in the BB2025 rulebook.
     var activeTeam: Team? = null
     var inactiveTeam: Team? = null
 

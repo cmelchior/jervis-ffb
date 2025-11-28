@@ -92,9 +92,11 @@ object StandardBlockChooseReroll: Procedure() {
         val team = attackingPlayer.team
         val hasTeamRerolls = team.availableRerollCount > 0
         val allowedToUseTeamReroll =
-            when (team.usedRerollThisTurn) {
-                true -> rules.allowMultipleTeamRerollsPrTurn
-                false -> true
+            when {
+                !team.game.canUseTeamRerolls -> false
+                team.usedRerollThisTurn && rules.allowMultipleTeamRerollsPrTurn -> true
+                !team.usedRerollThisTurn -> true
+                else -> false
             }
 
         return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {

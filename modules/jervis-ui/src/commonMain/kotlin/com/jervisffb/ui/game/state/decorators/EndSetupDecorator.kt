@@ -4,6 +4,8 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -15,26 +17,17 @@ object EndSetupDecorator : FieldActionDecorator<EndSetupWhenReady> {
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
-//        if (snapshot.actionsRequest.team?.isHomeTeam() == true) {
+        val title = when {
+            state.stack.containsProcedure(SolidDefense) -> "End Solid Defense"
+            state.stack.containsProcedure(QuickSnap) -> "End Quick Snap"
+            else -> "End Setup"
+        }
         acc.updateGameStatus {
             it.copy(
-                centerBadgeText = "End Setup",
-                centerBadgeAction = { actionProvider.userActionSelected(EndSetup) }
+                centerBadgeText = title,
+                centerBadgeAction = { actionProvider.userActionSelected(EndSetup) },
+                centerBadgeEnabled = true
             )
         }
-//            snapshot.homeTeamActions.add(
-//                ButtonData(
-//                    "End Setup",
-//                    onClick = { actionProvider.userActionSelected(EndSetup) }
-//                )
-//            )
-//        } else if (snapshot.actionsRequest.team?.isAwayTeam() == true) {
-//            snapshot.awayTeamActions.add(
-//                ButtonData(
-//                    "End Setup",
-//                    onClick = { actionProvider.userActionSelected(EndSetup) }
-//                )
-//            )
-//        }
     }
 }

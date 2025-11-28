@@ -27,6 +27,7 @@ import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.rules.common.actions.PlayerAction
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -576,14 +577,14 @@ abstract class Rules(
         if (player.location !is OnFieldLocation) return emptyList()
         return buildList {
             // Add any team actions that are available
-            state.activeTeamOrThrow().turnData.let {
-                if (it.moveActions > 0) add(teamActions.move)
-                if (it.passActions > 0 && it.throwTeamMateActions == teamActions.throwTeamMate.availablePrTurn) {
+            state.activeTeamOrThrow().turnData.let { turnData ->
+                if (turnData.moveActions > 0) add(teamActions.move)
+                if (turnData.passActions > 0 && turnData.throwTeamMateActions == teamActions.throwTeamMate.availablePrTurn) {
                     // Pass and Throw Team-mate are mutually exclusive
                     add(teamActions.pass)
                 }
-                if (it.handOffActions > 0) add(teamActions.handOff)
-                if (it.blockActions > 0) {
+                if (turnData.handOffActions > 0) add(teamActions.handOff)
+                if (turnData.blockActions > 0) {
                     val isStanding = (player.state == PlayerState.STANDING)
                     val hasEligibleTargets = (player.location as OnFieldLocation)
                         .getSurroundingCoordinates(this@Rules, 1)
@@ -597,7 +598,7 @@ abstract class Rules(
                         add(teamActions.block)
                     }
                 }
-                if (it.blitzActions > 0) {
+                if (turnData.blitzActions > 0) {
                     val hasEligibleBlitzTargets = player.team.otherTeam()
                         .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
                         .any {  targetPlayer -> isStanding(targetPlayer) }
@@ -606,7 +607,7 @@ abstract class Rules(
                         add(teamActions.blitz)
                     }
                 }
-                if (it.foulActions > 0) {
+                if (turnData.foulActions > 0) {
                     val hasEligibleFoulTargets = player.team.otherTeam()
                         .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
                         .any {  targetPlayer -> targetPlayer.state == PlayerState.PRONE || targetPlayer.state == PlayerState.STUNNED }
@@ -614,7 +615,11 @@ abstract class Rules(
                         add(teamActions.foul)
                     }
                 }
-                if (it.throwTeamMateActions > 0 && it.passActions == teamActions.pass.availablePrTurn && player.hasSkill(SkillType.THROW_TEAMMATE)) {
+                if (
+                    turnData.throwTeamMateActions > 0
+                    && turnData.usedStandardActions[PlayerStandardActionType.PASS] == 0
+                    && player.hasSkill(SkillType.THROW_TEAMMATE)
+                ) {
                     // Throw Team-mate and Pass are mutually exclusive
                     add(teamActions.throwTeamMate)
                 }
@@ -623,7 +628,7 @@ abstract class Rules(
                 // count to 0 in the TeamActions setup.
                 val hasUnsteady = player.isSkillAvailable(SkillType.UNSTEADY)
                 val isBigGuy = player.keywords.contains(PlayerKeyword.BIG_GUY)
-                if (it.secureTheBallActions > 0 && !hasUnsteady && !isBigGuy) {
+                if (turnData.secureTheBallActions > 0 && !hasUnsteady && !isBigGuy) {
                     // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
                     // In case of multiple balls, only one ball has to satisfy the criteria for he action to be available.
                     // The ball has to be on the floor at the start of the activation.
