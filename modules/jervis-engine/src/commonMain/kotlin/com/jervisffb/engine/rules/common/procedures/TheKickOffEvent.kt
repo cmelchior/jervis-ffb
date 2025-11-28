@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext

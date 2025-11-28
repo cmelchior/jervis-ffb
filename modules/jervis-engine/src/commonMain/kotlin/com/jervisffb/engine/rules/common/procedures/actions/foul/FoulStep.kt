@@ -58,7 +58,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object FoulStep: Procedure() {
     override val initialNode: Node = CalculateAssists
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return SetCurrentBall(null)
+    }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<FoulContext>()
 
     object CalculateAssists: ComputationNode() {

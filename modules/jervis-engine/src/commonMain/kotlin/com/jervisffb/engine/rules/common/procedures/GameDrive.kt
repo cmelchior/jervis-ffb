@@ -4,6 +4,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetKickingTeam
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -111,6 +112,8 @@ object GameDrive : Procedure() {
             return compositeCommandOf(
                 SetBallState.onGround(state.getBall()),
                 SetBallLocation(state.getBall(), FieldCoordinate.UNKNOWN),
+                // Us having to do this here, indicates we don't fully track the the lifecycle of the current ball
+                SetCurrentBall(null),
                 *movePlayers.toTypedArray(),
                 ExitProcedure(),
             )

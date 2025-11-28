@@ -623,10 +623,14 @@ object MultipleBlockAction: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            return when (context.defender1BallsHandled) {
-                false -> GotoNode(ResolveBlock1DefendersBallEvents)
-                true -> GotoNode(ResolveBlock2DefendersBallEvents)
+            val nextNode = when (context.defender1BallsHandled) {
+                false -> ResolveBlock1DefendersBallEvents
+                true -> ResolveBlock2DefendersBallEvents
             }
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                GotoNode(nextNode)
+            )
         }
     }
 
@@ -648,6 +652,7 @@ object MultipleBlockAction: Procedure() {
                 true -> GotoNode(ResolveBlock2DefendersBallEvents)
             }
             return compositeCommandOf(
+                SetCurrentBall(null),
                 RemoveContext<ThrowInContext>(),
                 nextNodeCommand
             )
