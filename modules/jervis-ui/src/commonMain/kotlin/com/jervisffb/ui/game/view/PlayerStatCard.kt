@@ -297,7 +297,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
-                                .padding(borderSize*2)
+                                .padding(top = borderSize*2, start = borderSize*2, end = borderSize*2)
                             ,
                         ) {
                             val skillFontSize = 16.jsp
@@ -326,10 +326,11 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                 }
                             }
                         }
+                        Spacer(modifier = Modifier.height(borderSize))
                         BottomEndFlowRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(borderSize*2)
+                                .padding(bottom = borderSize*2, start = borderSize*2, end = borderSize*2)
                             ,
                             horizontalSpacing = borderSize,
                             verticalSpacing = borderSize

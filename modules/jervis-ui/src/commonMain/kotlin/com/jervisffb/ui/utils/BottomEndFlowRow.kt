@@ -63,11 +63,13 @@ fun BottomEndFlowRow(
 
         val usedHeight = if (rows.isEmpty()) 0
         else rows.sumOf { it.height } + vSpace * (rows.size - 1)
-        val layoutW = maxW
-        val layoutH = when {
-            constraints.hasBoundedHeight -> constraints.maxHeight.coerceAtLeast(usedHeight)
-            else -> usedHeight.coerceIn(constraints.minHeight, Int.MAX_VALUE)
-        }
+
+        // Max row width, already including internal horizontal spacing
+        val usedWidth = rows.maxOfOrNull { it.width } ?: 0
+
+        // Wrap-content width/height within constraints
+        val layoutW = usedWidth.coerceIn(constraints.minWidth, constraints.maxWidth)
+        val layoutH = usedHeight.coerceIn(constraints.minHeight, constraints.maxHeight)
 
         layout(layoutW, layoutH) {
             var yBottom = layoutH
