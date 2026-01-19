@@ -62,7 +62,7 @@ import kotlinx.collections.immutable.toPersistentList
  * So for this roll, we only ask once after rolling the first die.
  */
 object AccuracyRoll: Procedure() {
-    override val initialNode: Node = RollDice
+    override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = setInitialModifiers(state, rules)
         return SetContext(context)
@@ -74,7 +74,7 @@ object AccuracyRoll: Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PassContext>()
 
-    object RollDice : ActionNode() {
+    object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

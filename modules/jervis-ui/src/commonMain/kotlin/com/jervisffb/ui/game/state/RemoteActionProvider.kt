@@ -4,6 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
  * in P2P games.
  *
  * For now, it just stores all events from the server and returns them in order when asked
- * for it. Not 100% sure this is the best architecture though. Something to think about.
+ * for it. Not 100% sure this is the best architecture, though. Something to think about.
  */
 class RemoteActionProvider(
     val clientMode: TeamActionMode,
@@ -31,6 +32,10 @@ class RemoteActionProvider(
     private var paused = false
     private lateinit var actions: ActionRequest
     private var sharedData: LocalFieldDataWrapper? = null
+
+    override fun init(controller: UiGameController) {
+        // Do nothing
+    }
 
     override fun startHandler() {
         // Do nothing

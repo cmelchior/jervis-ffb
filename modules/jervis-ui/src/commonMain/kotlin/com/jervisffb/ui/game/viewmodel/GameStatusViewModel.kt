@@ -4,13 +4,18 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiTeamInfoUpdate
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
  * View model for the top status bar that contains Team Info, inducements and general game status
  */
-class GameStatusViewModel(val screenModel: GameScreenModel, val controller: UiGameController) {
+class GameStatusViewModel(
+    val screenModel: GameScreenModel,
+    val localFieldData: LocalFieldDataWrapper,
+    val controller: UiGameController
+) {
 
     fun progress(): Flow<UiGameStatusUpdate> {
         return controller.uiStateFlow.map { uiSnapshot -> uiSnapshot.status }
@@ -25,6 +30,14 @@ class GameStatusViewModel(val screenModel: GameScreenModel, val controller: UiGa
     fun awayTeamInfoFlow(): Flow<UiTeamInfoUpdate> {
         return controller.uiStateFlow.map { uiSnapshot ->
             uiSnapshot.awayTeamInfo
+        }
+    }
+
+    // Which "game status" message to show. It is shown below the "Game Status" button
+    // and just above the field.
+    fun messageFlow(): Flow<String?> {
+        return controller.uiStateFlow.map {
+            it.gameStatusText
         }
     }
 }

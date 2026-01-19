@@ -116,8 +116,9 @@ data class PushContext(
  * slightly between single and multiple blocks, but this procedure is the
  * entry point for both of them and will describe the full sequence of events.
  *
- *
- *
+ * TODO It looks like this have changed in BB2025 (Ball bounce on Push Back),
+ *  but the below sequence also needs references to the rules.
+
  * -----
  *
  * Since the steps involved in this are complicated, this procedure is

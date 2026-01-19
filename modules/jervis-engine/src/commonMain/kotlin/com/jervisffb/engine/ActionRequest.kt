@@ -84,10 +84,6 @@ data class ActionRequest(
 ): List<GameActionDescriptor> by actions {
     val actionsCount = actions.sumOf { it.size } // TODO Should also count all sub actions
 
-    fun contains(action: EndAction): Boolean {
-        return actions.contains(EndActionWhenReady)
-    }
-
     fun contains(type: MoveType): Boolean {
         val found = actions.firstOrNull {
             it is SelectMoveType }

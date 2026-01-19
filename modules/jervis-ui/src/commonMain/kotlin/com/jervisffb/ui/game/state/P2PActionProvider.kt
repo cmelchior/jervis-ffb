@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.net.messages.GameActionServerError
 import com.jervisffb.net.messages.ServerError
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
@@ -20,8 +21,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
-// This UiActionProvider is the primary action provider for P2P games and are responsible for switching
-// between the local provider and the remote one (that is piping events from the server)
+/**
+ * This [UiActionProvider] is the primary action provider for P2P games and are responsible for switching
+ * between the local provider and the remote one (that is just receiving events from the server)
+ */
 class P2PActionProvider(
     private val engine: GameEngineController,
     private val settings: GameSettings,
@@ -47,6 +50,16 @@ class P2PActionProvider(
     private var handlingServerRevert = false // Set during `prepareForNextAction`. If `true`, the action will not be sent to the server again
 
     private var currentProvider = homeProvider
+
+    // Returns `true` if _this_ client is responsible for creating the current action.
+    // `false` if the action is expected to come from the server.
+    fun currentClientIsCreatingAction(): Boolean {
+        return currentProvider !is RemoteActionProvider
+    }
+
+    override fun init(controller: UiGameController) {
+        // Do nothing
+    }
 
     override fun startHandler() {
         networkAdapter.addMessageHandler(object: AbstractClintNetworkMessageHandler() {

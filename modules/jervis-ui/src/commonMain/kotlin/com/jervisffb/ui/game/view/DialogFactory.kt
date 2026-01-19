@@ -7,50 +7,24 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.FoulContext
-import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.PickupRollContext
-import com.jervisffb.engine.model.context.RushRollContext
-import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.CoinTossContext
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
-import com.jervisffb.engine.rules.common.procedures.DeviateRoll
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
-import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
-import com.jervisffb.engine.rules.common.procedures.TheKickOff
-import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseReroll
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
-import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
-import com.jervisffb.engine.rules.common.procedures.actions.pass.AccuracyRoll
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -64,12 +38,13 @@ import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRefContext
 import com.jervisffb.engine.rules.common.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.rules.common.procedures.tables.weather.SwelteringHeat
-import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import io.ktor.client.request.request
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.
@@ -83,15 +58,13 @@ object DialogFactory {
         controller: GameEngineController,
         request: ActionRequest,
         provider: UiActionProvider,
+        sharedData: LocalFieldDataWrapper,
+        acc: UiSnapshotAccumulator,
         mapUnknownActions: (ActionRequest) -> List<GameAction>
     ): UserInputDialog? {
         val rules = controller.rules
         val userInput: UserInputDialog? =
             when (val currentNode = controller.state.stack.currentNode()) {
-
-                is AccuracyRoll.RollDice -> {
-                    MultipleChoiceUserInputDialog.createAccuracyRollDialog(controller.state.getContext<PassContext>(), rules)
-                }
 
                 is ArgueTheCallRoll.RollDice -> {
                     MultipleChoiceUserInputDialog.createArgueTheCallRollDialog(
@@ -109,56 +82,6 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createBadHabitsRoll()
                 }
 
-                is StandardBlockChooseReroll.ReRollSourceOrAcceptRoll -> {
-                    val request = controller.getAvailableActions()
-                    ActionWheelInputDialog.createChooseBlockResultOrReroll(
-                        provider,
-                        controller.state,
-                        request,
-                        chooseResultAfterReroll = false
-                    )
-                }
-
-                // Because we we want the ability to both change the value and reroll on the same
-                // screen, we should roll automatically and then let it be up to the user to change
-                // the value (UNDO) if it doesn't match.
-                is StandardBlockRollDice.RollDice,
-                is StandardBlockRerollDice.ReRollDie -> {
-                    ActionWheelInputDialog.createBlockRollDialog(
-                        provider,
-                        request,
-                        isBlitz = controller.state.getContext<BlockContext>().isBlitzing,
-                        isReroll = (currentNode is StandardBlockRerollDice.ReRollDie)
-                    )
-                }
-
-                is StandardBlockChooseResult.SelectBlockResult -> {
-                    ActionWheelInputDialog.createChooseBlockResultOrReroll(
-                        provider,
-                        controller.state,
-                        request,
-                        chooseResultAfterReroll = true
-                    )
-                }
-
-                is BothDown.AttackerChooseToUseBlock -> {
-                    val context = controller.state.getContext<BothDownContext>()
-                    ActionWheelInputDialog.createUseSkillDialog(provider, context.attacker, context.attacker.getSkill(SkillType.BLOCK))
-                }
-
-                is BothDown.DefenderChooseToUseBlock -> {
-                    val context = controller.state.getContext<BothDownContext>()
-                    ActionWheelInputDialog.createUseSkillDialog(provider, context.defender, context.defender.getSkill(SkillType.BLOCK))
-                }
-
-                is Bounce.RollDirection -> {
-                    ActionWheelInputDialog.createBounceBallDialog(
-                        provider,
-                        controller.state,
-                        controller.getAvailableActions().team ?: controller.state.homeTeam
-                    )
-                }
-
                 is BrilliantCoaching.KickingTeamRollDie -> {
                     MultipleChoiceUserInputDialog.createBrilliantCoachingRolLDialog(controller.state.kickingTeam)
                 }
@@ -170,22 +93,6 @@ object DialogFactory {
                 is CasualtyRoll.RollDie -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
                     MultipleChoiceUserInputDialog.createCasualtyRollDialog(rules, player)
-                }
-
-                is CatchRoll.ChooseReRollSource -> {
-                    SingleChoiceInputDialog.createCatchRerollDialog(
-                        state = controller.state,
-                        mapUnknownActions(request),
-                        request.team!!
-                    )
-                }
-
-                CatchRoll.ReRollDie,
-                is CatchRoll.RollDie -> {
-                    SingleChoiceInputDialog.createCatchBallDialog(
-                        controller.state.getContext<CatchRollContext>().catchingPlayer,
-                        D6Result.allOptions(),
-                    )
                 }
 
                 CheeringFans.KickingTeamRollDie -> {
@@ -216,30 +123,6 @@ object DialogFactory {
                     SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
                         controller.state.awayTeam,
                         CoinSideSelected.allOptions(),
-                    )
-                }
-
-                is DeviateRoll.RollDice -> {
-                    ActionWheelInputDialog.createDeviateDialog(
-                        provider,
-                        controller.state,
-                        controller.getAvailableActions(),
-                        isKickOff = false
-                    )
-                }
-
-                is DodgeRoll.ReRollDie,
-                is DodgeRoll.RollDie -> {
-                    val context = controller.state.getContext<MoveContext>()
-                    MultipleChoiceUserInputDialog.createDodgeRollDialog(context.player, context.target!!)
-                }
-
-                is DodgeRoll.ChooseReRollSource -> {
-                    val request = controller.getAvailableActions()
-                    SingleChoiceInputDialog.createDodgeRerollDialog(
-                        state = controller.state,
-                        mapUnknownActions(request),
-                        request.team!!
                     )
                 }
 
@@ -275,38 +158,9 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createOfficiousRefPlayerRollDialog(context.kickingTeamPlayerSelected!!)
                 }
 
-                is PickupRoll.ChooseReRollSource -> {
-                    SingleChoiceInputDialog.createPickupRerollDialog(
-                        state = controller.state,
-                        mapUnknownActions(controller.getAvailableActions()),
-                    )
-                }
-
-                is PickupRoll.ReRollDie,
-                is PickupRoll.RollDie,
-                -> {
-                    SingleChoiceInputDialog.createPickupBallDialog(
-                        controller.state.getContext<PickupRollContext>().player,
-                        D6Result.allOptions(),
-                    )
-                }
-
                 PrayersToNuffleRoll.RollDie -> {
                     val context = controller.state.getContext<PrayersToNuffleRollContext>()
                     MultipleChoiceUserInputDialog.createPrayersToNuffleRollDialog(controller.rules, context.rollsRemaining)
-                }
-
-                is PushStepInitialMoveSequence.DecideToFollowUp -> {
-                    ActionWheelInputDialog.createFollowupDialog(provider, request, controller.state.getContext<PushContext>().firstPusher)
-                }
-
-                is PushStepInitialMoveSequence.DecideToUseSidestep -> {
-                    val player = controller.state.getContext<PushContext>().pushee()
-                    ActionWheelInputDialog.createUseSkillDialog(
-                        provider,
-                        player,
-                        player.getSkill(SkillType.SIDESTEP)
-                    )
                 }
 
                 is PatchUpPlayer.ChooseToUseApothecary -> {
@@ -332,21 +186,6 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createWeatherRollDialog(rules)
                 }
 
-                is RushRoll.ReRollDie,
-                is RushRoll.RollDie -> {
-                    val context = controller.state.getContext<RushRollContext>()
-                    MultipleChoiceUserInputDialog.createRushRollDialog(context.player, context.target)
-                }
-
-                is RushRoll.ChooseReRollSource -> {
-                    val request = controller.getAvailableActions()
-                    SingleChoiceInputDialog.createRushRerollDialog(
-                        state = controller.state,
-                        mapUnknownActions(request),
-                        request.team!!
-                    )
-                }
-
                 is ScatterRoll.RollDice -> {
                     MultipleChoiceUserInputDialog.createScatterRollDialog(rules)
                 }
@@ -361,41 +200,9 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createStandingUpRollDialog(player)
                 }
 
-                is Stumble.ChooseToUseDodge -> {
-                    val defender = controller.state.getContext<StumbleContext>().defender
-                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill(SkillType.DODGE))
-                }
-
-                is Stumble.ChooseToUseTackle -> {
-                    val defender = controller.state.getContext<StumbleContext>().attacker
-                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill(SkillType.TACKLE))
-                }
-
                 is SwelteringHeat.RollForAwayTeam,
                 is SwelteringHeat.RollForHomeTeam -> {
                     MultipleChoiceUserInputDialog.createSwelteringHeatRollDialog()
-                }
-
-                is TheKickOff.TheKickDeviates -> {
-                    val diceRolls = mutableListOf<DiceRollResults>()
-                    D8Result.allOptions().forEach { d8 ->
-                        D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceRollResults(d8, d6))
-                        }
-                    }
-                    ActionWheelInputDialog.createDeviateDialog(
-                        provider = provider,
-                        state = controller.state,
-                        request = controller.getAvailableActions(),
-                        isKickOff = true)
-                }
-
-                is TheKickOffEvent.RollForKickOffEvent -> {
-                    ActionWheelInputDialog.createKickOffEventDialog(
-                        provider,
-                        controller.rules,
-                        controller.state.kickingTeam
-                    )
                 }
 
                 is UseBB7Apothecary.ApothecaryInjuryReroll -> {
@@ -406,7 +213,7 @@ object DialogFactory {
                 else -> {
                     null
                 }
-            } as UserInputDialog?
+            }
 
         return if (userInput == null && request.actions.size == 1 && request.actions.first() is RollDice) {
             MultipleChoiceUserInputDialog.createUnknownDiceRoll(request.actions.first() as RollDice).apply {

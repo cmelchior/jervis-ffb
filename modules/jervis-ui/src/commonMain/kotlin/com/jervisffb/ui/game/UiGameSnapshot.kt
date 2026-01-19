@@ -39,6 +39,8 @@ data class UiGameSnapshot(
     val awayDogoutOnClickAction: (() -> Unit)?,
     // If set, a dialog should be shown as a first priority
     val dialogInput: UserInputDialog?,
+    // Whether the standard Action Wheel is visible or not. Animating out still counts as not being visible.
+    val actionWheelVisible: Boolean,
     // These are not used for rending, but to cache information we cannot extract from the rule engine
     val movesUsed: PersistentList<MoveUsed>,
     val weather: Weather,

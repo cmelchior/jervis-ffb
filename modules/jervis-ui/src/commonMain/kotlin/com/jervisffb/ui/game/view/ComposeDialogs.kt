@@ -40,10 +40,10 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_dice_roll
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.dialogs.ButtonId
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
-import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
+import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
@@ -90,6 +90,7 @@ fun SingleSelectUserActionDialog(
                                 CoinButton(
                                     modifier = Modifier.offset(y = 4.dp),
                                     coin = CoinMenuItem(
+                                        id = ButtonId("CoinSide"),
                                         value = action.component1(),
                                         parent = null,
                                         label = { description },
@@ -105,6 +106,7 @@ fun SingleSelectUserActionDialog(
                                 CoinButton(
                                     modifier = Modifier.offset(y = 4.dp),
                                     coin = CoinMenuItem(
+                                        id = ButtonId("CoinResult"),
                                         value = action.result,
                                         parent = null,
                                         label = { description },
@@ -254,23 +256,29 @@ fun MultipleSelectUserActionDialog(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog: ActionWheelInputDialog) {
-    val wheelViewModel = dialog.viewModel
+fun ActionWheelDialog(
+    uiState: ActionWheelUiStateData?,
+    fieldVm: FieldViewModel,
+    fieldData: FieldViewData,
+) {
+
     val ringSize = 250.jdp
     val boxSize = (hypot(ringSize.value, ringSize.value)).dp
     val ringSizePx = with(LocalDensity.current) { ringSize.toPx() }
     val boxWidthPx = with(LocalDensity.current) { boxSize.toPx() }
     var showTip by remember { mutableStateOf(false) }
     var tipRotationDegree by remember { mutableStateOf(0f) }
-    val offset = remember(fieldData, dialog.viewModel.center) {
-        if (dialog.viewModel.center == null) {
+
+    val offset = remember(uiState) {
+        val center = uiState?.center
+        if (center == null) {
             IntOffset(
                 x = ((fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
                 y = ((fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
             )
         } else {
             val data = fieldData.calculateActionWheelPlacement(
-                dialog,
+                center,
                 fieldVm,
                 boxWidthPx,
                 ringSizePx,
@@ -280,27 +288,24 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
             data.offset
         }
     }
-    if (!dialog.viewModel.isVisible()) return
-    val dismissRequest = remember(wheelViewModel.hideOnClickedOutside, wheelViewModel.onMenuHidden) {
-        { userDismissed: Boolean -> // `true` if the user clicked outside a button (to hide the wheel)
-            if (userDismissed && dialog.viewModel.hideOnClickedOutside) {
-                wheelViewModel.hideWheel(false)
-            }
+    uiState?.let { uiState ->
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .offset { offset }
+        ) {
+            ActionWheel(
+                uiState = uiState,
+                ringSize = ringSize,
+                maxSize = boxSize,
+                showTip = showTip,
+                tipRotationDegree = tipRotationDegree,
+                onAnimationFinished = {
+                    if (uiState.animationOnly) {
+                        fieldVm.screenModel.uiState.notifyAnimationDone()
+                    }
+                },
+            )
         }
-    }
-
-    Box(
-        modifier = Modifier
-            .wrapContentSize()
-            .offset { offset }
-    ) {
-        ActionWheel(
-            viewModel = wheelViewModel,
-            ringSize = ringSize,
-            maxSize = boxSize,
-            showTip = showTip,
-            tipRotationDegree = tipRotationDegree,
-            onDismissRequest = dismissRequest,
-        )
     }
 }

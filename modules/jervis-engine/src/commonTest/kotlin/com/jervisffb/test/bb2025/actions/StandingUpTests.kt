@@ -2,6 +2,7 @@ package com.jervisffb.test.bb2025.actions
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.EndAction
+import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -51,7 +52,7 @@ class StandingUpTests: JervisGameBB2025Test() {
         assertEquals(7, player.movesLeft)
         with(controller.getAvailableActions()) {
             assertEquals(2, actionsCount)
-            assertTrue(contains(EndAction))
+            assertTrue(contains<EndActionWhenReady>())
             assertTrue(contains(MoveType.STAND_UP))
         }
         controller.rollForward(MoveTypeSelected(MoveType.STAND_UP))

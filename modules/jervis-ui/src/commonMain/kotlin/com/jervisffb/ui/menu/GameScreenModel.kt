@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -67,8 +68,29 @@ class LocalFieldDataWrapper {
     var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
     // Used to share mouse events across all field layers
     val pointerBus: PointerEventBus = PointerEventBus()
-    // Indicates whether a context menu is visible
-    var isContentMenuVisible by mutableStateOf(false)
+    // Indicates whether a context menu is visible.
+    private val _isContentMenuVisible = mutableStateOf(false)
+    private val _isContextWheelVisible = mutableStateOf(false)
+    private val _isActionWheelVisible = mutableStateOf(false)
+
+    val isContentMenuVisible: State<Boolean>
+        get() = _isContentMenuVisible
+
+    val isActionWheelVisible: State<Boolean>
+        get() = _isActionWheelVisible
+
+    val isContextWheelVisible: State<Boolean>
+        get() = _isContextWheelVisible
+
+    fun setActionWheelVisibility(visible: Boolean) {
+        _isActionWheelVisible.value = visible
+        _isContentMenuVisible.value = _isActionWheelVisible.value || _isContextWheelVisible.value
+    }
+
+    fun setContextWheelVisibility(visible: Boolean) {
+        _isContextWheelVisible.value = visible
+        _isContentMenuVisible.value = _isActionWheelVisible.value || _isContextWheelVisible.value
+    }
 }
 
 class GameScreenModel(

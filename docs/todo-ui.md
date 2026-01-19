@@ -5,8 +5,11 @@ This document is used to track various todo lists for the UI.
 The TODO list are by no means exhaustive, it is just a place to dump
 things as they come up.
 
+- Hover over player when Action wheel is visible isn't working
+- Kickoff result animations are not working
 
 ## Todo List
+- [ ] When selecting dice rolls for scattering / deviating balls, show a translucent copy of where the ball will end up.
 - [ ] Kick-off pass animation doesn't work during Charge, if the kicking team ends up catching the ball on the receiving side.
 - [ ] Check that the UI works when kicking off when 0 players.
 - [ ] UI for pushing players into the crowd is not working (and have been disabled for now).

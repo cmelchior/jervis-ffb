@@ -7,6 +7,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -131,13 +132,24 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
 
 @Composable
 private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () -> Unit) {
-    GameScreen(
-        viewModel,
+
+    val fieldViewModel = remember(viewModel) {
         FieldViewModel(
             viewModel,
             viewModel.uiState,
             viewModel.hoverPlayerFlow,
-        ),
+        )
+    }
+
+    LaunchedEffect(fieldViewModel) {
+        launch {
+            fieldViewModel.actionWheelViewModel.start()
+        }
+    }
+
+    GameScreen(
+        viewModel,
+        fieldViewModel,
         SidebarViewModel(
             viewModel,
             viewModel.menuViewModel,
@@ -154,7 +166,7 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.awayTeam,
             viewModel.hoverPlayerFlow,
         ),
-        GameStatusViewModel(viewModel, viewModel.uiState),
+        GameStatusViewModel(viewModel, viewModel.sharedFieldData, viewModel.uiState),
         if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.uiState, viewModel) else null,
         if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
         ActionSelectorViewModel(viewModel.uiState),

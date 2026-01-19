@@ -1,6 +1,8 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -28,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,17 +41,24 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -69,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_brilliant_coaching_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
@@ -92,6 +103,7 @@ import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.onClickWithSmallDragControl
 import com.jervisffb.ui.utils.toImageBitmap
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
@@ -195,6 +207,81 @@ fun TopBarGameStatus(
             ) {
                 TeamRerolls(awayTeamInfo.rerolls.reversed(), distance)
             }
+        }
+        GameStatusMessage(vm)
+    }
+}
+
+@Composable
+fun GameStatusMessage(viewModel: GameStatusViewModel) {
+    val alpha = remember { Animatable(0f) }
+    val flow = remember(viewModel) { viewModel.messageFlow() }
+    val message by flow.collectAsState(null)
+    LaunchedEffect(message) {
+        val visible = message.isNullOrBlank().not()
+        alpha.animateTo(
+            targetValue = if (visible) 1f else 0f,
+            tween(300)
+        )
+    }
+    // Message box with a "brush" background
+    // Attempt to align it so it looks on the line with the team features row
+    Box(
+        modifier = Modifier.fillMaxWidth().height(145.jdp).alpha(alpha.value),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
+        val imageBrush = remember(chalkTexture) {
+            ShaderBrush(
+                shader = ImageShader(
+                    image = chalkTexture,
+                    tileModeX = TileMode.Repeated,
+                    tileModeY = TileMode.Repeated,
+                ),
+            )
+        }
+        Box(
+            modifier = Modifier.height(32.dp).drawWithContent {
+                // Create fade brush for left and right edges
+                val fadeBrush = Brush.horizontalGradient(
+                    0f to Color.Transparent,
+                    0.2f to Color.Black,
+                    0.8f to Color.Black,
+                    1f to Color.Transparent,
+                    startX = 0f,
+                    endX = size.width
+                )
+                // Draw the background with the fade mask
+                with(drawContext.canvas) {
+                    saveLayer(
+                        bounds = androidx.compose.ui.geometry.Rect(0f, 0f, size.width, size.height),
+                        paint = androidx.compose.ui.graphics.Paint()
+                    )
+                    drawRect(
+                        brush = imageBrush,
+                        size = size,
+                        alpha = 0.6f,
+                        colorFilter = ColorFilter.tint(JervisTheme.black)
+                    )
+                    drawRect(
+                        brush = fadeBrush,
+                        size = size,
+                        blendMode = BlendMode.DstIn
+                    )
+                    restore()
+                }
+                drawContent()
+            },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = message ?: "",
+                lineHeight = 1.em,
+                maxLines = 1,
+                color = Color.White,
+                fontSize = 20.jsp,
+                modifier = Modifier.padding(horizontal = 100.jdp),
+            )
         }
     }
 }
@@ -541,6 +628,7 @@ private fun TeamInfo(
     backgroundColor: Color,
     leftSide: Boolean
 ) {
+    // Changes here should also modify the text
     val coachBarHeight = 28.jdp // 24.jdp
     val coachBarLength = 200.jdp
     val teamNameBarHeight = 32.jdp // 28.jdp
@@ -557,6 +645,8 @@ private fun TeamInfo(
         horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
         verticalArrangement = Arrangement.Center,
     ) {
+
+        // Team Logo / Name / Coach
         Box(
             modifier = Modifier
                 // Make the team icons be slightly closer to the edge than dugout.
@@ -621,14 +711,14 @@ private fun TeamInfo(
                     )
                 }
             }
-// We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
-// but just using this doesn't scale well. We might need something that can switch between
-// using a normal image and this depending on the size (or switch pixelSize more smartly).
-//        PixelatedImageWithShader(
-//            modifier = Modifier.padding(8.jdp).size(90.jdp),
-//            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
-//            pixelSize = 2f,
-//        )
+            // We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
+            // but just using this doesn't scale well. We might need something that can switch between
+            // using a normal image and this depending on the size (or switch pixelSize more smartly).
+            //        PixelatedImageWithShader(
+            //            modifier = Modifier.padding(8.jdp).size(90.jdp),
+            //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
+            //            pixelSize = 2f,
+            //        )
             // Team Logo
             if (teamInfo.id.value.isNotEmpty()) {
                 Image(
@@ -640,6 +730,8 @@ private fun TeamInfo(
                 )
             }
         }
+
+        // Inducement icons and other team features
         AnimatedVisibility(
             visible = teamInfo.featureList.isNotEmpty()
         ) {

@@ -4,6 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.utils.singleThreadDispatcher
@@ -50,6 +51,10 @@ abstract class UiActionProvider {
     protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 
+    // Init method called when the ActionProvider is attached to a UiGameController.
+    // We have this to break the cyclic dependency between the ActionProvider and UiGameController, and it
+    // allows the UiGameController to provide additional context or configuration for the ActionProvider.
+    abstract fun init(controller: UiGameController)
     // Hook allowing the UiActionProvider to change how the next action is selected.
     // E.g. automated or queued actions.
     abstract suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest)
@@ -57,7 +62,6 @@ abstract class UiActionProvider {
     // E.g. enable onClick listeners on Players, highlight certain aspects of the field or show Dialogs.
     abstract fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator)
     // Hook to manipulate the UI after an action has been selected
-    // TODO Is this used for anything?
     abstract fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator)
     // Block until the next action is generated. Normally by calling `userActionSelected`.
     abstract suspend fun getAction(): GameAction

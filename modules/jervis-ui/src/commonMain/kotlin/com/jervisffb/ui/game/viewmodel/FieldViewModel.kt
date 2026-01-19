@@ -1,6 +1,11 @@
 package com.jervisffb.ui.game.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.positionInRoot
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
@@ -13,7 +18,8 @@ import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.animations.JervisAnimation
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.dialogs.PrimaryActionWheelViewModel
+import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.QueuedActionsResult
@@ -23,8 +29,17 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+
+data class SquareLayoutCoordinates(
+    val coordinate: FieldCoordinate,
+    val positionInRoot: Offset,
+    val boundsInRoot: Rect,
+)
+
+data class FieldLayoutCoordinates(
+    val positionInRoot: Offset,
+)
 
 /**
  * Expand player data with extra callbacks related to UI hover effects.
@@ -67,14 +82,28 @@ class FieldViewModel(
     val fieldViewData = screenModel.fieldViewData
     val fieldBackground = screenModel.fieldBackground
 
+    val actionWheelViewModel = PrimaryActionWheelViewModel(
+        eventFlow = uiState.actionWheelFlow,
+        team = uiState.state.homeTeam,
+        sharedFieldData = sharedFieldData,
+    )
+    var contextMenuViewModel = mutableStateOf(SecondaryActionWheelViewModel(
+        coordinates = null,
+        options = emptyList(),
+        team = uiState.state.homeTeam,
+        sharedFieldData = sharedFieldData,
+        hideOnClickedOutside = true,
+        autoShowOnNewActionButtons = false
+    ))
+
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
 
     // Field layout coordinates (inside the border)
-    var fieldCoordinates: LayoutCoordinates? = null
+    var fieldCoordinates: FieldLayoutCoordinates = FieldLayoutCoordinates(Offset.Zero)
     var borderSize: Float = 0f
     // Track offsets of field squares (so we can use them to animate things between squares)
     // Square offset is from inside the field border.
-    val squareOffsets: MutableMap<FieldCoordinate, LayoutCoordinates?> = mutableMapOf()
+    val squareOffsets: MutableMap<FieldCoordinate, SquareLayoutCoordinates?> = mutableMapOf()
 
     fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
         return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }
@@ -83,6 +112,9 @@ class FieldViewModel(
     fun highlights(): StateFlow<FieldCoordinate?> = _highlights
 
     fun triggerHoverEnter(square: FieldCoordinate) {
+        if (!square.isOnField(game.rules)) {
+            error("Square is not on field: $square")
+        }
         game.field[square].player.let { player: Player? ->
             hoverPlayerChannel.safeTryEmit(player)
         }
@@ -119,8 +151,6 @@ class FieldViewModel(
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {
                         val actionProvider = (uiState.actionProvider)
-
-
                         fun getQueuedActionsForPath(): QueuedActionsResult {
                             val selectedSquares = path.map {
                                 CompositeGameAction(
@@ -190,17 +220,6 @@ class FieldViewModel(
             }.toMap()
         }
     }
-
-    fun observeActionWheel(): Flow<ActionWheelInputDialog?> {
-        return uiState.uiStateFlow.map {
-            if (it.dialogInput != null && it.dialogInput::class == ActionWheelInputDialog::class) {
-                it.dialogInput as ActionWheelInputDialog
-            } else {
-                null
-            }
-        }.distinctUntilChanged()
-    }
-
     private fun showPathFinder(
         activePlayer: Player?,
         mouseEnter: FieldCoordinate?
@@ -212,16 +231,20 @@ class FieldViewModel(
             rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
     )
 
-    fun finishAnimation() {
+    fun notifyAnimationFinished() {
         uiState.notifyAnimationDone()
     }
 
     fun updateOffset(coordinate: FieldCoordinate, layoutCoords: LayoutCoordinates) {
-        squareOffsets[coordinate] = layoutCoords
+        squareOffsets[coordinate] = SquareLayoutCoordinates(
+            coordinate = coordinate,
+            positionInRoot = layoutCoords.positionInRoot(),
+            boundsInRoot = layoutCoords.boundsInRoot()
+        )
     }
 
     fun updateFieldOffSet(fieldLayoutCoordinates: LayoutCoordinates, borderSize: Float) {
-        fieldCoordinates = fieldLayoutCoordinates
+        fieldCoordinates = FieldLayoutCoordinates(fieldLayoutCoordinates.positionInRoot())
         this@FieldViewModel.borderSize = borderSize
         screenModel.updateFieldViewData(fieldLayoutCoordinates, borderSize)
     }

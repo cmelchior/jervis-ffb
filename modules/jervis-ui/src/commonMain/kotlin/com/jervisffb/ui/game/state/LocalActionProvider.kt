@@ -6,6 +6,7 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import kotlinx.coroutines.CoroutineName
@@ -28,6 +29,11 @@ class LocalActionProvider(
     private var actionJob: Job? = null
 
     private var sharedData: LocalFieldDataWrapper? = null
+
+    override fun init(controller: UiGameController) {
+        homeProvider.init(controller)
+        awayProvider.init(controller)
+    }
 
     override fun startHandler() {
         homeProvider.startHandler()

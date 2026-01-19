@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
-import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DirectionSelected
@@ -30,12 +29,12 @@ import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
@@ -43,13 +42,11 @@ import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
-import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
+import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
 import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
@@ -59,7 +56,6 @@ import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
 import com.jervisffb.ui.game.state.decorators.SelectFieldLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
-import com.jervisffb.ui.game.state.decorators.SelectPlayerActionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
 import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
@@ -72,12 +68,11 @@ import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
-import kotlin.to
 
 /**
  * Class responsible for enhancing the UI, so it is able to create a [GameAction].
  *
- * See [com.jervisffb.ui.game.UiGameController.startGameEventLoop]
+ * See [UiGameController.startGameEventLoop]
  */
 open class ManualActionProvider(
     protected val game: GameEngineController,
@@ -102,7 +97,7 @@ open class ManualActionProvider(
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
     private var sharedData: LocalFieldDataWrapper? = null
 
-    val fieldActionDecorators = mapOf(
+    private val fieldActionDecorators = mapOf(
         // EndSetupWhenReady -> TODO()
         // EndTurnWhenReady -> TODO()
         // is RollDice -> TODO()
@@ -115,7 +110,8 @@ open class ManualActionProvider(
         // is SelectRerollOption -> TODO()
         // is SelectSkill -> TODO()
         // TossCoin -> TODO()
-        DeselectPlayer::class to DeselectPlayerDecorator,
+        // DeselectPlayer::class to DeselectPlayerDecorator,
+        // SelectPlayerAction::class to SelectPlayerActionDecorator,
         EndActionWhenReady::class to EndActionDecorator,
         EndSetupWhenReady::class to EndSetupDecorator,
         EndTurnWhenReady::class to EndTurnDecorator,
@@ -125,10 +121,21 @@ open class ManualActionProvider(
         SelectFieldLocation::class to SelectFieldLocationDecorator,
         SelectMoveType::class to SelectMoveTypeDecorator,
         SelectPlayer::class to SelectPlayerDecorator,
-        SelectPlayerAction::class to SelectPlayerActionDecorator,
         SelectPlayers::class to SelectPlayersDecorator,
         SelectRandomPlayers::class to SelectRandomPlayersDecorator,
     )
+
+    private var nodeToActionWheelController: Map<Node, ActionWheelDialogController> = emptyMap()
+
+    override fun init(controller: UiGameController) {
+        nodeToActionWheelController = buildMap {
+            controller.actionWheelControllers.forEach { controller ->
+                controller.nodes.forEach { node ->
+                    this[node] = controller
+                }
+            }
+        }
+    }
 
     override fun startHandler() {
         // Do nothing. We are sharing the controller with the main UiGameController
@@ -185,11 +192,15 @@ open class ManualActionProvider(
         }
 
         if (showActionDecorators) {
-            addModalDialogDecorators(this, acc, actions)
-
+            addActionWheelDecorators(this, acc, actions)
+            // val actionWheelVisible = acc.actionWheelVisible
+            val actionWheelVisible = acc.gameController.currentNode()?.let { nodeToActionWheelController.contains(it) } ?: false
+            if (!actionWheelVisible) {
+                addModalDialogDecorators(this, acc, actions)
+            }
             // If a dialog is being shown, we do not want to enable any other kind of input until
             // the dialog has been resolved.
-            if (acc.dialogInput == null) {
+            if (acc.dialogInput == null && !actionWheelVisible) {
                 addNonDialogActionDecorators(acc, actions)
             }
 
@@ -197,20 +208,7 @@ open class ManualActionProvider(
             // added during `addNonDialogActionDecorators()`. Thus we need to check for it here.
             // TODO This is probably the wrong architecture as we can have multiple menus like during
             acc.squares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
-                acc.dialogInput = it.createActionWheelContextMenu(game.state)
-            }
-
-            acc.dialogInput?.let { dialog ->
-                if (dialog is ActionWheelInputDialog) {
-                    val square = dialog.viewModel.center
-                    if (square != null) {
-                        acc.updateSquare(square) {
-                            it.copy(
-                                isActionWheelFocus = true
-                            )
-                        }
-                    }
-                }
+                acc.contextMenuActionWheel = it.createActionWheelContextMenu(game.state, sharedData!!)
             }
         }
     }
@@ -219,11 +217,12 @@ open class ManualActionProvider(
         // If Undo'ing actions, this might happen through short-cuts and not the UI.
         // If this happens while a context menu is open, its state will be left hanging.
         // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
-        // that state here when the action is Undo or Revert.
+        // reset that state here when the action is Undo or Revert.
         // TODO In general we need to rethink the lifecycle of the Action Wheel since we want to enable
         //  animations between states in the Wheel. At that point, this logic should probably be revisited.
         if (action is Undo || action is Revert) {
-            sharedData?.isContentMenuVisible = false
+            sharedData?.setActionWheelVisibility(false)
+            sharedData?.setContextWheelVisibility(false)
         }
     }
 
@@ -276,21 +275,57 @@ open class ManualActionProvider(
     }
 
     /**
+     * Check if the game are in a state where we want to show an Action Wheel in order
+     * to create a [GameAction].
+     *
+     * Action Wheels at this stage are assumed to be visible from the start.
+     * Similar to how a modal dialog would be.
+     *
+     * If they are optional they are instead configured as [com.jervisffb.ui.game.view.ContextMenuOption]
+     * using a [FieldActionDecorator].
+     *
+     * Because ActionWheels sometimes have multiple steps e.g. roll-reroll-roll, we need to handle
+     * transitions between these. This is why action wheel lifecycles and their setup at each stage
+     * are controlled by a [com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController] subclass
+     * which encapsulates the entire lifecycle, including both forward and backward transactions
+     */
+    private fun addActionWheelDecorators(
+        provider: UiActionProvider,
+        acc: UiSnapshotAccumulator,
+        actions: ActionRequest,
+    ) {
+        val currentNode = acc.gameController.currentNode()
+        nodeToActionWheelController[currentNode]?.onDecorateActions(
+            acc,
+            provider,
+            actions,
+            sharedData!!
+        )
+    }
+
+    /**
      * Check if the game are in a state where we want to show a pop-up dialog in order
      * to create a [GameAction]. If yes, the data needed to build the dialog is added
      * to the UI state.
      */
     private fun addModalDialogDecorators(provider: UiActionProvider, state: UiSnapshotAccumulator, actions: ActionRequest) {
+        // First configure "standard" modal dialogs
         val dialogData = DialogFactory.createDialogIfPossible(
             game,
             actions,
             provider,
+            sharedData!!,
+            state,
             { actionDescriptors-> mapUnknownAction(actionDescriptors.actions) }
         )
         if (state.dialogInput != null) {
             error("Only 1 dialog is allowed. Dialog already configured: ${state.dialogInput}")
         }
-        state.dialogInput = dialogData
+        when (dialogData) {
+            else -> {
+                state.dialogInput = dialogData
+            }
+        }
     }
 
     /**
@@ -372,14 +407,6 @@ open class ManualActionProvider(
         // First, we check if we are playing Hotseat and the game is set to roll random
         // actions on the "server". In this case, they are generated here as no server exists.
         if (!gameSettings.clientSelectedDiceRolls && gameSettings.isHotseatGame && actions.containsActionWithRandomBehavior()) {
-            return createRandomAction(controller.state, actions)
-        }
-
-        // If the Client is allowed to select dice rolls, this normally happens at the correct Node in the Engine,
-        // but for blocks where we are using the Action Wheel, the UI gets a little wonky. So in that case, we
-        // always generate the roll here, and if the coach isn't happy with the result, they can modify it. Which
-        // will result in an Undo.
-        if (gameSettings.clientSelectedDiceRolls && (controller.currentNode() is StandardBlockRollDice.RollDice || controller.currentNode() is StandardBlockRerollDice.ReRollDie)) {
             return createRandomAction(controller.state, actions)
         }
 

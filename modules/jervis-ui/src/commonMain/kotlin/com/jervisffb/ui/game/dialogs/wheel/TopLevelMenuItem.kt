@@ -1,21 +1,25 @@
-package com.jervisffb.ui.game.dialogs.circle
+package com.jervisffb.ui.game.dialogs.wheel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
+import com.jervisffb.ui.game.dialogs.ButtonId
 
 /**
- * Class representing the "top"-level node of a menu system. It is entry point
- * owned by [ActionWheelMenuController].
+ * Class representing the "top"-level node of a menu system. This menu only
+ * has submenu items and no "primary". It is an entry point owned by
+ * [ActionWheelMenuController].
  */
 class TopLevelMenuItem(
-    val viewModel: ActionWheelViewModel,
+    val viewModel: AbstractActionWheelViewModel,
     originAngle: Float,
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf(),
-    override val expandMode: MenuExpandMode = MenuExpandMode.COMPACT
+    override var expandMode: MenuExpandMode = MenuExpandMode.Compact()
 ): ActionWheelMenuItem() {
+    override val id: ButtonId = ButtonId("TopLevel")
     override var label: () -> String = { "TopLevel" }
     val size: Int get() = subMenu.size
     override val parent: ActionWheelMenuItem? = null

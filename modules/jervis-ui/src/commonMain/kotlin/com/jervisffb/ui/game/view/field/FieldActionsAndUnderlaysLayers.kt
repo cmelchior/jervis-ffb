@@ -45,18 +45,20 @@ fun FieldActionsAndUnderlaysLayers(
 
     val fieldData: Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>> by fieldDataFlow.collectAsState(emptyMap())
     val pathFinderData by pathFinderFlow.collectAsState(null)
-
-    FieldSquares(vm) { modifier: Modifier, x, y ->
-        val coordinate = FieldCoordinate(x, y)
-        val squareData: UiFieldSquare? = fieldData[coordinate]?.first
-        val playerData: UiFieldPlayer? = fieldData[coordinate]?.second
-        SquareHighlightAndAction(
-            modifier,
-            vm,
-            squareData ?: UiFieldSquare(FieldCoordinate.UNKNOWN),
-            playerData,
-            pathFinderData?.let { it[coordinate] },
-        )
+    val isContextMenuVisible by vm.sharedFieldData.isContentMenuVisible
+    if (!isContextMenuVisible) {
+        FieldSquares(vm) { modifier: Modifier, x, y ->
+            val coordinate = FieldCoordinate(x, y)
+            val squareData: UiFieldSquare? = fieldData[coordinate]?.first
+            val playerData: UiFieldPlayer? = fieldData[coordinate]?.second
+            SquareHighlightAndAction(
+                modifier,
+                vm,
+                squareData ?: UiFieldSquare(FieldCoordinate.UNKNOWN),
+                playerData,
+                pathFinderData?.let { it[coordinate] },
+            )
+        }
     }
 }
 
@@ -70,10 +72,10 @@ private fun SquareHighlightAndAction(
     pathfinderData: UiPathFinderData?,
 ) {
     val sharedFieldData = vm.sharedFieldData
-
-    val bgColor = remember(sharedFieldData.isContentMenuVisible, square, player) {
+    val isActionWheelVisible = sharedFieldData.isContentMenuVisible
+    val bgColor = remember(isActionWheelVisible, square, player) {
         when {
-            sharedFieldData.isContentMenuVisible -> Color.Transparent
+            sharedFieldData.isContentMenuVisible.value -> Color.Transparent
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
@@ -98,8 +100,9 @@ private fun SquareHighlightAndAction(
                 .jervisPointerEvent(FieldPointerEventType.PrimaryClickSquare, square.coordinates) {
                     // In that case, it is the square that should handle opening it again, after which control transfers
                     // back to the ActionWheelLayer
-                    if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible) {
-                        vm.sharedFieldData.isContentMenuVisible = true
+                    if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible.value) {
+                        vm.contextMenuViewModel.value = square.createActionWheelContextMenu(vm.game, sharedFieldData)
+                        vm.contextMenuViewModel.value.showWheel()
                     }
 
                     // Toggling the Action Wheel should take precedence over triggering square/player actions.
@@ -123,11 +126,12 @@ private fun SquareHighlightAndAction(
                 }
             }
     ) {
+        val contentMenuVisible by sharedFieldData.isContentMenuVisible
         // TODO Move this to the Dialog Layer?
-        if (sharedFieldData.isContentMenuVisible && !square.useActionWheel) {
+        if (contentMenuVisible && !square.useActionWheel) {
             ContextPopupMenu(
                 hidePopup = { dismissed ->
-                    sharedFieldData.isContentMenuVisible = false
+                    sharedFieldData.setContextWheelVisibility(false)
                     if (dismissed) {
                         square.onMenuHidden?.invoke()
                     }
@@ -147,7 +151,7 @@ private fun SquareHighlightAndAction(
                     contentDescription = "Ball left field at ${square.coordinates}",
                 )
             }
-        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty() && !sharedFieldData.isContentMenuVisible) {
+        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty() && !contentMenuVisible) {
             val moveValue = pathfinderData.futureMoveDistance.toString()
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(

@@ -181,7 +181,7 @@ class GameEngineController(
             lastHandleActionError = ex
             throw ex
         }
-        LOG.v { "Current node: ${currentNode()}" }
+        LOG.d { "Current node: ${currentNode()}" }
     }
 
     /**

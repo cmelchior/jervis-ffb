@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
@@ -44,6 +45,10 @@ class RandomActionProvider(
     private var job: Job? = null
     private var paused = false
     private lateinit var actions: ActionRequest
+
+    override fun init(controller: UiGameController) {
+        // Do nothing
+    }
 
     override fun startHandler() {
         // Do nothing

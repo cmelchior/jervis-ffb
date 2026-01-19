@@ -54,7 +54,7 @@ fun KickOffEventResultAnimation(vm: FieldViewModel, animation: KickOffEventAnima
                 ) { value: Float, _: Float ->
                     alpha = value
                 }
-                vm.finishAnimation()
+                vm.notifyAnimationFinished()
             }
             launch {
                 // Let the image come in from a lower position rather than directly from the center

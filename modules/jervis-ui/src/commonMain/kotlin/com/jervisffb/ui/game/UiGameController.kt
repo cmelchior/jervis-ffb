@@ -7,9 +7,11 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -26,6 +28,25 @@ import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.state.actionwheel.AccuracyWheelController
+import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
+import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
+import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
+import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
+import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
+import com.jervisffb.ui.game.state.actionwheel.RushWheelController
+import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
+import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
+import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
@@ -36,6 +57,9 @@ import com.jervisffb.ui.game.state.indicators.MoveUsedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamFeatureStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
+import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.GameStatusMessageFactory
+import com.jervisffb.ui.game.view.HideActionWheel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.FrameRateAverager
@@ -85,9 +109,9 @@ class UiGameController(
     val rules: Rules = gameController.rules
     val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
 
-    // Persistent UI decorations that needs to be stored across actions
+    // Persistent UI decorations that need to be stored across actions
     val uiDecorations = UiPersistentGameIndicators()
-    val fieldStatusIndicators: List<FieldStatusIndicator> = listOf(
+    private val fieldStatusIndicators: List<FieldStatusIndicator> = listOf(
         BallCarriedStatusIndicator,
         BallExitStatusIndicator,
         BallOnGroundStatusIndicator,
@@ -97,6 +121,30 @@ class UiGameController(
         TeamFeatureStatusIndicator,
         TeamRerollStatusIndicator,
         TeamSetupsAvailableStatusIndicator
+    )
+    val actionWheelControllers = setOf(
+        AccuracyWheelController,
+        BounceRollWheelController,
+        CatchWheelController,
+        DeviateRollWheelController,
+        DodgeWheelController,
+        PickupWheelController,
+        RushWheelController,
+        SelectPlayerActionWheelController,
+        ScatterRollWheelController,
+
+        StandardBlockRollWheelController,
+        StandardBlockChooseResultOrRerollWheelController,
+
+        FollowUpWheelController,
+        UseBlockWheelController,
+        UseDodgeWheelController,
+        UseSidestepWheelController,
+        UseTackleWheelController,
+        UseWrestleWheelController,
+
+        UseApothecaryWheelController,
+        ArgueTheCallWheelController
     )
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
@@ -116,12 +164,25 @@ class UiGameController(
     private val _uiStateFlow = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val uiStateFlow: Flow<UiGameSnapshot> = _uiStateFlow
 
+    // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
+    private val _uiActionWheelFlow = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionWheelFlow: Flow<List<ActionWheelUiState>> = _uiActionWheelFlow
+    private val _uiContextWheelFlow = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+    val uiContextWheelFlow: Flow<List<ActionWheelUiState>> = _uiContextWheelFlow
+
+    val gameStatusMessageFactory = GameStatusMessageFactory(state)
+
+
     // `replay` is only used to allow the UI to register itself after the game controller has started
     private val _animationFlow = MutableSharedFlow<JervisAnimation?>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val animationFlow: Flow<JervisAnimation?> = _animationFlow
 
     // Channel used by the UI to indicate when the animation is done
     val animationDone = Channel<Boolean>(capacity = Channel.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
+
+    init {
+        actionProvider.init(this)
+    }
 
     /**
      * Start the main game loop.
@@ -170,6 +231,7 @@ class UiGameController(
                 homeDogoutOnClickAction = null,
                 awayDogoutOnClickAction = null,
                 dialogInput = null,
+                actionWheelVisible = false,
                 movesUsed = persistentListOf(),
                 weather = Weather.PERFECT_CONDITIONS,
                 homeTeamInfo = UiTeamInfoUpdate.INITIAL,
@@ -183,8 +245,14 @@ class UiGameController(
                 val state = controller.state
                 val delta = controller.getDelta()
                 val actions = controller.getAvailableActions()
+                val (previousNode, currentNode) = controller.previousNode() to controller.currentNode()
+                val acc = UiSnapshotAccumulator(
+                    _uiStateFlow,
+                    _uiActionWheelFlow,
+                    _uiContextWheelFlow,
+                    lastUiState, this@UiGameController)
 
-                runPreUpdateAnimations()
+                runPreUpdateAnimations(acc, previousNode, currentNode)
 
                 // Log entries from last action should be added after the animation,
                 // so we don't accidentally reveal the result too soon.
@@ -193,21 +261,20 @@ class UiGameController(
 
                 // Update UI State based on latest model state
                 actionProvider.prepareForNextAction(controller, actions)
-                val acc = UiSnapshotAccumulator(lastUiState, this@UiGameController)
                 addBaseGameStateChanges(state, actions, delta, acc)
-                applyUiIndicators(actions, state, acc)
-                _uiStateFlow.emit(acc.build())
+                applyUiIndicators(actions, controller, acc)
+                acc.emitAllUpdates()
 
                 // Detect animations and run them after updating the UI, but before making it ready
                 // for creating the user actions
-                runPostUpdateAnimations(state)
+                runPostUpdateStateAnimations(state, acc)
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
                 actionProvider.decorateAvailableActions(actions, acc)
-                acc.build().let {
-                    menuViewModel.updateUiState(it)
-                    _uiStateFlow.emit(it)
+                acc.let {
+                    menuViewModel.updateUiState(it.build())
+                    it.emitAllUpdates()
                 }
 
                 // Wait for the system to produce the next action, this can either be
@@ -218,19 +285,27 @@ class UiGameController(
                 // After an action was selected, run all decorators that modify
                 // the UI while the action is being processed.
                 actionProvider.decorateSelectedAction(userAction, acc)
-                val finalUiState = acc.build()
-                _uiStateFlow.emit(finalUiState)
+                acc.emitAllUpdates()
 
                 // Then run any animations triggered by the action (but before the state is updated)
-                runPostActionAnimations(state, userAction)
+                runPostActionSelectedAnimations(controller, userAction, acc)
 
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                lastUiState = finalUiState
+                lastUiState = acc.build()
                 try {
                     gameController.handleAction(userAction)
                     actionProvider.actionHandled(actions.team, userAction)
+
+                    // Now that we know the next node, we can also determine if the Action Wheel
+                    // is visible next step, if it isn't, we can hide it now
+
+                    val shouldHideActionWheel = !checkIfActionWheelIsVisible(gameController, acc)
+                    if (shouldHideActionWheel) {
+                        acc.emitActionWheelState()
+                    }
+
                 } catch (ex: InvalidActionException) {
                     menuViewModel.showReportIssueDialog(
                         title = "Invalid action created",
@@ -253,15 +328,50 @@ class UiGameController(
         }
     }
 
-    private fun applyUiIndicators(actionRequest: ActionRequest, state: Game, acc: UiSnapshotAccumulator) {
-        val currentNode = state.stack.currentNode() as ActionNode
+    fun checkIfActionWheelIsVisible(gameController: GameEngineController, finalUiState: UiSnapshotAccumulator): Boolean {
+        // If both current and previous node had a visible wheel, we can keep it around
+        val previousNode = gameController.previousNode()
+        val currentNode = gameController.currentNode()
+        val hadActionWheelInPreviousNode = actionWheelControllers.any { it.nodes.contains(previousNode) }
+        val hasActionWheelInCurrentNode = actionWheelControllers.any { it.nodes.contains(currentNode) }
+        return hadActionWheelInPreviousNode && hasActionWheelInCurrentNode
+    }
+
+    private fun applyUiIndicators(actionRequest: ActionRequest, controller: GameEngineController, acc: UiSnapshotAccumulator) {
+        val state = controller.state
+        val currentNode = controller.currentNode() as ActionNode
         fieldStatusIndicators.forEach { indicator ->
             indicator.decorate(currentNode, state, actionRequest, acc)
         }
 
+        // Set the game status for the current step. For Hotseat games it will always show the message
+        // for the active coach. For P2P games, each client will see the message relevant for the respective coach.
+        gameStatusMessageFactory.applyMessage(actionProvider, acc)
     }
 
-    private suspend fun runPreUpdateAnimations() {
+    // Run animations before we update the UI to represent the state we moved to after applying the last GameAction
+    private suspend fun runPreUpdateAnimations(acc: UiSnapshotAccumulator, previousNode: Node?, currentNode: Node?) {
+
+        val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
+            controller.nodes.contains(acc.gameController.currentNode())
+        }
+        if (currentWheelHandler != null) {
+            if (currentWheelHandler.onApplyCurrentState(
+                    acc,
+                    gameController.lastAction,
+                    previousNode,
+                    currentNode!!
+                )
+            ) {
+                acc.emitActionWheelState()
+                animationDone.receive()
+            }
+        } else {
+            acc.addActionWheelEvent(HideActionWheel)
+            acc.addContextWheelEvent(HideActionWheel)
+            acc.emitActionWheelState()
+        }
+
         if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
@@ -271,21 +381,32 @@ class UiGameController(
         }
     }
 
-    private suspend fun runPostUpdateAnimations(state: Game) {
+    private suspend fun runPostUpdateStateAnimations(state: Game, acc: UiSnapshotAccumulator) {
         if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
+                acc.addActionWheelEvent(HideActionWheel)
+                acc.emitActionWheelState()
                 _animationFlow.emit(animation)
                 animationDone.receive()
             }
         }
     }
 
-    private suspend fun runPostActionAnimations(state: Game, action: GameAction) {
-        if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getPostActionAnimation(state, action)
-            if (animation != null) {
-                _animationFlow.emit(animation)
+    private suspend fun runPostActionSelectedAnimations(
+        engineController: GameEngineController,
+        action: GameAction,
+        uiState: UiSnapshotAccumulator
+    ) {
+        if (action != Undo) {
+            val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
+                controller.nodes.contains(engineController.currentNode())
+            }
+            if (currentWheelHandler?.onPostActionAnimation(
+                    uiState,
+                    action
+                ) == true) {
+                uiState.emitActionWheelState()
                 animationDone.receive()
             }
         }

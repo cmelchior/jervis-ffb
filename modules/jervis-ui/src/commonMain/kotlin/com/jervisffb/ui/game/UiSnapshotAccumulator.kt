@@ -5,22 +5,37 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.ui.game.dialogs.HideActionWheel
+import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
+import com.jervisffb.ui.game.dialogs.ShowActionWheel
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
+import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
  * Class responsible for collecting all changes to create a [UiGameSnapshot].
  * This is primarily used by [FieldActionDecorator] and [FieldStatusIndicator]
  * subclasses.
+ *
+ * This class is mutable, but can send its current state to the UI using either
+ * [emitUiState] or [emitActionWheelState].
  */
 class UiSnapshotAccumulator(
-    private val previousSnapshot: UiGameSnapshot,
+    private val uiStateFlow: MutableSharedFlow<UiGameSnapshot>,
+    private val uiActionWheelFlow: MutableSharedFlow<List<ActionWheelUiState>>,
+    private val uiContextWheelFlow: MutableSharedFlow<List<ActionWheelUiState>>,
+    previousSnapshot: UiGameSnapshot,
     val uiController: UiGameController
 ) {
+    val gameController = uiController.gameController
+    val game = uiController.state
+
     private val playersBuilder = previousSnapshot.players.builder()
     private val squaresBuilder = previousSnapshot.squares.builder()
     private var gameStatusText: String? = null
@@ -34,9 +49,13 @@ class UiSnapshotAccumulator(
     val squares: Map<FieldCoordinate, UiFieldSquare>
         get() = squaresBuilder
     val stack = uiController.state.stack
-    val game = uiController.state
     var awayDogoutOnClickAction: (() -> Unit)? = null
     var homeDogoutOnClickAction: (() -> Unit)? = null
+    var actionWheelVisible: Boolean = previousSnapshot.actionWheelVisible
+        private set
+    private val actionWheelEvents = mutableListOf<ActionWheelUiState>()
+    private val contextWheelEvents = mutableListOf<ActionWheelUiState>()
+    var contextMenuActionWheel: SecondaryActionWheelViewModel? = null
     var dialogInput: UserInputDialog? = null
     var homeTeamInfo = UiTeamInfoUpdate(game.homeTeam)
     var awayTeamInfo = UiTeamInfoUpdate(game.awayTeam)
@@ -44,6 +63,25 @@ class UiSnapshotAccumulator(
     // If set, it means we are in the middle of a move action that allows the player
     // to move multiple squares.
     var pathFinder: PathFinder.AllPathsResult? = null
+
+    fun addActionWheelEvent(event: ActionWheelUiState) {
+        actionWheelEvents.add(event)
+        when (event) {
+            HideActionWheel -> actionWheelVisible = false
+            is ShowActionWheel -> {
+                actionWheelVisible = true
+            }
+            is ActionWheelUiStateData -> {
+                event.lastActionWasUndo = gameController.lastActionWasUndo()
+            }
+
+            else -> { /* Do nothing */ }
+        }
+    }
+
+    fun addContextWheelEvent(event: ActionWheelUiState) {
+        contextWheelEvents.add(event)
+    }
 
     fun getAllMoveUsed(): Map<FieldCoordinate, Int> {
         return movesUsed.associate { it.coordinate to it.value }
@@ -117,6 +155,7 @@ class UiSnapshotAccumulator(
             homeDogoutOnClickAction = homeDogoutOnClickAction,
             awayDogoutOnClickAction = awayDogoutOnClickAction,
             dialogInput = dialogInput,
+            actionWheelVisible = actionWheelVisible,
             movesUsed = movesUsedBuilder.build(),
             weather = weather,
             homeTeamInfo = homeTeamInfo,
@@ -125,4 +164,25 @@ class UiSnapshotAccumulator(
         )
     }
 
+    suspend fun emitUiState() {
+        uiStateFlow.emit(build())
+    }
+
+    // Send any current accumulated action wheel events to the UI. The list
+    // is cleared after sending it.
+    suspend fun emitActionWheelState() {
+        if (contextWheelEvents.isNotEmpty()) {
+            uiContextWheelFlow.emit(contextWheelEvents.toList())
+            contextWheelEvents.clear()
+        }
+        if (actionWheelEvents.isNotEmpty()) {
+            uiActionWheelFlow.emit(actionWheelEvents.toList())
+            actionWheelEvents.clear()
+        }
+    }
+
+    suspend fun emitAllUpdates() {
+        emitUiState()
+        emitActionWheelState()
+    }
 }

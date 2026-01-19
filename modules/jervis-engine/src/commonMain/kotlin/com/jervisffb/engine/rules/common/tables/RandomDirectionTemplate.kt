@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.model.Direction
 import kotlinx.serialization.Serializable
 import kotlin.math.PI
@@ -60,6 +61,22 @@ object RandomDirectionTemplate {
         d3: D3Result,
     ): Direction {
         return rotateVector(results[d3.value]!!, corner.rotateDegrees)
+    }
+
+    /**
+     * Returns the list of values on the template, starting from NORTH, then going clockwise
+     */
+    fun getTemplateValues(): List<Pair<D8Result, String>> {
+        return listOf(
+            2.d8 to "↑",
+            3.d8 to "↗",
+            5.d8 to "→",
+            8.d8 to "↘",
+            7.d8 to "↓",
+            6.d8 to "↙",
+            4.d8 to "←",
+            1.d8 to "↖",
+        )
     }
 
     private fun rotateVector(

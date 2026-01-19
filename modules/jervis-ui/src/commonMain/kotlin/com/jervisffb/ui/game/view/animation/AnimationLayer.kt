@@ -18,11 +18,14 @@ fun AnimationLayer(
     Box(modifier = Modifier.fillMaxSize()) {
         val animationFlow = remember { vm.observeAnimation() }
         val animationData by animationFlow.collectAsState(null)
-        if (animationData?.second is KickOffEventAnimation) {
-            KickOffEventResultAnimation(vm, animationData!!.second as KickOffEventAnimation)
-        }
-        if (animationData?.second is PassAnimation) {
-            PassResultAnimation(vm, animationData!!.second as PassAnimation)
+        when (animationData?.second) {
+            is KickOffEventAnimation -> {
+                KickOffEventResultAnimation(vm, animationData!!.second as KickOffEventAnimation)
+            }
+            is PassAnimation -> {
+                PassResultAnimation(vm, animationData!!.second as PassAnimation)
+            }
+            else -> { /* Do nothing */ }
         }
     }
 }

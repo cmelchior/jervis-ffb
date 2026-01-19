@@ -1,11 +1,13 @@
 package com.jervisffb.ui.game.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,9 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +43,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
@@ -50,6 +54,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
@@ -69,7 +74,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.adamglin.composeshadow.dropShadow
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D20Result
@@ -81,16 +85,16 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
-import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
-import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuController
-import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuItem
-import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
-import com.jervisffb.ui.game.dialogs.circle.ButtonLayoutMode
-import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
-import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
-import com.jervisffb.ui.game.dialogs.circle.TopLevelMenuItem
+import com.jervisffb.ui.game.dialogs.ActionButtonData
+import com.jervisffb.ui.game.dialogs.ButtonData
+import com.jervisffb.ui.game.dialogs.ButtonId
+import com.jervisffb.ui.game.dialogs.DieButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
+import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
@@ -102,13 +106,111 @@ import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.scalePixels
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import kotlin.random.Random
+
+sealed interface ActionWheelUiState
+object HideActionWheel : ActionWheelUiState
+object ShowActionWheel : ActionWheelUiState
+data class ActionWheelUiStateData(
+    val center: FieldCoordinate?,
+    val topItems: List<ButtonData> = emptyList(),
+    val topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
+    val topAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
+    val bottomItems: List<ButtonData> = emptyList(),
+    val bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
+    val bottomAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
+    val onDismiss: (() -> Unit)? = null,
+    val animationOnly: Boolean = false,
+): ActionWheelUiState {
+    var lastActionWasUndo: Boolean = false
+
+    // Only used in `COMPACT` mode and defines the distance in degrees between
+    // each sub item.
+    private val stepAngle = 45.0f
+
+    init {
+        recalculateSubMenuAngles(topItems, topExpandMode, -90f)
+        recalculateSubMenuAngles(bottomItems, bottomExpandMode, 90f)
+    }
+
+    private fun recalculateSubMenuAngles(
+        buttons: List<ButtonData>,
+        expandMode: MenuExpandMode,
+        startAngle: Float
+    ) {
+        if (buttons.isEmpty()) return
+        buttons.forEach {
+            it.defaultStartingAngle = startAngle
+        }
+        when (val mode = expandMode) {
+            MenuExpandMode.None -> error("Not supported")
+            MenuExpandMode.TwoWay -> {
+                buttons.forEachIndexed { index, item ->
+                    when (index) {
+                        0 -> {
+                            item.defaultStartingAngle = 0f
+                            item.targetAngle = -90f
+                        }
+                        1 -> {
+                            item.defaultStartingAngle = 180f
+                            item.targetAngle = 90f
+                        }
+                        else -> error("Too many item: ${buttons.size}")
+                    }
+                }
+            }
+            is MenuExpandMode.FanOut -> {
+                // If no parent, evenly distribute items in the ring.
+                // For an even number of items, one will always be on the `defaultStartAngle`
+                // For an odd number of items, `defaultStartAngle` will be in the middle between two items.
+                // directly on `centerAngle`
+                buttons.forEachIndexed { index, item ->
+                    item.targetAngle = (mode.spread / buttons.size) * index + startAngle
+                }
+            }
+            is MenuExpandMode.Compact -> {
+                // Clump menu items together at `centerAngle`. For an even number of menu items
+                // This means none of them will be directly on `centerAngle`.
+                val offset = if (buttons.size % 2 == 0) stepAngle / 2f else 0f
+                // val parentModifier = if (parent == null) 0 else 1
+                val parentModifier = 0
+                buttons.forEachIndexed { index, item ->
+                    // This will swap direction (starting with clockwise) and gradually move out,
+                    // so [cw(1), ccw(1), cw(2), ccw(2), ...]
+                    val direction = if (index % 2 == 1) -1 else 1
+                    val magnitude = ceil((index + parentModifier) / 2.0).toFloat()
+                    item.targetAngle = (startAngle + offset + direction * magnitude * stepAngle)
+                }
+            }
+        }
+    }
+
+    companion object {
+        val None: ActionWheelUiState = ActionWheelUiStateData(center = null)
+    }
+}
+
+data class ItemAnimatable(
+    // Used for position around the wheel
+    val angleDegree : Animatable<Float, *>,
+    val alpha: Animatable<Float, *> = Animatable(0f),
+    // Only use for dice roll animations
+    var isAnimating: MutableState<Boolean> = mutableStateOf(false),
+    val yOffset: Animatable<Float, *> = Animatable(0f), //  = remember(startingValue, endValue) { Animatable(0f) }
+    val rotation: Animatable<Float, *> = Animatable(0f), //  = remember(startingValue, endValue) { Animatable(0f) }
+    var displayFace: MutableState<DieResult?> = mutableStateOf(null) //  by remember(startingValue, endValue) { mutableStateOf(startingValue) }
+)
 
 /**
  * This file contains all the composable required to render a "Circular Action Menu".
@@ -116,76 +218,369 @@ import kotlin.math.sin
  * [ActionWheelViewModel].
  */
 
-/**
- * Main entry point for a Circular Action Menu.
- *
- * @param viewModel The view model driving the menu.
- * @param ringSize The size of the ring.
- * @param borderSize The size of the border. Is inside [ringSize].
- * @param animationDuration The duration of animations changing the menu layout,
- * like adding or removing menus.
- */
 @Composable
 fun ActionWheel(
-    viewModel: ActionWheelViewModel,
+    uiState: ActionWheelUiStateData,
     ringSize: Dp = 250.jdp,
     borderSize: Dp = 20.jdp,
     maxSize: Dp = 300.jdp,
-    animationDuration: Int = 300,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
-    onDismissRequest: (Boolean) -> Unit,
+    onAnimationFinished: () -> Unit,
 ) {
-    // Center of the menu in pixels
-    val teamColor = remember(viewModel.owner) {
-        when (viewModel.owner.isHomeTeam()) {
-            true -> JervisTheme.rulebookRed
-            false -> JervisTheme.rulebookBlue
-        }
+    val animationDurationMs = 300
+    var previousState by remember { mutableStateOf<ActionWheelUiStateData?>(null) }
+    val topAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }
+    val bottomAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }
+    // Track buttons until they removed again (alpha = 0). We cache them here to decouple all current buttons from the
+    // ActionWheelUiState, which should only care about the "current" state.
+    val topRenderButtons = remember { mutableStateListOf<ButtonData>() }
+    val bottomRenderButtons = remember { mutableStateListOf<ButtonData>() }
+
+    var buttonsEnabled by remember(uiState) { mutableStateOf(false) }
+    var hoverText by remember { mutableStateOf<String?>(null) }
+    // If a button has temporary primary focus, it will dim all other remaining buttons and disable their onClick handlers
+    var temporaryPrimaryFocus by remember { mutableStateOf<ButtonId?>(null) }
+
+    LaunchedEffect(Unit) {
+        bottomRenderButtons.clear()
+        bottomRenderButtons.addAll(uiState.bottomItems)
+        topRenderButtons.clear()
+        topRenderButtons.addAll(uiState.bottomItems)
     }
-    val hoverText: String? by viewModel.hoverText.collectAsState()
-    val topMessage = viewModel.topMessage
+
+    // Trigger animations on state changes.
+    // This effect is also responsible for tracking previous items until they are fully gone.
+    LaunchedEffect(uiState) {
+        hoverText = null
+        if (uiState.lastActionWasUndo) {
+            topAnimatable.clear()
+            bottomAnimatable.clear()
+            previousState = null
+        }
+
+        val from = previousState
+        val to = uiState
+
+        // 1) Make sure render list has union(from, to)
+        val bottomUnion = (from?.bottomItems.orEmpty() + to.bottomItems).reversed().distinctBy { it.id }.reversed()
+        bottomRenderButtons.clear()
+        bottomRenderButtons.addAll(bottomUnion)
+        val topUnion = (from?.topItems.orEmpty() + to.topItems).reversed().distinctBy { it.id }.reversed()
+        topRenderButtons.clear()
+        topRenderButtons.addAll(topUnion)
+
+        // 2) Run animations. This will animate disappearing items to alpha = 0
+        runWheelAnimations(
+            from = from,
+            to = to,
+            topAnims = topAnimatable,
+            bottomAnims = bottomAnimatable,
+            animationDurationMs = animationDurationMs,
+        )
+
+        // 3) After animation completes, remove items that are gone
+        val stillPresentBottomIds = to.bottomItems.map { it.id }.toSet()
+        bottomRenderButtons.removeAll { it.id !in stillPresentBottomIds }
+        val stillPresentTopIds = to.topItems.map { it.id }.toSet()
+        topRenderButtons.removeAll { it.id !in stillPresentTopIds }
+
+        previousState = uiState
+        buttonsEnabled = true
+        onAnimationFinished()
+    }
+
     Box(
         modifier = Modifier
             .size(maxSize)
-            .graphicsLayer(clip = false)
+            .alpha(1f)
         ,
         contentAlignment = Alignment.Center
     ) {
-        val updateHover = remember(viewModel) {
-            { ht: String? ->
-                viewModel.hoverText.value = if (ht.isNullOrBlank() && viewModel.fallbackToStartHoverText) {
-                    viewModel.startingHoverText
-                } else {
-                    ht
+        ActionWheelBackgroundRing(
+            ringSize,
+            borderSize,
+            showTip,
+            tipRotationDegree,
+            // Ring should appear slightly before items
+            animationDuration = if (uiState.lastActionWasUndo) 0 else animationDurationMs - 100,
+        )
+        WheelButtons(
+            animationsCache = topAnimatable,
+            buttons = topRenderButtons,
+            wheelRadius = (ringSize - borderSize)/2f,
+            buttonsClickable = buttonsEnabled,
+            onHover = { text -> hoverText = text },
+            primaryFocus = temporaryPrimaryFocus,
+            onPrimaryFocus = { id, isPrimary ->
+                temporaryPrimaryFocus = if (isPrimary) id else null
+                buttonsEnabled = !isPrimary
+            }
+        )
+
+        WheelButtons(
+            animationsCache = bottomAnimatable,
+            buttons = bottomRenderButtons,
+            wheelRadius = (ringSize - borderSize)/2f,
+            buttonsClickable = buttonsEnabled,
+            onHover = { text -> hoverText = text },
+            primaryFocus = temporaryPrimaryFocus,
+            onPrimaryFocus = { id, isPrimary ->
+                temporaryPrimaryFocus = if (isPrimary) id else null
+                buttonsEnabled = !isPrimary
+            }
+        )
+        HoverText(hoverText, JervisTheme.homeTeamColor)
+    }
+}
+private suspend fun runWheelAnimations(
+    from: ActionWheelUiStateData?,
+    to: ActionWheelUiStateData,
+    topAnims: MutableMap<ButtonId, ItemAnimatable>,
+    bottomAnims: MutableMap<ButtonId, ItemAnimatable>,
+    animationDurationMs: Int,
+) = coroutineScope {
+    val topJob = async {
+        animateRegion(
+            animationsCache = topAnims,
+            to = to.topItems,
+            from = from?.topItems.orEmpty(),
+            animationMode = if (to.lastActionWasUndo) ButtonLayoutMode.UNDO else to.topAnimationType,
+            animationDuration = animationDurationMs
+        )
+    }
+    val bottomJob = async {
+        animateRegion(
+            animationsCache = bottomAnims,
+            to = to.bottomItems,
+            from = from?.bottomItems.orEmpty(),
+            animationMode = if (to.lastActionWasUndo) ButtonLayoutMode.UNDO else to.bottomAnimationType,
+            animationDuration = animationDurationMs
+        )
+    }
+
+
+    topJob.await()
+    bottomJob.await()
+}
+
+private suspend fun animateRegion(
+    animationsCache: MutableMap<ButtonId, ItemAnimatable>,
+    from: List<ButtonData>,
+    to: List<ButtonData>,
+    animationMode: ButtonLayoutMode,
+    animationDuration: Int,
+) = coroutineScope {
+
+    val shortAnimation = (animationDuration * 2/3f).roundToInt()
+    val appearing = to.filter { new -> from.none { it.id == new.id } }
+    val staying   = to.filter { new -> from.any { it.id == new.id } }
+    val disappearing = from.filter { old -> to.none { it.id == old.id } }
+    val animatingRoll = to.filter { it.animateRoll != null }
+
+    // Debug information
+    //     println("AnimationMode [$animationDuration]: $animationMode")
+    //     println("Appearing: ${appearing.size}")
+    //     println("Staying: ${staying.size}")
+    //     println("Disappearing: ${disappearing.size}")
+
+    // Make sure that all buttons are in the animation cache
+    appearing.forEach {
+        animationsCache.getOrPut(it.id) {
+            ItemAnimatable(
+                Animatable(it.defaultStartingAngle),
+            )
+        }
+    }
+
+    when (animationMode) {
+        ButtonLayoutMode.STABLE -> {
+            // Do nothing
+        }
+        ButtonLayoutMode.DELAY -> {
+
+        }
+        ButtonLayoutMode.ANIMATING_ROLL -> {
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                    }
+                }
+            }
+            if (disappearing.isNotEmpty()) {
+                delay(shortAnimation.toLong())
+            }
+            animatingRoll.forEach {
+                launch {
+                    animationsCache[it.id]!!.let { anim ->
+                        anim.alpha.snapTo(1f)
+                        anim.angleDegree.snapTo(it.targetAngle)
+                        anim.isAnimating.value = true
+                        val randJob = launch {
+                            // For "complex" dice like Block dice, changing face too quick
+                            // makes it look really messy. With this approach we change once
+                            // near the top of the arc before switching to correct result.
+                            // From manual testing, this seems to be a good trade-off between
+                            // "hiding" the true result a bit and making it look more "random".
+                            it.animateRoll?.let { rollAnim ->
+                                anim.displayFace.value = rollAnim.startingValue
+                                delay(100)
+                                anim.displayFace.value = rollAnim.intermediateValue
+                                delay(100)
+                                anim.displayFace.value = rollAnim.endValue
+                            }
+                        }
+
+                        // Rotation while airborne
+                        val rotJob = launch {
+                            anim.rotation.animateTo(
+                                targetValue = 360f,
+                                animationSpec = tween(300, easing = LinearEasing)
+                            )
+                        }
+
+                        // Jump up in the air
+                        anim.yOffset.animateTo(
+                            targetValue = -75f,
+                            animationSpec = tween(150, easing = LinearOutSlowInEasing)
+                        )
+
+                        // Fall to the ground again
+                        anim.yOffset.animateTo(
+                            targetValue = 0f,
+                            animationSpec = tween(150, easing = FastOutLinearInEasing)
+                        )
+                        rotJob.cancel()
+                        randJob.cancel()
+                        anim.rotation.snapTo(0f)
+                        anim.displayFace.value = it.animateRoll!!.endValue
+                        it.animateRoll?.additionalDelayAfterRoll?.let { additionalDelay ->
+                            delay(additionalDelay)
+                        }
+                        anim.isAnimating.value = false
+                    }
                 }
             }
         }
-        ActionWheelBackgroundRing(ringSize, borderSize, showTip, tipRotationDegree, onDismissRequest = onDismissRequest)
-        NestedMenuLayout(
-            viewModel = viewModel,
-            viewModel.bottomMenu,
-            (ringSize - borderSize)/2f,
-            animationDuration,
-            onHover = updateHover,
-        )
-        if (topMessage == null) {
-            NestedMenuLayout(
-                viewModel = viewModel,
-                viewModel.topMenu,
-                (ringSize - borderSize)/2f,
-                animationDuration,
-                onHover = updateHover,
-            )
-        } else {
-            RingMessage(
-                message = topMessage,
-                angle = viewModel.topMenu.topLevelMenu.startSubAngle,
-                radius = (ringSize - borderSize)/2f,
-                borderColor = teamColor,
-            )
+        ButtonLayoutMode.EXPEND_NEW_SUBMENU -> {
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                    }
+                }
+            }
+            appearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(1f, tween(animationDuration))
+                    }
+                    launch {
+                        val target = shortestPathToTaget(anim.angleDegree.value, it.targetAngle)
+                        anim.angleDegree.animateTo(target, tween(animationDuration))
+                    }
+                }
+            }
+            staying.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.angleDegree.animateTo(it.targetAngle, tween(animationDuration))
+                    }
+                }
+            }
         }
-        HoverText(hoverText, teamColor)
+        ButtonLayoutMode.CONTRACT_NEW_SUBMENU -> {
+            appearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(1f, tween(animationDuration))
+                    }
+                    launch {
+                        anim.angleDegree.snapTo(it.targetAngle)
+                    }
+                }
+            }
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                        // anim.alpha.animateTo(0f, tween((shortAnimation * 0.8).roundToInt()))
+                    }
+                    launch {
+                        val target = shortestPathToTaget(anim.angleDegree.value, it.defaultStartingAngle)
+                        anim.angleDegree.animateTo(target, tween(shortAnimation))
+                    }
+                }
+            }
+            staying.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.angleDegree.animateTo(it.targetAngle, tween(animationDuration))
+                    }
+                }
+            }
+        }
+
+        ButtonLayoutMode.UNDO -> {
+            appearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.angleDegree.snapTo(it.targetAngle)
+                        anim.alpha.snapTo(1f)
+                    }
+                }
+            }
+            staying.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.angleDegree.snapTo(it.targetAngle)
+                        anim.alpha.snapTo(1f)
+                    }
+                }
+            }
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.angleDegree.snapTo(it.defaultStartingAngle)
+                        anim.alpha.snapTo(0f)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WheelButtons(
+    animationsCache: MutableMap<ButtonId, ItemAnimatable>,
+    buttons: List<ButtonData>,
+    wheelRadius: Dp,
+    buttonsClickable: Boolean,
+    onHover: (String?) -> Unit,
+    primaryFocus: ButtonId? = null,
+    onPrimaryFocus: (ButtonId, Boolean) -> Unit = { _, _ -> },
+) {
+    val radiusPx = with(LocalDensity.current) { wheelRadius.toPx() }
+    Box(Modifier.size(wheelRadius), Alignment.Center) {
+        buttons.reversed().forEachIndexed { i, item ->
+            val animationData = animationsCache[item.id]
+            if (animationData != null) {
+                val angle by animationData.angleDegree.asState()
+                val alpha by animationData.alpha.asState()
+                MenuItemButton(
+                    item,
+                    animationData,
+                    angle,
+                    alpha,
+                    radiusPx,
+                    isOnClickEnabled = buttonsClickable || (item.id == primaryFocus),
+                    isFullyVisible = (primaryFocus == null) || (item.id == primaryFocus),
+                    onHover,
+                    onPrimaryFocus,
+                )
+            }
+        }
     }
 }
 
@@ -205,13 +600,11 @@ private fun RingMessage(
     Box(modifier = Modifier.offset { offset.toIntOffset() }) {
         Box(
             modifier = Modifier
-                .dropShadow(
-                    shape = shape,
-                    color = Color.Black.copy(1f),
-                    offsetX = 0.dp,
-                    offsetY = 0.dp,
-                    blur = 16.dp
-                )
+                .dropShadow(shape = shape) {
+                    this.color = Color.Black.copy(1f)
+                    this.offset = Offset.Zero
+                    this.radius = 16.dp.toPx()
+                }
                 .paperBackground()
                 .border(width = 4.dp, borderColor)
                 .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp)
@@ -226,305 +619,58 @@ private fun RingMessage(
     }
 }
 
-/**
- * Top-level composable responsible for tracking a nested menu and transitions between the layers.
- * The "starting point" for the menu is defined by [TopLevelMenuItem.startSubAngle].
- *
- * This way you can have multiple nested layouts on the same ring, like buttons at the top
- * and actions at the bottom, but they do not know about each other, so can potentially overlap
- * if configured incorrectly.
- */
-@Composable
-private fun NestedMenuLayout(
-    viewModel: ActionWheelViewModel,
-    menuController: ActionWheelMenuController,
-    radius: Dp,
-    animationDuration: Int,
-    onHover: (String?) -> Unit
-) {
-    val stack = remember { mutableStateListOf<ActionWheelMenuItem>() }
-    var currentPrimaryMenu by remember { mutableStateOf<ActionWheelMenuItem?>(null) }
-    var mode by remember { mutableStateOf(ButtonLayoutMode.STABLE) }
-
-    CircularMenuLevel(
-        mode = mode,
-        activeButton = currentPrimaryMenu,
-        primaryMenuLevel = currentPrimaryMenu?.parent ?: menuController.topLevelMenu,
-        secondaryMenuLevel = stack.lastOrNull(),
-        radius = radius,
-        animationDuration = animationDuration,
-        onItemSelected = { item ->
-            if (item != currentPrimaryMenu && item.subMenu.isNotEmpty()) {
-                mode = ButtonLayoutMode.EXPAND
-                stack.add(item)
-                currentPrimaryMenu = item
-            } else if (item == currentPrimaryMenu) {
-                mode = ButtonLayoutMode.CONTRACT
-            } else {
-                (item as ActionMenuItem).onClick(item.parent, item)
-            }
-        },
-        onHover = onHover,
-        onAnimationOver = {
-            when (mode) {
-                ButtonLayoutMode.STABLE -> { }
-                ButtonLayoutMode.EXPAND -> { }
-                ButtonLayoutMode.CONTRACT -> {
-                    stack.removeLast()
-                    currentPrimaryMenu = stack.lastOrNull()
-                }
-            }
-            mode = ButtonLayoutMode.STABLE
-        },
-        onExpandChanged = { die, isExpanded ->
-            viewModel.onActionOptionsExpandChange(die, isExpanded)
-        }
-    )
-}
-
 // Calculate the shortest distance (in degrees) to a target when moving across a ring
 private fun shortestPathToTaget(current: Float, desired: Float): Float {
     val delta = ((((desired - current) % 360f) + 540f) % 360f) - 180f
     return current + delta
 }
 
-/**
- * Composable controlling a single "level" of a nested circular menu.
- * It also handles the transitions going back up the chain or diving further into
- * submenus.
- */
-@Composable
-private fun CircularMenuLevel(
-    mode: ButtonLayoutMode,
-    activeButton: ActionWheelMenuItem?,
-    primaryMenuLevel: ActionWheelMenuItem?,
-    // This is only used while animating changes. Once a menu is "stable", it is
-    // always sent as the `primaryMenuLevel`.
-    secondaryMenuLevel: ActionWheelMenuItem?,
-    radius: Dp,
-    animationDuration: Int,
-    onItemSelected: (ActionWheelMenuItem) -> Unit,
-    onHover: (String?) -> Unit,
-    onAnimationOver: () -> Unit,
-    onExpandChanged: (ActionWheelMenuItem, Boolean) -> Unit,
-) {
-    val radiusPx = with(LocalDensity.current) { radius.toPx() }
-
-    //    // Animation state for primary menu items
-    val mainAngleAnims = remember { mutableMapOf<ActionWheelMenuItem, Animatable<Float, AnimationVector1D>>() }
-    val mainAlphaAnims = remember { mutableMapOf<ActionWheelMenuItem, Animatable<Float, AnimationVector1D>>() }
-
-    // Animation state for submenu items for the currently selected main menu)
-    val subAngleAnims = remember { mutableMapOf<ActionWheelMenuItem, Animatable<Float, AnimationVector1D>>() }
-    val subAlphaAnims = remember { mutableMapOf<ActionWheelMenuItem, Animatable<Float, AnimationVector1D>>() }
-
-    Box(Modifier.size(radius), Alignment.Center) {
-        // "sub-level" items should be rendered first so they are behind "top-level" menus
-        secondaryMenuLevel?.subMenu?.forEachIndexed { i, item ->
-            val base = when (mode) {
-                ButtonLayoutMode.STABLE,
-                ButtonLayoutMode.EXPAND -> activeButton!!.startSubAngle
-                ButtonLayoutMode.CONTRACT -> item.startSubAngle // Should never be used because item is already in the map
-            }
-            val angleA = subAngleAnims.getOrPut(item) { Animatable(base) }
-            val alphaA = subAlphaAnims.getOrPut(item) { Animatable(0f) }
-
-            LaunchedEffect(mode, item, activeButton, primaryMenuLevel?.subMenu, secondaryMenuLevel.subMenu) {
-                when (mode) {
-                    ButtonLayoutMode.STABLE -> {
-                        // println("Sub Stable: ${item.label}")
-                        // Animate in new items. Existing items are already in this state.
-                        launch {
-                            angleA.animateTo(shortestPathToTaget(angleA.value, item.startSubAngle), tween(animationDuration))
-                        }
-                        launch {
-                            alphaA.animateTo(1f, tween(animationDuration))
-                        }
-                    }
-                    ButtonLayoutMode.EXPAND -> {
-                        // println("Expand sub level: ${item.label}")
-                        launch {
-                            angleA.animateTo(shortestPathToTaget(angleA.value, item.startSubAngle), tween(animationDuration))
-                        }
-                        launch {
-                            alphaA.animateTo(1f, tween(animationDuration))
-                        }
-
-                    }
-                    ButtonLayoutMode.CONTRACT -> {
-                        // println("Contract sub level: ${item.label}")
-                        launch {
-                            angleA.animateTo(shortestPathToTaget(angleA.value, activeButton!!.startSubAngle), tween(animationDuration))
-                        }
-                        launch {
-                            alphaA.animateTo(0f, tween(animationDuration))
-                        }
-                    }
-                }
-            }
-
-            // Draw button
-            MenuItemButton(
-                item,
-                angleA.value,
-                alphaA.value,
-                radiusPx,
-                onHover,
-                onItemSelected,
-                onExpandChanged,
-            )
-        }
-
-        // Render "top-level" menu
-        primaryMenuLevel?.subMenu?.forEachIndexed { i, item ->
-            val base = item.startSubAngle
-            val angleA = mainAngleAnims.getOrPut(item) { Animatable(base) }
-            val alphaA = mainAlphaAnims.getOrPut(item) { Animatable(1f) }
-            val isPrimary = (activeButton == item)
-            LaunchedEffect(mode, item, item.startSubAngle, activeButton, primaryMenuLevel.subMenu, secondaryMenuLevel?.subMenu) {
-                when (mode) {
-                    ButtonLayoutMode.STABLE -> {
-                        // println("Render main: ${item.label}")
-                        // Animate in new items. Existing items are already in this state.
-                        launch {
-                            angleA.animateTo(
-                                shortestPathToTaget(
-                                    angleA.value,
-                                    if (isPrimary) item.startMainAngle else item.startSubAngle
-                                ),
-                                tween(animationDuration)
-                            )
-                        }
-                        launch {
-                            // If there is no "active button" we are at the top-level and then want to show all buttons
-                            alphaA.animateTo(
-                                if (isPrimary || activeButton == null) 1f else 0f,
-                                tween(animationDuration)
-                            )
-                        }
-                    }
-                    ButtonLayoutMode.EXPAND -> {
-                        when {
-                            isPrimary -> {
-                                // println("Move to selected position: ${item.label}")
-                                launch {
-                                    angleA.animateTo(
-                                        shortestPathToTaget(angleA.value, item.startMainAngle),
-                                        tween(animationDuration)
-                                    )
-                                }
-                                launch {
-                                    alphaA.animateTo(
-                                        1f,
-                                        tween(animationDuration / 2)
-                                    )
-                                }
-                            }
-                            else -> {
-                                // println("Fade out: ${item.label}")
-                                launch {
-                                    alphaA.animateTo(
-                                        0f,
-                                        tween(animationDuration / 2)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    ButtonLayoutMode.CONTRACT -> {
-                        when {
-                            isPrimary -> {
-                                // println("Move primary back to starting position: ${item.label}")
-                                launch {
-                                    angleA.animateTo(
-                                        shortestPathToTaget(angleA.value, item.startSubAngle),
-                                        tween(animationDuration)
-                                    )
-                                }
-                            }
-                            else -> {
-                                // println("Fade in: ${item.label}")
-                                launch {
-                                    alphaA.animateTo(
-                                        1f,
-                                        tween(animationDuration / 2)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                launch {
-                    delay(animationDuration.toLong())
-                    onAnimationOver()
-                }
-            }
-
-            // Draw button on the ring
-            MenuItemButton(
-                item,
-                angleA.value,
-                alphaA.value,
-                radiusPx,
-                onHover,
-                onItemSelected,
-                onExpandChanged,
-            )
-        }
-    }
-}
-
 // Composable responsible for rending the actual action/dice button
 @Composable
 private fun MenuItemButton(
-    item: ActionWheelMenuItem,
+    item: ButtonData,
+    animationData: ItemAnimatable,
     angle: Float,
     alpha: Float,
     radiusPx: Float,
-    // Set onHover description
+    isOnClickEnabled: Boolean,
+    isFullyVisible: Boolean,
+    // Show or hide a hover description inside the wheel
     onHover: (String?) -> Unit,
-    onItemSelected: (ActionWheelMenuItem) -> Unit,
-    onExpandChanged: (ActionWheelMenuItem, Boolean) -> Unit = { _, _ -> },
+    onPrimaryFocus: (ButtonId, Boolean) -> Unit = { _, _ -> },
 ) {
     if (alpha <= 0f) return
     val offset = getOffset(angle, radiusPx)
     Box(
+        // It would be nice to be able to control `alpha` from this location, but there seems to be
+        // issues with this when using the new 1.9 `.dropShadow()`. So for now, it is up to each
+        // item composable to drive their animation updates
         modifier = Modifier
-            .offset { offset.toIntOffset() }
-            .alpha(alpha)
+            .offset {offset.toIntOffset() }
     ) {
         when (item) {
-            is TopLevelMenuItem -> error("Not supported: $item")
-            is ActionMenuItem -> {
+            is ActionButtonData -> {
                 ActionButton(
-                    item.label(),
+                    item.label,
+                    alpha,
                     item.icon,
-                    enabled = item.enabled,
-                    onHover = { onHover(it) },
-                    onClick = { onItemSelected(item) }
+                    isOnClickEnabled = if (!isOnClickEnabled) false else item.enabled,
+                    isFullyVisible = if (!isFullyVisible) false else item.enabled,
+                    onHover = onHover,
+                    onClick = item.action
                 )
             }
-            is DiceMenuItem<*> -> {
+            is DieButtonData<*> -> {
+                @Suppress("UNCHECKED_CAST")
                 ExpandableDiceSelector(
-                    item,
-                    disabled = !item.enabled,
-                    canExpand = item.expandable,
-                    onClick = {
-                        item.onClick(item.value)
-                    },
-                    onExpandedChanged = onExpandChanged,
-                    onHover = {
-                        @Suppress("UNCHECKED_CAST")
-                        val hoverText = item.onHover as (DieResult?) -> String?
-                        onHover(hoverText(it))
-                    },
-                )
-            }
-
-            is CoinMenuItem -> {
-                CoinButton(
-                    coin = item,
-                    disabled = false,
+                    item as DieButtonData<DieResult>,
+                    animationData,
+                    isOnClickEnabled = isOnClickEnabled,
+                    isFullyVisible = isFullyVisible,
+                    onClick = item.action,
+                    onHover = onHover,
+                    alpha = alpha,
+                    onExpandedChanged = onPrimaryFocus,
                 )
             }
         }
@@ -541,8 +687,11 @@ private fun ActionWheelBackgroundRing(
     // How many degrees to rotate the tip in degrees. 0f is top-left
     tipRotation: Float = 0f,
     ringColor: Color = JervisTheme.black,
-    onDismissRequest: (Boolean) -> Unit = { }
+    animationDuration: Int,
 ) {
+    // We only ever fade in the ring. If it ever fades out again, this is handled
+    // by fading out the entire action wheel in upper layers.
+    var visible by remember { mutableStateOf(true) }
     val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
     val imageBrush = remember {
         ShaderBrush(
@@ -555,62 +704,73 @@ private fun ActionWheelBackgroundRing(
     }
     val ringAlpha = 0.5f
     val padding = ((hypot(ringSize.value, ringSize.value)).dp - ringSize) / 2f
-    Canvas(
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer {
-                clip = false
-                compositingStrategy = CompositingStrategy.Offscreen
-            }
-    ) {
-        val radius = ringSize.toPx() / 2f
-        val center = Offset(size.width / 2f, size.height / 2f)
-        val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
-        if (showTip) {
-            val path = Path().apply {
-                moveTo(tip.x, tip.y)
-                lineTo(x = center.x, y = padding.toPx())
-                arcTo(
-                    rect = Rect(
-                        center = center,
-                        radius = radius
-                    ),
-                    startAngleDegrees = -90f,
-                    sweepAngleDegrees = 270f,
-                    forceMoveTo = true
-                )
-                lineTo(x = tip.x, y = tip.y)
-                close()
-            }
 
-            rotate(degrees = tipRotation) {
-                drawPath(
-                    path = path,
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(
+            animationSpec = tween(durationMillis = max(0, animationDuration), easing = FastOutLinearInEasing)
+        ),
+        exit = fadeOut(
+            animationSpec = tween(durationMillis = max(0, animationDuration), easing = FastOutLinearInEasing)
+        )
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    clip = false
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
+        ) {
+            val radius = ringSize.toPx() / 2f
+            val center = Offset(size.width / 2f, size.height / 2f)
+            val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
+            if (showTip) {
+                val path = Path().apply {
+                    moveTo(tip.x, tip.y)
+                    lineTo(x = center.x, y = padding.toPx())
+                    arcTo(
+                        rect = Rect(
+                            center = center,
+                            radius = radius
+                        ),
+                        startAngleDegrees = -90f,
+                        sweepAngleDegrees = 270f,
+                        forceMoveTo = true
+                    )
+                    lineTo(x = tip.x, y = tip.y)
+                    close()
+                }
+
+                rotate(degrees = tipRotation) {
+                    drawPath(
+                        path = path,
+                        brush = imageBrush,
+                        alpha = 1f,
+                        colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
+                    )
+                }
+            } else {
+                drawCircle(
                     brush = imageBrush,
+                    radius = radius,
+                    center = center,
                     alpha = 1f,
                     colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
                 )
             }
-        } else {
-            drawCircle(
-                brush = imageBrush,
-                radius = radius,
-                center = center,
-                alpha = 1f,
-                colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
+
+            val innerRadius = radius - borderSize.toPx()
+            val innerPath = Path().apply {
+                addOval(Rect(center = center, radius = innerRadius))
+            }
+
+            drawPath(
+                path = innerPath,
+                color = Color.Transparent,
+                blendMode = BlendMode.Clear
             )
         }
-
-        val innerRadius = radius - borderSize.toPx()
-        val innerPath = Path().apply {
-            addOval(Rect(center = center, radius = innerRadius))
-        }
-
-        drawPath(
-            path = innerPath,
-            color = Color.Transparent,
-            blendMode = BlendMode.Clear
-        )
     }
 }
 
@@ -624,7 +784,7 @@ private fun HoverText(
     val fontSize = 14.sp
     val fontWeight = FontWeight.Bold
     val textColor = Color.White
-    val animationDuration = 200
+    val animationDuration = 100
     var displayedMessage by remember { mutableStateOf<String?>(null) }
     val bgAlpha = remember {
         Animatable(0f)
@@ -706,64 +866,63 @@ private fun HoverText(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionButton(
-    description: String,
+    description: () -> String,
+    alpha: Float,
     icon: ActionIcon,
-    enabled: Boolean = true,
+    isOnClickEnabled: Boolean = true,
+    isFullyVisible: Boolean = true,
     onHover: (String?) -> Unit = {},
     onClick: () -> Unit = { },
 ) {
     val icon = remember(icon) { IconFactory.getActionIcon(icon) }
     val colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
-    var isHover by remember { mutableStateOf(false) }
+    var isHover by remember(icon) { mutableStateOf(false) }
+    // Modifier order is a mess to get shadows to animate correctly. The current setup works,
+    // but I suspect its performance could be improved. But this requires further experimentation.
     Box(
-        modifier = Modifier.alpha(if (enabled) 1f else 0.3f)
-    ) {
-        Image(
-            modifier = Modifier
-                .dropShadow(
-                    shape = CircleShape,
-                    color = Color.Black.copy(1f),
-                    offsetX = 0.dp,
-                    offsetY = 0.dp,
-                    blur = 8.dp
-                ),
-            bitmap = icon,
-            contentDescription = "Drop shadow",
-            filterQuality = FilterQuality.None,
-        )
-        Image(
-            modifier = Modifier
-                .border(2.dp, Color.Black.copy(0.5f), CircleShape)
-                .clip(CircleShape)
-                .applyIf(enabled) {
-                    this.pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val e = awaitPointerEvent()
-                                when (e.type) {
-                                    PointerEventType.Enter -> {
-                                        isHover = true
-                                        onHover(description)
-                                    }
-                                    PointerEventType.Exit  -> {
-                                        isHover = false
-                                        onHover(null)
-                                    }
-                                    PointerEventType.Press -> {
-                                        // We are about to trigger onClick, so prevent
-                                        // other layers from reacting too early
-                                        e.changes.forEach { it.consume() }
-                                    }
-                                    PointerEventType.Release -> {
-                                        e.changes.forEach { it.consume() }
-                                        onClick()
-                                    }
+        modifier = Modifier
+            .dropShadow(CircleShape) {
+                color = Color.Black.copy(0.75f * alpha)
+                offset = Offset.Zero
+                radius = 8.dp.toPx()
+                this.alpha = alpha
+            }
+            .graphicsLayer {
+                this.alpha = alpha
+                compositingStrategy = CompositingStrategy.Offscreen
+            }
+            .clip(CircleShape)
+            .border(2.dp, Color.Black.copy(0.5f), CircleShape)
+            .applyIf(isOnClickEnabled) {
+                this.pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val e = awaitPointerEvent()
+                            when (e.type) {
+                                PointerEventType.Enter -> {
+                                    isHover = true
+                                    onHover(description())
+                                }
+                                PointerEventType.Exit  -> {
+                                    isHover = false
+                                    onHover(null)
+                                }
+                                PointerEventType.Press -> {
+                                    // We are about to trigger onClick, so prevent
+                                    // other layers from reacting too early
+                                    e.changes.forEach { it.consume() }
+                                }
+                                PointerEventType.Release -> {
+                                    e.changes.forEach { it.consume() }
+                                    onClick()
                                 }
                             }
                         }
                     }
                 }
-            ,
+            }
+    ) {
+        Image(
             filterQuality = FilterQuality.None,
             bitmap = icon,
             contentDescription = "",
@@ -843,22 +1002,18 @@ fun CoinImage(
             contentDescription = coin.name,
             modifier = Modifier.fillMaxSize()
                 .applyIf(dropShadow) {
-                    dropShadow(
-                        shape = CircleShape,
-                        color = JervisTheme.black.copy(1f),
-                        offsetX = 0.dp,
-                        offsetY = 0.dp,
-                        blur = 12.dp,
-                    )
+                    dropShadow(shape = CircleShape) {
+                        color = JervisTheme.black.copy(1f)
+                        offset = Offset.Zero
+                        radius = 12.dp.toPx()
+                    }
                 }
                 .applyIf(!dropShadow) {
-                    this.dropShadow(
-                        shape = CircleShape,
-                        color = JervisTheme.black.copy(0.3f),
-                        offsetX = 0.dp,
-                        offsetY = 0.dp,
-                        blur = 4.dp
-                    )
+                    dropShadow(shape = CircleShape) {
+                        color = JervisTheme.black.copy(0.3f)
+                        offset = Offset.Zero
+                        radius = 4.dp.toPx()
+                    }
                 }
                 .applyIf(enabled) {
                     this.pointerInput(Unit) {
@@ -910,23 +1065,24 @@ fun CoinImage(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T : DieResult> ExpandableDiceSelector(
-    die: DiceMenuItem<T>,
-    // When using multiple selectors, the other selectors are disabled (grayed out)
-    // while one is open.
-    disabled: Boolean = false,
-    // if `false`. Clicking the primary dice button will just be treated as selecting that dice value
-    canExpand: Boolean = true,
-    onClick: (T) -> Unit = { },
-    onHover: (DieResult?) -> Unit = { },
-    onExpandedChanged: (ActionWheelMenuItem, Boolean) -> Unit = { _, _ -> },
-    onAnimationDone: () -> Unit = {}
+fun ExpandableDiceSelector(
+    button: DieButtonData<DieResult>,
+    animationData: ItemAnimatable,
+    isOnClickEnabled: Boolean = true,
+    isFullyVisible: Boolean = true,
+    onClick: () -> Unit = { },
+    onHover: (String?) -> Unit = { },
+    alpha: Float = 1f,
+    onExpandedChanged: (ButtonId, Boolean) -> Unit = { _, _ -> },
 ) {
 
     // Current state tracking
+    var currentDiceValue by remember(button) { mutableStateOf(button.diceValue) }
     val density = LocalDensity.current
-    val diceValue = die.value
-    val diceList = die.diceList
+    val diceList = button.options.toMutableList().apply {
+        remove(button.diceValue)
+        add(0, button.diceValue)
+    }
     val shadowColor = Color.Black
     var expanded by remember { mutableStateOf(false) }
 
@@ -940,7 +1096,7 @@ fun <T : DieResult> ExpandableDiceSelector(
     val backgroundPadding = 8.dp
     val spacingBetweenItems = backgroundPadding / 2f
 
-    val rows = when (die.value) {
+    val rows = when (button.diceValue) {
         is D12Result -> 3
         is D16Result -> 4
         is D20Result -> 4
@@ -952,14 +1108,15 @@ fun <T : DieResult> ExpandableDiceSelector(
         is DBlockResult -> 2
     }
     val itemsPrRow = diceList.size / rows
-    val buttonSize = IconFactory.getDiceSizeDp(diceValue)
+    val buttonSize = IconFactory.getDiceSizeDp(currentDiceValue)
     val (buttonWidth, buttonHeight) = buttonSize
     val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
     val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)
 
     // Determine the placement of popup
-    val (popupDirection, popupOffset) = remember(die) {
-        when (die.preferLtr) {
+    val (popupDirection, popupOffset) = remember(button) {
+        when (button.preferLtr) {
+            null,
             true -> {
                 val padding = with(density) { (backgroundPadding/2).toPx().roundToInt() }
                 val adjustment = with(density) {
@@ -979,65 +1136,59 @@ fun <T : DieResult> ExpandableDiceSelector(
 
     // Handle opening and closing animation of the dice selector
     if (expanded) {
-        LaunchedEffect(die) {
+        LaunchedEffect(button) {
             bgWidthDp.snapTo(maxWidthDp.value)
             // launch { bgWidthDp.animateTo(maxWidthDp.value, animation) }
             launch { bgAlpha.animateTo(1f) }
         }
     } else {
-        LaunchedEffect(die) {
+        LaunchedEffect(button) {
             bgWidthDp.snapTo(0f)
             // launch { bgWidthDp.animateTo(0f, animation) }
             launch { bgAlpha.animateTo(0f) }
         }
     }
 
-    // The visible button, but the normal and jumping one.
+    val isAnimating by animationData.isAnimating
+    val yOffset by animationData.yOffset.asState()
+    val rotation by animationData.rotation.asState()
+    val displayFace by animationData.displayFace
+
+    // The visible button, both the normal and jumping one.
     Box(
-        modifier = Modifier.alpha(if (disabled) 0.3f else 1f)
+        modifier = Modifier
+            .alpha(if (!isFullyVisible) 0.3f else 1f)
+            .applyIf(isAnimating) {
+                graphicsLayer {
+                    translationY = yOffset
+                    rotationZ = rotation
+                }
+            }
         ,
         contentAlignment = Alignment.CenterStart,
     ) {
-        if (!die.animationDone) {
-            DiceAnimation(
-                die.animatingFrom!!,
-                options = diceList,
-                diceValue,
-                content = { value ->
-                    DiceButton(
-                        DpSize(buttonWidth, buttonHeight),
-                        1f,
-                        value = value,
-                        enabled = false,
-                        dropShadow = true,
-                        dropShadowColor = shadowColor,
-                    )
-                },
-                onAnimationEnd = {
-                    die.animationDone = true
-                    onAnimationDone()
+        DiceButton(
+            DpSize(buttonWidth,  buttonHeight),
+            alpha,
+            value = if (isAnimating) displayFace!! else currentDiceValue,
+            label = button.label,
+            clickEnabled = isOnClickEnabled,
+            onHover = {
+                if (!isAnimating) {
+                    onHover(it)
                 }
-            )
-        } else {
-            DiceButton(
-                DpSize(buttonWidth,  buttonHeight),
-                1f,
-                value = diceValue,
-                enabled = !disabled,
-                onClick = {
-                    if (canExpand) {
-                        expanded = !expanded
-                        onExpandedChanged(die, expanded)
-                    } else {
-                        die.valueSelected(diceValue)
-                        onClick(diceValue)
-                    }
-                },
-                onHover = onHover,
-                dropShadow = true,
-                dropShadowColor = shadowColor
-            )
-        }
+            },
+            onClick = {
+                if (button.expandable) {
+                    expanded = !expanded
+                    onExpandedChanged(button.id, expanded)
+                } else {
+                    button.diceValue = currentDiceValue
+                    onClick()
+                }
+            },
+            dropShadowColor = shadowColor,
+        )
     }
 
     if (expanded) {
@@ -1047,7 +1198,7 @@ fun <T : DieResult> ExpandableDiceSelector(
             onDismissRequest = {
                 expanded = false
                 onHover(null)
-                onExpandedChanged(die, expanded)
+                onExpandedChanged(button.id, expanded)
             }
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides popupDirection) {
@@ -1067,6 +1218,7 @@ fun <T : DieResult> ExpandableDiceSelector(
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.Black.copy(alpha = bgAlpha.value))
                     )
+
                     // All buttons in the button group
                     Column(
                         modifier = Modifier.fillMaxHeight().padding(top = backgroundPadding/2f, bottom = backgroundPadding/2f),
@@ -1085,7 +1237,7 @@ fun <T : DieResult> ExpandableDiceSelector(
                             ) {
                                 // Generally options are sorted, but we always have the currently
                                 // selected value in the front
-                                row.forEachIndexed { index, label ->
+                                row.forEachIndexed { index, dieValue ->
                                     val currentBgWidth = bgWidthDp.value.dp
                                     val alpha = when (index == 0 || currentBgWidth > 52.dp * (index + 1)) {
                                         true -> bgAlpha.value
@@ -1094,23 +1246,24 @@ fun <T : DieResult> ExpandableDiceSelector(
                                     DiceButton(
                                         buttonSize,
                                         alpha,
-                                        value = label,
-                                        enabled = !disabled,
+                                        value = dieValue,
+                                        label = { null }, // Hide onHover values for the dice selector (for now)
+                                        clickEnabled = true,
+                                        onHover = onHover,
                                         onClick = {
                                             if (!expanded) {
                                                 expanded = true
                                             } else {
                                                 expanded = false
-                                                die.valueSelected(die.diceList[rowIndex*(diceList.size / rows) + index])
+                                                currentDiceValue = diceList[rowIndex*(diceList.size / rows) + index]
+                                                button.diceValue = currentDiceValue
                                             }
                                             if (rowIndex != 0 || index != 0) {
                                                 onHover(null)
                                             }
-                                            onExpandedChanged(die, expanded)
+                                            onExpandedChanged(button.id, expanded)
                                         },
                                         dropShadow = false,
-                                        onHover = onHover,
-                                        dropShadowColor = Color.Black,
                                     )
                                 }
                             }
@@ -1119,76 +1272,6 @@ fun <T : DieResult> ExpandableDiceSelector(
                 }
             }
         }
-    }
-}
-
-// Composable responsible for doing the dice animation i.e., jump up and spin.
-// But generic enough to run the animation on any content.
-// A `blur` effect is passed to the `content` which
-// provides a `blur` hint to the content being rotated.
-@Composable
-private fun <T: DieResult> DiceAnimation(
-    startingValue: T,
-    options: List<T>,
-    endValue: T,
-    content: @Composable (DieResult) -> Unit = {  _ -> },
-    onAnimationEnd: () -> Unit = {},
-) {
-    val yOffset = remember(startingValue, endValue) { Animatable(0f) }
-    val rotation = remember(startingValue, endValue) { Animatable(0f) }
-    var displayFace by remember(startingValue, endValue) { mutableStateOf(startingValue) }
-
-    // Total animation is 300 ms
-    LaunchedEffect(startingValue, endValue) {
-        val randJob = launch {
-            // For "complex" dice like Block dice, changing face too quick
-            // makes it look really messy. With this approach we change once
-            // near the top of the arc before switching to correct result.
-            // From manual testing, this seems to be a good trade-off between
-            // "hiding" the true result a bit and making it look more "random".
-            displayFace = startingValue
-            delay(100)
-            displayFace = options.random()
-            delay(100)
-            displayFace = endValue
-        }
-
-        // Parallel rotation while airborne
-        val rotJob = launch {
-            rotation.animateTo(
-                targetValue = 360f,
-                animationSpec = tween(300, easing = LinearEasing)
-            )
-        }
-
-        // Jump up
-        yOffset.animateTo(
-            targetValue = -75f,
-            animationSpec = tween(150, easing = LinearOutSlowInEasing)
-        )
-
-        // Start falling and stop rotation
-        yOffset.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(150, easing = FastOutLinearInEasing)
-        )
-        rotJob.cancel()
-        randJob.cancel()
-        rotation.snapTo(0f)
-        displayFace = endValue
-        onAnimationEnd()
-    }
-
-    Box(
-        modifier = Modifier
-            .graphicsLayer {
-                translationY = yOffset.value
-                rotationZ = rotation.value
-            }
-        ,
-        contentAlignment = Alignment.Center
-    ) {
-        content(displayFace)
     }
 }
 
@@ -1256,21 +1339,79 @@ private fun CoinAnimation(
     }
 }
 
+@Composable
+private fun SimpleDiceButton(
+    button: DieButtonData<*>,
+    animationData: ItemAnimatable,
+    isOnClickEnabled: Boolean = true,
+    isFullyVisible: Boolean = true,
+    onClick: () -> Unit = { },
+    onHover: (String?) -> Unit = { },
+    alpha: Float = 1f,
+) {
+    val shadowColor = Color.Black
+    val buttonSize = IconFactory.getDiceSizeDp(button.diceValue)
+    val (buttonWidth, buttonHeight) = buttonSize
+
+    val isAnimating by animationData.isAnimating
+    val yOffset by animationData.yOffset.asState()
+    val rotation by animationData.rotation.asState()
+    val displayFace by animationData.displayFace
+
+    // The visible button, both the normal and jumping one.
+    Box(
+        modifier = Modifier.alpha(if (isFullyVisible) 1f else 0.3f),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Box(
+            modifier = Modifier
+                .applyIf(isAnimating) {
+                    graphicsLayer {
+                        translationY = yOffset
+                        rotationZ = rotation
+                    }
+                }
+            ,
+            contentAlignment = Alignment.Center
+        ) {
+            DiceButton(
+                DpSize(buttonWidth,  buttonHeight),
+                alpha,
+                value = if (isAnimating) displayFace!! else button.diceValue,
+                label = button.label,
+                clickEnabled = (isAnimating || !isOnClickEnabled),
+                onHover = onHover,
+                onClick = onClick,
+                dropShadowColor = shadowColor,
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DiceButton(
     buttonSize: DpSize,
     alpha: Float,
     value: DieResult,
-    enabled: Boolean = true,
-    onHover: (DieResult?) -> Unit = {},
+    label: () -> String?,
+    clickEnabled: Boolean = true,
+    onHover: (String?) -> Unit = {},
     onClick: () -> Unit = {},
     dropShadowColor: Color = Color.Black,
     dropShadow: Boolean = true,
 ) {
+    val instanceId = remember { Random.nextLong() }
     val useSelectedColorAsHover = false
     var hover: Boolean by remember { mutableStateOf(false) }
     var colorFilter by remember { mutableStateOf<ColorFilter?>(null) }
+    val shape: Shape = remember(value) {
+        when (value) {
+            is D8Result -> D8Shape
+            is D6Result -> D6Shape
+            else -> RoundedCornerShape(4.dp)
+        }
+    }
     val bitmap = if ((useSelectedColorAsHover && hover)) {
         val color = when (value) {
             is D3Result,
@@ -1286,51 +1427,64 @@ private fun DiceButton(
         }
         IconFactory.getDiceIcon(value, color)
     }
+
+    fun showHoverEffect() {
+        onHover(label())
+        if (!useSelectedColorAsHover) {
+            colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+        }
+    }
+
+    LaunchedEffect(clickEnabled) {
+        if (clickEnabled && hover) {
+            showHoverEffect()
+        }
+    }
+
     Box(
         modifier = Modifier
             .size(buttonSize)
-            .alpha(alpha)
+            .onPointerEvent(PointerEventType.Enter) {
+                if (!hover) {
+                    hover = true
+                    showHoverEffect()
+                }
+            }
+            .onPointerEvent(PointerEventType.Exit) {
+                if (hover) {
+                    hover = false
+                    onHover(null)
+                    if (!useSelectedColorAsHover) {
+                        colorFilter = null
+                    }
+                }
+            }
+            .applyIf(dropShadow) {
+                dropShadow(shape = shape) {
+                    color = dropShadowColor.copy(alpha = 0.75f)
+                    offset = Offset.Zero
+                    radius = 12.dp.toPx()
+                    this.alpha = alpha * alpha
+                }
+            }
+            .graphicsLayer {
+                this.alpha = alpha
+                this.compositingStrategy = CompositingStrategy.Offscreen
+                this.shape = shape
+                this.clip = true
+            }
+            .applyIf(clickEnabled) {
+                onPointerEvent(PointerEventType.Press) {
+                    onClick()
+                }
+            }
         ,
         contentAlignment = Alignment.Center
     ) {
         Image(
             bitmap = bitmap,
             contentDescription = value.value.toString(),
-            modifier = Modifier.fillMaxSize()
-                .applyIf(dropShadow) {
-                    dropShadow(
-                        shape = when (value) {
-                            is D8Result -> D8Shape
-                            is D6Result -> D6Shape
-                            else -> RoundedCornerShape(4.dp)
-                        },
-                        color = dropShadowColor.copy(1f),
-                        offsetX = 0.dp,
-                        offsetY = 0.dp,
-                        blur = 12.dp,
-                    )
-                }
-                .applyIf(true) {
-                    this
-                        .onPointerEvent(PointerEventType.Enter) {
-                            hover = true
-                            onHover(value)
-                            if (!useSelectedColorAsHover) {
-                                colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
-                            }
-                        }
-                        .onPointerEvent(PointerEventType.Exit) {
-                            hover = false
-                            onHover(null)
-                            if (!useSelectedColorAsHover) {
-                                colorFilter = null
-                            }
-                        }
-                        .onPointerEvent(PointerEventType.Press) {
-                            onClick()
-                        }
-                }
-            ,
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None,
             colorFilter = colorFilter,

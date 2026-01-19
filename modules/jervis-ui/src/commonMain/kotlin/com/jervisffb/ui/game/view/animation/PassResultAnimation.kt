@@ -34,12 +34,12 @@ fun PassResultAnimation(vm: FieldViewModel, animation: PassAnimation) {
 
     // Kicker
     val startOffset = remember {
-        vm.squareOffsets[animation.from]!!.positionInRoot() - vm.fieldCoordinates!!.positionInRoot()
+        vm.squareOffsets[animation.from]!!.positionInRoot - vm.fieldCoordinates.positionInRoot
     }
     // Landing field
-    val endOffset = remember { vm.squareOffsets[animation.to]!!.positionInRoot() - vm.fieldCoordinates!!.positionInRoot() }
+    val endOffset = remember { vm.squareOffsets[animation.to]!!.positionInRoot - vm.fieldCoordinates.positionInRoot }
     // Size of square (which dictates size of ball)
-    val targetSquareSize = remember { vm.squareOffsets[animation.to]!!.boundsInRoot() }
+    val targetSquareSize = remember { vm.squareOffsets[animation.to]!!.boundsInRoot }
 
     val (duration, animStateCalculator) = animation.getStateCalculator(
         startOffset,
@@ -51,7 +51,7 @@ fun PassResultAnimation(vm: FieldViewModel, animation: PassAnimation) {
         duration = duration,
         image = IconFactory.getBall(),
         squareSize = targetSquareSize,
-        animationDone = { vm.finishAnimation() }
+        animationDone = { vm.notifyAnimationFinished() }
     )
 }
 

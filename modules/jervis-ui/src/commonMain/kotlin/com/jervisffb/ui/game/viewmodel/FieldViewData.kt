@@ -1,11 +1,11 @@
 package com.jervisffb.ui.game.viewmodel
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
-import com.jervisffb.ui.utils.DummyLayoutCoordinates
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.utils.jervisLogger
 import kotlin.math.roundToInt
 
@@ -46,14 +46,17 @@ data class FieldViewData(
         val LOG = jervisLogger()
     }
 
-    fun calculateActionWheelPlacement(dialog: ActionWheelInputDialog, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
+    fun calculateActionWheelPlacement(center: FieldCoordinate, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
         val squareSizePx = squareWidth
-        val ballLocation = dialog.viewModel.center
         // Offset according to root
-        val ballLocationCoordinates = fieldVm.squareOffsets[ballLocation] ?: DummyLayoutCoordinates
-        val fieldCoordinates = fieldVm.fieldCoordinates ?: DummyLayoutCoordinates
-        val fieldOffset = fieldCoordinates.localToRoot(Offset.Zero) // Offset(borderSizePx, borderSizePx))
-        val focus = ballLocationCoordinates.localToRoot(Offset.Zero) - fieldOffset + Offset(squareSizePx/2f, squareSizePx/2f)
+        val ballLocationCoordinates = fieldVm.squareOffsets[center] ?: SquareLayoutCoordinates(
+            coordinate = center,
+            positionInRoot = Offset.Zero,
+            boundsInRoot = Rect.Zero
+        )
+        val fieldCoordinates = fieldVm.fieldCoordinates
+        val fieldOffset = fieldCoordinates.positionInRoot // Offset(borderSizePx, borderSizePx))
+        val focus =  ballLocationCoordinates.positionInRoot - fieldOffset + Offset(squareSizePx/2f, squareSizePx/2f)
 
         // Calculate 9 sections for the placement of the action wheel:
         val tipPos = chooseTipPosition(

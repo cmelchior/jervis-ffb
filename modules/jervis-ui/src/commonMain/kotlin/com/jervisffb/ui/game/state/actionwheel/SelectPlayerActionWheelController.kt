@@ -1,51 +1,62 @@
-package com.jervisffb.ui.game.state.decorators
+package com.jervisffb.ui.game.state.actionwheel
 
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
+import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.dialogs.ActionButtonData
+import com.jervisffb.ui.game.dialogs.ButtonId
+import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
-import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.game.view.ContextMenuOption
+import com.jervisffb.ui.game.view.ActionWheelUiStateData
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 
-object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
-    override fun decorate(
-        actionProvider: ManualActionProvider,
-        state: Game,
-        descriptor: SelectPlayerAction,
-        owner: Team?,
-        acc: UiSnapshotAccumulator
+/**
+ * Select a player action after selecting the player.
+ */
+object SelectPlayerActionWheelController : ActionWheelDialogController() {
+    override val nodes: Set<Node> = setOf(ActivatePlayer.DeclareActionOrDeselectPlayer)
+
+    override fun onDecorateActions(
+        acc: UiSnapshotAccumulator,
+        provider: UiActionProvider,
+        actions: ActionRequest,
+        sharedData: LocalFieldDataWrapper
     ) {
-        // TODO Fix this, so we do not update each square multiple times
-        descriptor.actions.forEach {
-            addActionToContextMenu(actionProvider, state, acc, it)
-        }
+        val wheelOptions = actions.get<SelectPlayerAction>().actions.map {
+            val id = ButtonId("[$it.id.value] ${it.type}")
+            createActionOption(id, acc.game, provider, it)
+        }.toMutableList()
 
         // If prone, also add a "Stand Up & And Action". But only if the
         // action has a move component. Similar to FUMBBL.
         // TODO If the player has Jump Up, all non-move actions can also do this.
-        val activePlayer = state.activePlayer ?: error("No active player")
+        val activePlayer = acc.game.activePlayer ?: error("No active player")
         if (activePlayer.state == PlayerState.PRONE) {
             // val oldData = acc.fieldSquares[activePlayer.location as FieldCoordinate]!!
-            val menuItem = ContextMenuOption(
-                title = "Stand Up & End Action",
-                command = {
+            val menuItem = ActionButtonData(
+                id = ButtonId("[${actions.id.value}] Stand Up & End Action"),
+                label = { "Stand Up & End Action" },
+                action = {
                     // If players need to stand up or roll for negatraits before standing
                     // up we need wait for it.
-                    actionProvider.registerQueuedActionGenerator { controller ->
+                    provider.registerQueuedActionGenerator { controller ->
                         val availableActions = controller.getAvailableActions()
                         val canMove = availableActions.contains(MoveType.STANDARD)
                         val canEndAction = availableActions.contains<EndActionWhenReady>()
@@ -55,22 +66,35 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                             null
                         }
                     }
-                    actionProvider.userActionSelected(
+                    provider.userActionSelected(
                         CompositeGameAction(PlayerActionSelected(PlayerStandardActionType.MOVE), MoveTypeSelected(MoveType.STAND_UP))
                     )
                 },
                 icon = ActionIcon.STAND_UP_AND_END
             )
-            acc.updateSquare(activePlayer.location as FieldCoordinate) {
-                it.copy(
-                    contextMenuOptions = it.contextMenuOptions.add(menuItem)
-                )
-            }
+            wheelOptions.add(menuItem)
         }
+        val onDismiss = {
+            provider.userActionSelected(PlayerDeselected(activePlayer))
+        }
+        val wheelState = ActionWheelUiStateData(
+            center = activePlayer.coordinates,
+            bottomItems = wheelOptions,
+            bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
+            bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
+            onDismiss = onDismiss,
+        )
+        acc.addActionWheelEvent(wheelState)
     }
 
-    private fun addActionToContextMenu(actionProvider: UiActionProvider, state: Game, acc: UiSnapshotAccumulator, action: PlayerAction) {
-        state.activePlayer?.location?.let { location ->
+    // Temporary work-around while transition from FieldDecorator api
+    private fun createActionOption(
+        id: ButtonId,
+        state: Game,
+        provider: UiActionProvider,
+        action: PlayerAction
+    ): ActionButtonData {
+        return state.activePlayer?.location?.let { location ->
             val (actionName, actionIcon) = when (action.type) {
                 PlayerStandardActionType.MOVE -> "Move" to ActionIcon.MOVE
                 PlayerStandardActionType.PASS -> "Pass" to ActionIcon.PASS
@@ -91,18 +115,13 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                 PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit" to ActionIcon.PROJECTILE_VOMIT
                 PlayerSpecialActionType.STAB -> "Stab" to ActionIcon.STAB
             }
-
-            acc.updateSquare(location as FieldCoordinate) {
-                it.copy(
-                    contextMenuOptions = it.contextMenuOptions.add(
-                        ContextMenuOption(
-                            title = actionName,
-                            command = { actionProvider.userActionSelected(PlayerActionSelected(action.type)) },
-                            icon = actionIcon
-                        )
-                    )
-                )
-            }
+            ActionButtonData(
+                id = id,
+                label = { actionName },
+                icon = actionIcon,
+                action = { provider.userActionSelected(PlayerActionSelected(action.type)) },
+                enabled = true,
+            )
         } ?: error("No active player")
     }
 }

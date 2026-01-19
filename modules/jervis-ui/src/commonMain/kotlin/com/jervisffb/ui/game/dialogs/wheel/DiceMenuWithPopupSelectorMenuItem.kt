@@ -1,4 +1,4 @@
-package com.jervisffb.ui.game.dialogs.circle
+package com.jervisffb.ui.game.dialogs.wheel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -7,13 +7,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.DieId
+import com.jervisffb.ui.game.dialogs.ButtonId
 
 /**
- * Class representing a "dice" menu item in the action wheel.
+ * Class representing a single "dice" menu item in the action wheel.
+ * This menu item can be expanded with a pop-up dialog that shows all
+ * dice options.
+ *
+ * This is different from [DiceMenuWithSubmenuSelectorMenuItem] that will
+ * show the dice selector through a submenu.
  */
-class DiceMenuItem<T: DieResult>(
+class DiceMenuWithPopupSelectorMenuItem<T: DieResult>(
+    override val id: ButtonId,
     override val parent: ActionWheelMenuItem,
-    val id: DieId,
+    val diceId: DieId,
     value: T,
     options: List<T>,
     val preferLtr: Boolean = true,
@@ -25,7 +32,7 @@ class DiceMenuItem<T: DieResult>(
     val onHover: (T?) -> String? = { null },
 ): ActionWheelMenuItem() {
     override var label: () -> String by mutableStateOf({ "Dice[${value::class.simpleName}]" })
-    override val expandMode: MenuExpandMode = MenuExpandMode.NONE
+    override val expandMode: MenuExpandMode = MenuExpandMode.None
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf()
     override var enabled: Boolean by mutableStateOf(enabled)
     var onClick: (DieResult) -> Unit by mutableStateOf(onClick)
@@ -43,15 +50,15 @@ class DiceMenuItem<T: DieResult>(
     }
 
     override fun onActionOptionsExpandChange(item: ActionWheelMenuItem, expanded: Boolean) {
-        if (item is DiceMenuItem<*>) {
+        if (item is DiceMenuWithPopupSelectorMenuItem<*>) {
             enabled = !expanded || !(parent == item.parent && id != item.id)
         }
     }
 
     private fun reorderOptions() {
         val updatedList  = originalOptions.toMutableList().also {
-            it.remove(this@DiceMenuItem.value)
-            it.add(0, this@DiceMenuItem.value)
+            it.remove(this@DiceMenuWithPopupSelectorMenuItem.value)
+            it.add(0, this@DiceMenuWithPopupSelectorMenuItem.value)
         }
         diceList = updatedList
     }

@@ -1,10 +1,11 @@
-package com.jervisffb.ui.game.dialogs.circle
+package com.jervisffb.ui.game.dialogs.wheel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.jervisffb.ui.game.dialogs.ButtonId
 import com.jervisffb.ui.game.icons.ActionIcon
 
 /**
@@ -12,15 +13,15 @@ import com.jervisffb.ui.game.icons.ActionIcon
  * anything that is not "dice" or "coins".
  */
 class ActionMenuItem(
+    override val id: ButtonId,
     override val parent: ActionWheelMenuItem,
     label: () -> String,
     icon: ActionIcon,
     onClick: (parent: ActionWheelMenuItem?, button: ActionWheelMenuItem) -> Unit,
     enabled: Boolean = true,
-    override val expandMode: MenuExpandMode = MenuExpandMode.FAN_OUT,
+    override val expandMode: MenuExpandMode = MenuExpandMode.FanOut(),
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf()
 ): ActionWheelMenuItem() {
-
     override var enabled: Boolean by mutableStateOf(enabled)
     override var label: () -> String by mutableStateOf(label)
     var icon: ActionIcon by mutableStateOf(icon)

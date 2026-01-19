@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.view.field
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -17,6 +18,11 @@ enum class FieldPointerEventType {
     PrimaryClickSquare,
     SecondaryClickSquare,
 }
+
+data class SquarePressedEvent(
+    val square: FieldCoordinate,
+    val isPrimary: Boolean,
+)
 
 /**
  * Custom bus for propagating pointer events to the field to all field layers.
@@ -40,7 +46,7 @@ class PointerEventBus {
     private val secondaryClickSquare = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
     private val currentHover = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
 
-    var lastSquarePressed: Pair<FieldCoordinate, Boolean>? = null
+    var lastSquarePressed: SquarePressedEvent? = null
     var lastMoveSquare: FieldCoordinate? = null
 
     fun notifyMove(eventSquare: FieldCoordinate) {
@@ -68,15 +74,15 @@ class PointerEventBus {
     }
 
     fun notifyPressSquare(eventSquare: FieldCoordinate, isPrimary: Boolean) {
-        lastSquarePressed = eventSquare to isPrimary
+        lastSquarePressed = SquarePressedEvent(eventSquare, isPrimary)
     }
 
     fun notifyReleaseSquare(eventSquare: FieldCoordinate?) {
-        if (lastSquarePressed?.first == eventSquare && eventSquare != null) {
-            if (lastSquarePressed?.second == true) {
-                primaryClickSquare.tryEmit(eventSquare)
+        if (lastSquarePressed?.square == eventSquare && eventSquare != null) {
+            if (lastSquarePressed?.isPrimary == true) {
+                primaryClickSquare.safeTryEmit(eventSquare)
             } else {
-                secondaryClickSquare.tryEmit(eventSquare)
+                secondaryClickSquare.safeTryEmit(eventSquare)
             }
         }
         lastSquarePressed = null

@@ -27,6 +27,8 @@ import kotlin.random.Random
 
 sealed interface GameAction
 
+inline fun <reified T : GameAction> GameAction.safeCast(): T = this as? T ?: error("Cannot cast $this to ${T::class.simpleName}")
+
 /**
  * Game Action that can delay its value until called.
  * This is only for testing and should never be accepted by a [Procedure].
@@ -114,7 +116,11 @@ data class D2Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 2
 
-    override fun allOptions(): List<D2Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D2Result> {
+        return D2Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D2Result> {
@@ -130,7 +136,11 @@ data class D3Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 3
 
-    override fun allOptions(): List<D3Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D3Result> {
+        return D3Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun random(random: Random = Random): D3Result {
@@ -149,7 +159,11 @@ data class D4Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 4
 
-    override fun allOptions(): List<D4Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D4Result> {
+        return D4Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D4Result> {
@@ -165,7 +179,11 @@ data class D6Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 6
 
-    override fun allOptions(): List<D6Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D6Result> {
+        return D6Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D6Result> {
@@ -173,6 +191,9 @@ data class D6Result(override val value: Int) : DieResult() {
         }
         fun random(random: Random = Random): D6Result {
             return random.nextInt(1, 7).d6
+        }
+        fun randomExcept(except: D6Result): D6Result {
+            return allOptions().filter { it == except }.random()
         }
     }
 }
@@ -184,7 +205,11 @@ data class D8Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 8
 
-    override fun allOptions(): List<D8Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D8Result> {
+        return D8Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D8Result> {
@@ -205,7 +230,11 @@ data class D12Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 12
 
-    override fun allOptions(): List<D12Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D12Result> {
+        return Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D12Result> {
@@ -223,7 +252,11 @@ data class D16Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 16
 
-    override fun allOptions(): List<D16Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D16Result> {
+        return D16Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D16Result> {
@@ -241,7 +274,11 @@ data class D20Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 20
 
-    override fun allOptions(): List<D20Result> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<D20Result> {
+        return D20Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
 
     companion object {
         fun allOptions(): List<D20Result> {
@@ -258,7 +295,11 @@ data class DBlockResult(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 6
 
-    override fun allOptions(): List<DBlockResult> = Companion.allOptions()
+    override fun allOptions(vararg except: DieResult): List<DBlockResult> {
+        return DBlockResult.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
     val blockResult: BlockDice = BlockDice.fromD6(D6Result(value))
 
     companion object {
@@ -413,7 +454,7 @@ sealed class DieResult : Number(), GameAction {
         }
     }
 
-    abstract fun allOptions(): List<DieResult>
+    abstract fun allOptions(vararg except: DieResult): List<DieResult>
     override fun toByte(): Byte = value.toByte()
     override fun toDouble(): Double = value.toDouble()
     override fun toFloat(): Float = value.toFloat()

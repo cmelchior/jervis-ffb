@@ -8,6 +8,7 @@ import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
@@ -18,7 +19,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
+class ReplayActionProvider(
+    private val menuViewModel: MenuViewModel,
+    private val fumbbl: FumbblReplayAdapter?
+): UiActionProvider() {
 
     companion object {
         val LOG = jervisLogger()
@@ -31,6 +35,10 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
     var started = false
     private val pauseMutex = Mutex(locked = true)
     private var sharedData: LocalFieldDataWrapper? = null
+
+    override fun init(controller: UiGameController) {
+        // Do nothing
+    }
 
     override fun startHandler() {
         if (started) return

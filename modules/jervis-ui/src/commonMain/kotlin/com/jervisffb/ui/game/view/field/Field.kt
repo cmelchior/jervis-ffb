@@ -98,7 +98,7 @@ fun Field(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            // In case of rounding errors. The underlying game background will be showingx
+            // In case of rounding errors. The underlying game background will be showing
             .background(color = Color.Transparent)
         ,
         contentAlignment = Alignment.TopCenter,
@@ -198,6 +198,7 @@ fun Field(
                         BallLayer(vm)
                         DirectionArrowsLayer(vm)
                         AnimationLayer(vm)
+                        ContextMenuLayer(vm)
                         ActionWheelLayer(vm)
                     }
                 }

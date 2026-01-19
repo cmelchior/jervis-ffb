@@ -39,7 +39,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.jervisffb.engine.model.Player
-import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
@@ -161,7 +161,7 @@ fun Dialogs(vm: DialogsViewModel) {
             val dialog = dialogData as DicePoolUserInputDialog
             DicePoolSelectorDialog(dialog, vm)
         }
-        is ActionWheelInputDialog, // Handled by ActionWheelLayer
+        is AbstractActionWheelViewModel,
         null -> { /* Do nothing */ }
     }
     contextMenuData?.let { player ->
