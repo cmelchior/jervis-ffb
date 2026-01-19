@@ -36,7 +36,6 @@ fun ActionWheelLayer(vm: FieldViewModel) {
     var showWheel by remember { mutableStateOf(false) }
     LaunchedEffect(vm) {
         vm.actionWheelViewModel.observe().collect {
-            println("Receive: $it")
             when (it) {
                 is ActionWheelUiStateData -> {
                     currentState = it

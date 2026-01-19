@@ -66,7 +66,6 @@ class SecondaryActionWheelViewModel(
     }
 
     override fun showWheel() {
-        println("Show CONTEXT WHEEL method called")
         sharedFieldData.setContextWheelVisibility(true)
         isVisible.value = true
     }

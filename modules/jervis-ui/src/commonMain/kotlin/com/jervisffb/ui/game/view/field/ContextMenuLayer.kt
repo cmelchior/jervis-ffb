@@ -60,13 +60,11 @@ fun ContextMenuLayer(vm: FieldViewModel) {
                         if (e.buttons.isSecondaryPressed) continue
                         when (e.type) {
                             PointerEventType.Press -> {
-                                println("Context Layer press detected: $e")
                                 // Press is allowed to reach lower layers when the wheel isn't visible
                                 if (vm.sharedFieldData.isContextWheelVisible.value) {
                                     pressDetected = true
                                     vm.contextMenuViewModel.let {
                                         if (it.value.hideOnClickedOutside) {
-                                            println("Hide wheel from context layer")
                                             it.value.hideWheel(true)
                                         }
                                     }
