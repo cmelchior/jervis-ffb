@@ -228,7 +228,7 @@ class MultipleChoiceUserInputDialog(
                                 Direction(0, 1) -> "Down"
                                 Direction(1, 1) -> "Down-Right"
                                 else -> TODO("Not supported: $direction")
-                            }.toString()
+                            }
                         } else {
                             "null"
                         }

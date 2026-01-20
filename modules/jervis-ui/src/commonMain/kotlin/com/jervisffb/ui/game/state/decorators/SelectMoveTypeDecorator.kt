@@ -88,7 +88,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 // Maybe doing the calculation on the fly is fine.
                 val allPaths = state.rules.pathFinder.calculateAllPaths(
                     state,
-                    activeLocation as FieldCoordinate,
+                    activeLocation,
                     if (requiresDodge) 1 else player.movesLeft,
                 )
                 acc.pathFinder = allPaths

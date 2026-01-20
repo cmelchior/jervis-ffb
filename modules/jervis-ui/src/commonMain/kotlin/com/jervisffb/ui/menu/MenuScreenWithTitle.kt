@@ -136,7 +136,7 @@ fun MenuTitleBar(
             save()
             translate(0f, size.height - textBottomPadding.toPx())
             rotate(-angleDegrees)
-            skew(skewX.toFloat(), skewY.toFloat())
+            skew(skewX, skewY)
             this.drawTextLine(TextLine.make(title, skiaFont), paddingX, -paddingY, nativePaint)
             restore()
         }

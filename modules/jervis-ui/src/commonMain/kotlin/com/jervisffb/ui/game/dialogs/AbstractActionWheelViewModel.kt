@@ -12,6 +12,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -126,6 +127,7 @@ data class DieButtonData<T: DieResult>(
  * themselves. This is due to them sometimes persisting across actions and also needing
  * to animate between those stages.
  */
+@OptIn(DelicateCoroutinesApi::class)
 abstract class AbstractActionWheelViewModel(
     team: Team,
     // Used to connect the view model to the UI
@@ -179,6 +181,7 @@ abstract class AbstractActionWheelViewModel(
     var version by mutableStateOf(0)
 
     init {
+        // TODO Find a more appropriate scope here
         GlobalScope.launch {
             hoverText.collect { text ->
                 if (text != null) {

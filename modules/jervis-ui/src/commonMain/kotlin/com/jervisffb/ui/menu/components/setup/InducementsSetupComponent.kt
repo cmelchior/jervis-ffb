@@ -95,7 +95,7 @@ private fun ColumnScope.InducementRow(rowNo: Int, inducement: InducementData, on
         )
         OutlinedTextField(
             modifier = Modifier.width(125.dp),
-            value = if (inducement.price == null) "Varies" else formatCurrency(inducement.price!!),
+            value = if (inducement.price == null) "Varies" else formatCurrency(inducement.price),
             onValueChange = {  },
             readOnly = true, // (it.price == null),
             enabled = false, // (it.price != null),

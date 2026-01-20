@@ -67,14 +67,15 @@ class UiSnapshotAccumulator(
     fun addActionWheelEvent(event: ActionWheelUiState) {
         actionWheelEvents.add(event)
         when (event) {
-            HideActionWheel -> actionWheelVisible = false
-            is ShowActionWheel -> {
+            HideActionWheel -> {
+                actionWheelVisible = false
+            }
+            com.jervisffb.ui.game.view.ShowActionWheel -> {
                 actionWheelVisible = true
             }
             is ActionWheelUiStateData -> {
                 event.lastActionWasUndo = gameController.lastActionWasUndo()
             }
-
             else -> { /* Do nothing */ }
         }
     }

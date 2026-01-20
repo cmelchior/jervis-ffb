@@ -1117,7 +1117,6 @@ fun ExpandableDiceSelector(
     // Determine the placement of popup
     val (popupDirection, popupOffset) = remember(button) {
         when (button.preferLtr) {
-            null,
             true -> {
                 val padding = with(density) { (backgroundPadding/2).toPx().roundToInt() }
                 val adjustment = with(density) {

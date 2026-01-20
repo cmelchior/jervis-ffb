@@ -327,7 +327,7 @@ fun TitleBarWithSidebar(modifier: Modifier, title: String) {
             save()
             translate(0f + 282.dp.toPx(), line.getY(316.dp.toPx())) // TODO. How to translate across the line?
             rotate(-angleDegrees)
-            skew(skewX.toFloat(), skewY.toFloat())
+            skew(skewX, skewY)
             this.drawTextLine(TextLine.make(title, skiaFont), padding, -padding, nativePaint)
             restore()
         }

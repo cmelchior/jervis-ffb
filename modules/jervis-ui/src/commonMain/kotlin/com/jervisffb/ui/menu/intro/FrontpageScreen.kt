@@ -351,7 +351,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
             save()
             translate(0f, size.height)
             rotate(-angleDegrees)
-            skew(skewX.toFloat(), skewY.toFloat())
+            skew(skewX, skewY)
             this.drawTextLine(TextLine.make(line2, skiaFont), padding, -padding, nativePaint)
             this.drawTextLine(TextLine.make(line1, skiaFont), padding, -lineHeight, nativePaint)
             restore()
