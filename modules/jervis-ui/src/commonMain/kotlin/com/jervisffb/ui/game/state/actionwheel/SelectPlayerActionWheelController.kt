@@ -83,6 +83,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
             onDismiss = onDismiss,
+            hideWhenClickOutside = true
         )
         acc.addActionWheelEvent(wheelState)
     }

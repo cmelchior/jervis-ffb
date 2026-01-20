@@ -2,6 +2,8 @@ package com.jervisffb.ui.game.dialogs
 
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.ActionWheelUiStateData
+import com.jervisffb.ui.game.view.ShowActionWheel
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +18,10 @@ class PrimaryActionWheelViewModel(
     val eventFlow: Flow<List<ActionWheelUiState>>,
     team: Team,
     sharedFieldData: LocalFieldDataWrapper
-) : AbstractActionWheelViewModel(team, sharedFieldData) {
+) : AbstractActionWheelViewModel(
+        team = team,
+        sharedFieldData = sharedFieldData,
+    ) {
 
     private val _eventFlow = MutableSharedFlow<ActionWheelUiState?>(replay = 1, extraBufferCapacity = Int.MAX_VALUE)
 
@@ -28,6 +33,18 @@ class PrimaryActionWheelViewModel(
     suspend fun start() {
         eventFlow.collect { wheelEvents ->
             val event = wheelEvents.firstOrNull()
+            when (event) {
+                is ActionWheelUiStateData -> {
+                    this.hideOnClickedOutside.value = event.hideWhenClickOutside
+                    sharedFieldData.setActionWheelVisibility(true)
+                }
+                ShowActionWheel -> {
+                    sharedFieldData.setActionWheelVisibility(true)
+                }
+                else -> {
+                    sharedFieldData.setActionWheelVisibility(false)
+                }
+            }
             _eventFlow.emit(event)
         }
     }
@@ -37,13 +54,13 @@ class PrimaryActionWheelViewModel(
         isVisible.value = true
     }
 
-    override fun hideWheel(userUiAction: Boolean) {
+    override fun hideWheel(userUiAction: Boolean, onDismiss: (() -> Unit)?) {
         sharedFieldData.let {
             if (it.isContentMenuVisible.value) {
                 it.setActionWheelVisibility(false)
                 isVisible.value = false
                 if (userUiAction) {
-                    onMenuHidden?.invoke()
+                    onDismiss?.invoke()
                 }
             }
         }

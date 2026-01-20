@@ -15,8 +15,6 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import com.jervisffb.ui.game.view.ActionWheelDialog
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.game.view.HideActionWheel
-import com.jervisffb.ui.game.view.ShowActionWheel
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 
 /**
@@ -33,23 +31,18 @@ fun ActionWheelLayer(vm: FieldViewModel) {
     // is present.
 
     var currentState by remember { mutableStateOf<ActionWheelUiStateData?>(null) }
-    var showWheel by remember { mutableStateOf(false) }
+    var showWheel = vm.sharedFieldData.isActionWheelVisible
+    var hideWhenClickOutside by remember(vm.actionWheelViewModel.hideOnClickedOutside) { vm.actionWheelViewModel.hideOnClickedOutside }
     LaunchedEffect(vm) {
         vm.actionWheelViewModel.observe().collect {
             when (it) {
                 is ActionWheelUiStateData -> {
                     currentState = it
-                    showWheel = true
-                }
-                HideActionWheel -> {
-                    showWheel = false
-                }
-                ShowActionWheel -> {
-                    showWheel = true
                 }
                 null -> {
-                    showWheel = false
+                    currentState = null
                 }
+                else -> { /* Do nothing */ }
             }
         }
     }
@@ -67,7 +60,7 @@ fun ActionWheelLayer(vm: FieldViewModel) {
     // Compose creates a custom layer for animations, and somehow it doesn't get the correct
     // dimensions. This requires further investigation. Moving the animation into the Action Wheel
     // itself fixes the issue.
-    if (!showWheel) {
+    if (!showWheel.value || currentState == null) {
         return
     }
     Box(
@@ -87,9 +80,8 @@ fun ActionWheelLayer(vm: FieldViewModel) {
                                 if (vm.sharedFieldData.isActionWheelVisible.value) {
                                     pressWhenVisible = true
                                     vm.actionWheelViewModel.let {
-                                        if (it.hideOnClickedOutside) {
-                                            println("Hide wheel from action layer")
-                                            it.hideWheel(true)
+                                        if (hideWhenClickOutside) {
+                                            it.hideWheel(true, currentState?.onDismiss)
                                         }
                                     }
                                     e.changes.forEach { it.consume() }

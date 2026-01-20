@@ -14,7 +14,6 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.game.view.HideActionWheel
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.ShowActionWheel
 import com.jervisffb.ui.game.viewmodel.FieldViewModel

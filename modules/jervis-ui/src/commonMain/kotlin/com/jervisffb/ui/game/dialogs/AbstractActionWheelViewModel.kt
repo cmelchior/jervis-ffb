@@ -140,8 +140,6 @@ abstract class AbstractActionWheelViewModel(
     fallbackToShowStartHoverText: Boolean = false,
     topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
     bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
-    var hideOnClickedOutside: Boolean = false,
-    var onMenuHidden: (() -> Unit)? = null,
     // This contains the set of nodes we know this wheel model can handle. This is used as an addition
     // to `hideWhenActionIsSelected` and we use this to be able to hide action wheels in the next game-loop.
     // The two overlap to a big degree, but in some cases we might want to trigger an animation before
@@ -153,6 +151,7 @@ abstract class AbstractActionWheelViewModel(
 
     // Whether the entire wheel is visible or not
     var isVisible = mutableStateOf(false)
+    var hideOnClickedOutside = mutableStateOf(false)
 
     // Where should the Action Wheel be placed? If `null` it will be centered in the middle of the screen.
     // Otherwise, we will do a best-effort attempt at placing the circle directly over the `center` coordinate,
@@ -190,5 +189,5 @@ abstract class AbstractActionWheelViewModel(
     }
 
     abstract fun showWheel()
-    abstract fun hideWheel(userUiAction: Boolean)
+    abstract fun hideWheel(userUiAction: Boolean, onDismiss: (() -> Unit)? = null)
 }

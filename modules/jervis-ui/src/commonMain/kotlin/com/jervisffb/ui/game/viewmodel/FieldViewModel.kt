@@ -92,7 +92,6 @@ class FieldViewModel(
         options = emptyList(),
         team = uiState.state.homeTeam,
         sharedFieldData = sharedFieldData,
-        hideOnClickedOutside = true,
         autoShowOnNewActionButtons = false
     ))
 

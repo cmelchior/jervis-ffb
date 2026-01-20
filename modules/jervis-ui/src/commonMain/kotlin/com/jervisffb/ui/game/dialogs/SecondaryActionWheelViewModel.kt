@@ -25,7 +25,6 @@ class SecondaryActionWheelViewModel(
     fallbackToShowStartHoverText: Boolean = false,
     topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
     bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
-    hideOnClickedOutside: Boolean = true,
     onMenuHidden: (() -> Unit)? = null,
     availableInNodes: Set<Node>? = null,
     autoShowOnNewActionButtons: Boolean = true
@@ -37,8 +36,6 @@ class SecondaryActionWheelViewModel(
         fallbackToShowStartHoverText,
         topExpandMode,
         bottomExpandMode,
-        hideOnClickedOutside,
-        onMenuHidden,
         availableInNodes,
         autoShowOnNewActionButtons
     ) {
@@ -62,6 +59,7 @@ class SecondaryActionWheelViewModel(
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
             onDismiss = { onMenuHidden?.invoke() },
+            hideWhenClickOutside = true
         )
     }
 
@@ -70,13 +68,13 @@ class SecondaryActionWheelViewModel(
         isVisible.value = true
     }
 
-    override fun hideWheel(userUiAction: Boolean) {
+    override fun hideWheel(userUiAction: Boolean, onDismiss: (() -> Unit)?) {
         sharedFieldData.let {
             if (it.isContentMenuVisible.value) {
                 it.setContextWheelVisibility(false)
                 isVisible.value = false
                 if (!userUiAction) {
-                    onMenuHidden?.invoke()
+                    onDismiss?.invoke()
                 }
             }
         }

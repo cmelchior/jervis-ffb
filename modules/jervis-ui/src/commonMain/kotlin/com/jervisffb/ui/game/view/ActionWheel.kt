@@ -132,6 +132,7 @@ data class ActionWheelUiStateData(
     val bottomAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
     val onDismiss: (() -> Unit)? = null,
     val animationOnly: Boolean = false,
+    val hideWhenClickOutside: Boolean = false,
 ): ActionWheelUiState {
     var lastActionWasUndo: Boolean = false
 

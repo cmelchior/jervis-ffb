@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -26,7 +27,8 @@ import com.jervisffb.ui.game.viewmodel.FieldViewModel
 fun ContextMenuLayer(vm: FieldViewModel) {
     val contextActionWheelPresent by vm.sharedFieldData.isContextWheelVisible
     val fieldData by vm.fieldViewData.collectAsState()
-    var currentState by vm.contextMenuViewModel
+    var currentState by remember(vm.contextMenuViewModel) { vm.contextMenuViewModel }
+    var hideWhenClickOutside by remember(vm.actionWheelViewModel.hideOnClickedOutside) { vm.actionWheelViewModel.hideOnClickedOutside }
 
     // Context menu visibility is different than the Action Wheel. Can we be sure
     // that this always works? I suspect so, since we also check if the main action wheel is present
@@ -64,7 +66,7 @@ fun ContextMenuLayer(vm: FieldViewModel) {
                                 if (vm.sharedFieldData.isContextWheelVisible.value) {
                                     pressDetected = true
                                     vm.contextMenuViewModel.let {
-                                        if (it.value.hideOnClickedOutside) {
+                                        if (hideWhenClickOutside) {
                                             it.value.hideWheel(true)
                                         }
                                     }
