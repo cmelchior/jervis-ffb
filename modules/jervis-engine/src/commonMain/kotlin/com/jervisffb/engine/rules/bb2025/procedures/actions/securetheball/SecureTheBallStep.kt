@@ -14,14 +14,16 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.PickupModifier
+import com.jervisffb.engine.model.modifiers.SecureTheBallModifier
 import com.jervisffb.engine.reports.ReportSecuredTheBallResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
+import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
  * Procedure for when a player moved into the ball and must now attempt to
@@ -36,7 +38,7 @@ object SecureTheBallStep: Procedure() {
         val ball = state.currentBall()
         val securingPlayer = state.field[ball.location].player!!
         val modifiers = emptyList<DiceModifier>() // Currently, no known modifiers affect this roll
-        val rollContext = PickupRollContext(securingPlayer, modifiers)
+        val rollContext = SecureTheBallRollContext(securingPlayer, modifiers)
         return SetContext(rollContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -56,7 +58,23 @@ object SecureTheBallStep: Procedure() {
     object RollToSecureBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val actionContext = state.getContext<SecureTheBallContext>()
-            return SetContext(SecureTheBallRollContext(actionContext.player))
+            val player = actionContext.player
+            val secureContext = SecureTheBallRollContext(
+                player = actionContext.player,
+                modifiers = buildList {
+                    if (state.weather == Weather.POURING_RAIN) {
+                        add(SecureTheBallModifier.POURING_RAIN)
+                    }
+                    rules.addMarkedModifiers(
+                        state,
+                        player.team,
+                        player.coordinates,
+                        this,
+                        PickupModifier.MARKED
+                    )
+                },
+            )
+            return SetContext(secureContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SecureTheBallRoll
         override fun onExitNode(state: Game, rules: Rules): Command {

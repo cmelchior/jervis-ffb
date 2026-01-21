@@ -38,10 +38,13 @@ import com.jervisffb.engine.utils.addIfNotNull
  * See page 59 in the BB2025 rulebook.
  *
  * Developer's Commentary:
- * It is currently a bit unclear which modifiers (if any) apply to rolling for
- * securing the ball. For now, we assume that the wording "they will
- * automatically pick up the ball" means that this is a straight 2+ roll
- * with no modifiers - This roll is specifically NOT a pickup-roll.
+ * It is currently unclear which modifiers (if any) apply to rolling for
+ * securing the ball. For now, we are using the NAF interpretation, which means
+ * that Marked and Pouring Rain both will apply to the roll.
+ *
+ * Since you cannot choose this action if an opponent is within 2 squares of the
+ * ball, Marked modifiers would only happen if an opponent was able to use
+ * Shadowing to follow the player close to the ball
  */
 object SecureTheBallAction : Procedure() {
     override val initialNode: Node = MoveOrEndAction

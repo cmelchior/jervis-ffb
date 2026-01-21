@@ -170,14 +170,15 @@ class StandingUpTests: JervisGameBB2025Test() {
                     checkActionUsed = { assertEquals(0, player.team.turnData.throwTeamMateActions) }
                     rollBack = { 5 }
                 }
+                PlayerStandardActionType.SECURE_THE_BALL -> {
+                    startAction = { controller ->
+                        controller.rollForward(PlayerActionSelected(PlayerStandardActionType.SECURE_THE_BALL))
+                    }
+                    checkActionUsed = { assertEquals(0, player.team.turnData.secureTheBallActions) }
+                    rollBack = { 5 }
+                }
                 PlayerStandardActionType.SPECIAL -> {
                     // Skip for now
-                    startAction = null
-                }
-                PlayerStandardActionType.SECURE_THE_BALL -> {
-                    // Skip for now. We don't know the specifics for this action yet
-                    // Also, this action isn't supported in BB2020, it shouldn't be
-                    // tested here. We need to figure out how to split the tests.
                     startAction = null
                 }
             }

@@ -23,17 +23,18 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import com.jervisffb.engine.utils.sum
 
 /**
  * Procedure for handling a Secure the Ball roll.
@@ -59,7 +60,7 @@ object SecureTheBallRoll : Procedure() {
                 val context = state.getContext<SecureTheBallRollContext>()
                 val updatedContext = context.copy(
                     roll = D6DieRoll.create(state, d6),
-                    isSuccess = isSecuringSuccessful(d6),
+                    isSuccess = isSecuringSuccessful(d6, context.modifiers),
                 )
                 return compositeCommandOf(
                     SetContext(updatedContext),
@@ -126,7 +127,7 @@ object SecureTheBallRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SecureTheBallRollContext>().player.team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
 
@@ -138,7 +139,7 @@ object SecureTheBallRoll : Procedure() {
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isSecuringSuccessful(d6)
+                    isSuccess = isSecuringSuccessful(d6, context.modifiers)
                 )
                 compositeCommandOf(
                     SetContext(updatedContext),
@@ -149,10 +150,13 @@ object SecureTheBallRoll : Procedure() {
         }
     }
 
-    private fun isSecuringSuccessful(roll: D6Result): Boolean {
+    private fun isSecuringSuccessful(roll: D6Result, modifiers: List<DiceModifier>): Boolean {
+        val target = 2
         return when (roll.value) {
             1 -> false
-            else -> true
+            in 2..5 -> (target <= roll.value + modifiers.sum())
+            6 -> true
+            else -> error("Invalid value: ${roll.value}")
         }
     }
 }

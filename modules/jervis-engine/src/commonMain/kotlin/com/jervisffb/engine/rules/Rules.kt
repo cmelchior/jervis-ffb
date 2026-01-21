@@ -630,16 +630,16 @@ abstract class Rules(
                 val isBigGuy = player.keywords.contains(PlayerKeyword.BIG_GUY)
                 if (turnData.secureTheBallActions > 0 && !hasUnsteady && !isBigGuy) {
                     // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
-                    // In case of multiple balls, only one ball has to satisfy the criteria for he action to be available.
-                    // The ball has to be on the floor at the start of the activation.
+                    // In the case of multiple balls, only one ball has to satisfy the criteria for the action to be
+                    // available. The ball has to be on the floor at the start of the activation.
                     val eligibleBallExists = state.balls.any { ball ->
                         val onTheGround = (ball.state == BallState.ON_GROUND)
                         val enemiesInRange = ball.location.getSurroundingCoordinates(
                             rules = this@Rules,
                             distance = 2,
                             includeOutOfBounds = false
-                        ).any {
-                            state.field[it].player?.let { p->
+                        ).any { coordinate ->
+                            state.field[coordinate].player?.let { p->
                                 (p.team != player.team) && this@Rules.canMarkPlayers(p)
                             } ?: false
                         }

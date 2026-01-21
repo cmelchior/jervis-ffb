@@ -520,13 +520,13 @@ book.
     - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
     - [x] Crash Landing
     - [x] Landing in the crowd
-- [ ] Secure the Ball
-  - [ ] Not allowed if Big Guy
-  - [ ] 2+, No modifiers, including Rain (automatic pickup if roll is cleared)
-  - [ ] Not allowed if standing player with TZ's within 2 squares
-  - [ ] Action ends after pickup
-  - [ ] Cannot switch to "pickup" when moving into the ball
-  - [ ] Turnover if failing to secure the ball
+- [x] Secure the Ball
+  - [x] Not allowed if Big Guy.
+  - [x] 2+, Marked and Pouring Rain modifiers apply
+  - [x] Not allowed if standing player with TZ's within 2 squares
+  - [x] Action ends after pickup.
+  - [x] Turnover if player does not have the ball when action ends.
+  - [ ] Marked modifiers when using Shadowing
 
 ## Statistics
 

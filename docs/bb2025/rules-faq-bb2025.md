@@ -105,9 +105,11 @@ Arguments against:
   Ball. Since no modifiers explicitly mention Secure the Ball, it is always a
   unmodified 2+ roll
 
-Jervis has adopted the 2nd interpretation, as otherwise, the wording "they will 
-automatically pick up the ball" will not make any sense. This interpretation
-is consistent with how FUMBBL interprets this rule.
+The NAF has released a document with suggested interpretations of this rule
+until we see a FAQ released. FUMBBL has adopted a similar interpretation.
+
+For those reasons Jervis will also apply "pickup"-modifiers to the Secure the 
+Ball roll.
 
 ### Page 69 - Foul Action and Lone Fouler
 It is ambiguous what happens if you reroll a natural double in a Foul Action
