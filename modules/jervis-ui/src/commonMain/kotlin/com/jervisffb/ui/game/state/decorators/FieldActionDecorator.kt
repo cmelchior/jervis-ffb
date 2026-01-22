@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.state.decorators
 
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
@@ -18,6 +19,7 @@ import com.jervisffb.ui.game.state.ManualActionProvider
  * for the given fields.
  */
 interface FieldActionDecorator<T: GameActionDescriptor> {
+    fun isApplicable(state: Game, request: ActionRequest) = true
     fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,

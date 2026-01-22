@@ -55,7 +55,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Put the Boot In
 - [ ] Quick Foul
 - [ ] Saboteur
-- [ ] Shadowing
+- [x] Shadowing
+  - [x] Only works on opponents turn
+  - [x] 4+ to succeed
+  - [x] Only works when a player dodges, not leaps or teleports
+  - [x] Only one player can select shadowing 
+  - [x] Can only use up to shadowing MA
 - [ ] Sneaky Git
 - [ ] Violent Innovator
 

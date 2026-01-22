@@ -216,6 +216,7 @@ abstract class SkillSettings {
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }
 
+    // Creates a new skill that doesn't have an associate value, e.g. Dodge vs. Mighty Blow (+1)
     protected fun addNoValueEntry(
         name: String,
         type: SkillType,

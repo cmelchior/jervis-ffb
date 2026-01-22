@@ -47,6 +47,7 @@ import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
+import com.jervisffb.ui.game.state.decorators.CancelDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
 import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
@@ -112,6 +113,7 @@ open class ManualActionProvider(
         // TossCoin -> TODO()
         // DeselectPlayer::class to DeselectPlayerDecorator,
         // SelectPlayerAction::class to SelectPlayerActionDecorator,
+        CancelWhenReady::class to CancelDecorator,
         EndActionWhenReady::class to EndActionDecorator,
         EndSetupWhenReady::class to EndSetupDecorator,
         EndTurnWhenReady::class to EndTurnDecorator,
@@ -193,7 +195,6 @@ open class ManualActionProvider(
 
         if (showActionDecorators) {
             addActionWheelDecorators(this, acc, actions)
-            // val actionWheelVisible = acc.actionWheelVisible
             val actionWheelVisible = acc.gameController.currentNode()?.let { nodeToActionWheelController.contains(it) } ?: false
             if (!actionWheelVisible) {
                 addModalDialogDecorators(this, acc, actions)
@@ -339,7 +340,7 @@ open class ManualActionProvider(
         val state = acc.game
         request.actions.forEach { descriptor ->
             val decorator = getDecorator(descriptor::class)
-            if (decorator != null) {
+            if (decorator != null && decorator.isApplicable(acc.game, request)) {
                 decorator.decorate(this, state, descriptor, request.team, acc)
             } else {
                 // Any action that isn't being mapped to an UI component needs to go here.

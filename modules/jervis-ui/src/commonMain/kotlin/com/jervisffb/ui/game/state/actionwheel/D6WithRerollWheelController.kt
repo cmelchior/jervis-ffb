@@ -16,8 +16,10 @@ import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
+import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
@@ -48,6 +50,7 @@ import kotlin.time.ExperimentalTime
  * - Dodge
  * - Pickup
  * - Rush
+ * - Shadowing
  */
 abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
 
@@ -271,6 +274,25 @@ object RushWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<RushRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action Wheel layout when rolling for Shadowing.
+ */
+object ShadowingWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "shadowing"
+    override val rollDiceNode: Node = ShadowingRoll.RollDie
+    override val chooseRerollSourceNode: Node = ShadowingRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ShadowingRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ShadowingRollContext>().player.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<ShadowingRollContext>()
         return context.roll!!.originalRoll
     }
 }

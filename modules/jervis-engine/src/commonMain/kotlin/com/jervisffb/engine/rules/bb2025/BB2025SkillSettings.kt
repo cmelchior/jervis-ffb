@@ -26,6 +26,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2025.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2025.skills.Regeneration
 import com.jervisffb.engine.rules.bb2025.skills.RightStuff
+import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.bb2025.skills.Sidestep
 import com.jervisffb.engine.rules.bb2025.skills.Sprint
 import com.jervisffb.engine.rules.bb2025.skills.Stab
@@ -175,9 +176,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.SHADOWING -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Shadowing", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        Shadowing(player, category, expiresAt)
+                    }
                 }
                 SkillType.SNEAKY_GIT -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

@@ -535,14 +535,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         )
 
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
-        assertTrue(homeTeam[1.playerNo]!!.moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        assertTrue(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
 
         // Prayer and effects will be removed after the drive
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
-        assertFalse(homeTeam[1.playerNo]!!.moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        assertFalse(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
     }
 
     @Test

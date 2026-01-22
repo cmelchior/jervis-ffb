@@ -10,6 +10,7 @@ import com.jervisffb.engine.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.RemovePrayersToNuffle
 import com.jervisffb.engine.commands.RemoveTeamReroll
+import com.jervisffb.engine.commands.ResetShadowingSkill
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetSpecialPlayCardActive
@@ -25,6 +26,7 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -168,6 +170,22 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
+    // Reset skills that track things during a turn
+    val resetSkills = if (duration == Duration.END_OF_TURN) {
+        teams.flatMap { team ->
+            team.flatMap { player ->
+                val shadowingSkill = player.getSkillOrNull(SkillType.SHADOWING)
+                if (shadowingSkill is Shadowing) {
+                    listOf(ResetShadowingSkill(player))
+                } else {
+                    emptyList()
+                }
+            }
+        }
+    } else {
+        emptyList<Command>()
+    }
+
     // Find all other temporary effects
     val removableTemporaryEffects = teams.flatMap { team ->
         team.flatMap { player ->
@@ -219,6 +237,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     return (
         removableStatModifiers
             + removableSkills
+            + resetSkills
             + removableTemporaryEffects
             + removableRerolls
             + removableLeaderRerolls

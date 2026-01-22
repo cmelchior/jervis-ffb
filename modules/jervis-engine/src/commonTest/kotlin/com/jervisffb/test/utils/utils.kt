@@ -88,7 +88,4 @@ inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
 }
 
-inline fun <reified T: Skill<*>> Player.getSkill(): T {
-    return this.skills.first { it is T } as T
-}
 

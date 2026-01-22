@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -17,7 +18,6 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectSkillReroll
-import com.jervisffb.test.utils.getSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

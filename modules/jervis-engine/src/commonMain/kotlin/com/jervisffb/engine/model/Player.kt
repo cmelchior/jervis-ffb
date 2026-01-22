@@ -286,3 +286,11 @@ fun Player.isSkillAvailable(type: SkillType): Boolean {
         return !skill.used
     } ?: false
 }
+
+/**
+ * Only used this when you are 100% sure about the skill class, i.e. when it used by a single
+ * ruleset.
+ */
+inline fun <reified T: Skill<*>> Player.getSkill(): T {
+    return this.skills.first { it is T } as T
+}

@@ -32,6 +32,8 @@ import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -168,8 +170,7 @@ object StandardMoveStep: Procedure() {
                 moveContext.player,
                 moveContext.startingSquare,
                 moveContext.target!!
-            )
-            )
+            ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DodgeRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -178,7 +179,7 @@ object StandardMoveStep: Procedure() {
             return if (dodgeContext.isSuccess) {
                 compositeCommandOf(
                     RemoveContext<DodgeRollContext>(),
-                    GotoNode(ResolveMove/*CheckIfShadowingIsAvailable*/)
+                    GotoNode(CheckForShadowing)
                 )
             } else {
                 compositeCommandOf(
@@ -191,14 +192,24 @@ object StandardMoveStep: Procedure() {
         }
     }
 
-    object CheckIfShadowingIsAvailable: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            TODO("Not yet implemented")
+    object CheckForShadowing: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            // For now, we only support Shadowing in BB2025
+            return if (rules.baseVersion != GameVersion.BB2025)  {
+                ResolveMove
+            } else {
+                null
+            }
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> error("Unsupported game version: ${rules.baseVersion}")
+                GameVersion.BB2025 -> UseShadowingStep
+            }
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(ResolveMove)
         }
     }
 

@@ -39,6 +39,7 @@ import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
+import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
@@ -130,6 +131,7 @@ class UiGameController(
         DodgeWheelController,
         PickupWheelController,
         RushWheelController,
+        ShadowingWheelController,
         SelectPlayerActionWheelController,
         ScatterRollWheelController,
 

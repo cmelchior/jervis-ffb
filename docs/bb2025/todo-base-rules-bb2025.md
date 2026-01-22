@@ -494,7 +494,7 @@ book.
 - [ ] Throw Team-mate Action
     - [x] Require Throw Team-mate and Right Stuff traits
     - [x] Right Stuff player must have Strenght 3 or less
-    - [x] Pass Action and Throw Team-mate are mutually exclusive
+    - [ ] Pass Action and Throw Team-mate can be used in the same turn
     - [x] Action used when moving without throwing
     - [x] Action used when throwing without moving
     - [x] Cannot move after the throw
