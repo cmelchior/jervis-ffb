@@ -60,9 +60,9 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
 
         },
         topMenuRightContent = {
-            val isLoggedIn: Boolean by viewModel.loggedInState().collectAsState()
+            val isLoggedIn: Boolean by viewModel.isLoggedIn.collectAsState()
             val label = when (isLoggedIn) {
-                true -> viewModel.coachName().value
+                true -> viewModel.coachName.value
                 false -> "Login".uppercase()
             }
             TopbarButton(label, onClick = { viewModel.authMenubarActionInitiated() })
@@ -81,7 +81,7 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    val isLoggedIn: Boolean by viewModel.loggedInState().collectAsState()
+                    val isLoggedIn: Boolean by viewModel.isLoggedIn.collectAsState()
                     MenuSidebarButton("Gamefinder", onClick = { openUrlInBrowser(viewModel.URL_GAMEFINDER) })
                     if (isLoggedIn) {
                         MenuSidebarButton("Coach page", onClick = { openUrlInBrowser(viewModel.getCoachUrl()) })

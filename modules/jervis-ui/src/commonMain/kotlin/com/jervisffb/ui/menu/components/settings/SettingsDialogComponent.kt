@@ -13,7 +13,7 @@ import com.jervisffb.ui.menu.components.NotImplementYetDialog
  */
 @Composable
 fun SettingsDialogComponent(viewModel: MenuViewModel) {
-    val visible: Boolean by viewModel.showSettingsDialog().collectAsState()
+    val visible: Boolean by viewModel.isSettingsDialogVisible.collectAsState()
     if (!visible) return
     NotImplementYetDialog(
         "Settings",

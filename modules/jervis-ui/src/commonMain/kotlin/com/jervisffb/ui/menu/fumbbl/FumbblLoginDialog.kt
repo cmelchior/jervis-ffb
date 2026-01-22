@@ -38,8 +38,8 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FumbblLoginDialog(viewModel: FumbblScreenModel) {
-    val showDialog: Boolean by viewModel.showLoginDialog().collectAsState()
-    val isLoggedIn: Boolean by viewModel.loggedInState().collectAsState()
+    val showDialog: Boolean by viewModel.showLoginDialog.collectAsState()
+    val isLoggedIn: Boolean by viewModel.isLoggedIn.collectAsState()
     if (!showDialog) return
     val icon = @Composable {
         Image(
@@ -57,7 +57,7 @@ fun FumbblLoginDialog(viewModel: FumbblScreenModel) {
 
 @Composable
 private fun LogoutDialog(viewModel: FumbblScreenModel, icon: @Composable () -> Unit) {
-    val coachName: String by viewModel.coachName().collectAsState()
+    val coachName: String by viewModel.coachName.collectAsState()
     JervisDialog(
         title = "Log out of FUMBBL",
         icon = icon,
@@ -91,11 +91,11 @@ private fun LogoutDialog(viewModel: FumbblScreenModel, icon: @Composable () -> U
 @Composable
 private fun LoginDialog(viewModel: FumbblScreenModel, icon: @Composable () -> Unit,) {
     val focusManager = LocalFocusManager.current
-    val loginError: String? by viewModel.loginError().collectAsState()
-    val isLoginAvailable: Boolean by viewModel.loginButtonAvailable().collectAsState()
-    val coachName: String by viewModel.coachName().collectAsState()
-    val clientID by viewModel.clientId().collectAsState()
-    val clientSecret by viewModel.clientSecret().collectAsState()
+    val loginError: String? by viewModel.loginError.collectAsState()
+    val isLoginAvailable: Boolean by viewModel.loginButtonAvailable.collectAsState()
+    val coachName: String by viewModel.coachName.collectAsState()
+    val clientID by viewModel.clientId.collectAsState()
+    val clientSecret by viewModel.clientSecret.collectAsState()
     JervisDialog(
         title = "Log in to FUMBBL",
         icon = icon,

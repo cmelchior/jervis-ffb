@@ -44,8 +44,8 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
-    val globalUrl: String by viewModel.globalUrl.collectAsState()
-    val localUrl: String by viewModel.localUrl.collectAsState()
+    val globalUrl: String by viewModel.globalGameUrl.collectAsState()
+    val localUrl: String by viewModel.localGameUrl.collectAsState()
     val globalUrlError by viewModel.globalGameUrlError.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),

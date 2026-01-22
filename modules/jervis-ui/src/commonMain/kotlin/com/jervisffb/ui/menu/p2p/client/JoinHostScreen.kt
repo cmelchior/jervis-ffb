@@ -34,13 +34,13 @@ import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
  */
 @Composable
 fun JoinHostScreen(viewModel: JoinHostScreenModel, onJoin: () -> Unit, onCancel: () -> Unit,) {
-    val gameUrl by viewModel.gameUrl().collectAsState()
-    val serverUrl by viewModel.serverIp().collectAsState()
-    val port by viewModel.port().collectAsState()
-    val gameId by viewModel.gameId().collectAsState()
-    val joinState by viewModel.canJoin().collectAsState()
-    val joiningMessage by viewModel.joinMessage().collectAsState()
-    val joiningError by viewModel.joinError().collectAsState()
+    val gameUrl by viewModel.gameUrl.collectAsState()
+    val serverUrl by viewModel.serverIp.collectAsState()
+    val port by viewModel.port.collectAsState()
+    val gameId by viewModel.gameId.collectAsState()
+    val joinState by viewModel.joinState.collectAsState()
+    val joiningMessage by viewModel.joinMessage.collectAsState()
+    val joiningError by viewModel.joinError.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 0.dp),

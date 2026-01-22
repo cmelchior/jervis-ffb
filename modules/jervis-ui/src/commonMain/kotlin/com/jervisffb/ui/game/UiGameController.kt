@@ -163,21 +163,19 @@ class UiGameController(
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
     // set up correctly and the `replay` is not used.
-    private val _uiStateFlow = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-    val uiStateFlow: Flow<UiGameSnapshot> = _uiStateFlow
+    val uiStateFlow: Flow<UiGameSnapshot>
+        field = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
 
     // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
-    private val _uiActionWheelFlow = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionWheelFlow: Flow<List<ActionWheelUiState>> = _uiActionWheelFlow
-    private val _uiContextWheelFlow = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
-    val uiContextWheelFlow: Flow<List<ActionWheelUiState>> = _uiContextWheelFlow
-
+    val uiActionWheelFlow: Flow<List<ActionWheelUiState>>
+        field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+    val uiContextWheelFlow: Flow<List<ActionWheelUiState>>
+        field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
     val gameStatusMessageFactory = GameStatusMessageFactory(state)
 
-
     // `replay` is only used to allow the UI to register itself after the game controller has started
-    private val _animationFlow = MutableSharedFlow<JervisAnimation?>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-    val animationFlow: Flow<JervisAnimation?> = _animationFlow
+    val animationFlow: Flow<JervisAnimation?>
+        field = MutableSharedFlow<JervisAnimation?>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
 
     // Channel used by the UI to indicate when the animation is done
     val animationDone = Channel<Boolean>(capacity = Channel.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
@@ -249,9 +247,9 @@ class UiGameController(
                 val actions = controller.getAvailableActions()
                 val (previousNode, currentNode) = controller.previousNode() to controller.currentNode()
                 val acc = UiSnapshotAccumulator(
-                    _uiStateFlow,
-                    _uiActionWheelFlow,
-                    _uiContextWheelFlow,
+                    uiStateFlow,
+                    uiActionWheelFlow,
+                    uiContextWheelFlow,
                     lastUiState, this@UiGameController)
 
                 runPreUpdateAnimations(acc, previousNode, currentNode)
@@ -377,7 +375,7 @@ class UiGameController(
         if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
-                _animationFlow.emit(animation)
+                animationFlow.emit(animation)
                 animationDone.receive()
             }
         }
@@ -389,7 +387,7 @@ class UiGameController(
             if (animation != null) {
                 acc.addActionWheelEvent(HideActionWheel)
                 acc.emitActionWheelState()
-                _animationFlow.emit(animation)
+                animationFlow.emit(animation)
                 animationDone.receive()
             }
         }
@@ -517,7 +515,7 @@ class UiGameController(
     fun notifyAnimationDone() {
         animationScope.launch {
             animationDone.send(true)
-            _animationFlow.emit(null)
+            animationFlow.emit(null)
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {
                 throw it

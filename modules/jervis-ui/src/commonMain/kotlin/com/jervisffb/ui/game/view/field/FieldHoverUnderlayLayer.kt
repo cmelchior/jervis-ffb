@@ -34,7 +34,7 @@ fun FieldHoverUnderlayLayer(
     vm: FieldViewModel,
 ) {
     val fieldSizeData = LocalFieldData.current.size
-    val highlightedSquare: FieldCoordinate? by vm.highlights().collectAsState()
+    val highlightedSquare: FieldCoordinate? by vm.highlights.collectAsState()
     val showHover by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_SHOW_MOUSE_OVER_EFFECT_ON_SQUARE_VALUE, true).collectAsState(true)
     // When the Action Wheel is showing, we do not want to show the hover effect (regardless of it being enabled or not)
     // as it looks confusing with too many things happening at once. The onHover on players will still trigger to show

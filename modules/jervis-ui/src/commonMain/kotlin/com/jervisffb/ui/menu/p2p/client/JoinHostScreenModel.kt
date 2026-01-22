@@ -37,21 +37,27 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     val coachSetupModel = CoachSetupComponentModel(menuViewModel) { coachName ->
         checkForValidGameUrl()
     }
-    private val _gameUrl = MutableStateFlow("")
-    private val _serverIp = MutableStateFlow("")
-    private val _port = MutableStateFlow("")
-    private val _gameId = MutableStateFlow("")
-    private val _joinState = MutableStateFlow(JoinState.INVALID_URL)
-    private val _joinMessage = MutableStateFlow("")
-    private val _joinError = MutableStateFlow("")
 
-    fun gameUrl(): StateFlow<String> = _gameUrl
-    fun serverIp(): StateFlow<String> = _serverIp
-    fun port(): StateFlow<String> = _port
-    fun gameId(): StateFlow<String> = _gameId
-    fun canJoin(): StateFlow<JoinState> = _joinState
-    fun joinMessage(): StateFlow<String> = _joinMessage
-    fun joinError(): StateFlow<String> = _joinError
+    val gameUrl: StateFlow<String>
+        field = MutableStateFlow("")
+
+    val serverIp: StateFlow<String>
+        field = MutableStateFlow("")
+
+    val port: StateFlow<String>
+        field = MutableStateFlow("")
+
+    val gameId: StateFlow<String>
+        field = MutableStateFlow("")
+
+    val joinState: StateFlow<JoinState>
+        field = MutableStateFlow(JoinState.INVALID_URL)
+
+    val joinMessage: StateFlow<String>
+        field = MutableStateFlow("")
+
+    val joinError: StateFlow<String>
+        field = MutableStateFlow("")
 
     @OptIn(ExperimentalUuidApi::class)
     fun getCoach(): Coach? {
@@ -72,7 +78,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     }
 
     fun updateGameUrl(gameUrl: String, updateOtherFields: Boolean = true) {
-        _gameUrl.value = gameUrl
+        this.gameUrl.value = gameUrl
         if (updateOtherFields) {
             updateGameUrlComponents(gameUrl)
         } else {
@@ -81,21 +87,21 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     }
 
     fun updateServerIp(string: String, updateGameUrl: Boolean = true) {
-        _serverIp.value = string
+        serverIp.value = string
         if (updateGameUrl) {
             updateGameUrlFromComponents()
         }
     }
 
     fun updatePort(string: String, updateGameUrl: Boolean = true) {
-        _port.value = string
+        port.value = string
         if (updateGameUrl) {
             updateGameUrlFromComponents()
         }
     }
 
     fun updateGameId(string: String, updateGameUrl: Boolean = true) {
-        _gameId.value = string
+        gameId.value = string
         if (updateGameUrl) {
             updateGameUrlFromComponents()
         }
@@ -103,9 +109,9 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     fun clientJoinGame() {
         menuViewModel.navigatorContext.launch {
-            val joiningUrl = gameUrl().value
-            _joinMessage.value = "Joining $joiningUrl..."
-            _joinState.value = JoinState.JOINING
+            val joiningUrl = gameUrl.value
+            joinMessage.value = "Joining $joiningUrl..."
+            joinState.value = JoinState.JOINING
             val coachName = coachSetupModel.coachName.value
             val coachType = coachSetupModel.coachType.value
             SETTINGS_MANAGER.set(SettingsKeys.JERVIS_DEFAULT_CLIENT_COACH_NAME, coachName)
@@ -113,13 +119,13 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
                 gameUrl = joiningUrl,
                 coachName = coachName,
                 coachType = coachType,
-                gameId = GameId(_gameId.value),
+                gameId = GameId(gameId.value),
                 teamIfHost = null,
                 handler = object: AbstractClintNetworkMessageHandler() {
                     override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
-                        _joinError.value = ""
-                        _joinMessage.value = "Joined ${_gameUrl.value} as $coachName"
-                        _joinState.value = JoinState.JOINED
+                        joinError.value = ""
+                        joinMessage.value = "Joined ${gameUrl.value} as $coachName"
+                        joinState.value = JoinState.JOINED
                         model.userJoinOrContinue()
                     }
                     override fun onDisconnected(reason: CloseReason) {
@@ -131,10 +137,10 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
                         }
 
                         // We might already have reset optimistically
-                        if (_joinState.value != JoinState.READY_JOIN) {
-                            _joinMessage.value = ""
-                            _joinError.value = errorMsg
-                            _joinState.value = JoinState.READY_JOIN
+                        if (joinState.value != JoinState.READY_JOIN) {
+                            joinMessage.value = ""
+                            joinError.value = errorMsg
+                            joinState.value = JoinState.READY_JOIN
                         }
                     }
                 }
@@ -151,9 +157,9 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             })
         }
         // Optimistically leave connection. There is nothing we want from it anywway
-        _joinMessage.value = ""
-        _joinError.value = ""
-        _joinState.value = JoinState.READY_JOIN
+        joinMessage.value = ""
+        joinError.value = ""
+        joinState.value = JoinState.READY_JOIN
     }
 
     // Fetch the sub-components out of the url, so we can update the other fields with it
@@ -176,30 +182,30 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     // Subcomponents were updated independently. This will update the full gameUrl as well
     private fun updateGameUrlFromComponents() {
-        val newUrl = "ws://${_serverIp.value}:${_port.value}/joinGame?id=${_gameId.value}"
+        val newUrl = "ws://${serverIp.value}:${port.value}/joinGame?id=${gameId.value}"
         updateGameUrl(newUrl, false)
     }
 
     private fun checkForValidGameUrl() {
         var isValid = false
-        if (_serverIp.value.isNotBlank() && _port.value.isNotBlank() && _gameId.value.isNotBlank()) {
+        if (serverIp.value.isNotBlank() && port.value.isNotBlank() && gameId.value.isNotBlank()) {
             try {
-                Url(gameUrl().value) // Will throw if not a valid url
+                Url(gameUrl.value) // Will throw if not a valid url
                 isValid = true
             } catch (_: IllegalArgumentException) {
                 isValid = false
             }
         }
         if (isValid && coachSetupModel.coachName.value.isNotBlank()) {
-            _joinState.value = JoinState.READY_JOIN
+            joinState.value = JoinState.READY_JOIN
         } else {
-            _joinState.value = JoinState.INVALID_URL
+            joinState.value = JoinState.INVALID_URL
         }
     }
 
     fun reset(reason: String?) {
-        _joinState.value = JoinState.READY_JOIN
-        _joinMessage.value = ""
-        _joinError.value = reason ?: ""
+        joinState.value = JoinState.READY_JOIN
+        joinMessage.value = ""
+        joinError.value = reason ?: ""
     }
 }

@@ -78,10 +78,10 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         selectedTeam.value = teamSelected
     }
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
-    private val _globalGameUrl = MutableStateFlow("")
-    val globalUrl: StateFlow<String> = _globalGameUrl
-    private val _localGameUrl = MutableStateFlow("")
-    val localUrl: StateFlow<String> = _localGameUrl
+    val globalGameUrl: StateFlow<String>
+        field = MutableStateFlow("")
+    val localGameUrl: StateFlow<String>
+        field = MutableStateFlow("")
     val globalGameUrlError = MutableStateFlow<String?>(null)
     private var server: LightServer? = null
 
@@ -215,8 +215,8 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     }
 
     private suspend fun resetServer() {
-        _globalGameUrl.value = ""
-        _localGameUrl.value = ""
+        globalGameUrl.value = ""
+        localGameUrl.value = ""
         globalGameUrlError.value = null
         val oldServer = server
         server = null
@@ -326,16 +326,16 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
 
     // Go into "Waiting for Opponent" screen from either "Setup" or "Select Team"
     private suspend fun prepareWaitingForOpponent() {
-        _globalGameUrl.value = "Fetching..."
-        _localGameUrl.value = "Fetching..."
+        globalGameUrl.value = "Fetching..."
+        localGameUrl.value = "Fetching..."
         menuViewModel.backgroundContext.launch {
             val localIp = getLocalIpAddress()
-            _localGameUrl.value = "ws://$localIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+            localGameUrl.value = "ws://$localIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
             val publicIp = getPublicIpAddress()
             if (publicIp.isNullOrBlank()) {
                 globalGameUrlError.value = "Unable to get IP address. Goto https://api.ipify.org to see your public IP address"
             }
-            _globalGameUrl.value = "ws://$publicIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+            globalGameUrl.value = "ws://$publicIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
         }
         startServer()
     }

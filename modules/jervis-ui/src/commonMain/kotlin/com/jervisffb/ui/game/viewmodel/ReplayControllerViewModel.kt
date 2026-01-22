@@ -16,14 +16,14 @@ class ReplayControllerViewModel(
     private val uiState: UiGameController,
     private val gameModel: GameScreenModel,
 ) {
-    private val _state = MutableStateFlow(ReplayState.PAUSED)
-    val state: StateFlow<ReplayState> = _state
+    val state: StateFlow<ReplayState>
+        field = MutableStateFlow(ReplayState.PAUSED)
 
     private val actionProvider = uiState.actionProvider as ReplayActionProvider
     private var hasStarted = false
 
     fun start() {
-        _state.value = ReplayState.STARTED
+        state.value = ReplayState.STARTED
         if (hasStarted) {
             actionProvider.pauseActionProvider()
         }
@@ -32,7 +32,7 @@ class ReplayControllerViewModel(
     }
 
     fun pause() {
-        _state.value = ReplayState.PAUSED
+        state.value = ReplayState.PAUSED
         actionProvider.pauseActionProvider()
     }
 }

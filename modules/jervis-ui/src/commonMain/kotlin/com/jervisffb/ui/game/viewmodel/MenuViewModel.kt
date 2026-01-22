@@ -91,13 +91,18 @@ class MenuViewModel {
 
     val p2pHostAvaiable: Boolean = canBeHost()
 
-    private val _showSettingsDialog = MutableStateFlow(false)
-    private val _showDialogDialog = MutableStateFlow(false)
-    private val _showErrorDialog = MutableStateFlow(ErrorDialog(false, "",))
-    private val _showReportIssueDialog = MutableStateFlow(ReportIssueDialogData.HIDDEN)
-    val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
-    val isErrorDialogVisible: StateFlow<ErrorDialog> = _showErrorDialog
-    val isReportIssueDialogVisible: StateFlow<ReportIssueDialogData> = _showReportIssueDialog
+    val isSettingsDialogVisible: StateFlow<Boolean>
+        field = MutableStateFlow(false)
+
+    val isAboutDialogVisible: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
+
+    val isErrorDialogVisible: StateFlow<ErrorDialog>
+        field = MutableStateFlow(ErrorDialog(false, "",))
+
+    val isReportIssueDialogVisible: StateFlow<ReportIssueDialogData>
+        field = MutableStateFlow(ReportIssueDialogData.HIDDEN)
+
     val creditData: CreditData = CreditData()
 
     // Scope for lauching tasks directly related to navigating the UI
@@ -123,7 +128,7 @@ class MenuViewModel {
                     error = null,
                     gameState = null
                 )
-                _showReportIssueDialog.value = dialogData
+                isReportIssueDialogVisible.value = dialogData
             }
         } catch (_: Throwable) {
             /* Ignore, we should never crash when reporting previous errors */
@@ -133,11 +138,11 @@ class MenuViewModel {
     }
 
     fun showAboutDialog(visible: Boolean) {
-        _showDialogDialog.value = visible
+        isAboutDialogVisible.value = visible
     }
 
     fun showErrorDialog(message: String, error: Throwable? = null) {
-        _showErrorDialog.value = ErrorDialog(
+        isErrorDialogVisible.value = ErrorDialog(
             visible = true,
             title = message,
             error = error,
@@ -145,11 +150,11 @@ class MenuViewModel {
     }
 
     fun hideErrorDialog() {
-        _showErrorDialog.value = ErrorDialog(visible = false, title = "",)
+        isErrorDialogVisible.value = ErrorDialog(visible = false, title = "",)
     }
 
     fun showReportIssueDialog(title: String, body: String, error: Throwable? = null, gameState: GameEngineController? = null) {
-        _showReportIssueDialog.value = ReportIssueDialogData(
+        isReportIssueDialogVisible.value = ReportIssueDialogData(
             visible = true,
             title = title,
             body = body,
@@ -159,7 +164,7 @@ class MenuViewModel {
     }
 
     fun hideReportIssueDialog() {
-        _showReportIssueDialog.value = ReportIssueDialogData.HIDDEN
+        isReportIssueDialogVisible.value = ReportIssueDialogData.HIDDEN
     }
 
     fun backToLastScreen() {
@@ -167,10 +172,8 @@ class MenuViewModel {
     }
 
     fun openSettings(bool: Boolean = true) {
-        _showSettingsDialog.value = bool
+        isSettingsDialogVisible.value = bool
     }
-
-    fun showSettingsDialog(): StateFlow<Boolean> = _showSettingsDialog
 
     fun serializeGameState(includeDebugState: Boolean): String {
         return JervisSerialization.serializeGameStateToJson(controller!!, includeDebugState)

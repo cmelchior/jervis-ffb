@@ -12,7 +12,7 @@ import com.jervisffb.ui.menu.components.NotImplementYetDialog
  */
 @Composable
 fun LoadReplayDialog(viewModel: FumbblScreenModel) {
-    val visible: Boolean by viewModel.isReplayDialogVisible().collectAsState()
+    val visible: Boolean by viewModel.isReplayDialogVisible.collectAsState()
     if (!visible) return
     NotImplementYetDialog(
         title = "Load Replay",

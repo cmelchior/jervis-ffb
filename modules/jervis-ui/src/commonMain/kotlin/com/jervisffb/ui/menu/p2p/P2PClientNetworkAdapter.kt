@@ -48,15 +48,16 @@ object Connected : ConnectionState
 class P2PClientNetworkAdapter(
     private val isHost: Boolean = false
 ) {
-    private val _clientState = MutableStateFlow(P2PClientState.JOIN_SERVER)
-    val clientState: StateFlow<P2PClientState> = _clientState
+    val clientState: StateFlow<P2PClientState>
+        field = MutableStateFlow(P2PClientState.JOIN_SERVER)
 
-    private val _hostState = MutableStateFlow(P2PHostState.SETUP_GAME)
-    val hostState: StateFlow<P2PHostState> = _hostState
+    val hostState: StateFlow<P2PHostState>
+        field= MutableStateFlow(P2PHostState.SETUP_GAME)
 
-    private val _connectionState = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
-    val connectionState: StateFlow<ConnectionState> = _connectionState
-    val networManager: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
+    val connectionState: StateFlow<ConnectionState>
+        field = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
+
+    val networkManager: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
 
     private var server: LightServer? = null
     private var gameId: GameId? = null
@@ -89,42 +90,42 @@ class P2PClientNetworkAdapter(
         handler: ClientNetworkMessageHandler,) {
         this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
-        networManager.addMessageHandler(handler)
-        networManager.connectAndJoinGame(gameUrl, gameId, coachName, coachType, isHost = (teamIfHost != null), teamIfHost)
+        networkManager.addMessageHandler(handler)
+        networkManager.connectAndJoinGame(gameUrl, gameId, coachName, coachType, isHost = (teamIfHost != null), teamIfHost)
         // TODO How to update state when handler is coming from the outside?
     }
 
     suspend fun teamSelected(team: TeamInfo) {
-        networManager.sendTeamSelected(team)
+        networkManager.sendTeamSelected(team)
     }
 
     fun cancelJoin() {
-        networManager.cancelJoin()
+        networkManager.cancelJoin()
     }
 
     fun updateClientState(newState: P2PClientState) {
-        _clientState.value = newState
+        clientState.value = newState
     }
 
     fun updateHostState(newState: P2PHostState) {
-        _hostState.value = newState
+        hostState.value = newState
     }
 
     suspend fun close() {
         updateClientState(P2PClientState.JOIN_SERVER)
         server?.stop()
 //        mockServerJob.cancel()
-        networManager.disconnect()
+        networkManager.disconnect()
     }
 
     suspend fun disconnect(handler: AbstractClintNetworkMessageHandler) {
         updateClientState(P2PClientState.JOIN_SERVER)
-        networManager.addMessageHandler(handler)
-        networManager.disconnect()
+        networkManager.addMessageHandler(handler)
+        networkManager.disconnect()
     }
 
     suspend fun gameAccepted(accepted: Boolean) {
-        networManager.sendStartGame(accepted)
+        networkManager.sendStartGame(accepted)
         // TODO The server will disconnect us, and doing this here
         //  results in a race condition where the server never receives
         //  the accepted result. This only happens if we reject twice.
@@ -136,19 +137,19 @@ class P2PClientNetworkAdapter(
     }
 
     suspend fun sendActionToServer(index: GameActionId, action: GameAction) {
-        networManager.sendClientAction(index, action)
+        networkManager.sendClientAction(index, action)
     }
 
     suspend fun sendGameStarted() {
-        networManager.sendGameStarted(this.gameId!!)
+        networkManager.sendGameStarted(this.gameId!!)
     }
 
     fun addMessageHandler(handler: ClientNetworkMessageHandler) {
-        networManager.addMessageHandler(handler)
+        networkManager.addMessageHandler(handler)
     }
 
     suspend fun sendServerClosed() {
-        networManager.sendCloseHostedServer()
+        networkManager.sendCloseHostedServer()
     }
 
     /**
@@ -165,15 +166,15 @@ class P2PClientNetworkAdapter(
         // Network state
         override fun onConnected() {
             LOG.d { "onConnected" }
-            _connectionState.value = Connected
+            connectionState.value = Connected
         }
         override fun onConnecting() {
             LOG.d { "onConnecting" }
-            _connectionState.value = Connecting
+            connectionState.value = Connecting
         }
         override fun onDisconnected(reason: CloseReason) {
             LOG.d { "onDisconnected: $reason" }
-            _connectionState.value = Disconnected(reason)
+            connectionState.value = Disconnected(reason)
         }
 
         // Game State
@@ -217,11 +218,11 @@ class P2PClientNetworkAdapter(
         }
 
         override fun onClientStateChange(newState: P2PClientState) {
-            _clientState.value = newState
+            clientState.value = newState
         }
 
         override fun onHostStateChange(newState: P2PHostState) {
-            _hostState.value = newState
+            hostState.value = newState
         }
 
         override fun onSpectatorStateChange(newState: SpectatorState) {
@@ -236,11 +237,11 @@ class P2PClientNetworkAdapter(
             awayCoach.value = message.coaches.getOrNull(1)
             homeTeam.value = message.homeTeam?.let { SerializedTeam.deserialize(message.rules, it, homeCoach.value!!) }
             awayTeam.value = message.awayTeam?.let { SerializedTeam.deserialize(message.rules, it, awayCoach.value!!) }
-            _clientState.value = message.clientState
+            clientState.value = message.clientState
         }
 
         override fun updateClientState(state: P2PClientState) {
-            _clientState.value = state
+            clientState.value = state
         }
 
         override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) {

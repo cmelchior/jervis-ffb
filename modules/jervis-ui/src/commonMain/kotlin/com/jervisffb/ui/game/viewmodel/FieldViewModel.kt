@@ -83,7 +83,7 @@ class FieldViewModel(
     val fieldBackground = screenModel.fieldBackground
 
     val actionWheelViewModel = PrimaryActionWheelViewModel(
-        eventFlow = uiState.actionWheelFlow,
+        eventFlow = uiState.uiActionWheelFlow,
         team = uiState.state.homeTeam,
         sharedFieldData = sharedFieldData,
     )
@@ -95,7 +95,8 @@ class FieldViewModel(
         autoShowOnNewActionButtons = false
     ))
 
-    private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
+    val highlights: StateFlow<FieldCoordinate?>
+        field = MutableStateFlow<FieldCoordinate?>(null)
 
     // Field layout coordinates (inside the border)
     var fieldCoordinates: FieldLayoutCoordinates = FieldLayoutCoordinates(Offset.Zero)
@@ -108,8 +109,6 @@ class FieldViewModel(
         return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }
     }
 
-    fun highlights(): StateFlow<FieldCoordinate?> = _highlights
-
     fun triggerHoverEnter(square: FieldCoordinate) {
         if (!square.isOnField(game.rules)) {
             error("Square is not on field: $square")
@@ -117,11 +116,11 @@ class FieldViewModel(
         game.field[square].player.let { player: Player? ->
             hoverPlayerChannel.safeTryEmit(player)
         }
-        _highlights.value = square
+        highlights.value = square
     }
 
     fun triggerHoverExit() {
-        _highlights.value = null
+        highlights.value = null
     }
 
     fun triggerShowContextMenu(player: PlayerId) {
@@ -133,7 +132,7 @@ class FieldViewModel(
      * moves are written on each square of the field
      */
     fun observePathFinder(): Flow<Map<FieldCoordinate, UiPathFinderData>> {
-        return combine(_highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
+        return combine(highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
             // If a highlighted square exists, we are going to calculate the shortest path to that
             // square and annotate the path towards it as well. These decorations take precedence
             // over already existing move decorations.
@@ -213,7 +212,7 @@ class FieldViewModel(
     fun observeSnapshot(): Flow<UiGameSnapshot>  = uiState.uiStateFlow
 
     fun observeField(): Flow<Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>>> {
-        return combine(_highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
+        return combine(highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
             uiSnapshot.squares.map {
                 it.key to Pair(it.value, uiSnapshot.players[it.value.player])
             }.toMap()

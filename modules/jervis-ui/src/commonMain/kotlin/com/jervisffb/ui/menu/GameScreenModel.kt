@@ -69,27 +69,23 @@ class LocalFieldDataWrapper {
     // Used to share mouse events across all field layers
     val pointerBus: PointerEventBus = PointerEventBus()
     // Indicates whether a context menu is visible.
-    private val _isContentMenuVisible = mutableStateOf(false)
-    private val _isContextWheelVisible = mutableStateOf(false)
-    private val _isActionWheelVisible = mutableStateOf(false)
-
     val isContentMenuVisible: State<Boolean>
-        get() = _isContentMenuVisible
+        field = mutableStateOf(false)
 
     val isActionWheelVisible: State<Boolean>
-        get() = _isActionWheelVisible
+        field = mutableStateOf(false)
 
     val isContextWheelVisible: State<Boolean>
-        get() = _isContextWheelVisible
+        field = mutableStateOf(false)
 
     fun setActionWheelVisibility(visible: Boolean) {
-        _isActionWheelVisible.value = visible
-        _isContentMenuVisible.value = _isActionWheelVisible.value || _isContextWheelVisible.value
+        isActionWheelVisible.value = visible
+        isContentMenuVisible.value = isActionWheelVisible.value || isContextWheelVisible.value
     }
 
     fun setContextWheelVisibility(visible: Boolean) {
-        _isContextWheelVisible.value = visible
-        _isContentMenuVisible.value = _isActionWheelVisible.value || _isContextWheelVisible.value
+        isContextWheelVisible.value = visible
+        isContentMenuVisible.value = isActionWheelVisible.value || isContextWheelVisible.value
     }
 }
 
@@ -124,10 +120,10 @@ class GameScreenModel(
     val rules: Rules = gameController.rules
     // `false` until both teams have accepted the game
     val isReadyToStartGame = MutableStateFlow(false)
-    val _loadingMessages = MutableStateFlow<String>("")
-    val loadingMessages: StateFlow<String> = _loadingMessages
-    val _isLoaded = MutableStateFlow<Boolean>(false)
-    val isLoaded: StateFlow<Boolean> = _isLoaded
+    val loadingMessages: StateFlow<String>
+        field = MutableStateFlow<String>("")
+    val isLoaded: StateFlow<Boolean>
+        field = MutableStateFlow<Boolean>(false)
     val homeTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
     val homeTeamData: LoadingTeamInfo
     val awayTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
@@ -225,7 +221,7 @@ class GameScreenModel(
             TeamActionMode.AWAY_TEAM -> "Waiting for ${homeTeam.name}"
             TeamActionMode.ALL_TEAMS -> "" // Should not be called in Hotseat games
         }
-        _loadingMessages.value = waitMessage
+        loadingMessages.value = waitMessage
     }
 
     /**
@@ -240,15 +236,15 @@ class GameScreenModel(
      * Initialize game icons and other assets.
      */
     suspend fun initialize(density: Density) {
-        _loadingMessages.value = "Initializing icons"
+        loadingMessages.value = "Initializing icons"
         IconFactory.initialize(density, homeTeam, awayTeam)
-        _loadingMessages.value = "Initializing sounds"
+        loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
         menuViewModel.uiState = uiState
         uiState.startGameEventLoop()
         onEngineInitialized()
-        _loadingMessages.value = "Starting game"
-        _isLoaded.value = true
+        loadingMessages.value = "Starting game"
+        isLoaded.value = true
     }
 
     fun stopGame() {
