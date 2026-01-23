@@ -57,10 +57,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Usage is optional (for now we always use it)
   - [x] Works when inside a tackle zone
   - [x] Only works on offensive assists
-- [ ] Quick Foul
+- [x] Quick Foul
+  - [x] Can move after foul
+  - [x] Cannot foul twice
+  - [x] Cannot move if foul is a turnover
 - [ ] Saboteur
 - [x] Shadowing
-  - [x] Only works on opponents turn
+  - [x] Only works on opponent turn
   - [x] 4+ to succeed
   - [x] Only works when a player dodges, not leaps or teleports
   - [x] Only one player can select shadowing 

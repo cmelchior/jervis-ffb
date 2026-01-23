@@ -24,6 +24,7 @@ import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2025.skills.Pro
 import com.jervisffb.engine.rules.bb2025.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2025.skills.PutTheBootIn
+import com.jervisffb.engine.rules.bb2025.skills.QuickFoul
 import com.jervisffb.engine.rules.bb2025.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2025.skills.Regeneration
 import com.jervisffb.engine.rules.bb2025.skills.RightStuff
@@ -167,9 +168,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.QUICK_FOUL -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Quick Foul", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        QuickFoul(player, category, expiresAt)
+                    }
                 }
                 SkillType.SABOTEUR -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

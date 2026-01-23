@@ -134,6 +134,11 @@ Jervis has adopted the 2nd interpretation, as that is most in line with what
 people would assume a re-roll does (entirely replacing the first roll). This
 would also explain why it isn't described better in the rulebook. 
 
+### Page 135 - Put the Boot In
+Technically, using the skill should be optional, but there doesn't seem to be 
+any use case for this (even a bad one), so until such a use case surfaces, this 
+skill is always used.
+
 ## Spike 19
 None
 
