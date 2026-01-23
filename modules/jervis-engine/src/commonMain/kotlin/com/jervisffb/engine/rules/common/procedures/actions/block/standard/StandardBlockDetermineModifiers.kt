@@ -66,18 +66,8 @@ object StandardBlockDetermineModifiers: Procedure() {
     object DetermineAssists : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
-            val offensiveAssists =
-                context.defender.coordinates.getSurroundingCoordinates(rules)
-                    .mapNotNull { state.field[it].player }
-                    .filter { it != context.attacker}
-                    .count { player -> rules.canOfferAssist(player, context.defender) }
-
-            val defensiveAssists =
-                context.attacker.coordinates.getSurroundingCoordinates(rules)
-                    .mapNotNull { state.field[it].player }
-                    .filter { it != context.defender}
-                    .count { player -> rules.canOfferAssist(player, context.attacker) }
-
+            val offensiveAssists = rules.calculateOffensiveAssists(context.attacker, context.defender)
+            val defensiveAssists = rules.calculateDefensiveAssists(context.defender, context.attacker)
             return compositeCommandOf(
                 SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 ExitProcedure()

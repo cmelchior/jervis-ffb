@@ -36,14 +36,16 @@ interface Skill<T> {
     // When the `used` state reset back to `false`?
     val resetAt: Duration
     // Whether this skill works when the player has lost its tackle zones
-    // If `true`, in BB2025 this is equal to the skill having the `Passive` keyword.
+    // If `true`, in BB2025 this means the skills should also have the `Passive` keyword.
     val workWithoutTackleZones: Boolean
     // Whether this skill works when the player is prone or stunned
-    // If `true`, in BB2025 this is equal to the skill having the `Passive` keyword.
+    // If `true`, in BB2025 this is also means that the skill should have the `Passive` keyword.
     val workWhenProne: Boolean
     // If the skill is temporary, this defines when the skill expires and is removed
     val expiresAt: Duration
-    // Any keywords associated with this skill (only used in BB2025)
+    // Any keywords associated with this skill (only used in BB2025).
+    // `passive/active` are only used for display purposes, `workWhenProne` and `workWithoutTackleZones`
+    // are used to determine the rule effect.
     val keywords: List<SkillKeyword>
     // Whether this skill is temporary (removed at latest and end of game) or not
     val isTemporary: Boolean

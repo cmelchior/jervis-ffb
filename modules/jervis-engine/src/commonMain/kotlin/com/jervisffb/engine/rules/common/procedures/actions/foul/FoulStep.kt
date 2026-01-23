@@ -36,13 +36,17 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.model.modifiers.DefensiveAssistsModifier
 import com.jervisffb.engine.model.modifiers.OffensiveAssistModifier
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
@@ -73,9 +77,39 @@ object FoulStep: Procedure() {
             val offensiveAssists = rules.calculateOffensiveAssists(fouler, victim)
             val defensiveAssists = rules.calculateDefensiveAssists(victim, fouler)
             return compositeCommandOf(
-                SetContext(context.copy(foulAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
-                GotoNode(RollForFoul)
+                SetContext(context.copy(foulStandardAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                GotoNode(CalculatePutTheBootInAssists)
             )
+        }
+    }
+
+    // While only relevant for BB2025, we keep it in the common code as long as it can
+    // stay as a computation node
+    object CalculatePutTheBootInAssists: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            if (rules.baseVersion != GameVersion.BB2025) {
+                return GotoNode(RollForFoul)
+            }
+            val context = state.getContext<FoulContext>()
+            val bootAssists = context.victim!!.coordinates.getSurroundingCoordinates(rules)
+                .mapNotNull { state.field[it].player }
+                .filter { it != context.fouler }
+                .filter { it.isSkillAvailable(SkillType.PUT_THE_BOOT_IN) }
+                .filter { rules.isStanding(it) && rules.isMarked(it) }
+
+            return buildCompositeCommand {
+                bootAssists.forEach { player ->
+                    add(ReportSkillUsed(player, player.getSkill(SkillType.PUT_THE_BOOT_IN)))
+                }
+                addAll(
+                    SetContext(
+                        context.copy(
+                            putTheBootInAssists = bootAssists.size
+                        )
+                    ),
+                    GotoNode(RollForFoul)
+                )
+            }
         }
     }
 

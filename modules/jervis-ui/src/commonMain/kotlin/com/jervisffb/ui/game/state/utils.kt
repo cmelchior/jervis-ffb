@@ -23,18 +23,8 @@ fun calculateAssumedNoOfBlockDice(state: Game, attacker: Player, defender: Playe
         attackerStrength += 1
     }
 
-    val offensiveAssists = defender.coordinates.getSurroundingCoordinates(state.rules)
-        .mapNotNull { state.field[it].player }
-        .filter { it != attacker }
-        .count { player ->
-            rules.canOfferAssist(player, defender)
-        }
-
-    val defensiveAssists =
-        attacker.coordinates.getSurroundingCoordinates(rules)
-            .mapNotNull { state.field[it].player }
-            .filter { it != defender }
-            .count { player -> rules.canOfferAssist(player, attacker) }
+    val offensiveAssists = rules.calculateOffensiveAssists(attacker, defender)
+    val defensiveAssists = rules.calculateDefensiveAssists(defender, attacker)
 
     return calculateBlockDiceToRoll(attackerStrength, offensiveAssists, defenderStrength, defensiveAssists)
 }

@@ -373,7 +373,7 @@ abstract class Rules(
         val field = defender.team.game.field
         return defender.coordinates.getSurroundingCoordinates(this)
             .mapNotNull { field[it].player }
-            .filter { it != attacker }
+            .filter { it != attacker && it.team == attacker.team }
             .count { player ->
                 canOfferAssist(player, defender)
             }
@@ -394,7 +394,7 @@ abstract class Rules(
         val field = defender.team.game.field
         return attacker.coordinates.getSurroundingCoordinates(this)
             .mapNotNull { field[it].player }
-            .filter { it != defender }
+            .filter { it != defender && it.team == defender.team }
             .count { player ->
                 canOfferAssist(player, attacker)
             }
@@ -414,21 +414,22 @@ abstract class Rules(
         if (!assister.location.isAdjacent(this, target.location)) return false
         if (!canMarkPlayers(assister)) return false
         // TODO If player has Guard, player can always assist
-        // We need to check if the only player marking the possible assister is the target
-        // If yes, they can still assist
+        // A player can only assist if they themselves are not being marked.
+        // This logic does not take into account any skills.
         val field = assister.team.game.field
         return assister.coordinates
             .getSurroundingCoordinates(this, 1, false)
-            .fold(0) { acc, coordinate ->
-                val markingPlayer: Player? = field[coordinate].player
-                val markingTeam = markingPlayer?.team
-                val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
-                if (markingPlayer != null && assister.team != markingTeam && canMark) {
-                    acc + 1
+            .none { coordinate ->
+                // Check that no opponents prevent `assister` from actually assisting
+                // This does not take into account any skills.
+                val adjacentPlayer = field[coordinate].player
+                val isOpponent = (adjacentPlayer?.team != assister.team)
+                if (adjacentPlayer != null && isOpponent && adjacentPlayer != target) {
+                    canMarkPlayers(adjacentPlayer)
                 } else {
-                    acc
+                    false
                 }
-            } <= 1
+            }
     }
 
     /**

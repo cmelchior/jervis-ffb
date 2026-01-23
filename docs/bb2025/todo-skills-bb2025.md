@@ -52,7 +52,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Fumblerooskie
 - [ ] Lethal Flight
 - [ ] Pile Driver
-- [ ] Put the Boot In
+- [x] Put the Boot In
+  - [x] Doesn't work when prone
+  - [x] Usage is optional (for now we always use it)
+  - [x] Works when inside a tackle zone
+  - [x] Only works on offensive assists
 - [ ] Quick Foul
 - [ ] Saboteur
 - [x] Shadowing
