@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Represents the "Quick Foul" skill.
  *
- * See page XXX in the BB2025 rulebook.
+ * See page 134 in the BB2025 rulebook.
  */
 class QuickFoul(
     override val player: Player,
