@@ -134,6 +134,30 @@ Jervis has adopted the 2nd interpretation, as that is most in line with what
 people would assume a re-roll does (entirely replacing the first roll). This
 would also explain why it isn't described better in the rulebook. 
 
+### Page 71 - Test for Accuracy
+Rules as written make PA 1+ identical to PA 2+, which is probably not intended.
+Both NAF and FUMBBL have adopted the interpretation instead:
+
+If the Passing Ability Test is a 1 or lower after modifiers, or a natural 1, 
+the Pass is Fumbled. PA1+ players pass the test on a modified 1.
+
+So Jervis has done the same, at least until we have a FAQ released.
+
+### Page 71 - Fumbled Pass
+The BB2025 rulebook does not specify what happens if you try to pass with a 
+PA stat of "-". In BB2020, this was defined as you would always fumble the ball
+
+Since BB2025 lack any guidance on this, for now Jervis uses th BB2020 rule, i.e.
+a player with PA -, can start a pass action, but the pass will always be a 
+fumble.
+
+### Page 127 - Cloud Burster
+Technically, this is skill is optional, but you would only want to disable it
+if you wanted the opponent to "accidentally" catch the ball, but in that case
+the opponent can just decide to not intercept.
+
+So for ease of use, this skill is always used when available.
+
 ### Page 135 - Put the Boot In
 Technically, using the skill should be optional, but there doesn't seem to be 
 any use case for this (even a bad one), so until such a use case surfaces, this 

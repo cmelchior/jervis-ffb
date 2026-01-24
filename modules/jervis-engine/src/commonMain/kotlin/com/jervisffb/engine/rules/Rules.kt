@@ -3,17 +3,13 @@ package com.jervisffb.engine.rules
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Ball
-import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnFieldLocation
@@ -27,16 +23,12 @@ import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.rules.common.actions.PlayerAction
-import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
-import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.common.tables.ThrowInPosition
 import com.jervisffb.engine.rules.common.tables.ThrowInTemplate
-import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.Serializable
 
@@ -571,98 +563,10 @@ abstract class Rules(
 
     /**
      * Returns all actions available to this player when they are activated.
-     * Actions that require a target to activate are filtered out, e.g., Blitz and Foul.
+     * This method should filter out actions that require targets that do not
+     * exist, like Blitz or Foul (in BB2020).
      */
-    fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
-        if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
-        if (player.location !is OnFieldLocation) return emptyList()
-        return buildList {
-            // Add any team actions that are available
-            state.activeTeamOrThrow().turnData.let { turnData ->
-                if (turnData.moveActions > 0) add(teamActions.move)
-                if (turnData.passActions > 0 && turnData.throwTeamMateActions == teamActions.throwTeamMate.availablePrTurn) {
-                    // Pass and Throw Team-mate are mutually exclusive
-                    add(teamActions.pass)
-                }
-                if (turnData.handOffActions > 0) add(teamActions.handOff)
-                if (turnData.blockActions > 0) {
-                    val isStanding = (player.state == PlayerState.STANDING)
-                    val hasEligibleTargets = (player.location as OnFieldLocation)
-                        .getSurroundingCoordinates(this@Rules, 1)
-                        .mapNotNull { state.field[it].player }
-                        .filter { otherPlayer -> otherPlayer.team != player.team }
-                        .filter { otherPlayer -> isStanding(otherPlayer)}
-                        .any { otherPlayer -> isMarking(player, otherPlayer)}
-
-                    // TODO Also check for Jump Up
-                    if (isStanding && hasEligibleTargets) {
-                        add(teamActions.block)
-                    }
-                }
-                if (turnData.blitzActions > 0) {
-                    val hasEligibleBlitzTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
-                        .any {  targetPlayer -> isStanding(targetPlayer) }
-
-                    if (hasEligibleBlitzTargets) {
-                        add(teamActions.blitz)
-                    }
-                }
-                if (turnData.foulActions > 0) {
-                    val hasEligibleFoulTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
-                        .any {  targetPlayer -> targetPlayer.state == PlayerState.PRONE || targetPlayer.state == PlayerState.STUNNED }
-                    if (hasEligibleFoulTargets) {
-                        add(teamActions.foul)
-                    }
-                }
-                if (
-                    turnData.throwTeamMateActions > 0
-                    && turnData.usedStandardActions[PlayerStandardActionType.PASS] == 0
-                    && player.hasSkill(SkillType.THROW_TEAMMATE)
-                ) {
-                    // Throw Team-mate and Pass are mutually exclusive
-                    add(teamActions.throwTeamMate)
-                }
-                // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
-                // since it makes maintaining the logic easier. The action is disabled by setting the
-                // count to 0 in the TeamActions setup.
-                val hasUnsteady = player.isSkillAvailable(SkillType.UNSTEADY)
-                val isBigGuy = player.keywords.contains(PlayerKeyword.BIG_GUY)
-                if (turnData.secureTheBallActions > 0 && !hasUnsteady && !isBigGuy) {
-                    // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
-                    // In the case of multiple balls, only one ball has to satisfy the criteria for the action to be
-                    // available. The ball has to be on the floor at the start of the activation.
-                    val eligibleBallExists = state.balls.any { ball ->
-                        val onTheGround = (ball.state == BallState.ON_GROUND)
-                        val enemiesInRange = ball.location.getSurroundingCoordinates(
-                            rules = this@Rules,
-                            distance = 2,
-                            includeOutOfBounds = false
-                        ).any { coordinate ->
-                            state.field[coordinate].player?.let { p->
-                                (p.team != player.team) && this@Rules.canMarkPlayers(p)
-                            } ?: false
-                        }
-                        onTheGround && !enemiesInRange
-                    }
-                    if (eligibleBallExists) {
-                        add(teamActions.secureTheBall)
-                    }
-                }
-            }
-
-            // Add any special actions that are provided by skills
-            player.skills.filterIsInstance<SpecialActionProvider>().forEach {
-                val type = it.specialAction
-                val isSkillActionUsed = it.isSpecialActionUsed
-                val isActionAvailable = state.activeTeamOrThrow().turnData.availableSpecialActions[type]!! > 0
-                if (!isSkillActionUsed && isActionAvailable) {
-                    add(teamActions[type])
-                }
-            }
-        }
-    }
+    abstract fun getAvailableActions(state: Game, player: Player): List<PlayerAction>
 
     /**
      * When either a `baseX` or `XModifiers` stat value has been updated, this method should also

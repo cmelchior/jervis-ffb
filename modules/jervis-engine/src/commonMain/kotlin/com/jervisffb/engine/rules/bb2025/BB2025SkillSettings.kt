@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.bb2025.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
+import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
@@ -335,9 +336,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.CLOUD_BURSTER -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Cloud Burster", type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        CloudBurster(player, category, expiresAt)
+                    }
                 }
                 SkillType.DUMP_OFF -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->

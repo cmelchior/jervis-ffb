@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.pass
+package com.jervisffb.engine.rules.bb2025.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -27,19 +27,19 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
-import com.jervisffb.engine.rules.common.procedures.DeviateRoll
-import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -47,7 +47,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Procedure for handling the passing part of a [PassAction].
  *
- * See page 48 in the rulebook.
+ * See page 70 in the BB2025 rulebook.
+ *
+ * TODO: Need to convert to BB2025 rules.
  */
 object PassStep: Procedure() {
     override val initialNode: Node = DeclareTargetSquare
@@ -74,7 +76,7 @@ object PassStep: Procedure() {
                         Range.OUT_OF_RANGE -> false
                     }
                 }
-                .map { TargetSquare.throwTarget(it) }
+                .map { TargetSquare.Companion.throwTarget(it) }
                 .let { SelectFieldLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
@@ -96,7 +98,7 @@ object PassStep: Procedure() {
                                     range = distance
                                 )
                             ),
-                            SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
+                            SetBallState.Companion.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
                             SetBallLocation(ball, newLocation),
                             GotoNode(TestForAccuracy)
                         )
@@ -110,12 +112,11 @@ object PassStep: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = AccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
-            return when (context.passingResult) {
+            return when (val result = context.passingResult) {
                 PassingType.ACCURATE -> GotoNode(ResolveAccuratePass)
                 PassingType.INACCURATE -> GotoNode(ResolveInaccuratePass)
-                PassingType.WILDLY_INACCURATE -> GotoNode(ResolveWildlyInaccuratePass)
                 PassingType.FUMBLED -> GotoNode(ResolveFumbledPass)
-                null -> INVALID_GAME_STATE("Missing passing result value")
+                else -> INVALID_GAME_STATE("Unsupported passing result: $result")
             }
         }
     }
@@ -127,9 +128,9 @@ object PassStep: Procedure() {
             val context = state.getContext<PassContext>()
             val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.accurateThrow(ball),
+                SetBallState.Companion.accurateThrow(ball),
                 SetBallLocation(ball, context.target!!),
-                GotoNode(AttemptPassingInterference)
+                GotoNode(AttemptInterception)
             )
         }
     }
@@ -143,7 +144,7 @@ object PassStep: Procedure() {
             val context = state.getContext<PassContext>()
             val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.scattered(ball),
+                SetBallState.Companion.scattered(ball),
                 SetBallLocation(ball, context.target!!),
                 SetContext(
                     ScatterRollContext(
@@ -161,59 +162,19 @@ object PassStep: Procedure() {
             val ball = state.currentBall()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
-                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
+                    SetBallState.Companion.outOfBounds(ball, context.outOfBoundsAt),
                     SetBallLocation(ball, context.landsAt!!),
                     SetContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
-                    GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
+                    GotoNode(AttemptInterceptionBeforeGoingOutOfBounds)
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.scattered(ball),
+                    SetBallState.Companion.scattered(ball),
                     SetBallLocation(ball, context.landsAt!!),
                     SetContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
-                    GotoNode(AttemptPassingInterference)
-                )
-            }
-        }
-    }
-
-    /**
-     * If the pass is Wildly Accurate, the ball will deviate from the thrower's location.
-     */
-    object ResolveWildlyInaccuratePass: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val passContext = state.getContext<PassContext>()
-            val ball = state.currentBall()
-            return compositeCommandOf(
-                SetBallState.deviating(ball),
-                SetBallLocation(ball, passContext.thrower.coordinates),
-                SetContext(DeviateRollContext(passContext.thrower.coordinates))
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            // The opposite team can now run interference. How this is done
-            // depends on if the deviated ball is about to go out of bounds or not.
-            val context = state.getContext<DeviateRollContext>()
-            val passContext = state.getContext<PassContext>()
-            val ball = state.currentBall()
-            return if (context.outOfBoundsAt != null) {
-                compositeCommandOf(
-                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
-                    SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
-                    RemoveContext<DeviateRollContext>(),
-                    GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
-                )
-            } else {
-                compositeCommandOf(
-                    SetBallState.deviating(ball),
-                    SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
-                    RemoveContext<DeviateRollContext>(),
-                    GotoNode(AttemptPassingInterference)
+                    GotoNode(AttemptInterception)
                 )
             }
         }
@@ -242,71 +203,60 @@ object PassStep: Procedure() {
      * Attempt to interfere with a pass that is about to go out of bounds. If successful,
      * the ball doesn't go out of bounds (at least not due to the original pass).
      *
-     * Designer's Commentary: If the ball goes out of bounds. Passing Interference is checked at
-     * the square just before the ball goes out of bounds.
+     * Designer's Commentary:
+     * In BB2020, this was FAQ'ed to say that
+     *
+     * "If the ball goes out of bounds. Passing Interference is checked at
+     * the square just before the ball goes out of bounds."
+     *
+     * Since this is unspecified in the BB2025 rulebook, we use the same interpretation
+     * as in BB2020.
      */
-    object AttemptPassingInterferenceBeforeGoingOutOfBounds: ParentNode() {
+    object AttemptInterceptionBeforeGoingOutOfBounds: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val passContext = state.getContext<PassContext>()
-            val interferenceContext = PassingInterferenceContext(
+            val interferenceContext = InterceptionContext(
                 thrower = passContext.thrower,
                 target = state.currentBall().outOfBoundsAt!!,
             )
             return SetContext(interferenceContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = InterceptionStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If the ball was not deflected, it will continue going out of bounds.
-            // If it was successfully deflected. Regardless of that outcome, the thrower's action
+            // If the ball was not intercepted, it will continue going out of bounds.
+            // If it was successfully intercepted. Regardless of that outcome, the thrower's action
             // is over.
-            val context = state.getContext<PassingInterferenceContext>()
-            return if (!context.continueThrow) {
-                compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
-                    RemoveContext<PassingInterferenceContext>(),
-                    ExitProcedure()
-                )
-            } else {
-                compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
-                    RemoveContext<PassingInterferenceContext>(),
-                    GotoNode(ResolveGoingOutOfBounds)
-                )
-            }
+            val context = state.getContext<InterceptionContext>()
+            return compositeCommandOf(
+                SetContext(state.getContext<PassContext>().copy(intercept = context)),
+                RemoveContext<InterceptionContext>(),
+                if (!context.didIntercept) ExitProcedure() else GotoNode(ResolveGoingOutOfBounds)
+            )
         }
     }
 
     /**
      * Attempt to interfere with a pass that landed on the field without the ball going out of bounds first.
      */
-    object AttemptPassingInterference: ParentNode() {
+    object AttemptInterception: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val passContext = state.getContext<PassContext>()
-            val interferenceContext = PassingInterferenceContext(
+            val interferenceContext = InterceptionContext(
                 thrower = passContext.thrower,
                 target = state.currentBall().location,
             )
             return SetContext(interferenceContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = InterceptionStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If the ball was not deflected, it will continue to land at the target location.
-            // If it was successfully deflected. Regardless of that outcome, the thrower's action
-            // is over.
-            val context = state.getContext<PassingInterferenceContext>()
-            return if (!context.continueThrow) {
-                compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
-                    RemoveContext<PassingInterferenceContext>(),
-                    ExitProcedure()
-                )
-            } else {
-                compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
-                    RemoveContext<PassingInterferenceContext>(),
-                    GotoNode(ResolveBounceOrCatch)
-                )
-            }
+            // If the ball was not intercepted, it will continue to land at the target location.
+            // If it was successfully intercepted, the thrower's actions is over.
+            val context = state.getContext<InterceptionContext>()
+            return compositeCommandOf(
+                SetContext(state.getContext<PassContext>().copy(intercept = context)),
+                RemoveContext<InterceptionContext>(),
+                if (context.didIntercept) ExitProcedure() else GotoNode(ResolveBounceOrCatch)
+            )
         }
     }
 
@@ -326,7 +276,11 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 RemoveContext<ThrowInContext>(),
-                if (!rules.teamHasBall(passContext.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
+                if (!rules.teamHasBall(
+                        passContext.thrower.team,
+                        state.currentBall()
+                    )
+                ) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }
@@ -359,7 +313,11 @@ object PassStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return compositeCommandOf(
-                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
+                if (!rules.teamHasBall(
+                        context.thrower.team,
+                        state.currentBall()
+                    )
+                ) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

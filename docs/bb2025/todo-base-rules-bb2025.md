@@ -472,35 +472,26 @@ book.
     - [x] Marked modifiers to parser
     - [x] Accurate pass
     - [x] Inaccurate pass
-    - [x] Wildly inaccurate pass
     - [x] Fumbled pass
     - [x] Bounce from target if not caught
-    - [x] Passing Interference (players under the ruler)
-        - [x] Choose not to deflect
+    - [x] Interception (players under the ruler)
+        - [x] Choose not to intercept
         - [x] Must be standing with a tackle zone
         - [x] Opposing coach chooses player if multiple options
         - [x] Modifiers
-        - [x] Scatter if failed catch
-        - [x] Run Passing Interference before going out of bounds
-        - [x] Run Passing Interference on accurate pass
-        - [x] Run Passing Interference on inaccurate pass
-        - [x] Run Passing Interference on Wildly inaccurate pass
-        - [x] Convert deflection into interception
-        - [x] Deflect, but fails to catch, ball ends up on floor
-        - [x] Deflect, but fails to catch, ball ends up on thrower team
-        - [x] Deflect, but fails to catch, ball ends up on interceptor team
-        - [x] Deflect, but fails to catch, scatters the ball out of bounds
-        - [x] Passing Interference on ball going out of bounds
+        - [x] Throw continues if not intercepted
+        - [x] Intercept before going out of bounds
+        - [x] Intercept accurate pass
+        - [x] Intercept inaccurate pass
 - [ ] Throw Team-mate Action
     - [x] Require Throw Team-mate and Right Stuff traits
-    - [x] Right Stuff player must have Strenght 3 or less
     - [ ] Pass Action and Throw Team-mate can be used in the same turn
     - [x] Action used when moving without throwing
     - [x] Action used when throwing without moving
     - [x] Cannot move after the throw
+    - [ ] Can throw prone player
     - [x] Superb Throw
-    - [x] Successful Throw
-    - [x] Terrible Throw
+    - [ ] Subpar Throw
     - [x] Fumbled Throw
     - [x] Scatter on non-fumbled throws
     - [x] Land Superb throw

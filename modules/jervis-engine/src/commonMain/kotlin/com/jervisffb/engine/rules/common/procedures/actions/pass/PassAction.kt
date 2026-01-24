@@ -34,6 +34,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
@@ -62,7 +64,10 @@ data class PassContext(
     val passingModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val passingResult: PassingType? = null,
     val runInterference: Player? = null,
+    // Used in BB2020
     val passingInterference: PassingInterferenceContext? = null,
+    // Used in BB2025
+    val intercept: InterceptionContext? = null
 ) : ProcedureContext {
     fun copyAndAdd(passingModifier: DiceModifier): PassContext = this.copy(
         passingModifiers = passingModifiers.add(passingModifier)
@@ -72,7 +77,8 @@ data class PassContext(
 /**
  * Procedure for controlling a player's Pass action.
  *
- * See page 48 in the rulebook.
+ * See page 48 in the BB2020 rulebook.
+ * See page 70 in the BB2025 rulebook.
  */
 object PassAction : Procedure() {
     override val initialNode: Node = MoveOrPassOrEndAction
@@ -170,7 +176,12 @@ object PassAction : Procedure() {
             val context = state.getContext<PassContext>()
             return SetCurrentBall(context.thrower.ball)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassStep
+                GameVersion.BB2025 -> com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return compositeCommandOf(

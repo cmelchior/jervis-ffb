@@ -359,39 +359,10 @@ class TouchdownTests: JervisGameBB2025Test() {
         assertTouchdown()
     }
 
+    @Ignore
     @Test
     fun catchDeviatedBallInOpponentEndZone() {
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
-                deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
-                kickoffEvent = defaultKickOffEvent(),
-                bounce = null
-            ),
-            PlayerSelected("A6".playerId) // Give ball to A6
-        )
-
-        // Away turn has started. Fake the position of two away players
-        // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(6, 3)).execute(state)
-        val player = awayTeam[6.playerNo]
-        assertEquals(0, state.awayScore)
-
-        // Throw ball as wildly inaccurate, but it still hits a player in the end zone
-        controller.rollForward(
-            *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
-            FieldSquareSelected(1, 3), // Hit square in front of player in end zone
-            2.d6, // Wildly Inaccurate
-            NoRerollSelected(),
-            DiceRollResults(4.d8, 6.d6), // Deviate into end zone
-            6.d6, // Catch + Score
-            NoRerollSelected(),
-        )
-        assertTouchdown()
+        // No way to deviate the ball during normal play in BB20205 (right now)
     }
 
     @Test

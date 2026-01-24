@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.pass
+package com.jervisffb.engine.rules.bb2025.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -22,7 +22,6 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.PassingInterferenceRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -35,31 +34,31 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
 /**
- * Procedure for handling rolling for Passing Interference as described on page 50
- * in the rulebook.
+ * Procedure for handling rolling for Interception as described on page 71
+ * in the BB20235 rulebook.
  *
  * It is only responsible for handling the actual dice roll. The result is stored
- * in [PassingInterferenceRollContext] and it is up to the caller of the procedure
+ * in [InterceptionRollContext] and it is up to the caller of the procedure
  * to choose the appropriate action depending on the outcome.
  */
-object PassingInterferenceRoll : Procedure() {
+object InterceptionRoll : Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<PassingInterferenceRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<InterceptionRollContext>()
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassingInterferenceRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<InterceptionRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<PassingInterferenceRollContext>()
+                val rollContext = state.getContext<InterceptionRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.Companion.create(state, d6),
                     isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
                 )
                 return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.PASSING_INTERFERENCE, d6),
+                    ReportDiceRoll(DiceRollType.INTERCEPTION, d6),
                     SetContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
@@ -68,13 +67,13 @@ object PassingInterferenceRoll : Procedure() {
     }
 
     object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassingInterferenceRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<InterceptionRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<PassingInterferenceRollContext>()
+            val context = state.getContext<InterceptionRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
                 context.player,
-                DiceRollType.PASSING_INTERFERENCE,
+                DiceRollType.INTERCEPTION,
                 context.roll!!,
                 context.isSuccess
             )
@@ -90,7 +89,7 @@ object PassingInterferenceRoll : Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.PASSING_INTERFERENCE, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(DiceRollType.INTERCEPTION, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -116,11 +115,11 @@ object PassingInterferenceRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassingInterferenceRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<InterceptionRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val context = state.getContext<PassingInterferenceRollContext>()
+                val context = state.getContext<InterceptionRollContext>()
                 val rerollResult = context.copy(
                     roll = context.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,

@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.pass
+package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -35,12 +35,14 @@ import com.jervisffb.engine.model.modifiers.PassingInterferenceModifier
 import com.jervisffb.engine.reports.ReportDeflection
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Catch
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for checking for passing interference as part of a [PassAction].
+ * Procedure for checking for passing interference as part of a [com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction].
  *
- * See page 50 in the rulebook.
+ * See page 50 in the BB2020 rulebook.
  */
 object PassingInterferenceStep: Procedure() {
     override val initialNode: Node = SelectPlayerForInterference

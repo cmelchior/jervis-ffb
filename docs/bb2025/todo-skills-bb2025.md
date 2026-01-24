@@ -23,10 +23,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Reroll catching a successful Pass
     - [x] Reroll catching a bouncing ball
     - [x] Reroll catching a hand-off
-    - [x] Reroll catching a deviated ball
+    - [ ] Reroll catching a deviated ball
     - [x] Reroll catching a scattered ball
     - [x] Reroll catching a bouncing ball
-    - [ ] Reroll convert a deflection into interception
     - [x] Only works on failed catches
     - [x] Does not work if missing tackle zones
     - [ ] Works multiple times pr. turn

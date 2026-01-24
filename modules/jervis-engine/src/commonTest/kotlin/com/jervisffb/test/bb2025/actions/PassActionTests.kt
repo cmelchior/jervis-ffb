@@ -12,7 +12,6 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
@@ -363,28 +362,6 @@ class PassActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun wildlyInaccuratePass() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(14, 5),
-            Confirm, // Start pass
-            FieldSquareSelected(14, 1),
-            2.d6, // Throw Short pass, needs 5+ (-1 modifier)
-            NoRerollSelected(),
-        )
-        assertEquals(PassingType.WILDLY_INACCURATE, state.getContext<PassContext>().passingResult)
-        controller.rollForward(
-            DiceRollResults(2.d8, 2.d6), // Deviate
-            8.d8, // Bounce
-        )
-        assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,4), state.singleBall().location)
-    }
-
-    @Test
     fun fumbledPass() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
@@ -406,7 +383,7 @@ class PassActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun opponentMustSelectOneToRunInterference() {
+    fun opponentMustSelectOneToIntercept() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
@@ -422,7 +399,6 @@ class PassActionTests: JervisGameBB2025Test() {
         assertEquals(5, interceptors.size)
         controller.rollForward(
             PlayerSelected("H2".playerId),
-            6.d6, // Deflect,
             6.d6 // Intercept
         )
         assertTrue(homeTeam["H2".playerId].hasBall())
@@ -493,7 +469,7 @@ class PassActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun runningInterference_accuratePass() {
+    fun intercept_accuratePass() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
@@ -512,19 +488,19 @@ class PassActionTests: JervisGameBB2025Test() {
         awayTeam["A3".playerId].hasTackleZones = false // Remove mark
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
-            3.d6, // Deflect (with -3 modifier) - Will fail
+            3.d6, // Intercept (with -3 modifier) - Will fail
         )
-        assertFalse(state.getContext<PassContext>().passingInterference!!.didDeflect)
+        assertFalse(state.getContext<PassContext>().intercept!!.didIntercept)
         controller.rollForward(
             Undo,
-            4.d6, // Deflect - Will succeed
-            2.d6, // Catch (with -1 modifier)
+            4.d6, // Intercept - Will succeed
         )
+        assertEquals(homeTeam, state.activeTeam)
         assertTrue(homeTeam["H2".playerId].hasBall())
     }
 
     @Test
-    fun runningInterference_inaccuratePass() {
+    fun intercept_inaccuratePass() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
@@ -544,19 +520,20 @@ class PassActionTests: JervisGameBB2025Test() {
         awayTeam["A3".playerId].hasTackleZones = false // Remove mark
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
-            2.d6, // Deflect (with -2 modifier) - Will fail
+            2.d6, // Intecept (with -2 modifier) - Will fail
         )
-        assertFalse(state.getContext<PassContext>().passingInterference!!.didDeflect)
+        assertFalse(state.getContext<PassContext>().intercept!!.didIntercept)
         controller.rollForward(
             Undo,
-            3.d6, // Deflect - Will succeed
-            2.d6, // Catch (with -1 modifier)
+            3.d6, // Intercept - Will succeed
         )
+        assertEquals(homeTeam, state.activeTeam)
         assertTrue(homeTeam["H2".playerId].hasBall())
     }
 
     @Test
-    fun runningInterference_wildlyInaccuratePass() {
+    fun intercept_markedModifiers() {
+        awayTeam["A1".playerId].state = PlayerState.PRONE
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
@@ -564,33 +541,28 @@ class PassActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SmartMoveTo(12, 3),
             Confirm, // Start pass
-            FieldSquareSelected(13, 10),
-            2.d6, // Pass - Wildly inaccurate
+            FieldSquareSelected(9, 9),
+            3.d6, // Pass - Inaccurate
             NoRerollSelected(),
-            DiceRollResults(7.d8, 6.d6) // Deviate to [12, 9]
+            DiceRollResults(5.d8, 5.d8, 5.d8) // Scatter to [12, 9]
         )
-        assertEquals(PassingType.WILDLY_INACCURATE, state.getContext<PassContext>().passingResult)
-        homeTeam["H2".playerId].agility = 2 // Make interceptor super human
-        awayTeam["A1".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A2".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A3".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A4".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A5".playerId].hasTackleZones = false // Remove mark
+        assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
+        assertEquals(2, rules.calculateMarks(state, homeTeam, homeTeam["H2".playerId].coordinates))
+        homeTeam["H2".playerId].agility = 1 // Make interceptor superhuman
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
-            2.d6, // Deflect (with -1 modifier) - Will fail
+            4.d6, // Intercept (with -4 modifier) - Will fail
         )
-        assertFalse(state.getContext<PassContext>().passingInterference!!.didDeflect)
+        assertFalse(state.getContext<PassContext>().intercept!!.didIntercept)
         controller.rollForward(
             Undo,
-            3.d6, // Deflect - Will succeed
-            3.d6, // Catch (with -1 modifier)
+            5.d6, // Intercept - Will succeed
         )
         assertTrue(homeTeam["H2".playerId].hasBall())
     }
 
     @Test
-    fun runningInterference_markedModifiers() {
+    fun throwContinuesIfFailingToIntercept() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
@@ -598,49 +570,17 @@ class PassActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SmartMoveTo(12, 3),
             Confirm, // Start pass
-            FieldSquareSelected(13, 10),
-            2.d6, // Pass - Wildly inaccurate
-            NoRerollSelected(),
-            DiceRollResults(7.d8, 6.d6) // Deviate to [12, 9]
-        )
-        assertEquals(PassingType.WILDLY_INACCURATE, state.getContext<PassContext>().passingResult)
-        assertEquals(3, rules.calculateMarks(state, homeTeam, homeTeam["H2".playerId].coordinates))
-        homeTeam["H2".playerId].agility = 1 // Make interceptor super human
-        controller.rollForward(
-            PlayerSelected("H2".playerId), // Select Interceptor
-            4.d6, // Deflect (with -4 modifier) - Will fail
-        )
-        assertFalse(state.getContext<PassContext>().passingInterference!!.didDeflect)
-        controller.rollForward(
-            Undo,
-            5.d6, // Deflect - Will succeed
-            5.d6, // Catch (with -4 modifier)
-        )
-        assertTrue(homeTeam["H2".playerId].hasBall())
-    }
-
-    @Test
-    fun scatterIfFailedToIntercept() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(13, 9),
+            FieldSquareSelected(14, 9),
             6.d6, // Pass
             NoRerollSelected(),
         )
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
             2.d6, // Fail Intercept
-            DiceRollResults(1.d8, 1.d8, 1.d8), // Scatter
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(9, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(14, 8), state.singleBall().location)
     }
 
     @Test
@@ -656,104 +596,11 @@ class PassActionTests: JervisGameBB2025Test() {
             6.d6, // Pass
             NoRerollSelected(),
             PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
             6.d6, // Intercept
         )
         assertTrue(homeTeam["H2".playerId].hasBall())
         assertFalse(awayTeam["A10".playerId].hasBall())
         assertEquals(homeTeam, state.activeTeam)
         assertNull(state.activePlayer)
-    }
-
-    @Test
-    fun passAction_deflectEndsUpOnOpponentTeam() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
-            PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
-            2.d6, // Fail Intercept
-            DiceRollResults(2.d8, 7.d8, 2.d8), // Scatter
-            6.d6 // Catch
-        )
-        // Results in a turnover
-        assertEquals(BallState.CARRIED, state.singleBall().state)
-        assertTrue(homeTeam["H1".playerId].hasBall())
-        assertEquals(homeTeam, state.activeTeam)
-    }
-
-    @Test
-    fun deflectBallGoingOutOfBounds() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(10, 0), // Empty square
-            3.d6, // Inaccurate pass
-            NoRerollSelected(),
-            DiceRollResults(2.d8, 2.d8, 2.d8),
-        )
-        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
-        assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
-        controller.rollForward(
-            PlayerSelected("H7".playerId), // Select Interceptor
-            6.d6, // Deflect
-        )
-        controller.rollForward(
-            2.d6, // Fail intercept
-            NoRerollSelected(), // Do not use Catch
-            DiceRollResults(4.d8, 4.d8, 4.d8), // Scatter from interceptor
-            4.d8 // Bounce
-        )
-        // Turnover
-        assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(6, 1), state.singleBall().location)
-        assertEquals(homeTeam, state.activeTeam)
-    }
-
-    @Test
-    fun deflectCausesBallToScatterOutOfBounds() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(10, 0), // Empty square
-            3.d6, // Inaccurate pass
-            NoRerollSelected(),
-            DiceRollResults(2.d8, 2.d8, 2.d8),
-        )
-        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
-        assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
-        controller.rollForward(
-            PlayerSelected("H7".playerId), // Select Interceptor
-            6.d6, // Deflect
-        )
-        controller.rollForward(
-            2.d6, // Fail intercept
-            NoRerollSelected(), // Do not use Catch
-            DiceRollResults(1.d8, 1.d8, 1.d8), // Scatter from interceptor, goes out of bounds at [9, 0]
-            2.d3, // Throw-in direction
-            DiceRollResults(1.d6, 2.d6), // Throw-in distance
-            4.d8 // Bounce
-        )
-        // Turnover
-        assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(8, 3), state.singleBall().location)
-        assertEquals(homeTeam, state.activeTeam)
     }
 }

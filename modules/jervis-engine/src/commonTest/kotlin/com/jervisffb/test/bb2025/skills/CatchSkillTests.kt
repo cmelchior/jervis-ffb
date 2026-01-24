@@ -2,7 +2,6 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
@@ -11,20 +10,17 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
-import com.jervisffb.test.defaultAwaySetup
-import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
-import com.jervisffb.test.setupPlayer
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.hasSkill
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -32,8 +28,8 @@ import kotlin.test.assertTrue
 /**
  * Class testing usage of the [com.jervisffb.engine.rules.common.procedures.Catch] skill
  *
- * See page 75 in the rulebook for the skill.
- * See page 51 in the rulebook for the catching description.
+ * See page 126 in the rulebook for the skill.
+ * See page 72 in the rulebook for the catching description.
  */
 class CatchSkillTests: JervisGameBB2025Test() {
 
@@ -120,35 +116,10 @@ class CatchSkillTests: JervisGameBB2025Test() {
         assertTrue(awayTeam["A1".playerId].hasBall())
     }
 
+    @Ignore
     @Test
     fun catchDeviatedBall() {
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultHomeSetup(),
-            *defaultAwaySetup(endSetup = false),
-            *setupPlayer("A10".playerId, FieldCoordinate(15, 7)),
-            EndSetup,
-            *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(16, 7),
-                deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
-                bounce = null
-            ),
-            6.d6, // Catch Landing
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
-            FieldSquareSelected(15, 1), // Throw Short Pass to player with Catch
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
-        )
-        assertEquals(BallState.DEVIATING, state.currentBall().state)
-        controller.rollForward(
-            DiceRollResults(2.d8, 6.d6), // Deviate ball, so it eventually ends up on the target anyway
-            1.d6, // Fail first catch roll
-            SelectSkillReroll(SkillType.CATCH), // Reroll using Catch
-            5.d6 // Catch succeed
-        )
-        assertTrue(awayTeam["A7".playerId].hasBall())
+        // No known way to test deviated balls in BB2025
     }
 
     @Test

@@ -49,7 +49,6 @@ import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -142,12 +141,12 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun thrownPlayerMustHaveStr3OrLower() {
+    fun thrownPlayerRequiresRightStuff() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
         )
         awayTeam["A13".playerId].strength = 4
-        assertFalse(controller.getAvailableActions().contains<SelectPlayer>())
+        assertTrue(controller.getAvailableActions().contains<SelectPlayer>())
         awayTeam["A13".playerId].strength = 3
         val availablePlayersForThrowing = controller.getAvailableActions().get<SelectPlayer>().players
         assertEquals(1, availablePlayersForThrowing.size)
@@ -192,7 +191,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun passPreventsThrowTeamMate() {
+    fun combinePassAndThrowTeammate() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(15, 6),
@@ -200,11 +199,11 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(0, awayTeam.turnData.passActions)
         controller.rollForward(PlayerSelected("A1".playerId))
-        assertFalse(controller.getAvailableActions().get<SelectPlayerAction>().actions.any { it.type == PlayerStandardActionType.THROW_TEAM_MATE })
+        assertTrue(controller.getAvailableActions().get<SelectPlayerAction>().actions.any { it.type == PlayerStandardActionType.THROW_TEAM_MATE })
     }
 
     @Test
-    fun throwPlayerPreventsPass() {
+    fun throwPlayerDoesNotPreventPass() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
@@ -214,7 +213,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *landingRoll(6.d6),
             PlayerSelected("A10".playerId),
         )
-        assertTrue(controller.getAvailableActions().get<SelectPlayerAction>().actions.none { it.type == PlayerStandardActionType.PASS })
+        assertTrue(controller.getAvailableActions().get<SelectPlayerAction>().actions.any { it.type == PlayerStandardActionType.PASS })
     }
 
     @Test

@@ -44,7 +44,7 @@ import kotlin.test.assertTrue
  * explicitly on their own page, we also compile them together here.
  * be covered by tests for those actions, but since turnovers are described
  *
- * See page 23 in the rulebook.
+ * See page 35 in the rulebook.
  */
 class TurnOverTests: JervisGameBB2025Test() {
 
@@ -435,81 +435,6 @@ class TurnOverTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun passAction_deflectEndsUpOnFloor() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
-            PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
-            2.d6, // Fail Intercept
-            DiceRollResults(5.d8, 5.d8, 5.d8), // Scatter
-            5.d8 // Bounce
-        )
-        // Results in a turnover
-        assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(16, 6), state.singleBall().location)
-        assertEquals(homeTeam, state.activeTeam)
-    }
-
-    @Test
-    fun passAction_deflectEndsUpOnInterceptorTeam() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
-            PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
-            2.d6, // Fail Intercept
-            DiceRollResults(2.d8, 7.d8, 5.d8), // Scatter
-            6.d6, // Catch
-            NoRerollSelected()
-        )
-        // No turnover, but pass action ends
-        assertEquals(BallState.CARRIED, state.singleBall().state)
-        assertTrue(awayTeam["A2".playerId].hasBall())
-        assertEquals(awayTeam, state.activeTeam)
-        assertNull(state.activePlayer)
-        assertEquals(0, awayTeam.turnData.passActions)
-    }
-
-    @Test
-    fun deflectEndsUpOnThrowerTeam_noTurnOver() {
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            SmartMoveTo(12, 3),
-            Confirm, // Start pass
-            FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
-            PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
-            2.d6, // Fail Intercept
-            DiceRollResults(7.d8, 3.d8, 2.d8), // Scatter to H1
-            *catch(6.d6) // Catch
-        )
-        assertTrue(awayTeam["A1".playerId].hasBall())
-        assertNull(state.activePlayer)
-        assertEquals(awayTeam, state.activeTeam)
-    }
-
-
-    @Test
     fun successfulInterception() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
@@ -522,7 +447,6 @@ class TurnOverTests: JervisGameBB2025Test() {
             6.d6, // Pass
             NoRerollSelected(),
             PlayerSelected("H2".playerId), // Select Interceptor
-            6.d6, // Deflect
             6.d6, // Intercept
         )
         assertTrue(homeTeam["H2".playerId].hasBall())

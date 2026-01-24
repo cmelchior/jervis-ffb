@@ -8,24 +8,23 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Right Stuff* (Passive) skill.
+ * Represents the "Cloud Burster" skill.
  *
- * See page 135 in the BB2025 rulebook.
+ * See page 127 in the BB2025 rulebook.
  */
-class RightStuff(
+class CloudBurster(
     override val player: Player,
-    override val category: SkillCategory = SkillCategory.TRAITS,
+    override val category: SkillCategory = SkillCategory.PASSING,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
-    val maxStrength = Int.MAX_VALUE // In BB2025, there is no Strength limit unlike BB2020
-    override val type: SkillType = SkillType.RIGHT_STUFF
+    override val type: SkillType = SkillType.CLOUD_BURSTER
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
-    override val compulsory: Boolean = true
+    override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false
-    override val workWithoutTackleZones: Boolean = true
-    override val workWhenProne: Boolean = true
-    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.PASSIVE)
+    override val workWithoutTackleZones: Boolean = false
+    override val workWhenProne: Boolean = false
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 }
