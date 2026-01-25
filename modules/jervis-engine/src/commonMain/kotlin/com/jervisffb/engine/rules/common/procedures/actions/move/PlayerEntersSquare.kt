@@ -35,11 +35,11 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepResolveSingleBlockPushChain
-import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll

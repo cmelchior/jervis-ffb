@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.throwteammate
+package com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -52,8 +52,6 @@ import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.DeviateRoll
-import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
@@ -61,6 +59,10 @@ import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateAction
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -73,7 +75,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * Procedure for handling the throwing the player part of a [ThrowTeamMateAction].
  * This procedure assumes that the player being thrown has already been selected.
  *
- * See page 53 in the rulebook.
+ * See page 76 in the BB2025 rulebook.
  */
 object ThrowPlayerStep: Procedure() {
     override val initialNode: Node = DeclareTargetSquare
@@ -101,7 +103,7 @@ object ThrowPlayerStep: Procedure() {
                         Range.OUT_OF_RANGE -> false
                     }
                 }
-                .map { TargetSquare.throwTarget(it) }
+                .map { TargetSquare.Companion.throwTarget(it) }
                 .let { SelectFieldLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
@@ -124,7 +126,7 @@ object ThrowPlayerStep: Procedure() {
                                         context.copy(
                                             target = newLocation,
                                             range = distance,
-                                            qualityRollResult = ThrowPlayerResult.FUMBLED_THROW
+                                            qualityRollResult = ThrowPlayerResult.FUMBLED
                                         )
                                     ),
                                     GotoNode(ResolveFumbledThrow)
@@ -149,17 +151,18 @@ object ThrowPlayerStep: Procedure() {
     }
 
     object TestForQuality: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = QualityRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = AccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
                 ReportQualityOfThrow(context),
                 when (context.qualityRollResult) {
-                    ThrowPlayerResult.SUCCESSFUL_THROW,
-                    ThrowPlayerResult.SUPERB_THROW -> GotoNode(ResolveThrowOnTarget)
-                    ThrowPlayerResult.TERRIBLE_THROW -> GotoNode(ResolveDeviateThrow)
-                    ThrowPlayerResult.FUMBLED_THROW -> GotoNode(ResolveFumbledThrow)
-                    null -> INVALID_GAME_STATE("Missing passing result value")
+                    ThrowPlayerResult.SUPERB -> GotoNode(ResolveThrowOnTarget)
+                    ThrowPlayerResult.SUBPAR -> GotoNode(ResolveThrowOnTarget)
+                    ThrowPlayerResult.FUMBLED -> GotoNode(ResolveFumbledThrow)
+                    ThrowPlayerResult.SUCCESSFUL,
+                    ThrowPlayerResult.TERRIBLE,
+                    null -> error("Unsupported quality roll result: ${context.qualityRollResult}")
                 }
             )
         }
@@ -178,47 +181,8 @@ object ThrowPlayerStep: Procedure() {
         }
     }
 
-    /**
-     * If the pass is a Terrible Throw, the player will deviate from the thrower position.
-     */
-    object ResolveDeviateThrow: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<ThrowTeamMateContext>()
-            val deviateContext = DeviateRollContext(context.thrower.coordinates)
-            return SetContext(deviateContext)
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val deviateContext = state.getContext<DeviateRollContext>()
-            val throwContext = state.getContext<ThrowTeamMateContext>()
-            return if (deviateContext.outOfBoundsAt != null) {
-                compositeCommandOf(
-                    SetPlayerLocation(
-                        player = throwContext.thrownPlayer!!,
-                        location = deviateContext.landsAt!!,
-                        isThrown = false,
-                    ),
-                    SetContext(throwContext.copy(target = deviateContext.landsAt, outOfBoundsAt = deviateContext.outOfBoundsAt)),
-                    RemoveContext<DeviateRollContext>(),
-                    GotoNode(ResolveLandingInTheCrowd)
-                )
-            } else {
-                compositeCommandOf(
-                    SetPlayerLocation(
-                        throwContext.thrownPlayer!!,
-                        deviateContext.landsAt!!,
-                        isThrown = true,
-                    ),
-                    SetContext(throwContext.copy(target = deviateContext.landsAt)),
-                    RemoveContext<DeviateRollContext>(),
-                    GotoNode(ScatterPlayer)
-                )
-            }
-        }
-    }
-
-    // For Superb, Successful and Terrible throws, the player will scatter before
-    // attempting to land
+    // For Superb and Subpar throws, the player will Scatter(3) before
+    // attempting to land.
     object ScatterPlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
@@ -239,7 +203,12 @@ object ThrowPlayerStep: Procedure() {
                         location = scatterContext.landsAt!!,
                         isThrown = false,
                     ),
-                    SetContext(throwContext.copy(target = scatterContext.landsAt, outOfBoundsAt = scatterContext.outOfBoundsAt)),
+                    SetContext(
+                        throwContext.copy(
+                            target = scatterContext.landsAt,
+                            outOfBoundsAt = scatterContext.outOfBoundsAt
+                        )
+                    ),
                     RemoveContext<ScatterRollContext>(),
                     ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = true),
                     GotoNode(ResolveLandingInTheCrowd)
@@ -309,10 +278,12 @@ object ThrowPlayerStep: Procedure() {
                         location = target,
                         isThrown = true,
                     ),
-                    SetContext(throwContext.copy(
-                        target = target,
-                        outOfBoundsAt = if (landingNode == ResolveLandingInTheCrowd) throwContext.thrownPlayer.coordinates else null
-                    )),
+                    SetContext(
+                        throwContext.copy(
+                            target = target,
+                            outOfBoundsAt = if (landingNode == ResolveLandingInTheCrowd) throwContext.thrownPlayer.coordinates else null
+                        )
+                    ),
                     if (landingNode == ResolveLandingInTheCrowd) {
                         ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = false)
                     } else {
@@ -366,7 +337,7 @@ object ThrowPlayerStep: Procedure() {
                     // Lose the ball before rolling for injury, so the ball doesn't end up in the Dogout.
                     addAll(
                         SetBallLocation(thrownPlayer.ball!!, context.target!!),
-                        SetBallState.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
+                        SetBallState.Companion.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
                         SetTurnOver(TurnOver.STANDARD)
                     )
                 }
@@ -430,11 +401,10 @@ object ThrowPlayerStep: Procedure() {
 
             // Add modifier depending on the quality of the throw
             val qualityModifier = when (context.qualityRollResult) {
-                ThrowPlayerResult.SUPERB_THROW -> LandingModifier.SUPERB_THROW
-                ThrowPlayerResult.SUCCESSFUL_THROW -> LandingModifier.SUCCESSFUL_THROW
-                ThrowPlayerResult.TERRIBLE_THROW -> LandingModifier.TERRIBLE_THROW
-                ThrowPlayerResult.FUMBLED_THROW -> LandingModifier.FUMBLED_THROW
-                null -> INVALID_GAME_STATE("Missing quality roll value: $context")
+                ThrowPlayerResult.SUPERB -> LandingModifier.SUPERB
+                ThrowPlayerResult.SUBPAR -> LandingModifier.SUBPAR
+                ThrowPlayerResult.FUMBLED -> LandingModifier.FUMBLED
+                else -> INVALID_GAME_STATE("Unsupported quality roll value: $context")
             }
             modifiers.add(qualityModifier)
 
@@ -498,7 +468,7 @@ object ThrowPlayerStep: Procedure() {
     }
 
     object PickupBallAfterLanding: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val pickupContext = PickupRollContext(throwContext.thrownPlayer!!)
             return SetContext(pickupContext)
@@ -559,7 +529,7 @@ object ThrowPlayerStep: Procedure() {
                     isThrown = false,
                 ),
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
-                    SetBallState.bouncing(it)
+                    SetBallState.Companion.bouncing(it)
                 },
                 SetPlayerState(thrownPlayer, PlayerState.KNOCKED_DOWN),
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
@@ -595,10 +565,10 @@ object ThrowPlayerStep: Procedure() {
             add(RemoveContext<RiskingInjuryContext>())
             if (ball != null) {
                 addAll(
-                    SetBallState.bouncing(ball),
+                    SetBallState.Companion.bouncing(ball),
                     GotoNode(BounceBallOnLandingSquare)
                 )
-            } else  {
+            } else {
                 add(ExitProcedure())
             }
         }

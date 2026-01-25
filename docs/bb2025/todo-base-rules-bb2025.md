@@ -483,21 +483,20 @@ book.
         - [x] Intercept before going out of bounds
         - [x] Intercept accurate pass
         - [x] Intercept inaccurate pass
-- [ ] Throw Team-mate Action
+- [x] Throw Team-mate Action
     - [x] Require Throw Team-mate and Right Stuff traits
-    - [ ] Pass Action and Throw Team-mate can be used in the same turn
+    - [x] Pass Action and Throw Team-mate can be used in the same turn
     - [x] Action used when moving without throwing
     - [x] Action used when throwing without moving
     - [x] Cannot move after the throw
-    - [ ] Can throw prone player
+    - [x] Can throw prone player
     - [x] Superb Throw
-    - [ ] Subpar Throw
+    - [x] Subpar Throw
     - [x] Fumbled Throw
     - [x] Scatter on non-fumbled throws
     - [x] Land Superb throw
     - [x] Land Fumbled throw
-    - [x] Land Successful throw
-    - [x] Land Terrible throw
+    - [x] Land Subpar throw
     - [x] Marker modifiers on landing
     - [x] Land in an occupied square
     - [x] Turnover if landing on a player from their own team
@@ -509,7 +508,7 @@ book.
     - [x] Land on a player with the ball. Ball gets knocked loose. It bounces immediately
     - [x] Player with a ball lands badly on another ball. Player ball is bounced first, then ball on ground
     - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
-    - [x] Crash Landing
+    - [x] Crash Landing (not called that in BB2025)
     - [x] Landing in the crowd
 - [x] Secure the Ball
   - [x] Not allowed if Big Guy.

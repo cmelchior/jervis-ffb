@@ -37,6 +37,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportPickingUpPlayerToThrow
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.RightStuff
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
@@ -47,12 +48,14 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
 
-// See page 53 in the rulebook
+// See page 53 in the BB2020 rulebook
+// See page 77 in the BB2025 rulebook
 enum class ThrowPlayerResult {
-    SUPERB_THROW,
-    SUCCESSFUL_THROW,
-    TERRIBLE_THROW,
-    FUMBLED_THROW,
+    SUPERB, // Both BB2020 and BB2025
+    SUCCESSFUL, // Only BB2020
+    TERRIBLE, // Only BB2020
+    SUBPAR, // Only BB2025
+    FUMBLED, // Both BB2020 and BB2025
 }
 
 data class ThrowTeamMateContext(
@@ -77,11 +80,11 @@ data class ThrowTeamMateContext(
 
 /**
  * Procedure for controlling a player's Throw team-mate action.
- * See page 52 in the rulebook.
+ * See page 52 in the BB2020 rulebook.
+ * See page 76 in the BB2025 rulebook.
  *
  * This procedure assumes that the caller has checked that the thrower has the
- * Throw Team-mate trait
- *
+ * Throw Team-mate trait.
  */
 object ThrowTeamMateAction : Procedure() {
     override val initialNode: Node = MoveOrThrowPlayerOrEndAction
@@ -223,7 +226,12 @@ object ThrowTeamMateAction : Procedure() {
     }
 
     object ResolveThrowPlayer : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowPlayerStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep
+                GameVersion.BB2025 -> com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(

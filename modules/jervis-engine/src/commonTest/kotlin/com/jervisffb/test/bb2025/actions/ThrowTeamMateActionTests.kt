@@ -265,7 +265,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun successfulThrow() {
+    fun subparThrow() {
         awayTeam["A1".playerId].passing = 2
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
@@ -281,21 +281,6 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
         assertEquals(FieldCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
-    }
-
-    @Test
-    fun terribleThrow() {
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
-            FieldSquareSelected(8, 4), // -1 Short Pass, -2 Marks
-            *qualityRoll(4.d6), // Should result in a 1 after modifiers
-            DiceRollResults(5.d8, 6.d6), // Deviate
-            DiceRollResults(2.d8, 2.d8, 2.d8), // Always scatter
-            *landingRoll(6.d6)
-        )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(19, 2), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -331,7 +316,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun successfulLanding() {
+    fun subparLanding() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             *moveTo(14, 4),
@@ -346,23 +331,6 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
         assertEquals(FieldCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
-    }
-
-    @Test
-    fun terribleLanding() {
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
-            FieldSquareSelected(8, 4), // -1 Short Pass, -2 Marks
-            *qualityRoll(4.d6), // Should result in a 1 after modifiers
-            DiceRollResults(5.d8, 6.d6), // Deviate
-            DiceRollResults(2.d8, 2.d8, 2.d8), // Always scatter
-            4.d6,
-            SelectTeamReroll<TeamReroll>(),
-            5.d6
-        )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(19, 2), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -471,7 +439,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     // Landing in an Occupied Square takes precedence over Crash Landing
     @Test
     fun crashLandOnAnotherPlayer() {
-        awayTeam["A13".playerId].state = PlayerState.PRONE
+        awayTeam["A13".playerId].hasTackleZones = false
         controller.rollForward(
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),

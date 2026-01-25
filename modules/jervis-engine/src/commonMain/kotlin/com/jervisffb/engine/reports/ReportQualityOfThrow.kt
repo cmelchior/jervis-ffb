@@ -10,10 +10,11 @@ class ReportQualityOfThrow(
     override val message: String = buildString {
         val playerName = context.thrower.name
         val message = when (context.qualityRollResult) {
-            ThrowPlayerResult.SUPERB_THROW -> "$playerName made a superb throw"
-            ThrowPlayerResult.SUCCESSFUL_THROW -> "$playerName made a successful throw"
-            ThrowPlayerResult.TERRIBLE_THROW -> "$playerName made a terrible throw"
-            ThrowPlayerResult.FUMBLED_THROW -> "$playerName fumbled the throw"
+            ThrowPlayerResult.SUPERB -> "$playerName made a superb throw"
+            ThrowPlayerResult.SUBPAR -> "$playerName made a subpar throw"
+            ThrowPlayerResult.SUCCESSFUL -> "$playerName made a successful throw"
+            ThrowPlayerResult.TERRIBLE -> "$playerName made a terrible throw"
+            ThrowPlayerResult.FUMBLED -> "$playerName fumbled the throw"
             null -> error("Missing quality roll value: $context")
         }
         append(message)

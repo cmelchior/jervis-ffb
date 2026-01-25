@@ -4,7 +4,7 @@ package com.jervisffb.engine.rules
  * Enumerate all dice roll types available across all variants of Blood Bowl.
  */
 enum class DiceRollType {
-    ACCURACY, // For passing
+    ACCURACY, // For passing and Throw Teammate (in BB2025)
     ARMOUR,
     BAD_HABITS,
     BB7_APOTHECARY,

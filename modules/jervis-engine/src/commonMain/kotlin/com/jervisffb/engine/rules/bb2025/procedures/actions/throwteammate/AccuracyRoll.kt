@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.throwteammate
+package com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
@@ -33,6 +32,8 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -41,12 +42,12 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 
 /**
- * Implement the Quality Roll as described on page 53 in the rulebook.
+ * Implement the Accuracy Roll as described on page 77 in the BB2025 rulebook.
  *
- * The result is stored in [ThrowTeamMateContext] and it is up
- * to the caller to determine what to do with the result.
+ * The result is stored in [ThrowTeamMateContext] and it is up to the caller to
+ * determine what to do with the result.
  */
-object QualityRoll: Procedure() {
+object AccuracyRoll: Procedure() {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -54,7 +55,11 @@ object QualityRoll: Procedure() {
 
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(
+            com.jervisffb.engine.actions.RollDice(
+                Dice.D6
+            )
+        )
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateThrowTeamMateContext(state, rules, d6, false)
@@ -74,7 +79,7 @@ object QualityRoll: Procedure() {
             val availableRerolls: SelectRerollOption? = calculateAvailableRerollsFor(
                 rules,
                 context.thrower,
-                DiceRollType.QUALITY,
+                DiceRollType.ACCURACY,
                 context.qualityRoll!!,
                 null
             )
@@ -90,7 +95,7 @@ object QualityRoll: Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.QUALITY, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(DiceRollType.ACCURACY, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -117,12 +122,16 @@ object QualityRoll: Procedure() {
 
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(
+            com.jervisffb.engine.actions.RollDice(
+                Dice.D6
+            )
+        )
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateThrowTeamMateContext(state, rules, d6, true)
                 compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.QUALITY, d6),
+                    ReportDiceRoll(DiceRollType.ACCURACY, d6),
                     SetContext(updatedContext),
                     ExitProcedure(),
                 )
@@ -164,12 +173,15 @@ object QualityRoll: Procedure() {
         val passingStat = context.thrower.passing ?: Int.MAX_VALUE
         val modifierTotal = modifiers.sum()
         val result = when {
-            context.thrower.passing == null -> ThrowPlayerResult.FUMBLED_THROW
-            d6.value == 1 -> ThrowPlayerResult.FUMBLED_THROW
-            d6.value == 6 -> ThrowPlayerResult.SUPERB_THROW
-            d6.value + modifierTotal == 1 -> ThrowPlayerResult.TERRIBLE_THROW
-            d6.value + modifierTotal >= passingStat -> ThrowPlayerResult.SUPERB_THROW
-            d6.value + modifierTotal < passingStat -> ThrowPlayerResult.SUCCESSFUL_THROW
+            // The value can be modified below 1. Players with PA 1+ will fumble
+            // on a modified 0 and below.
+            context.thrower.passing == null -> ThrowPlayerResult.FUMBLED
+            d6.value == 6 -> ThrowPlayerResult.SUPERB
+            d6.value == 1 && passingStat != 1 -> ThrowPlayerResult.FUMBLED
+            d6.value + modifierTotal <= 1 && passingStat > 1 -> ThrowPlayerResult.FUMBLED
+            d6.value + modifierTotal <= 0 && passingStat == 1 -> ThrowPlayerResult.FUMBLED
+            d6.value + modifierTotal >= passingStat -> ThrowPlayerResult.SUPERB
+            d6.value + modifierTotal < passingStat -> ThrowPlayerResult.SUBPAR
             else -> INVALID_GAME_STATE("Unsupported result: ${d6.value}, target: $passingStat, modifierTotal: $modifierTotal")
         }
 
@@ -184,7 +196,7 @@ object QualityRoll: Procedure() {
             )
         } else {
             context.copy(
-                qualityRoll = D6DieRoll.create(state, d6),
+                qualityRoll = D6DieRoll.Companion.create(state, d6),
                 qualityRollModifiers = modifiers,
                 qualityRollResult = result
             )
