@@ -37,6 +37,7 @@ import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
+import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
@@ -136,6 +137,7 @@ class UiGameController(
         DeviateRollWheelController,
         DodgeWheelController,
         InterceptionWheelController,
+        JumpWheelController,
         PickupWheelController,
         RushWheelController,
         SecureTheBallWheelController,

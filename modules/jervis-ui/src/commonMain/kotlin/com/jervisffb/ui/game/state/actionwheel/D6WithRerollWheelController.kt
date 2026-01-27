@@ -14,6 +14,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
+import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
@@ -30,6 +31,8 @@ import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -53,6 +56,7 @@ import kotlin.time.ExperimentalTime
  * - Catch
  * - Dodge
  * - Interception
+ * - Jump
  * - Pickup
  * - Rush
  * - Shadowing
@@ -357,6 +361,23 @@ object ShadowingWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<ShadowingRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling to Jump.
+ */
+object JumpWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "jump"
+    override val rollDiceNode: Node = JumpRoll.RollDie
+    override val chooseRerollSourceNode: Node = JumpRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = JumpRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<MoveContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<JumpRollContext>()
         return context.roll!!.originalRoll
     }
 }

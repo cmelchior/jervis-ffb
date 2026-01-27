@@ -20,7 +20,8 @@ object EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
     ) {
         state.activePlayer?.location?.let { location ->
             acc.updateSquare(location as FieldCoordinate) {
-                it.copy(contextMenuOptions = it.contextMenuOptions.add(
+                // Add action at the front so the button is placed at the bottom.
+                it.copy(contextMenuOptions = it.contextMenuOptions.add(0,
                     ContextMenuOption(
                         "End action",
                         { actionProvider.userActionSelected(EndAction) },
