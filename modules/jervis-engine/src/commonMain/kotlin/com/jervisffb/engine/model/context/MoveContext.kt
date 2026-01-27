@@ -17,6 +17,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 data class MoveContext(
     val player: Player,
     val moveType: MoveType,
+    val useVeryLongLegs: Boolean = false,
     val hasMoved: Boolean = false,
     val target: FieldCoordinate? = null,
     val startingSquare: FieldCoordinate = when (val location = player.location) {

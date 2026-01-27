@@ -2,6 +2,9 @@ package com.jervisffb.engine.rules.common.procedures.actions.move
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -34,6 +37,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
@@ -42,6 +46,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlin.math.max
 
 data class JumpRollContext(
@@ -158,7 +163,7 @@ object JumpStep : Procedure() {
                 )
                 else -> compositeCommandOf(
                     SetPlayerLocation(context.player, context.target!!),
-                    GotoNode(RollForJump)
+                    GotoNode(ChooseToUseVeryLongLegs)
                 )
             }
         }
@@ -216,7 +221,7 @@ object JumpStep : Procedure() {
                     SetPlayerRushesLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     RemoveContext<RushRollContext>(),
-                    GotoNode(RollForJump)
+                    GotoNode(ChooseToUseVeryLongLegs)
                 )
             } else {
                 // Rush failed, player is Knocked Down in target square
@@ -230,22 +235,56 @@ object JumpStep : Procedure() {
         }
     }
 
-    /**
-     * Player could move to the target square (after rushes, tentacles) and can
-     * now roll for Jump.
-     */
-    object RollForJump: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
+    object ChooseToUseVeryLongLegs: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val player = context.player
+            return if (player.isSkillAvailable(SkillType.VERY_LONG_LEGS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val usingVeryLongLegs = (action is Confirm)
+            return compositeCommandOf(
+                SetContext(context.copy(useVeryLongLegs = usingVeryLongLegs)),
+                GotoNode(CalculateJumpModifiers)
+            )
+        }
+    }
+
+    object CalculateJumpModifiers: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val player = moveContext.player
             val jumpFromMarks = rules.calculateMarks(state, player.team, moveContext.startingSquare)
             val jumpToMarks = rules.calculateMarks(state, player.team, moveContext.target!!)
             val markModifier = MarkedModifier(max(jumpToMarks, jumpFromMarks), JumpModifier.MARKED)
-            return SetContext(JumpRollContext(
-                player = player,
-                modifiers = listOf(markModifier),
-            ))
+            val modifiers = mutableListOf<DiceModifier>()
+            modifiers.add(markModifier)
+            if (moveContext.useVeryLongLegs) {
+                modifiers.add(JumpModifier.VERY_LONG_LEGS)
+            }
+            return compositeCommandOf(
+                SetContext(JumpRollContext(
+                    player = player,
+                    modifiers = modifiers,
+                )),
+                GotoNode(RollForJump)
+            )
         }
+    }
+
+    /**
+     * Player could move to the target square (after rushes, tentacles) and can
+     * now roll for Jump.
+     */
+    object RollForJump: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = JumpRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()

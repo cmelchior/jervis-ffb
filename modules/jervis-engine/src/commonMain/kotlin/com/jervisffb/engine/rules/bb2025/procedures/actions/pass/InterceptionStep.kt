@@ -60,6 +60,7 @@ data class InterceptionContext(
     // scatter from a failed interception.
     val target: FieldCoordinate,
     val interceptingPlayer: Player? = null, // Player doing the interception, if any.
+    val useCloudBurster: Boolean = false,
     val useExtraArms: Boolean = false, // If intercepting player is using Extra Arms or not
     val interceptionRoll: InterceptionRollContext? = null,
     val didIntercept: Boolean = false,
@@ -70,7 +71,20 @@ data class InterceptionContext(
 
 /**
  * Procedure handling possible interceptions when throwing a ball or bomb.
- * If no players are elligble for interception, this procedure does nothing.
+ * If no players are eligible for interception, this procedure does nothing.
+ *
+ * Developer's Commentary:
+ * For now, Cloud Burster is always used. The rationale is that if you want
+ * the opponent to intercept it because it would be a disadvantage to them, they
+ * could just opt out of intercepting.
+ *
+ * Very Long Legs is also always applied, leaving it up to the coach to decide
+ * if they want to intercept or not. This means the sequence of events is:
+ *
+ * 1. Check if Cloud Burster is used
+ * 2. If used, only players with Very Long Legs are eligible for interception.
+ * 3. Confirm usage of Extra Arms if applicable.
+ * 4. Roll interception dice.
  */
 object InterceptionStep: Procedure() {
     override val initialNode: Node = CheckForCloudBurster
@@ -86,10 +100,12 @@ object InterceptionStep: Procedure() {
             val context = state.getContext<InterceptionContext>()
             val thrower = context.thrower
             val candidates = getInterceptionCandidates(rules, context)
+            val anyVeryLongLegs = candidates.any { it.isSkillAvailable(SkillType.VERY_LONG_LEGS) }
             return if (candidates.isNotEmpty() && context.thrower.isSkillAvailable(SkillType.CLOUD_BURSTER)) {
                 compositeCommandOf(
+                    SetContext(context.copy(useCloudBurster = true)),
                     ReportSkillUsed(thrower, SkillType.CLOUD_BURSTER),
-                    ExitProcedure()
+                    if (anyVeryLongLegs) GotoNode(SelectPlayerForInterception) else ExitProcedure()
                 )
             } else {
                 GotoNode(SelectPlayerForInterception)
@@ -101,7 +117,12 @@ object InterceptionStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<InterceptionContext>()
-            val candidates = getInterceptionCandidates(rules, context)
+            val candidates = getInterceptionCandidates(rules, context).filter {
+                when (context.useCloudBurster) {
+                    false -> true // All players are eligible
+                    true -> it.isSkillAvailable(SkillType.VERY_LONG_LEGS) // Only Very Long Legged players are eligible
+                }
+            }
             return if (candidates.isNotEmpty()) {
                 listOf(
                     SelectPlayer.fromPlayers(candidates),
@@ -188,6 +209,9 @@ object InterceptionStep: Procedure() {
             }
             if (interceptionContext.useExtraArms) {
                 modifiers.add(InterceptionModifier.EXTRA_ARMS)
+            }
+            if (player.isSkillAvailable(SkillType.VERY_LONG_LEGS)) {
+                modifiers.add(InterceptionModifier.VERY_LONG_LEGS)
             }
             val context = InterceptionRollContext(
                 player = player,

@@ -51,6 +51,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
@@ -152,6 +153,7 @@ class UiGameController(
         UseSidestepWheelController,
         UseTackleWheelController,
         UseWrestleWheelController,
+        UseVeryLongLegsWheelController,
 
         UseApothecaryWheelController,
         ArgueTheCallWheelController

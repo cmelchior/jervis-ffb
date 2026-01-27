@@ -46,6 +46,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Titchy
 import com.jervisffb.engine.rules.bb2025.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2025.skills.Unsteady
+import com.jervisffb.engine.rules.bb2025.skills.VeryLongLegs
 import com.jervisffb.engine.rules.bb2025.skills.Wrestle
 import com.jervisffb.engine.rules.bb2025.specialrules.SneakiestOfTheLot
 import com.jervisffb.engine.rules.common.skills.SkillCategory
@@ -319,9 +320,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.VERY_LONG_LEGS -> {
-                    // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Very Long Legs", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                        VeryLongLegs(player, category, expiresAt)
+                    }
                 }
 
                 //

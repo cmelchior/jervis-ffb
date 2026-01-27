@@ -167,6 +167,13 @@ Technically, using the skill should be optional, but there doesn't seem to be
 any use case for this (even a bad one), so until such a use case surfaces, this 
 skill is always used.
 
+### Page 138 - Very Long Legs
+While this skill is optional during Interceptions, Jervis always enables it as 
+the coach can just choose to not intercept instead. This lowers the complexity 
+in the rule engine.
+
+It is still optional for Catch, Leap and Jump.
+
 ## Spike 19
 None
 

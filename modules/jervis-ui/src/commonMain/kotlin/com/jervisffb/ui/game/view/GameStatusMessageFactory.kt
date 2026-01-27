@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
@@ -232,7 +233,14 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 true -> "Use Big Hand?"
                 false -> "Waiting for player to use Big Hand"
             }
-        }
+        },
+
+        JumpStep.ChooseToUseVeryLongLegs to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Very Long Legs?"
+                false -> "Waiting for player to use Very Long Legs"
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

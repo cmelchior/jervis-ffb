@@ -179,6 +179,11 @@ fun moveTo(x: Int, y: Int) = arrayOf(
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
 
+fun jumpTo(x: Int, y: Int) = arrayOf(
+    MoveTypeSelected(MoveType.JUMP),
+    FieldSquareSelected(FieldCoordinate(x, y)),
+)
+
 fun rushTo(x: Int, y: Int, rushRoll: D6Result = 6.d6) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),

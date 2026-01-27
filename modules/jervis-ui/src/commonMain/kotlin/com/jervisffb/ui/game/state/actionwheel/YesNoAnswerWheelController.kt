@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.StumbleContext
@@ -22,9 +23,11 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId
@@ -88,10 +91,16 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
     }
 }
 
+abstract class UseSkillWheelController(skill: SkillType) : YesNoAnswerWheelController() {
+    override val yesLabel: String = "Use ${skill.description}?"
+    override val noLabel: String = "Do not use ${skill.description}"
+}
+
 object FollowUpWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
         PushStepInitialMoveSequence.DecideToFollowUp
     )
+
     override val yesLabel: String = "Follow Up"
     override val noLabel: String = "Stay"
 
@@ -101,14 +110,11 @@ object FollowUpWheelController: YesNoAnswerWheelController() {
     }
 }
 
-object UseBigHandWheelController: YesNoAnswerWheelController() {
+object UseBigHandWheelController: UseSkillWheelController(SkillType.BIG_HAND) {
     override val nodes: Set<Node> = setOf(
         Pickup.ChooseToUseBigHand,
         SecureTheBallStep.ChooseToUseBigHand,
     )
-    override val yesLabel: String = "Use Big Hand"
-    override val noLabel: String = "Do not use Big Hand"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = when (state.stack.currentNode()) {
             Pickup.ChooseToUseBigHand -> state.getContext<PickupRollContext>().player
@@ -119,16 +125,11 @@ object UseBigHandWheelController: YesNoAnswerWheelController() {
     }
 }
 
-object UseBlockWheelController: YesNoAnswerWheelController() {
-
+object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
     override val nodes: Set<Node> = setOf(
         BothDown.AttackerChooseToUseBlock,
         BothDown.DefenderChooseToUseBlock,
     )
-
-    override val yesLabel: String = "Use Block"
-    override val noLabel: String = "Do not use Block"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
@@ -139,14 +140,11 @@ object UseBlockWheelController: YesNoAnswerWheelController() {
     }
 }
 
-object UseWrestleWheelController: YesNoAnswerWheelController() {
+object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
     override val nodes: Set<Node> = setOf(
         BothDown.AttackerChooseToUseWrestle,
         BothDown.DefenderChooseToUseWrestle,
     )
-    override val yesLabel: String = "Use Wrestle"
-    override val noLabel: String = "Do not use Wrestle"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
@@ -157,42 +155,43 @@ object UseWrestleWheelController: YesNoAnswerWheelController() {
     }
 }
 
-object UseSidestepWheelController: YesNoAnswerWheelController() {
+object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
     override val nodes: Set<Node> = setOf(
         PushStepInitialMoveSequence.DecideToUseSidestep
     )
-    override val yesLabel: String = "Use Sidestep"
-    override val noLabel: String = "Do not use Sidestep"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<PushContext>().pushee()
         return player.coordinates
     }
 }
 
-object UseDodgeWheelController: YesNoAnswerWheelController() {
+object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
     override val nodes: Set<Node> = setOf(
         Stumble.ChooseToUseDodge
     )
-    override val yesLabel: String = "Use Dodge"
-    override val noLabel: String = "Do not use Dodge"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val defender = state.getContext<StumbleContext>().defender
         return defender.coordinates
     }
 }
 
-object UseTackleWheelController: YesNoAnswerWheelController() {
+object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
     override val nodes: Set<Node> = setOf(
         Stumble.ChooseToUseTackle
     )
-    override val yesLabel: String = "Use Tackle"
-    override val noLabel: String = "Do not use Tackle"
-
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val attacker = state.getContext<StumbleContext>().attacker
         return attacker.coordinates
+    }
+}
+
+object UseVeryLongLegsWheelController: UseSkillWheelController(SkillType.VERY_LONG_LEGS) {
+    override val nodes: Set<Node> = setOf(
+        JumpStep.ChooseToUseVeryLongLegs
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<MoveContext>().player
+        return player.coordinates
     }
 }
 

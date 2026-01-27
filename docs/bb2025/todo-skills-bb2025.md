@@ -127,6 +127,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Use skill multiple times pr. turn
   - [x] Skill use is optional
 - [ ] Very Long Legs
+  - [x] Is optional
+  - [ ] +1 to Leap
+  - [x] +1 to Jump
+  - [x] +2 to Intercept
+  - [x] Ignore CloudBurster
 
 ## Passing Skills
 
@@ -138,7 +143,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Long Pass
   - [x] Works on Long Bomb
   - [x] Is optional
-- [ ] Cloud Burster
+- [x] Cloud Burster
+  - [x] Prevents interceptions
 - [ ] Dump-off
 - [ ] Give and Go
 - [ ] Hail Mary Pass

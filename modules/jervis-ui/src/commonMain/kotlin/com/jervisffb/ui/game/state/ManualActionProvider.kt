@@ -36,6 +36,8 @@ import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -45,6 +47,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
@@ -495,8 +498,15 @@ open class ManualActionProvider(
         }
 
         // Whether to use the Big Hand skill or not
-        if (menuViewModel.isFeatureEnabled(Feature.ALLOWS_USE_BIG_HAND) && (currentNode == Pickup.ChooseToUseBigHand || currentNode == SecureTheBallStep.ChooseToUseBigHand)) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_BIG_HAND) && (currentNode == Pickup.ChooseToUseBigHand || currentNode == SecureTheBallStep.ChooseToUseBigHand)) {
             if (controller.state.activePlayer?.isSkillAvailable(SkillType.BIG_HAND) == true) {
+                return Confirm
+            }
+        }
+
+        // Whether to use the Very Long Legs skill or not
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_VERY_LONG_LEGS) && (currentNode == JumpStep.ChooseToUseVeryLongLegs)) {
+            if (controller.state.getContextOrNull<MoveContext>()?.player?.isSkillAvailable(SkillType.VERY_LONG_LEGS) == true) {
                 return Confirm
             }
         }
