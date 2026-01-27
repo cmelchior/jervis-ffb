@@ -43,13 +43,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-// Map between "Automated Actions" and their corresponding settings keys.
+// Map between "Automated Actions" (features) and their corresponding settings keys.
 enum class Feature(val settingsKey: String) {
     DO_NOT_REROLL_SUCCESSFUL_ACTIONS(SettingsKeys.JERVIS_AUTO_ACTION_DO_NOT_REROLL_SUCCESSFUL_ACTIONS_VALUE),
     SELECT_KICKING_PLAYER(SettingsKeys.JERVIS_AUTO_ACTION_SELECT_KICKING_PLAYER_VALUE),
     END_PLAYER_ACTION_IF_ONLY_OPTION(SettingsKeys.JERVIS_AUTO_ACTION_END_PLAYER_ACTION_IF_ONLY_OPTION_VALUE),
     SELECT_BLOCK_TYPE_IF_ONLY_OPTION(SettingsKeys.JERVIS_AUTO_ACTION_SELECT_BLOCK_TYPE_IF_ONE_OPTION_VALUE),
     PUSH_PLAYER_INTO_CROWD(SettingsKeys.JERVIS_AUTO_ACTION_PUSH_PLAYER_INTO_CROWD_VALUE),
+    ALLOWS_USE_BIG_HAND(SettingsKeys.JERVIS_AUTO_ACTION_ALLOWS_USE_BIG_HAND_VALUE),
 }
 
 data class ErrorDialog(

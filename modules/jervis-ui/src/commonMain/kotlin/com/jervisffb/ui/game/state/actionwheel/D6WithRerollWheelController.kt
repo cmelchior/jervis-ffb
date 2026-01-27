@@ -16,10 +16,12 @@ import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
+import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
@@ -276,6 +278,26 @@ object RushWheelController : D6WithRerollWheelController() {
         return context.roll!!.originalRoll
     }
 }
+
+/**
+ * Define the Action Wheel layout when rolling for Securing the Ball.
+ */
+object SecureTheBallWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "secure"
+    override val rollDiceNode: Node = SecureTheBallRoll.RollDie
+    override val chooseRerollSourceNode: Node = SecureTheBallRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = SecureTheBallRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+        return state.activePlayer?.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<SecureTheBallRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
 
 /**
  * Define the Action Wheel layout when rolling for Shadowing.

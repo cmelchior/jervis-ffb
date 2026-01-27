@@ -1,5 +1,11 @@
 package com.jervisffb.engine.rules.common.procedures
 
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
@@ -8,20 +14,25 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
@@ -43,38 +54,15 @@ import com.jervisffb.engine.rules.common.tables.Weather
  * across BB2020 and BB2025.
  */
 object Pickup : Procedure() {
-    override val initialNode: Node = RollToPickup
+    override val initialNode: Node = ChooseToUseBigHand
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        // Determine target and modifiers for the Catch roll
         val ball = state.currentBall()
         val pickupPlayer = state.field[ball.location].player!!
-        val modifiers = mutableListOf<DiceModifier>()
-
-        // Add modifiers for other opponent players marking the field.
-        rules.addMarkedModifiers(
-            state,
-            pickupPlayer.team,
-            ball.location,
-            modifiers,
-            PickupModifier.MARKED
-        )
-
-        // Other modifiers, like disturbing presence?
-
-        // Weather
-        if (state.weather == Weather.POURING_RAIN) {
-            modifiers.add(PickupModifier.POURING_RAIN)
-        }
-
-        val rollContext = PickupRollContext(pickupPlayer, modifiers)
-        return compositeCommandOf(
-            SetContext(rollContext),
-        )
+        val rollContext = PickupRollContext(pickupPlayer)
+        return SetContext(rollContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return compositeCommandOf(
-            RemoveContext<PickupRollContext>()
-        )
+        return RemoveContext<PickupRollContext>()
     }
     override fun isValid(state: Game, rules: Rules) {
         if (state.currentBall().state != BallState.ON_GROUND) {
@@ -83,6 +71,52 @@ object Pickup : Procedure() {
         if (state.activePlayer?.location != state.currentBall().location) {
             throw IllegalStateException(
                 "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
+            )
+        }
+    }
+
+    object ChooseToUseBigHand: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PickupRollContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PickupRollContext>()
+            val player = context.player
+            return if (player.isSkillAvailable(SkillType.BIG_HAND)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
+            val player = context.player
+            val modifiers = mutableListOf<DiceModifier>()
+            val ignoreNegativeModifiers = (action == Confirm)
+            if (!ignoreNegativeModifiers) {
+                // Add modifiers for other opponent players marking the field.
+                rules.addMarkedModifiers(
+                    state,
+                    context.player.team,
+                    state.currentBall().location,
+                    modifiers,
+                    PickupModifier.MARKED
+                )
+                // Weather
+                if (state.weather == Weather.POURING_RAIN) {
+                    modifiers.add(PickupModifier.POURING_RAIN)
+                }
+                // Other modifiers, like disturbing presence?
+            }
+
+            return compositeCommandOf(
+                if (ignoreNegativeModifiers) {
+                    ReportSkillUsed(player, player.getSkill(SkillType.BIG_HAND))
+                } else {
+                    null
+                },
+                SetContext(context.copy(modifiers = modifiers)),
+                GotoNode(RollToPickup)
             )
         }
     }

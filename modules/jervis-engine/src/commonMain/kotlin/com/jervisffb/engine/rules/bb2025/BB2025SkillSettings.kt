@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.bb2025
 
 import com.jervisffb.engine.rules.bb2025.skills.Accurate
 import com.jervisffb.engine.rules.bb2025.skills.AnimalSavagery
+import com.jervisffb.engine.rules.bb2025.skills.BigHand
 import com.jervisffb.engine.rules.bb2025.skills.Block
 import com.jervisffb.engine.rules.bb2025.skills.BloodLust
 import com.jervisffb.engine.rules.bb2025.skills.BoneHead
@@ -262,9 +263,9 @@ class BB2025SkillSettings: SkillSettings() {
                 // Mutations Category
                 //
                 SkillType.BIG_HAND -> {
-                    // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Big Hand", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                        BigHand(player, category, expiresAt)
+                    }
                 }
                 SkillType.CLAWS -> {
                     // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->

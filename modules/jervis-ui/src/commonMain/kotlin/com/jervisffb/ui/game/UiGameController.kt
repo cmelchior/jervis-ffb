@@ -38,11 +38,13 @@ import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.SecureTheBallWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
@@ -131,6 +133,7 @@ class UiGameController(
         DodgeWheelController,
         PickupWheelController,
         RushWheelController,
+        SecureTheBallWheelController,
         ShadowingWheelController,
         SelectPlayerActionWheelController,
         ScatterRollWheelController,
@@ -139,6 +142,7 @@ class UiGameController(
         StandardBlockChooseResultOrRerollWheelController,
 
         FollowUpWheelController,
+        UseBigHandWheelController,
         UseBlockWheelController,
         UseDodgeWheelController,
         UseSidestepWheelController,
@@ -171,7 +175,7 @@ class UiGameController(
         field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
     val uiContextWheelFlow: Flow<List<ActionWheelUiState>>
         field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
-    val gameStatusMessageFactory = GameStatusMessageFactory(state)
+    val gameStatusMessageFactory = GameStatusMessageFactory(menuViewModel, state)
 
     // `replay` is only used to allow the UI to register itself after the game controller has started
     val animationFlow: Flow<JervisAnimation?>

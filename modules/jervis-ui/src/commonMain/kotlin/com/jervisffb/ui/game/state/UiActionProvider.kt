@@ -76,7 +76,7 @@ abstract class UiActionProvider {
     // Similar to `userMultipleActionsSelected` but allows for flexibility in the generated sequence. In some cases,
     // you cannot fully predict the full sequence (e.g. if you need to roll dice along the way).
     abstract fun registerQueuedActionGenerator(generator: QueuedActionsGenerator)
-    // Returns `true` if there are queued actions waiting be processed. `QueuedActionsGenerator` will
-    // add actions to the queue in `prepareForNextAction`
+    // Returns `true` if the next action is already available. Either because it was automated or because a QueuedActionGenerator
+    // will provide it.
     abstract fun hasQueuedActions(): Boolean
 }

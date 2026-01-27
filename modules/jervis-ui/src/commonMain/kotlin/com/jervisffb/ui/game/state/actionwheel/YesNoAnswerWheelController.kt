@@ -8,9 +8,13 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.model.context.PickupRollContext
+import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
@@ -94,6 +98,24 @@ object FollowUpWheelController: YesNoAnswerWheelController() {
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<BlockContext>()
         return context.attacker.coordinates
+    }
+}
+
+object UseBigHandWheelController: YesNoAnswerWheelController() {
+    override val nodes: Set<Node> = setOf(
+        Pickup.ChooseToUseBigHand,
+        SecureTheBallStep.ChooseToUseBigHand,
+    )
+    override val yesLabel: String = "Use Big Hand"
+    override val noLabel: String = "Do not use Big Hand"
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = when (state.stack.currentNode()) {
+            Pickup.ChooseToUseBigHand -> state.getContext<PickupRollContext>().player
+            SecureTheBallStep.ChooseToUseBigHand -> state.getContext<SecureTheBallContext>().player
+            else -> error("Unsupported node: ${state.stack.currentNode()}")
+        }
+        return player.coordinates
     }
 }
 

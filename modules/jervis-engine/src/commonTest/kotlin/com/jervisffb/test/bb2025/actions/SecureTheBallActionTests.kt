@@ -27,6 +27,7 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -67,6 +68,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
         )
 
         assertTrue(player.hasBall())
+        assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, player.available)
         assertEquals(awayTeam, state.activeTeam)
     }

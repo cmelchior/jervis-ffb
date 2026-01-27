@@ -515,7 +515,7 @@ object ThrowPlayerStep: Procedure() {
     }
 
     object PickupBallAfterLanding: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val pickupContext = PickupRollContext(throwContext.thrownPlayer!!)
             return SetContext(pickupContext)

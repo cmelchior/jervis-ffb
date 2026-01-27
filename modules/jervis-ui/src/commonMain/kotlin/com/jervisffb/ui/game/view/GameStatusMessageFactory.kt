@@ -3,12 +3,15 @@ package com.jervisffb.ui.game.view
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
+import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
@@ -18,6 +21,7 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 
 /**
  * Class responsible for setting the game status message for the current step.
@@ -26,7 +30,7 @@ import com.jervisffb.ui.game.state.UiActionProvider
  * For P2P games, each client will see the message relevant for the respective
  * coach.
  */
-class GameStatusMessageFactory(private val state: Game) {
+class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private val state: Game) {
 
     private val messageFactories = mutableMapOf<Node, (isActiveClient: Boolean, serverDiceRolls: Boolean, game: Game) -> String?>(
         AccuracyRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
@@ -111,7 +115,6 @@ class GameStatusMessageFactory(private val state: Game) {
             "The Kick Deviates"
         },
 
-
         PickupRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Roll D6 to Pickup the Ball"
@@ -154,6 +157,25 @@ class GameStatusMessageFactory(private val state: Game) {
             "Scatter Roll"
         },
 
+        SecureTheBallRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to Secure the Ball"
+                else -> null
+            }
+        },
+        SecureTheBallRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Secure the Ball Result or Reroll D6?"
+                else -> null
+            }
+        },
+        SecureTheBallRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Secure the Ball"
+                else -> null
+            }
+        },
+
         ShadowingRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Roll D6 to shadow player"
@@ -179,6 +201,19 @@ class GameStatusMessageFactory(private val state: Game) {
                 false -> "Waiting for player to use Shadowing"
             }
         },
+
+        Pickup.ChooseToUseBigHand to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Big Hand?"
+                false -> "Waiting for player to use Big Hand"
+            }
+        },
+        SecureTheBallStep.ChooseToUseBigHand to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Big Hand?"
+                false -> "Waiting for player to use Big Hand"
+            }
+        }
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {
@@ -192,6 +227,7 @@ class GameStatusMessageFactory(private val state: Game) {
     // Set a game status message for the current game state. This is done by going back
     // through the chain of procedure nodes, using the first node that returns an message
     // to show.
+    // If we already have an automated action, we will skip showing a message as it might cause flickering.
     fun applyMessage(
         actionProvider: UiActionProvider,
         acc: UiSnapshotAccumulator
@@ -202,7 +238,8 @@ class GameStatusMessageFactory(private val state: Game) {
         var currentIndex = 0
         var currentNode: Node? = stack.currentNode()
         var message: String? = null
-        while (currentNode != null && message == null) {
+        val automatedAction = actionProvider.hasQueuedActions()
+        while (!automatedAction && currentNode != null && message == null) {
             val messageFactory = messageFactories[currentNode]
             if (messageFactory != null) {
                 message = messageFactory(isActiveCoach, serverDiceRolls, state)

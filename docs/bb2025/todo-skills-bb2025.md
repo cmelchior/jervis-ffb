@@ -102,7 +102,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## Mutations
 
-- [ ] Big Hand
+- [x] Big Hand
+  - [x] Big Hands is optional
+  - [x] Works on normal pickup
+  - [x] Works on Secure the Ball
+  - [x] Ignores Pouring Rain
+  - [x] Ignores Marks
 - [ ] Claws
 - [ ] Disturbing Presence*
 - [ ] Extra Arms

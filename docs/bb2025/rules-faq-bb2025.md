@@ -151,6 +151,10 @@ Since BB2025 lack any guidance on this, for now Jervis uses th BB2020 rule, i.e.
 a player with PA -, can start a pass action, but the pass will always be a 
 fumble.
 
+### Page 124 - Big Hand
+Using the NAF interpretation of Secure the Ball as a "pickup". This also means
+that Big Hand will work on Secure the Ball rolls.
+
 ### Page 127 - Cloud Burster
 Technically, this is skill is optional, but you would only want to disable it
 if you wanted the opponent to "accidentally" catch the ball, but in that case

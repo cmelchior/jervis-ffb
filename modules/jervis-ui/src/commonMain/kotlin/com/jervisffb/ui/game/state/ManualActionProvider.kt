@@ -36,12 +36,16 @@ import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController
@@ -483,10 +487,17 @@ open class ManualActionProvider(
 
         // Automatically decide to follow op (or not), if you there really isn't a choice in the matter
         if (currentNode is PushStepInitialMoveSequence.DecideToFollowUp && actions.size == 1) {
-            when (val action = actions.first()) {
+            return when (val action = actions.first()) {
                 is ConfirmWhenReady -> Confirm
                 is CancelWhenReady -> Cancel
                 else -> error("Unexpected action: $action")
+            }
+        }
+
+        // Whether to use the Big Hand skill or not
+        if (menuViewModel.isFeatureEnabled(Feature.ALLOWS_USE_BIG_HAND) && (currentNode == Pickup.ChooseToUseBigHand || currentNode == SecureTheBallStep.ChooseToUseBigHand)) {
+            if (controller.state.activePlayer?.isSkillAvailable(SkillType.BIG_HAND) == true) {
+                return Confirm
             }
         }
 
@@ -508,7 +519,7 @@ open class ManualActionProvider(
     }
 
     override fun hasQueuedActions(): Boolean {
-        return queuedActions.isNotEmpty()
+        return automatedAction != null || queuedActions.isNotEmpty()
     }
 }
 
