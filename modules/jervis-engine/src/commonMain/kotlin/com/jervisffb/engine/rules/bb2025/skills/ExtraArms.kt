@@ -8,16 +8,16 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Big Hand (Active) skill.
+ * Representation of the Extra Arms (Active) skill.
  *
- * See page 124 in the BB2025 rulebook.
+ * See page 128 in the BB2025 rulebook.
  */
-class BigHand(
+class ExtraArms(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.MUTATIONS,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
-    override val type: SkillType = SkillType.BIG_HAND
+    override val type: SkillType = SkillType.EXTRA_ARMS
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description

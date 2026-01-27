@@ -74,7 +74,7 @@ object UseShadowingStep: Procedure() {
                     val player = action.getPlayer(state)
                     val shadowingContext = ShadowingRollContext(player = player)
                     compositeCommandOf(
-                        ReportSkillUsed(player, player.getSkill(SkillType.SHADOWING)),
+                        ReportSkillUsed(player, SkillType.SHADOWING),
                         UseShadowingSkill(player),
                         SetContext(shadowingContext),
                         GotoNode(RollShadowingDie),

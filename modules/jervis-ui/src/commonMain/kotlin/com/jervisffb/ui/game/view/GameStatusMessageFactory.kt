@@ -52,6 +52,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
+        com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to Pass the Ball"
+                else -> null
+            }
+        },
+        com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Pass Result or Reroll D6?"
+                else -> null
+            }
+        },
+        com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Pass the Ball"
+                else -> null
+            }
+        },
+
         Bounce.RollDirection to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Roll D8 to Bounce the Ball"

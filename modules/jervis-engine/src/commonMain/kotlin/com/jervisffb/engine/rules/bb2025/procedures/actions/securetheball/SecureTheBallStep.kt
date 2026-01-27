@@ -15,6 +15,7 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -41,6 +42,12 @@ import com.jervisffb.engine.rules.common.tables.Weather
  *
  * The result is stored in [SecureTheBallContext], it is up to the caller to
  * handle it.
+ *
+ * Developer's Commentary:
+ * With the NAF interpretation that Secure the Ball is also a "pickup", it would
+ * probably make sense to try to combine the two procedures into one, but until
+ * that has been fully clarified in an official FAQ, we are keeping them
+ * separate, even though it means duplicating logic.
  */
 object SecureTheBallStep: Procedure() {
     override val initialNode: Node = ChooseToUseBigHand
@@ -66,10 +73,10 @@ object SecureTheBallStep: Procedure() {
 
     object ChooseToUseBigHand: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team {
-            return state.getContext<SecureTheBallContext>().player.team
+            return state.getContext<SecureTheBallRollContext>().player.team
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<SecureTheBallContext>()
+            val context = state.getContext<SecureTheBallRollContext>()
             val player = context.player
             return if (player.isSkillAvailable(SkillType.BIG_HAND)) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
@@ -80,14 +87,58 @@ object SecureTheBallStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<SecureTheBallRollContext>()
             val player = context.player
+            val useBigHands = (action == Confirm)
+            return compositeCommandOf(
+                if (useBigHands) {
+                    ReportSkillUsed(player, SkillType.BIG_HAND)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useBigHands = useBigHands)),
+                GotoNode(ChooseToUseExtraArms)
+            )
+        }
+    }
+
+    object ChooseToUseExtraArms: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<SecureTheBallRollContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<SecureTheBallRollContext>()
+            val player = context.player
+            return if (player.isSkillAvailable(SkillType.EXTRA_ARMS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<SecureTheBallRollContext>()
+            val player = context.player
+            val useExtraArms = (action == Confirm)
+            return compositeCommandOf(
+                if (useExtraArms) {
+                    ReportSkillUsed(player, SkillType.EXTRA_ARMS)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useExtraArms = useExtraArms)),
+                GotoNode(CalculateModifiers)
+            )
+        }
+    }
+
+    object CalculateModifiers: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<SecureTheBallRollContext>()
             val modifiers = mutableListOf<DiceModifier>()
-            val ignoreNegativeModifiers = (action == Confirm)
-            if (!ignoreNegativeModifiers) {
+            if (!context.useBigHands) {
                 // Add modifiers for other opponent players marking the field.
                 rules.addMarkedModifiers(
                     state,
                     context.player.team,
-                    context.ball.location,
+                    state.currentBall().location,
                     modifiers,
                     SecureTheBallModifier.MARKED
                 )
@@ -97,12 +148,11 @@ object SecureTheBallStep: Procedure() {
                 }
                 // Other modifiers, like disturbing presence?
             }
+            if (context.useExtraArms) {
+                modifiers.add(SecureTheBallModifier.EXTRA_ARMS)
+            }
+
             return compositeCommandOf(
-                if (ignoreNegativeModifiers) {
-                    ReportSkillUsed(player, player.getSkill(SkillType.BIG_HAND))
-                } else {
-                    null
-                },
                 SetContext(context.copy(modifiers = modifiers)),
                 GotoNode(RollToSecureBall)
             )

@@ -9,4 +9,5 @@ enum class CatchModifier(override val modifier: Int, override val description: S
     MARKED(-1, "Marked"),
     DISTURBING_PRESENCE(-1, "Disturbing Presence"),
     POURING_RAIN(-1, "Pouring Rain"),
+    EXTRA_ARMS(1, "Extra Arms"),
 }

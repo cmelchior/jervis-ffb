@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.Secure
  * @see [MarkedModifier]
  */
 enum class SecureTheBallModifier(override val modifier: Int, override val description: String) : DiceModifier {
+    EXTRA_ARMS(1, "Extra Arms"),
     MARKED(-1, "Marked"),
     POURING_RAIN(-1, "Pouring Rain"),
 }

@@ -1,5 +1,11 @@
 package com.jervisffb.engine.rules.common.procedures
 
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -9,22 +15,28 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportCatch
 import com.jervisffb.engine.reports.ReportInterception
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -38,40 +50,13 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * in the first place.
  */
 object Catch : Procedure() {
-    override val initialNode: Node = RollToCatch
+    override val initialNode: Node = ChooseToUseExtraArms
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Determine target and modifiers for the Catch roll
         val ball = state.currentBall()
         val catchingPlayer = state.field[ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
-        val modifiers = mutableListOf<DiceModifier>()
-        val ballStateModifier = when (ball.state) {
-            BallState.BOUNCING -> CatchModifier.BOUNCING
-            BallState.DEVIATING -> CatchModifier.DEVIATED
-            BallState.SCATTERED -> CatchModifier.SCATTERED
-            BallState.THROW_IN -> CatchModifier.THROW_IN
-            BallState.DEFLECTED -> CatchModifier.CONVERT_DEFLECTION
-            else -> null
-        }
-        if (ballStateModifier != null) modifiers.add(ballStateModifier)
-
-        // Add marked modifiers for the field
-        rules.addMarkedModifiers(
-            state,
-            catchingPlayer.team,
-            ball.location,
-            modifiers,
-            CatchModifier.MARKED
-        )
-
-        // Check the weather
-        if (state.weather == Weather.POURING_RAIN) {
-            modifiers.add(CatchModifier.POURING_RAIN)
-        }
-
-        // TODO Check for disturbing presence.
-
-        val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
+        val rollContext = CatchRollContext(catchingPlayer, ball, diceRollTarget)
         return SetContext(rollContext)
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -88,6 +73,76 @@ object Catch : Procedure() {
         return compositeCommandOf(
             RemoveContext<CatchRollContext>(),
         )
+    }
+
+    object ChooseToUseExtraArms: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<CatchRollContext>().catchingPlayer.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<CatchRollContext>()
+            val player = context.catchingPlayer
+            return if (player.isSkillAvailable(SkillType.EXTRA_ARMS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<CatchRollContext>()
+            val player = context.catchingPlayer
+            val useExtraArms = (action == Confirm)
+            return compositeCommandOf(
+                if (useExtraArms) {
+                    ReportSkillUsed(player, SkillType.EXTRA_ARMS)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useExtraArms = useExtraArms)),
+                GotoNode(CalculateModifiers)
+            )
+        }
+    }
+
+    object CalculateModifiers: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<CatchRollContext>()
+            val modifiers = mutableListOf<DiceModifier>()
+            val ballStateModifier = when (context.ball.state) {
+                BallState.BOUNCING -> CatchModifier.BOUNCING
+                BallState.DEVIATING -> CatchModifier.DEVIATED
+                BallState.SCATTERED -> CatchModifier.SCATTERED
+                BallState.THROW_IN -> CatchModifier.THROW_IN
+                BallState.DEFLECTED -> CatchModifier.CONVERT_DEFLECTION
+                else -> null
+            }
+            if (ballStateModifier != null) modifiers.add(ballStateModifier)
+
+            // Add marked modifiers for the field
+            rules.addMarkedModifiers(
+                state,
+                context.catchingPlayer.team,
+                context.ball.location,
+                modifiers,
+                CatchModifier.MARKED
+            )
+
+            // Check the weather
+            if (state.weather == Weather.POURING_RAIN) {
+                modifiers.add(CatchModifier.POURING_RAIN)
+            }
+
+            // Players with extra arms can use it
+            if (context.useExtraArms) {
+                modifiers.add(CatchModifier.EXTRA_ARMS)
+            }
+
+            // TODO Check for disturbing presence.
+            return compositeCommandOf(
+                SetContext(context.copy(modifiers = modifiers)),
+                GotoNode(RollToCatch)
+            )
+        }
     }
 
     object RollToCatch : ParentNode() {

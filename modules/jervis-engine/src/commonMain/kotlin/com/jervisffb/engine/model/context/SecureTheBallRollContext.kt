@@ -13,6 +13,8 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 data class SecureTheBallRollContext(
     val player: Player,
     val ball: Ball,
+    val useBigHands: Boolean = false,
+    val useExtraArms: Boolean = false,
     val modifiers: List<DiceModifier> = emptyList(),
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false,

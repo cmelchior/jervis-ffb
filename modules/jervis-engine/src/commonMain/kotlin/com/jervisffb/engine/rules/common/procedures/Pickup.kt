@@ -15,6 +15,7 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -52,6 +53,13 @@ import com.jervisffb.engine.rules.common.tables.Weather
  * It is unclear if there are any cases where a player can move voluntarily
  * without the player being active, so for now we assume the logic is the same
  * across BB2020 and BB2025.
+ *
+ * The order of choosing skills to use is not defined in the rules, so for now
+ * we use the following order:
+ *
+ * 1. Use Big Hands?
+ * 2. Use Extra Arms?
+ * 3. Roll for Pickup
  */
 object Pickup : Procedure() {
     override val initialNode: Node = ChooseToUseBigHand
@@ -91,9 +99,53 @@ object Pickup : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<PickupRollContext>()
             val player = context.player
+            val useBigHands = (action == Confirm)
+            return compositeCommandOf(
+                if (useBigHands) {
+                    ReportSkillUsed(player, SkillType.BIG_HAND)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useBigHands = useBigHands)),
+                GotoNode(ChooseToUseExtraArms)
+            )
+        }
+    }
+
+    object ChooseToUseExtraArms: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PickupRollContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PickupRollContext>()
+            val player = context.player
+            return if (player.isSkillAvailable(SkillType.EXTRA_ARMS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
+            val player = context.player
+            val useExtraArms = (action == Confirm)
+            return compositeCommandOf(
+                if (useExtraArms) {
+                    ReportSkillUsed(player, SkillType.EXTRA_ARMS)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useExtraArms = useExtraArms)),
+                GotoNode(CalculateModifiers)
+            )
+        }
+    }
+
+    object CalculateModifiers: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
             val modifiers = mutableListOf<DiceModifier>()
-            val ignoreNegativeModifiers = (action == Confirm)
-            if (!ignoreNegativeModifiers) {
+            if (!context.useBigHands) {
                 // Add modifiers for other opponent players marking the field.
                 rules.addMarkedModifiers(
                     state,
@@ -108,13 +160,11 @@ object Pickup : Procedure() {
                 }
                 // Other modifiers, like disturbing presence?
             }
+            if (context.useExtraArms) {
+                modifiers.add(PickupModifier.EXTRA_ARMS)
+            }
 
             return compositeCommandOf(
-                if (ignoreNegativeModifiers) {
-                    ReportSkillUsed(player, player.getSkill(SkillType.BIG_HAND))
-                } else {
-                    null
-                },
                 SetContext(context.copy(modifiers = modifiers)),
                 GotoNode(RollToPickup)
             )

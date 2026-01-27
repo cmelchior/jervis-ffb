@@ -2,6 +2,8 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -58,6 +60,7 @@ data class InterceptionContext(
     // scatter from a failed interception.
     val target: FieldCoordinate,
     val interceptingPlayer: Player? = null, // Player doing the interception, if any.
+    val useExtraArms: Boolean = false, // If intercepting player is using Extra Arms or not
     val interceptionRoll: InterceptionRollContext? = null,
     val didIntercept: Boolean = false,
 ): ProcedureContext {
@@ -65,6 +68,10 @@ data class InterceptionContext(
     val continueThrow = !didIntercept
 }
 
+/**
+ * Procedure handling possible interceptions when throwing a ball or bomb.
+ * If no players are elligble for interception, this procedure does nothing.
+ */
 object InterceptionStep: Procedure() {
     override val initialNode: Node = CheckForCloudBurster
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
@@ -81,7 +88,7 @@ object InterceptionStep: Procedure() {
             val candidates = getInterceptionCandidates(rules, context)
             return if (candidates.isNotEmpty() && context.thrower.isSkillAvailable(SkillType.CLOUD_BURSTER)) {
                 compositeCommandOf(
-                    ReportSkillUsed(thrower, thrower.getSkill(SkillType.CLOUD_BURSTER)),
+                    ReportSkillUsed(thrower, SkillType.CLOUD_BURSTER),
                     ExitProcedure()
                 )
             } else {
@@ -117,11 +124,45 @@ object InterceptionStep: Procedure() {
                         val context = state.getContext<InterceptionContext>()
                         compositeCommandOf(
                             SetContext(context.copy(interceptingPlayer = it.getPlayer(state))),
-                            GotoNode(RollForInterception)
+                            GotoNode(ChooseToUseExtraArms)
                         )
                     }
                 }
             }
+        }
+    }
+
+    object ChooseToUseExtraArms: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<InterceptionContext>().interceptingPlayer?.team ?: INVALID_GAME_STATE("Missing intercepting player")
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val player = state.getContext<InterceptionContext>().interceptingPlayer ?: INVALID_GAME_STATE("Missing intercepting player")
+            return if (player.isSkillAvailable(SkillType.EXTRA_ARMS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules
+        ): Command {
+            val context = state.getContext<InterceptionContext>()
+            val player = context.interceptingPlayer!!
+            val useExtraArms = (action == Confirm)
+            return compositeCommandOf(
+                if (useExtraArms) {
+                    ReportSkillUsed(player, SkillType.EXTRA_ARMS)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useExtraArms = useExtraArms)),
+                GotoNode(RollForInterception)
+            )
         }
     }
 
@@ -144,6 +185,9 @@ object InterceptionStep: Procedure() {
                 else -> INVALID_GAME_STATE("Unsupported pass result: ${passContext.passingResult}")
             }.let {
                 modifiers.add(it)
+            }
+            if (interceptionContext.useExtraArms) {
+                modifiers.add(InterceptionModifier.EXTRA_ARMS)
             }
             val context = InterceptionRollContext(
                 player = player,

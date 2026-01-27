@@ -36,7 +36,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.DogOut
@@ -99,7 +98,7 @@ object FoulStep: Procedure() {
 
             return buildCompositeCommand {
                 bootAssists.forEach { player ->
-                    add(ReportSkillUsed(player, player.getSkill(SkillType.PUT_THE_BOOT_IN)))
+                    add(ReportSkillUsed(player, SkillType.PUT_THE_BOOT_IN))
                 }
                 addAll(
                     SetContext(

@@ -110,7 +110,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Ignores Marks
 - [ ] Claws
 - [ ] Disturbing Presence*
-- [ ] Extra Arms
+- [x] Extra Arms
+  - [x] Is optional
+  - [x] Works on Catch
+  - [x] Works on Pickup
+  - [x] Works on Secure the Ball
+  - [x] Works on Interceptions
 - [ ] Foul Appearance*
 - [ ] Horns
 - [ ] Iron Hard Skin

@@ -180,7 +180,7 @@ object DodgeRoll: Procedure() {
             return compositeCommandOf(
                 when (action) {
                     Confirm -> {
-                        ReportSkillUsed(context.player, context.player.getSkill(SkillType.TWO_HEADS))
+                        ReportSkillUsed(context.player, SkillType.TWO_HEADS)
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.TWO_HEADS))
                     }
                     Cancel,
@@ -214,7 +214,7 @@ object DodgeRoll: Procedure() {
                 Confirm -> {
                     val modifier = BreakTackleModifier(player.strength, rules.baseVersion)
                     compositeCommandOf(
-                        ReportSkillUsed(context.player, context.player.getSkill(SkillType.BREAK_TACKLE)),
+                        ReportSkillUsed(context.player, SkillType.BREAK_TACKLE),
                         SetContext(context.copyAndAddModifier(modifier)),
                         SetSkillUsed(player = player, skill = player.getSkill(SkillType.BREAK_TACKLE), used = true),
                         GotoNode(ChooseToUsePrehensileTail)
@@ -259,7 +259,7 @@ object DodgeRoll: Procedure() {
                 is PlayerSelected -> {
                     val player = action.getPlayer(state)
                     compositeCommandOf(
-                        ReportSkillUsed(player, player.getSkill(SkillType.PREHENSILE_TAIL)),
+                        ReportSkillUsed(player, SkillType.PREHENSILE_TAIL),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
                         GotoNode(ChooseToUseDivingTackle)
                     )

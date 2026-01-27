@@ -12,6 +12,8 @@ import com.jervisffb.engine.utils.sum
  */
 data class PickupRollContext(
     val player: Player,
+    val useBigHands: Boolean = false,
+    val useExtraArms: Boolean = false,
     val modifiers: List<DiceModifier> = emptyList(),
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false,

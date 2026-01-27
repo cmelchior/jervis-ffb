@@ -121,7 +121,7 @@ object AccuracyRoll: Procedure() {
             return compositeCommandOf(
                 when (action) {
                     Confirm -> {
-                        ReportSkillUsed(context.thrower, context.thrower.getSkill(SkillType.ACCURATE))
+                        ReportSkillUsed(context.thrower, SkillType.ACCURATE)
                         SetContext(context.copyAndAdd(passingModifier = AccuracyModifier.ACCURATE))
                     }
 
@@ -156,7 +156,7 @@ object AccuracyRoll: Procedure() {
             return compositeCommandOf(
                 when (action) {
                     Confirm -> {
-                        ReportSkillUsed(context.thrower, context.thrower.getSkill(SkillType.CANNONEER))
+                        ReportSkillUsed(context.thrower, SkillType.CANNONEER)
                         SetContext(context.copyAndAdd(passingModifier = AccuracyModifier.CANNONEER))
                     }
 

@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
+import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
@@ -278,9 +279,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.EXTRA_ARMS -> {
-                    // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Extra Arms", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                        ExtraArms(player, category, expiresAt)
+                    }
                 }
                 SkillType.FOUL_APPEARANCE -> {
                     // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->

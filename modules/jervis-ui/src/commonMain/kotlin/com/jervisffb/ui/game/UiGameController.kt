@@ -28,13 +28,15 @@ import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.game.state.actionwheel.AccuracyWheelController
+import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
+import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025WheelController
 import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
+import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
@@ -126,11 +128,13 @@ class UiGameController(
         TeamSetupsAvailableStatusIndicator
     )
     val actionWheelControllers = setOf(
-        AccuracyWheelController,
+        AccuracyBB2020WheelController,
+        AccuracyBB2025WheelController,
         BounceRollWheelController,
         CatchWheelController,
         DeviateRollWheelController,
         DodgeWheelController,
+        InterceptionWheelController,
         PickupWheelController,
         RushWheelController,
         SecureTheBallWheelController,

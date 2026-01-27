@@ -21,6 +21,9 @@ import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -49,6 +52,7 @@ import kotlin.time.ExperimentalTime
  * - Accuracy
  * - Catch
  * - Dodge
+ * - Interception
  * - Pickup
  * - Rush
  * - Shadowing
@@ -184,13 +188,32 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
 }
 
 /**
- * Define the Action Wheel layout when rolling for Accuracy (passing).
+ * Define the Action Wheel layout when rolling for Accuracy (passing) in BB2025.
  */
-object AccuracyWheelController : D6WithRerollWheelController() {
+object AccuracyBB2020WheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
     override val rollDiceNode: Node = AccuracyRoll.RollDie
     override val chooseRerollSourceNode: Node = AccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = AccuracyRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<PassContext>().thrower.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<PassContext>()
+        return context.passingRoll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action Wheel layout when rolling for Accuracy (passing) in BB2025.
+ */
+object AccuracyBB2025WheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "accuracy"
+    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.RollDie
+    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         return state.getContext<PassContext>().thrower.coordinates
@@ -237,6 +260,26 @@ object DodgeWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<DodgeRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action Wheel layout when rolling for Interception.
+ */
+object InterceptionWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "interception"
+    override val rollDiceNode: Node = InterceptionRoll.RollDie
+    override val chooseRerollSourceNode: Node = InterceptionRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = InterceptionRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<InterceptionContext>()
+        return context.interceptingPlayer?.coordinates ?: error("Missing intercepting player: $state")
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<InterceptionRollContext>()
         return context.roll!!.originalRoll
     }
 }
