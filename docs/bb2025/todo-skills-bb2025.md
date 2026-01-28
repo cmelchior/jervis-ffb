@@ -91,7 +91,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Frenzy 2nd block is not taken when defender is using Fend (as they cannot follow up)
     - [ ] Works on players with the Foul Appearance trait
     - [ ] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
-- [ ] Kick
+- [x] Kick
+  - [x] Usage is optional
+  - [x] Reduces distance from D6 to D3
 - [ ] Pro
 - [ ] Steady Footing
 - [ ] Strip Ball

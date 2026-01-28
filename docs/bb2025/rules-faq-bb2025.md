@@ -162,6 +162,13 @@ the opponent can just decide to not intercept.
 
 So for ease of use, this skill is always used when available.
 
+### Page 130 - Kick
+Jervis uses the NAF interpretation, which means that you are allowed to roll the
+deviate die (D6) and then choose to treat the roll as either a D6 or D3.
+
+In the rulebook, D3's are defined as Rolling a D6, taking half the value and 
+round up.
+
 ### Page 135 - Put the Boot In
 Technically, using the skill should be optional, but there doesn't seem to be 
 any use case for this (even a bad one), so until such a use case surfaces, this 

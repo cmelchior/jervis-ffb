@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
+import kotlin.math.ceil
 import kotlin.random.Random
 
 
@@ -184,6 +185,11 @@ data class D6Result(override val value: Int) : DieResult() {
             removeAll(except.toList())
         }
     }
+
+    /**
+     * Convert a D6 roll into a D3 value using the rules described on page 26 in the BB2025 rulebook.
+     */
+    fun toD3(): D3Result = ceil(value / 2f).toInt().d3
 
     companion object {
         fun allOptions(): List<D6Result> {

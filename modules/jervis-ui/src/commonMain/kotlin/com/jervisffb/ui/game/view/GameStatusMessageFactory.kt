@@ -1,7 +1,9 @@
 package com.jervisffb.ui.game.view
 
+import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -11,6 +13,7 @@ import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
+import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
@@ -261,6 +264,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 else -> null
             }
         },
+        TheKickOff.ChooseToUseKick to { isActiveClient, serverDiceRolls, state ->
+            val d6 = state.getContext<DeviateRollContext>().deviateRoll.last() as D6Result
+            when (isActiveClient) {
+                true -> "Use Kick to reduce distance from ${d6.value} (D6) to ${d6.toD3().value} (D3)?"
+                false -> "Waiting for opponent to use Kick"
+            }
+        }
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

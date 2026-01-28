@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.Pickup
+import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
@@ -191,6 +192,16 @@ object UseVeryLongLegsWheelController: UseSkillWheelController(SkillType.VERY_LO
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<MoveContext>().player
+        return player.coordinates
+    }
+}
+
+object UseKickWheelController: UseSkillWheelController(SkillType.KICK) {
+    override val nodes: Set<Node> = setOf(
+        TheKickOff.ChooseToUseKick
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.kickingPlayer ?: error("Missing kicking player: $state")
         return player.coordinates
     }
 }

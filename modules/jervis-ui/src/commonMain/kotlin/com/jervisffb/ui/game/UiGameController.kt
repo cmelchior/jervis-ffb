@@ -50,6 +50,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseKickWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
@@ -156,6 +157,7 @@ class UiGameController(
         UseTackleWheelController,
         UseWrestleWheelController,
         UseVeryLongLegsWheelController,
+        UseKickWheelController,
 
         UseApothecaryWheelController,
         ArgueTheCallWheelController

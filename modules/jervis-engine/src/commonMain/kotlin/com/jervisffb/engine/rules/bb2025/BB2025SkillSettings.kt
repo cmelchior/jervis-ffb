@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
+import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
 import com.jervisffb.engine.rules.bb2025.skills.Loner
@@ -221,9 +222,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.KICK -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Kick", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        Kick(player, category, expiresAt)
+                    }
                 }
                 SkillType.PRO -> {
                     addNoValueEntry("Pro", type, SkillCategory.GENERAL) { player, category,expiresAt ->
