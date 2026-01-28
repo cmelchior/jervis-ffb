@@ -20,6 +20,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
@@ -426,7 +427,6 @@ open class ManualActionProvider(
         }
 
         // Randomly select a kicking player
-        // TODO Should only do this if no-one has kick
         val currentNode = controller.currentProcedure()?.currentNode()
         if (currentNode == TheKickOff.NominateKickingPlayer && menuViewModel.isFeatureEnabled(
                 Feature.SELECT_KICKING_PLAYER
@@ -434,7 +434,14 @@ open class ManualActionProvider(
             return (currentNode as ActionNode).getAvailableActions(controller.state, controller.rules)
                 .filterIsInstance<SelectPlayer>()
                 .single()
-                .createRandom()
+                .getPlayers(game.state).let {
+                    val playersWithKick = it.filter { it.isSkillAvailable(SkillType.KICK) }
+                    if (playersWithKick.isNotEmpty()) {
+                        PlayerSelected(playersWithKick.first())
+                    } else {
+                        PlayerSelected(it.random())
+                    }
+                }
         }
 
         // If a player action can only end, just end it immediately

@@ -4,6 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
@@ -353,6 +354,8 @@ data class SelectPlayer private constructor(
         return PlayerSelected(selectedPlayer)
     }
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
+
+    fun getPlayers(state: Game): List<Player> = players.map { state.getPlayerById(it) }
 
     companion object {
         fun single(player: Player): SelectPlayer = SelectPlayer(listOf(player.id))
