@@ -43,8 +43,12 @@ abstract class BB2025Rules(
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let { turnData ->
                 if (turnData.moveActions > 0) add(teamActions.move)
-                if (turnData.passActions > 0) add(teamActions.pass)
-                if (turnData.handOffActions > 0) add(teamActions.handOff)
+                if (turnData.passActions > 0 && !player.isSkillAvailable(SkillType.MY_BALL)) {
+                    add(teamActions.pass)
+                }
+                if (turnData.handOffActions > 0 && !player.isSkillAvailable(SkillType.MY_BALL)) {
+                    add(teamActions.handOff)
+                }
                 if (turnData.blockActions > 0) {
                     val isStanding = (player.state == PlayerState.STANDING)
                     val hasEligibleTargets = (player.location as OnFieldLocation)

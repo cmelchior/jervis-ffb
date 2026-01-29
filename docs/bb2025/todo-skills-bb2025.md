@@ -208,6 +208,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Hypnotic Gaze
 - [ ] Kick Team-mate
 - [ ] Loner (X+)*
+- [ ] My Ball* 
+  - [x] Cannot Pass
+  - [x] Cannot Hand-off
+  - [ ] Cannot Fumblerooskie
 - [ ] No Ball*
 - [ ] Plague Ridden
 - [ ] Pogo Stick
