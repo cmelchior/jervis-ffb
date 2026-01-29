@@ -30,6 +30,7 @@ import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.rules.common.tables.LastingInjuryResult
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.sum
 
 enum class RiskingInjuryMode {
     FALLING_OVER,
@@ -48,9 +49,7 @@ data class RiskingInjuryContext(
 
     // Armour roll
     val armourRoll: List<D6Result> = listOf(),
-    val armourResult: Int = -1,
     val armourModifiers: List<DiceModifier> = listOf(),
-    val armourBroken: Boolean = false,
 
     // Injury roll
     val injuryRoll: List<D6Result> = emptyList(),
@@ -85,7 +84,12 @@ data class RiskingInjuryContext(
     val regenerationApothecaryUsed: Apothecary? = null,
     val regenerationReRoll: D6Result? = null,
     val regenerationSuccess: Boolean = false
-): ProcedureContext
+): ProcedureContext {
+    val armourResult: Int
+        get() = armourRoll.sum() + armourModifiers.sum()
+    val armourBroken: Boolean
+        get() = (player.armorValue <= armourResult)
+}
 
 /**
  * Implement Armor and Injury Rolls as described on page 60-62 in the rulebook.
@@ -141,10 +145,7 @@ object RiskingInjuryRoll: Procedure() {
     }
 
     object RollForInjury: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return InjuryRoll
-        }
-
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = InjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             return when (context.injuryResult) {

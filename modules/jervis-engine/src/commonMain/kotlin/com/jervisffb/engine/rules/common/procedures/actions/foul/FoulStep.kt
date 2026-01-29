@@ -40,8 +40,8 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
-import com.jervisffb.engine.model.modifiers.DefensiveAssistsModifier
-import com.jervisffb.engine.model.modifiers.OffensiveAssistModifier
+import com.jervisffb.engine.model.modifiers.DefensiveAssistsArmourModifier
+import com.jervisffb.engine.model.modifiers.OffensiveAssistArmourModifier
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
@@ -56,7 +56,10 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Foul part of a [com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction].
+ * Procedure for handling the Foul part of a Foul Action.
+ *
+ * See [com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction].
+ * See [com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction].
  */
 object FoulStep: Procedure() {
     override val initialNode: Node = CalculateAssists
@@ -119,8 +122,8 @@ object FoulStep: Procedure() {
                 player = foulContext.victim!!,
                 mode = RiskingInjuryMode.FOUL,
                 armourModifiers = listOf(
-                    OffensiveAssistModifier(foulContext.foulAssists),
-                    DefensiveAssistsModifier(foulContext.defensiveAssists * -1)
+                    OffensiveAssistArmourModifier(foulContext.foulAssists),
+                    DefensiveAssistsArmourModifier(foulContext.defensiveAssists)
                 )
             )
             return SetContext(injuryContext)

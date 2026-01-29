@@ -8,28 +8,22 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Represents the "Shadowing" skill.
+ * Represents the "Dirty Player" skill.
  *
- * See page 135 in the BB2025 rulebook.
+ * See page XXX in the BB2025 rulebook.
  */
-class Shadowing(
+class DirtyPlayer(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.DEVIOUS,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
-    override val type: SkillType = SkillType.SHADOWING
+    override val type: SkillType = SkillType.DIRTY_PLAYER
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val compulsory: Boolean = false
-    override val resetAt: Duration = Duration.SPECIAL
-    // For Shadowing, it can be used up to the players MA stat, so we track how many times it has been used
-    // so we can disable it (used = false) at the right time.
-    var usedThisTurn: Int = 0
+    override val resetAt: Duration = Duration.END_OF_ACTION
     override var used: Boolean = false
-        get() {
-            return usedThisTurn >= player.move
-        }
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
     override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)

@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
+import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
@@ -138,9 +139,9 @@ class BB2025SkillSettings: SkillSettings() {
                 // Devious Category
                 //
                 SkillType.DIRTY_PLAYER -> {
-                    // addEntry(type, SkillCategory.DEVIOUS, 1) { player, category, value , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Dirty Player", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        DirtyPlayer(player, category, expiresAt)
+                    }
                 }
                 SkillType.EYE_GOUGE -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

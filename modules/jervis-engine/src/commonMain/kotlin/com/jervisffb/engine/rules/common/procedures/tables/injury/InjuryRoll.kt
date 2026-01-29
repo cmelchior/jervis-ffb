@@ -1,31 +1,47 @@
 package com.jervisffb.engine.rules.common.procedures.tables.injury
 
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.InjuryModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.sum
 
 /**
- * Implement the injury roll as described on page 60 in the rulebook.
+ * Implement the injury roll.
  *
- * The result is stored in [Game.injuryRollResultContext] and it is up
+ * See page 60 in the BB2020 rulebook.
+ * See page XX in the BB2025 rulebook.
+ *
+ * The result is stored in [RiskingInjuryContext] and it is up
  * to the caller to determine what to do with the result.
  *
  * TODO Note, Mighty Blow specifically say "When an opposition player is knocked
@@ -50,20 +66,52 @@ object InjuryRoll: Procedure() {
                 // Determine result of injury roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow and others.
                 val roll = listOf(die1, die2)
-                val modifiers = emptyList<DiceModifier>()
-                val result = rules.injuryTable.roll(die1, die2, modifiers.sumOf { it.modifier })
-
+                val result = rules.injuryTable.roll(die1, die2)
                 val updatedContext = context.copy(
                     injuryRoll = roll,
                     injuryResult = result,
-                    injuryModifiers = modifiers,
                 )
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.INJURY, roll),
                     SetContext(updatedContext),
-                    ExitProcedure()
+                    GotoNode(ChooseToUseDirtyPlayer),
                 )
+            }
+        }
+    }
+
+    object ChooseToUseDirtyPlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<RiskingInjuryContext>().player.team.otherTeam()
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val isFoul = (context.mode == RiskingInjuryMode.FOUL)
+            val hasDirtyPlayer = (state.getContextOrNull<FoulContext>()?.fouler?.isSkillAvailable(SkillType.DIRTY_PLAYER) == true)
+            return if (isFoul && hasDirtyPlayer) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val usedDirtyPlayer = (action is Confirm)
+            return buildCompositeCommand {
+                if (usedDirtyPlayer) {
+                    val fouler = state.getContext<FoulContext>().fouler
+                    val updatedModifiers = context.injuryModifiers + InjuryModifier.DIRTY_PLAYER
+                    val updatedContext = context.copy(
+                        injuryModifiers = updatedModifiers,
+                        injuryResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], updatedModifiers.sum())
+                    )
+                    add(SetContext(updatedContext))
+                    add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
+                    add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
+                }
+                add(ExitProcedure())
             }
         }
     }

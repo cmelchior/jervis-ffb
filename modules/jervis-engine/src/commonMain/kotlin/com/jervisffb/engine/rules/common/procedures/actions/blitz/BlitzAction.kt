@@ -49,10 +49,12 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.StandardBlockS
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -90,7 +92,8 @@ object BlitzAction : Procedure() {
                 SetContext(activateContext.copy(markActionAsUsed = true))
             } else {
                 SetContext(activateContext.copy(markActionAsUsed = false))
-            }
+            },
+            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
         )
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -375,7 +378,8 @@ object BlitzAction : Procedure() {
                 compositeCommandOf(
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),
-                    GotoNode(RemainingMovesOrEndAction)
+                    GotoNode(RemainingMovesOrEndAction),
+                    *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
                 )
             }
         }

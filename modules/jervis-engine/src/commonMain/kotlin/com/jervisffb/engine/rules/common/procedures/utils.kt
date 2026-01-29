@@ -13,6 +13,7 @@ import com.jervisffb.engine.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.ResetShadowingSkill
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
+import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetSpecialPlayCardActive
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
@@ -170,12 +171,12 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
-    // Reset skills that track things during a turn
-    val resetSkills = if (duration == Duration.END_OF_TURN) {
+    // Shadowing is special as it tracks move usage, we need to reset its counter at the end of a turn
+    val resetShadowingCounter = if (duration == Duration.END_OF_TURN) {
         teams.flatMap { team ->
             team.flatMap { player ->
                 val shadowingSkill = player.getSkillOrNull(SkillType.SHADOWING)
-                if (shadowingSkill is Shadowing) {
+                if (shadowingSkill is com.jervisffb.engine.rules.bb2025.skills.Shadowing) {
                     listOf(ResetShadowingSkill(player))
                 } else {
                     emptyList()
@@ -184,6 +185,16 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     } else {
         emptyList<Command>()
+    }
+
+
+    // Reset skills that have been used
+    val resetSkills = teams.flatMap { team ->
+        team.flatMap { player ->
+            player.skills
+                .filter { it.resetAt == duration }
+                .map { SetSkillUsed(player, it, false) }
+        }
     }
 
     // Find all other temporary effects
@@ -237,6 +248,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     return (
         removableStatModifiers
             + removableSkills
+            + resetShadowingCounter
             + resetSkills
             + removableTemporaryEffects
             + removableRerolls

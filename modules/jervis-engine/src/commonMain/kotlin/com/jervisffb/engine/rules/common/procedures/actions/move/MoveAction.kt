@@ -20,7 +20,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -36,7 +38,11 @@ object MoveAction : Procedure() {
         val player = state.activePlayer!!
         return getSetPlayerRushesCommand(rules, player)
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return compositeCommandOf(
+            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+        )
+    }
     override fun isValid(state: Game, rules: Rules) {
         if (state.activePlayer == null) INVALID_GAME_STATE("No active player")
     }

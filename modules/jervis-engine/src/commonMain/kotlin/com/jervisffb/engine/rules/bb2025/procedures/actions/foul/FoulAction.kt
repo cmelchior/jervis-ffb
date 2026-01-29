@@ -35,7 +35,9 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -57,7 +59,7 @@ object FoulAction : Procedure() {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(FoulContext(player))
+            SetContext(FoulContext(player)),
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -70,7 +72,8 @@ object FoulAction : Procedure() {
                 activePlayerContext.copy(
                     markActionAsUsed = context.hasFouled || context.hasMoved
                 )
-            )
+            ),
+            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
         )
     }
 

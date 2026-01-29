@@ -22,6 +22,10 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
+import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
@@ -246,29 +250,56 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
-        JumpRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+        JumpRoll.RollDie to { isActiveClient, serverDiceRolls, _ ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Roll D6 to Jump"
                 else -> null
             }
         },
-        JumpRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+        JumpRoll.ChooseReRollSource to { isActiveClient, _, _ ->
             when {
                 (isActiveClient) -> "Accept Jump Result or Reroll D6?"
                 else -> null
             }
         },
-        JumpRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+        JumpRoll.ReRollDie to { isActiveClient, serverDiceRolls, _ ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Jump?"
                 else -> null
             }
         },
-        TheKickOff.ChooseToUseKick to { isActiveClient, serverDiceRolls, state ->
+        TheKickOff.ChooseToUseKick to { isActiveClient, _, state ->
             val d6 = state.getContext<DeviateRollContext>().deviateRoll.last() as D6Result
             when (isActiveClient) {
                 true -> "Use Kick to reduce distance from ${d6.value} (D6) to ${d6.toD3().value} (D3)?"
                 false -> "Waiting for opponent to use Kick"
+            }
+        },
+
+        ArmourRoll.ChooseToUseDirtyPlayer to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Dirty Player on Armour Roll?"
+                false -> "Waiting for opponent to use Dirty Player"
+            }
+        },
+        InjuryRoll.ChooseToUseDirtyPlayer to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Dirty Player on Injury Roll?"
+                false -> "Waiting for opponent to use Dirty Player"
+            }
+        },
+
+        UseBB11Apothecary.ChooseToUseApothecary to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Apothecary?"
+                false -> "Waiting for opponent to use Apothecary"
+            }
+        },
+
+        UseBB7Apothecary.ChooseToUseApothecary to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Apothecary?"
+                false -> "Waiting for opponent to use Apothecary"
             }
         }
     )

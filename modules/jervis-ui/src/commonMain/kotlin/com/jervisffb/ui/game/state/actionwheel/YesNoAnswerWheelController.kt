@@ -25,6 +25,8 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitia
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
@@ -202,6 +204,17 @@ object UseKickWheelController: UseSkillWheelController(SkillType.KICK) {
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.kickingPlayer ?: error("Missing kicking player: $state")
+        return player.coordinates
+    }
+}
+
+object UseDirtyPlayerWheelController: UseSkillWheelController(SkillType.DIRTY_PLAYER) {
+    override val nodes: Set<Node> = setOf(
+        ArmourRoll.ChooseToUseDirtyPlayer,
+        InjuryRoll.ChooseToUseDirtyPlayer
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<FoulContext>().fouler
         return player.coordinates
     }
 }

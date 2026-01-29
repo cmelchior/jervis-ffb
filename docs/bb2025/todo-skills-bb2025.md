@@ -46,7 +46,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## Devious Skills
 
-- [ ] Dirty Player
+- [x] Dirty Player
+  - [x] Is optional
+  - [x] Works on either Armour or Injury
+  - [x] Can be used on every Foul Action.
 - [ ] Eye Gouge
 - [ ] Fumblerooskie
 - [ ] Lethal Flight

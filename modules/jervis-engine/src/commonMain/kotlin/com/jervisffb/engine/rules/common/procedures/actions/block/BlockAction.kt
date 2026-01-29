@@ -31,6 +31,8 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
@@ -84,7 +86,8 @@ object BlockAction : Procedure() {
         return compositeCommandOf(
             SetContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
             RemoveContext<BlockContext>(),
-            RemoveContext<BlockActionContext>()
+            RemoveContext<BlockActionContext>(),
+            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
         )
     }
 

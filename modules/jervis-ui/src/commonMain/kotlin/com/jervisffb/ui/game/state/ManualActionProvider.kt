@@ -49,6 +49,9 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
@@ -516,6 +519,21 @@ open class ManualActionProvider(
             if (controller.state.getContextOrNull<MoveContext>()?.player?.isSkillAvailable(SkillType.VERY_LONG_LEGS) == true) {
                 return Confirm
             }
+        }
+
+        // Use Dirty Player on Armour roll if it wasn't broken using the normal role
+        if (menuViewModel.isFeatureEnabled(Feature.USE_DIRTY_PLAYER_ON_ARMOUR) && (currentNode == ArmourRoll.ChooseToUseDirtyPlayer)) {
+            val context = controller.state.getContextOrNull<RiskingInjuryContext>()
+            if (context?.armourBroken != true) {
+                return Confirm
+            } else {
+                return Cancel
+            }
+        }
+
+        // Always use Dirty Player on Injury (if possible)
+        if (menuViewModel.isFeatureEnabled(Feature.USE_DIRTY_PLAYER_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseDirtyPlayer)) {
+            return Confirm
         }
 
         return null
