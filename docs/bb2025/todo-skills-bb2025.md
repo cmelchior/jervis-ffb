@@ -212,7 +212,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Cannot Pass
   - [x] Cannot Hand-off
   - [ ] Cannot Fumblerooskie
-- [ ] No Ball*
+- [x] No Ball*
+  - [x] Catch rolls are automatic 1's
+  - [x] Do not use Extra Arms on Catch
+  - [x] Pickup rolls are automatic 1's
+  - [x] Do not use Big Hand / Extra Arms on Pickup
+  - [x] Secure the Ball rolls are automatic 1's
+  - [x] Cannot intercept
 - [ ] Plague Ridden
 - [ ] Pogo Stick
 - [ ] Projectile Vomit

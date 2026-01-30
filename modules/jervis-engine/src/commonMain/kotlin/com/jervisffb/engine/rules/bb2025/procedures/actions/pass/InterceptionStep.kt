@@ -117,12 +117,19 @@ object InterceptionStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<InterceptionContext>()
-            val candidates = getInterceptionCandidates(rules, context).filter {
-                when (context.useCloudBurster) {
-                    false -> true // All players are eligible
-                    true -> it.isSkillAvailable(SkillType.VERY_LONG_LEGS) // Only Very Long Legged players are eligible
+            val candidates = getInterceptionCandidates(rules, context)
+                .filter { player ->
+                    // Check for CloudBurster and Very Long Legs combination
+                    when (context.useCloudBurster) {
+                        false -> true // All players are eligible
+                        true -> player.isSkillAvailable(SkillType.VERY_LONG_LEGS) // Only Very Long Legged players are eligible if Cloud Burster is used
+                    }
                 }
-            }
+                .filterNot { player ->
+                    // Players with No Ball are not eligible for interception
+                    player.isSkillAvailable(SkillType.NO_BALL)
+                }
+
             return if (candidates.isNotEmpty()) {
                 listOf(
                     SelectPlayer.fromPlayers(candidates),

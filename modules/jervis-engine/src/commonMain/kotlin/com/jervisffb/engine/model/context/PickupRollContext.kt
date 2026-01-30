@@ -1,5 +1,6 @@
 package com.jervisffb.engine.model.context
 
+import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
@@ -12,6 +13,7 @@ import com.jervisffb.engine.utils.sum
  */
 data class PickupRollContext(
     val player: Player,
+    val ball: Ball,
     val useBigHands: Boolean = false,
     val useExtraArms: Boolean = false,
     val modifiers: List<DiceModifier> = emptyList(),

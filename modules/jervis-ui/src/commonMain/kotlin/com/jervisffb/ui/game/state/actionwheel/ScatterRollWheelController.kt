@@ -8,8 +8,10 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
+import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
@@ -69,8 +71,9 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                 }
             )
         )
+        val coords = acc.game.getContext<ScatterRollContext>().from
         val wheelState = ActionWheelUiStateData(
-            center = acc.game.currentBall().location,
+            center = coords,
             topItems = diceButtons,
             topExpandMode = MenuExpandMode.Compact(),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,

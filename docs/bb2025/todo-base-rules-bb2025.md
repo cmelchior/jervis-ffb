@@ -503,6 +503,7 @@ book.
     - [x] Not turnover if landing on player from an opponent team
     - [x] No Turnover if a thrown player is knocked down and not holding the ball
     - [x] Turnover if the thrown player is knocked down and is holding the ball
+    - [x] Successful landing on the ball trigger Bounce
     - [x] Land in the occupied square with prone player. Roll injury again
     - [x] Land in the end-zone with ball trigger touchdown.
     - [x] Land on a player with the ball. Ball gets knocked loose. It bounces immediately

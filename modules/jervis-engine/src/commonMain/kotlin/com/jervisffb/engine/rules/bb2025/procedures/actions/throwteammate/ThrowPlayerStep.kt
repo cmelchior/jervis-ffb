@@ -37,7 +37,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
-import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
@@ -460,23 +459,37 @@ object ThrowPlayerStep: Procedure() {
                 playerHasBall && !isTurnOver -> GotoNode(CheckForScoring)
                 playerHasBall && isTurnOver -> ExitProcedure()
                 !playerHasBall && isTurnOver -> ExitProcedure()
-                !playerHasBall && ballInSquare -> GotoNode(PickupBallAfterLanding)
+                !playerHasBall && ballInSquare -> {
+                    // Ball in square always bounce when landing
+                    val ball = state.balls.first { it.state == BallState.ON_GROUND && it.location == context.target }
+                    compositeCommandOf(
+                        SetBallState.bouncing(ball),
+                        GotoNode(BounceBallOnLandingSquare)
+                    )
+                }
                 !playerHasBall && !ballInSquare -> ExitProcedure()
                 else -> INVALID_GAME_STATE("Invalid state for landing player: hasBall[$playerHasBall], ballInSquare[$ballInSquare], turnOver[$isTurnOver]")
             }
         }
     }
 
+    // It is currently a bit unclear if it is allowed to pick up the ball when landing on it. RAW it seems "no", but it is
+    // a change from BB2020 and the rulebook doesn't explicitly say so.
     object PickupBallAfterLanding: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
-            val pickupContext = PickupRollContext(throwContext.thrownPlayer!!)
-            return SetContext(pickupContext)
+            val ball = state.field[throwContext.thrownPlayer!!.coordinates].balls.single()
+            return compositeCommandOf(
+                SetCurrentBall(ball),
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
             // All possible results are calculated inside Pickup, so just end here
-            return ExitProcedure()
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                ExitProcedure()
+            )
         }
     }
 
@@ -529,7 +542,7 @@ object ThrowPlayerStep: Procedure() {
                     isThrown = false,
                 ),
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
-                    SetBallState.Companion.bouncing(it)
+                    SetBallState.bouncing(it)
                 },
                 SetPlayerState(thrownPlayer, PlayerState.KNOCKED_DOWN),
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
@@ -565,7 +578,7 @@ object ThrowPlayerStep: Procedure() {
             add(RemoveContext<RiskingInjuryContext>())
             if (ball != null) {
                 addAll(
-                    SetBallState.Companion.bouncing(ball),
+                    SetBallState.bouncing(ball),
                     GotoNode(BounceBallOnLandingSquare)
                 )
             } else {

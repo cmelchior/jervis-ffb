@@ -26,9 +26,11 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
+import com.jervisffb.engine.reports.ReportNoBallAffectingAction
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
@@ -37,7 +39,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
- * Resolve a Pickup, i.e., when a player moves into a field where the ball is placed.
+ * Resolve a Pickup, i.e., when a player moves into a field where the ball is
+ * placed. This procedure requires that the caller has set a current ball.
  *
  * See page 46 in the BB2020 rulebook.
  * See page 57 in the BB2025 rulebook.
@@ -57,29 +60,53 @@ import com.jervisffb.engine.rules.common.tables.Weather
  * The order of choosing skills to use is not defined in the rules, so for now
  * we use the following order:
  *
- * 1. Use Big Hands?
- * 2. Use Extra Arms?
- * 3. Roll for Pickup
+ * 1. Has No Ball?
+ * 2. Use Big Hands?
+ * 3. Use Extra Arms?
+ * 4. Roll for Pickup
  */
 object Pickup : Procedure() {
-    override val initialNode: Node = ChooseToUseBigHand
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val ball = state.currentBall()
-        val pickupPlayer = state.field[ball.location].player!!
-        val rollContext = PickupRollContext(pickupPlayer)
-        return SetContext(rollContext)
+    override val initialNode: Node = CheckForNoBallSkill
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        return if (state.getContextOrNull<PickupRollContext>() == null) {
+            val ball = state.currentBall()
+            val pickupPlayer = state.field[ball.location].player!!
+            val rollContext = PickupRollContext(pickupPlayer, ball)
+            SetContext(rollContext)
+        } else {
+            null
+        }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<PickupRollContext>()
     }
     override fun isValid(state: Game, rules: Rules) {
-        if (state.currentBall().state != BallState.ON_GROUND) {
+        val ball = state.currentBall()
+        val playerOnBall = state.field[ball.location].player
+        if (ball.state != BallState.ON_GROUND) {
             throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
         }
-        if (state.activePlayer?.location != state.currentBall().location) {
+        if (playerOnBall?.location != ball.location) {
             throw IllegalStateException(
                 "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
             )
+        }
+    }
+
+    object CheckForNoBallSkill: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
+            val player = context.player
+            val hasNoBall = player.isSkillAvailable(SkillType.NO_BALL)
+            return if (hasNoBall) {
+                compositeCommandOf(
+                    SetBallState.bouncing(context.ball),
+                    ReportNoBallAffectingAction(player, ReportNoBallAffectingAction.ActionType.PICKUP),
+                    GotoNode(PickupFailed)
+                )
+            } else {
+                GotoNode(ChooseToUseBigHand)
+            }
         }
     }
 
@@ -150,7 +177,7 @@ object Pickup : Procedure() {
                 rules.addMarkedModifiers(
                     state,
                     context.player.team,
-                    state.currentBall().location,
+                    context.ball.location,
                     modifiers,
                     PickupModifier.MARKED
                 )
@@ -175,7 +202,7 @@ object Pickup : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PickupRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val result = state.getContext<PickupRollContext>()
-            val ball = state.currentBall()
+            val ball = result.ball
             return if (result.isSuccess) {
                 compositeCommandOf(
                     SetBallState.carried(ball, result.player),

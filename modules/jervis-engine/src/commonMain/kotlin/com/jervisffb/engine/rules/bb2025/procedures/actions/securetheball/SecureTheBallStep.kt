@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.SecureTheBallModifier
+import com.jervisffb.engine.reports.ReportNoBallAffectingAction
 import com.jervisffb.engine.reports.ReportSecuredTheBallResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
@@ -50,7 +51,7 @@ import com.jervisffb.engine.rules.common.tables.Weather
  * separate, even though it means duplicating logic.
  */
 object SecureTheBallStep: Procedure() {
-    override val initialNode: Node = ChooseToUseBigHand
+    override val initialNode: Node = CheckForNoBallSkill
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val ball = state.currentBall()
         val securingPlayer = state.field[ball.location].player!!
@@ -68,6 +69,23 @@ object SecureTheBallStep: Procedure() {
             throw IllegalStateException(
                 "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
             )
+        }
+    }
+
+    object CheckForNoBallSkill: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<SecureTheBallRollContext>()
+            val player = context.player
+            val hasNoBall = player.isSkillAvailable(SkillType.NO_BALL)
+            return if (hasNoBall) {
+                compositeCommandOf(
+                    SetBallState.bouncing(context.ball),
+                    ReportNoBallAffectingAction(player, ReportNoBallAffectingAction.ActionType.SECURE_THE_BALL),
+                    GotoNode(SecuringTheBallFailed)
+                )
+            } else {
+                GotoNode(ChooseToUseBigHand)
+            }
         }
     }
 

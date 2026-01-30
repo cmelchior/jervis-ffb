@@ -54,7 +54,7 @@ import kotlin.test.assertTrue
 
 /**
  * Class responsible for testing the Throw Team-mate action as described on
- * page 52-54 in the rulebook.
+ * page 76+79 in the BB2025 rulebook.
  */
 class ThrowTeamMateActionTests: JervisGameBB2025Test() {
 
@@ -313,6 +313,44 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
         assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
+    }
+
+    // In BB2025, it is not allowed to pick up the ball when successfully landing on it. This is a rule change from BB2020.
+    @Test
+    fun superbLanding_onBall() {
+        SetBallLocation(state.singleBall(), FieldCoordinate(8, 4)).execute(state)
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
+            *moveTo(14, 4),
+            *dodge(),
+            PlayerSelected("A13".playerId),
+            FieldSquareSelected(11, 4),
+            *qualityRoll(6.d6),
+            DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
+            *landingRoll(6.d6),
+            4.d8 // Ball bounce
+        )
+        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        assertEquals(FieldCoordinate(7,4), state.singleBall().location)
+    }
+
+    @Test
+    fun failLanding_bounceIfLandingOnBall() {
+        SetBallLocation(state.singleBall(), FieldCoordinate(8, 4)).execute(state)
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
+            *moveTo(14, 4),
+            *dodge(),
+            PlayerSelected("A13".playerId),
+            FieldSquareSelected(11, 4),
+            *qualityRoll(6.d6),
+            DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
+            *landingRoll(1.d6),
+            DiceRollResults(1.d6, 1.d6), // Fail armour roll
+            4.d8 // Ball bounce
+        )
+        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        assertEquals(FieldCoordinate(7,4), state.singleBall().location)
     }
 
     @Test

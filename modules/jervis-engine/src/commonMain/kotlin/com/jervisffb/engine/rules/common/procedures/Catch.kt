@@ -33,6 +33,7 @@ import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportCatch
 import com.jervisffb.engine.reports.ReportInterception
+import com.jervisffb.engine.reports.ReportNoBallAffectingAction
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
@@ -50,7 +51,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * in the first place.
  */
 object Catch : Procedure() {
-    override val initialNode: Node = ChooseToUseExtraArms
+    override val initialNode: Node = CheckForNoBallSkill
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Determine target and modifiers for the Catch roll
         val ball = state.currentBall()
@@ -75,6 +76,23 @@ object Catch : Procedure() {
         )
     }
 
+    object CheckForNoBallSkill: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<CatchRollContext>()
+            val player = context.catchingPlayer
+            val hasNoBall = player.isSkillAvailable(SkillType.NO_BALL)
+            return if (hasNoBall) {
+                compositeCommandOf(
+                    ReportNoBallAffectingAction(player, ReportNoBallAffectingAction.ActionType.CATCH),
+                    SetBallState.bouncing(context.ball),
+                    GotoNode(CatchFailed)
+                )
+            } else {
+                GotoNode(ChooseToUseExtraArms)
+            }
+        }
+    }
+
     object ChooseToUseExtraArms: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team {
             return state.getContext<CatchRollContext>().catchingPlayer.team
@@ -82,10 +100,10 @@ object Catch : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<CatchRollContext>()
             val player = context.catchingPlayer
-            return if (player.isSkillAvailable(SkillType.EXTRA_ARMS)) {
-                listOf(ConfirmWhenReady, CancelWhenReady)
-            } else {
-                listOf(ContinueWhenReady)
+            val hasExtraArms = player.isSkillAvailable(SkillType.EXTRA_ARMS)
+            return when (hasExtraArms) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

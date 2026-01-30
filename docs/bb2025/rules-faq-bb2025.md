@@ -151,6 +151,17 @@ Since BB2025 lack any guidance on this, for now Jervis uses th BB2020 rule, i.e.
 a player with PA -, can start a pass action, but the pass will always be a 
 fumble.
 
+### Page 78 - Landing
+In BB2020, it was well-defined what happened if a player landed successfully on 
+the ball (they were allowed to pick it up).
+
+This wording has been removed from the rulebook in BB2025, and Pickup (page 57)
+indicates that any player moving outside their activation is counting as 
+involuntary movement, thus it is no longer allowed.
+
+It isn't explicitly spelled out this way, but that is the interpretation used
+by Jervis.
+
 ### Page 124 - Big Hand
 Using the NAF interpretation of Secure the Ball as a "pickup". This also means
 that Big Hand will work on Secure the Ball rolls.
@@ -168,6 +179,10 @@ deviate die (D6) and then choose to treat the roll as either a D6 or D3.
 
 In the rulebook, D3's are defined as Rolling a D6, taking half the value and 
 round up.
+
+### Page 132 - No Ball
+Technically, you are allowed to user other skills like Extra Arms, but since 
+it would be pointless, Jervis just ignore these skills.
 
 ### Page 135 - Put the Boot In
 Technically, using the skill should be optional, but there doesn't seem to be 

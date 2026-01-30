@@ -25,6 +25,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Loner
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2025.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2025.skills.MyBall
+import com.jervisffb.engine.rules.bb2025.skills.NoBall
 import com.jervisffb.engine.rules.bb2025.skills.Pass
 import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2025.skills.Pro
@@ -541,7 +542,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.NO_BALL -> {
-                    // TODO
+                    addNoValueEntry("No Ball", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        NoBall(player, category, expiresAt)
+                    }
                 }
                 SkillType.PICK_ME_UP -> {
                     // TODO()
