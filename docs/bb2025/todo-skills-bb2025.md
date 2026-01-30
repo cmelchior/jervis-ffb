@@ -180,7 +180,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] +3 if ST5 or more
 - [ ] Bulls Eye
 - [ ] Grab
-- [ ] Guard
+- [x] Guard
+  - [x] Allow offensive assists
+  - [x] Allow defensive assists
 - [ ] Juggernaut
 - [ ] Mighty Blow
 - [ ] Multiple Block

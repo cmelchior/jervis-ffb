@@ -204,6 +204,8 @@ abstract class SkillSettings {
 
     // Helper method for populating the `skillCache` and `categories` mappings. Should only be called from
     // `initializeSkillCache()`
+
+    // Creates a new skill that has an associated Int value e.g. Mighty Block (+1)
     protected fun addIntEntry(
         name: String,
         type: SkillType,
@@ -216,7 +218,7 @@ abstract class SkillSettings {
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }
 
-    // Creates a new skill that doesn't have an associate value, e.g. Dodge vs. Mighty Blow (+1)
+    // Creates a new skill that doesn't have an associate value, e.g. Dodge or Block.
     protected fun addNoValueEntry(
         name: String,
         type: SkillType,
@@ -228,6 +230,7 @@ abstract class SkillSettings {
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }
 
+    // Creates a new skill that has an associated Keyword value e.g. Hatred (Big Guy)
     protected fun addKeywordEntry(
         name: String,
         type: SkillType,

@@ -173,6 +173,11 @@ the opponent can just decide to not intercept.
 
 So for ease of use, this skill is always used when available.
 
+### Page 129 - Guard
+While this skill is optional, it only affects how many dice are rolled and not
+the final outcome. This combined with the fact that there are no scenario where
+you might want to _not_ use Guard, we always apply it.
+
 ### Page 130 - Kick
 Jervis uses the NAF interpretation, which means that you are allowed to roll the
 deviate die (D6) and then choose to treat the roll as either a D6 or D3.

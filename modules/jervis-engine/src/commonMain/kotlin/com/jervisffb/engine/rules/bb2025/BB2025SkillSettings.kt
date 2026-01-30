@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
+import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
 import com.jervisffb.engine.rules.bb2025.skills.Kick
@@ -422,9 +423,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.GUARD -> {
-                    // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Guard", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                        Guard(player, category, expiresAt)
+                    }
                 }
                 SkillType.JUGGERNAUT -> {
                     // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->

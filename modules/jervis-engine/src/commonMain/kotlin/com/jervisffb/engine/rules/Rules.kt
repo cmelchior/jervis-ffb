@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnFieldLocation
@@ -27,6 +28,7 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.ThrowInPosition
 import com.jervisffb.engine.rules.common.tables.ThrowInTemplate
 import com.jervisffb.engine.utils.sum
@@ -405,7 +407,10 @@ abstract class Rules(
         if (assister.team == target.team) return false
         if (!assister.location.isAdjacent(this, target.location)) return false
         if (!canMarkPlayers(assister)) return false
-        // TODO If player has Guard, player can always assist
+        // We always apply Guard. It is technically an optional skill, but there
+        // should be no downside to always applying it.
+        if (assister.isSkillAvailable(SkillType.GUARD)) return true
+
         // A player can only assist if they themselves are not being marked.
         // This logic does not take into account any skills.
         val field = assister.team.game.field
