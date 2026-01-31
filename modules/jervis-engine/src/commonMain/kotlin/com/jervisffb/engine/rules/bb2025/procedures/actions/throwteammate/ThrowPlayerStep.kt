@@ -150,7 +150,7 @@ object ThrowPlayerStep: Procedure() {
     }
 
     object TestForQuality: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = AccuracyRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowTeammateAccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(

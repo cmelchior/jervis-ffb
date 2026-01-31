@@ -151,11 +151,6 @@ class CatchSkillTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun catchInterception() {
-        // TODO
-    }
-
-    @Test
     fun doesNotWorkWithMissingTackleZones() {
         awayTeam["A7".playerId].hasTackleZones = false
         controller.rollForward(

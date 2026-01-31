@@ -109,7 +109,7 @@ object PassStep: Procedure() {
     }
 
     object TestForAccuracy: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = AccuracyRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassAccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return when (val result = context.passingResult) {

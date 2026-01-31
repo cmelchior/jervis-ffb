@@ -4,7 +4,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
 
 data object DogOut : Location {
-//    override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
     override fun isInWideZone(rules: Rules): Boolean = false
     override fun isInEndZone(rules: Rules): Boolean = false
@@ -16,5 +15,5 @@ data object DogOut : Location {
     override fun isOutOfBounds(rules: Rules): Boolean = false
     override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = null
     override fun isAdjacent(rules: Rules, location: Location): Boolean = false
-    override fun overlap(otherLocation: Location): Boolean = otherLocation == DogOut
+    override fun overlap(otherLocation: Location): Boolean = (otherLocation == DogOut)
 }

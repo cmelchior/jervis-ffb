@@ -20,6 +20,8 @@ sealed interface Location {
     fun isOutOfBounds(rules: Rules): Boolean
     fun getCornerLocation(rules: Rules): CornerThrowInPosition?
     fun isAdjacent(rules: Rules, location: Location): Boolean
+    // Returns true if this location overlaps with the otherLocation, i.e. some part of it
+    // are the same position on the board.
     fun overlap(otherLocation: Location): Boolean
 }
 

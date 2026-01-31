@@ -117,6 +117,35 @@ object Catch : Procedure() {
                     null
                 },
                 SetContext(context.copy(useExtraArms = useExtraArms)),
+                GotoNode(ChooseToUseNervesOfSteel)
+            )
+        }
+    }
+
+    object ChooseToUseNervesOfSteel: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<CatchRollContext>().catchingPlayer.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<CatchRollContext>()
+            val player = context.catchingPlayer
+            val hasExtraArms = player.isSkillAvailable(SkillType.NERVES_OF_STEEL)
+            return when (hasExtraArms) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<CatchRollContext>()
+            val player = context.catchingPlayer
+            val useNervesOfSteel = (action == Confirm)
+            return compositeCommandOf(
+                if (useNervesOfSteel) {
+                    ReportSkillUsed(player, SkillType.NERVES_OF_STEEL)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useNervesOfSteel = useNervesOfSteel)),
                 GotoNode(CalculateModifiers)
             )
         }
@@ -136,14 +165,16 @@ object Catch : Procedure() {
             }
             if (ballStateModifier != null) modifiers.add(ballStateModifier)
 
-            // Add marked modifiers for the field
-            rules.addMarkedModifiers(
-                state,
-                context.catchingPlayer.team,
-                context.ball.location,
-                modifiers,
-                CatchModifier.MARKED
-            )
+            // Add marked modifiers from other players, unless the catch has Nerves of Steel
+            if (!context.useNervesOfSteel) {
+                rules.addMarkedModifiers(
+                    state,
+                    context.catchingPlayer.team,
+                    context.ball.location,
+                    modifiers,
+                    CatchModifier.MARKED
+                )
+            }
 
             // Check the weather
             if (state.weather == Weather.POURING_RAIN) {

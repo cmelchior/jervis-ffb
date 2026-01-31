@@ -215,9 +215,9 @@ object AccuracyBB2020WheelController : D6WithRerollWheelController() {
  */
 object AccuracyBB2025WheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
-    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.RollDie
-    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.AccuracyRoll.ReRollDie
+    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie
+    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         return state.getContext<PassContext>().thrower.coordinates

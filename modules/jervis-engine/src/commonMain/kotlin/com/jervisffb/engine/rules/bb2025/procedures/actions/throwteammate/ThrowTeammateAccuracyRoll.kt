@@ -42,12 +42,13 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 
 /**
- * Implement the Accuracy Roll as described on page 77 in the BB2025 rulebook.
+ * Implement the Accuracy Roll for Throw Teammate as described on page 77 in the
+ * BB2025 rulebook.
  *
  * The result is stored in [ThrowTeamMateContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object AccuracyRoll: Procedure() {
+object ThrowTeammateAccuracyRoll: Procedure() {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null

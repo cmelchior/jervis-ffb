@@ -86,7 +86,7 @@ object Pickup : Procedure() {
         if (ball.state != BallState.ON_GROUND) {
             throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
         }
-        if (playerOnBall?.location != ball.location) {
+        if (playerOnBall?.location?.overlap(ball.location) != true) {
             throw IllegalStateException(
                 "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
             )

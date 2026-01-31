@@ -162,7 +162,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Removed immediately if pushed into the crowd
     - [ ] Not removed if other players with Leader on the field
     - [ ] Only one, regardless of number of players
-- [ ] Nerves of Steel
+- [x] Nerves of Steel
+  - [x] Ignore Marked modifiers on Catch
+  - [x] Ignore Marked modifiers on Pass
 - [ ] On the Ball
 - [ ] Pass
 - [ ] Punt

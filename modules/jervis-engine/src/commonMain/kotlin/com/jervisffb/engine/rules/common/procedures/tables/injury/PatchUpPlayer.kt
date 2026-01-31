@@ -285,7 +285,6 @@ object PatchUpPlayer: Procedure() {
                                     InjuryResult.BADLY_HURT -> PlayerState.BADLY_HURT
                                     InjuryResult.SERIOUSLY_HURT -> PlayerState.SERIOUSLY_HURT
                                     InjuryResult.DEAD -> PlayerState.DEAD
-                                    else -> INVALID_GAME_STATE("Unsupported injury result: $context")
                                 }
                                 add(SetPlayerState(player, playerState))
                             }

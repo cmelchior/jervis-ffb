@@ -62,6 +62,7 @@ data class PassContext(
     // Target of the pass in the current step. This means it will be updated when the ball scatters, deviates etc.
     val target: FieldCoordinate? = null,
     val range: Range? = null,
+    val useNervesOfSteel: Boolean = false,
     val passingRoll: D6DieRoll? = null,
     val passingModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val passingResult: PassingType? = null,
@@ -69,7 +70,7 @@ data class PassContext(
     // Used in BB2020
     val passingInterference: PassingInterferenceContext? = null,
     // Used in BB2025
-    val intercept: InterceptionContext? = null
+    val intercept: InterceptionContext? = null,
 ) : ProcedureContext {
     fun copyAndAdd(passingModifier: DiceModifier): PassContext = this.copy(
         passingModifiers = passingModifiers.add(passingModifier)
@@ -88,7 +89,7 @@ object PassAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(PassContext(thrower = player))
+            SetContext(PassContext(thrower = player,))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {

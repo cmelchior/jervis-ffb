@@ -51,10 +51,11 @@ import com.jervisffb.engine.utils.sum
 import kotlinx.collections.immutable.toPersistentList
 
 /**
- * Implement the Accuracy Roll as described on page 71 in the BB2020 rulebook.
+ * Implement the Accuracy Roll for Pass actions as described on page 71 in the
+ * BB2025 rulebook.
  *
- * The result is stored in [PassContext] and it is up
- * to the caller to determine what to do with the result.
+ * The result is stored in [PassContext] and it is up to the caller to determine
+ * what to do with the result.
  *
  * Designer's Commentary:
  * Rules as written, make PA 1+ worthless, which is probably not intended.
@@ -72,8 +73,8 @@ import kotlinx.collections.immutable.toPersistentList
  *
  * So for this roll, we only ask once after rolling the first die.
  */
-object AccuracyRoll: Procedure() {
-    override val initialNode: Node = RollDie
+object PassAccuracyRoll: Procedure() {
+    override val initialNode: Node = ChooseToUseNervesOfSteel
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = setInitialModifiers(state, rules)
         return SetContext(context)
@@ -85,6 +86,45 @@ object AccuracyRoll: Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PassContext>()
 
+    object ChooseToUseNervesOfSteel: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PassContext>().thrower.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PassContext>()
+            val player = context.thrower
+            val hasExtraArms = player.isSkillAvailable(SkillType.NERVES_OF_STEEL)
+            return when (hasExtraArms) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            val player = context.thrower
+            val useNervesOfSteel = (action == Confirm)
+            val modifiers = context.passingModifiers.toMutableList()
+            if (!useNervesOfSteel) {
+                rules.addMarkedModifiers(
+                    state,
+                    context.thrower.team,
+                    context.thrower.coordinates,
+                    modifiers,
+                    AccuracyModifier.MARKED
+                )
+            }
+            return compositeCommandOf(
+                if (useNervesOfSteel) {
+                    ReportSkillUsed(player, SkillType.NERVES_OF_STEEL)
+                } else {
+                    null
+                },
+                SetContext(context.copy(useNervesOfSteel = useNervesOfSteel, passingModifiers = modifiers.toPersistentList())),
+                GotoNode(RollDie)
+            )
+        }
+    }
+
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
@@ -93,7 +133,7 @@ object AccuracyRoll: Procedure() {
                 val context = state.getContext<PassContext>()
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    SetContext(context.copy(passingRoll = D6DieRoll.Companion.create(state, d6))),
+                    SetContext(context.copy(passingRoll = D6DieRoll.create(state, d6))),
                     GotoNode(ChooseToUseAccurate),
                 )
             }
@@ -256,15 +296,6 @@ object AccuracyRoll: Procedure() {
             Range.LONG_BOMB -> AccuracyModifier.LONG_BOMB
             else -> INVALID_GAME_STATE("Unsupported range: ${context.range}")
         }?.let { modifiers.add(it) }
-
-        // Marked modifiers for thrower
-        rules.addMarkedModifiers(
-            state,
-            context.thrower.team,
-            context.thrower.coordinates,
-            modifiers,
-            AccuracyModifier.MARKED
-        )
 
         // Weather
         if (state.weather == Weather.VERY_SUNNY) {

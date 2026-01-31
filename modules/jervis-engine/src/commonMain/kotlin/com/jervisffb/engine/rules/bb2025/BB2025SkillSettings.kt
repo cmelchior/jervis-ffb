@@ -26,6 +26,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Loner
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2025.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2025.skills.MyBall
+import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
 import com.jervisffb.engine.rules.bb2025.skills.Pass
 import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
@@ -369,9 +370,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.NERVES_OF_STEEL -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Nerves of Steel", type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        NervesOfSteel(player, category, expiresAt)
+                    }
                 }
                 SkillType.ON_THE_BALL -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
