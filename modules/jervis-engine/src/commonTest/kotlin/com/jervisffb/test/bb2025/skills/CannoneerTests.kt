@@ -26,7 +26,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the [Canon] skill.
+ * Class testing usage of the [Cannoneer] skill.
  */
 class CannoneerTests: JervisGameBB2025Test() {
 

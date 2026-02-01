@@ -151,7 +151,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [x] Cloud Burster
   - [x] Prevents interceptions
 - [ ] Dump-off
-- [ ] Give and Go
+- [x] Give and Go
+  - [x] Works on successful Quick Pass
+  - [x] Does not work on Short Pass and above
+  - [x] Works on successful Hand Off
+  - [x] Does not work on Hand Off that results in a turnover
 - [ ] Hail Mary Pass
 - [ ] Leader
     - [ ] Available after setup

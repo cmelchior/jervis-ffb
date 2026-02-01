@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
+import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
@@ -355,9 +356,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.GIVE_AND_GO -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Give and Go", type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        GiveAndGo(player, category, expiresAt)
+                    }
                 }
                 SkillType.HAIL_MARY_PASS -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->

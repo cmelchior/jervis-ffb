@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.common.procedures.actions.handoff
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -32,6 +34,8 @@ import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -42,6 +46,7 @@ import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
@@ -51,6 +56,7 @@ data class HandOffContext(
     val thrower: Player,
     val catcher: Player? = null,
     val hasMoved: Boolean = false,
+    val hasHandedOff: Boolean = false
 ) : ProcedureContext {
 }
 
@@ -173,7 +179,11 @@ object HandOffAction : Procedure() {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {
-                    add(GotoNode(MoveOrHandOffOrEndAction))
+                    if (handOffContext.hasHandedOff) {
+                        add(GotoNode(MoveOrEndAction))
+                    } else {
+                        add(GotoNode(MoveOrHandOffOrEndAction))
+                    }
                 }
             }
         }
@@ -193,14 +203,7 @@ object HandOffAction : Procedure() {
     object ResolveCatch : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If no player on the holds the ball after the hand-off is complete, it is a turnover.
-            // otherwise the action just ends
-            val context = state.getContext<HandOffContext>()
-            return compositeCommandOf(
-                SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
-                ExitProcedure()
-            )
+            return GotoNode(ChooseStepAfterHandOff)
         }
     }
 
@@ -210,14 +213,68 @@ object HandOffAction : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If no player on the holds the ball after the hand-off is complete, it is a turnover.
-            // otherwise the action just ends
+            return GotoNode(ChooseStepAfterHandOff)
+        }
+    }
+
+    object ChooseStepAfterHandOff: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            // If no player on the throwers team holds the ball after the hand-off is complete, it is a turnover.
+            // If not, if the player has Give and Go they can continue to move, otherwise the action ends.
             val context = state.getContext<HandOffContext>()
-            return compositeCommandOf(
-                SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
-                ExitProcedure()
-            )
+
+            // Check if the conditions for using Give and Go are present
+            // While this skill is only available in BB205, it should be safe to do the checks in the common action
+            val hasGiveAndGo = context.thrower.isSkillAvailable(SkillType.GIVE_AND_GO)
+            val isOtherTurnOverCause = state.isTurnOver()
+            val teamHasBall = rules.teamHasBall(context.thrower.team, state.currentBall())
+            val canUseGiveAndGo = hasGiveAndGo && teamHasBall && !isOtherTurnOverCause
+
+            return buildCompositeCommand {
+                add(SetCurrentBall(null))
+                add(SetContext(context.copy(hasHandedOff = true)))
+                if (!teamHasBall) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                }
+                if (canUseGiveAndGo) {
+                    addAll(
+                        ReportSkillUsed(context.thrower, SkillType.GIVE_AND_GO),
+                        GotoNode(MoveOrEndAction)
+                    )
+                } else {
+                    add(ExitProcedure())
+                }
+            }
+        }
+    }
+
+    // If thrower has Give and Go, after the handoff, they can continue to move.
+    object MoveOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<HandOffContext>().thrower.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            if (state.endActionImmediately()) {
+                return listOf(ContinueWhenReady)
+            }
+            val options = mutableListOf<GameActionDescriptor>()
+            // Find possible move types
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            // End the action
+            options.add(EndActionWhenReady)
+            return options
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<HandOffContext>()
+            return when (action) {
+                Continue, EndAction -> ExitProcedure()
+                is MoveTypeSelected -> {
+                    val moveContext = MoveContext(context.thrower, action.moveType)
+                    compositeCommandOf(
+                        SetContext(moveContext),
+                        GotoNode(ResolveMove)
+                    )
+                }
+                else -> INVALID_ACTION(action)
+            }
         }
     }
 }

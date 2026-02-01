@@ -33,6 +33,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.catch
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
@@ -390,8 +391,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
             PlayerSelected("A5".playerId),
-            5.d6, // Catch + Score
-            NoRerollSelected(),
+            *catch(5.d6) // Catch in end zone
         )
         assertTouchdown()
     }

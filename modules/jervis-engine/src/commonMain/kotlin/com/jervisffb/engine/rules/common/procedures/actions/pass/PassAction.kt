@@ -31,8 +31,10 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
 import com.jervisffb.engine.rules.builder.GameVersion
@@ -42,6 +44,7 @@ import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -75,6 +78,8 @@ data class PassContext(
     fun copyAndAdd(passingModifier: DiceModifier): PassContext = this.copy(
         passingModifiers = passingModifiers.add(passingModifier)
     )
+    val hasThrown: Boolean
+        get() = (range != null)
 }
 
 /**
@@ -169,7 +174,11 @@ object PassAction : Procedure() {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {
-                    add(GotoNode(MoveOrPassOrEndAction))
+                    if (context.hasThrown) {
+                        add(GotoNode(MoveOrEndAction))
+                    } else {
+                        add(GotoNode(MoveOrPassOrEndAction))
+                    }
                 }
             }
         }
@@ -194,9 +203,53 @@ object PassAction : Procedure() {
                     // No target was selected, so no pass was attempted, continue the pass.
                     GotoNode(MoveOrPassOrEndAction)
                 } else {
-                    ExitProcedure()
+                    // Check if the conditions for using Give and Go are present
+                    // While this skill is only available in BB205, it should be safe to do the checks in the common action
+                    val hasGiveAndGo = context.thrower.isSkillAvailable(SkillType.GIVE_AND_GO)
+                    val isQuickPass = (context.range == Range.QUICK_PASS)
+                    val isTurnover = state.isTurnOver()
+                    val canUseGiveAndGo = hasGiveAndGo && isQuickPass && !isTurnover
+
+                    if (canUseGiveAndGo) {
+                        compositeCommandOf(
+                            ReportSkillUsed(context.thrower, SkillType.GIVE_AND_GO),
+                            GotoNode(MoveOrEndAction)
+                        )
+                    } else {
+                        ExitProcedure()
+                    }
                 }
             )
+        }
+    }
+
+    // If thrower has Give and Go, after the throw, they can continue to move.
+    object MoveOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            if (state.endActionImmediately()) {
+                return listOf(ContinueWhenReady)
+            }
+            val options = mutableListOf<GameActionDescriptor>()
+            // Find possible move types
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            // End the action
+            options.add(EndActionWhenReady)
+            return options
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            return when (action) {
+                Continue, EndAction -> ExitProcedure()
+                is MoveTypeSelected -> {
+                    val moveContext = MoveContext(context.thrower, action.moveType)
+                    compositeCommandOf(
+                        SetContext(moveContext),
+                        GotoNode(ResolveMove)
+                    )
+                }
+                else -> INVALID_ACTION(action)
+            }
         }
     }
 }
