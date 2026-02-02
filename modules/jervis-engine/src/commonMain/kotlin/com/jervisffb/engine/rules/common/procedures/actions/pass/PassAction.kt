@@ -1,7 +1,5 @@
 package com.jervisffb.engine.rules.common.procedures.actions.pass
 
-import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
@@ -9,6 +7,8 @@ import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.SelectPassType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
@@ -19,6 +19,7 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -36,8 +37,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.HailMaryPassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
@@ -61,6 +64,7 @@ enum class PassingType {
 
 data class PassContext(
     val thrower: Player,
+    val type: PassType = PassType.STANDARD,
     val hasMoved: Boolean = false,
     // Target of the pass in the current step. This means it will be updated when the ball scatters, deviates etc.
     val target: FieldCoordinate? = null,
@@ -94,7 +98,7 @@ object PassAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(PassContext(thrower = player,))
+            SetContext(PassContext(thrower = player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -129,7 +133,13 @@ object PassAction : Procedure() {
 
             // If holding the ball, the player can start the "Pass" section of the Pass action
             if (context.thrower.hasBall()) {
-                options.add(ConfirmWhenReady) // TODO Do something more specific here?
+                val passTypes = buildList {
+                    add(PassType.STANDARD)
+                    if (context.thrower.isSkillAvailable(SkillType.HAIL_MARY_PASS)) {
+                        add(PassType.HAIL_MARY_PASS)
+                    }
+                }
+                options.add(SelectPassType(passTypes))
             }
 
             // End the pass action before trying to throw the ball
@@ -141,8 +151,14 @@ object PassAction : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return when (action) {
-                Confirm -> {
-                    GotoNode(ResolveThrow)
+                is PassTypeSelected -> {
+                    when (action.type) {
+                        PassType.STANDARD -> GotoNode(ResolveStandardThrow)
+                        PassType.HAIL_MARY_PASS -> compositeCommandOf(
+                            ReportSkillUsed(context.thrower, SkillType.HAIL_MARY_PASS),
+                            GotoNode(ResolveHailMaryThrow)
+                        )
+                    }
                 }
                 Continue, EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
@@ -184,10 +200,13 @@ object PassAction : Procedure() {
         }
     }
 
-    object ResolveThrow : ParentNode() {
+    object ResolveStandardThrow : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return SetCurrentBall(context.thrower.ball)
+        }
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(HandlePostThrowStep)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when (rules.baseVersion) {
@@ -195,7 +214,29 @@ object PassAction : Procedure() {
                 GameVersion.BB2025 -> com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
             }
         }
+    }
+
+    object ResolveHailMaryThrow : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            return compositeCommandOf(
+                SetContext(context.copy(type = PassType.HAIL_MARY_PASS)),
+                SetCurrentBall(context.thrower.ball)
+            )
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(HandlePostThrowStep)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> TODO("Not supported yet")
+                GameVersion.BB2025 -> HailMaryPassStep
+            }
+        }
+    }
+
+    object HandlePostThrowStep: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetCurrentBall(null),

@@ -38,6 +38,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
@@ -314,15 +315,16 @@ object PassAccuracyRoll: Procedure() {
         val d6 = context.passingRoll!!.result
         val passingStat = context.thrower.passing ?: Int.MAX_VALUE
         val modifierTotal = context.passingModifiers.sum()
+        val isUsingHailMary = (context.type == PassType.HAIL_MARY_PASS)
         val result = when {
             // The value can be modified below 1. Players with PA 1+ will fumble
             // on a modified 0 and below.
             context.thrower.passing == null -> PassingType.FUMBLED
-            d6.value == 6 -> PassingType.ACCURATE
+            d6.value == 6 -> if (isUsingHailMary) PassingType.INACCURATE else PassingType.ACCURATE
             d6.value == 1 && passingStat != 1 -> PassingType.FUMBLED
             d6.value + modifierTotal <= 1 && passingStat > 1 -> PassingType.FUMBLED
             d6.value + modifierTotal <= 0 && passingStat == 1 -> PassingType.FUMBLED
-            d6.value + modifierTotal >= passingStat -> PassingType.ACCURATE
+            d6.value + modifierTotal >= passingStat -> if (isUsingHailMary) PassingType.INACCURATE else PassingType.ACCURATE
             d6.value + modifierTotal < passingStat -> PassingType.INACCURATE
             else -> INVALID_GAME_STATE("Unsupported result: ${d6.value}, target: $passingStat, modifierTotal: $modifierTotal")
         }

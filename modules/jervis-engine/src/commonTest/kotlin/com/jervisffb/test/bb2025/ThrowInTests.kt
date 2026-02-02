@@ -1,10 +1,10 @@
 package com.jervisffb.test.bb2025
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallLocation
@@ -15,11 +15,14 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,12 +48,10 @@ class ThrowInTests: JervisGameBB2025Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            6.d6, // Pick-up
-            NoRerollSelected(),
-            Confirm, // Start Pass section
+            *pickup(6.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(25, 0), // Throw into the corner
-            6.d6, // Throw ball
-            NoRerollSelected(), // No Reroll
+            *throwBall(6.d6),
             3.d8, // Bounce outside the field
         )
         assertEquals(BallState.OUT_OF_BOUNDS, state.currentBall().state)
@@ -244,8 +245,7 @@ class ThrowInTests: JervisGameBB2025Test() {
                 PlayerSelected("H11".playerId),
                 PlayerActionSelected(PlayerStandardActionType.MOVE),
                 SmartMoveTo(x, y),
-                1.d6, // Fail pickup
-                NoRerollSelected(),
+                *pickup(1.d6), // Fail pickup
                 1.d8, // Bounce out of field
             )
         } else {
@@ -253,12 +253,10 @@ class ThrowInTests: JervisGameBB2025Test() {
                 PlayerSelected("A10".playerId),
                 PlayerActionSelected(PlayerStandardActionType.PASS),
                 *moveTo(17, 7),
-                6.d6, // Pick-up
-                NoRerollSelected(),
-                Confirm, // Start Pass section
+                *pickup(6.d6),
+                PassTypeSelected(PassType.STANDARD),
                 FieldSquareSelected(x, y), // Throw into the corner
-                6.d6, // Throw ball
-                NoRerollSelected(), // No Reroll
+                *throwBall(6.d6),
                 bounceDirection,
             )
         }

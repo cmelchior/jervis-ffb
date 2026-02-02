@@ -2,12 +2,14 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -42,7 +44,7 @@ class NervesOfSteelTests: JervisGameBB2025Test() {
             *activatePlayer("A7", PlayerStandardActionType.PASS),
             SmartMoveTo(17, 7),
             *pickup(6.d6),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 5),
             *throwBall(6.d6),
             Confirm, // Use Nerves of Steel
@@ -61,7 +63,7 @@ class NervesOfSteelTests: JervisGameBB2025Test() {
             *moveTo(13, 4),
             *dodge(6.d6),
             *pickup(6.d6),
-            Confirm, // Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
             Confirm, // Use Nerves of Steel
         )

@@ -1,10 +1,9 @@
 package com.jervisffb.test.bb2020.skills
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -13,6 +12,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2020Test
@@ -23,6 +23,7 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.setupPlayer
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.Test
@@ -67,10 +68,9 @@ class CatchSkillTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Select player with Catch next to thrower
-            6.d6, // Throw ball
-            NoRerollSelected(), // No Reroll
+            *throwBall(6.d6),
         )
         assertEquals(BallState.ACCURATE_THROW, state.currentBall().state)
         controller.rollForward(
@@ -136,10 +136,9 @@ class CatchSkillTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Throw Short Pass to player with Catch
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(2.d6) // Wildly Inaccurate Pass
         )
         assertEquals(BallState.DEVIATING, state.currentBall().state)
         controller.rollForward(
@@ -164,10 +163,9 @@ class CatchSkillTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Throw Quick Pass to player with Catch
-            3.d6, // Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(3.d6), // Inaccurate Pass
         )
         assertEquals(BallState.SCATTERED, state.currentBall().state)
         controller.rollForward(

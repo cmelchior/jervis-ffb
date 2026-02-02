@@ -1,9 +1,8 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -11,12 +10,15 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
+import com.jervisffb.test.catch
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.throwBall
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -39,10 +41,9 @@ class DeviateTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(21, 7), // Throw Short Pass to empty square
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 
         // Check that we need to roll a random D8 + D6 to deviate
@@ -68,18 +69,16 @@ class DeviateTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(22, 7), // Throw Short Pass to empty square
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 
         // Check that player in landing field must attempt to catch the ball
         assertEquals(BallState.DEVIATING, state.currentBall().state)
         controller.rollForward(
             DiceRollResults(5.d8, 6.d6), // Deviate roll
-            6.d6, // Catch roll
-            NoRerollSelected(),
+            *catch(6.d6)
         )
         assertTrue(awayTeam["A11".playerId].hasBall())
     }
@@ -97,13 +96,12 @@ class DeviateTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(22, 7), // Throw Short Pass to empty square
         )
         awayTeam["A11".playerId].hasTackleZones = false
         controller.rollForward(
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(2.d6), // Wildly Inaccurate Pass
         )
         // Check that ball bounce if landing on a player who cannot catch
         assertEquals(BallState.DEVIATING, state.currentBall().state)
@@ -128,10 +126,9 @@ class DeviateTests: JervisGameBB2020Test() {
             6.d6, // Catch Landing
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(21, 7), // Throw Short Pass to empty square
-            2.d6, // Wildly Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 
         // Check that a ball will bounce after landing in an empty square

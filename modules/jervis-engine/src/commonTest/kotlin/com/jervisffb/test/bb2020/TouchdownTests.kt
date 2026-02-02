@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallLocation
@@ -29,16 +30,22 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.catch
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.jump
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -239,8 +246,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             SmartMoveTo(1, 3),
             *moveTo(0, 3), // Move that requires a dodge
-            1.d6, // Fail Dodge
-            NoRerollSelected(),
+            *dodge(1.d6), // Fail Dodge
             DiceRollResults(1.d6, 1.d6),
             2.d8, // Bounce
         )
@@ -278,8 +284,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             SmartMoveTo(2, 4),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(0, 4),
-            4.d6, // Jump
-            NoRerollSelected(),
+            *jump(4.d6)
         )
         assertTouchdown()
     }
@@ -314,12 +319,10 @@ class TouchdownTests: JervisGameBB2020Test() {
         // Give player enough move to reach the End Zone in one turn.
         controller.rollForward(
             *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(0, 3),
-            6.d6, // Accurate Throw
-            NoRerollSelected(),
-            6.d6, // Catch + Score
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(6.d6), // Catch + Score
         )
         assertTouchdown()
     }
@@ -348,13 +351,11 @@ class TouchdownTests: JervisGameBB2020Test() {
         // Give player enough move to reach the End Zone in one turn.
         controller.rollForward(
             *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(1, 3), // Hit square in front of player in end zone
-            3.d6, // Inaccurate Throw
-            NoRerollSelected(),
+            *throwBall(3.d6), // Inaccurate Throw
             DiceRollResults(4.d8, 5.d8, 4.d8), // Scatter on top of player ind end zone
-            6.d6, // Catch + Score
-            NoRerollSelected(),
+            *catch(6.d6), // Catch + Score
         )
         assertTouchdown()
     }
@@ -383,13 +384,11 @@ class TouchdownTests: JervisGameBB2020Test() {
         // Throw ball as wildly inaccurate, but it still hits a player in the end zone
         controller.rollForward(
             *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(1, 3), // Hit square in front of player in end zone
-            2.d6, // Wildly Inaccurate
-            NoRerollSelected(),
+            *throwBall(2.d6), // Wildly Inaccurate
             DiceRollResults(4.d8, 6.d6), // Deviate into end zone
-            6.d6, // Catch + Score
-            NoRerollSelected(),
+            *catch(6.d6), // Catch + Score
         )
         assertTouchdown()
     }
@@ -419,8 +418,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
             PlayerSelected("A5".playerId),
-            5.d6, // Catch + Score
-            NoRerollSelected(),
+            *catch(5.d6), // Catch + Score
         )
         assertTouchdown()
     }
@@ -449,13 +447,11 @@ class TouchdownTests: JervisGameBB2020Test() {
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(1, 3), // Target empty square
-            6.d6, // Throw
-            NoRerollSelected(),
+            *throwBall(6.d6),
             4.d8, // Bounce to player
-            6.d6, // Catch + Score
-            NoRerollSelected(),
+            *catch(6.d6), // Catch + Score
         )
         assertTouchdown()
     }
@@ -484,15 +480,13 @@ class TouchdownTests: JervisGameBB2020Test() {
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(0, 0), // Hit empty square
-            6.d6, // Throw
-            NoRerollSelected(),
+            *throwBall(6.d6),
             2.d8, // Bounce Out-of-Bounds
             3.d3, // Throw-in direction
             DiceRollResults(1.d6, 2.d6), // Throw-in distance
-            6.d6, // Catch
-            NoRerollSelected(),
+            *catch(6.d6),
         )
         assertTouchdown()
     }
@@ -524,8 +518,7 @@ class TouchdownTests: JervisGameBB2020Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             SmartMoveTo(0, 3),
-            6.d6, // Pickup and Score
-            NoRerollSelected(),
+            *pickup(6.d6), // Pickup and Score
         )
         assertTouchdown()
     }

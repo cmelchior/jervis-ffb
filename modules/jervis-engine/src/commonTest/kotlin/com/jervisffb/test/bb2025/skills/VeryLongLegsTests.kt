@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d6
@@ -15,6 +16,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.InterceptionModifier
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRollContext
 import com.jervisffb.engine.rules.bb2025.skills.VeryLongLegs
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
@@ -26,6 +28,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jumpTo
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -56,13 +60,11 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             4.d6, // Intercept (with "-6 + 2" modifier) - Will fail
         )
@@ -108,13 +110,11 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
         )
         assertContains(state.getContext<InterceptionRollContext>().modifiers, InterceptionModifier.VERY_LONG_LEGS)

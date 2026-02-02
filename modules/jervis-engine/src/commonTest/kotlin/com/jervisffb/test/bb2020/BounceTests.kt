@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -10,10 +10,14 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
+import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,8 +41,7 @@ class BounceTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(17, 7), // Move into the ball
-            1.d6, // Fail pickup
-            NoRerollSelected(),
+            *pickup(1.d6), // Fail pickup
         )
         assertEquals(1, controller.getAvailableActions().size)
         controller.rollForward(
@@ -54,14 +57,11 @@ class BounceTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7), // Move into the ball
-            6.d6, // Pickup ball
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(6.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Target player
-            6.d6, // Throw ball
-            NoRerollSelected(),
-            1.d6, // Fail to catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(1.d6), // Fail to catch
             4.d8, // Bounce to another player
         )
         val player = awayTeam["A6".playerId]
@@ -81,14 +81,11 @@ class BounceTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7), // Move into the ball
-            6.d6, // Pickup ball
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(6.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Target player
-            6.d6, // Throw ball
-            NoRerollSelected(),
-            1.d6, // Fail to catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(1.d6), // Fail to catch
         )
         val player = awayTeam["A6".playerId]
         player.hasTackleZones = false
@@ -96,8 +93,7 @@ class BounceTests: JervisGameBB2020Test() {
         controller.rollForward(
             4.d8, // Bounce to another player
             5.d8, // Player cannot catch, so bounce back to original player
-            6.d6, // Target player catches it
-            NoRerollSelected(),
+            *catch(6.d6), // Target player catches it
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -108,23 +104,17 @@ class BounceTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7), // Move into the ball
-            6.d6, // Pickup ball
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(6.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Target player
-            6.d6, // Throw ball to A7
-            NoRerollSelected(),
-            1.d6, // Fail to catch
-            NoRerollSelected(),
+            *throwBall(6.d6), // Throw ball to A7
+            *catch(1.d6), // Fail to catch
             4.d8, // Bounce to A6
-            2.d6, // Fail to catch
-            NoRerollSelected(),
+            *catch(2.d6), // Fail to catch
             5.d8, // Bounce back to A7
-            3.d6, // Fail to catch
-            NoRerollSelected(),
+            *catch(3.d6), // Fail to catch
             4.d8, // Bounce back to A6
-            1.d6, // Fail to catch
-            NoRerollSelected(),
+            *catch(1.d6), // Fail to catch
             4.d8, // Bounce to [13, 1]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)

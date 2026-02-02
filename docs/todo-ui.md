@@ -9,6 +9,7 @@ things as they come up.
 - Kickoff result animations are not working
 
 ## Todo List
+- [ ] Add Action Wheel selector and animation for "pass type".
 - [ ] During Kickoff when choosing to use the kick skill, also display on the field the end result of both results.
 - [ ] When selecting dice rolls for scattering / deviating balls, show a translucent copy of where the ball will end up.
 - [ ] Kick-off pass animation doesn't work during Charge, if the kicking team ends up catching the ball on the receiving side.

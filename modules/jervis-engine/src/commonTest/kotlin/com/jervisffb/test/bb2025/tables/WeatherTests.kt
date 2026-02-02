@@ -1,9 +1,8 @@
 package com.jervisffb.test.bb2025.tables
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
@@ -24,6 +23,7 @@ import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.model.modifiers.RushModifier
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
@@ -37,7 +37,9 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.throwBall
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -98,12 +100,10 @@ class WeatherTests: JervisGameBB2025Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup ball
-            NoRerollSelected(),
-            Confirm,
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(18, 7), // 1 Field away = Quick Pass
-            4.d6, // Roll for Accuracy roll (should be 5+ to be accurate)
-            NoRerollSelected(),
+            *throwBall(4.d6), // Roll for Accuracy roll (should be 5+ to be accurate)
         )
         val context = state.getContext<PassContext>()
         assertContains(context.passingModifiers, AccuracyModifier.VERY_SUNNY)
@@ -187,9 +187,8 @@ class WeatherTests: JervisGameBB2025Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup ball
-            NoRerollSelected(),
-            Confirm,
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
         )
 
         // Check that no squares outside the valid range can be selected.

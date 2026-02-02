@@ -1,15 +1,16 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -53,7 +54,7 @@ class GiveAndGoTests: JervisGameBB2025Test() {
             4.d6, // Pickup
             NoRerollSelected(),
             SmartMoveTo(16, 4),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(4.d6),
             *catch(6.d6),
@@ -76,7 +77,7 @@ class GiveAndGoTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(6.d6),
             SmartMoveTo(16, 5),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(5.d6),
             *catch(6.d6),
@@ -94,7 +95,7 @@ class GiveAndGoTests: JervisGameBB2025Test() {
             4.d6, // Pickup
             NoRerollSelected(),
             SmartMoveTo(16, 4),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(4.d6),
             *catch(1.d6),

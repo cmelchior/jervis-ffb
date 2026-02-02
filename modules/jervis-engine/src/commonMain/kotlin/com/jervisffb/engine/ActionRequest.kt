@@ -41,6 +41,7 @@ import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -58,6 +59,7 @@ import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectPassType
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectPlayers
@@ -110,6 +112,9 @@ data class ActionRequest(
         return when (action) {
             is BlockTypeSelected -> {
                 actions.singleInstanceOfOrNull<SelectBlockType>()?.types.orEmpty().contains(action.type)
+            }
+            is PassTypeSelected -> {
+                actions.singleInstanceOfOrNull<SelectPassType>()?.types.orEmpty().contains(action.type)
             }
             is CalculatedAction -> true // Only used by tests, so always accept
             Cancel -> actions.contains(CancelWhenReady)

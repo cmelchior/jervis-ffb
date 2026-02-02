@@ -3,12 +3,13 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
@@ -19,6 +20,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSkillReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,12 +44,10 @@ class ExtraArmsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
+            *throwBall(6.d6),
             Cancel, // Do not use Extra Arms
             2.d6, // Catch fails
             SelectSkillReroll(SkillType.CATCH),
@@ -62,12 +62,10 @@ class ExtraArmsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
+            *throwBall(6.d6),
             Confirm, // Do use Extra Arms
             1.d6, // Catch fails
             SelectSkillReroll(SkillType.CATCH),
@@ -108,13 +106,11 @@ class ExtraArmsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
         homeTeam["H2".playerId].apply {

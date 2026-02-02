@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallState
@@ -22,6 +23,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
@@ -32,7 +34,9 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.throwBall
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -248,13 +252,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(14, 5),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 5),
-            1.d6, // Fumbbl pass
-            NoRerollSelected(),
+            *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
         assertEquals(TurnOver.STANDARD, state.turnOver)
@@ -273,12 +275,10 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A11", PlayerStandardActionType.PASS),
             SmartMoveTo(17, 7),
-            6.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(6.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(23, 7),
-            1.d6, // Fumbbl pass
-            NoRerollSelected(),
+            *throwBall(1.d6), // Fumbled Pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
         assertEquals(TurnOver.STANDARD, state.turnOver)
@@ -296,13 +296,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(14, 5),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
-            1.d6, // Fumbbl pass
-            NoRerollSelected(),
+            *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
         assertEquals(TurnOver.STANDARD, state.turnOver)
@@ -320,14 +318,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Pass
-            NoRerollSelected(),
-            1.d6, // Fail catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(1.d6), // Fail catch
             2.d8, // Bounce
         )
         assertEquals(homeTeam, state.activeTeam)
@@ -347,10 +342,9 @@ class TurnOverTests: JervisGameBB2020Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            4.d6, // Throw
-            NoRerollSelected(),
+            *throwBall(4.d6),
             *catch(1.d6),
             4.d8, // Bounce
             *catch(6.d6) // Other team player catches ball
@@ -365,14 +359,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 5),
-            6.d6, // Pass
-            NoRerollSelected(),
-            1.d6, // Fail catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(1.d6),
             4.d8, // Bounce
             6.d6, // Caught by opponent
         )
@@ -442,10 +433,9 @@ class TurnOverTests: JervisGameBB2020Test() {
             4.d6, // Pickup
             NoRerollSelected(),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
             2.d6, // Fail Intercept
@@ -463,19 +453,16 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
             2.d6, // Fail Intercept
             DiceRollResults(2.d8, 7.d8, 5.d8), // Scatter
-            6.d6, // Catch
-            NoRerollSelected()
+            *catch(6.d6)
         )
         // No turnover, but pass action ends
         assertEquals(BallState.CARRIED, state.singleBall().state)
@@ -490,18 +477,16 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
             2.d6, // Fail Intercept
             DiceRollResults(7.d8, 3.d8, 2.d8), // Scatter to H1
-            *catch(6.d6) // Catch
+            *catch(6.d6)
         )
         assertTrue(awayTeam["A1".playerId].hasBall())
         assertNull(state.activePlayer)
@@ -514,13 +499,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
             6.d6, // Intercept

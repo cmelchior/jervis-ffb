@@ -37,6 +37,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -100,6 +101,7 @@ fun ActionSelector(
                             is DirectionSelected -> "Direction: ${action.direction}"
                             is ForegoActivationSelected -> "Forego Activation: ${action.player}"
                             is PlayersSelected -> "Selected Players: $action"
+                            is PassTypeSelected -> action.type.toString()
                         }
                     Text(text, fontSize = 10.sp)
                 }

@@ -1,11 +1,10 @@
 package com.jervisffb.test.bb2025.actions
 
 import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
@@ -20,6 +19,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
@@ -28,9 +28,12 @@ import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
 import com.jervisffb.test.rushTo
+import com.jervisffb.test.throwBall
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -76,14 +79,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            5.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(5.d6),
         )
         assertFalse(awayTeam["A10".playerId].hasBall())
         assertTrue(awayTeam["A7".playerId].hasBall())
@@ -94,14 +94,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            5.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(5.d6),
         )
         assertEquals(Availability.HAS_ACTIVATED,  awayTeam["A10".playerId].available)
         assertNull(state.activePlayer)
@@ -113,16 +110,13 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             Cancel, // Cancel pass action
-            Confirm, // Restart pass
+            PassTypeSelected(PassType.STANDARD), // Restart pass
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            5.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(5.d6),
         )
         assertEquals(Availability.HAS_ACTIVATED,  awayTeam["A10".playerId].available)
         assertNull(state.activePlayer)
@@ -134,17 +128,14 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(23, 7),
             *rushTo(24, 7),
             *rushTo(25, 7),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            5.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(5.d6),
         )
         assertEquals(Availability.HAS_ACTIVATED,  awayTeam["A10".playerId].available)
         assertNull(state.activePlayer)
@@ -157,12 +148,10 @@ class PassActionTests: JervisGameBB2025Test() {
         SetBallState.carried(state.singleBall(), awayTeam["A10".playerId]).execute(state)
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            5.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(5.d6),
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -172,14 +161,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm, // Start pass
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            1.d6, // Fail catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(1.d6), // Fail catch
             7.d8
         )
         assertEquals(FieldCoordinate(15, 2), state.singleBall().location)
@@ -190,8 +176,7 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(16, 4),
         )
         assertEquals(
@@ -199,12 +184,10 @@ class PassActionTests: JervisGameBB2025Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            4.d6, // Throw
-            NoRerollSelected(),
-            6.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(4.d6),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -214,8 +197,7 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(16, 5),
         )
         assertEquals(
@@ -223,12 +205,10 @@ class PassActionTests: JervisGameBB2025Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            5.d6, // Throw
-            NoRerollSelected(),
-            6.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(5.d6),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -238,8 +218,7 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(16, 8),
         )
         assertEquals(
@@ -247,12 +226,10 @@ class PassActionTests: JervisGameBB2025Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            6.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -262,8 +239,7 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(13, 13),
         )
         assertEquals(
@@ -271,12 +247,10 @@ class PassActionTests: JervisGameBB2025Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
-            6.d6, // Throw
-            NoRerollSelected(),
-            6.d6, // Catch
-            NoRerollSelected(),
+            *throwBall(6.d6),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -286,9 +260,8 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
-            Confirm
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
         )
         val targets = controller.getAvailableActions().singleInstanceOf<SelectFieldLocation>()
         assertTrue(targets.squares.all { it.type == TargetSquare.Type.THROW_TARGET })
@@ -300,8 +273,7 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(13, 4)
         )
         assertTrue(rules.isMarked(awayTeam["A10".playerId]))
@@ -310,10 +282,9 @@ class PassActionTests: JervisGameBB2025Test() {
             rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(14, 1))
         )
         controller.rollForward(
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
-            4.d6, // Throw Quick pass (-1 marked modifier), needs 5+
-            NoRerollSelected(),
+            *throwBall(4.d6), // Throw Quick pass (-1 marked modifier), needs 5+
         )
         assertEquals(BallState.SCATTERED, state.singleBall().state)
     }
@@ -323,18 +294,15 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(14, 4),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
-            4.d6, // Throw Quick pass, needs 4+
-            NoRerollSelected(),
+            *throwBall(4.d6), // Throw Quick pass, needs 4+
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
         controller.rollForward(
-            4.d6, // Catch
-            NoRerollSelected(),
+            *catch(4.d6)
         )
         assertTrue(awayTeam["A6".playerId].hasBall())
     }
@@ -344,19 +312,16 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(14, 4),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
-            3.d6, // Throw Quick pass, needs 4+
-            NoRerollSelected(),
+            *throwBall(3.d6), // Throw Quick pass, needs 4+
         )
         assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
         controller.rollForward(
             DiceRollResults(2.d8, 8.d8, 4.d8), // Scatter
-            4.d6, // Catch
-            NoRerollSelected(),
+            *catch(4.d6),
         )
         assertTrue(awayTeam["A6".playerId].hasBall())
     }
@@ -366,13 +331,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(14, 5),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 1),
-            1.d6, // Fumbbl pass
-            NoRerollSelected(),
+            *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
         controller.rollForward(
@@ -387,13 +350,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
         )
         val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(5, interceptors.size)
@@ -409,13 +370,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
         )
         val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(5, interceptors.size)
@@ -434,17 +393,14 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             2.d6, // Fail to deflect
-            6.d6, // Catch
-            NoRerollSelected(),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A5".playerId].hasBall())
     }
@@ -454,16 +410,13 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             Cancel, // Do not deflect
-            6.d6, // Catch
-            NoRerollSelected(),
+            *catch(6.d6),
         )
         assertTrue(awayTeam["A5".playerId].hasBall())
     }
@@ -473,13 +426,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
         homeTeam["H2".playerId].agility = 1 // Make interceptor super human
@@ -504,13 +455,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 10),
-            4.d6, // Pass - Inaccurate
-            NoRerollSelected(),
+            *throwBall(4.d6), // Inaccurate Pass
             DiceRollResults(4.d8, 2.d8, 5.d8) // Scatter back to the original target
         )
         assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
@@ -537,13 +486,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(9, 9),
-            3.d6, // Pass - Inaccurate
-            NoRerollSelected(),
+            *throwBall(3.d6), // Pass - Inaccurate
             DiceRollResults(5.d8, 5.d8, 5.d8) // Scatter to [12, 9]
         )
         assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
@@ -566,13 +513,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(14, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
         )
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
@@ -588,13 +533,11 @@ class PassActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
-            6.d6, // Pass
-            NoRerollSelected(),
+            *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Intercept
         )

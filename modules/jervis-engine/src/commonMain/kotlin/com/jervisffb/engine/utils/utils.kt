@@ -40,6 +40,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -58,6 +59,7 @@ import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectInducement
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectPassType
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectPlayers
@@ -116,6 +118,7 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
             TossCoin -> true
             is SelectForgoActivation -> false
             is SelectPlayers -> false
+            is SelectPassType -> false
         }
     }
     if (randomActions.contains(true) && randomActions.contains(false)) {
@@ -168,6 +171,7 @@ fun GameAction.isRandomAction(): Boolean {
         Revert -> false
         is ForegoActivationSelected -> false
         is PlayersSelected -> false
+        is PassTypeSelected -> false
     }
 }
 

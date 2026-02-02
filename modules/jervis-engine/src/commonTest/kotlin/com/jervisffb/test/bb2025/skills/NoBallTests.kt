@@ -1,14 +1,14 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -42,7 +42,7 @@ class NoBallTests: JervisGameBB2025Test() {
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             SmartMoveTo(17, 7),
             *pickup(6.d6),
-            Confirm, // Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(6.d6),
             5.d8, // Bounce due to No Ball
@@ -62,7 +62,7 @@ class NoBallTests: JervisGameBB2025Test() {
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             SmartMoveTo(17, 7),
             *pickup(6.d6),
-            Confirm, // Pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(6.d6),
             5.d8, // Bounce due to No Ball
@@ -143,10 +143,9 @@ class NoBallTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),
-            4.d6, // Pickup
-            NoRerollSelected(),
+            *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 9),
             *throwBall(6.d6),
             *catch(6.d6),

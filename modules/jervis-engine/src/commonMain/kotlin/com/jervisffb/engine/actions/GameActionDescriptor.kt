@@ -11,6 +11,7 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.utils.cartesianProduct
@@ -406,6 +407,14 @@ data class SelectBlockType(
     override val size: Int = types.size
     override fun createRandom(random: Random): GameAction = BlockTypeSelected(types.random(random))
     override fun createAll(): List<GameAction> = types.map { BlockTypeSelected(it) }
+}
+
+data class SelectPassType(
+    val types: List<PassType>
+): GameActionDescriptor {
+    override val size: Int = types.size
+    override fun createRandom(random: Random): GameAction = PassTypeSelected(types.random(random))
+    override fun createAll(): List<GameAction> = types.map { PassTypeSelected(it) }
 }
 
 data class SelectRandomPlayers(

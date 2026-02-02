@@ -25,6 +25,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -89,6 +90,7 @@ data class SingleChoiceInputDialog(
                 is DirectionSelected -> action.direction.toString()
                 is ForegoActivationSelected -> "Forego Activation: ${action.player}"
                 is PlayersSelected -> "Select Players: $action"
+                is PassTypeSelected -> action.type.name
             }
         }
 

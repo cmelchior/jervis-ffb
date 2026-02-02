@@ -1,13 +1,14 @@
 package com.jervisffb.test.bb2025
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
@@ -117,7 +118,7 @@ class MarkedTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             SmartMoveTo(12, 3),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(13, 6),
             *throwBall(6.d6),
             *catch(6.d6) // Catch, because H1 and H2 cannot intercept
@@ -133,7 +134,7 @@ class MarkedTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             SmartMoveTo(16, 4),
-            Confirm, // Start pass
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1),
             *throwBall(4.d6),
             7.d8 // Bounce because player cannot catch

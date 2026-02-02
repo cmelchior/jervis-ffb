@@ -1,9 +1,8 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -11,6 +10,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -18,6 +18,7 @@ import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.Ignore
@@ -63,10 +64,9 @@ class CatchSkillTests: JervisGameBB2025Test() {
             6.d6, // Catch Landing
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Select player with Catch next to thrower
-            6.d6, // Throw ball
-            NoRerollSelected(), // No Reroll
+            *throwBall(6.d6),
         )
         assertEquals(BallState.ACCURATE_THROW, state.currentBall().state)
         controller.rollForward(
@@ -135,10 +135,9 @@ class CatchSkillTests: JervisGameBB2025Test() {
             6.d6, // Catch Landing
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
-            Confirm, // Start Pass section
+            PassTypeSelected(PassType.STANDARD),
             FieldSquareSelected(15, 1), // Throw Quick Pass to player with Catch
-            3.d6, // Inaccurate Pass
-            NoRerollSelected(), // No Reroll
+            *throwBall(3.d6), // Inaccurate Pass
         )
         assertEquals(BallState.SCATTERED, state.currentBall().state)
         controller.rollForward(

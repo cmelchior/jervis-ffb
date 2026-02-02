@@ -247,6 +247,11 @@ fun pickup(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = ar
     reroll,
 )
 
+fun jump(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun qualityRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,

@@ -18,6 +18,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -446,6 +447,9 @@ data class InducementSelected(val name: String): GameAction
 
 @Serializable
 data class BlockTypeSelected(val type: BlockType): GameAction
+
+@Serializable
+data class PassTypeSelected(val type: PassType): GameAction
 
 // Available actions
 @Serializable

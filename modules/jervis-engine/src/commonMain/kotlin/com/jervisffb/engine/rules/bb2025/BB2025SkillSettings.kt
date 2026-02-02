@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.bb2025.skills.Guard
+import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
 import com.jervisffb.engine.rules.bb2025.skills.Kick
@@ -361,9 +362,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.HAIL_MARY_PASS -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Hail Mary Pass", type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        HailMaryPass(player, category, expiresAt)
+                    }
                 }
                 SkillType.LEADER -> {
                     addNoValueEntry("Leader", type, SkillCategory.PASSING) { player, category,expiresAt ->

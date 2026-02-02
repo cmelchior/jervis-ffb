@@ -157,6 +157,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on successful Hand Off
   - [x] Does not work on Hand Off that results in a turnover
 - [ ] Hail Mary Pass
+  - [ ] Works on Bombs
+  - [x] Select any square on the field
+  - [x] Cannot intercept with Hail Mary Pass
+  - [x] Always Long Bomb distance
+  - [x] Always count Accurate as Inaccurate
 - [ ] Leader
     - [ ] Available after setup
     - [ ] Does not reset for overtime
