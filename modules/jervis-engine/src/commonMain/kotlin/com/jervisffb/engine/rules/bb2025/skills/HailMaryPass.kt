@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Representation of the Hail Mary Pass (Active) skill.
  *
- * See page XXX in the BB2025 rulebook.
+ * See page 129 in the BB2025 rulebook.
  */
 class HailMaryPass(
     override val player: Player,

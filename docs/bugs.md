@@ -3,6 +3,7 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Move counter on field squares does not reset when a players action ends immediately (like when using Safe Pass)
 - Action Wheel animation isn't correct when animating D6 rererolls when automatically selecting the reroll type.
   It looks like two animations are running over each other or that some positions are being reused.
 - Action Wheel for Catch rerolls jump back to the thrower when undoing actions

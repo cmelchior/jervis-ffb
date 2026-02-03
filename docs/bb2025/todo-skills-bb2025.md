@@ -179,11 +179,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Works for Bombs
   - [x] Works for normal passes
   - [x] Works for hail mary passes
-- [ ] Quick Pass
-- [ ] Rush
-- [ ] Sneaky Pass
 - [ ] Punt
 - [ ] Safe Pass
+  - [x] Works on Pass
+  - [x] Works on Hail Mary Pass
+  - [ ] Works on throwing a bomb
 
 ## Strength Skills
 

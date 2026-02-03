@@ -39,6 +39,7 @@ import com.jervisffb.engine.rules.bb2025.skills.QuickFoul
 import com.jervisffb.engine.rules.bb2025.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2025.skills.Regeneration
 import com.jervisffb.engine.rules.bb2025.skills.RightStuff
+import com.jervisffb.engine.rules.bb2025.skills.SafePass
 import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.bb2025.skills.Sidestep
 import com.jervisffb.engine.rules.bb2025.skills.Sprint
@@ -392,9 +393,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.SAFE_PASS -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Safe Pass", type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        SafePass(player, category, expiresAt)
+                    }
                 }
 
                 //

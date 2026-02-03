@@ -2,6 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -17,6 +20,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -28,6 +32,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -39,6 +45,7 @@ import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -46,7 +53,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * Procedure for handling the passing part of a [PassAction] when using [HailMary].
  *
  * See page 70 in the BB2025 rulebook.
- * See page XXX in the BB2025 rulebook.
+ * See page 129 in the BB2025 rulebook.
  */
 object HailMaryPassStep: Procedure() {
     override val initialNode: Node = DeclareTargetSquare
@@ -107,7 +114,7 @@ object HailMaryPassStep: Procedure() {
             val context = state.getContext<PassContext>()
             return when (val result = context.passingResult) {
                 PassingType.INACCURATE -> GotoNode(ResolveInaccuratePass)
-                PassingType.FUMBLED -> GotoNode(ResolveFumbledPass)
+                PassingType.FUMBLED -> GotoNode(ChooseToUseSafePass)
                 else -> INVALID_GAME_STATE("Unsupported passing result: $result")
             }
         }
@@ -154,6 +161,42 @@ object HailMaryPassStep: Procedure() {
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(ResolveBounceOrCatch)
                 )
+            }
+        }
+    }
+
+    object ChooseToUseSafePass: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PassContext>().thrower.team
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PassContext>()
+            val player = context.thrower
+            val hasSafePass = player.isSkillAvailable(SkillType.SAFE_PASS)
+            // Safe Pass requires a natural 1 on the dice. It doesn't work on a modified 1 and below.
+            val isSafePassEligible = (context.passingRoll?.result == 1.d6)
+            val isFumble = (context.passingResult == PassingType.FUMBLED)
+            return when (hasSafePass && isSafePassEligible && isFumble) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            val ball = state.currentBall()
+            val useSafePass = (action == Confirm)
+
+            return if (useSafePass) {
+                compositeCommandOf(
+                    ReportSkillUsed(context.thrower, SkillType.SAFE_PASS),
+                    SetBallState.carried(ball, context.thrower),
+                    SetContext(context.copy(useSafePass = true)),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(ResolveFumbledPass)
             }
         }
     }

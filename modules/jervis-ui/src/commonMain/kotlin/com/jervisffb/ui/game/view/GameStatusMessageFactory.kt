@@ -5,6 +5,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
@@ -300,6 +301,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Apothecary?"
                 false -> "Waiting for opponent to use Apothecary"
+            }
+        },
+
+        PassStep.ChooseToUseSafePass to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Safe Pass to avoid Fumble?"
+                false -> "Waiting for opponent to use Safe Pass"
             }
         }
     )

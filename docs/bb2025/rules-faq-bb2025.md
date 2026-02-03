@@ -189,10 +189,22 @@ round up.
 Technically, you are allowed to user other skills like Extra Arms, but since 
 it would be pointless, Jervis just ignore these skills.
 
-### Page 135 - Put the Boot In
+### Page 134 - Put the Boot In
 Technically, using the skill should be optional, but there doesn't seem to be 
 any use case for this (even a bad one), so until such a use case surfaces, this 
 skill is always used.
+
+### Page 135 - Safe Pass
+The skill uses the wording "Passing Ability Test", which is the same wording
+used for rolling for the throw in both Pass and Throw Team-mate actions. But 
+then the rest of the skill only describes what happens to the ball, indicating 
+that maybe they just mean that it works for normal Pass actions.
+
+If we allowed it to work for Throw Team-mate actions, it would open up a lot 
+of unspecified scenarios with regard to how the thrown player be handled? 
+
+For this reason, Jervis assumes that Safe Pass is only applicable for normal
+Pass actions (and by extension, throwing bombs).
 
 ### Page 138 - Very Long Legs
 While this skill is optional during Interceptions, Jervis always enables it as 

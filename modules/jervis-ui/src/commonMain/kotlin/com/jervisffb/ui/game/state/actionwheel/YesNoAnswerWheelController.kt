@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
@@ -25,6 +26,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitia
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -50,6 +52,7 @@ import kotlin.time.ExperimentalTime
  * During Block action:
  * - Block (skill usage)
  * - Dodge (skill usage)
+ * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
  * - Tackle (skill usage)
  * - Follow Up
@@ -155,6 +158,16 @@ object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
             BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
             else -> error("Unsupported node: $currentNode")
         }
+    }
+}
+
+object UseSafePassWheelController: UseSkillWheelController(SkillType.SAFE_PASS) {
+    override val nodes: Set<Node> = setOf(
+        com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep.ChooseToUseSafePass
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<PassContext>().thrower
+        return player.coordinates
     }
 }
 

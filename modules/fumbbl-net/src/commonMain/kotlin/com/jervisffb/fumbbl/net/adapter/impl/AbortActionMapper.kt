@@ -52,7 +52,7 @@ object AbortActionMapper: CommandActionMapper {
         when ((command.reportList.first() as PlayerActionReport).playerAction) {
             PlayerAction.MOVE -> {
                 val movingPlayerId = command.modelChangeList.filterIsInstance<ActingPlayerSetPlayerId>().first().value!!
-                val movingPlayer = jervisGame.getPlayerById(PlayerId(movingPlayerId.id))!!
+                val movingPlayer = jervisGame.getPlayerById(PlayerId(movingPlayerId.id))
                 newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
                 newActions.add(
                     { state, rules -> PlayerActionSelected(rules.teamActions.move.type) },

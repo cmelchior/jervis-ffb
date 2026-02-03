@@ -46,6 +46,7 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
@@ -557,13 +558,19 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.USE_PASS_SKILL_REROLL) && (currentNode == PassAccuracyRoll.ChooseReRollSource)) {
-            val context = controller.state.getContext<PassContext>()
             val availableRerollOptions = availableActions.getOrNull<SelectRerollOption>()
             availableRerollOptions?.options?.firstOrNull {
                 val source = it.getRerollSource(controller.state)
                 (source is Skill<*> && source.type == SkillType.PASS)
             }?.let {
                 return RerollOptionSelected(it, availableRerollOptions.dicePoolId)
+            }
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_SAFE_PASS) && (currentNode == PassStep.ChooseToUseSafePass)) {
+            val context = controller.state.getContext<PassContext>()
+            if (context.thrower.isSkillAvailable(SkillType.SAFE_PASS)) {
+                return Confirm
             }
         }
 

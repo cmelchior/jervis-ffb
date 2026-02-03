@@ -42,9 +42,9 @@ object SetupPlayerMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val playerId = (command.modelChangeList.first() as FieldModelSetPlayerState).key!!
+        val playerId = (command.modelChangeList.first() as FieldModelSetPlayerState).key
         var coordinates = (command.modelChangeList[1] as FieldModelSetPlayerCoordinate).value!!
-        val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))!!
+        val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))
         newActions.add(PlayerSelected(selectedPlayer), SetupTeam.SelectPlayerOrEndSetup)
         if (coordinates.x < 0 || coordinates.y > 25) {
             newActions.add(DogoutSelected, SetupTeam.PlacePlayer)

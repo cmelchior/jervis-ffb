@@ -2,6 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -17,6 +20,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -29,6 +33,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -40,6 +46,7 @@ import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -98,7 +105,7 @@ object PassStep: Procedure() {
                                     range = distance
                                 )
                             ),
-                            SetBallState.Companion.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
+                            SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
                             SetBallLocation(ball, newLocation),
                             GotoNode(TestForAccuracy)
                         )
@@ -115,7 +122,7 @@ object PassStep: Procedure() {
             return when (val result = context.passingResult) {
                 PassingType.ACCURATE -> GotoNode(ResolveAccuratePass)
                 PassingType.INACCURATE -> GotoNode(ResolveInaccuratePass)
-                PassingType.FUMBLED -> GotoNode(ResolveFumbledPass)
+                PassingType.FUMBLED -> GotoNode(ChooseToUseSafePass)
                 else -> INVALID_GAME_STATE("Unsupported passing result: $result")
             }
         }
@@ -162,7 +169,7 @@ object PassStep: Procedure() {
             val ball = state.currentBall()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
-                    SetBallState.Companion.outOfBounds(ball, context.outOfBoundsAt),
+                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
                     SetBallLocation(ball, context.landsAt!!),
                     SetContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
@@ -176,6 +183,41 @@ object PassStep: Procedure() {
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptInterception)
                 )
+            }
+        }
+    }
+
+    object ChooseToUseSafePass: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PassContext>().thrower.team
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PassContext>()
+            val player = context.thrower
+            val hasSafePass = player.isSkillAvailable(SkillType.SAFE_PASS)
+            val isSafePassEligible = (context.passingRoll?.result == 1.d6)
+            val isFumble = (context.passingResult == PassingType.FUMBLED)
+            return when (hasSafePass && isSafePassEligible && isFumble) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            val ball = state.currentBall()
+            val useSafePass = (action == Confirm)
+
+            return if (useSafePass) {
+                compositeCommandOf(
+                    ReportSkillUsed(context.thrower, SkillType.SAFE_PASS),
+                    SetBallState.carried(ball, context.thrower),
+                    SetContext(context.copy(useSafePass = true)),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(ResolveFumbledPass)
             }
         }
     }

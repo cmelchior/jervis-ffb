@@ -73,6 +73,7 @@ data class PassContext(
     val passingRoll: D6DieRoll? = null,
     val passingModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val passingResult: PassingType? = null,
+    val useSafePass: Boolean = false,
     val runInterference: Player? = null,
     // Used in BB2020
     val passingInterference: PassingInterferenceContext? = null,
@@ -238,29 +239,38 @@ object PassAction : Procedure() {
     object HandlePostThrowStep: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
-            return compositeCommandOf(
-                SetCurrentBall(null),
-                if (context.target == null) {
-                    // No target was selected, so no pass was attempted, continue the pass.
-                    GotoNode(MoveOrPassOrEndAction)
-                } else {
-                    // Check if the conditions for using Give and Go are present
-                    // While this skill is only available in BB205, it should be safe to do the checks in the common action
-                    val hasGiveAndGo = context.thrower.isSkillAvailable(SkillType.GIVE_AND_GO)
-                    val isQuickPass = (context.range == Range.QUICK_PASS)
-                    val isTurnover = state.isTurnOver()
-                    val canUseGiveAndGo = hasGiveAndGo && isQuickPass && !isTurnover
-
-                    if (canUseGiveAndGo) {
-                        compositeCommandOf(
-                            ReportSkillUsed(context.thrower, SkillType.GIVE_AND_GO),
-                            GotoNode(MoveOrEndAction)
-                        )
-                    } else {
-                        ExitProcedure()
+            val abortUsingSafePass = context.useSafePass
+            return buildCompositeCommand {
+                add(SetCurrentBall(null))
+                when {
+                    context.target == null -> {
+                        // No target was selected, so no pass was attempted, continue the pass.
+                        add(GotoNode(MoveOrPassOrEndAction))
+                    }
+                    abortUsingSafePass -> {
+                        // If Safe Pass was used, activation ends immediately, but no turnover occurs
+                        val activateContext = state.getContext<ActivatePlayerContext>()
+                        add(SetContext(activateContext.copy(activationEndsImmediately = true)))
+                        add(ExitProcedure())
+                    }
+                    else -> {
+                        // Check if the conditions for using Give and Go are present
+                        // While this skill is only available in BB205, it should be safe to do the checks in the common action
+                        val hasGiveAndGo = context.thrower.isSkillAvailable(SkillType.GIVE_AND_GO)
+                        val isQuickPass = (context.range == Range.QUICK_PASS)
+                        val isTurnover = state.isTurnOver()
+                        val canUseGiveAndGo = hasGiveAndGo && isQuickPass && !isTurnover
+                        if (canUseGiveAndGo) {
+                            addAll(
+                                ReportSkillUsed(context.thrower, SkillType.GIVE_AND_GO),
+                                GotoNode(MoveOrEndAction)
+                            )
+                        } else {
+                            add(ExitProcedure())
+                        }
                     }
                 }
-            )
+            }
         }
     }
 

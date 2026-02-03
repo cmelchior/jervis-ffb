@@ -10,7 +10,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
-import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
+import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
@@ -31,7 +31,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the [Cannoneer] skill.
+ * Class testing usage of the [HailMaryPass] skill.
  */
 class HailMaryPassTests: JervisGameBB2025Test() {
 
