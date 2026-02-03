@@ -13,6 +13,7 @@ import com.jervisffb.engine.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.ResetShadowingSkill
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
+import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetSpecialPlayCardActive
 import com.jervisffb.engine.model.Availability
@@ -27,9 +28,9 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
@@ -197,6 +198,16 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
+    // Reset skills that have been used
+    val resetSkillRerolls = teams.flatMap { team ->
+        team.flatMap { player ->
+            player.skills
+                .filterIsInstance<RerollSource>()
+                .filter { it.rerollResetAt == duration }
+                .map { SetSkillRerollUsed(it, false) }
+        }
+    }
+
     // Find all other temporary effects
     val removableTemporaryEffects = teams.flatMap { team ->
         team.flatMap { player ->
@@ -244,12 +255,12 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
             .map { SetSpecialPlayCardActive(it, false) }
     }
 
-
     return (
         removableStatModifiers
             + removableSkills
             + resetShadowingCounter
             + resetSkills
+            + resetSkillRerolls
             + removableTemporaryEffects
             + removableRerolls
             + removableLeaderRerolls

@@ -239,7 +239,7 @@ object CatchWheelController : D6WithRerollWheelController() {
     override val rerollDiceNode: Node = CatchRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
-        return state.currentBall().location
+        return state.getContext<CatchRollContext>().catchingPlayer.coordinates
     }
 
     override fun getOriginalRoll(state: Game): D6Result {

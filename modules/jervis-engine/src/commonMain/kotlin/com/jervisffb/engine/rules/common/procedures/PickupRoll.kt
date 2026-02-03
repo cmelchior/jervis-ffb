@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -101,6 +102,7 @@ object PickupRoll : Procedure() {
                     val rerollContext = UseRerollContext(DiceRollType.PICKUP, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
+                        ReportRerollUsed(action.getRerollSource(state)),
                         GotoNode(UseRerollSource),
                     )
                 }

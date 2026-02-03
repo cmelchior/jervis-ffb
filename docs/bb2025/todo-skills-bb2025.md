@@ -176,6 +176,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Ignore Marked modifiers on Pass
 - [ ] On the Ball
 - [ ] Pass
+  - [ ] Works for Bombs
+  - [x] Works for normal passes
+  - [x] Works for hail mary passes
+- [ ] Quick Pass
+- [ ] Rush
+- [ ] Sneaky Pass
 - [ ] Punt
 - [ ] Safe Pass
 

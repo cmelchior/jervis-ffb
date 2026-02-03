@@ -3,6 +3,9 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Action Wheel animation isn't correct when animating D6 rererolls when automatically selecting the reroll type.
+  It looks like two animations are running over each other or that some positions are being reused.
+- Action Wheel for Catch rerolls jump back to the thrower when undoing actions
 - CompositeGameActions are broken up in the save file, so if you reload a save file and start Undo'ing actions,
   it will behave differently than if you do it from the same game.
 - No pass animation is being triggered when Using the Pass action.

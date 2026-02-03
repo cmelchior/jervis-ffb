@@ -21,6 +21,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
@@ -32,16 +33,21 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
+import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
@@ -49,9 +55,11 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
@@ -534,6 +542,29 @@ open class ManualActionProvider(
         // Always use Dirty Player on Injury (if possible)
         if (menuViewModel.isFeatureEnabled(Feature.USE_DIRTY_PLAYER_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseDirtyPlayer)) {
             return Confirm
+        }
+
+        // When rerolling Catch rolls, prefer to use the free reroll from the Catch skill
+        if (menuViewModel.isFeatureEnabled(Feature.USE_CATCH_SKILL_REROLL) && (currentNode == CatchRoll.ChooseReRollSource)) {
+            val context = controller.state.getContext<CatchRollContext>()
+            val availableRerollOptions = availableActions.getOrNull<SelectRerollOption>()
+            availableRerollOptions?.options?.firstOrNull {
+                val source = it.getRerollSource(controller.state)
+                (source is Skill<*> && source.type == SkillType.CATCH)
+            }?.let {
+                return RerollOptionSelected(it, availableRerollOptions.dicePoolId)
+            }
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.USE_PASS_SKILL_REROLL) && (currentNode == PassAccuracyRoll.ChooseReRollSource)) {
+            val context = controller.state.getContext<PassContext>()
+            val availableRerollOptions = availableActions.getOrNull<SelectRerollOption>()
+            availableRerollOptions?.options?.firstOrNull {
+                val source = it.getRerollSource(controller.state)
+                (source is Skill<*> && source.type == SkillType.PASS)
+            }?.let {
+                return RerollOptionSelected(it, availableRerollOptions.dicePoolId)
+            }
         }
 
         return null

@@ -12,6 +12,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * This class contains the rules for using various forms of rerolls.
@@ -90,7 +91,11 @@ object UseStandardSkillReroll : Procedure() {
             val result = UseRerollContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(
                 SetOldContext(Game::rerollContext, result),
-                SetSkillRerollUsed(context.source),
+                if (context.source.rerollResetAt != Duration.PERMANENT) {
+                    SetSkillRerollUsed(context.source, used = true)
+                } else {
+                    null
+                },
                 ExitProcedure(),
             )
         }

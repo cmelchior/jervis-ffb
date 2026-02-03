@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
@@ -93,6 +94,7 @@ object PassingInterferenceRoll : Procedure() {
                     val rerollContext = UseRerollContext(DiceRollType.PASSING_INTERFERENCE, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
+                        ReportRerollUsed(action.getRerollSource(state)),
                         GotoNode(UseRerollSource),
                     )
                 }

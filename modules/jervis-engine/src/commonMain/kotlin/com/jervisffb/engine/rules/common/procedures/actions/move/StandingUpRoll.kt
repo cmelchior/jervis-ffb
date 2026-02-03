@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
@@ -92,6 +93,7 @@ object StandingUpRoll : Procedure() {
                     val rerollContext = UseRerollContext(DiceRollType.STANDING_UP, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
+                        ReportRerollUsed(action.getRerollSource(state)),
                         GotoNode(UseRerollSource),
                     )
                 }

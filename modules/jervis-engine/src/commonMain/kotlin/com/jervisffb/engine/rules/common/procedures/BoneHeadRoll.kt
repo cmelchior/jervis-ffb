@@ -33,6 +33,7 @@ import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -121,6 +122,7 @@ object BoneHeadRoll: Procedure() {
                     val rerollContext = UseRerollContext(DiceRollType.BONE_HEAD, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
+                        ReportRerollUsed(action.getRerollSource(state)),
                         GotoNode(UseRerollSource),
                     )
                 }
