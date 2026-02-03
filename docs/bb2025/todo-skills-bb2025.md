@@ -104,6 +104,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Does not work against Stand Firm (Fumbbl)
   - [ ] No score, if ball is stripped when pushed into end zone
 - [ ] Sure Hands
+  - [x] Works on pickup
+  - [x] Does not work on Secure the Ball
+  - [ ] Prevent Strip Ball from working
 - [x] Tackle
   - [x] Prevent use of Dodge skill when dodging away
   - [x] Only use Tackle if other player has Dodge

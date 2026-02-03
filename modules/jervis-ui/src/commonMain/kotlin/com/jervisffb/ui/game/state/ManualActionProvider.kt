@@ -48,8 +48,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
+import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
@@ -584,6 +586,13 @@ open class ManualActionProvider(
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == Stumble.ChooseToUseTackle)) {
             return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.USE_SURE_HANDS_REROLL) && (currentNode == PickupRoll.ChooseReRollSource)) {
+            val rerollOptions = availableActions.getOrNull<SelectRerollOption>()
+            rerollOptions?.options?.firstOrNull { it.getRerollSource(controller.state) is SureHands }?.let {
+                return RerollOptionSelected(it, rerollOptions.dicePoolId)
+            }
         }
 
         return null
