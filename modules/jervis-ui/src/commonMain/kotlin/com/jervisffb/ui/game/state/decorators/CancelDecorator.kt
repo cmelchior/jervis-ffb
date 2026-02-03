@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
+import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -17,7 +18,9 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
 
     private val nodesToDecorate = setOf(
         UseShadowingStep.CheckIfShadowingIsAvailable,
-        InterceptionStep.SelectPlayerForInterception
+        InterceptionStep.SelectPlayerForInterception,
+        DodgeRoll.ChooseToUseTackle,
+        DodgeRoll.ChooseToUsePrehensileTail
     )
 
     override fun isApplicable(state: Game, request: ActionRequest): Boolean {
@@ -35,6 +38,8 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
         val title = when (state.stack.currentNode()) {
             UseShadowingStep.CheckIfShadowingIsAvailable -> "Do not use Shadowing"
             InterceptionStep.SelectPlayerForInterception -> "Do not intercept"
+            DodgeRoll.ChooseToUseTackle -> "Do not use Tackle"
+            DodgeRoll.ChooseToUsePrehensileTail -> "Do not use Prehensile Tail"
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
         acc.updateGameStatus {

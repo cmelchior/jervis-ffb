@@ -5,6 +5,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillKeyword
+import com.jervisffb.engine.model.context.DodgeRollContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.D6StandardSkillReroll
@@ -41,6 +43,7 @@ class Dodge(
     )
 
     override fun canReroll(state: Game, type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
-        return type == DiceRollType.DODGE
+        val context = state.getContextOrNull<DodgeRollContext>()
+        return (type == DiceRollType.DODGE) && (context?.useTackle == null)
     }
 }

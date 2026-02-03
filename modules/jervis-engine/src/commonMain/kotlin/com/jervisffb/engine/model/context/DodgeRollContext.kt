@@ -16,6 +16,7 @@ data class DodgeRollContext(
     val targetSquare: FieldCoordinate,
     val roll: D6DieRoll? = null,
     val rollModifiers: List<DiceModifier> = emptyList(),
+    val useTackle: Player? = null,
     val isSuccess: Boolean = true,
 ): ProcedureContext {
     fun copyAndAddModifier(twoHeads: DiceModifier): DodgeRollContext {

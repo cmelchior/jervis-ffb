@@ -54,7 +54,9 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
@@ -572,6 +574,16 @@ open class ManualActionProvider(
             if (context.thrower.isSkillAvailable(SkillType.SAFE_PASS)) {
                 return Confirm
             }
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_DODGE) && (currentNode == DodgeRoll.ChooseToUseTackle)) {
+            // Always select the first available player to use Tackle
+            val selectedPlayer = availableActions.get<SelectPlayer>().players.first()
+            return PlayerSelected(selectedPlayer)
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == Stumble.ChooseToUseTackle)) {
+            return Confirm
         }
 
         return null

@@ -19,6 +19,9 @@ import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
@@ -308,6 +311,28 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Safe Pass to avoid Fumble?"
                 false -> "Waiting for opponent to use Safe Pass"
+            }
+        },
+
+        Stumble.ChooseToUseTackle to { isActiveClient, _, state ->
+            val context = state.getContext<BlockContext>()
+            when (isActiveClient) {
+                true -> "Use Tackle to knock down ${context.defender.name}?"
+                false -> "Waiting for opponent to use Tackle"
+            }
+        },
+
+        DodgeRoll.ChooseToUseTackle to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Select player with Tackle to prevent Dodge from being used"
+                false -> "Waiting for opponent to use Tackle"
+            }
+        },
+
+        PushStepInitialMoveSequence.DecideToFollowUp to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Follow up?"
+                false -> "Waiting for opponent to use to follow up or not"
             }
         }
     )

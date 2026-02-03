@@ -68,15 +68,16 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
  *      a. -1 for each marking player in the target field.
  *      b. Stunty* (Ignore all -1 marked modifiers in the target field).
  *      c. Titchy* (+1).
- * 2. Choose optional modifiers. These apply to both roll and reroll.
+ * 3. Choose optional modifiers. These apply to both roll and reroll.
  *      a. Two Heads (+1).
  *      b. Break Tackle (+1/+2 in 2020, +1/+2/+3 in 2025).
  *      c. Prehensile Tail (-1).
  *      d. Diving Tackle (-2, and user prone).
- * 4. Choose to Reroll or not.
- * 5. If Reroll. Choose optional modifiers with negative consequences for the user.
+ * 4. Choose to use Tackle or not.
+ * 5. Choose to Reroll or not.
+ * 6. If Reroll. Choose optional modifiers with negative consequences for the user.
  *      a. Diving Tackle
- * 6. Calculate the final result.
+ * 7. Calculate the final result.
  *
  * Designer's Commentary (BB2020):
  * It is possible to wait using Diving Tackle until the reroll has been made.
@@ -330,8 +331,55 @@ object DodgeRoll: Procedure() {
             val success = testAgainstAgility(context.player, context.roll!!.result, context.rollModifiers)
             return compositeCommandOf(
                 SetContext(context.copy(isSuccess = success)),
-                if (afterReroll) ExitProcedure() else GotoNode(ChooseReRollSource)
+                if (afterReroll) ExitProcedure() else GotoNode(ChooseToUseTackle)
             )
+        }
+    }
+
+    object ChooseToUseTackle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<DodgeRollContext>().player.team.otherTeam()
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<DodgeRollContext>()
+            val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
+            val playersWithTackle = context.startingSquare.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false).mapNotNull {
+                val player = state.field[it].player
+                if (player != null && player.isSkillAvailable(SkillType.TACKLE)) {
+                    player
+                } else {
+                    null
+                }
+            }
+
+            return if (dodgingPlayerHasDodge && playersWithTackle.isNotEmpty()) {
+                listOf(SelectPlayer.fromPlayers(playersWithTackle), CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules
+        ): Command {
+            val context = state.getContext<DodgeRollContext>()
+            return when (action) {
+                is PlayerSelected -> {
+                    val tacklePlayer = action.getPlayer(state)
+                    compositeCommandOf(
+                        ReportSkillUsed(tacklePlayer, SkillType.TACKLE),
+                        SetContext(context.copy(useTackle = tacklePlayer)),
+                        GotoNode(ChooseReRollSource)
+                    )
+                }
+                Cancel, Continue -> {
+                    GotoNode(ChooseReRollSource)
+                }
+                else -> INVALID_ACTION(action)
+            }
         }
     }
 

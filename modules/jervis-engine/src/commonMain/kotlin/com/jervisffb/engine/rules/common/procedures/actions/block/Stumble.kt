@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -26,6 +27,7 @@ import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
@@ -35,7 +37,9 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
  * Resolve a Stumble when selected on a block die.
- * See page 57 in the rulebook.
+ *
+ * See page 57 in the BB2020 rulebook.
+ * See page 62 in the BB2025 rulebook.
  */
 object Stumble: Procedure() {
     override val initialNode: Node = ChooseToUseTackle
@@ -62,24 +66,26 @@ object Stumble: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<StumbleContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
-            return if (stumbleContext.attacker.hasSkill(SkillType.TACKLE)) {
+            val attackerHasTackle = stumbleContext.attacker.hasSkill(SkillType.TACKLE)
+            val defenderHasDodge = stumbleContext.defender.hasSkill(SkillType.DODGE)
+            return if (attackerHasTackle && defenderHasDodge) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val useTackle = when (action) {
-                Confirm -> true
-                Cancel,
-                Continue -> false
-                else -> INVALID_ACTION(action)
-            }
+            val useTackle = (action == Confirm)
             val updatedContext = state.getContext<StumbleContext>().copy(attackerUsesTackle = useTackle)
-            return compositeCommandOf(
-                SetContext(updatedContext),
-                if (useTackle) GotoNode(ResolvePush) else GotoNode(ChooseToUseDodge)
-            )
+            return buildCompositeCommand {
+                add(SetContext(updatedContext))
+                if (useTackle) {
+                    add(ReportSkillUsed(updatedContext.attacker, SkillType.TACKLE))
+                    add(GotoNode(ResolvePush))
+                } else {
+                    add(GotoNode(ChooseToUseDodge))
+                }
+            }
         }
     }
 

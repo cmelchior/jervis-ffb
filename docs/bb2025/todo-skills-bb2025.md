@@ -37,6 +37,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Jump Up
 - [ ] Leap
 - [ ] Safe Pair of Hands
+  - [ ] Does not work against Strip Ball (NAF)
 - [ ] Sidestep
 - [ ] Sprint
 - [x] Sure Feet
@@ -100,8 +101,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Pro
 - [ ] Steady Footing
 - [ ] Strip Ball
+  - [ ] Does not work against Stand Firm (Fumbbl)
+  - [ ] No score, if ball is stripped when pushed into end zone
 - [ ] Sure Hands
-- [ ] Tackle
+- [x] Tackle
+  - [x] Prevent use of Dodge skill when dodging away
+  - [x] Only use Tackle if other player has Dodge
+  - [x] Defender does not count as having dodge during a Block
 - [ ] Taunt
 - [ ] Wrestle
 
@@ -204,6 +210,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Mighty Blow
 - [ ] Multiple Block
     - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
+    - [ ] Tackle on both blocks
 - [ ] Stand Firm
 - [ ] Strong Arm
 - [ ] Thick Skull
@@ -217,8 +224,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Bombardier
   - [ ] Accurate skill works
   - [ ] Cannoneer skill works
-- [ ] Bone Armor*
-- [ ] Bone Fury*
+  - [ ] Safe Pass skills works
+  - [ ] Hail Mary Pass works
 - [ ] Bone Head*
 - [ ] Blood Lust (X+)*
 - [ ] Breathe Fire
