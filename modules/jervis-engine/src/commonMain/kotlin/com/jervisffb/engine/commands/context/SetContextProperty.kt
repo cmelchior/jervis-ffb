@@ -2,7 +2,6 @@ package com.jervisffb.engine.commands.context
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -44,7 +43,6 @@ import kotlin.reflect.KMutableProperty1
  * scanning nodes. So it feels like hiding these behind helper functions
  * makes it a bit more readable.
  *
- * @see PushContext
  * @see com.jervisffb.engine.model.context.DodgeRollContext
  */
 class SetContextProperty<T, V>(

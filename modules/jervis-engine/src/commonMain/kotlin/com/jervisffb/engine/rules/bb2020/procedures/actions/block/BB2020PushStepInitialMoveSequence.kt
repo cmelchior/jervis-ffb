@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -31,14 +31,12 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
-import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
@@ -53,59 +51,6 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryM
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
-
-data class PushContext(
-    // Player starting the first push
-    val firstPusher: Player,
-    // First player being pushed
-    val firstPushee: Player,
-    // firstPushee is knocked down after the pushback has resolved. So if they
-    // have the ball, it will bounce.
-    val isDefenderKnockedDown: Boolean,
-    // Is the push part of a multiple block
-    val isMultipleBlock: Boolean,
-    // Chain of pushes. For a single push, this contains one element
-    // Should only be modified from within the `PushStep` procedure.
-    val pushChain: MutableList<PushData>,
-    // If `true`, the `firstPusher` will follow up after resolving the rest of the chain.
-    var followsUp: Boolean = false,
-    // Temporary state tracking the current player being resolved for this push step.
-    var fullyResolveInProgress: Player? = null,
-    // Track any balls that must bounce after the push is resolved.
-    // Either because a player was pushed into it, or because a trapdoor
-    // swallowed a player with a ball. Balls should be added and resolved in
-    // order.
-    val looseBalls: MutableList<Ball> = mutableListOf(),
-) : ProcedureContext {
-
-    // Returns last "pusher" in the push chain
-    fun pusher(): Player {
-        return pushChain.last().pusher
-    }
-
-    // Returns the last "pushee" in the chain
-    fun pushee(): Player {
-        return pushChain.last().pushee
-    }
-
-    data class PushData(
-        val pusher: Player,
-        val pushee: Player,
-        // Where is the pushee being pushed from?
-        val from: FieldCoordinate,
-        // Where is the pushee being pushed to?
-        var to: FieldCoordinate? = null, // If `null` push direction has not been selected yet
-        val isBlitzing: Boolean = false, // If first pusher is doing a Blitz
-        val isChainPush: Boolean = false, // True for every push beyond the first
-        var usingJuggernaut: Boolean = false,
-        var usedGrab: Boolean = false,
-        var usedStandFirm: Boolean = false,
-        var usedSideStep: Boolean = false,
-        var usedFend: Boolean = false,
-        // Set to `true` if we checked the player in this step for scoring
-        var checkedForScoringAfterTrapdoors: Boolean = false,
-    )
-}
 
 /**
  * This procedure is responsible for handling the first parts of a push started
@@ -210,7 +155,7 @@ data class PushContext(
  *    c. Cannot be used if Player A is blitzing and using Juggernaut.
  */
 // TODO Add support for Treacherous Trapdoor
-object PushStepInitialMoveSequence: Procedure() {
+object BB2020PushStepInitialMoveSequence: Procedure() {
 
     // Start the push by figuring out what kind of push and what skills could impact it.
     // The chain is as follows: Juggernaut -> Stand Firm -> Grab -> Sidestep.
@@ -228,7 +173,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasJuggernaut = false // How to check?
-            val canUseJuggernaut = !context.pushChain.last().usingJuggernaut
+            val canUseJuggernaut = !context.isAttackerUsingJuggernaut
             return when (hasJuggernaut && canUseJuggernaut) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -239,8 +184,8 @@ object PushStepInitialMoveSequence: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
-                        SetContextProperty(PushContext.PushData::usingJuggernaut, pushData, true),
+                    compositeCommandOf(
+                        // SetContextProperty(PushContext::isAttackerUsingJuggernaut, pushData, true),
                         GotoNode(DecideToUseStandFirm)
                     )
                 }
@@ -259,7 +204,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasStandFirm = false // How to check?
-            val canUseStandFirm = !context.pushChain.last().usingJuggernaut
+            val canUseStandFirm = !context.isAttackerUsingJuggernaut
             return when (hasStandFirm && canUseStandFirm) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -334,36 +279,6 @@ object PushStepInitialMoveSequence: Procedure() {
                     val pushData = context.pushChain.last()
                     return compositeCommandOf(
                         SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
-                        GotoNode(DecideToUseFend)
-                    )
-                }
-                Cancel, Continue -> {
-                    GotoNode(DecideToUseFend)
-                }
-                else -> INVALID_ACTION(action)
-            }
-        }
-    }
-
-    object DecideToUseFend: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<PushContext>().pushChain.last()
-            val hasFend = false // How to check?
-            val canUseFend = false // How?
-            return when (hasFend && canUseFend) {
-                true -> listOf(ConfirmWhenReady, CancelWhenReady)
-                false -> listOf(ContinueWhenReady)
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Confirm -> {
-                    val context = state.getContext<PushContext>()
-                    val pushData = context.pushChain.last()
-                    return compositeCommandOf(
-                        SetContextProperty(PushContext.PushData::usedFend, pushData, true),
                         GotoNode(SelectPushDirection)
                     )
                 }

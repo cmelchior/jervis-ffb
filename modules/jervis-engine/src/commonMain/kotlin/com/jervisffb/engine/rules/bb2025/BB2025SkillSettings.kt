@@ -15,12 +15,14 @@ import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
+import com.jervisffb.engine.rules.bb2025.skills.Fend
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
+import com.jervisffb.engine.rules.bb2025.skills.Juggernaut
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
@@ -48,6 +50,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
+import com.jervisffb.engine.rules.bb2025.skills.Taunt
 import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
@@ -220,9 +223,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.FEND -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Fend", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        Fend(player, category, expiresAt)
+                    }
                 }
                 SkillType.FRENZY -> {
                     addNoValueEntry("Frenzy", type, SkillCategory.GENERAL) { player, category,expiresAt ->
@@ -260,9 +263,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.TAUNT -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Taunt", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        Taunt(player, category, expiresAt)
+                    }
                 }
                 SkillType.WRESTLE -> {
                     addNoValueEntry("Wrestle", type, SkillCategory.GENERAL) { player, category,expiresAt ->
@@ -432,9 +435,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.JUGGERNAUT -> {
-                    // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Juggernaut", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                        Juggernaut(player, category, expiresAt)
+                    }
                 }
                 SkillType.MIGHTY_BLOW -> {
                     addIntEntry("Mighty Blow", type, SkillCategory.STRENGTH, 1) { player, category, _, expiresAt ->

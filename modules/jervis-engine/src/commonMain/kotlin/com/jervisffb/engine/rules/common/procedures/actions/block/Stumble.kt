@@ -23,6 +23,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -30,6 +31,9 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -124,7 +128,12 @@ object Stumble: Procedure() {
             return SetContext(pushContext)
         }
 
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepInitialMoveSequence
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
+                GameVersion.BB2025 -> BB2025PushStepInitialMoveSequence
+            }
+        }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<StumbleContext>()

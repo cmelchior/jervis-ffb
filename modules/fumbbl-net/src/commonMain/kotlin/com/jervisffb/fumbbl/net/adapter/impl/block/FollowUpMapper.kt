@@ -3,7 +3,7 @@ package com.jervisffb.fumbbl.net.adapter.impl.blitz
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -48,9 +48,9 @@ object FollowUpMapper: CommandActionMapper {
             (previousPreviousCommand is GameSetDialogParameter) &&
             previousPreviousCommand.value?.dialogId == com.jervisffb.fumbbl.net.model.DialogId.FOLLOWUP_CHOICE
         ) {
-            newActions.add(Confirm, PushStepInitialMoveSequence.DecideToFollowUp)
+            newActions.add(Confirm, BB2025PushStepInitialMoveSequence.ChooseToFollowUp)
         } else {
-            newActions.add(Cancel, PushStepInitialMoveSequence.DecideToFollowUp)
+            newActions.add(Cancel, BB2025PushStepInitialMoveSequence.ChooseToFollowUp)
         }
     }
 }

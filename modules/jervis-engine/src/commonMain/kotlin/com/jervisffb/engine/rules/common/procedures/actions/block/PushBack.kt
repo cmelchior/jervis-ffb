@@ -15,6 +15,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -23,6 +24,9 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.builder.GameVersion
 
 
 // Helper method for creating a push context before moving a player back
@@ -40,6 +44,7 @@ fun createPushContext(state: Game): PushContext {
     val newContext = PushContext(
         firstPusher = blockContext.attacker,
         firstPushee = blockContext.defender,
+        isAttackerUsingJuggernaut = false,
         isDefenderKnockedDown = isKnockedDown,
         blockContext.isUsingMultiBlock,
         mutableListOf(
@@ -49,7 +54,6 @@ fun createPushContext(state: Game): PushContext {
                 from = blockContext.defender.location as FieldCoordinate,
                 isBlitzing = blockContext.isBlitzing,
                 isChainPush = false,
-                usingJuggernaut = false
             )
         )
     )
@@ -58,11 +62,16 @@ fun createPushContext(state: Game): PushContext {
 
 /**
  * Resolve a pushback when select on a block die.
- * See page 57 in the rulebook.
+ *
+ * See page 57 in the BB2020 rulebook.
+ * See page 62 in the BB2025 rulebook.
  *
  * The logic differs slightly depending on this being a single block or part of
- * a multiple block. For multiple block, we only run the first part of the push
- * sequence. The rest is delayed until later.
+ * a multiple block. For Multiple Block, we only run the first part of the push
+ * sequence (up until choosing to follow up or not). The rest is delayed until
+ * later (e.g. checking for trapdoors, scoring).
+ *
+ * @see [PushStepResolveSingleBlockPushChain]
  */
 object PushBack: Procedure() {
     override val initialNode: Node = ResolveInitialPushSequence
@@ -82,7 +91,12 @@ object PushBack: Procedure() {
     }
 
     object ResolveInitialPushSequence: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepInitialMoveSequence
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
+                GameVersion.BB2025 -> BB2025PushStepInitialMoveSequence
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             val pushContext = state.getContext<PushContext>()

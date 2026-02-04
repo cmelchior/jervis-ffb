@@ -4,7 +4,9 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -20,7 +22,6 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
@@ -329,10 +330,31 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
-        PushStepInitialMoveSequence.DecideToFollowUp to { isActiveClient, _, _ ->
+        BB2020PushStepInitialMoveSequence.DecideToFollowUp to { isActiveClient, _, _ ->
             when (isActiveClient) {
                 true -> "Follow up?"
                 false -> "Waiting for opponent to use to follow up or not"
+            }
+        },
+
+        BB2025PushStepInitialMoveSequence.ChooseToFollowUp to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Follow up?"
+                false -> "Waiting for opponent to use to follow up or not"
+            }
+        },
+
+        BB2025PushStepInitialMoveSequence.ChooseToUseFend to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Fend to prevent a follow up?"
+                false -> "Waiting for opponent to use to Fend or not"
+            }
+        },
+
+        BB2025PushStepInitialMoveSequence.ChooseToUseTaunt to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Taunt to force attacker to follow up?"
+                false -> "Waiting for opponent to use Taunt or not"
             }
         }
     )

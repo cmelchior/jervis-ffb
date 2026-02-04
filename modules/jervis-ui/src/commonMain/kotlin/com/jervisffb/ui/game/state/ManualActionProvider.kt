@@ -45,6 +45,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -55,7 +57,6 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -466,7 +467,11 @@ open class ManualActionProvider(
         }
 
         // Automatically select pushback direction when only one option is available.
-        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is PushStepInitialMoveSequence.SelectPushDirection) {
+        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is BB2025PushStepInitialMoveSequence.SelectPushDirection) {
+            val loc = (actions.first() as SelectFieldLocation).squares.first()
+            return FieldSquareSelected(loc.coordinate)
+        }
+        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is BB2020PushStepInitialMoveSequence.SelectPushDirection) {
             val loc = (actions.first() as SelectFieldLocation).squares.first()
             return FieldSquareSelected(loc.coordinate)
         }
@@ -512,7 +517,14 @@ open class ManualActionProvider(
         }
 
         // Automatically decide to follow op (or not), if you there really isn't a choice in the matter
-        if (currentNode is PushStepInitialMoveSequence.DecideToFollowUp && actions.size == 1) {
+        if (currentNode is BB2025PushStepInitialMoveSequence.ChooseToFollowUp && actions.size == 1) {
+            return when (val action = actions.first()) {
+                is ConfirmWhenReady -> Confirm
+                is CancelWhenReady -> Cancel
+                else -> error("Unexpected action: $action")
+            }
+        }
+        if (currentNode is BB2020PushStepInitialMoveSequence.DecideToFollowUp && actions.size == 1) {
             return when (val action = actions.first()) {
                 is ConfirmWhenReady -> Confirm
                 is CancelWhenReady -> Cancel

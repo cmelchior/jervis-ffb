@@ -4,9 +4,10 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 
@@ -28,12 +29,9 @@ object DirectionArrowStatusIndicator: FieldStatusIndicator {
             // chain is created and players have moved (and we are about to resolve following up and
             // bouncing balls etc.) they should be removed again. Otherwise the UI gets too confusing.
             val stack = state.stack
-            if (
-                !stack.containsProcedure(PushStepInitialMoveSequence)
-                || state.stack.currentNode() == PushStepInitialMoveSequence.DecideToFollowUp
-            ) {
-                return@let
-            }
+            val isBB2020FollowUp = !stack.containsProcedure(BB2020PushStepInitialMoveSequence) || state.stack.currentNode() == BB2020PushStepInitialMoveSequence.DecideToFollowUp
+            val isBB2025FollowUp = !stack.containsProcedure(BB2025PushStepInitialMoveSequence) || state.stack.currentNode() == BB2025PushStepInitialMoveSequence.ChooseToFollowUp
+            if (isBB2025FollowUp || isBB2020FollowUp) return@let
 
             // Only show arrows on intermediate push steps, not the final square
             context.pushChain.forEachIndexed { index, pushData ->

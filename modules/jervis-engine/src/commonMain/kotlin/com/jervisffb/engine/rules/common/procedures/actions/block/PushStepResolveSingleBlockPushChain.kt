@@ -16,6 +16,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
@@ -27,9 +28,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * This procedure is controlling the last part of a Push Chain (after the follow-up).
- * The is contained in its own procedure because it differs slightly from how
+ * This is contained in its own procedure because it differs slightly from how
  * it works in Multiple Block, whereas the first part is shared between single and
- * multiple block.
+ * Multiple Block.
  *
  * @see [PushStepInitialMoveSequence] For the full description of the Push Step sequence for single blocks.
  * @see [MultipleBlockAction] For the full description of sequence in Multiple Block.

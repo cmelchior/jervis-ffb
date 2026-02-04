@@ -82,7 +82,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Defender chooses bloc
 - [ ] Dauntless
 - [ ] Fend
-    - [ ] Prevents Frenzy from working
+    - [x] Prevent follow up
+    - [ ] Does not work against Ball & Chain
+    - [ ] Does not work against Juggernaut
+    - [x] Prevent follow up from Frenzy
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
@@ -112,6 +115,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Only use Tackle if other player has Dodge
   - [x] Defender does not count as having dodge during a Block
 - [ ] Taunt
+  - [x] Pushed Back
+  - [x] Stumble with Dodge
+  - [x] Cannot use Taunt if Fend is selected
+  - [ ] Does not work against Rooted
 - [ ] Wrestle
 
 ## Mutations
@@ -213,7 +220,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Mighty Blow
 - [ ] Multiple Block
     - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
-    - [ ] Tackle on both blocks
+    - [ ] Tackle is available for both blocks
+    - [ ] Taunt does not work against Multiple Block
 - [ ] Stand Firm
 - [ ] Strong Arm
 - [ ] Thick Skull

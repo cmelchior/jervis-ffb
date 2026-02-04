@@ -178,12 +178,26 @@ While this skill is optional, it only affects how many dice are rolled and not
 the final outcome. This combined with the fact that there are no scenario where
 you might want to _not_ use Guard, we always apply it.
 
+### Page 129 - Juggernaut
+Juggernaut cancels Fend, Stand Firm and Wrestle for both the blocked player
+and all other opponents in the push chain.
+
+This interpretation comes from the Juggernaut skill description: "..opposition 
+players cannot use..." (note plural and specifically mentioning opposition).
+
+In particular, this means that in a Chain Push scenario, a player with 
+Juggernaut will cancel Stand Firm for all opponent players, but not players on 
+their own team.
+
 ### Page 130 - Kick
 Jervis uses the NAF interpretation, which means that you are allowed to roll the
 deviate die (D6) and then choose to treat the roll as either a D6 or D3.
 
 In the rulebook, D3's are defined as Rolling a D6, taking half the value and 
 round up.
+
+### Page 132 - Multiple Block
+- Taunt: Multiple Block prevents follow-ups, so Taunt has no effect.
 
 ### Page 132 - No Ball
 Technically, you are allowed to user other skills like Extra Arms, but since 
