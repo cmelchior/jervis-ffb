@@ -262,6 +262,17 @@ object UseTauntWheelController: UseSkillWheelController(SkillType.TAUNT) {
     }
 }
 
+object UseThickSkullWheelController: UseSkillWheelController(SkillType.THICK_SKULL) {
+    override val nodes: Set<Node> = setOf(
+        InjuryRoll.ChooseToUseThickSkull
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<RiskingInjuryContext>()
+        val player = context.player
+        return player.coordinates
+    }
+}
+
 object UseApothecaryWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
         UseBB11Apothecary.ChooseToUseApothecary,

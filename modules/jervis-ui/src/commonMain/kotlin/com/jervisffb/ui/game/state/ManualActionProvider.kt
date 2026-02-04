@@ -607,6 +607,10 @@ open class ManualActionProvider(
             }
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_THICK_SKULL) && currentNode == InjuryRoll.ChooseToUseThickSkull) {
+            return Confirm
+        }
+
         return null
     }
 

@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.InjuryModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -33,13 +34,14 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.utils.sum
 
 /**
  * Implement the injury roll.
  *
  * See page 60 in the BB2020 rulebook.
- * See page XX in the BB2025 rulebook.
+ * See page 66 in the BB2025 rulebook.
  *
  * The result is stored in [RiskingInjuryContext] and it is up
  * to the caller to determine what to do with the result.
@@ -110,6 +112,41 @@ object InjuryRoll: Procedure() {
                     add(SetContext(updatedContext))
                     add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
                     add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
+                }
+                add(GotoNode(ChooseToUseThickSkull))
+            }
+        }
+    }
+
+    // Choose to use Thick Skull, but only if it actually reduces the injury.
+    object ChooseToUseThickSkull: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<RiskingInjuryContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val hasThickSkull = (context.player.hasSkill(SkillType.THICK_SKULL))
+            val isStunty = context.player.hasSkill(SkillType.STUNTY)
+            val roll = context.injuryRollResult
+            val reduceNormalInjury = (!isStunty && roll == 8)
+            val reduceStuntyInjury = (isStunty && roll == 7)
+            return if (hasThickSkull && (reduceStuntyInjury || reduceNormalInjury)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val useThickSkull = (action == Confirm)
+            val isStunty = context.player.hasSkill(SkillType.STUNTY)
+            return buildCompositeCommand {
+                if (useThickSkull) {
+                    val roll = context.injuryRollResult
+                    val reduceToStunned = ((isStunty && roll == 7) || (!isStunty && roll == 8))
+                    val newInjury = if (reduceToStunned) InjuryResult.STUNNED else context.injuryResult!!
+                    add(SetContext(context.copy(injuryResult = newInjury, useThickSkullOnInjuryRoll = true)))
+                    add(ReportSkillUsed(context.player, SkillType.THICK_SKULL))
                 }
                 add(ExitProcedure())
             }

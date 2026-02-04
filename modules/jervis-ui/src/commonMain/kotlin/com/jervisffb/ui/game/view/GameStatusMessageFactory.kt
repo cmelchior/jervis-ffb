@@ -356,7 +356,14 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 true -> "Use Taunt to force attacker to follow up?"
                 false -> "Waiting for opponent to use Taunt or not"
             }
-        }
+        },
+
+        InjuryRoll.ChooseToUseThickSkull to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Thick Skull to avoid being Knocked Out?"
+                false -> "Waiting for opponent to use Thick Skull"
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

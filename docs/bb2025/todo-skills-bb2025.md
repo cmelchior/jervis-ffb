@@ -224,7 +224,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Taunt does not work against Multiple Block
 - [ ] Stand Firm
 - [ ] Strong Arm
-- [ ] Thick Skull
+- [x] Thick Skull
+  - [x] Stunty rolling 7 (incl modifiers)
+  - [x] Normal player rolling 8 (incl modifiers)
+  - [x] Do not use Thick Skull if it isn't useful
 
 ## Traits
 

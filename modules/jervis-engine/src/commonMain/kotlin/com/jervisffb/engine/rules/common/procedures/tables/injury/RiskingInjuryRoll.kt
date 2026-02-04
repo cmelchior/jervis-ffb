@@ -55,6 +55,7 @@ data class RiskingInjuryContext(
     val injuryRoll: List<D6Result> = emptyList(),
     val injuryModifiers: List<DiceModifier> = listOf(),
     val injuryResult: InjuryResult? = null,
+    val useThickSkullOnInjuryRoll: Boolean = false,
 
     // Casualty roll
     val casualtyRoll: D16Result? = null,
@@ -85,6 +86,8 @@ data class RiskingInjuryContext(
     val regenerationReRoll: D6Result? = null,
     val regenerationSuccess: Boolean = false
 ): ProcedureContext {
+    val injuryRollResult: Int
+        get() = injuryRoll.sum() + injuryModifiers.sum()
     val armourResult: Int
         get() = armourRoll.sum() + armourModifiers.sum()
     val armourBroken: Boolean
