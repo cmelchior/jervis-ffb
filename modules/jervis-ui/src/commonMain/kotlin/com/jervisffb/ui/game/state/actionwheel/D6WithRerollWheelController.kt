@@ -33,6 +33,8 @@ import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRollContext
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
+import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
+import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRollContext
@@ -387,7 +389,7 @@ object JumpWheelController : D6WithRerollWheelController() {
 }
 
 /**
- * Define the Action-Wheel layout when rolling to Jump.
+ * Define the Action-Wheel layout when rolling for Bone Head.
  */
 object BoneHeadWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "bonehead"
@@ -399,6 +401,23 @@ object BoneHeadWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<BoneHeadRollContext>()
+        return context.roll.originalRoll
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling for Bone Head.
+ */
+object ReallyStupidWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "really-stupid"
+    override val rollDiceNode: Node = ReallyStupidRoll.RollDie
+    override val chooseRerollSourceNode: Node = ReallyStupidRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ReallyStupidRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ActivatePlayerContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<ReallyStupidRollContext>()
         return context.roll.originalRoll
     }
 }

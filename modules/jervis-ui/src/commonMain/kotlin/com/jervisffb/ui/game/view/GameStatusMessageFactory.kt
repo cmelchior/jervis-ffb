@@ -20,6 +20,7 @@ import com.jervisffb.engine.rules.common.procedures.DeviateRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
+import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
@@ -381,6 +382,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         BoneHeadRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to avoid Bone Head"
+                else -> null
+            }
+        },
+
+        ReallyStupidRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Really Stupid"
+                else -> null
+            }
+        },
+        ReallyStupidRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Really Stupid Result or Reroll D6?"
+                else -> null
+            }
+        },
+        ReallyStupidRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to avoid Really Stupid"
                 else -> null
             }
         },

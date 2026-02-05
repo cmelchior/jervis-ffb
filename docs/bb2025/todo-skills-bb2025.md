@@ -268,6 +268,14 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Pogo Stick
 - [ ] Projectile Vomit
 - [ ] Really Stupid*
+  - [ ] Pro can be used as a reroll
+  - [x] Clear after activating
+  - [x] Roll after selecting action
+  - [x] Does not clear if you forgo activation
+  - [x] Use action if failing roll
+  - [x] Adjacent player can offer help
+  - [x] Adjacent player with Really Stupid cannot offer help
+  - [x] Distracted adjacent player cannot offer help
 - [ ] Regeneration
 - [ ] Right Stuff*
 - [ ] Secret Weapon*

@@ -39,7 +39,8 @@ data class PlayerStatusEffect(
         fun distracted() = PlayerStatusEffect(PlayerStatusEffectType.DISTRACTED, Duration.START_OF_ACTIVATION)
         fun dodgySnack() = PlayerStatusEffect(PlayerStatusEffectType.DODGY_SNACK, Duration.END_OF_DRIVE)
         fun unchannelledFury() = PlayerStatusEffect(PlayerStatusEffectType.UNCHANNELLED_FURY, Duration.START_OF_ACTIVATION)
-        fun boneHead() = PlayerStatusEffect(PlayerStatusEffectType.BLOOD_LUST, Duration.START_OF_ACTIVATION)
+        fun boneHead() = PlayerStatusEffect(PlayerStatusEffectType.BONE_HEAD, Duration.START_OF_ACTIVATION)
+        fun reallyStupid() = PlayerStatusEffect(PlayerStatusEffectType.REALLY_STUPID, Duration.START_OF_ACTIVATION)
         fun bloodLust() = PlayerStatusEffect(PlayerStatusEffectType.BLOOD_LUST, Duration.END_OF_ACTIVATION)
     }
 }

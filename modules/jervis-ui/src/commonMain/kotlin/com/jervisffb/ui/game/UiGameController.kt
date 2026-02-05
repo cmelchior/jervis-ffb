@@ -40,6 +40,7 @@ import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
+import com.jervisffb.ui.game.state.actionwheel.ReallyStupidWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SecureTheBallWheelController
@@ -147,6 +148,7 @@ class UiGameController(
         InterceptionWheelController,
         JumpWheelController,
         PickupWheelController,
+        ReallyStupidWheelController,
         RushWheelController,
         SecureTheBallWheelController,
         ShadowingWheelController,
