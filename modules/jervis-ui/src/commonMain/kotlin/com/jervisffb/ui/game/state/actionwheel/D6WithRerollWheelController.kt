@@ -35,6 +35,8 @@ import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
+import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
+import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRollContext
@@ -64,8 +66,10 @@ import kotlin.time.ExperimentalTime
  * - Interception
  * - Jump
  * - Pickup
+ * - Really Stupid
  * - Rush
  * - Shadowing
+ * - Unchannelled Fury
  */
 abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
 
@@ -421,3 +425,21 @@ object ReallyStupidWheelController : D6WithRerollWheelController() {
         return context.roll.originalRoll
     }
 }
+
+/**
+ * Define the Action-Wheel layout when rolling for Unchannelled Fury.
+ */
+object UnchannelledFuryWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "unchannelled-fury"
+    override val rollDiceNode: Node = UnchannelledFuryRoll.RollDie
+    override val chooseRerollSourceNode: Node = UnchannelledFuryRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = UnchannelledFuryRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ActivatePlayerContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<UnchannelledFuryRollContext>()
+        return context.roll.originalRoll
+    }
+}
+

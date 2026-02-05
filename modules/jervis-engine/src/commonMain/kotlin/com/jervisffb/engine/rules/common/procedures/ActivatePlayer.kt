@@ -33,6 +33,9 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
+import com.jervisffb.engine.reports.ReportFailedBoneHead
+import com.jervisffb.engine.reports.ReportFailedReallyStupid
+import com.jervisffb.engine.reports.ReportFailedUnchannelledFury
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -235,9 +238,11 @@ object ActivatePlayer : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BoneHeadRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
+            val player = context.player
             return if (context.activationEndsImmediately) {
                 compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    SetPlayerAvailability(player, Availability.HAS_ACTIVATED),
+                    ReportFailedBoneHead(player),
                     ExitProcedure()
                 )
             } else {
@@ -260,9 +265,11 @@ object ActivatePlayer : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ReallyStupidRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
+            val player = context.player
             return if (context.activationEndsImmediately) {
                 compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    SetPlayerAvailability(player, Availability.HAS_ACTIVATED),
+                    ReportFailedReallyStupid(player),
                     ExitProcedure()
                 )
             } else {
@@ -286,8 +293,10 @@ object ActivatePlayer : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             return if (context.activationEndsImmediately) {
+                val player = context.player
                 compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    SetPlayerAvailability(player, Availability.HAS_ACTIVATED),
+                    ReportFailedUnchannelledFury(player),
                     ExitProcedure()
                 )
             } else {

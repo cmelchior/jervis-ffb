@@ -48,7 +48,10 @@ data class UnchannelledFuryRollContext(
 }
 
 /**
- * Procedure for rolling for Unchannelled Fury* as described on page 87 in the rulebook.
+ * Procedure for rolling for Unchannelled Fury* (Passive).
+ *
+ * See page 87 in the BB2020 rulebook.
+ * See page 138 in the BB2025 rulebook.
  *
  * This procedure will update [ActivatePlayerContext] with the result of the roll.
  * It is up to the caller of this method to react to it.

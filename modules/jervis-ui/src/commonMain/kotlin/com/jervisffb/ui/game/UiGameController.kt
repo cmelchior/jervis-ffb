@@ -48,6 +48,7 @@ import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.UnchannelledFuryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
@@ -149,6 +150,7 @@ class UiGameController(
         JumpWheelController,
         PickupWheelController,
         ReallyStupidWheelController,
+        UnchannelledFuryWheelController,
         RushWheelController,
         SecureTheBallWheelController,
         ShadowingWheelController,

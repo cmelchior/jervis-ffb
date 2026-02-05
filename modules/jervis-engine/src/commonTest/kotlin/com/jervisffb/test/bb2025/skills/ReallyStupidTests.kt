@@ -12,10 +12,10 @@ import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
-import com.jervisffb.test.boneHead
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.reallyStupid
 import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -41,7 +41,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
     fun getDistractedIfFail() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
-            *boneHead(1.d6),
+            *reallyStupid(1.d6),
         )
         val player = awayTeam["A1".playerId]
         assertNull(state.activePlayer)
@@ -52,7 +52,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
     fun rollAfterSelectingAction() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
-            *boneHead(2.d6), // Only works if player is helping
+            *reallyStupid(2.d6), // Only works if player is helping
             *moveTo(14, 5),
             *dodge(1.d6)
         )
@@ -65,7 +65,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
     fun useActionIfFailRoll() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLITZ),
-            *boneHead(1.d6),
+            *reallyStupid(1.d6),
         )
         assertNull(state.activePlayer)
         assertEquals(0, state.awayTeam.turnData.blitzActions)
@@ -75,7 +75,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
     fun doesNotClearDistractedIfForegoActivation() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
-            *boneHead(1.d6),
+            *reallyStupid(1.d6),
             EndTurn,
         )
         val player = awayTeam["A1".playerId]
@@ -92,7 +92,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
         val player = awayTeam["A1".playerId]
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
-            *boneHead(1.d6),
+            *reallyStupid(1.d6),
         )
         assertNull(state.activePlayer)
         assertTrue(rules.isDistracted(player))
@@ -100,7 +100,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
             EndTurn,
             EndTurn,
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
-            *boneHead(2.d6),
+            *reallyStupid(2.d6),
         )
         assertEquals(player, state.activePlayer)
         assertFalse(rules.isDistracted(player))

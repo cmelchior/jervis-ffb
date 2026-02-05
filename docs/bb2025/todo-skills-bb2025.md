@@ -290,6 +290,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Throw Team-mate
 - [ ] Timmm-ber!
 - [ ] Unchannelled Fury*
+  - [ ] Pro can be used as a reroll
+  - [x] Roll after selecting action
+  - [x] Use action if failing roll
+  - [x] Block improves chance
+  - [x] Blitz improves chance
 - [x] Unsteady
   - [x] Prevent selecting Secure the Ball if standing
   - [x] Prevent selecting Throw Team-mate prone
