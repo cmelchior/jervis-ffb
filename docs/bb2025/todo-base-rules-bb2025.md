@@ -427,6 +427,7 @@ book.
     - [x] Pow!
     -  [ ] Pow into crowd only roll crowd injury
 - [ ] Blitz Action
+    - [ ] Cannot declare Blitz if they cannot reach Player using move + GFI + Sprint 
     - [x] Must select target before starting blitz
     - [x] Rush To Blitz
     - [x] Cannot blitz if no more move

@@ -241,6 +241,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Safe Pass skills works
   - [ ] Hail Mary Pass works
 - [ ] Bone Head*
+  - [x] Clear after activating
+  - [x] Roll after selecting action
+  - [x] Does not clear if you forgo activation
+  - [x] Use action if failing roll
+  - [ ] Can use skills to reroll Bone Head (Pro)
 - [ ] Blood Lust (X+)*
 - [ ] Breathe Fire
 - [ ] Chainsaw*

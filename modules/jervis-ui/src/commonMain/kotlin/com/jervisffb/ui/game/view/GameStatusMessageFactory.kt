@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.Secure
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
@@ -362,6 +363,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Thick Skull to avoid being Knocked Out?"
                 false -> "Waiting for opponent to use Thick Skull"
+            }
+        },
+
+        BoneHeadRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Bone Head"
+                else -> null
+            }
+        },
+        BoneHeadRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Bone Head Result or Reroll D6?"
+                else -> null
+            }
+        },
+        BoneHeadRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to avoid Bone Head"
+                else -> null
             }
         },
     )

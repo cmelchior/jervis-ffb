@@ -391,6 +391,7 @@ data class PlayerDeselected(val playerId: PlayerId) : GameAction {
 
 @Serializable
 data class ForegoActivationSelected(val player: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
     fun getPlayer(state: Game): Player {
         return state.getPlayerById(player)
     }

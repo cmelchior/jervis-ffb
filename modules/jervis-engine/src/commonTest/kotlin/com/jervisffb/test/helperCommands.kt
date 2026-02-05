@@ -232,6 +232,11 @@ fun standardBlock(target: String,  die: DBlockResult) = arrayOf(
     SelectSingleBlockDieResult(),
 )
 
+fun boneHead(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun dodge(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,

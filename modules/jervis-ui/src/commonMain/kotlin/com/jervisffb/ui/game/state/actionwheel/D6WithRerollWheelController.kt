@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
@@ -28,6 +29,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRol
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
+import com.jervisffb.engine.rules.common.procedures.BoneHeadRollContext
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -53,6 +56,7 @@ import kotlin.time.ExperimentalTime
  * Abstract class for handling all single D6 with a potential reroll like:
  *
  * - Accuracy
+ * - BoneHead
  * - Catch
  * - Dodge
  * - Interception
@@ -379,5 +383,22 @@ object JumpWheelController : D6WithRerollWheelController() {
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<JumpRollContext>()
         return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling to Jump.
+ */
+object BoneHeadWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "bonehead"
+    override val rollDiceNode: Node = BoneHeadRoll.RollDie
+    override val chooseRerollSourceNode: Node = BoneHeadRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = BoneHeadRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ActivatePlayerContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<BoneHeadRollContext>()
+        return context.roll.originalRoll
     }
 }
