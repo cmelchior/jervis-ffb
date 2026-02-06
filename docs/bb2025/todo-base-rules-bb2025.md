@@ -300,6 +300,7 @@ book.
     - [ ] Follows the chart in the rulebook
     - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
 - [ ] Catch (basic, no skills)
+    - [ ] No -1 for Scatter And Deviating Ball
     - [ ] Accurate pass
     - [ ] Deflection into Interception
     - [ ] Bouncing ball
@@ -310,8 +311,8 @@ book.
     - [ ] Must roll for catch
     - [ ] Players can only catch if they have tackle zones
     - [ ] Failing to catch will bounce from square
-- [ ] Throw-in (basic no skills)
-    - [ ] Count first square as 1
+- [x] Throw-in (basic no skills)
+    - [x] Count first square as 1
     - [x] From corners
     - [x] From south/north/east/west
     - [x] Player in landing field must catch it if possible

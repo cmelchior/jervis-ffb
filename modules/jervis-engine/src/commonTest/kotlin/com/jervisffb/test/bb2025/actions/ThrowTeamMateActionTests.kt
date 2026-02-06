@@ -611,7 +611,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(2.d8, 2.d8, 2.d8),
             DiceRollResults(1.d6, 1.d6), // Armour roll
             2.d3, // Throw-in direction
-            DiceRollResults(2.d6, 1.d6), // Throw-in distance
+            DiceRollResults(3.d6, 1.d6), // Throw-in distance
             2.d8 // Bounce ball
         )
         // Turn-over if player with ball is thrown out of the field

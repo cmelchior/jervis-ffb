@@ -460,7 +460,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *throwBall(6.d6),
             2.d8, // Bounce Out-of-Bounds
             3.d3, // Throw-in direction
-            DiceRollResults(1.d6, 2.d6), // Throw-in distance
+            DiceRollResults(1.d6, 3.d6), // Throw-in distance
             *catch(6.d6)
         )
         assertTouchdown()

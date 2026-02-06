@@ -262,7 +262,7 @@ class PushbackTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             Confirm, // Follow up
             2.d3, // Throw-in direction
-            DiceRollResults(1.d6, 1.d6), // Throw-in distance
+            DiceRollResults(1.d6, 2.d6), // Throw-in distance
             7.d8 // Bounce
         )
         assertNull(state.activePlayer)
@@ -293,7 +293,7 @@ class PushbackTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
             Cancel, // Do not follow up
             2.d3, // Throw-in direction
-            DiceRollResults(1.d6, 1.d6), // Throw-in distance
+            DiceRollResults(1.d6, 2.d6), // Throw-in distance
             *catch(6.d6)
         )
         assertEquals(homeTeam, state.activeTeam)

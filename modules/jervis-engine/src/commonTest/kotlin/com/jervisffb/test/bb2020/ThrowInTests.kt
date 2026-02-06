@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Tests for Throw-in as described on page 51 in the rulebook.
+ * Tests for Throw-in as described on page 51 in the BB2020 rulebook.
  */
 class ThrowInTests: JervisGameBB2020Test() {
 

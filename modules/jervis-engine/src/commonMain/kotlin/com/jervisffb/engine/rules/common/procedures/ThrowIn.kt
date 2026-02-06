@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.utils.assert
 import com.jervisffb.engine.utils.sum
 
@@ -91,7 +92,7 @@ object ThrowIn : Procedure() {
             return castDiceRollList<D6Result>(action) { dice ->
                 assert(dice.size == 2)
                 val context = state.getContext<ThrowInContext>()
-                val distance = dice.sum()
+                val diceDistance = dice.sum()
 
                 // Move the ball the entire distance until it either goes out of bounds again
                 // or hit an empty location
@@ -99,7 +100,15 @@ object ThrowIn : Procedure() {
                 val ball = context.ball
                 var ballPosition = context.outOfBoundsAt
                 var outOfBoundsAt: FieldCoordinate? = null
-                for (d in 1..distance) {
+
+
+                // In BB2024, the first square is counted as 0, while in BB2025, it is counted as 1
+                val travelDistance = when (rules.baseVersion) {
+                    GameVersion.BB2020 -> 1 .. diceDistance
+                    GameVersion.BB2025 -> 2 .. diceDistance
+                }
+
+                for (d in travelDistance) {
                     val start = ballPosition
                     ballPosition = start.move(direction, 1)
                     if (ballPosition.isOutOfBounds(rules)) {

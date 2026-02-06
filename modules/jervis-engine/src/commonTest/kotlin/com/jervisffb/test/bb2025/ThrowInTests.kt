@@ -3,7 +3,6 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -19,6 +18,7 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
+import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Tests for Throw-in as described on page 51 in the rulebook.
+ * Tests for Throw-in as described on page 73 in the BB2025 rulebook.
  */
 class ThrowInTests: JervisGameBB2025Test() {
 
@@ -60,7 +60,7 @@ class ThrowInTests: JervisGameBB2025Test() {
         )
         assertEquals(BallState.THROW_IN, state.currentBall().state)
         controller.rollForward(
-            DiceRollResults(1.d6, 2.d6) // Distance
+            DiceRollResults(1.d6, 3.d6) // Distance
         )
         assertEquals(BallState.BOUNCING, state.currentBall().state)
         controller.rollForward(
@@ -75,11 +75,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(13, 0)
         controller.rollForward(
             1.d3, // Direction
-            DiceRollResults(4.d6, 2.d6), // Distance to [19,6]
-            8.d8 // Bounce to [20,7]
+            DiceRollResults(4.d6, 2.d6), // Distance to [18,5]
+            8.d8 // Bounce to [19, 6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(20,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(19,6), state.singleBall().location)
     }
 
     @Test
@@ -87,24 +87,23 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(13, 14)
         controller.rollForward(
             3.d3, // Direction
-            DiceRollResults(4.d6, 2.d6), // Distance to [19,8]
-            3.d8 // Bounce to [20,7]
+            DiceRollResults(4.d6, 2.d6), // Distance to [18,9]
+            3.d8 // Bounce to [19,8]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(20,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(19, 8), state.singleBall().location)
     }
 
     @Test
     fun throwInFromLeftBorder() {
-        // Move the ball and let the home team try to pick it up after which it will bounce
         leaveFieldAt(0, 7)
         controller.rollForward(
             3.d3, // Direction
-            DiceRollResults(1.d6, 3.d6), // Distance to [19,8]
-            8.d8 // Bounce to [20,7]
+            DiceRollResults(1.d6, 3.d6), // Distance to [3,10]
+            8.d8 // Bounce to [4, 11]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(5,12), state.singleBall().location)
+        assertEquals(FieldCoordinate(4,11), state.singleBall().location)
     }
 
     @Test
@@ -112,11 +111,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(25, 7)
         controller.rollForward(
             3.d3, // Direction
-            DiceRollResults(1.d6, 1.d6), // Distance to [23,5]
-            1.d8 // Bounce to [22,4]
+            DiceRollResults(1.d6, 1.d6), // Distance to [24,6]
+            1.d8 // Bounce to [23,5]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(22,4), state.singleBall().location)
+        assertEquals(FieldCoordinate(23,5), state.singleBall().location)
     }
 
     @Test
@@ -124,11 +123,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(0, 0)
         controller.rollForward(
             3.d3, // Direction
-            DiceRollResults(1.d6, 5.d6), // Distance to [0,6]
-            7.d8 // Bounce to [0,7]
+            DiceRollResults(1.d6, 5.d6), // Distance to [0,5]
+            7.d8 // Bounce to [0,6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(0,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(0,6), state.singleBall().location)
     }
 
     @Test
@@ -136,11 +135,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(25, 0)
         controller.rollForward(
             1.d3, // Direction
-            DiceRollResults(1.d6, 5.d6), // Distance to [25,6]
-            7.d8 // Bounce to [25,7]
+            DiceRollResults(1.d6, 5.d6), // Distance to [25,5]
+            7.d8 // Bounce to [25,6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(25,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(25,6), state.singleBall().location)
     }
 
     @Test
@@ -148,11 +147,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(0, 14)
         controller.rollForward(
             1.d3, // Direction
-            DiceRollResults(1.d6, 5.d6), // Distance to [0,6]
-            2.d8 // Bounce to [0,7]
+            DiceRollResults(1.d6, 5.d6), // Distance to [0,9]
+            2.d8 // Bounce to [0,8]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(0,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(0,8), state.singleBall().location)
     }
 
     @Test
@@ -160,11 +159,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(25, 14)
         controller.rollForward(
             1.d3, // Direction
-            DiceRollResults(1.d6, 1.d6), // Distance to [23,14]
-            2.d8 // Bounce to [23,13]
+            DiceRollResults(1.d6, 1.d6), // Distance to [24,13]
+            2.d8 // Bounce to [24,13]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23,13), state.singleBall().location)
+        assertEquals(FieldCoordinate(24,13), state.singleBall().location)
     }
 
     @Test
@@ -172,12 +171,11 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(25, 1)
         controller.rollForward(
             2.d3, // Direction
-            DiceRollResults(5.d6, 5.d6), // Distance
+            DiceRollResults(5.d6, 6.d6), // Distance
         )
         assertEquals(BallState.THROW_IN, state.singleBall().state)
         controller.rollForward(
-            6.d6, // Must catch
-            NoRerollSelected()
+            *catch(6.d6) // Must catch
         )
         assertTrue(awayTeam["A7".playerId].hasBall())
     }
@@ -188,7 +186,7 @@ class ThrowInTests: JervisGameBB2025Test() {
         awayTeam["A7".playerId].state = PlayerState.PRONE
         controller.rollForward(
             2.d3, // Direction
-            DiceRollResults(5.d6, 5.d6), // Distance
+            DiceRollResults(5.d6, 6.d6), // Distance
             2.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
@@ -200,7 +198,7 @@ class ThrowInTests: JervisGameBB2025Test() {
         leaveFieldAt(25, 1)
         controller.rollForward(
             2.d3, // Direction
-            DiceRollResults(2.d6, 2.d6), // Distance
+            DiceRollResults(2.d6, 3.d6), // Distance
         )
         assertEquals(BallState.BOUNCING, state.singleBall().state)
         controller.rollForward(
@@ -217,10 +215,10 @@ class ThrowInTests: JervisGameBB2025Test() {
             3.d3, // Direction
             DiceRollResults(6.d6, 6.d6), // Distance
             1.d3, // 2nd throw-in direction
-            DiceRollResults(5.d6, 5.d6),
+            DiceRollResults(5.d6, 6.d6),
             2.d3, // 3rd throw-in direction
-            DiceRollResults(2.d6, 2.d6),
-            2.d8,
+            DiceRollResults(3.d6, 2.d6),
+            2.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(FieldCoordinate(21,3), state.singleBall().location)
