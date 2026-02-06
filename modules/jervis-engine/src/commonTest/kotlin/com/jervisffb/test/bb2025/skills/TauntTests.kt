@@ -2,8 +2,10 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
@@ -62,6 +64,23 @@ class TauntTests: JervisGameBB2025Test() {
             *standardBlock("H1", 3.dblock), // Pushed Back
             DirectionSelected(Direction.UP_LEFT),
             Confirm, // Use Taunt
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(FieldCoordinate(12, 5), attacker.location)
+    }
+
+    @Test
+    fun workOnPow() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.addSkill(SkillType.TAUNT)
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 6.dblock), // Pow
+            DirectionSelected(Direction.UP_LEFT),
+            Confirm, // Use Taunt
+            DiceRollResults(1.d6, 1.d6),
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)

@@ -94,9 +94,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Does not work against Ball & Chain
     - [ ] Does not work against Juggernaut
     - [x] Prevent follow up from Frenzy
-    - [ ] Works on POW
-    - [ ] Works on Stumble
-    - [ ] Works on Pushback
+    - [x] Works on POW
+    - [x] Works on Stumble
+    - [x] Works on Pushback
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
@@ -126,13 +126,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Only use Tackle if other player has Dodge
   - [x] Defender does not count as having dodge during a Block
 - [ ] Taunt
-  - [x] Pushed Back
-  - [x] Stumble with Dodge
   - [x] Cannot use Taunt if Fend is selected
   - [ ] Does not work against Rooted
-  - [ ] Works on POW
-  - [ ] Works on Stumble
-  - [ ] Works on Pushback
+  - [x] Works on POW
+  - [x] Works on Stumble
+  - [x] Works on Pushback
 - [ ] Wrestle
 
 ## Mutations

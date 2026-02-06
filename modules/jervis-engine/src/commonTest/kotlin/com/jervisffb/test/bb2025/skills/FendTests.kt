@@ -1,7 +1,9 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
@@ -31,7 +33,7 @@ class FendTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun preventFollowUp() {
+    fun preventFollowUpFromPushback() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         defender.addSkill(SkillType.FEND)
@@ -45,6 +47,42 @@ class FendTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(FieldCoordinate(13, 5), attacker.location)
     }
+
+    @Test
+    fun preventFollowUpFromStumble() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.addSkill(SkillType.FEND)
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 5.dblock), // Stumble
+            DirectionSelected(Direction.UP_LEFT),
+            Confirm, // Use Fend
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
+    }
+
+    @Test
+    fun preventFollowUpFromPow() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.addSkill(SkillType.FEND)
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 6.dblock), // POW
+            DirectionSelected(Direction.UP_LEFT),
+            Confirm, // Use Fend
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
+    }
+
+
 
     @Test
     fun preventFollowUpFromFrenzy() {
