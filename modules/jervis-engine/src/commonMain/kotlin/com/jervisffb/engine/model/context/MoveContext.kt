@@ -10,7 +10,8 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Context data for a player moving. This includes standing up, moving
- * a single square, jumping or leaping, but no other special actions.
+ * a single square, jumping, leaping, or using the Pogo, but no other special
+ * actions.
  *
  * @see [MoveAction]
  */
@@ -18,6 +19,8 @@ data class MoveContext(
     val player: Player,
     val moveType: MoveType,
     val useVeryLongLegs: Boolean = false,
+    // `true` if the player uses the +1 Leap Modifier. If the modifier is +0, this should be `false`
+    val useLeapModifier: Boolean = false,
     val hasMoved: Boolean = false,
     val target: FieldCoordinate? = null,
     val startingSquare: FieldCoordinate = when (val location = player.location) {

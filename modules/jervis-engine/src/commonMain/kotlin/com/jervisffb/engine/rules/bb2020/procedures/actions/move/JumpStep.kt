@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.move
+package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -8,8 +8,7 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.SelectFieldLocation
-import com.jervisffb.engine.actions.TargetSquare
+import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
@@ -28,12 +27,11 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -41,20 +39,16 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
+import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlin.math.max
-
-data class JumpRollContext(
-    val player: Player,
-    val modifiers: List<DiceModifier> = emptyList(),
-    val roll: D6DieRoll? = null,
-    val isSuccess: Boolean = false
-): ProcedureContext
 
 /**
  * Procedure controlling a Jump action.
@@ -86,17 +80,12 @@ data class JumpRollContext(
  * BB2025 Update: In BB2025 it is defined that failing any Rush leaves the player
  * in the starting field. So we apply the same rule to BB2020.
  *
- *
  * The interaction between Jump and Tentacles is also a bit unclear,
  * https://www.reddit.com/r/bloodbowl/comments/xodttp/shadowing_and_tentacles_work_on_followups_jumps/
  *
  * This was clarified in the Designer's Commentary. Tentacles are rolled first.
  */
 object JumpStep : Procedure() {
-
-    // How many squares of movement are used to Jump
-    const val JUMP_DISTANCE = 2
-
     override val initialNode: Node = SelectTargetSquareOrCancel
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -108,27 +97,7 @@ object JumpStep : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MoveContext>()
             val jumpingPlayer = context.player
-            val hasMoveLeft = jumpingPlayer.movesLeft + jumpingPlayer.rushesLeft >= JUMP_DISTANCE && rules.isStanding(jumpingPlayer)
-            val needRush = jumpingPlayer.movesLeft < JUMP_DISTANCE
-            val eligibleJumpSquares = if (hasMoveLeft) {
-                val eligibleJumpSquares = jumpingPlayer.coordinates.getSurroundingCoordinates(rules, distance = 1)
-                    .mapNotNull { state.field[it].player }
-                    .filter { !rules.isStanding(it) }
-                    .flatMap {
-                        rules.getPushOptions(jumpingPlayer, it)
-                            .filter { coords ->
-                                // A jumping player can only jump to the same squares you would normally push the player
-                                // to. See page 45 in the rulebook.
-                                // This should be kept up to date with `calculateMoveTypesAvailable()`
-                                coords.isOnField(rules) && state.field[coords].isUnoccupied()
-                            }
-                    }
-                    .map { TargetSquare.jump(it, needRush) }
-                    .let { SelectFieldLocation(it) }
-                listOf(eligibleJumpSquares)
-            } else {
-                emptyList()
-            }
+            val eligibleJumpSquares = calculateOptionsForMoveType(state, rules, jumpingPlayer, MoveType.JUMP)
             return eligibleJumpSquares + CancelWhenReady
         }
 
@@ -271,10 +240,12 @@ object JumpStep : Procedure() {
                 modifiers.add(JumpModifier.VERY_LONG_LEGS)
             }
             return compositeCommandOf(
-                SetContext(JumpRollContext(
-                    player = player,
-                    modifiers = modifiers,
-                )),
+                SetContext(
+                    JumpRollContext(
+                        player = player,
+                        modifiers = modifiers,
+                    )
+                ),
                 GotoNode(RollForJump)
             )
         }

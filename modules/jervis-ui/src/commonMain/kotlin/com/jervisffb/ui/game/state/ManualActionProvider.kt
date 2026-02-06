@@ -47,6 +47,8 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -60,7 +62,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -540,7 +541,9 @@ open class ManualActionProvider(
         }
 
         // Whether to use the Very Long Legs skill or not
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_VERY_LONG_LEGS) && (currentNode == JumpStep.ChooseToUseVeryLongLegs)) {
+        if (
+            menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_VERY_LONG_LEGS)
+            && (currentNode == JumpStep.ChooseToUseVeryLongLegs || currentNode == com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs)) {
             if (controller.state.getContextOrNull<MoveContext>()?.player?.isSkillAvailable(SkillType.VERY_LONG_LEGS) == true) {
                 return Confirm
             }
@@ -608,6 +611,10 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_THICK_SKULL) && currentNode == InjuryRoll.ChooseToUseThickSkull) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_LEAP_MODIFIER) && currentNode == LeapStep.ChooseToUseLeapModifier) {
             return Confirm
         }
 

@@ -58,6 +58,7 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.InducementSelected::class)
         subclass(com.jervisffb.engine.actions.MoveTypeSelected::class)
         subclass(com.jervisffb.engine.actions.NoRerollSelected::class)
+        subclass(com.jervisffb.engine.actions.PassTypeSelected::class)
         subclass(com.jervisffb.engine.actions.PlayerActionSelected::class)
         subclass(com.jervisffb.engine.actions.PlayerDeselected::class)
         subclass(com.jervisffb.engine.actions.PlayerSelected::class)

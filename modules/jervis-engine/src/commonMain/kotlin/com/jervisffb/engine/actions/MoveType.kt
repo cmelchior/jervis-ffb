@@ -11,5 +11,6 @@ enum class MoveType {
     LEAP,
     STANDARD,
     STAND_UP,
+    POGO
 }
 

@@ -1,5 +1,7 @@
 package com.jervisffb.ui.game.state.decorators
 
+import androidx.compose.runtime.getValue
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
@@ -13,6 +15,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -38,8 +41,15 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
+        val hasLeapAndJump = descriptor.types.contains(MoveType.LEAP) && descriptor.types.contains(MoveType.JUMP)
+        val hideJump = hasLeapAndJump && SETTINGS_MANAGER.getBoolean(SettingsKeys.JERVIS_UI_HIDE_JUMP_IF_LEAP_IS_AVAILABLE_VALUE, false)
         descriptor.types.forEach {
-            handleType(actionProvider, state, acc, it)
+            when (it) {
+                MoveType.JUMP -> {
+                    if (!hideJump) handleType(actionProvider, state, acc, it)
+                }
+                else -> handleType(actionProvider, state, acc, it)
+            }
         }
     }
 
@@ -72,6 +82,20 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                             ContextMenuOption(
                                 "Leap",
                                 { actionProvider.userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
+                                ActionIcon.LEAP
+                            )
+                        )
+                    )
+                }
+            }
+
+            MoveType.POGO -> {
+                acc.updateSquare(activeLocation) {
+                    it.copy(
+                        contextMenuOptions = it.contextMenuOptions.add(
+                            ContextMenuOption(
+                                "Pogo",
+                                { actionProvider.userActionSelected(MoveTypeSelected(MoveType.POGO)) },
                                 ActionIcon.LEAP
                             )
                         )

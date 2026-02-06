@@ -284,7 +284,7 @@ book.
     - [x] Can only jump over prone/stunned player
     - [x] Jump over stunned/prone player from both teams
     - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
-    - [x] If Rushing twice and fail, ends up in target square
+    - [x] If Rushing twice and fail, ends up in starting square
     - [x] Can only jump to opposite squares. Similar to pushes
     - [ ] Cannot jump over a Giant since the rules specify a "single square"
     - [x] Modifiers on leaving and entering
@@ -311,6 +311,7 @@ book.
     - [ ] Players can only catch if they have tackle zones
     - [ ] Failing to catch will bounce from square
 - [ ] Throw-in (basic no skills)
+    - [ ] Count first square as 1
     - [x] From corners
     - [x] From south/north/east/west
     - [x] Player in landing field must catch it if possible

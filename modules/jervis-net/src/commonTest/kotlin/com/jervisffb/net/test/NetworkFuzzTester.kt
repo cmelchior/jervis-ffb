@@ -294,7 +294,7 @@ class NetworkFuzzTester {
                 handleManualAwayKickingSetup(controller, compositeActions)
             }
             compositeActions.add(EndSetup)
-            return CompositeGameAction(compositeActions)
+            CompositeGameAction(compositeActions)
         } else {
             null
         }

@@ -36,6 +36,14 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Hit and Run
 - [ ] Jump Up
 - [ ] Leap
+    - [x] Leap over any square using Jump rules
+    - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
+    - [x] If Rushing twice and fail, ends up in starting square
+    - [x] If Rushing once and fail, ends up in starting square,
+    - [ ] Cannot jump over a Giant since the rules specify a "single square"
+    - [x] Modifiers on leaving and entering
+    - [x] Leap modifier is optional
+    - [x] Leap modifier only work if there are more than one negative modifier
 - [ ] Safe Pair of Hands
   - [ ] Does not work against Strip Ball (NAF)
 - [ ] Sidestep
@@ -86,6 +94,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Does not work against Ball & Chain
     - [ ] Does not work against Juggernaut
     - [x] Prevent follow up from Frenzy
+    - [ ] Works on POW
+    - [ ] Works on Stumble
+    - [ ] Works on Pushback
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
@@ -119,6 +130,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Stumble with Dodge
   - [x] Cannot use Taunt if Fend is selected
   - [ ] Does not work against Rooted
+  - [ ] Works on POW
+  - [ ] Works on Stumble
+  - [ ] Works on Pushback
 - [ ] Wrestle
 
 ## Mutations
@@ -147,9 +161,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Use skill on dodge
   - [x] Use skill multiple times pr. turn
   - [x] Skill use is optional
-- [ ] Very Long Legs
+- [x] Very Long Legs
   - [x] Is optional
-  - [ ] +1 to Leap
+  - [x] Does not work with Pogo
+  - [x] +1 to Leap
   - [x] +1 to Jump
   - [x] +2 to Intercept
   - [x] Ignore CloudBurster
@@ -266,6 +281,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Cannot intercept
 - [ ] Plague Ridden
 - [ ] Pogo Stick
+    - [x] Pogo over any square using Jump rules
+    - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
+    - [x] If Rushing twice and fail, ends up in starting square
+    - [x] If Rushing once and fail, ends up in starting square,
+    - [ ] Cannot Pogo over a Giant since the rules specify a "single square"
+    - [x] Modifiers on leaving and entering
+    - [x] No negative modifiers when using Pogo
 - [ ] Projectile Vomit
 - [ ] Really Stupid*
   - [ ] Pro can be used as a reroll

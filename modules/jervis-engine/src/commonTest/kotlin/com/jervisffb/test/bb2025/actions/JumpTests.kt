@@ -13,11 +13,16 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.JumpRollContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.ext.undoActions
+import com.jervisffb.test.rushRoll
+import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -130,11 +135,9 @@ class JumpTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 4),
             4.d6, // 2 Modifiers from leaving, no to enter, so should fail
         )
-        val reroll = RerollOptionSelected(
-            option = (controller.getAvailableActions().actions.last() as SelectRerollOption).options.first()
-        )
+        assertFalse(state.getContext<JumpRollContext>().isSuccess)
         controller.rollForward(
-            reroll,
+            SelectTeamReroll<RegularTeamReroll>(),
             5.d6,
         )
         assertEquals(PlayerState.STANDING, jumpingPlayer.state)
@@ -174,14 +177,12 @@ class JumpTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 7),
-            5.d6, // 1 Marked Modifiers from leaving, 2 from entering
+            4.d6, // 1 Marked Modifiers from leaving, 2 from entering
         )
-        val reroll = RerollOptionSelected(
-            option = (controller.getAvailableActions().actions.last() as SelectRerollOption).options.first()
-        )
+        assertFalse(state.getContext<JumpRollContext>().isSuccess)
         controller.rollForward(
-            reroll,
-            6.d6,
+            SelectTeamReroll<RegularTeamReroll>(),
+            5.d6,
         )
         assertEquals(PlayerState.STANDING, jumpingPlayer.state)
         assertEquals(FieldCoordinate(11, 7), jumpingPlayer.location)
@@ -233,8 +234,7 @@ class JumpTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            2.d6, // Rush
-            NoRerollSelected(),
+            *rushRoll(2.d6),
             4.d6, // Jump
             NoRerollSelected(),
         )
@@ -257,10 +257,8 @@ class JumpTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            2.d6, // Rush
-            NoRerollSelected(),
-            2.d6, // Rush
-            NoRerollSelected(),
+            *rushRoll(2.d6),
+            *rushRoll(2.d6),
             4.d6, // Jump
             NoRerollSelected(),
         )
@@ -293,7 +291,7 @@ class JumpTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun fallOverInTargetSquareWhenFailingSecondRush() {
+    fun fallOverInStartingSquareWhenFailingSecondRush() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A1".playerId)
 
@@ -306,13 +304,11 @@ class JumpTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            2.d6, // Rush
-            NoRerollSelected(),
-            1.d6, // Rush
-            NoRerollSelected(),
+            *rushRoll(2.d6),
+            *rushRoll(1.d6)
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
     }
 
     @Test

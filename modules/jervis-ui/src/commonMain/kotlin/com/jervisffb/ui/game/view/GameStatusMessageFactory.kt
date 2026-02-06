@@ -7,6 +7,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -27,7 +30,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -250,7 +252,14 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
-        JumpStep.ChooseToUseVeryLongLegs to { isActiveClient, _, _ ->
+        com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Very Long Legs?"
+                false -> "Waiting for player to use Very Long Legs"
+            }
+        },
+
+        com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to { isActiveClient, _, _ ->
             when (isActiveClient) {
                 true -> "Use Very Long Legs?"
                 false -> "Waiting for player to use Very Long Legs"
@@ -402,6 +411,51 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to avoid Really Stupid"
                 else -> null
+            }
+        },
+
+        LeapRoll.RollDie to { isActiveClient, serverDiceRolls, _ ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to Leap"
+                else -> null
+            }
+        },
+        LeapRoll.ChooseReRollSource to { isActiveClient, _, _ ->
+            when {
+                (isActiveClient) -> "Accept Leap Result or Reroll D6?"
+                else -> null
+            }
+        },
+        LeapRoll.ReRollDie to { isActiveClient, serverDiceRolls, _ ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Leap?"
+                else -> null
+            }
+        },
+
+        PogoRoll.RollDie to { isActiveClient, serverDiceRolls, _ ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to use Pogo"
+                else -> null
+            }
+        },
+        PogoRoll.ChooseReRollSource to { isActiveClient, _, _ ->
+            when {
+                (isActiveClient) -> "Accept Pogo Result or Reroll D6?"
+                else -> null
+            }
+        },
+        PogoRoll.ReRollDie to { isActiveClient, serverDiceRolls, _ ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to use Pogo?"
+                else -> null
+            }
+        },
+
+        LeapStep.ChooseToUseLeapModifier to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Leap Modifier?"
+                false -> "Waiting for opponent to use Leap Modifier"
             }
         },
     )

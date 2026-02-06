@@ -380,3 +380,17 @@ inline fun <reified T: Any> List<*>.singleInstanceOf(): T {
 inline fun <reified T: Any> List<*>.singleInstanceOfOrNull(): T? {
     return singleOrNull { it is T } as T?
 }
+
+/**
+ * Format dice rolls and modifiers into a nice looking String that can be used for log output
+ */
+fun formatDiceRoll(roll: D6DieRoll, modifiers: List<DiceModifier>): String {
+    return buildString {
+        append(roll.result.value)
+        append(" Roll")
+        for (modifier in modifiers) {
+            val prefix = if (modifier.modifier < 0) "" else "+"
+            append(" ${prefix}${modifier.modifier} ${modifier.description}")
+        }
+    }
+}

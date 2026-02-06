@@ -27,6 +27,8 @@ import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
@@ -40,6 +42,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  *
  * TODO Maybe not ball an chain? :thinking:
  */
+// TODO
 fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     if (state.endActionImmediately()) {
         return null
@@ -71,6 +74,17 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
         options.add(MoveType.JUMP)
     }
 
+    // Leap and Pogo
+    val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 2)
+    val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
+    val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.field[it].isUnoccupied() }
+    if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
+        options.add(MoveType.LEAP)
+    }
+    if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.POGO_STICK)) {
+        options.add(MoveType.POGO)
+    }
+
     // Standup
     if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
         options.add(MoveType.STAND_UP)
@@ -89,9 +103,48 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
  * move.
  */
 fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<SelectFieldLocation> {
+    // How many squares of movement are used to Jump
     return when (type) {
-        MoveType.JUMP -> TODO()
-        MoveType.LEAP -> TODO()
+        MoveType.JUMP -> {
+            val hasMoveLeft = player.movesLeft + player.rushesLeft >= JUMP_DISTANCE && rules.isStanding(player)
+            val needRush = player.movesLeft < JUMP_DISTANCE
+            if (hasMoveLeft) {
+                val eligibleTargetSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
+                    .mapNotNull { state.field[it].player }
+                    .filter { !rules.isStanding(it) }
+                    .flatMap {
+                        rules.getPushOptions(player, it)
+                            .filter { coords ->
+                                // A jumping player can only jump to the same squares you would normally push the to.
+                                // See page 45 in the BB2020 rulebook.
+                                // See page 56 in the BB2025 rulebook.
+                                // This should be kept up to date with `calculateMoveTypesAvailable()`
+                                coords.isOnField(rules) && state.field[coords].isUnoccupied()
+                            }
+                    }
+                    .map { TargetSquare.jump(it, needRush) }
+                    .let { SelectFieldLocation(it) }
+                listOf(eligibleTargetSquares)
+            } else {
+                emptyList()
+            }
+        }
+        MoveType.LEAP,
+        MoveType.POGO -> {
+            val hasMoveLeft = player.movesLeft + player.rushesLeft >= JUMP_DISTANCE && rules.isStanding(player)
+            val needRush = player.movesLeft < JUMP_DISTANCE
+            if (hasMoveLeft) {
+                val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 2)
+                val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
+                val eligibleTargetSquares = (allSquares - adjacentSquares.toSet())
+                    .filter { state.field[it].isUnoccupied() }
+                    .map { TargetSquare.jump(it, needRush) }
+                    .let { SelectFieldLocation(it) }
+                listOf(eligibleTargetSquares)
+            } else {
+                emptyList()
+            }
+        }
         MoveType.STANDARD -> {
             val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
             if (player.movesLeft + player.rushesLeft > 0) {

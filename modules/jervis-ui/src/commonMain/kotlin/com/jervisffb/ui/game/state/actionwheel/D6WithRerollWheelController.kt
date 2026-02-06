@@ -15,14 +15,19 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
+import com.jervisffb.engine.model.context.JumpRollContext
+import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
+import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRollContext
@@ -39,7 +44,6 @@ import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -65,7 +69,9 @@ import kotlin.time.ExperimentalTime
  * - Dodge
  * - Interception
  * - Jump
+ * - Leap
  * - Pickup
+ * - Pogo
  * - Really Stupid
  * - Rush
  * - Shadowing
@@ -440,6 +446,40 @@ object UnchannelledFuryWheelController : D6WithRerollWheelController() {
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<UnchannelledFuryRollContext>()
         return context.roll.originalRoll
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling for Leap.
+ */
+object LeapWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "leap"
+    override val rollDiceNode: Node = LeapRoll.RollDie
+    override val chooseRerollSourceNode: Node = LeapRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = LeapRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<LeapRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<LeapRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling for Pogo.
+ */
+object PogoWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "pogo"
+    override val rollDiceNode: Node = PogoRoll.RollDie
+    override val chooseRerollSourceNode: Node = PogoRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = PogoRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<PogoRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<PogoRollContext>()
+        return context.roll?.originalRoll!!
     }
 }
 

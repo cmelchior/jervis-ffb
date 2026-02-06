@@ -70,6 +70,23 @@ subjected to any rules that take place at the start or during their activation".
 This means that if a player is Distracted and chooses to forgo their activation, 
 the Distracted status will _not_ be cleared.
 
+### Page 56 - Jumping over Players
+Since players leave their square in a slightly unconventional way, the order
+of checks needs to be defined. This isn't 100% clear from the rulebook, but
+the following order seems correct:
+
+1. Tentacles
+2. Rush(es)
+3. Jump/Leap/Pogo
+4. Diving Tackle
+
+This order is not strictly defined in the rules, and there could be an argument 
+for needing to roll for Rush before Tentacles as you do not strictly move until 
+the rushes succeeded. However, Tentacles uses the wording "attempt" which could 
+be read as declaring the intent to Jump. 
+
+This is also the order used by FUMBBL, so Jervis has adopted this order as well. 
+
 ### Page 58 - Rushing
 The wording in the rulebook does not strictly specify that you can only Rush 
 after using all normal Movement, which means that you can argue that a player 
@@ -196,6 +213,32 @@ deviate die (D6) and then choose to treat the roll as either a D6 or D3.
 In the rulebook, D3's are defined as Rolling a D6, taking half the value and 
 round up.
 
+### Page 130 - Leap
+Leap make it clear that reducing the difficulty of the Leap is only allowed if
+there is more than one negative modifier. However, the sequence of events when
+combined with Diving Tackle is a bit unclear as Diving Tackle is applied after
+all other modifiers. Does this mean that Leap can reduce the difficulty from
+Diving Tackle?
+
+For now, Jervis assumes "no", so if the Leap modifier was chosen, it will not
+apply to Diving Tackle.
+
+This means the sequence of events is:
+
+1. Declare Leap
+2. Roll for any Rushes needed
+2. Choose to use Very Long Legs
+3. Choose to use Leap Modifier. It will either be +1 or +0 depending on the 
+   number of negative modifiers.
+4. Roll / Re-roll the Leap
+5. Choose to use Diving Tackle. 
+6. Leap Modifier does not get recalculated. It was locked in step 3.
+6. Calculate final Leap result.
+
+This interpretation is mostly chosen because it reduces the complexity of the 
+rule engine. It should be re-evaluated in case that NAF / FUMBBL / FAQ takes
+the opposite stance.
+
 ### Page 132 - Multiple Block
 - Taunt: Multiple Block prevents follow-ups, so Taunt has no effect.
 
@@ -220,12 +263,19 @@ of unspecified scenarios with regard to how the thrown player be handled?
 For this reason, Jervis assumes that Safe Pass is only applicable for normal
 Pass actions (and by extension, throwing bombs).
 
+### Page 137 - Tentacles
+This skill explicitly mentions Dodge, Jump and Leap, but not Pogo, so it is 
+assumed that this skill cannot affect a player using Pogo. 
+
 ### Page 138 - Very Long Legs
 While this skill is optional during Interceptions, Jervis always enables it as 
 the coach can just choose to not intercept instead. This lowers the complexity 
 in the rule engine.
 
-It is still optional for Catch, Leap and Jump.
+It is still optional for Catch, Leap and Jump. 
+
+Note, that Very Long Legs does not mention Pogo, so it is assumed that this 
+skill does not work if a player is using Pogo.
 
 ## Spike 19
 None

@@ -17,6 +17,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
@@ -25,7 +26,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
-import com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -53,6 +53,7 @@ import kotlin.time.ExperimentalTime
  * - Block (skill usage)
  * - Dodge (skill usage)
  * - Fend (skill usage)
+ * - Leap (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
  * - Tackle (skill usage)
@@ -207,7 +208,8 @@ object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
 
 object UseVeryLongLegsWheelController: UseSkillWheelController(SkillType.VERY_LONG_LEGS) {
     override val nodes: Set<Node> = setOf(
-        JumpStep.ChooseToUseVeryLongLegs
+        com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs,
+        com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<MoveContext>().player
@@ -268,6 +270,17 @@ object UseThickSkullWheelController: UseSkillWheelController(SkillType.THICK_SKU
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
+        val player = context.player
+        return player.coordinates
+    }
+}
+
+object UseLeapWheelController: UseSkillWheelController(SkillType.LEAP) {
+    override val nodes: Set<Node> = setOf(
+        LeapStep.ChooseToUseLeapModifier
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<MoveContext>()
         val player = context.player
         return player.coordinates
     }

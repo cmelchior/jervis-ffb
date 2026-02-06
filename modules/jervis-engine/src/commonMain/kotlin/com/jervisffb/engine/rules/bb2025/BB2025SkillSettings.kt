@@ -33,6 +33,7 @@ import com.jervisffb.engine.rules.bb2025.skills.MyBall
 import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
 import com.jervisffb.engine.rules.bb2025.skills.Pass
+import com.jervisffb.engine.rules.bb2025.skills.Pogo
 import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2025.skills.Pro
 import com.jervisffb.engine.rules.bb2025.skills.ProjectileVomit
@@ -563,9 +564,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.POGO_STICK -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Pogo", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        Pogo(player, category, expiresAt)
+                    }
                 }
                 SkillType.PROJECTILE_VOMIT -> {
                     addNoValueEntry("Projectile Vomit", type, SkillCategory.TRAITS) { player, category,expiresAt ->

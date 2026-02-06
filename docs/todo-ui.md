@@ -9,6 +9,8 @@ things as they come up.
 - Kickoff result animations are not working
 
 ## Todo List
+- [ ] Toggling "Hide Jump if Leap is possible", isn't reactive. You need to re-calculate the decoraters. It would be nicer if the Action Wheel was updated immediately.
+- [ ] Action icon for Pogo
 - [ ] Reroll icon for Pass skill
 - [ ] Add Action Wheel selector and animation for "pass type".
 - [ ] During Kickoff when choosing to use the kick skill, also display on the field the end result of both results.

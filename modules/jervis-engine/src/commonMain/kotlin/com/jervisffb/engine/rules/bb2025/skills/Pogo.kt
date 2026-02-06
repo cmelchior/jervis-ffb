@@ -1,22 +1,23 @@
-package com.jervisffb.engine.rules.bb2020.skills
+package com.jervisffb.engine.rules.bb2025.skills
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Represents the "Leap" skill.
+ * Represents the Pogo (Active) skill.
  *
- * See page 75 in the BB2020 rulebook.
+ * See page 133 in the BB2025 rulebook.
  */
-class Leap(
+class Pogo(
     override val player: Player,
-    override val category: SkillCategory = SkillCategory.AGILITY,
+    override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill {
-    override val type: SkillType = SkillType.LEAP
+) : BB2025Skill {
+    override val type: SkillType = SkillType.POGO_STICK
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
@@ -25,4 +26,5 @@ class Leap(
     override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 }

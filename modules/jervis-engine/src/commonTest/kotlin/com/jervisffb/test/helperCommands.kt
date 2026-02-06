@@ -277,6 +277,11 @@ fun landingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected())
     reroll,
 )
 
+fun rushRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun throwBall(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll

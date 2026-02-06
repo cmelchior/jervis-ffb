@@ -136,7 +136,7 @@ enum class SkillType(val description: String) {
     NO_HANDS("No Hands"),
     PICK_ME_UP("Pick-me-up"),
     PLAGUE_RIDDEN("Plague Ridden"),
-    POGO_STICK("Pojo Stick"),
+    POGO_STICK("Pogo"),
     PROJECTILE_VOMIT("Projectile Vomit"),
     REALLY_STUPID("Really Stupid"),
     REGENERATION("Regeneration"),
