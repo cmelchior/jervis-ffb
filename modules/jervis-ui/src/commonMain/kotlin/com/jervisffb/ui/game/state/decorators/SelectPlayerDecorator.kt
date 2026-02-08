@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider

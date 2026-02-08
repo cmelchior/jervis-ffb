@@ -22,10 +22,9 @@ import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockApplyResult
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 
 /**

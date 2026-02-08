@@ -20,12 +20,12 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer

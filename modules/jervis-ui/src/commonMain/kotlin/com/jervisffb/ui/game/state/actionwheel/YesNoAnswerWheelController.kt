@@ -22,9 +22,9 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.Secure
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
+import com.jervisffb.engine.model.context.BothDownContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll

@@ -37,8 +37,8 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.actions.block.MultipleBlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepResolveSingleBlockPushChain
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepResolveSingleBlockPushChain
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
@@ -68,7 +68,7 @@ import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
  *
  * @see [com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence]
  * @see [com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence]
- * @see [PushStepResolveSingleBlockPushChain]
+ * @see [BB2020PushStepResolveSingleBlockPushChain]
  * @see [MultipleBlockAction]
  * @see [ThrowPlayerStep]
  *

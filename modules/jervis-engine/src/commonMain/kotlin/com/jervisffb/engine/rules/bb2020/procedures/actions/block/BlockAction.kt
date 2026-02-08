@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.EndAction
@@ -6,7 +6,6 @@ import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -25,7 +24,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.BlockActionContext
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
@@ -35,17 +35,6 @@ import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCo
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
-
-/**
- * Context for a "Block Action". This context only tracks the top-level state relevant to a block action.
- * All state related to the type of block is tracked in the relevant contexts.
- */
-data class BlockActionContext(
-    val attacker: Player,
-    val defender: Player,
-    val blockType: BlockType? = null,
-    val hasBlocked: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure for controlling a player's Standard Block action. Multiple Block, Stab, Projectile Vomit, etc. have
@@ -103,7 +92,7 @@ object BlockAction : Procedure() {
                     .filter { state.field[it].player!!.team != attacker.team }
                     .map { state.field[it].player!! }
                     .filter { it.state == PlayerState.STANDING }
-                    .let { listOf(SelectPlayer.fromPlayers(it)) }
+                    .let { listOf(SelectPlayer.Companion.fromPlayers(it)) }
 
             return end + eligibleDefenders
         }
@@ -131,7 +120,7 @@ object BlockAction : Procedure() {
             val attacker = state.getContext<BlockActionContext>().attacker
             val availableBlockTypes = getAvailableBlockType(attacker, true)
             return listOf(
-                SelectBlockType(availableBlockTypes),
+                com.jervisffb.engine.actions.SelectBlockType(availableBlockTypes),
                 EndActionWhenReady
             )
         }

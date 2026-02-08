@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
@@ -35,7 +35,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * @see [PushStepInitialMoveSequence] For the full description of the Push Step sequence for single blocks.
  * @see [MultipleBlockAction] For the full description of sequence in Multiple Block.
  */
-object PushStepResolveSingleBlockPushChain: Procedure() {
+object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
     override val initialNode: Node = CheckForTrapDoors
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {

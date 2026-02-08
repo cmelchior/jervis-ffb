@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -20,6 +20,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.BlockActionContext
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.BlockType
@@ -28,7 +30,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 /**
  * Procedure for handling the Stab special action as described on page 86 in the rulebook
  */
-object StabAction : Procedure() {
+object ProjectileVomitAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -36,7 +38,6 @@ object StabAction : Procedure() {
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>()
         )
-
     }
 
     object SelectDefenderOrEndAction : ActionNode() {

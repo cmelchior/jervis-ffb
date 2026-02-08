@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.standard
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
@@ -11,14 +11,14 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.SkillStatModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.MultipleBlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**

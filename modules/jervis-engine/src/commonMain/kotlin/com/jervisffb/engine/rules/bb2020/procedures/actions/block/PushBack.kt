@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.commands.Command
@@ -14,6 +14,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
@@ -24,7 +25,6 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.builder.GameVersion
 
@@ -71,7 +71,7 @@ fun createPushContext(state: Game): PushContext {
  * sequence (up until choosing to follow up or not). The rest is delayed until
  * later (e.g. checking for trapdoors, scoring).
  *
- * @see [PushStepResolveSingleBlockPushChain]
+ * @see [BB2020PushStepResolveSingleBlockPushChain]
  */
 object PushBack: Procedure() {
     override val initialNode: Node = ResolveInitialPushSequence
@@ -138,7 +138,7 @@ object PushBack: Procedure() {
     }
 
     object ResolveRemainingPushSequenceForSingleBlock: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepResolveSingleBlockPushChain
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020PushStepResolveSingleBlockPushChain
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -23,11 +23,11 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
@@ -35,15 +35,6 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
-
-data class BothDownContext(
-    val attacker: Player,
-    val defender: Player,
-    val attackUsesBlock: Boolean = false,
-    val defenderUsesBlock: Boolean = false,
-    val attackerUsesWrestle: Boolean = false,
-    val defenderUsesWrestle: Boolean = false,
-) : ProcedureContext
 
 /**
  * Resolve a "Both Down" selected as a block result.

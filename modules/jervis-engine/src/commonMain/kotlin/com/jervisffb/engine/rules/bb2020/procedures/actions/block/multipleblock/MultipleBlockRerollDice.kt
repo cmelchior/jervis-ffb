@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady

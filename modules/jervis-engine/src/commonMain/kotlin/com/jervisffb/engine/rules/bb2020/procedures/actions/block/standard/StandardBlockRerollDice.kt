@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.standard
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
@@ -20,13 +20,13 @@ import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill

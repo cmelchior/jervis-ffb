@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.standard
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DBlockResult
@@ -15,10 +15,10 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDicePool
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

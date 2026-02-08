@@ -58,9 +58,9 @@ import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll

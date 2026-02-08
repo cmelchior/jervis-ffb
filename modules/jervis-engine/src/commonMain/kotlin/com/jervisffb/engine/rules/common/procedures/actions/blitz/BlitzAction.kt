@@ -35,6 +35,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
@@ -43,9 +44,8 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.BlockType
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable

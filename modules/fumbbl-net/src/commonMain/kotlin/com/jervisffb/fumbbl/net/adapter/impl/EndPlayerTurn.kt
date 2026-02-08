@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder

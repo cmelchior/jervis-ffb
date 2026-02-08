@@ -4,8 +4,8 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockChooseReroll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

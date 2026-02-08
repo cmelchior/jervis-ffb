@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.standard
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 /**
  * Returns the number of block dice to roll during a block. x < 0 means the defender

@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block.standard
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.commands.Command
@@ -7,15 +7,15 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BothDown
-import com.jervisffb.engine.rules.common.procedures.actions.block.PlayerDown
-import com.jervisffb.engine.rules.common.procedures.actions.block.Pow
-import com.jervisffb.engine.rules.common.procedures.actions.block.PushBack
-import com.jervisffb.engine.rules.common.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PlayerDown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Pow
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushBack
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 
 /**
  * Resolve the chosen block result.

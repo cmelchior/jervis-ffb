@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.actions.block
+package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
@@ -39,15 +39,16 @@ import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockChoseResults
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockRerollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockChoseResults
-import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockRerollDice
-import com.jervisffb.engine.rules.common.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlin.collections.plus
 
 /**
  * This procedure is responsible for handling Multiple Block as described on
@@ -248,21 +249,25 @@ object MultipleBlockAction: Procedure() {
                     when {
                         context.defender1 == null -> {
                             compositeCommandOf(
-                                SetContext(context.copy(
-                                    defender1 = player,
-                                    defender1Location = player.coordinates,
-                                    activeDefender = 0)
+                                SetContext(
+                                    context.copy(
+                                        defender1 = player,
+                                        defender1Location = player.coordinates,
+                                        activeDefender = 0
+                                    )
                                 ),
                                 GotoNode(SelectBlockTypeAgainstSelectedDefender)
                             )
                         }
                         context.defender2 == null -> {
                             compositeCommandOf(
-                                SetContext(context.copy(
-                                    defender2 = player,
-                                    defender2Location = player.coordinates,
-                                    activeDefender = 1
-                                )),
+                                SetContext(
+                                    context.copy(
+                                        defender2 = player,
+                                        defender2Location = player.coordinates,
+                                        activeDefender = 1
+                                    )
+                                ),
                                 GotoNode(SelectBlockTypeAgainstSelectedDefender)
                             )
                         }
@@ -296,7 +301,10 @@ object MultipleBlockAction: Procedure() {
                 is PlayerDeselected -> {
                     val player = action.getPlayer(state)
                     if (player != context.getActiveDefender()) {
-                        INVALID_ACTION(action, "Player is not the active defender: ${player.id} vs. ${context.getActiveDefender()?.id}")
+                        INVALID_ACTION(
+                            action,
+                            "Player is not the active defender: ${player.id} vs. ${context.getActiveDefender()?.id}"
+                        )
                     }
                     compositeCommandOf(
                         SetContext(context.copyAndUnsetDefender(player)),
@@ -391,7 +399,7 @@ object MultipleBlockAction: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             return listOf(
-                SelectPlayer.fromPlayers(listOf(context.defender1!!, context.defender2!!)),
+                SelectPlayer.Companion.fromPlayers(listOf(context.defender1!!, context.defender2!!)),
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -484,7 +492,7 @@ object MultipleBlockAction: Procedure() {
                 RemoveContext(contextClass),
                 SetTurnOver(context.postponeTurnOver),
                 updatedMultiBlockContextCommand,
-                SetContextProperty(MultipleBlockContext::activeDefender,  context, null),
+                SetContextProperty(MultipleBlockContext::activeDefender, context, null),
                 GotoNode(ResolveInjuries)
             )
         }
@@ -506,7 +514,7 @@ object MultipleBlockAction: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
             return compositeCommandOf(
-                SetContextProperty(MultipleBlockContext::activeDefender,  context, 1),
+                SetContextProperty(MultipleBlockContext::activeDefender, context, 1),
                 GotoNode(ResolveBlock2Trapdoors)
             )
         }
@@ -517,7 +525,7 @@ object MultipleBlockAction: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
             return compositeCommandOf(
-                SetContextProperty(MultipleBlockContext::activeDefender,  context, 0),
+                SetContextProperty(MultipleBlockContext::activeDefender, context, 0),
                 GotoNode(CheckBlock1Touchdowns)
             )
         }
@@ -767,4 +775,3 @@ object MultipleBlockAction: Procedure() {
         }
     }
 }
-

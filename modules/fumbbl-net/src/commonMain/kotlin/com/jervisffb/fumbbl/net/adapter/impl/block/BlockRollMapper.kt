@@ -5,8 +5,8 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.common.actions.BlockType
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
