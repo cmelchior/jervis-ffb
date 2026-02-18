@@ -43,9 +43,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable

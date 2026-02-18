@@ -15,13 +15,13 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
+import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId

@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
@@ -16,15 +18,13 @@ import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
-import com.jervisffb.engine.model.context.BothDownContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll

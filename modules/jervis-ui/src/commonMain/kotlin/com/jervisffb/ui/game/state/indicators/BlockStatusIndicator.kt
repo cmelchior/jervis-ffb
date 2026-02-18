@@ -4,12 +4,12 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**

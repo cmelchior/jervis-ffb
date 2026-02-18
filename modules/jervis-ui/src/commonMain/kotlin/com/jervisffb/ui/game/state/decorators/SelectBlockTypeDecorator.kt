@@ -4,12 +4,12 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.BlockActionContext
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BlockActionContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
