@@ -19,7 +19,7 @@ val DEFAULT_INDUCEMENTS_BB2025 = mapOf<InducementType, Inducement<*>>(
     InducementType.TEMP_AGENCY_CHEERLEADER to SimpleInducement(InducementType.TEMP_AGENCY_CHEERLEADER, "Temp Agency Cheerleaders", 5, 5_000, true),
     InducementType.TEAM_MASCOT to SimpleInducement(InducementType.TEAM_MASCOT, "Team Mascot", 1, 25_000, true),
     InducementType.WEATHER_MAGE to SimpleInducement(InducementType.WEATHER_MAGE, "Weather Mage", 1, 25_000, true),
-    InducementType.BLITZERS_BEST_KEGS to SimpleInducement(InducementType.BLOODWEISER_KEG, "Blitzer's Best Kegs", 2, 50_000, true),
+    InducementType.BLITZERS_BEST_KEGS to SimpleInducement(InducementType.BLITZERS_BEST_KEGS, "Blitzer's Best Kegs", 2, 50_000, true),
     InducementType.BRIBE to SimpleInducement(InducementType.BRIBE, "Bribe", 3, 100_000, true), // 0.5x price and 2x amount for Bribery and Corruption
     InducementType.EXTRA_TEAM_TRAINING to SimpleInducement(InducementType.EXTRA_TEAM_TRAINING, "Extra Team Training", 8, 100_000, true),
     InducementType.MORTUARY_ASSISTANT to SimpleInducement(InducementType.MORTUARY_ASSISTANT, "Mortuary Assistant", 1, 100_000, true, requirements = listOf(TeamSpecialRule.MASTERS_OF_UNDEATH)),

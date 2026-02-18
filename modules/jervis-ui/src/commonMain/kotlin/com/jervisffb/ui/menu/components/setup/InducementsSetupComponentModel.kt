@@ -50,7 +50,7 @@ class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder,
     }
 
     fun updateInducementEnabled(category: String, type: InducementType, enabled: Boolean) {
-        val inducementsInCategory = inducements[category]!!
+        val inducementsInCategory = inducements[category] ?: error("Inducements for $category not found")
         updateEnabled(inducementsInCategory, type, enabled)
 
         // Expanded Mercenaries replace the standard rules and vice versa.
@@ -77,7 +77,10 @@ class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder,
     ) {
         inducements.indexOfFirst { it.type == type }.let { index ->
             if (index >= 0) {
-                builders!![type]!!.enabled = enabled
+                val inducementBuilders = builders ?: error("Missing Inducement Builders")
+                inducementBuilders[type]?.let {
+                    it.enabled = enabled
+                } ?: error("Builder for $type was not found")
                 inducements[index] = inducements[index].copy(enabled = enabled)
             }
         }
