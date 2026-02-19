@@ -122,7 +122,7 @@ private fun SquareHighlightAndAction(
         modifier = boxWrapperModifier
             .jervisPointerEvent(FieldPointerEventType.SecondaryClickSquare, square.coordinates) {
                 if (player != null) {
-                    vm.triggerShowContextMenu(player.id)
+                    vm.triggerShowPlayerContextMenu(player.id)
                 }
             }
     ) {

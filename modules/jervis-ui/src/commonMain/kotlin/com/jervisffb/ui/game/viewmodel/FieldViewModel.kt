@@ -123,8 +123,14 @@ class FieldViewModel(
         highlights.value = null
     }
 
-    fun triggerShowContextMenu(player: PlayerId) {
-        screenModel.showPlayerContextMenu(player)
+    fun triggerShowPlayerContextMenu(player: PlayerId) {
+        // Right now, right-clicking a player immediately show the "Edit Player" dialog.
+        // The rules control this behavior. In the future the Player Context Menu
+        // will probably contain more customizations (like markers), so should always be
+        // available, but for now, the behavior to disable it is controlled through the rules.
+        if (rules.allowPlayerEditsDuringGame) {
+            screenModel.showPlayerContextMenu(player)
+        }
     }
 
     /**
