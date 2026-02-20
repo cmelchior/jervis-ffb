@@ -34,7 +34,9 @@ fun JervisButton(
 ) {
     Button(
         modifier = modifier
-            .onClickWithSmallDragControl(onClick = onClick)
+            .applyIf(enabled) {
+                onClickWithSmallDragControl(onClick = onClick)
+            }
             .applyIf(fillWidth) {
                 fillMaxWidth()
             }
