@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.utils.jervisLogger
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 data class ActionWheelPlacementData(
@@ -32,7 +33,7 @@ enum class TipPosition {
  * We use this to position dialogs in relation to the field (normally in the center).
  */
 data class FieldViewData(
-    val screenSize: Size, // Size of the main game window
+    val screenSizePx: Size, // Size of the main game window in pixels. This does not include frame decour like the title bar on Mac.
     val fieldSizePx: IntSize, // Size of the field in pixels. This includes the border.
     val borderSizePx: Float,
     val fieldOffset: IntOffset, // Offset of the field in the main game window
@@ -60,9 +61,13 @@ data class FieldViewData(
 
         // Calculate 9 sections for the placement of the action wheel:
         val tipPos = chooseTipPosition(
+            screenSize = screenSizePx,
+            fieldOffset = fieldOffset,
             squareSizePx = squareSizePx,
             focus = focus,
-            wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.75f)/2f,
+            // Factor accounts for button size on the action wheel, but it would be better
+            // if it used the correct button size, rather than just guess.
+            wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.45f)/2f,
             fieldSize = fieldSizePx,
         )
 
@@ -162,6 +167,8 @@ data class FieldViewData(
     }
 
     fun chooseTipPosition(
+        screenSize: Size,
+        fieldOffset: Offset,
         squareSizePx: Float,
         focus: Offset, // Center of square in focus. Offset is from top-left corner of the field.
         wheelRadius: Float,
@@ -174,7 +181,7 @@ data class FieldViewData(
         val leftSpace = focus.x + squareSizePx*2
         val rightSpace = fieldSize.width - focus.x + squareSizePx*2
         val topSpace = focus.y + squareSizePx*2
-        val bottomSpace = fieldSize.height - focus.y + squareSizePx*2
+        val bottomSpace = min(screenSize.height - focus.y - fieldOffset.y, fieldSize.height - focus.y + squareSizePx*2)
 
         val hasCenterRoom = leftSpace >= wheelRadius &&
             rightSpace >= wheelRadius &&
