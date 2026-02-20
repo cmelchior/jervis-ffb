@@ -116,6 +116,8 @@ class P2PActionProvider(
 
     override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
         this.sharedData = sharedData
+        homeProvider.updateSharedData(sharedData)
+        awayProvider.updateSharedData(sharedData)
     }
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
