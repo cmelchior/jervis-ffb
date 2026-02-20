@@ -127,10 +127,15 @@ fun BoxScope.FieldMarkerLayer(
     Box(modifier = Modifier.fillMaxSize().drawWithContent {
         val chalkBrushSize = brushWidth.toPx()
         val squareSize = fieldDataSize.squareSize.width.toFloat() // Assumes square field
-        val wideZonePathEffect = PathEffect.dashPathEffect(
-            floatArrayOf(squareSize * 2f, squareSize),
-            squareSize
-        )
+
+        val wideZonePathEffect = if (squareSize > 0f) {
+            PathEffect.dashPathEffect(
+                floatArrayOf(squareSize * 2f, squareSize),
+                squareSize
+            )
+        } else {
+            null
+        }
 
         // Border around the  field
         drawRect(
