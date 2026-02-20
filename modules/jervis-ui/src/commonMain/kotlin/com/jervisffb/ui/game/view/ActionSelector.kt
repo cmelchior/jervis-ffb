@@ -23,6 +23,7 @@ import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
@@ -102,6 +103,7 @@ fun ActionSelector(
                             is ForegoActivationSelected -> "Forego Activation: ${action.player}"
                             is PlayersSelected -> "Selected Players: $action"
                             is PassTypeSelected -> action.type.toString()
+                            is DevModeGameAction -> error("Not supported")
                         }
                     Text(text, fontSize = 10.sp)
                 }

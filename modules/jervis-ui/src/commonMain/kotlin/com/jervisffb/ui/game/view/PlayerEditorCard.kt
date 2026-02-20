@@ -3,7 +3,6 @@ package com.jervisffb.ui.game.view
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -32,6 +31,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +56,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.actions.AddPlayerKeyword
+import com.jervisffb.engine.actions.AddPlayerSkill
+import com.jervisffb.engine.actions.ChangePlayerBaseStat
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.RemovePlayerKeyword
+import com.jervisffb.engine.actions.RemovePlayerSkill
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillValue
 import com.jervisffb.engine.model.isOnHomeTeam
@@ -72,6 +78,7 @@ import com.jervisffb.ui.game.view.JervisTheme.rulebookBlue
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -83,9 +90,19 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PlayerEditorCard(player: UiPlayerCard) {
+fun PlayerEditorCard(
+    gameModel: GameScreenModel,
+    player: UiPlayerCard
+) {
     var updateTrigger by remember { mutableStateOf(0) }
     val borderSize = 6.jdp
+
+    LaunchedEffect(gameModel.uiState.devActionHandled) {
+        gameModel.uiState.devActionHandled.collect {
+            updateTrigger += 1
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,7 +116,9 @@ fun PlayerEditorCard(player: UiPlayerCard) {
             ) {
                 PlayerStatsCard(flowOf(player))
             }
-            PlayerEditor(player, updateTrigger, borderSize, { updateTrigger += 1})
+            PlayerEditor(gameModel, player, updateTrigger, borderSize, { action ->
+                gameModel.actionProvider.userActionSelected(action)
+            })
         }
     }
 }
@@ -199,10 +218,11 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
 
 @Composable
 private fun PlayerEditor(
+    vm: GameScreenModel,
     player: UiPlayerCard,
     updateTrigger: Int,
     borderSize: Dp,
-    notifyUpdate: () -> Unit
+    handleAction: (GameAction) -> Unit
 ) {
     val tabs = listOf("Skills", "Stats", "Keywords")
     val pagerStateTop = rememberPagerState(initialPage = 0) { tabs.size }
@@ -265,11 +285,11 @@ private fun PlayerEditor(
             userScrollEnabled = userScrollEnabled,
         ) { page ->
             when (page) {
-                0 -> SkillSelectorTab(player, updateTrigger, borderSize, notifyUpdate) { skillValueSelectorVisible ->
+                0 -> SkillSelectorTab(player, updateTrigger, borderSize, handleAction) { skillValueSelectorVisible ->
                     userScrollEnabled = !skillValueSelectorVisible
                 }
-                1 -> StatsSelectorTab(player, updateTrigger, notifyUpdate)
-                2 -> KeywordsSelectorTab(player, updateTrigger, borderSize, notifyUpdate)
+                1 -> StatsSelectorTab(vm, player, updateTrigger, handleAction)
+                2 -> KeywordsSelectorTab(player, updateTrigger, borderSize, handleAction)
             }
         }
     }
@@ -281,7 +301,7 @@ private fun SkillSelectorTab(
     player: UiPlayerCard,
     updateTrigger: Int,
     borderSize: Dp,
-    notifyUpdate: () -> Unit,
+    handleAction: (GameAction) -> Unit,
     onValueSelectorShown: (Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -310,7 +330,7 @@ private fun SkillSelectorTab(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         skills.forEach { skill ->
-                            SelectSkillButton(player.model, skill, notifyUpdate) { data, onNewSkill ->
+                            SelectSkillButton(player.model, skill, handleAction) { data, onNewSkill ->
                                 scope.launch {
                                     onValueSelectorShown(true)
                                     val selected = showSkillOptionsSelector(
@@ -332,15 +352,26 @@ private fun SkillSelectorTab(
 
 @Composable
 private fun StatsSelectorTab(
+    vm: GameScreenModel,
     player: UiPlayerCard,
     updateTrigger: Int,
-    notifyUpdate: () -> Unit
+    handleAction: (GameAction) -> Unit
 ) {
     var baseMove by remember(player, updateTrigger) { mutableStateOf(player.model.baseMove.toString()) }
     var baseStrength by remember(player, updateTrigger) { mutableStateOf(player.model.baseStrength.toString()) }
     var baseAgility by remember(player, updateTrigger) { mutableStateOf("${player.model.baseAgility}+") }
     var basePassing by remember(player, updateTrigger) { mutableStateOf(player.model.basePassing?.let { "$it+" } ?: "-") }
     var baseArmour by remember(player, updateTrigger) { mutableStateOf("${player.model.baseArmorValue}+") }
+
+    LaunchedEffect(vm.uiState.devActionHandled) {
+        vm.uiState.devActionHandled.collect {
+            baseMove = player.model.baseMove.toString()
+            baseStrength = player.model.baseStrength.toString()
+            baseAgility = "${player.model.baseAgility}+"
+            basePassing = player.model.basePassing?.let { "$it+" } ?: "-"
+            baseArmour = "${player.model.baseArmorValue}+"
+        }
+    }
 
     @Composable
     fun StatRow(
@@ -393,7 +424,9 @@ private fun StatsSelectorTab(
         }
     }
 
-
+    // TODO All of these decrease/increase actions have race conditions as the model
+    //  might not update in time. That is fine for now, as we probably need to refactor
+    //  the flow of these dev events anyway.
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -407,20 +440,16 @@ private fun StatsSelectorTab(
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.move > rules.moveRange.first) {
-                    model.baseMove -= 1
-                    rules.updatePlayerStat(model, StatModifier.Type.MA)
-                    baseMove = model.baseMove.toString()
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.MA, -1)
+                    handleAction(action)
                 }
             },
             onIncreaseValue = {
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.move < rules.moveRange.last) {
-                    model.baseMove += 1
-                    rules.updatePlayerStat(model, StatModifier.Type.MA)
-                    baseMove = model.baseMove.toString()
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.MA, +1)
+                    handleAction(action)
                 }
             },
         )
@@ -433,20 +462,16 @@ private fun StatsSelectorTab(
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.strength > rules.strengthRange.first) {
-                    model.baseStrength -= 1
-                    rules.updatePlayerStat(model, StatModifier.Type.ST)
-                    baseStrength = model.baseStrength.toString()
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.ST, -1)
+                    handleAction(action)
                 }
             },
             onIncreaseValue = {
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.strength < rules.strengthRange.last) {
-                    model.baseStrength += 1
-                    rules.updatePlayerStat(model, StatModifier.Type.ST)
-                    baseStrength = model.baseStrength.toString()
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.ST, +1)
+                    handleAction(action)
                 }
             },
         )
@@ -459,20 +484,16 @@ private fun StatsSelectorTab(
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.agility > rules.agilityRange.first) {
-                    model.baseAgility -= 1
-                    rules.updatePlayerStat(model, StatModifier.Type.AG)
-                    baseAgility = "${model.baseAgility}+"
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.AG, -1)
+                    handleAction(action)
                 }
             },
             onIncreaseValue = {
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.agility < rules.agilityRange.last) {
-                    model.baseAgility += 1
-                    rules.updatePlayerStat(model, StatModifier.Type.AG)
-                    baseAgility = "${model.baseAgility}+"
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.AG, +1)
+                    handleAction(action)
                 }
             },
         )
@@ -483,32 +504,18 @@ private fun StatsSelectorTab(
             value = basePassing,
             onDecreaseValue = {
                 val model = player.model
-                val rules = model.team.game.rules
-                if (model.passing == rules.passingRange.first) {
-                    model.basePassing = null
-                    rules.updatePlayerStat(model, StatModifier.Type.PA)
-                    basePassing = "-"
-                    notifyUpdate()
-                } else if (model.passing != null && model.passing!! > rules.passingRange.first) {
-                    model.basePassing = model.passing!! - 1
-                    rules.updatePlayerStat(model, StatModifier.Type.PA)
-                    basePassing = "${model.basePassing}+"
-                    notifyUpdate()
+                val currentPassing = player.model.passing
+                if (currentPassing != null) {
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.PA, -1)
+                    handleAction(action)
                 }
             },
             onIncreaseValue = {
                 val model = player.model
                 val rules = model.team.game.rules
-                if (model.basePassing == null) {
-                    model.basePassing = rules.passingRange.first
-                    rules.updatePlayerStat(model, StatModifier.Type.PA)
-                    basePassing = model.basePassing.toString()
-                    notifyUpdate()
-                } else if (model.passing!! < rules.passingRange.last) {
-                    model.basePassing = (model.basePassing!! + 1)
-                    rules.updatePlayerStat(model, StatModifier.Type.PA)
-                    basePassing = "${model.basePassing}+"
-                    notifyUpdate()
+                if ((model.passing ?: 0) < rules.agilityRange.last) {
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.PA, +1)
+                    handleAction(action)
                 }
             },
         )
@@ -521,20 +528,16 @@ private fun StatsSelectorTab(
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.armorValue > rules.armorValueRange.first) {
-                    model.baseArmorValue -= 1
-                    rules.updatePlayerStat(model, StatModifier.Type.AV)
-                    baseArmour = "${model.baseArmorValue}+"
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.AV, -1)
+                    handleAction(action)
                 }
             },
             onIncreaseValue = {
                 val model = player.model
                 val rules = model.team.game.rules
                 if (model.armorValue < rules.armorValueRange.last) {
-                    model.baseArmorValue += 1
-                    rules.updatePlayerStat(model, StatModifier.Type.AV)
-                    baseArmour = "${model.baseArmorValue}+"
-                    notifyUpdate()
+                    val action = ChangePlayerBaseStat(model.id, StatModifier.Type.AV, +1)
+                    handleAction(action)
                 }
             },
         )
@@ -546,7 +549,7 @@ private fun KeywordsSelectorTab(
     player: UiPlayerCard,
     updateTrigger: Int,
     borderSize: Dp,
-    notifyUpdate: () -> Unit,
+    handleAction: (GameAction) -> Unit,
 ) {
     val keywordsList = remember(player, updateTrigger) {
         player.getKeywords()
@@ -566,7 +569,7 @@ private fun KeywordsSelectorTab(
             ) {
                 val color = if (player.model.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
                 keywordsList.forEach { keyword ->
-                    SelectKeywordButton(player.model, keyword, color, notifyUpdate)
+                    SelectKeywordButton(player.model, keyword, color, handleAction)
                 }
             }
         }
@@ -578,7 +581,7 @@ private fun KeywordsSelectorTab(
 fun SelectSkillButton(
     player: Player,
     skill: UiSkillData,
-    notifyUpdate: () -> Unit,
+    handleAction: (GameAction) -> Unit,
     selectSkillOption: (data: UiSkillData, onNewSkill: (Skill<*>?) -> Unit) -> Unit
 ) {
     val shape = RoundedCornerShape(0.dp)
@@ -599,29 +602,29 @@ fun SelectSkillButton(
         {
             when (isActive) {
                 true -> {
-                    player.removeSkill(skill.existingSkill!!)
+                    val action = RemovePlayerSkill(player.id, skill.existingSkill!!.skillId)
                     skillLabel = skill.factory.name
                     isActive = !isActive
-                    notifyUpdate()
+                    handleAction(action)
                 }
                 false -> {
                     if (skill.options?.options?.isNotEmpty() == true) {
                         selectSkillOption(skill) { generatedSkill ->
                             if (generatedSkill != null) {
-                                player.addSkill(generatedSkill)
+                                val action = AddPlayerSkill(player.id, generatedSkill.skillId)
                                 skillLabel = generatedSkill.name
                                 skill.existingSkill = generatedSkill
-                                notifyUpdate()
                                 isActive = !isActive
+                                handleAction(action)
                             }
                         }
                     } else {
-                        player.addSkill(skill.factory.createSkill(player, null, Duration.PERMANENT))
-                        notifyUpdate()
+                        val skill = skill.factory.createSkill(player, null, Duration.PERMANENT)
+                        val action = AddPlayerSkill(player.id, skill.skillId)
                         isActive = !isActive
+                        handleAction(action)
                     }
                 }
-
             }
         }
     }
@@ -655,7 +658,7 @@ fun SelectSkillButton(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SelectKeywordButton(player: Player, keyword: UiKeywordData, color: Color, notifyUpdate: () -> Unit) {
+private fun SelectKeywordButton(player: Player, keyword: UiKeywordData, color: Color, handleAction: (GameAction) -> Unit) {
     val shape = RoundedCornerShape(0.dp)
     var isHover by remember { mutableStateOf(false) }
     var isActive by remember(keyword) { mutableStateOf(keyword.isEnabled) }
@@ -670,12 +673,12 @@ private fun SelectKeywordButton(player: Player, keyword: UiKeywordData, color: C
     }
     val onClick = remember(keyword) {
         {
-            when (isActive) {
-                true -> player.keywords.remove(keyword.keyword)
-                false -> player.keywords.add(keyword.keyword)
+            val action = when (isActive) {
+                true -> RemovePlayerKeyword(player.id, keyword.keyword)
+                false -> AddPlayerKeyword(player.id, keyword.keyword)
             }
             isActive = !isActive
-            notifyUpdate()
+            handleAction(action)
         }
     }
 

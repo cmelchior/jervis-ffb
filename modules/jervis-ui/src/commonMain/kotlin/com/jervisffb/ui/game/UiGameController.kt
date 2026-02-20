@@ -3,6 +3,7 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -202,6 +203,11 @@ class UiGameController(
     val uiStateFlow: Flow<UiGameSnapshot>
         field = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
 
+    // Will trigger an event on this flow, every the Game Controller has handled a Dev Event.
+    // It would be nice if this was just part of the normal UI flow, but for now, this should be good enough.
+    val devActionHandled: Flow<Unit>
+        field = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+
     // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
     val uiActionWheelFlow: Flow<List<ActionWheelUiState>>
         field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
@@ -218,6 +224,22 @@ class UiGameController(
 
     init {
         actionProvider.init(this)
+    }
+
+    // Report an invalid action to the user, it should not crash the app
+    private fun reportInvalidAction(ex: InvalidActionException) {
+        menuViewModel.showReportIssueDialog(
+            title = "Invalid action created",
+            body = """
+                The UI created an action that was rejected by the rules engine.
+                State: ${state.stack.stateToPrettyString()}
+                ${ex.message}
+            """.trimIndent(),
+            error = ex,
+            gameState = gameController
+        )
+        LOG.e { "Invalid action selected: ${ex.message}" }
+        menuViewModel.lastActionException = ex
     }
 
     /**
@@ -316,7 +338,28 @@ class UiGameController(
                 // Wait for the system to produce the next action, this can either be
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
-                val userAction = actionProvider.getAction()
+                val userAction = run {
+                    // Until we can figure out how to better treat Dev Commands in the UI, we will
+                    // just execute them immediately without trying to update the UI. At least
+                    // this should fix the immediate problem of these actions not showing up
+                    // in the save file. The downside is that we risk the UI being slightly out
+                    // of sync until the next "real" action
+                    tailrec suspend fun getNextNonDevAction(): GameAction {
+                        val action = actionProvider.getAction()
+                        return if (action is DevModeGameAction) {
+                            try {
+                                gameController.handleAction(action)
+                                devActionHandled.emit(Unit)
+                            } catch (ex: InvalidActionException) {
+                                reportInvalidAction(ex)
+                            }
+                            getNextNonDevAction()
+                        } else {
+                            action
+                        }
+                    }
+                    getNextNonDevAction()
+                }
 
                 // After an action was selected, run all decorators that modify
                 // the UI while the action is being processed.
@@ -341,20 +384,8 @@ class UiGameController(
                     if (shouldHideActionWheel) {
                         acc.emitActionWheelState()
                     }
-
                 } catch (ex: InvalidActionException) {
-                    menuViewModel.showReportIssueDialog(
-                        title = "Invalid action created",
-                        body = """
-                            The UI created an action that was rejected by the rules engine.
-                            State: ${state.stack.stateToPrettyString()}
-                            ${ex.message}
-                        """.trimIndent(),
-                        error = ex,
-                        gameState = gameController
-                    )
-                    LOG.e { "Invalid action selected: ${ex.message}" }
-                    menuViewModel.lastActionException = ex
+                    reportInvalidAction(ex)
                 }
             }
         }.invokeOnCompletion {

@@ -156,7 +156,7 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                     }
                     if (viewModel.isHotseat) {
                         // TODO Make this globally available when we have refactored editing a player to go
-                        //  through "dev game actions".
+                        //  through "dev game actions" that work across the network protocol
                         SimpleSwitch("Allow Player Edits", isSelected = allowPlayerEdits) {
                             viewModel.updateAllowPlayerEdits(it)
                         }

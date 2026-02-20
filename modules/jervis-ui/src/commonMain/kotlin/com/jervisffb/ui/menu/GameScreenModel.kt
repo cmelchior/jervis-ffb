@@ -89,6 +89,9 @@ class LocalFieldDataWrapper {
     }
 }
 
+/**
+ * Top-level ViewModel foreverything on the Game Screen.
+ */
 class GameScreenModel(
     private val uiMode: TeamActionMode,
     private val gameController: GameEngineController,

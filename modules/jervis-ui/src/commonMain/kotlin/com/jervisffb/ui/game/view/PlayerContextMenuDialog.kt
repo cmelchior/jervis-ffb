@@ -43,7 +43,7 @@ fun PlayerContextMenuDialog(
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            PlayerEditorCard(player)
+            PlayerEditorCard(vm, player)
         }
     }
 }

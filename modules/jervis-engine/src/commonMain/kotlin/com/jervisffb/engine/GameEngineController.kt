@@ -1,14 +1,21 @@
 package com.jervisffb.engine
 
+import com.jervisffb.engine.actions.AddPlayerKeyword
+import com.jervisffb.engine.actions.AddPlayerSkill
+import com.jervisffb.engine.actions.ChangePlayerBaseStat
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.RemovePlayerKeyword
+import com.jervisffb.engine.actions.RemovePlayerSkill
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.EnterProcedure
+import com.jervisffb.engine.commands.ModifyPlayerBaseStat
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -27,6 +34,7 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.procedures.FullGame
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
@@ -175,6 +183,7 @@ class GameEngineController(
                     // and just apply it without restrictions.
                     undoLastAction(revertActionId = true)
                 }
+                is DevModeGameAction -> processDevAction(action)
                 else -> processForwardAction(action)
             }
         } catch (ex: InvalidActionException) {
@@ -317,6 +326,24 @@ class GameEngineController(
         }
     }
 
+    private fun processDevAction(action: DevModeGameAction) {
+        // For now, the Dev Actions only allow changes to players, revisit these
+        // checks and errors if it changes.
+        // For now, we also allow both coaches to emit Dev Commands, this should
+        // probably also change.
+        if (!rules.allowPlayerEditsDuringGame) {
+            error("Player edits are not allowed during this game.")
+        }
+        lastActionIfUndo = null
+        val newDeltaId = (lastGameActionId + 1)
+        deltaBuilder = DeltaBuilder(newDeltaId, null)
+        processSingleDevAction(deltaBuilder, action)
+        val delta = deltaBuilder.build()
+        _history.add(delta)
+        lastGameActionId = newDeltaId
+    }
+
+    // Any change here might need to be replicated in [processDevAction]
     private fun processForwardAction(userAction: GameAction) {
         lastActionIfUndo = null
         val actionOwner = currentNode().let { node ->
@@ -354,6 +381,45 @@ class GameEngineController(
         val command = currentNode.applyAction(userAction, state, rules)
         executeCommand(command)
         rollForwardToNextActionNode()
+        if (logAvailableActions) {
+            logInternalEvent(ReportAvailableActions(getAvailableActions()))
+        }
+        deltaBuilder.endAction()
+    }
+
+    // This is a reduced version of [processSingleAction]
+    private fun processSingleDevAction(deltaBuilder: DeltaBuilder, action: DevModeGameAction) {
+        val currentProcedure = stack.peepOrNull()!!
+        deltaBuilder.beginAction(
+            action,
+            currentProcedure.procedure,
+            currentProcedure.currentNode())
+        logInternalEvent(ReportHandleAction(action))
+        val command = when (action) {
+            is AddPlayerSkill -> {
+                val player = action.getPlayer(state)
+                val skill = rules.createSkill(player, action.skill, Duration.PERMANENT)
+                com.jervisffb.engine.commands.AddPlayerSkill(player, skill)
+            }
+            is RemovePlayerSkill -> {
+                val player = action.getPlayer(state)
+                val skill = player.getSkill(action.skill.type)
+                com.jervisffb.engine.commands.RemovePlayerSkill(player, skill)
+            }
+            is ChangePlayerBaseStat -> {
+                val player = action.getPlayer(state)
+                ModifyPlayerBaseStat(player, action.type, action.modifier)
+            }
+            is AddPlayerKeyword -> {
+                val player = action.getPlayer(state)
+                com.jervisffb.engine.commands.AddPlayerKeyword(player, action.keyword)
+            }
+            is RemovePlayerKeyword -> {
+                val player = action.getPlayer(state)
+                com.jervisffb.engine.commands.RemovePlayerKeyword(player, action.keyword)
+            }
+        }
+        executeCommand(command)
         if (logAvailableActions) {
             logInternalEvent(ReportAvailableActions(getAvailableActions()))
         }

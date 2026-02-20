@@ -20,8 +20,7 @@ things as they come up.
 - [ ] UI for pushing players into the crowd is not working (and have been disabled for now).
 - [ ] Add a "right-click" menu for players. We should combine "Edit Player" and "Forego Activation" in there.
 - [ ] Add a better error message when reporting invalid setup. Possibly adopt the BB3 approach where you are shown all the invariants during setup.
-- [ ] Add a "dev-mode" protocol for networked game. Should be used for e.g. "Allow Player Edits". Need to figure out 
-      how to refresh UI on the other client.
+- [ ] The current "dev-mode" protocol works around the UI-loop in a way that can lead to UI inconsistencies.
 - [ ] Make a keyboard shortcut for showing "Player range" and "Tackle Zones"
       Unclear which keys makes sense. Probably need to make it configurable
 - [ ] Add UI indicator signaling limit of opponent players move (see BB3).
@@ -49,8 +48,6 @@ things as they come up.
 - [ ] Add scrollbar indicator to game log components.
 - [ ] Could we add 3d dice rolling across the board? Probably difficult in pure Compose, but maybe using Lottie?
 - [ ] Add AFK Limit to timer settings + AFK button in the UI
-- [ ] Add a "Player Editor" in Dev Mode that makes it possible to add skills, change stats, and states.
-      Need to figure out exactly how this should work.
 - [ ] When Undo'ing block dice it messes up the Action Wheel logic so it shows the dice roll that is skipped when going
       forward. That isn't a bug per see, but how the design works. However it feels jarring in that case. Not 100% sure
       what the best approach is. We can either combine Nodes in the engine, or find some ways to hack the UI flow.

@@ -30,8 +30,11 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.common.procedures.D6DieRoll::class)
     }
     polymorphic(com.jervisffb.engine.actions.GameAction::class) {
+        subclass(com.jervisffb.engine.actions.AddPlayerKeyword::class)
+        subclass(com.jervisffb.engine.actions.AddPlayerSkill::class)
         subclass(com.jervisffb.engine.actions.BlockTypeSelected::class)
         subclass(com.jervisffb.engine.actions.Cancel::class)
+        subclass(com.jervisffb.engine.actions.ChangePlayerBaseStat::class)
         subclass(com.jervisffb.engine.actions.CoinSideSelected::class)
         subclass(com.jervisffb.engine.actions.CoinTossResult::class)
         subclass(com.jervisffb.engine.actions.CompositeGameAction::class)
@@ -64,10 +67,19 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.PlayerSelected::class)
         subclass(com.jervisffb.engine.actions.PlayersSelected::class)
         subclass(com.jervisffb.engine.actions.RandomPlayersSelected::class)
+        subclass(com.jervisffb.engine.actions.RemovePlayerKeyword::class)
+        subclass(com.jervisffb.engine.actions.RemovePlayerSkill::class)
         subclass(com.jervisffb.engine.actions.RerollOptionSelected::class)
         subclass(com.jervisffb.engine.actions.Revert::class)
         subclass(com.jervisffb.engine.actions.SkillSelected::class)
         subclass(com.jervisffb.engine.actions.Undo::class)
+        polymorphic(com.jervisffb.engine.actions.DevModeGameAction::class) {
+            subclass(com.jervisffb.engine.actions.AddPlayerKeyword::class)
+            subclass(com.jervisffb.engine.actions.AddPlayerSkill::class)
+            subclass(com.jervisffb.engine.actions.ChangePlayerBaseStat::class)
+            subclass(com.jervisffb.engine.actions.RemovePlayerKeyword::class)
+            subclass(com.jervisffb.engine.actions.RemovePlayerSkill::class)
+        }
         polymorphic(com.jervisffb.engine.actions.DieResult::class) {
             subclass(com.jervisffb.engine.actions.D12Result::class)
             subclass(com.jervisffb.engine.actions.D16Result::class)

@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
@@ -91,6 +92,7 @@ data class SingleChoiceInputDialog(
                 is ForegoActivationSelected -> "Forego Activation: ${action.player}"
                 is PlayersSelected -> "Select Players: $action"
                 is PassTypeSelected -> action.type.name
+                is DevModeGameAction -> error("Not supported")
             }
         }
 

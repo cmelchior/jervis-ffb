@@ -21,6 +21,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DeselectPlayer
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
@@ -220,6 +221,8 @@ data class ActionRequest(
                     it.players.containsAll(action.players)
                 } ?: false
             }
+
+            is DevModeGameAction -> false // Dev Actions should never be handled here
         }
     }
 

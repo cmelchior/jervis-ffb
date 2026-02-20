@@ -19,6 +19,20 @@ interface StatModifier {
     val expiresAt: Duration
 }
 
+// Fake StatModifier constructor for generic stat modifiers
+fun StatModifier(
+    type: Type,
+    modifier: Int,
+    description: String,
+    expiresAt: Duration = Duration.PERMANENT
+): StatModifier =
+    object : StatModifier {
+        override val type: Type = type
+        override val modifier: Int = modifier
+        override val description: String = description
+        override val expiresAt: Duration = expiresAt
+    }
+
 enum class SkillStatModifier(
     override val description: String,
     override val modifier: Int,

@@ -22,6 +22,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DeselectPlayer
+import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
@@ -172,6 +173,7 @@ fun GameAction.isRandomAction(): Boolean {
         is ForegoActivationSelected -> false
         is PlayersSelected -> false
         is PassTypeSelected -> false
+        is DevModeGameAction -> false
     }
 }
 
