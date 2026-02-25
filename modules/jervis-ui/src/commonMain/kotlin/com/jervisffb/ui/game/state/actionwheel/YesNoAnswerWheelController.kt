@@ -22,6 +22,8 @@ import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
@@ -142,6 +144,8 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
     override val nodes: Set<Node> = setOf(
         BothDown.AttackerChooseToUseBlock,
         BothDown.DefenderChooseToUseBlock,
+        BB2025BothDown.AttackerChooseToUseBlock,
+        BB2025BothDown.DefenderChooseToUseBlock
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<BothDownContext>()
@@ -157,6 +161,8 @@ object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
     override val nodes: Set<Node> = setOf(
         BothDown.AttackerChooseToUseWrestle,
         BothDown.DefenderChooseToUseWrestle,
+        BB2025BothDown.AttackerChooseToUseWrestle,
+        BB2025BothDown.DefenderChooseToUseWrestle
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<BothDownContext>()
@@ -191,7 +197,8 @@ object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
 
 object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
     override val nodes: Set<Node> = setOf(
-        Stumble.ChooseToUseDodge
+        Stumble.ChooseToUseDodge,
+        BB2025Stumble.ChooseToUseDodge,
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val defender = state.getContext<StumbleContext>().defender
@@ -201,7 +208,8 @@ object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
 
 object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
     override val nodes: Set<Node> = setOf(
-        Stumble.ChooseToUseTackle
+        Stumble.ChooseToUseTackle,
+        BB2025Stumble.ChooseToUseTackle
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val attacker = state.getContext<StumbleContext>().attacker
