@@ -28,6 +28,8 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.utils.assert
@@ -72,6 +74,7 @@ object ThrowIn : Procedure() {
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
                 val ball = context.ball
                 return compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.THROWIN_DIRECTION, d3),
                     SetContext(context.copy(
                         directionRoll =  d3,
                         direction = direction,
@@ -119,6 +122,7 @@ object ThrowIn : Procedure() {
 
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
+                        ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
                         SetContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         SetBallState.outOfBounds(ball, outOfBoundsAt),
@@ -126,6 +130,7 @@ object ThrowIn : Procedure() {
                     )
                 } else {
                     compositeCommandOf(
+                        ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
                         SetContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         GotoNode(ResolveLandOnField)
