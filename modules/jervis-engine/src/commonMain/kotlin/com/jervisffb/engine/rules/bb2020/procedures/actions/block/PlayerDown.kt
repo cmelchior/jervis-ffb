@@ -16,7 +16,7 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportPlayerDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
@@ -39,7 +39,7 @@ object PlayerDown: Procedure() {
     }
 
     object ResolvePlayerDown: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

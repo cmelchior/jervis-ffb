@@ -16,11 +16,14 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.common.procedures.Pickup
@@ -108,7 +111,7 @@ abstract class UseSkillWheelController(skill: SkillType) : YesNoAnswerWheelContr
 object FollowUpWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
         BB2020PushStepInitialMoveSequence.DecideToFollowUp,
-        BB2025PushStepInitialMoveSequence.ChooseToFollowUp,
+        FollowUpStep.ChooseToFollowUp,
     )
 
     override val yesLabel: String = "Follow Up"
@@ -178,7 +181,7 @@ object UseSafePassWheelController: UseSkillWheelController(SkillType.SAFE_PASS) 
 object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
     override val nodes: Set<Node> = setOf(
         BB2020PushStepInitialMoveSequence.DecideToUseSidestep,
-        BB2025PushStepInitialMoveSequence.DecideToUseSidestep,
+        CreatePushChainStep.DecideToUseSidestep,
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<PushContext>().pushee()
@@ -240,11 +243,11 @@ object UseDirtyPlayerWheelController: UseSkillWheelController(SkillType.DIRTY_PL
 
 object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
     override val nodes: Set<Node> = setOf(
-        BB2025PushStepInitialMoveSequence.ChooseToUseFend
+        FollowUpStep.ChooseToUseFend
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = when (state.stack.currentNode()) {
-            BB2025PushStepInitialMoveSequence.ChooseToUseFend -> state.getContext<PushContext>().firstPushee
+            FollowUpStep.ChooseToUseFend -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
         return player.coordinates
@@ -253,11 +256,11 @@ object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
 
 object UseTauntWheelController: UseSkillWheelController(SkillType.TAUNT) {
     override val nodes: Set<Node> = setOf(
-        BB2025PushStepInitialMoveSequence.ChooseToUseTaunt
+        FollowUpStep.ChooseToUseTaunt
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = when (state.stack.currentNode()) {
-            BB2025PushStepInitialMoveSequence.ChooseToUseTaunt -> state.getContext<PushContext>().firstPushee
+            FollowUpStep.ChooseToUseTaunt -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
         return player.coordinates

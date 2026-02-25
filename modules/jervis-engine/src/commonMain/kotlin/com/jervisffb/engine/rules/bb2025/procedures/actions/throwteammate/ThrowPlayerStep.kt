@@ -50,6 +50,7 @@ import com.jervisffb.engine.reports.ReportStartingThrowTeamMate
 import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
@@ -63,7 +64,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowP
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
-import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
@@ -310,7 +310,7 @@ object ThrowPlayerStep: Procedure() {
                 SetContext(throwContext.copy(knockedDownWhenLanding = true))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
@@ -548,7 +548,7 @@ object ThrowPlayerStep: Procedure() {
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }

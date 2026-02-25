@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures.tables.injury
+package com.jervisffb.engine.rules.bb2025.procedures.tables.injury
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -14,21 +14,28 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Resolve a player being knocked down as described on page 27 in the rulebook.
+ * Resolve a player being Knocked Down. This includes skills triggering just
+ * before being Knocked Down, like Steady Footing, as well as skills triggering
+ * after, like Pile Driver.
+ *
+ * See page 40 in the BB2025 rulebook.
  */
-object KnockedDown: Procedure() {
+object BB2025KnockedDown: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
-        // See page 23 in the rulebook
+        // See page 23 in the BB2020 rulebook
         val isOnActiveTeam = (context.player.team == state.activeTeam)
         // It is only a turnover if a thrown player is knocked down holding the ball (see Errata May 2025)
         val hasBall = context.player.hasBall()
@@ -71,7 +78,7 @@ object KnockedDown: Procedure() {
             val isBouncing = state.currentBallOrNull()?.state == BallState.BOUNCING
             return when {
                 isBouncing && context.isPartOfMultipleBlock -> {
-                    val mbContext = state.getContext<MultipleBlockContext>()
+                    val mbContext = state.getContext<BB2020MultipleBlockContext>()
                     compositeCommandOf(
                         SetCurrentBall(null),
                         ExitProcedure()
@@ -100,4 +107,3 @@ object KnockedDown: Procedure() {
         }
     }
 }
-

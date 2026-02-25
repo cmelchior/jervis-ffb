@@ -15,16 +15,14 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.reports.ReportPowResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 
@@ -55,22 +53,18 @@ object Pow: Procedure() {
 
     object ResolveInitialPushSequence: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when (rules.baseVersion) {
-                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
-                GameVersion.BB2025 -> BB2025PushStepInitialMoveSequence
-            }
-
+            return BB2020PushStepInitialMoveSequence
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             val pushContext = state.getContext<PushContext>()
             return buildCompositeCommand {
                 if (blockContext.isUsingMultiBlock) {
-                    val multipleBlockContext = state.getContext<MultipleBlockContext>()
+                    val multipleBlockContext = state.getContext<BB2020MultipleBlockContext>()
                     val property = if (multipleBlockContext.activeDefender == 0) {
-                        MultipleBlockContext::defender1PushChain
+                        BB2020MultipleBlockContext::defender1PushChain
                     } else {
-                        MultipleBlockContext::defender2PushChain
+                        BB2020MultipleBlockContext::defender2PushChain
                     }
                     add(SetContextProperty(property, multipleBlockContext, pushContext))
                 }
@@ -87,7 +81,7 @@ object Pow: Procedure() {
      * If they had a ball, it is now loose, ready to bounce.
      *
      * If this is part of a Multiple Block, the injury isn't fully resolved,
-     * instead it is saved in the Injury Pool in [MultipleBlockContext] and
+     * instead it is saved in the Injury Pool in [BB2020MultipleBlockContext] and
      * will be resolved later. The same for any loose ball. It is just knocked
      * loose, but the bounce is handled later.
      *
@@ -132,7 +126,7 @@ object Pow: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val multipleBlockContext = state.getContextOrNull<MultipleBlockContext>()
+            val multipleBlockContext = state.getContextOrNull<BB2020MultipleBlockContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val updateInjuryCommand = multipleBlockContext?.addInjuryReferenceForPlayer(
                 injuryContext.player,
@@ -153,7 +147,7 @@ object Pow: Procedure() {
     // TODO
     object DecideToUseStripBall: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val isMultipleBlock = state.hasContext<MultipleBlockContext>()
+            val isMultipleBlock = state.hasContext<BB2020MultipleBlockContext>()
             return when (isMultipleBlock) {
                 true -> ExitProcedure()
                 false -> GotoNode(ResolveRemainingPushSequenceForSingleBlock)

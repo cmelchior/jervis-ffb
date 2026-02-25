@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 
@@ -30,7 +30,7 @@ object DirectionArrowStatusIndicator: FieldStatusIndicator {
             // bouncing balls etc.) they should be removed again. Otherwise the UI gets too confusing.
             val stack = state.stack
             val isBB2020FollowUp = !stack.containsProcedure(BB2020PushStepInitialMoveSequence) || state.stack.currentNode() == BB2020PushStepInitialMoveSequence.DecideToFollowUp
-            val isBB2025FollowUp = !stack.containsProcedure(BB2025PushStepInitialMoveSequence) || state.stack.currentNode() == BB2025PushStepInitialMoveSequence.ChooseToFollowUp
+            val isBB2025FollowUp = !stack.containsProcedure(FollowUpStep) || state.stack.currentNode() == FollowUpStep.ChooseToFollowUp
             if (isBB2025FollowUp || isBB2020FollowUp) return@let
 
             // Only show arrows on intermediate push steps, not the final square

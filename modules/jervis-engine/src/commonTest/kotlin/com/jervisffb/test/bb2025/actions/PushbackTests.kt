@@ -205,8 +205,8 @@ class PushbackTests: JervisGameBB2025Test() {
         )
         controller.rollForward(
             DirectionSelected(Direction.BOTTOM),
+            Confirm, // Follow up
             DiceRollResults(1.d6, 1.d6), // Injury roll
-            Confirm // Follow up
         )
         assertEquals(FieldCoordinate(1, 14), awayTeam["A1".playerId].coordinates)
         homeTeam["H8".playerId].let {
@@ -259,8 +259,8 @@ class PushbackTests: JervisGameBB2025Test() {
             *activatePlayer("A7", PlayerStandardActionType.BLOCK),
             *standardBlock("H4", 4.dblock),
             DirectionSelected(Direction.UP),
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             Confirm, // Follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             2.d3, // Throw-in direction
             DiceRollResults(1.d6, 2.d6), // Throw-in distance
             7.d8 // Bounce
@@ -290,8 +290,8 @@ class PushbackTests: JervisGameBB2025Test() {
             *standardBlock("H2", 4.dblock),
             DirectionSelected(Direction.RIGHT), // First push
             DirectionSelected(Direction.RIGHT), // 2nd push (into the crowd)
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
             Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
             2.d3, // Throw-in direction
             DiceRollResults(1.d6, 2.d6), // Throw-in distance
             *catch(6.d6)
@@ -319,8 +319,8 @@ class PushbackTests: JervisGameBB2025Test() {
             *standardBlock("H2", 4.dblock),
             DirectionSelected(Direction.RIGHT), // First push
             DirectionSelected(Direction.RIGHT), // 2nd push (into the crowd)
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
         )
         assertEquals(awayTeam, state.activeTeam)
         assertNull(state.activePlayer)

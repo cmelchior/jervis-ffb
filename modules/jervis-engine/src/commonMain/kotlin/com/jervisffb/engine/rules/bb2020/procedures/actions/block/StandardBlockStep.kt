@@ -19,8 +19,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 
 /**
- * Procedure for handling a standard block once attacker and defender have been identified. This includes
- * rolling dice and resolving the result.
+ * Procedure for handling a standard block once attacker and defender have been
+ * identified. This includes rolling dice and resolving the result.
  *
  * This procedure is called as part of a [BlockAction] or [BlitzAction].
  */

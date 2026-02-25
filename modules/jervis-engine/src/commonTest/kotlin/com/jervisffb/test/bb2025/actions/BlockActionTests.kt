@@ -23,7 +23,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
@@ -166,7 +166,7 @@ class BlockActionTests: JervisGameBB2025Test() {
             },
             DiceRollResults(6.dblock, 6.dblock),
         )
-        assertEquals(StandardBlockChooseResult.SelectBlockResult, controller.currentNode())
+        assertEquals(SingleStandardBlockChooseResult.SelectBlockResult, controller.currentNode())
         val context = state.getContext<BlockContext>()
         assertEquals(2, context.roll.size)
         context.roll.forEach {

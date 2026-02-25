@@ -49,7 +49,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
@@ -468,7 +469,7 @@ open class ManualActionProvider(
         }
 
         // Automatically select pushback direction when only one option is available.
-        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is BB2025PushStepInitialMoveSequence.SelectPushDirection) {
+        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is CreatePushChainStep.SelectPushDirection) {
             val loc = (actions.first() as SelectFieldLocation).squares.first()
             return FieldSquareSelected(loc.coordinate)
         }
@@ -489,8 +490,12 @@ open class ManualActionProvider(
 
         // When there is only one block type for a block, just select that one straight away
         if (
-            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION) &&
-            (currentNode == BlockAction.SelectBlockType || currentNode == BlitzAction.SelectBlockType)
+            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION)
+            && (currentNode in setOf(
+                com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectBlockType,
+                com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
+                BlitzAction.SelectBlockType,
+            ))
         ) {
             actions.filterIsInstance<SelectBlockType>().firstOrNull()?.let {
                 if (it.size == 1) {
@@ -518,7 +523,7 @@ open class ManualActionProvider(
         }
 
         // Automatically decide to follow op (or not), if you there really isn't a choice in the matter
-        if (currentNode is BB2025PushStepInitialMoveSequence.ChooseToFollowUp && actions.size == 1) {
+        if (currentNode is FollowUpStep.ChooseToFollowUp && actions.size == 1) {
             return when (val action = actions.first()) {
                 is ConfirmWhenReady -> Confirm
                 is CancelWhenReady -> Cancel

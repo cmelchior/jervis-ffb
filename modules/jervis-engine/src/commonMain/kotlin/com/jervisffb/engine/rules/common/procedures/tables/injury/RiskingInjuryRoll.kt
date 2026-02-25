@@ -15,7 +15,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -268,7 +268,7 @@ object RiskingInjuryRoll: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             return if (state.getContext<RiskingInjuryContext>().isPartOfMultipleBlock) {
                 val injuryContext = state.getContext<RiskingInjuryContext>()
-                val mbContext = state.getContext<MultipleBlockContext>()
+                val mbContext = state.getContext<BB2020MultipleBlockContext>()
                 compositeCommandOf(
                     mbContext.addInjuryReferenceForPlayer(injuryContext.player, injuryContext),
                     ExitProcedure(),

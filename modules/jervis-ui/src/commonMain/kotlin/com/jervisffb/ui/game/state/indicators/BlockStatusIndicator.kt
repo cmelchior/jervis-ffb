@@ -4,8 +4,8 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -24,7 +24,7 @@ object BlockStatusIndicator: FieldStatusIndicator {
         acc: UiSnapshotAccumulator
     ) {
         val blockContext = state.getContextOrNull<BlockContext>()
-        val multipleBlockContext = state.getContextOrNull<MultipleBlockContext>()
+        val multipleBlockContext = state.getContextOrNull<BB2020MultipleBlockContext>()
         val players = mutableListOf<Player>()
         if (multipleBlockContext != null) {
             multipleBlockContext.defender1?.let { players.add(it) }

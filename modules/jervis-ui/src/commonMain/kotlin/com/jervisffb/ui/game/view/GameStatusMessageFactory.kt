@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
@@ -348,21 +348,21 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
-        BB2025PushStepInitialMoveSequence.ChooseToFollowUp to { isActiveClient, _, _ ->
+        FollowUpStep.ChooseToFollowUp to { isActiveClient, _, _ ->
             when (isActiveClient) {
                 true -> "Follow up?"
                 false -> "Waiting for opponent to use to follow up or not"
             }
         },
 
-        BB2025PushStepInitialMoveSequence.ChooseToUseFend to { isActiveClient, _, _ ->
+        FollowUpStep.ChooseToUseFend to { isActiveClient, _, _ ->
             when (isActiveClient) {
                 true -> "Use Fend to prevent a follow up?"
                 false -> "Waiting for opponent to use to Fend or not"
             }
         },
 
-        BB2025PushStepInitialMoveSequence.ChooseToUseTaunt to { isActiveClient, _, _ ->
+        FollowUpStep.ChooseToUseTaunt to { isActiveClient, _, _ ->
             when (isActiveClient) {
                 true -> "Use Taunt to force attacker to follow up?"
                 false -> "Waiting for opponent to use Taunt or not"

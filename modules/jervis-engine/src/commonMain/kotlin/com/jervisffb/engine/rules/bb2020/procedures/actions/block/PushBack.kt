@@ -14,8 +14,8 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
@@ -25,8 +25,6 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.builder.GameVersion
 
 
 // Helper method for creating a push context before moving a player back
@@ -92,10 +90,7 @@ object PushBack: Procedure() {
 
     object ResolveInitialPushSequence: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when (rules.baseVersion) {
-                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
-                GameVersion.BB2025 -> BB2025PushStepInitialMoveSequence
-            }
+            return BB2020PushStepInitialMoveSequence
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
@@ -104,11 +99,11 @@ object PushBack: Procedure() {
             return buildCompositeCommand {
                 add(SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)))
                 if (blockContext.isUsingMultiBlock) {
-                    val multipleBlockContext = state.getContext<MultipleBlockContext>()
+                    val multipleBlockContext = state.getContext<BB2020MultipleBlockContext>()
                     val property = if (multipleBlockContext.activeDefender == 0) {
-                        MultipleBlockContext::defender1PushChain
+                        BB2020MultipleBlockContext::defender1PushChain
                     } else {
-                        MultipleBlockContext::defender2PushChain
+                        BB2020MultipleBlockContext::defender2PushChain
                     }
                     add(SetContextProperty(property, multipleBlockContext, pushContext))
                 }
@@ -129,7 +124,7 @@ object PushBack: Procedure() {
     // TODO
     object DecideToUseStripBall: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val isMultipleBlock = state.hasContext<MultipleBlockContext>()
+            val isMultipleBlock = state.hasContext<BB2020MultipleBlockContext>()
             return when (isMultipleBlock) {
                 true -> ExitProcedure()
                 false -> GotoNode(ResolveRemainingPushSequenceForSingleBlock)

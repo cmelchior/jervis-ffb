@@ -32,9 +32,7 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.builder.GameVersion
-import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -94,7 +92,7 @@ object Stumble: Procedure() {
     }
 
     object ChooseToUseDodge: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().defender.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<StumbleContext>().defender.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
             return if (stumbleContext.defender.hasSkill(SkillType.DODGE)) {
@@ -129,10 +127,7 @@ object Stumble: Procedure() {
         }
 
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when (rules.baseVersion) {
-                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
-                GameVersion.BB2025 -> BB2025PushStepInitialMoveSequence
-            }
+            return BB2020PushStepInitialMoveSequence
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -160,7 +155,7 @@ object Stumble: Procedure() {
                 SetContext(injuryContext)
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),

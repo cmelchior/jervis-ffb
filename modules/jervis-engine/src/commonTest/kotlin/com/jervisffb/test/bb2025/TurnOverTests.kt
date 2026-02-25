@@ -133,8 +133,8 @@ class TurnOverTests: JervisGameBB2025Test() {
         )
         assertEquals(TurnOver.STANDARD, state.turnOver)
         controller.rollForward(
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
             Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
             2.d3, // Throw-in direction
             DiceRollResults(1.d6, 2.d6), // Throw-in distance
             *catch(6.d6)
@@ -162,8 +162,8 @@ class TurnOverTests: JervisGameBB2025Test() {
         )
         assertNull(state.turnOver)
         controller.rollForward(
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, do not cause turnover
             Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, do not cause turnover
         )
         assertNull(state.turnOver)
         assertNull(state.activePlayer)
@@ -182,8 +182,8 @@ class TurnOverTests: JervisGameBB2025Test() {
         )
         assertNull(state.turnOver)
         controller.rollForward(
-            DiceRollResults(1.d6, 1.d6), // Injury roll
             Confirm, // Follow up
+            DiceRollResults(1.d6, 1.d6), // Injury roll
             2.d3, // Throw-in direction
             DiceRollResults(1.d6, 1.d6), // Throw-in distance
             4.d8 // Bounce

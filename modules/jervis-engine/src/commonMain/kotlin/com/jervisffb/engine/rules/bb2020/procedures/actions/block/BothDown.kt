@@ -31,7 +31,7 @@ import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.KnockedDown
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -228,7 +228,7 @@ object BothDown: Procedure() {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ResolveAttackerInjury)
         }
@@ -256,7 +256,7 @@ object BothDown: Procedure() {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Attacker went down, so its turn ends immediately, commonly because it is a turnover,
             // but if it happened during a kick-off blitz, it just ends the Blitz.

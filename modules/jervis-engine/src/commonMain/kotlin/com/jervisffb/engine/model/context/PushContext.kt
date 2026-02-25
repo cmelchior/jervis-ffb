@@ -34,6 +34,8 @@ data class PushContext(
     // swallowed a player with a ball. Balls should be added and resolved in
     // order.
     val looseBalls: MutableList<Ball> = mutableListOf(),
+    // True, if the last player gets pushed into the crowd.
+    val pushedIntoTheCrowd: Boolean = false
 ) : ProcedureContext {
 
     // Tracks if the attacker is using Juggernaut.

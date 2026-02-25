@@ -1,20 +1,15 @@
 package com.jervisffb.engine.model.context
 
-import com.jervisffb.engine.actions.BlockDicePool
-import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
@@ -24,109 +19,7 @@ import com.jervisffb.engine.rules.common.actions.BlockType.MULTIPLE_BLOCK
 import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
-import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-
-/**
- * Class wrapping one of the block actions part of a multiple block actions.
- * It also acts as a facade, exposing a shared API for all the different block types.
- */
-data class MultipleBlockDiceRoll(
-    val type: BlockType,
-    var rollContext: ProcedureContext, // The roll specific context for the given type
-) {
-
-    fun createDicePool(id: Int): BlockDicePool {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> BlockDicePool((rollContext as BlockContext).roll, selectDice = 1, id = DicePoolId(id))
-        }
-    }
-
-
-    fun hasAcceptedResult(): Boolean {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                (rollContext as BlockContext).hasAcceptedResult
-            }
-        }
-    }
-
-    fun getRoll(): List<DieRoll<*>> {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> (rollContext as BlockContext).roll
-        }
-    }
-
-    fun copyAndSetHasAcceptedResult(acceptedResult: Boolean): MultipleBlockDiceRoll {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                this.copy(rollContext = (rollContext as BlockContext).copy(hasAcceptedResult = acceptedResult))
-            }
-        }
-    }
-
-    fun getRerollOptions(rules: Rules, attacker: Player, dicePoolId: Int): List<GameActionDescriptor> {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                StandardBlockRerollDice.getRerollOptions(
-                    rules = rules,
-                    attackingPlayer = attacker,
-                    dicePoolId = dicePoolId,
-                    diceRoll = (rollContext as BlockContext).roll
-                )
-            }
-        }
-    }
-
-    fun setSelectedDieResult(die: DieResult): Command {
-        return when (type) {
-            BlockType.BREATHE_FIRE -> TODO()
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                val context = (rollContext as BlockContext)
-                var selectedIndex = -1
-                for (i in context.roll.indices) {
-                    // This might select another index if two dice have the same value
-                    // Does it matter?
-                    if (context.roll[i].result == die) {
-                        selectedIndex = i
-                        break
-                    }
-                }
-                SetContextProperty(BlockContext::resultIndex, context, selectedIndex)
-            }
-        }
-    }
-}
-
 /**
  * Context containing state related to doing a Multiple Block.
  *
@@ -134,7 +27,7 @@ data class MultipleBlockDiceRoll(
  * it exposes an API that makes it possible to access rolls using list
  * indexes.
  */
-data class MultipleBlockContext(
+data class BB2025MultipleBlockContext(
     val attacker: Player,
     val defender1: Player? = null,
     val defender2: Player? = null,
@@ -151,6 +44,10 @@ data class MultipleBlockContext(
     val defender1BallsHandled: Boolean = false,
     val defender2BallsHandled: Boolean = false,
     val attackerBallHandled: Boolean = false,
+    // Set to true, if the player should be Knocked Down, when we come to that phase of Multiple Block
+    val attackerKnockedDown: Boolean = false,
+    val defender1KnockedDown: Boolean = false,
+    val defender2KnockedDown: Boolean = false,
     // Set if any of the players involved received an injury. The attacker might suffer an
     // injury from both blocks
     val attackerInjuryContext: MutableList<RiskingInjuryContext> = mutableListOf(),
@@ -187,7 +84,7 @@ data class MultipleBlockContext(
         }
     }
 
-    fun copyAndUpdateHasAcceptedResult(index: Int, hasAcceptedResult: Boolean): MultipleBlockContext {
+    fun copyAndUpdateHasAcceptedResult(index: Int, hasAcceptedResult: Boolean): BB2025MultipleBlockContext {
         return when (index) {
             0 -> copy(roll1 = roll1!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
             1 -> copy(roll2 = roll2!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
@@ -284,8 +181,8 @@ data class MultipleBlockContext(
     fun addInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): Command {
         return when (player) {
             attacker -> AddContextListItem(attackerInjuryContext, injuryContext)
-            defender1 -> SetContextProperty(MultipleBlockContext::defender1InjuryContext, this, injuryContext)
-            defender2 -> SetContextProperty(MultipleBlockContext::defender2InjuryContext, this, injuryContext)
+            defender1 -> SetContextProperty(BB2025MultipleBlockContext::defender1InjuryContext, this, injuryContext)
+            defender2 -> SetContextProperty(BB2025MultipleBlockContext::defender2InjuryContext, this, injuryContext)
             else -> throw IllegalArgumentException("Invalid player: $player")
         }
     }
@@ -294,7 +191,7 @@ data class MultipleBlockContext(
      * Sets the block type for the current active defender.
      * This also c
      */
-    fun copyAndSetBlockTypeForActiveDefender(type: BlockType): MultipleBlockContext {
+    fun copyAndSetBlockTypeForActiveDefender(type: BlockType): BB2025MultipleBlockContext {
         val defender = when (activeDefender) {
             0 -> defender1!!
             1 -> defender2!!
@@ -340,6 +237,14 @@ data class MultipleBlockContext(
         return when (activeDefender) {
             0 -> roll1!!.rollContext
             1 -> roll2!!.rollContext
+            else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")
+        }
+    }
+
+    fun copyAndKnockDownActiveDefender(knockedDown: Boolean): BB2025MultipleBlockContext {
+        return when (activeDefender) {
+            0 -> this.copy(defender1KnockedDown = knockedDown)
+            1 -> this.copy(defender2KnockedDown = knockedDown)
             else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")
         }
     }

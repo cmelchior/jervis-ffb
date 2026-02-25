@@ -3,7 +3,7 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.calculateBlockDiceToRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.calculateBlockDiceToRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
