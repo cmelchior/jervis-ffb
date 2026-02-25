@@ -45,6 +45,8 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
@@ -322,7 +324,12 @@ object BlitzAction : Procedure() {
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
                 BlockType.STAB -> TODO()
-                BlockType.STANDARD -> StandardBlockStep
+                BlockType.STANDARD -> {
+                    when (rules.baseVersion) {
+                        GameVersion.BB2020 -> StandardBlockStep
+                        GameVersion.BB2025 -> SingleStandardBlockStep
+                    }
+                }
             }
         }
         override fun onExitNode(state: Game, rules: Rules): Command {

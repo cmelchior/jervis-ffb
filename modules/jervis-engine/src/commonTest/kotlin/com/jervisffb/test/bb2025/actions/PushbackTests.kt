@@ -4,6 +4,8 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.EndAction
+import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -22,6 +24,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
@@ -271,6 +274,31 @@ class PushbackTests: JervisGameBB2025Test() {
         assertEquals(FieldCoordinate(15, 3), state.singleBall().location)
         assertEquals(DogOut, homeTeam[4.playerNo].location)
         assertEquals(FieldCoordinate(15, 0), awayTeam[7.playerNo].coordinates)
+    }
+
+    @Test
+    fun pushOpponentPlayerWithBallIntoCrowdUsingBlitz() {
+        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(20, 0)).execute(state)
+        SetBallState.carried(state.singleBall(), homeTeam[4.playerNo]).execute(state)
+        controller.rollForward(
+            *activatePlayer("A10", PlayerStandardActionType.BLITZ),
+            PlayerSelected("H4".playerId),
+            SmartMoveTo(20, 1),
+            *standardBlock("H4", 4.dblock),
+            DirectionSelected(Direction.UP),
+            Confirm, // Follow up
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
+            2.d3, // Throw-in direction
+            DiceRollResults(1.d6, 2.d6), // Throw-in distance
+            7.d8, // Bounce
+            EndAction
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(BallState.ON_GROUND, state.singleBall().state)
+        assertEquals(FieldCoordinate(20, 3), state.singleBall().location)
+        assertEquals(DogOut, homeTeam[4.playerNo].location)
+        assertEquals(FieldCoordinate(20, 0), awayTeam[10.playerNo].coordinates)
     }
 
     @Test

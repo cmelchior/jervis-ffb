@@ -23,10 +23,8 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.reports.ReportPowResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepResolveSingleBlockPushChain
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.PushedBack
-import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 
@@ -57,11 +55,7 @@ object BB2025Pow: Procedure() {
 
     object ResolveInitialPushSequence: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when (rules.baseVersion) {
-                GameVersion.BB2020 -> BB2020PushStepInitialMoveSequence
-                GameVersion.BB2025 -> PushedBack
-            }
-
+            return PushedBack
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
