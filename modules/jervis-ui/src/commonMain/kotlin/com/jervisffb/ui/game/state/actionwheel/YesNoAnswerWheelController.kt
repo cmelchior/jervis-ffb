@@ -296,7 +296,15 @@ object UseApothecaryWheelController: YesNoAnswerWheelController() {
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val attacker = state.getContext<RiskingInjuryContext>().player
-        return attacker.coordinates
+        return when (attacker.location) {
+            DogOut -> {
+                state.getContext<PushContext>().pushChain.last().from
+            }
+            is FieldCoordinate -> {
+                attacker.coordinates
+            }
+            is GiantLocation -> TODO("Not supported")
+        }
     }
 }
 
