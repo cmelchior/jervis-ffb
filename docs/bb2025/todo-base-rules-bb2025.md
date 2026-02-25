@@ -422,7 +422,7 @@ book.
         - [x] Own player chain pushed into crowd
         - [x] Own Player with ball pushed into crowd -> throwin -> turnover
         - [x] Player with ball pushed into crowd - > throwin
-        - [ ] Must choose to follow up before rolling any dice, including injury from Crowd.
+        - [x] Must choose to follow up before rolling any dice, including injury from Crowd.
         - [ ] Chain Push Attacker away
         - [ ] Chain Push Defender away
         - [ ] Chain Push infinite circle
