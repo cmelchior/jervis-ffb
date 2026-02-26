@@ -20,6 +20,7 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Class testing usage of the [Fend] skill.
@@ -99,6 +100,27 @@ class FendTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(FieldCoordinate(13, 5), attacker.location)
+    }
+
+    @Test
+    fun doesNotWorkOnBothDown() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.apply {
+            addSkill(SkillType.FEND)
+            addSkill(SkillType.BLOCK)
+        }
+        attacker.addSkill(SkillType.BLOCK)
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
+            Confirm, // Use Block (Defender)
+            Confirm, // Use Block (Attacker)
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(FieldCoordinate(12, 5), defender.location)
+        assertTrue(rules.isStanding(defender))
     }
 
     @Ignore

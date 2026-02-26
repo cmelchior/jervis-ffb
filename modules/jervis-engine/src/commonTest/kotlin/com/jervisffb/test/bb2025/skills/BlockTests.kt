@@ -3,9 +3,11 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
@@ -21,6 +23,7 @@ import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -47,10 +50,17 @@ class BlockTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        assertEquals(PlayerState.STANDING, attacker.state)
+        controller.rollForward(
+            DiceRollResults(6.d6, 6.d6), // Defender Armour
+            DiceRollResults(1.d6, 1.d6), // Defender Injury
+            DiceRollResults(1.d6, 1.d6), // Attacker Armour
+        )
+        assertEquals(PlayerState.STUNNED, defender.state)
+        assertEquals(PlayerState.PRONE, attacker.state)
     }
 
     @Test
@@ -70,6 +80,7 @@ class BlockTests: JervisGameBB2025Test() {
             Confirm, // Defender uses block
             Confirm, // Attacker uses block
         )
+        assertNull(state.activePlayer)
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(12, 5), defender.location)

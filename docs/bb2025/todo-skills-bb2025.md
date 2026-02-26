@@ -101,6 +101,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Works on POW
     - [x] Works on Stumble
     - [x] Works on Pushback
+    - [x] Does not trigger on Both Down
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
@@ -135,6 +136,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on POW
   - [x] Works on Stumble
   - [x] Works on Pushback
+  - [x] Does not work on Both Down
 - [ ] Wrestle
 
 ## Mutations

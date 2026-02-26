@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
@@ -38,6 +39,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -229,10 +231,21 @@ class BlockActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        assertEquals(PlayerState.STANDING, attacker.state)
+        controller.rollForward(
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertEquals(PlayerState.PRONE, defender.state)
+        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
+        controller.rollForward(
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertEquals(PlayerState.PRONE, defender.state)
+        assertEquals(PlayerState.PRONE, attacker.state)
+        assertNull(state.activePlayer)
     }
 
     @Test

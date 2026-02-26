@@ -128,6 +128,18 @@ until we see a FAQ released. FUMBBL has adopted a similar interpretation.
 For those reasons Jervis will also apply "pickup"-modifiers to the Secure the 
 Ball roll.
 
+### Page 62 - Both Down
+If both players are Knocked Down, the rules do not specify the sequence of 
+events. E.g., do we first roll for Steady Footing for each player and then 
+roll Armour/Injury for each, or do we fully resolve each Knocked Down event in 
+full?
+
+There is a slight chance that choosing to use certain skills or the apothecary
+on the injury depends on knowing this, but the likelyhood seems very low.
+
+For that reason, and since it is easier to implement, Jervis will fully resolve
+each Knocked Down event in full. First the Defender, then the Attacker.
+
 ### Page 62/63 - Pushed Players and Chain Pushes
 Pushbacks and the timing of other events are not well-defined in the rulebook.
 This impacts a number of things, like trapdoors, bouncing balls, throw-ins and

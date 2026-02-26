@@ -4,18 +4,20 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
-import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -32,7 +34,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * See page 40 in the BB2025 rulebook.
  */
 object BB2025KnockedDown: Procedure() {
-    override val initialNode: Node = RollForInjury
+    override val initialNode: Node = KnockdownPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
         // See page 23 in the BB2020 rulebook
@@ -49,10 +51,20 @@ object BB2025KnockedDown: Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<RiskingInjuryContext>()
         val context = state.getContext<RiskingInjuryContext>()
         if (context.mode != RiskingInjuryMode.KNOCKED_DOWN && context.mode != RiskingInjuryMode.BAD_LANDING) {
             INVALID_GAME_STATE("Player needs to have a bad landing or be knocked down to use this procedure: ${context.mode}")
+        }
+    }
+
+    // For now, we always knock the player down, but in the future this needs to trigger "pre-knockdown" skills
+    object KnockdownPlayer: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            return compositeCommandOf(
+                SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
+                GotoNode(RollForInjury)
+            )
         }
     }
 

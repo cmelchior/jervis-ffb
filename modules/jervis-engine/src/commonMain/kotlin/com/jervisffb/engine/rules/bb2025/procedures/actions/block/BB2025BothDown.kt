@@ -10,8 +10,6 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
-import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -25,7 +23,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.BothDownContext
@@ -33,9 +30,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020KnockedDown
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
@@ -186,107 +183,92 @@ object BB2025BothDown: Procedure() {
         }
     }
 
+    // When resolving a Both Down, we potentially need to resolve 2 Knocked Downs.
+    // If that happens, we resolve them one after the other, starting with the defender.
     object ResolveBothDown: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BothDownContext>()
 
             // If Wrestle was used, both players are just placed prone and nothing more happens.
-            // Otherwise check if one or both players need to roll injury
-            return if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
-                compositeCommandOf(
+            if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
+                return compositeCommandOf(
                     SetPlayerState(context.attacker, PlayerState.PRONE, hasTackleZones = false),
                     SetPlayerState(context.defender, PlayerState.PRONE, hasTackleZones = false),
                     ExitProcedure()
                 )
-            } else {
-                buildCompositeCommand {
-                    if (!context.attackUsesBlock) {
-                        add(SetTurnOver(TurnOver.STANDARD))
-                        add(SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
-                    }
-                    if (!context.defenderUsesBlock) {
-                        add(SetPlayerState(context.defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
-                    }
-                    add(GotoNode(ResolveDefenderInjury))
-                }
             }
-        }
-    }
 
-    object ResolveDefenderInjury: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            val blockContext = state.getContext<BlockContext>()
-            val context = state.getContext<BothDownContext>()
-            return if (!context.defenderUsesBlock) {
-                // If this is part of a Multiple, just mark the defender as being Knocked Down
-                // and handle it later.
-                if (blockContext.isUsingMultiBlock) {
-                    val multiContext = state.getContext<BB2025MultipleBlockContext>()
-                    val updatedContext = multiContext.copyAndKnockDownActiveDefender(true)
-                    compositeCommandOf(
-                        SetContext(updatedContext),
-                        GotoNode(ResolveAttackerInjury)
-                    )
-                } else {
-                    GotoNode(RollDefenderInjury)
-                }
-            } else {
-                GotoNode(ResolveAttackerInjury)
+            // If Block was used for both attacker and defender, nothing further happens
+            if (context.attackUsesBlock && context.defenderUsesBlock) {
+                return ExitProcedure()
             }
-        }
-    }
 
-    object RollDefenderInjury: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
+            // TODO We need special handling for Multiple Block here - This is just the old BB2020 logic
             val blockContext = state.getContext<BlockContext>()
-            val context = state.getContext<BothDownContext>()
-            return SetContext(
-                RiskingInjuryContext(
-                    player = context.defender,
-                    isPartOfMultipleBlock = blockContext.isUsingMultiBlock
-                )
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(ResolveAttackerInjury)
-        }
-    }
-
-    object ResolveAttackerInjury: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            val blockContext = state.getContext<BlockContext>()
-            val context = state.getContext<BothDownContext>()
-            // If this is part of a Multiple, just mark the attacker as being Knocked Down
-            // and handle it later.
-            return if (blockContext.isUsingMultiBlock) {
+            if (blockContext.isUsingMultiBlock) {
+                val defenderKnockedDown = !context.defenderUsesBlock
+                val attackerKnockedDown = !context.attackUsesBlock
                 val multiContext = state.getContext<BB2025MultipleBlockContext>()
-                val updatedContext = multiContext.copy(attackerKnockedDown = true)
-                compositeCommandOf(
+                var updatedContext = multiContext.copyAndKnockDownActiveDefender(defenderKnockedDown)
+                updatedContext = updatedContext.copy(attackerKnockedDown = attackerKnockedDown)
+                return compositeCommandOf(
                     SetContext(updatedContext),
                     ExitProcedure()
                 )
-            } else {
-                GotoNode(RollAttackerInjury)
             }
+
+            // Otherwise, resolve one or both players being Knocked Down.
+            return GotoNode(ResolveDefenderKnockedDown)
         }
     }
 
-    object RollAttackerInjury: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val blockContext = state.getContext<BlockContext>()
+    object ResolveDefenderKnockedDown: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<BothDownContext>()
-            return SetContext(
-                RiskingInjuryContext(
-                    player = context.attacker,
-                    isPartOfMultipleBlock = blockContext.isUsingMultiBlock
-                )
+            return if (context.defenderUsesBlock) {
+                ResolveAttackerKnockedDown
+            } else {
+                null
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val bothDownContext = state.getContext<BothDownContext>()
+            val context = RiskingInjuryContext(
+                player = bothDownContext.defender,
+                isPartOfMultipleBlock = false,
+                mode = RiskingInjuryMode.KNOCKED_DOWN
             )
+            return SetContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // Attacker went down, so its turn ends immediately, commonly because it is a turnover,
-            // but if it happened during a kick-off blitz, it just ends the Blitz.
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                GotoNode(ResolveAttackerKnockedDown)
+            )
+        }
+    }
+
+    object ResolveAttackerKnockedDown: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<BothDownContext>()
+            return if (context.attackUsesBlock) {
+                ExitProcedureNode
+            } else {
+                null
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val bothDownContext = state.getContext<BothDownContext>()
+            val context = RiskingInjuryContext(
+                player = bothDownContext.attacker,
+                isPartOfMultipleBlock = false,
+                mode = RiskingInjuryMode.KNOCKED_DOWN
+            )
+            return SetContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()

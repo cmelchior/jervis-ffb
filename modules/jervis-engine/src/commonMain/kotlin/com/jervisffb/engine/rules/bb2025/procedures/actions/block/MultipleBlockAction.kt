@@ -104,22 +104,13 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * 10. Resolve Block A. What happens differs slightly depending on the block
  *     dice:
  *  	  - PlayerDown
- *  	    // - Handle skills that trigger on Knocked Down.
  *  	    - Mark Attacker as being Knocked Down, but is not Knocked Down yet.
- *  	    // - Do not roll for Armour / Injury yet. Attacker is added to the "Injury
- *  	    //   Pool".
  *  		- If Attacker is holding the ball, mark it as loose and bouncing, but do
  *  	      not roll for bouncing yet.
  *
  *  	 - BothDown
- *  	   // - Handle skills for that trigger on Both Down: Defender, then Attacker.
  *  	   - Handle skills that trigger on Both Down.
  *  	   - Mark Defender/Attacker as being Knocked Down, but is not Knocked Down yet.
-// *  	   - Handle skills that trigger on Knocked Down. First Defender,
-// *           then Attacker.
-// *         - Mark both as being Knocked Down., but
-// *  	   - Do not roll for Armour / Injury yet. Both are added to the "Injury
-// *  	     Pool".
  *  	   - If Defender is holding the ball, mark it as loose and bouncing, but do
  *  	     not roll for bouncing yet.
  *  	   - If Attacker is holding the ball, mark it as loose and bouncing, but do
