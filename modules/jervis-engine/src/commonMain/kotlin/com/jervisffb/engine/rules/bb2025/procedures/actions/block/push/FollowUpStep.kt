@@ -14,6 +14,7 @@ import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
@@ -39,9 +40,21 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * See [BB2025PushBack] and [MultipleBlockAction] for more details on each.
  */
 object FollowUpStep: Procedure() {
-    override val initialNode: Node = ChooseToUseFend
+    override val initialNode: Node = IsFollowUpAvailable
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
+    object IsFollowUpAvailable: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PushContext>()
+            val isAvailable = calculateFollowUpStatus(context)
+            return when (isAvailable) {
+                FollowUpStatus.OPTIONAL,
+                FollowUpStatus.MUST_FOLLOW_UP -> GotoNode(ChooseToUseFend)
+                FollowUpStatus.NOT_ALLOWED -> ExitProcedure()
+            }
+        }
+    }
 
     object ChooseToUseFend: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team {
@@ -138,10 +151,11 @@ object FollowUpStep: Procedure() {
         // The following rules are in effect:
         // - If the attacker used Frenzy, they must follow up if allowed.
         // - If the attacker used Multiple Block, they cannot follow up.
+        // - If the defender is using Stand Firm, they cannot follow up.
         // - If the defender used Taunt, the attacker must follow up, unless they are Rooted or used Multiple Block.
         // - If the defender is using Fend, the attacker cannot follow up.
         // - If the defender is using Taunt, the attacker must follow up if allowed.
-        val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend /* Add support for Rooted */
+        val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend || context.isDefenderUsingStandFirm /* Add support for Rooted */
         val mustFollowUp = context.defenderIsUsingTaunt || context.isAttackerUsingFrenzy
         return when {
             cannotFollowUp -> FollowUpStatus.NOT_ALLOWED

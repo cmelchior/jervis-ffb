@@ -631,6 +631,10 @@ open class ManualActionProvider(
             return Confirm
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STAND_FIRM) && currentNode == CreatePushChainStep.DecideToUseStandFirm) {
+            return Confirm
+        }
+
         return null
     }
 

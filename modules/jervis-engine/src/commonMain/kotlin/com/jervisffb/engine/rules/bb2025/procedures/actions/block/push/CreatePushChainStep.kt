@@ -134,13 +134,14 @@ object CreatePushChainStep: Procedure() {
 
     object DecideToUseStandFirm: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? {
-            return state.getContext<PushContext>().pushChain.last().pushee.team
+            return state.getContext<PushContext>().pushee().team
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
-            val hasStandFirm = false // How to check?
-            val canUseStandFirm = !context.isAttackerUsingJuggernaut
-            return when (hasStandFirm && canUseStandFirm) {
+            val hasStandFirm = context.pushee().isSkillAvailable(SkillType.STAND_FIRM)
+            val isUsingJuggernaut = context.isAttackerUsingJuggernaut
+            val canUseStandFirm = hasStandFirm && !isUsingJuggernaut
+            return when (canUseStandFirm) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -251,6 +252,13 @@ object CreatePushChainStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
+
+            // If Stand Firm is used, the Push Chain just stops in its current state,
+            if (lastPushInChain.usedStandFirm) {
+                return listOf(ContinueWhenReady)
+            }
+
+            // Otherwise, we need to find the squares the player can be pushed back into
             val pushOptions = if (lastPushInChain.usedSideStep || lastPushInChain.usedGrab) {
                 // Should be safe as Grab only works cannot be used on chain pushes.
                 lastPushInChain.pushee.coordinates.getSurroundingCoordinates(rules).toSet()
@@ -278,49 +286,58 @@ object CreatePushChainStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            // If the chosen direction results in a chain push, modify the push context
-            // and redo the entire chain.
-            return castAction<DirectionSelected>(action) { squareSelected ->
-                val context = state.getContext<PushContext>()
-                val origin = context.pushee().coordinates
-                val target = origin.move(squareSelected.direction, 1)
-                val isEmptyOptionAvailable = getEmptySquaresForPushing(
-                    pushContext = state.getContext<PushContext>(),
-                    pushOptions = setOf(target),
-                    state = state
-                ).isNotEmpty()
+            val context = state.getContext<PushContext>()
+            if (action == Continue) {
+                // If the Player cannot be pushed back (for some reason), we terminate the Push Chain here.
                 val pushData = context.pushChain.last()
-                val updateActions = listOfNotNull(
-                    SetContextProperty(PushContext.PushData::to, pushData, target),
-                    if (target.isOnField(rules)) {
-                        AddContextListItem(context.looseBalls, state.field[target].balls)
+                return compositeCommandOf(
+                    SetContextProperty(PushContext.PushData::to, pushData, pushData.from),
+                    ExitProcedure()
+                )
+            } else {
+                // If the chosen direction results in a chain push, modify the push context
+                // and redo the entire chain.
+                return castAction<DirectionSelected>(action) { squareSelected ->
+                    val origin = context.pushee().coordinates
+                    val target = origin.move(squareSelected.direction, 1)
+                    val isEmptyOptionAvailable = getEmptySquaresForPushing(
+                        pushContext = state.getContext<PushContext>(),
+                        pushOptions = setOf(target),
+                        state = state
+                    ).isNotEmpty()
+                    val pushData = context.pushChain.last()
+                    val updateActions = listOfNotNull(
+                        SetContextProperty(PushContext.PushData::to, pushData, target),
+                        if (target.isOnField(rules)) {
+                            AddContextListItem(context.looseBalls, state.field[target].balls)
+                        } else {
+                            null
+                        }
+                    ).toTypedArray()
+                    val commands = if (isEmptyOptionAvailable) {
+                        // Player was moved into an empty square, which means we can start resolving
+                        // the entire chain.
+                        compositeCommandOf(
+                            *updateActions,
+                            ExitProcedure()
+                        )
                     } else {
-                        null
+                        // Target field is occupied, resulting in a chain push, add the
+                        // new chain push to the context and restart the process
+                        val newPush = PushContext.PushData(
+                            pusher = context.pushChain.last().pushee,
+                            pushee = state.field[target].player!!, // TODO This doesn't take into account chain pushes
+                            from = target,
+                            isChainPush = true,
+                        )
+                        compositeCommandOf(
+                            *updateActions,
+                            AddContextListItem(context.pushChain, newPush),
+                            GotoNode(DecideToUseJuggernaut)
+                        )
                     }
-                ).toTypedArray()
-                val commands = if (isEmptyOptionAvailable) {
-                    // Player was moved into an empty square, which means we can start resolving
-                    // the entire chain.
-                    compositeCommandOf(
-                        *updateActions,
-                        ExitProcedure()
-                    )
-                } else {
-                    // Target field is occupied, resulting in a chain push, add the
-                    // new chain push to the context and restart the process
-                    val newPush = PushContext.PushData(
-                        pusher = context.pushChain.last().pushee,
-                        pushee = state.field[target].player!!, // TODO This doesn't take into account chain pushes
-                        from = target,
-                        isChainPush = true,
-                    )
-                    compositeCommandOf(
-                        *updateActions,
-                        AddContextListItem(context.pushChain, newPush),
-                        GotoNode(DecideToUseJuggernaut)
-                    )
+                    commands
                 }
-                commands
             }
         }
 

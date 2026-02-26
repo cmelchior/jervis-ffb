@@ -41,6 +41,11 @@ data class PushContext(
     // Tracks if the attacker is using Juggernaut.
     val isAttackerUsingFrenzy: Boolean = firstPusher.hasSkill(SkillType.FRENZY)
 
+    // Tracks if Stand Firm is used anywhere in the Push or Chain of Pushes. This will prevent
+    // all players from being moved.
+    val isDefenderUsingStandFirm: Boolean
+        get() = pushChain.any { it.usedStandFirm }
+
     // Returns last "pusher" in the push chain
     fun pusher(): Player {
         return pushChain.last().pusher

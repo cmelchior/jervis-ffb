@@ -22,6 +22,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Class testing usage of the [Sidestep] skill.
@@ -145,6 +146,31 @@ class SidestepTests: JervisGameBB2025Test() {
         )
         assertEquals(PlayerState.STANDING, player.state)
         assertEquals(FieldCoordinate(12, 4), player.location)
+        assertNull(state.activePlayer)
+    }
+
+    @Test
+    fun doesNotWorkIfDistracted() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.apply {
+            addSkill(SkillType.SIDESTEP)
+            hasTackleZones = false
+        }
+        assertTrue(rules.isDistracted(defender))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 3.dblock),
+        )
+        val actions = controller.getAvailableActions()
+        assertEquals(3, actions.get<SelectDirection>().directions.size)
+        assertEquals(awayTeam, actions.team)
+        controller.rollForward(
+            DirectionSelected(Direction.LEFT),
+            Cancel // Do not follow up
+        )
+        assertEquals(FieldCoordinate(11, 5), defender.location)
+        assertEquals(PlayerState.STANDING, defender.state)
         assertNull(state.activePlayer)
     }
 }

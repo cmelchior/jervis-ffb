@@ -62,6 +62,7 @@ import kotlin.time.ExperimentalTime
  * - Leap (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
+ * - Stand Firm (skill usage)
  * - Tackle (skill usage)
  * - Taunt (skill usage)
  * - Follow Up
@@ -269,6 +270,17 @@ object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
             FollowUpStep.ChooseToUseFend -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
+        return player.coordinates
+    }
+}
+
+object UseStandFirmWheelController: UseSkillWheelController(SkillType.STAND_FIRM) {
+    override val nodes: Set<Node> = setOf(
+        CreatePushChainStep.DecideToUseStandFirm
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<PushContext>()
+        val player = context.pushee()
         return player.coordinates
     }
 }

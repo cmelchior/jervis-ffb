@@ -7,7 +7,6 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
@@ -34,7 +33,6 @@ import com.jervisffb.test.bb2020.skills.BlockTests
 import com.jervisffb.test.bb2020.skills.DodgeSkillTests
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
-import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -183,13 +181,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            3.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 3.dblock),
             DirectionSelected(Direction.LEFT),
             Confirm
         )
@@ -204,13 +197,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            1.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 1.dblock),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -223,13 +211,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            2.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
         )
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
@@ -253,13 +236,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            3.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 3.dblock),
             DirectionSelected(Direction.LEFT),
             Cancel,
         )
@@ -274,13 +252,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            5.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 5.dblock),
             DirectionSelected(Direction.UP_LEFT),
             Cancel,
         )
@@ -295,13 +268,8 @@ class BlockActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            5.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 6.dblock),
             DirectionSelected(Direction.DOWN_LEFT),
             Cancel,
         )

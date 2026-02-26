@@ -249,7 +249,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
     - [ ] Tackle is available for both blocks
     - [ ] Taunt does not work against Multiple Block
-- [ ] Stand Firm
+- [x] Stand Firm
+  - [x] Prevent being pushed back in the first block
+  - [x] Prevent being pushed back in a chain push
+  - [x] Does not prevent Frenzy hitting twice
+  - [x] Does not work if distracted
+  - [x] Prevent Follow Up
+  - [x] No players are moved if using Stand Firm during the Chain Push
 - [ ] Strong Arm
 - [x] Thick Skull
   - [x] Stunty rolling 7 (incl modifiers)

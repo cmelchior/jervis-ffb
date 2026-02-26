@@ -47,7 +47,13 @@ object MovePlayersInPushChainStep: Procedure() {
     object MovePushedPlayers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            // Execute push commands from the last to the first, this way we avoid having to deal
+
+            // If Stand Firm was used, no players are moved, so just exit early
+            if (context.isDefenderUsingStandFirm) {
+                return ExitProcedure()
+            }
+
+            // Otherwise, execute push commands from the last to the first, this way we avoid having to deal
             // with squares needing to have to players temporarily. This should be a safe implementation
             // detail, since all commands are executed before creating the game delta.
             return buildCompositeCommand {
@@ -90,8 +96,6 @@ object MovePlayersInPushChainStep: Procedure() {
                 }
                 add(SetContext(context.copy(pushedIntoTheCrowd = pushedIntoCrowd)))
                 add(ExitProcedure())
-//                val nextNode = if (pushedIntoCrowd) ResolvePushedIntoTheCrowd else ChooseToUseFend
-//                add(GotoNode(nextNode))
             }
         }
     }
