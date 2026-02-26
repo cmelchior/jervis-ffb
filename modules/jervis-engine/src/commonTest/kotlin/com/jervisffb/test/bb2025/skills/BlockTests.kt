@@ -17,8 +17,10 @@ import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,13 +44,8 @@ class BlockTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            2.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
         )
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
@@ -70,13 +67,8 @@ class BlockTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.extraSkills.addNewSkill(defender, SkillType.BLOCK)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            2.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
             Confirm, // Defender uses block
             Confirm, // Attacker uses block
         )
@@ -94,13 +86,8 @@ class BlockTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.extraSkills.addNewSkill(defender, SkillType.BLOCK)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            2.dblock,
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
             Confirm, // Defender uses block
             Cancel, // Attacker doesn't use block
         )
@@ -109,5 +96,28 @@ class BlockTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(PlayerState.STANDING, defender.state)
+    }
+
+    @Test
+    fun doesNotWorkWhenDistracted() {
+        val attacker = state.getPlayerById("A1".playerId)
+        attacker.addSkill(SkillType.BLOCK)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.apply {
+            addSkill(SkillType.BLOCK)
+            hasTackleZones = false
+        }
+        assertTrue(rules.isDistracted(defender))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 2.dblock),
+            Confirm, // Attacker uses block
+            DiceRollResults(1.d6, 1.d6), // Defender cannot use Block, so gets Knocked Down for Armour Roll
+        )
+        assertNull(state.activePlayer)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        assertEquals(PlayerState.STANDING, attacker.state)
+        assertEquals(FieldCoordinate(12, 5), defender.location)
+        assertEquals(PlayerState.PRONE, defender.state)
     }
 }

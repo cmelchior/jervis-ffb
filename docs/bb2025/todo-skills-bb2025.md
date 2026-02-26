@@ -51,6 +51,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Player with sidestep choose the target square.
   - [x] Sidestep does not work when prone (During chain-pushes)
   - [x] Sidestep is not available if there are no valid target squares
+  - [x] Is not available if Distracted
 - [ ] Sprint
 - [x] Sure Feet
   - [x] Reroll failed Rush
@@ -90,8 +91,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 - [x] Block
   - [x] Using Block is optional
-  - [ ] Block does not work when distracted
-  - [ ] Defender chooses bloc
+  - [x] Block does not work when distracted
 - [ ] Dauntless
 - [ ] Fend
     - [x] Prevent follow up
@@ -102,6 +102,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Works on Stumble
     - [x] Works on Pushback
     - [x] Does not trigger on Both Down
+    - [x] Does not work when Distracted
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
@@ -137,6 +138,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Stumble
   - [x] Works on Pushback
   - [x] Does not work on Both Down
+  - [x] Does not work when Distracted
 - [ ] Wrestle
 
 ## Mutations

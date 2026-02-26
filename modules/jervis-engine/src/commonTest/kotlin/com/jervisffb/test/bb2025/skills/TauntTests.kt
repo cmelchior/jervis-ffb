@@ -1,6 +1,7 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.BlockTypeSelected
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
@@ -23,6 +24,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -146,6 +148,28 @@ class TauntTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertTrue(rules.isStanding(defender))
+    }
+
+    @Test
+    fun doesNotWorkWhenDistracted() {
+        val attacker = state.getPlayerById("A1".playerId)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.apply {
+            addSkill(SkillType.TAUNT)
+            hasTackleZones = false
+        }
+        assertTrue(rules.isDistracted(defender))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 3.dblock),
+            DirectionSelected(Direction.LEFT),
+            Cancel // Do not follow up
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(FieldCoordinate(11, 5), defender.location)
+        assertTrue(rules.isStanding(defender))
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
     }
 
     @Ignore

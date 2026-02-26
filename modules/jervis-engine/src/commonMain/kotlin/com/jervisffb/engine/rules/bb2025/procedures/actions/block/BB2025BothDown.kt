@@ -135,8 +135,8 @@ object BB2025BothDown: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
-            val hasBlock = context.defender.getSkillOrNull(SkillType.BLOCK) != null
-            return when (hasBlock) {
+            val canUseBlock = context.defender.isSkillAvailable(SkillType.BLOCK)
+            return when (canUseBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -161,8 +161,8 @@ object BB2025BothDown: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
-            val hasBlock = (context.attacker.getSkillOrNull(SkillType.BLOCK) != null)
-            return when (hasBlock) {
+            val canUseBlock = context.attacker.isSkillAvailable(SkillType.BLOCK)
+            return when (canUseBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
