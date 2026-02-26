@@ -8,6 +8,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
@@ -456,6 +457,27 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Leap Modifier?"
                 false -> "Waiting for opponent to use Leap Modifier"
+            }
+        },
+
+        CreatePushChainStep.DecideToUseSidestep to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Sidestep?"
+                false -> "Waiting for opponent to use Sidestep"
+            }
+        },
+
+        CreatePushChainStep.DecideToUseGrab to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Grab?"
+                false -> "Waiting for opponent to use Grab"
+            }
+        },
+
+        CreatePushChainStep.DecideToUseStandFirm to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Stand Firm?"
+                false -> "Waiting for opponent to use Stand Firm"
             }
         },
     )

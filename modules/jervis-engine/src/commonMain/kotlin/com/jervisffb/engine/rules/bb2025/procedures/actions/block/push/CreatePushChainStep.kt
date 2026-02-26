@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
@@ -49,7 +49,6 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * See [BB2025PushBack] and [MultipleBlockAction] for more details on each.
  *
  * Developer's Commentary:
- *
  * When determining a step in the push chain, it involves a number of skills
  * and interactions that are not straight-forward. The exact sequence of these
  * is described below with Player A = pusher and Player B = pushee
@@ -185,7 +184,7 @@ object CreatePushChainStep: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
+                    compositeCommandOf(
                         SetContextProperty(PushContext.PushData::usedGrab, pushData, true),
                         ReplaceContextListItem(context.pushChain, pushData),
                         GotoNode(DecideToUseSidestep)
@@ -200,14 +199,14 @@ object CreatePushChainStep: Procedure() {
     }
 
     object DecideToUseSidestep: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.last().pushee.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>().pushChain.last()
-            val hasSidestep = context.pushee.hasSkill(SkillType.SIDESTEP)
+            val hasSidestep = context.pushee.isSkillAvailable(SkillType.SIDESTEP)
             val validSideStepTargets = context.pushee.coordinates
                 .getSurroundingCoordinates(rules)
                 .count { state.field[it].isUnoccupied() } > 0
-            val canUseSidestep = !(context.usedGrab || context.usedStandFirm)
+            val canUseSidestep = !(context.usedGrab || context.usedStandFirm) && validSideStepTargets
             return when (hasSidestep && canUseSidestep) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -218,37 +217,8 @@ object CreatePushChainStep: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
-                        SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
-                        GotoNode(DecideToUseFend)
-                    )
-                }
-                Cancel, Continue -> {
-                    GotoNode(DecideToUseFend)
-                }
-                else -> INVALID_ACTION(action)
-            }
-        }
-    }
-
-    object DecideToUseFend: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<PushContext>().pushChain.last()
-            val hasFend = false // How to check?
-            val canUseFend = false // How?
-            return when (hasFend && canUseFend) {
-                true -> listOf(ConfirmWhenReady, CancelWhenReady)
-                false -> listOf(ContinueWhenReady)
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Confirm -> {
-                    val context = state.getContext<PushContext>()
                     compositeCommandOf(
-                        SetContextProperty(PushContext::defenderIsUsingFend, context, true),
+                        SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
                         GotoNode(SelectPushDirection)
                     )
                 }
@@ -267,14 +237,14 @@ object CreatePushChainStep: Procedure() {
             return if (context.pushChain.last().usedSideStep) {
                 context.pushChain.last().pushee.team
             } else {
-                context.pushChain.last().pusher.team
+                context.firstPusher.team
             }
         }
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
-            // TODO Add support for skills, right now just go with the default 3 options
+            // TODO Add support for Grab
             val pushOptions = if (lastPushInChain.usedSideStep) {
                 lastPushInChain.pushee.coordinates.getSurroundingCoordinates(rules).toSet()
             } else {

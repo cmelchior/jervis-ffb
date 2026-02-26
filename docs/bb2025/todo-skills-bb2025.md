@@ -46,7 +46,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Leap modifier only work if there are more than one negative modifier
 - [ ] Safe Pair of Hands
   - [ ] Does not work against Strip Ball (NAF)
-- [ ] Sidestep
+- [x] Sidestep
+  - [x] Sidestep is optional
+  - [x]  Player with sidestep choose the target square.
+  - [x] Sidestep does not work when prone (During chain-pushes)
+  - [x] Sidestep is not available if there are no valid target squares
 - [ ] Sprint
 - [x] Sure Feet
   - [x] Reroll failed Rush

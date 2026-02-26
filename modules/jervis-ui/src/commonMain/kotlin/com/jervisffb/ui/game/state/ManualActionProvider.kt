@@ -623,6 +623,10 @@ open class ManualActionProvider(
             return Confirm
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_SIDESTEP) && currentNode == CreatePushChainStep.DecideToUseSidestep) {
+            return Confirm
+        }
+
         return null
     }
 
