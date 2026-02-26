@@ -289,7 +289,7 @@ class BlockActionTests: JervisGameBB2020Test() {
             5.dblock,
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
-            DirectionSelected(Direction.BOTTOM_LEFT),
+            DirectionSelected(Direction.DOWN_LEFT),
             Cancel,
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)

@@ -204,7 +204,7 @@ class PushbackTests: JervisGameBB2020Test() {
             availableDirections.origin.move(availableDirections.directions.first(), 1)
         )
         controller.rollForward(
-            DirectionSelected(Direction.BOTTOM),
+            DirectionSelected(Direction.DOWN),
             DiceRollResults(1.d6, 1.d6), // Injury roll
             Confirm // Follow up
         )

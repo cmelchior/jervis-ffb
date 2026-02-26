@@ -41,8 +41,9 @@ object PushedBack: Procedure() {
     }
 
     object CreatePushChain: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            CreatePushChainStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return CreatePushChainStep
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             return if (blockContext.isUsingMultiBlock) {

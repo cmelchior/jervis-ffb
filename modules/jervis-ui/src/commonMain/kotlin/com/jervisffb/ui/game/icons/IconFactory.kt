@@ -20,9 +20,9 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.Direction.Companion.BOTTOM
-import com.jervisffb.engine.model.Direction.Companion.BOTTOM_LEFT
-import com.jervisffb.engine.model.Direction.Companion.BOTTOM_RIGHT
+import com.jervisffb.engine.model.Direction.Companion.DOWN
+import com.jervisffb.engine.model.Direction.Companion.DOWN_LEFT
+import com.jervisffb.engine.model.Direction.Companion.DOWN_RIGHT
 import com.jervisffb.engine.model.Direction.Companion.LEFT
 import com.jervisffb.engine.model.Direction.Companion.RIGHT
 import com.jervisffb.engine.model.Direction.Companion.UP
@@ -660,13 +660,13 @@ object IconFactory {
             RIGHT -> {
                 if (active) Res.drawable.icons_game_pb_east_filled else Res.drawable.icons_game_pb_east
             }
-            BOTTOM_LEFT -> {
+            DOWN_LEFT -> {
                 if (active) Res.drawable.icons_game_pb_southwest_filled else Res.drawable.icons_game_pb_southwest
             }
-            BOTTOM -> {
+            DOWN -> {
                 if (active) Res.drawable.icons_game_pb_south_filled else Res.drawable.icons_game_pb_south
             }
-            BOTTOM_RIGHT -> {
+            DOWN_RIGHT -> {
                 if (active) Res.drawable.icons_game_pb_southeast_filled else Res.drawable.icons_game_pb_southeast
             }
             else -> error("Unsupported direction: $direction")

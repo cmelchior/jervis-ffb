@@ -207,7 +207,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
             4.dblock, // Block roll
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
-            DirectionSelected(Direction.BOTTOM_LEFT),
+            DirectionSelected(Direction.DOWN_LEFT),
             Cancel, // Do not follow up
             EndAction
         )
@@ -260,7 +260,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
             4.dblock, // Push back
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
-            DirectionSelected(Direction.BOTTOM_LEFT),
+            DirectionSelected(Direction.DOWN_LEFT),
             Cancel,
             *moveTo(13, 4),
             6.d6, // Dodge roll

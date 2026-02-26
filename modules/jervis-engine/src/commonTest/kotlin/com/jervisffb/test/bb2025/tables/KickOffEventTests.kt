@@ -900,7 +900,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     BlockTypeSelected(BlockType.STANDARD),
                     DiceRollResults(6.dblock, 6.dblock),
                     SelectSingleBlockDieResult(),
-                    DirectionSelected(Direction.BOTTOM_RIGHT),
+                    DirectionSelected(Direction.DOWN_RIGHT),
                     Cancel,
                     DiceRollResults(1.d6, 1.d6),
                     EndAction

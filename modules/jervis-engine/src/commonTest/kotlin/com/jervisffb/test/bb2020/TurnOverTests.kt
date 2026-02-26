@@ -178,7 +178,7 @@ class TurnOverTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H8", 4.dblock),
-            DirectionSelected(Direction.BOTTOM), // Pushed into crowd, no turnover
+            DirectionSelected(Direction.DOWN), // Pushed into crowd, no turnover
         )
         assertNull(state.turnOver)
         controller.rollForward(
