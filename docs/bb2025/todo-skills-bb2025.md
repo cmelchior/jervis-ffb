@@ -48,7 +48,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Does not work against Strip Ball (NAF)
 - [x] Sidestep
   - [x] Sidestep is optional
-  - [x]  Player with sidestep choose the target square.
+  - [x] Player with sidestep choose the target square.
   - [x] Sidestep does not work when prone (During chain-pushes)
   - [x] Sidestep is not available if there are no valid target squares
 - [ ] Sprint
@@ -229,7 +229,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] +2 if ST4
   - [x] +3 if ST5 or more
 - [ ] Bulls Eye
-- [ ] Grab
+- [x] Grab
+  - [x] Grab is optional
+  - [x] Blocking player select any adjacent square to blocked player
+  - [x] Grab cannot be used if there are no valid target squares
+  - [x] Prevents using Sidestep
+  - [x] Grab does not prevent Sidestep in a Chain-Push (NAF)
+  - [x] Only work on Declared Block Actions, i.e. not on Blitz.
 - [x] Guard
   - [x] Allow offensive assists
   - [x] Allow defensive assists

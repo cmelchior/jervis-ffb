@@ -58,6 +58,7 @@ import kotlin.time.ExperimentalTime
  * - Block (skill usage)
  * - Dodge (skill usage)
  * - Fend (skill usage)
+ * - Grab (skill usage)
  * - Leap (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
@@ -106,7 +107,7 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
 }
 
 abstract class UseSkillWheelController(skill: SkillType) : YesNoAnswerWheelController() {
-    override val yesLabel: String = "Use ${skill.description}?"
+    override val yesLabel: String = "Use ${skill.description}"
     override val noLabel: String = "Do not use ${skill.description}"
 }
 
@@ -154,6 +155,16 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
             BothDown.DefenderChooseToUseBlock -> context.defender.coordinates
             else -> error("Unsupported node: $currentNode")
         }
+    }
+}
+
+object UseGrabWheelController: UseSkillWheelController(SkillType.GRAB) {
+    override val nodes: Set<Node> = setOf(
+        CreatePushChainStep.DecideToUseGrab,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<PushContext>().firstPusher
+        return player.coordinates
     }
 }
 

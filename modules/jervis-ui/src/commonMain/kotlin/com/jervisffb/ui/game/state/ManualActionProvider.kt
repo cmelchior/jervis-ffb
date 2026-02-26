@@ -627,6 +627,10 @@ open class ManualActionProvider(
             return Confirm
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_GRAB) && currentNode == CreatePushChainStep.DecideToUseGrab) {
+            return Confirm
+        }
+
         return null
     }
 

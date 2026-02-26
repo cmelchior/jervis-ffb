@@ -8,16 +8,16 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Represents the "Guard (Active)" skill.
+ * Representation of the "Grab (Active)" skill.
  *
- * See page 129 in the BB2025 rulebook.
+ * See page 128 in the BB2025 rulebook.
  */
-class Guard(
+class Grab(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.STRENGTH,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
-    override val type: SkillType = SkillType.GUARD
+    override val type: SkillType = SkillType.GRAB
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description

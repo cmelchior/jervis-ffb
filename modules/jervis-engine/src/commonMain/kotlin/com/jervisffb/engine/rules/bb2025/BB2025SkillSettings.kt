@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.Fend
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
+import com.jervisffb.engine.rules.bb2025.skills.Grab
 import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
@@ -426,9 +427,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.GRAB -> {
-                    // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Grab", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                        Grab(player, category, expiresAt)
+                    }
                 }
                 SkillType.GUARD -> {
                     addNoValueEntry("Guard", type, SkillCategory.STRENGTH) { player, category,expiresAt ->

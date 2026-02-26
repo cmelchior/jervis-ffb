@@ -31,6 +31,7 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.MultipleBlockAction
@@ -71,13 +72,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * 4. Player B must decide whether to use Sidestep. Page 135 in the BB2025
  *    rulebook.
  *.   a. Cannot be used if Player A used Grab.
- *    c. Cannot be used if no unoccupied squares exist adjacent to Player B.
- *
- * 5. Player B must decide whether to use Fend. See page 128 in the BB2025
- *    rulebook.
- *    a. Cannot be used on a chain push.
- *    b. Cannot be used if Player A has Ball & Chain.
- *    c. Cannot be used if Player A is blitzing and using Juggernaut. *
+ *    b. Cannot be used if no unoccupied squares exist adjacent to Player B.
  */
 object CreatePushChainStep: Procedure() {
     override val initialNode: Node = DecideToUseJuggernaut
@@ -155,7 +150,8 @@ object CreatePushChainStep: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
+                    compositeCommandOf(
+                        ReportSkillUsed(pushData.pushee, SkillType.STAND_FIRM),
                         SetContextProperty(PushContext.PushData::usedStandFirm, pushData, true),
                         GotoNode(DecideToUseGrab)
                     )
@@ -171,10 +167,17 @@ object CreatePushChainStep: Procedure() {
     object DecideToUseGrab: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<PushContext>()
-            val hasGrab = false // How to check?
-            val canUseGrab = true // TODO Is this true?
-            return when (hasGrab && canUseGrab) {
+            val pushContext = state.getContext<PushContext>()
+            val blockContext = state.getContext<BlockContext>()
+            val hasGrab = pushContext.firstPusher.isSkillAvailable(SkillType.GRAB)
+            val isFirstBlock = (pushContext.pushChain.size == 1)
+            val isBlitz = blockContext.isBlitzing
+            val isStandFirmUsed = pushContext.pushChain.first().usedStandFirm
+            val hasValidGrabTargets = pushContext.firstPushee.coordinates
+                .getSurroundingCoordinates(rules, includeOutOfBounds = false)
+                .any { state.field[it].isUnoccupied() }
+            val canUseGrab = hasGrab && isFirstBlock && !isBlitz && !isStandFirmUsed && hasValidGrabTargets
+            return when (canUseGrab) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -185,6 +188,7 @@ object CreatePushChainStep: Procedure() {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
                     compositeCommandOf(
+                        ReportSkillUsed(pushData.pusher, SkillType.GRAB),
                         SetContextProperty(PushContext.PushData::usedGrab, pushData, true),
                         ReplaceContextListItem(context.pushChain, pushData),
                         GotoNode(DecideToUseSidestep)
@@ -204,10 +208,12 @@ object CreatePushChainStep: Procedure() {
             val context = state.getContext<PushContext>().pushChain.last()
             val hasSidestep = context.pushee.isSkillAvailable(SkillType.SIDESTEP)
             val validSideStepTargets = context.pushee.coordinates
-                .getSurroundingCoordinates(rules)
-                .count { state.field[it].isUnoccupied() } > 0
-            val canUseSidestep = !(context.usedGrab || context.usedStandFirm) && validSideStepTargets
-            return when (hasSidestep && canUseSidestep) {
+                .getSurroundingCoordinates(rules, includeOutOfBounds = false)
+                .any { state.field[it].isUnoccupied() }
+            val isGrabUsed = context.usedGrab
+            val isStandFirmUsed = context.usedStandFirm
+            val canUseSidestep = hasSidestep && !isGrabUsed && !isStandFirmUsed && validSideStepTargets
+            return when (canUseSidestep) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -218,6 +224,7 @@ object CreatePushChainStep: Procedure() {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
                     compositeCommandOf(
+                        ReportSkillUsed(pushData.pushee, SkillType.SIDESTEP),
                         SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
                         GotoNode(SelectPushDirection)
                     )
@@ -244,8 +251,8 @@ object CreatePushChainStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
-            // TODO Add support for Grab
-            val pushOptions = if (lastPushInChain.usedSideStep) {
+            val pushOptions = if (lastPushInChain.usedSideStep || lastPushInChain.usedGrab) {
+                // Should be safe as Grab only works cannot be used on chain pushes.
                 lastPushInChain.pushee.coordinates.getSurroundingCoordinates(rules).toSet()
             } else {
                 rules.getPushOptions(lastPushInChain.pusher, lastPushInChain.pushee)
@@ -316,6 +323,8 @@ object CreatePushChainStep: Procedure() {
                 commands
             }
         }
+
+        // -- HELPER FUNCTIONS --
 
         // Return squares considered "empty" when doing a Push. This takes into account any ongoing chain pushes.
         private fun getEmptySquaresForPushing(
