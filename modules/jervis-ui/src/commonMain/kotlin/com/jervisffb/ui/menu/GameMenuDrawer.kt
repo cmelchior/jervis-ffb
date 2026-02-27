@@ -7,7 +7,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +38,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
@@ -49,7 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.jervis.generated.MenuSection
-import com.jervis.generated.getGameSettingsMenu
+import com.jervis.generated.SettingsKeys
+import com.jervis.generated.ToggleItem
+import com.jervis.generated.gameSettingsMenu
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_arrow_down
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_arrow_right
@@ -201,12 +203,30 @@ fun GameMenuDrawer(
                     )
                 }
                 DrawerSectionHeader("Settings")
-                val generatedMenu = getGameSettingsMenu()
+                SimpleSwitch(
+                    label = "Use automated actions",
+                    isSelected = menuViewModel.enableAutomatedActions,
+                    description = "Disable to have full control over all actions",
+                    innerPadding = 4.dp,
+                    onSelected = { selected ->
+                        menuViewModel.enableAutomatedActions = selected
+                        if (!selected && secondLevelItems?.id == SettingsKeys.JERVIS_AUTO_ACTION) {
+                            secondLevelItems = null
+                        }
+                    }
+                )
+                val generatedMenu = gameSettingsMenu
                 generatedMenu.sections.forEachIndexed { index, section ->
+                    val enabled = if (section.id == SettingsKeys.JERVIS_AUTO_ACTION) {
+                        menuViewModel.enableAutomatedActions
+                    } else {
+                        true
+                    }
                     DrawerMenuGroupHeader(
                         title = section.label,
                         isSelected = (secondLevelItems == section),
                         if (index % 2 == 1) JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f) else Color.Transparent,
+                        enabled = enabled,
                         onClick = {
                             if (secondLevelItems == null) {
                                 // No menu open, open the new one
@@ -270,40 +290,65 @@ fun GameMenuDrawer(
                         }
                     }
                     .padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
+                var itemIndex = 0
                 secondLevelItems?.let { menuGroup ->
-                    DrawerSectionHeader(menuGroup.label, topPadding = 0.dp)
-                    menuGroup.items.forEachIndexed { index, item ->
-                        val itemValue by SETTINGS_MANAGER.observeBooleanKey(item.key, item.value).collectAsState(item.value)
-                        // The "onClick" effect needs to be below the Switch to avoid making it too dim
-                        Box(modifier = Modifier
-                            .applyIf(index % 2 == 1) {
-                                paperBackground(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f))
+                    // If Section has no sub-sections
+                    if (!menuGroup.subsections) {
+                        DrawerSectionHeader(menuGroup.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
+                    }
+                    menuGroup.items.forEach { item ->
+                        when (item) {
+                            is ToggleItem -> {
+                                SettingsEntry(item, itemIndex)
+                                itemIndex++
                             }
-                            .pointerInput(itemValue) {
-                                // Prevent mouse events on menu items to reach the Drawer
-                                // as clicks here will close it.
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        val event = awaitPointerEvent()
-                                        event.changes.forEach { it.consume() }
+                            is MenuSection -> {
+                                DrawerSectionHeader(item.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
+                                item.items.forEach { subItem ->
+                                    when (subItem) {
+                                        is ToggleItem -> SettingsEntry(subItem, itemIndex)
+                                        else -> { /* nested-nested items are not supported */ }
                                     }
+                                    itemIndex++
                                 }
                             }
-                        ) {
-                            SimpleSwitch(
-                                label = item.label,
-                                isSelected = itemValue,
-                                innerPadding = 4.dp,
-                                onSelected = { selected ->
-                                    SETTINGS_MANAGER[item.key] = selected
-                                }
-                            )
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SettingsEntry(item: ToggleItem, itemIndex: Int) {
+    val itemValue by SETTINGS_MANAGER.observeBooleanKey(item.key, item.value).collectAsState(item.value)
+    Box(modifier = Modifier
+        .applyIf(itemIndex % 2 == 1) {
+            paperBackground(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f))
+        }
+        .pointerInput(itemValue) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    if (event.type == PointerEventType.Press) {
+                        event.changes.forEach { it.consume() }
+                    }
+                }
+            }
+        }
+    ) {
+        SimpleSwitch(
+            label = item.label,
+            isSelected = itemValue,
+            description = item.description,
+            innerPadding = 4.dp,
+            onSelected = { selected ->
+                SETTINGS_MANAGER[item.key] = selected
+            }
+        )
     }
 }
 
@@ -335,6 +380,7 @@ private fun DrawerMenuGroupHeader(
     title: String,
     isSelected: Boolean,
     background: Color,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
     Row(
@@ -343,10 +389,12 @@ private fun DrawerMenuGroupHeader(
                 paperBackground(background)
             }
             .fillMaxWidth()
-            .clickable { onClick() }
+            .applyIf(enabled) {
+                clickable { onClick() }
+            }
             .padding(4.dp)
         ,
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = title,
@@ -368,7 +416,6 @@ private fun DrawerMenuGroupHeader(
             },
             contentScale = ContentScale.FillBounds,
             colorFilter = ColorFilter.tint(JervisTheme.rulebookRed)
-
         )
     }
 }

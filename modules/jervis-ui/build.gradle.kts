@@ -8,6 +8,7 @@ import org.jetbrains.compose.reload.gradle.ComposeHotRun
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.nio.file.Files
+import java.util.Enumeration
 import java.util.Properties
 
 plugins {
@@ -243,23 +244,34 @@ abstract class GenerateClientConfig : DefaultTask() {
         val outDir = outRoot.resolve(pkg.replace('.', '/')).apply { mkdirs() }
         val outFile = outDir.resolve("ClientConfig.kt")
 
-        val props = Properties()
+        val props = GameMenuParser.LinkedProperties()
         props.load(iniFile.asFile.get().inputStream())
 
         // Parse INI - we only expect [a-zA-Z_.] characters since we control it. Ignore comments and empty lines.
         val entries = mutableListOf<ConfigEntry>()
         val regex = Regex("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
-        for ((key, value) in props.entries) {
-            var stringKey = key.toString()
-            val codeKey = stringKey
+        for ((propKey, propValue) in props.entries) {
+            var key = propKey.toString()
+            if (key.endsWith(".label") || key.endsWith(".description")) {
+                continue
+            }
+            val codeKey = key
                 .split(".")
                 .map {
                     it.replace(regex, "_")
                 }
                 .joinToString("_")
                 .uppercase()
-            val value = value.toString().trim()
-            entries.add(ConfigEntry(codeKey, stringKey, value))
+
+            val value = propValue.toString().trim().removeSurrounding("\"")
+            entries.add(ConfigEntry(codeKey, key, value))
+
+            // We also want extra entries for section id's. We can identify them from the sectionLabel
+            if (key.endsWith(".sectionLabel")) {
+                val sectionCodeKey = codeKey.removeSuffix("_SECTION_LABEL")
+                val sectionKey = key.substringBeforeLast(".sectionLabel")
+                entries.add(ConfigEntry(sectionCodeKey, sectionKey, sectionKey))
+            }
         }
 
         // Clean output dir to avoid stale constants
@@ -312,6 +324,8 @@ val generateClientConfig =
         iniFile.set(layout.projectDirectory.file("src/commonMain/resources/default-client-settings.ini"))
         outputDir.set(layout.buildDirectory.dir("generated/jervis/commonMain/kotlin"))
         packageName.set("com.jervis.generated")
+        inputs.file(layout.projectDirectory.file("src/commonMain/resources/default-client-settings.ini"))
+        outputs.dir(layout.buildDirectory.dir("generated/jervis/commonMain/kotlin"))
     }
 
 kotlin.sourceSets.named("commonMain") {
@@ -323,74 +337,229 @@ kotlin.sourceSets.named("commonMain") {
 // ----
 object GameMenuParser {
 
+    class LinkedProperties : Properties() {
+        private val linkMap: MutableMap<Any?, Any?> = LinkedHashMap<Any?, Any?>()
+        @Synchronized
+        override fun put(key: Any?, value: Any?): Any? {
+            return linkMap.put(key, value)
+        }
+        @Synchronized
+        override fun contains(value: Any?): Boolean {
+            return linkMap.containsValue(value)
+        }
+        override fun containsValue(value: Any?): Boolean {
+            return linkMap.containsValue(value)
+        }
+        @Suppress("UNCHECKED_CAST")
+        override val entries: MutableSet<MutableMap.MutableEntry<in Any, in Any>>
+            get() = linkMap.entries as MutableSet<MutableMap.MutableEntry<in Any, in Any>>
+        @Synchronized
+        override fun elements(): Enumeration<Any?>? {
+            throw UnsupportedOperationException(
+                "Enumerations are so old-school, don't use them, "
+                    + "use keySet() or entrySet() instead"
+            )
+        }
+        @Synchronized
+        override fun clear() {
+            linkMap.clear()
+        }
+
+        @Synchronized
+        override fun containsKey(key: Any?): Boolean {
+            return linkMap.containsKey(key)
+        }
+
+        companion object {
+            private const val serialVersionUID = 1L
+        }
+    }
+
     fun parse(props: Properties): String {
 
-        // 1) Collect section labels from keys like: jervis.autoAction.label=Automatic Actions
+        // 1) Collect section labels from keys like: jervis.ui.sectionLabel=UI Settings
         val sectionLabels = mutableMapOf<String, String>()
-        props.forEach { (pKey, pValue) ->
-            val key = pKey.toString()
-            val value = pValue.toString()
+        props.forEach { (propKey, propValue) ->
+            val key = propKey.toString()
+            val value = propValue.toString()
             val parts = key.split('.')
             if (parts.last() == "sectionLabel") {
-                // e.g., ["jervis","autoAction","label"] -> "jervis.autoAction"
+                // e.g., ["jervis","ui","sectionLabel"] -> "jervis.ui"
                 sectionLabels[parts.subList(0, parts.lastIndex).joinToString(".")] = value
             }
         }
 
-        // 2) Collect items per section. Item keys look like:
-        //    jervis.autoAction.doNotRerollSuccessfulActions.label
-        //    jervis.autoAction.doNotRerollSuccessfulActions.value
-        data class Tmp(var label: String? = null, var value: Boolean? = null)
-        val sectionData = mutableMapOf<String, MutableMap<String, Tmp>>() // sectionId -> (fullItemKey -> Tmp)
-        props.forEach { (pKey, pValue) ->
-            val key = pKey.toString()
-            val itemId = key.substringBeforeLast('.')
-            val value = pValue.toString()
-
-            // Check if line is a sub-item of already found section headers
-            val sectionId = sectionLabels.keys.firstOrNull { sectionId ->
-                itemId.startsWith("$sectionId.")
+        // 2) Collect subsection order definitions from keys like: jervis.autoAction.sections=actions,skills
+        val subsectionDefs = mutableMapOf<String, List<String>>()
+        props.forEach { (propKey, propValue) ->
+            val key = propKey.toString()
+            val value = propValue.toString()
+            if (key.endsWith(".sections")) {
+                val sectionId = key.substringBeforeLast(".sections")
+                subsectionDefs[sectionId] = value.split(",").map { it.trim() }
             }
-            if (sectionId != null) {
-                val sectionItems = sectionData.getOrPut(sectionId) { mutableMapOf() }
-                val entryData = sectionItems.getOrPut(itemId) { Tmp() }
-                when {
-                    key.endsWith(".label") -> {
-                        entryData.label = value
-                    }
-                    key.endsWith(".value") -> {
-                        entryData.value = value.toBooleanStrictOrNull()
+        }
+
+        // 3) Collect subsection labels (e.g., jervis.autoAction.actions.label)
+        val subsectionLabels = mutableMapOf<String, String>()
+        props.forEach { (propKey, propValue) ->
+            val key = propKey.toString()
+            val value = propValue.toString()
+            if (key.endsWith(".label") && !key.endsWith("sectionLabel")) {
+                // Check if this is a subsection label
+                val potentialSubsectionId = key.substringBeforeLast(".label")
+                val parts = potentialSubsectionId.split('.')
+                if (parts.size >= 3) {
+                    // Check if the parent section has subsections defined
+                    val parentSection = parts.subList(0, parts.size - 1).joinToString(".")
+                    if (subsectionDefs.containsKey(parentSection)) {
+                        val subsectionName = parts.last()
+                        if (subsectionDefs[parentSection]?.contains(subsectionName) == true) {
+                            subsectionLabels[potentialSubsectionId] = value
+                        }
                     }
                 }
             }
         }
 
-        // 3) Build generated code
+        // 4) For sections with subsections, find their label
+        val parentSectionLabels = mutableMapOf<String, String>()
+        subsectionDefs.keys.forEach { parentId ->
+            parentSectionLabels[parentId] = sectionLabels[parentId] ?: "Unknown Category"
+        }
+
+        // 5) Collect items per section/subsection. Item keys look like:
+        //    jervis.autoAction.actions.doNotRerollSuccessfulActions.label
+        //    jervis.autoAction.actions.doNotRerollSuccessfulActions.description
+        //    jervis.autoAction.actions.doNotRerollSuccessfulActions.value
+        data class Tmp(var label: String? = null, var description: String? = null, var value: Boolean? = null)
+
+        // Sections with subsections
+        val nestedSectionData = linkedMapOf<String, MutableMap<String, MutableMap<String, Tmp>>>() // parentSectionId -> (subsectionId -> (fullItemKey -> Tmp))
+
+        // Sections with only a top-level list
+        val flatSectionData = linkedMapOf<String, MutableMap<String, Tmp>>() // sectionId -> (fullItemKey -> Tmp)
+
+        props.forEach { (propKey, propValue) ->
+            val key = propKey.toString()
+            val value = propValue.toString()
+
+            // Skip non-item keys
+            if (key.endsWith(".sections") || key.endsWith(".sectionLabel")) return@forEach
+
+            val itemId = key.substringBeforeLast('.')
+
+            // Check if this is part of a nested section structure
+            var isNested = false
+            for ((parentSection, subsectionNames) in subsectionDefs) {
+                for (subsectionName in subsectionNames) {
+                    val subsectionId = "$parentSection.$subsectionName"
+                    // Check if this is a subsection label (e.g., jervis.autoAction.actions.label)
+                    val isSubsectionLabel = key == "$subsectionId.label"
+                    // Check if this is an item under a subsection (e.g., jervis.autoAction.actions.doNotReroll.label)
+                    val isSubsectionItem = itemId.startsWith("$subsectionId.") && !isSubsectionLabel
+
+                    if (isSubsectionItem) {
+                        isNested = true
+                        val subsectionMap = nestedSectionData
+                            .getOrPut(parentSection) { linkedMapOf() }
+                            .getOrPut(subsectionId) { linkedMapOf() }
+                        val entryData = subsectionMap.getOrPut(itemId) { Tmp() }
+                        when {
+                            key.endsWith(".label") -> entryData.label = value
+                            key.endsWith(".description") -> entryData.description = value.removeSurrounding("\"")
+                            key.endsWith(".value") -> entryData.value = value.toBooleanStrictOrNull()
+                        }
+                        break
+                    }
+                }
+                if (isNested) break
+            }
+
+            // If not nested, check if it belongs to a flat section
+            if (!isNested) {
+                val sectionId = sectionLabels.keys.firstOrNull { sectionId ->
+                    itemId.startsWith("$sectionId.")
+                }
+                // Make sure this section is not a parent section with subsections
+                if (sectionId != null && !subsectionDefs.containsKey(sectionId)) {
+                    val sectionItems = flatSectionData.getOrPut(sectionId) { linkedMapOf() }
+                    val entryData = sectionItems.getOrPut(itemId) { Tmp() }
+                    when {
+                        key.endsWith(".label") -> entryData.label = value
+                        key.endsWith(".description") -> entryData.description = value.removeSurrounding("\"")
+                        key.endsWith(".value") -> entryData.value = value.toBooleanStrictOrNull()
+                    }
+                }
+            }
+        }
+
+        // 6) Build generated code
         return buildString {
             appendLine("""
+                sealed interface MenuItem
                 data class GameMenu(val sections: List<MenuSection>)
                 data class MenuSection(
                     val id: String,
                     val label: String,
-                    val items: List<ToggleItem>
-                )
+                    val subsections: Boolean,
+                    val items: List<MenuItem>
+                ) : MenuItem
                 data class ToggleItem(
                     val key: String,
                     val label: String,
+                    val description: String,
                     val value: Boolean
-                )
+                ) : MenuItem
             """.trimIndent())
-            appendLine("fun getGameSettingsMenu(): GameMenu {")
+            appendLine("val gameSettingsMenu: GameMenu by lazy {")
             appendLine("\tval sections = listOf(")
-            sectionData.forEach { (sectionId, sectionItems) ->
+
+            // Generate nested sections
+            nestedSectionData.forEach { (parentSectionId, subsections) ->
+                val subsectionOrder = subsectionDefs[parentSectionId] ?: emptyList()
+                appendLine("\t\tMenuSection(")
+                appendLine("\t\t\tid = \"${parentSectionId}\",")
+                appendLine("\t\t\tlabel = \"${parentSectionLabels[parentSectionId] ?: "Unknown"}\",")
+                appendLine("\t\t\tsubsections = true,")
+                appendLine("\t\t\titems = listOf(")
+
+                // Output subsections in the defined order
+                for (subsectionName in subsectionOrder) {
+                    val subsectionId = "$parentSectionId.$subsectionName"
+                    val items = subsections[subsectionId] ?: continue
+                    appendLine("\t\t\t\tMenuSection(")
+                    appendLine("\t\t\t\t\tid = \"${subsectionId}\",")
+                    appendLine("\t\t\t\t\tlabel = \"${subsectionLabels[subsectionId]}\",")
+                    appendLine("\t\t\t\t\tsubsections = false,")
+                    appendLine("\t\t\t\t\titems = listOf(")
+                    items.forEach { (fullItemKey, tmp) ->
+                        appendLine("\t\t\t\t\t\tToggleItem(")
+                        appendLine("\t\t\t\t\t\t\tkey = \"${fullItemKey}.value\",")
+                        appendLine("\t\t\t\t\t\t\tlabel = \"${tmp.label}\",")
+                        appendLine("\t\t\t\t\t\t\tdescription = \"${tmp.description}\",")
+                        appendLine("\t\t\t\t\t\t\tvalue = ${tmp.value},")
+                        appendLine("\t\t\t\t\t\t),")
+                    }
+                    appendLine("\t\t\t\t\t),")
+                    appendLine("\t\t\t\t),")
+                }
+                appendLine("\t\t\t),")
+                appendLine("\t\t),")
+            }
+
+            // Generate flat sections
+            flatSectionData.forEach { (sectionId, sectionItems) ->
                 appendLine("\t\tMenuSection(")
                 appendLine("\t\t\tid = \"${sectionId}\",")
                 appendLine("\t\t\tlabel = \"${sectionLabels[sectionId]}\",")
+                appendLine("\t\t\tsubsections = false,")
                 appendLine("\t\t\titems = listOf(")
                 sectionItems.forEach { (fullItemKey, tmp) ->
                     appendLine("\t\t\t\tToggleItem(")
                     appendLine("\t\t\t\t\tkey = \"${fullItemKey}.value\",")
                     appendLine("\t\t\t\t\tlabel = \"${tmp.label}\",")
+                    appendLine("\t\t\t\t\tdescription = \"${tmp.description}\",")
                     appendLine("\t\t\t\t\tvalue = ${tmp.value},")
                     appendLine("\t\t\t\t),")
                 }
@@ -398,7 +567,7 @@ object GameMenuParser {
                 appendLine("\t\t),")
             }
             appendLine("\t)")
-            appendLine("\treturn GameMenu(sections)")
+            appendLine("\tGameMenu(sections)")
             appendLine("}")
         }
     }
