@@ -145,7 +145,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
                 }
             } ?: emptyList()
             val wheelState = ActionWheelUiStateData(
-                center = acc.game.activePlayer?.coordinates,
+                center = getActionWheelCenter(acc.game),
                 topItems = listOf(rolledValue),
                 topExpandMode = MenuExpandMode.FanOut(spread = 360f),
                 topAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
