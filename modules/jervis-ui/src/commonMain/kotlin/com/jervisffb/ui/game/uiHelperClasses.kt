@@ -62,6 +62,7 @@ data class UiTeamInfoUpdate(
 
 // This class contains high-level game information that is primarily used by the top status bar.
 data class UiGameStatusUpdate(
+    val currentTeam: TeamId? = null,
     val half: Int = 0,
     val drive: Int = 0,
     val turnMax: Int = 0,
@@ -71,7 +72,8 @@ data class UiGameStatusUpdate(
     val badgeSubButtons: PersistentList<ButtonData> = persistentListOf(),
     val actionButtons: PersistentList<ButtonData> = persistentListOf(),
 ) {
-    constructor(game: Game) : this(
+    constructor(team: TeamId?, game: Game) : this(
+        currentTeam = team,
         half = game.halfNo,
         drive = game.driveNo,
         turnMax = if (game.halfNo > game.rules.halfsPrGame) game.rules.turnsInExtraTime else game.rules.turnsPrHalf,

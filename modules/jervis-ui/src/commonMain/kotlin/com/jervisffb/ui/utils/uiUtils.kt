@@ -2,17 +2,24 @@ package com.jervisffb.ui.utils
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -27,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SamplingMode
@@ -245,4 +253,46 @@ private fun hslToColor(hsl: FloatArray): Color {
     val g = hue2rgb(p, q, h)
     val b = hue2rgb(p, q, h - 1f / 3f)
     return Color(r, g, b)
+}
+
+/**
+ * Creates an outer glow that follows the shape of the content.
+ * Created by ChatGPT, so can probably be optimzed.
+ */
+@Composable
+fun OuterGlow(
+    modifier: Modifier = Modifier,
+    color: Color,
+    blur: Dp = 16.dp,
+    alpha: Float = 1f,
+    content: @Composable () -> Unit
+) {
+    Box(modifier) {
+        // Glow layer (same content, blurred + tinted)
+        Box(
+            Modifier
+                // Important: Offscreen so BlendMode.SrcIn works as an alpha mask
+                .graphicsLayer {
+                    compositingStrategy = CompositingStrategy.Offscreen
+                    renderEffect = BlurEffect(
+                        blur.toPx(),
+                        blur.toPx(),
+                        TileMode.Decal
+                    )
+                }
+                // Tint using content alpha as mask
+                .drawWithContent {
+                    drawContent()
+                    drawRect(
+                        color = color.copy(alpha = alpha),
+                        blendMode = BlendMode.SrcIn
+                    )
+                }
+        ) {
+            content()
+        }
+
+        // Real content on top (unblurred)
+        content()
+    }
 }

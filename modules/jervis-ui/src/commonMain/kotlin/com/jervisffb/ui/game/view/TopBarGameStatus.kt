@@ -4,14 +4,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -59,15 +57,9 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.asSkiaBitmap
-import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -97,21 +89,16 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.components.JervisTooltipArea
 import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.toRadians
+import com.jervisffb.ui.utils.PixelBorderBox
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.onClickWithSmallDragControl
-import com.jervisffb.ui.utils.toImageBitmap
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.Paint
-import org.jetbrains.skia.Rect
-import org.jetbrains.skia.RuntimeEffect
-import org.jetbrains.skia.RuntimeShaderBuilder
 import kotlin.math.abs
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.tan
 
 // Game Status Layout that is compatible with a Game Screen layout for a Blood Bowl 3 inspired layout
@@ -134,9 +121,9 @@ fun TopBarGameStatus(
         modifier = modifier
     ) {
         Row {
-            TeamInfo(homeTeamInfo, JervisTheme.rulebookRed, leftSide = true)
+            TeamBadge(homeTeamInfo, progress.currentTeam == homeTeamInfo.id, JervisTheme.rulebookRed, leftSide = true)
             Spacer(modifier = Modifier.weight(1f))
-            TeamInfo(awayTeamInfo, JervisTheme.rulebookBlue, leftSide = false)
+            TeamBadge(awayTeamInfo, progress.currentTeam == awayTeamInfo.id, JervisTheme.rulebookBlue, leftSide = false)
         }
         Column(
             Modifier,
@@ -623,8 +610,9 @@ private fun GameStatusBox(
  * Composable responsible for the team logo, name and coach name in upper left/right corner of the screen.
  */
 @Composable
-private fun TeamInfo(
+private fun TeamBadge(
     teamInfo: UiTeamInfoUpdate,
+    isActive: Boolean,
     backgroundColor: Color,
     leftSide: Boolean
 ) {
@@ -647,87 +635,87 @@ private fun TeamInfo(
     ) {
 
         // Team Logo / Name / Coach
-        Box(
-            modifier = Modifier
-                // Make the team icons be slightly closer to the edge than dugout.
-                // It looks nicer with the current gfx.
-                .offset(x = if (leftSide) -8.jdp else 8.jdp)
-            ,
-            contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
+        PixelBorderBox(
+            // Make the team icons be slightly closer to the edge than dugout.
+            // It looks nicer with the current gfx.
+            modifier = Modifier.offset(x = if (leftSide) -12.jdp else 12.jdp),
+            borderEnabled = isActive
         ) {
-            Column(
-                modifier = Modifier
-                    .applyIf(leftSide) { padding(start = 44.jdp) }
-                    .applyIf(!leftSide) { padding(end = 44.jdp) }
-                ,
-                horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
+            Box(
+                modifier = Modifier.padding(horizontal = 4.jdp),
+                contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
             ) {
-                Box(modifier = Modifier
-                    .clip(backgroundShape)
-                    .width(coachBarLength)
-                    .height(coachBarHeight)
-                    .background(JervisTheme.black)
-                    ,
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier
+                        .applyIf(leftSide) { padding(start = 44.jdp) }
+                        .applyIf(!leftSide) { padding(end = 44.jdp) },
+                    horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
                 ) {
-                    Text(
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .applyIf(leftSide) { padding(start = textPadding) }
-                            .applyIf(!leftSide) { padding(end = textPadding) }
-                        ,
-                        textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
-                        text = teamInfo.coachName,
-                        color = Color.White,
-                        // fontStyle = FontStyle.Italic,
-                        lineHeight = 1.em,
-                        fontSize = 12.jsp
+                            .clip(backgroundShape)
+                            .width(coachBarLength)
+                            .height(coachBarHeight)
+                            .background(JervisTheme.black),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .applyIf(leftSide) { padding(start = textPadding) }
+                                .applyIf(!leftSide) { padding(end = textPadding) },
+                            textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
+                            text = teamInfo.coachName,
+                            color = Color.White,
+                            // fontStyle = FontStyle.Italic,
+                            lineHeight = 1.em,
+                            fontSize = 12.jsp
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(backgroundShape)
+                            .width(teamNameBarLength)
+                            .height(teamNameBarHeight)
+                            .background(backgroundColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .applyIf(leftSide) { padding(start = textPadding) }
+                                .applyIf(!leftSide) { padding(end = textPadding) },
+                            textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
+                            text = teamInfo.teamName,
+                            color = Color.White,
+                            lineHeight = 1.em,
+                            overflow = TextOverflow.Ellipsis,
+                            letterSpacing = 1.jsp,
+                            maxLines = 1,
+                            fontSize = 18.jsp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = JervisTheme.fontFamily(),
+                        )
+                    }
+                }
+                // We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
+                // but just using this doesn't scale well. We might need something that can switch between
+                // using a normal image and this depending on the size (or switch pixelSize more smartly).
+                //        PixelatedImageWithShader(
+                //            modifier = Modifier.padding(8.jdp).size(90.jdp),
+                //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
+                //            pixelSize = 2f,
+                //        )
+                // Team Logo
+                if (teamInfo.id.value.isNotEmpty()) {
+                    Image(
+                        modifier = Modifier.padding(top = logoTopPadding).size(teamLogoSize),
+                        bitmap = IconFactory.getLogo(teamInfo.id, LogoSize.SMALL),
+                        contentDescription = teamInfo.teamName + " logo",
+                        contentScale = ContentScale.Fit,
+                        filterQuality = FilterQuality.None,
                     )
                 }
-                Box(modifier = Modifier
-                    .clip(backgroundShape)
-                    .width(teamNameBarLength)
-                    .height(teamNameBarHeight)
-                    .background(backgroundColor)
-                    ,
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .applyIf(leftSide) { padding(start = textPadding) }
-                            .applyIf(!leftSide) { padding(end = textPadding) }
-                        ,
-                        textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
-                        text = teamInfo.teamName,
-                        color = Color.White,
-                        lineHeight = 1.em,
-                        overflow = TextOverflow.Ellipsis,
-                        letterSpacing = 1.jsp,
-                        maxLines = 1,
-                        fontSize = 18.jsp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = JervisTheme.fontFamily(),
-                    )
-                }
-            }
-            // We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
-            // but just using this doesn't scale well. We might need something that can switch between
-            // using a normal image and this depending on the size (or switch pixelSize more smartly).
-            //        PixelatedImageWithShader(
-            //            modifier = Modifier.padding(8.jdp).size(90.jdp),
-            //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
-            //            pixelSize = 2f,
-            //        )
-            // Team Logo
-            if (teamInfo.id.value.isNotEmpty()) {
-                Image(
-                    modifier = Modifier.padding(top = logoTopPadding).size(teamLogoSize),
-                    bitmap = IconFactory.getLogo(teamInfo.id, LogoSize.SMALL),
-                    contentDescription = teamInfo.teamName + " logo",
-                    contentScale = ContentScale.Fit,
-                    filterQuality = FilterQuality.None,
-                )
             }
         }
 
@@ -854,73 +842,6 @@ fun ParallelogramButton(
 }
 
 @Composable
-fun PixelatedImageWithShader(
-    modifier: Modifier = Modifier,
-    painter: Painter,
-    pixelSize: Float = 4f
-) {
-    val shaderCode = """
-            uniform shader img;
-            uniform float2 resolution;
-            uniform float pixelSize;
-
-            half4 main(float2 fragCoord) {
-                float2 pixelCoord = floor(fragCoord / pixelSize) * pixelSize;
-                float2 uv = pixelCoord / resolution;
-                return img.eval(uv * resolution);
-            }
-    """.trimIndent()
-
-    val effect = remember { RuntimeEffect.makeForShader(shaderCode) }
-    val shaderBuilder = remember(effect) { RuntimeShaderBuilder(effect) }
-
-    BoxWithConstraints(
-        modifier = modifier
-    ) {
-        val width = maxWidth
-        val height = maxHeight
-        val density = LocalDensity.current
-        val widthPx = with(density) { width.toPx() }
-        val heightPx = with(density) { height.toPx() }
-
-        // Render SVG to bitmap at requested size
-        val skiaBitmap = remember {
-            painter.intrinsicSize
-            val imageBitmap = painter.toImageBitmap(fitInside(painter.intrinsicSize, Size(widthPx, heightPx)), density)
-            imageBitmap.asSkiaBitmap()
-        }
-
-        // Build the shader to pixelate the image
-        val shader = remember {
-            shaderBuilder.uniform(
-                "resolution",
-                widthPx,
-                heightPx
-            )
-            shaderBuilder.uniform(
-                "pixelSize",
-                pixelSize
-            )
-            shaderBuilder.child(
-                "img",
-                skiaBitmap.makeShader()
-            )
-            shaderBuilder.makeShader()
-        }
-
-        Canvas(modifier = Modifier
-        ) {
-            drawIntoCanvas { canvas ->
-                val paint = Paint().apply {
-                    this.shader = shader
-                }
-                canvas.nativeCanvas.drawRect(Rect.makeXYWH(0f, 0f, skiaBitmap.width.toFloat(), skiaBitmap.height.toFloat()), paint)
-            }
-        }
-    }
-}
-
-@Composable
 private fun StatusBarButton(text: String, onClick: () -> Unit) {
     Button(
         modifier = Modifier
@@ -940,36 +861,4 @@ private fun StatusBarButton(text: String, onClick: () -> Unit) {
             color = JervisTheme.white,
         )
     }
-}
-
-/**
- * Converts a [Painter] to a Compose [ImageBitmap], making it easier to process further.
- */
-private fun Painter.toImageBitmap(
-    size: Size,
-    density: Density,
-): ImageBitmap {
-    // Right now this method isn't used anywhere where LayoutDirection matters, so hard-code for now.
-    val layoutDirection: LayoutDirection = LayoutDirection.Ltr
-    val bitmap = ImageBitmap(size.width.toInt(), size.height.toInt())
-    val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
-    CanvasDrawScope().draw(density, layoutDirection, canvas, size) {
-        draw(size)
-    }
-    return bitmap
-}
-
-fun fitInside(
-    original: Size,
-    maxSize: Size
-): Size {
-    val scale = min(
-        maxSize.width / original.width,
-        maxSize.height
-            / original.height
-    )
-    return Size(
-        (original.width  * scale),
-        (original.height * scale)
-    )
 }

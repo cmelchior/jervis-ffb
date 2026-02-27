@@ -7,7 +7,6 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.ui.game.dialogs.HideActionWheel
 import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
-import com.jervisffb.ui.game.dialogs.ShowActionWheel
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
@@ -39,7 +38,7 @@ class UiSnapshotAccumulator(
     private val playersBuilder = previousSnapshot.players.builder()
     private val squaresBuilder = previousSnapshot.squares.builder()
     private var gameStatusText: String? = null
-    private var statusBuilder: UiGameStatusUpdate = UiGameStatusUpdate(uiController.state)
+    private var statusBuilder: UiGameStatusUpdate = UiGameStatusUpdate(gameController.getAvailableActions().team?.id, uiController.state)
     private val unknownActionsBuilder = persistentListOf<GameAction>().builder()
     private val weather = uiController.state.weather
 

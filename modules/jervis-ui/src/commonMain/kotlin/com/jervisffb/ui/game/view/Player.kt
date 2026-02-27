@@ -258,7 +258,6 @@ private fun PlayerImage(
         isGoingDown -> playerDownBorderShader
         else -> playerSelectedBorderShader
     }
-    // val runtimeEffect = remember(playerBorderShader.hashCode()) { RuntimeEffect.makeForShader(playerBorderShader) }
     val runtimeEffect = RuntimeEffect.makeForShader(playerBorderShader)
     BoxWithConstraints(
         modifier = Modifier
