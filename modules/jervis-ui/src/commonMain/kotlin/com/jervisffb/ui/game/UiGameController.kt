@@ -47,6 +47,7 @@ import com.jervisffb.ui.game.state.actionwheel.ReallyStupidWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SecureTheBallWheelController
+import com.jervisffb.ui.game.state.actionwheel.SelectBlockTypeWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
@@ -163,6 +164,7 @@ class UiGameController(
         SecureTheBallWheelController,
         ShadowingWheelController,
         SelectPlayerActionWheelController,
+        SelectBlockTypeWheelController,
         ScatterRollWheelController,
 
         StandardBlockRollWheelController,
