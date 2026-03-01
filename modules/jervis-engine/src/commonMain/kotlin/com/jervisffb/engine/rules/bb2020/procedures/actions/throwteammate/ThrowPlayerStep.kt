@@ -51,6 +51,7 @@ import com.jervisffb.engine.reports.ReportStartingThrowTeamMate
 import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
@@ -65,7 +66,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdo
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
@@ -351,7 +351,6 @@ object ThrowPlayerStep: Procedure() {
             val injuryContext = RiskingInjuryContext(playerInSquare)
             return compositeCommandOf(
                 ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
-                SetPlayerState(playerInSquare, PlayerState.KNOCKED_DOWN),
                 SetContext(injuryContext),
                 SetContext(throwContext.copy(knockedDownWhenLanding = true))
             )
@@ -429,8 +428,10 @@ object ThrowPlayerStep: Procedure() {
     object ResolveLanding: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (context.knockedDownWhenLanding) {
-                return ResolveLandingPlayerKnockedDown
+            return if (context.fallOverWhenLanding) {
+                ResolveLandingPlayerFallingOver
+            } else if (context.knockedDownWhenLanding) {
+                ResolveLandingPlayerKnockedDown
             } else if (context.willCrashLand) {
                 ResolveLandingPlayerFallingOver
             } else {
@@ -560,7 +561,7 @@ object ThrowPlayerStep: Procedure() {
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }
@@ -577,9 +578,8 @@ object ThrowPlayerStep: Procedure() {
                     isThrown = false,
                 ),
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
-                    SetBallState.Companion.bouncing(it)
+                    SetBallState.bouncing(it)
                 },
-                SetPlayerState(thrownPlayer, PlayerState.KNOCKED_DOWN),
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }

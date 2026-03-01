@@ -71,7 +71,7 @@ fun createPushContext(state: Game): PushContext {
  *
  * @see [BB2020PushStepResolveSingleBlockPushChain]
  */
-object PushBack: Procedure() {
+object BB2020PushBack: Procedure() {
     override val initialNode: Node = ResolveInitialPushSequence
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)

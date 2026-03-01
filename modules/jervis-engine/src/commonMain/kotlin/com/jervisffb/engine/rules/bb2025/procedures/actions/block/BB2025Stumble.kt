@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -21,7 +20,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
@@ -144,7 +142,6 @@ object BB2025Stumble: Procedure() {
                 isPartOfMultipleBlock = blockContext.isUsingMultiBlock
             )
             return compositeCommandOf(
-                SetPlayerState(defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
                 SetContext(injuryContext)
             )
         }

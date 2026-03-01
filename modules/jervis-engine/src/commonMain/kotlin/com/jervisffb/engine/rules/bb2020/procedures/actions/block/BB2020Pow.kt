@@ -38,7 +38,7 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryR
  * @see MultipleBlockAction for a full description of Multiple Blocks work and
  * how a block result like POW! is resolved in that context.
  */
-object Pow: Procedure() {
+object BB2020Pow: Procedure() {
     override val initialNode: Node = ResolveInitialPushSequence
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val pushContext = createPushContext(state)

@@ -1,8 +1,6 @@
 package com.jervisffb.engine.rules.bb2025.procedures.actions.block
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -12,8 +10,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
@@ -37,11 +33,7 @@ object BB2025PlayerDown: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<BlockContext>()
         val injuryContext = RiskingInjuryContext(context.attacker, context.isUsingMultiBlock)
-        return compositeCommandOf(
-            SetTurnOver(TurnOver.STANDARD),
-            SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
-            SetContext(injuryContext),
-        )
+        return SetContext(injuryContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return ReportPlayerDownResult(state.getContext<BlockContext>().attacker)

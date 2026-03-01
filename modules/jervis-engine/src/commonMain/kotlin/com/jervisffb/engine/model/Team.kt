@@ -238,4 +238,8 @@ class Team(
     fun hasPrayer(prayer: PrayerToNuffle): Boolean {
         return activePrayersToNuffle.contains(prayer)
     }
+
+    override fun toString(): String {
+        return "Team(id=$id, name='$name')"
+    }
 }

@@ -13,8 +13,6 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -27,9 +25,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
@@ -42,10 +38,10 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.reports.ReportJumpResult
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -155,8 +151,6 @@ object JumpStep : Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -188,8 +182,6 @@ object JumpStep : Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -266,8 +258,6 @@ object JumpStep : Procedure() {
                 // Rush failed catastrophically, player Falls Over in starting square
                 compositeCommandOf(
                     SetPlayerLocation(player, moveContext.startingSquare),
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<JumpRollContext>(),
                     ReportJumpResult(jumpContext, moveContext.startingSquare),
                     GotoNode(ResolvePlayerFallingOver)
@@ -275,8 +265,6 @@ object JumpStep : Procedure() {
             } else {
                 // Jump failed, Player Falls Overin target square
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<RushRollContext>(),
                     ReportJumpResult(jumpContext, moveContext.target!!),
                     GotoNode(ResolvePlayerFallingOver)
@@ -305,7 +293,7 @@ object JumpStep : Procedure() {
             val context = state.getContext<MoveContext>()
             return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(

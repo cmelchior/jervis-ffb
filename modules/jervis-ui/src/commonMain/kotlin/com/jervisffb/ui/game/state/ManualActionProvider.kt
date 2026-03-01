@@ -46,9 +46,9 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
@@ -56,6 +56,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
@@ -604,7 +606,10 @@ open class ManualActionProvider(
             return PlayerSelected(selectedPlayer)
         }
 
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == Stumble.ChooseToUseTackle)) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == BB2020Stumble.ChooseToUseTackle)) {
+            return Confirm
+        }
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == BB2025Stumble.ChooseToUseTackle)) {
             return Confirm
         }
 
@@ -632,6 +637,15 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STAND_FIRM) && currentNode == CreatePushChainStep.DecideToUseStandFirm) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STEADY_FOOTING)
+            && (
+                currentNode == BB2025FallingOver.ChooseToUseSteadyFooting
+                    || currentNode == BB2025KnockedDown.ChooseToUseSteadyFooting
+            )
+        ) {
             return Confirm
         }
 

@@ -3,7 +3,6 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block.push
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.context.SetContext
@@ -12,7 +11,6 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
@@ -88,9 +86,6 @@ object MovePlayersInPushChainStep: Procedure() {
                         add(SetPlayerLocation(push.pushee, to))
                         state.field[to].balls.singleOrNull()?.let {
                             add(SetBallState.bouncing(it))
-                        }
-                        if (context.isDefenderKnockedDown && push.pushee == context.firstPushee) {
-                            add(SetPlayerState(push.pushee, PlayerState.KNOCKED_DOWN))
                         }
                     }
                 }

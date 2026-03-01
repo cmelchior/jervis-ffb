@@ -27,7 +27,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
@@ -43,23 +42,27 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Resolve a player being Knocked Down. This includes skills triggering just
- * before being Knocked Down, like Steady Footing, as well as skills triggering
- * after, like Pile Driver.
+ * Resolve a player falling over.
  *
  * See page 40 in the BB2025 rulebook.
  */
-object BB2025KnockedDown: Procedure() {
+object BB2025FallingOver: Procedure() {
     override val initialNode: Node = ChooseToUseSteadyFooting
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        return if (state.currentBallOrNull() != null) {
+            SetCurrentBall(null)
+        } else {
+            null
+        }
+    }
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<RiskingInjuryContext>()
-        if (context.player.state == PlayerState.KNOCKED_DOWN) {
-            INVALID_GAME_STATE("Player is already knocked down: ${context.player.state}")
+        if (context.player.state == PlayerState.FALLEN_OVER) {
+            INVALID_GAME_STATE("Player is already falling over: ${context.player}")
         }
-        if (context.mode != RiskingInjuryMode.KNOCKED_DOWN && context.mode != RiskingInjuryMode.BAD_LANDING) {
-            INVALID_GAME_STATE("Player needs to have a bad landing or be knocked down to use this procedure: ${context.mode}")
+        if (context.mode != RiskingInjuryMode.FALLING_OVER && context.mode != RiskingInjuryMode.BAD_LANDING) {
+            INVALID_GAME_STATE("Player needs to have landed badly or be falling over oto use this procedure: ${context.mode}")
         }
     }
 
@@ -85,7 +88,7 @@ object BB2025KnockedDown: Procedure() {
                     GotoNode(RollForSteadyFooting)
                 )
             } else {
-                return GotoNode(KnockdownPlayer)
+                return GotoNode(PlayerFallsOver)
             }
         }
     }
@@ -93,7 +96,7 @@ object BB2025KnockedDown: Procedure() {
     object RollForSteadyFooting: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            val context = SteadyFootingRollContext(injuryContext.player, RiskingInjuryMode.KNOCKED_DOWN)
+            val context = SteadyFootingRollContext(injuryContext.player, RiskingInjuryMode.FALLING_OVER)
             return SetContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SteadyFootingRoll
@@ -101,35 +104,46 @@ object BB2025KnockedDown: Procedure() {
             val context = state.getContext<SteadyFootingRollContext>()
             return if (context.isSuccess) {
                 compositeCommandOf(
-                    ReportSteadyFootingResult(context, RiskingInjuryMode.KNOCKED_DOWN),
+                    ReportSteadyFootingResult(context, RiskingInjuryMode.FALLING_OVER),
                     ExitProcedure()
                 )
             } else {
-                GotoNode(KnockdownPlayer)
+                GotoNode(PlayerFallsOver)
             }
         }
     }
 
-    object KnockdownPlayer: ComputationNode() {
+    object PlayerFallsOver: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val player = context.player
             return buildCompositeCommand {
-                add(SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
-                // Note, in BB2020, thrown players where knocked down after landing on other players,
-                // but this was explicitly not a turnover (after errata). The wording in BB2025
-                // is the original wording, so landing on your team players is always a turnover for now.
-                val isOnActiveTeam = (context.player.team == state.activeTeam)
-                if (isOnActiveTeam) {
-                    add(SetTurnOver(TurnOver.STANDARD))
-                }
+                add(SetPlayerState(player, PlayerState.FALLEN_OVER, hasTackleZones = false))
+                /**
+                 * If the player falling over, carried a ball, they will drop the ball, and it
+                 * will bounce from this square.
+                 *
+                 * In case a ball was lying on the ground in the square the player was falling
+                 * over in. It will bounce from the square as part of [com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoSquare],
+                 * so when we get to this procedure and the player drops the ball, there should only
+                 * be one ball in the square.
+                 */
                 if (player.hasBall()) {
                     val ball = player.ball!!
                     addAll(
                         SetCurrentBall(ball),
                         SetBallLocation(ball, player.coordinates),
-                        SetBallState.bouncing(ball)
+                        SetBallState.bouncing(ball),
                     )
+                }
+                // Falling over results in a turn-over pr. the list of turnovers on page 35 in the BB2025 rulebook.
+                // But only if they are the active player, or if they are a thrown player with the ball(i.e. thrown
+                // players not holding the ball does not trigger this)
+                val isOnActiveTeam = (player.team == state.activeTeam)
+                val playerThrown = (context.mode == RiskingInjuryMode.BAD_LANDING)
+                val hasBall = player.hasBall()
+                if ((isOnActiveTeam && !playerThrown) || (isOnActiveTeam && playerThrown && hasBall)) {
+                    add(SetTurnOver(TurnOver.STANDARD))
                 }
                 add(GotoNode(RollForInjury))
             }
@@ -140,27 +154,11 @@ object BB2025KnockedDown: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
-            // If we are part of a Multiple Block, the bounce is delayed until later,
-            // so in that case, we just knock the ball loose and handle it later, otherwise
-            // we resolve it here.
-            val isBouncing = state.currentBallOrNull()?.state == BallState.BOUNCING
-            return when {
-                isBouncing && context.isPartOfMultipleBlock -> {
-                    val mbContext = state.getContext<BB2025MultipleBlockContext>()
-                    compositeCommandOf(
-                        SetCurrentBall(null),
-                        ExitProcedure()
-                    )
-                }
-                isBouncing && !context.isPartOfMultipleBlock-> {
-                    GotoNode(BounceBall)
-                }
-                else -> {
-                    compositeCommandOf(
-                        SetCurrentBall(null),
-                        ExitProcedure()
-                    )
-                }
+            val ball = state.currentBallOrNull()
+            return if (ball?.state == BallState.BOUNCING) {
+                GotoNode(BounceBall)
+            } else {
+                ExitProcedure()
             }
         }
     }

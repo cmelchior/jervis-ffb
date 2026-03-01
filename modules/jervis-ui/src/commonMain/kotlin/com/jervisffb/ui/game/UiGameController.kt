@@ -52,6 +52,7 @@ import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.SteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.UnchannelledFuryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
@@ -65,6 +66,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseLeapWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSafePassWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStandFirmWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseSteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseThickSkullWheelController
@@ -163,6 +165,7 @@ class UiGameController(
         RushWheelController,
         SecureTheBallWheelController,
         ShadowingWheelController,
+        SteadyFootingWheelController,
         SelectPlayerActionWheelController,
         SelectBlockTypeWheelController,
         ScatterRollWheelController,
@@ -182,6 +185,7 @@ class UiGameController(
         UseSafePassWheelController,
         UseSidestepWheelController,
         UseStandFirmWheelController,
+        UseSteadyFootingWheelController,
         UseTackleWheelController,
         UseTauntWheelController,
         UseThickSkullWheelController,

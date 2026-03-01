@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -21,7 +20,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
@@ -43,7 +41,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * See page 57 in the BB2020 rulebook.
  * See page 62 in the BB2025 rulebook.
  */
-object Stumble: Procedure() {
+object BB2020Stumble: Procedure() {
     override val initialNode: Node = ChooseToUseTackle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
@@ -150,10 +148,7 @@ object Stumble: Procedure() {
                 player = defender,
                 isPartOfMultipleBlock = blockContext.isUsingMultiBlock
             )
-            return compositeCommandOf(
-                SetPlayerState(defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
-                SetContext(injuryContext)
-            )
+            return SetContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {

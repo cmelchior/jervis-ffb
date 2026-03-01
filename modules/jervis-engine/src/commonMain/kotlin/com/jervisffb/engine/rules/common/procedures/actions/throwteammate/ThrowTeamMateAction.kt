@@ -73,8 +73,12 @@ data class ThrowTeamMateContext(
     // If a player without TZ or prone/stunned are thrown they will bounce one
     // extra time before landing.
     val willCrashLand: Boolean = false,
-    // If a player bounces on another player, they will automatically be Knocked Down when finally landing.
+    // If a player bounces on another player, the result when they land differs between rulesets.
+    // - in BB2020, the rulebook says they will Fall Down, but it was errata'ed to a Knock Down
+    // - in BB2025, the rulebook says they will Fall Over, and no errata currently exist.
+    val fallOverWhenLanding: Boolean = false,
     val knockedDownWhenLanding: Boolean = false,
+    val landsAt: FieldCoordinate? = null,
     // If the player scattered, deviated or bounced into the crowd while holding the ball.
     // The ball should be thrown in from this field.
     val outOfBoundsAt: FieldCoordinate? = null

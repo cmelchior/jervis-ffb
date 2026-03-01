@@ -15,7 +15,6 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -32,7 +31,6 @@ import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.LandingRollContext
@@ -50,6 +48,7 @@ import com.jervisffb.engine.reports.ReportStartingThrowTeamMate
 import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Pickup
@@ -63,7 +62,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.Landin
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
@@ -305,9 +303,8 @@ object ThrowPlayerStep: Procedure() {
             val injuryContext = RiskingInjuryContext(playerInSquare)
             return compositeCommandOf(
                 ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
-                SetPlayerState(playerInSquare, PlayerState.KNOCKED_DOWN),
                 SetContext(injuryContext),
-                SetContext(throwContext.copy(knockedDownWhenLanding = true))
+                SetContext(throwContext.copy(fallOverWhenLanding = true))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
@@ -315,6 +312,7 @@ object ThrowPlayerStep: Procedure() {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
             // According to FAQ May 2025, landing on a player from your own team is always a turnover.
+            // TODO Is this also the case if they have Steady Footing?
             return compositeCommandOf(
                 if (injuryContext.player.team == throwContext.thrownPlayer!!.team) SetTurnOver(TurnOver.STANDARD) else null,
                 RemoveContext<RiskingInjuryContext>(),
@@ -383,10 +381,12 @@ object ThrowPlayerStep: Procedure() {
     object ResolveLanding: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (context.knockedDownWhenLanding) {
-                return ResolveLandingPlayerKnockedDown
+            return if (context.fallOverWhenLanding) {
+                ResolveLandingPlayerFallingOver
             } else if (context.willCrashLand) {
                 ResolveLandingPlayerFallingOver
+            } else if (context.knockedDownWhenLanding) {
+                INVALID_GAME_STATE("A thrown player landing should not be Knocked Down")
             } else {
                 null
             }
@@ -521,34 +521,10 @@ object ThrowPlayerStep: Procedure() {
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
                     SetBallState.bouncing(it)
                 },
-                SetPlayerState(thrownPlayer, PlayerState.FALLEN_OVER),
                 SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return exitPlayingGoingDownNode(state)
-        }
-    }
-
-    object ResolveLandingPlayerKnockedDown: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val throwContext = state.getContext<ThrowTeamMateContext>()
-            val thrownPlayer = throwContext.thrownPlayer ?: INVALID_GAME_STATE("Could not find thrown player: $throwContext")
-            return compositeCommandOf(
-                SetPlayerLocation(
-                    thrownPlayer,
-                    throwContext.target!!,
-                    isThrown = false,
-                ),
-                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
-                    SetBallState.bouncing(it)
-                },
-                SetPlayerState(thrownPlayer, PlayerState.KNOCKED_DOWN),
-                SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }

@@ -4,9 +4,10 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
@@ -28,12 +29,14 @@ import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
+import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -327,7 +330,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
-        Stumble.ChooseToUseTackle to { isActiveClient, _, state ->
+        BB2020Stumble.ChooseToUseTackle to { isActiveClient, _, state ->
             val context = state.getContext<BlockContext>()
             when (isActiveClient) {
                 true -> "Use Tackle to knock down ${context.defender.name}?"
@@ -478,6 +481,39 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Stand Firm?"
                 false -> "Waiting for opponent to use Stand Firm"
+            }
+        },
+
+        SteadyFootingRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            val context = state.getContext<SteadyFootingRollContext>()
+            when {
+                (isActiveClient && !serverDiceRolls) -> {
+                    when (context.mode) {
+                        RiskingInjuryMode.FALLING_OVER -> "Roll D6 to use Steady Footing to avoid Falling Over"
+                        RiskingInjuryMode.KNOCKED_DOWN -> "Roll D6 to use Steady Footing to avoid being Knocked Down"
+                        else -> error("Unsupported mode: ${context.mode}")
+                    }
+                }
+                else -> null
+            }
+        },
+        SteadyFootingRoll.ChooseReRollSource to { isActiveClient, _, _ ->
+            when {
+                (isActiveClient) -> "Accept Steady Footing Result or Reroll D6?"
+                else -> null
+            }
+        },
+        SteadyFootingRoll.ReRollDie to { isActiveClient, serverDiceRolls, _ ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> {
+                    val context = state.getContext<SteadyFootingRollContext>()
+                    when (context.mode) {
+                        RiskingInjuryMode.FALLING_OVER -> "Re-roll D6 to use Steady Footing to avoid Falling Over"
+                        RiskingInjuryMode.KNOCKED_DOWN -> "Re-roll D6 to use Steady Footing to avoid being Knocked Down"
+                        else -> error("Unsupported mode: ${context.mode}")
+                    }
+                }
+                else -> null
             }
         },
     )

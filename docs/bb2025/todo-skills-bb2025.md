@@ -119,7 +119,16 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Usage is optional
   - [x] Reduces distance from D6 to D3
 - [ ] Pro
-- [ ] Steady Footing
+- [x] Steady Footing
+  - [x] If success, prevents turn over
+  - [x] Prevent Fall Over (during own turn)
+    - [x] Rush
+    - [x] Jump
+    - [x] Being Thrown
+  - [x] Prevent Knocked Down (during own turn)
+    - [x] Block
+  - [x] Prevent Knocked Down (during opponent turn)
+  - [x] Does not work when Distracted
 - [ ] Strip Ball
   - [ ] Does not work against Stand Firm (Fumbbl)
   - [ ] No score, if ball is stripped when pushed into end zone

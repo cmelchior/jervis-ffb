@@ -38,7 +38,10 @@ enum class RiskingInjuryMode {
     PUSHED_INTO_CROWD,
     FOUL,
     HIT_BY_ROCK,
-    BAD_LANDING // TODO Is there a difference between Bad Landing and Crash Landing here?
+    // Player is injured after being thrown (normally the same as Falling Over),
+    // but we need to know the difference in order to trigger turnovers
+    // correctly.
+    BAD_LANDING
 }
 
 // What do we need to track?

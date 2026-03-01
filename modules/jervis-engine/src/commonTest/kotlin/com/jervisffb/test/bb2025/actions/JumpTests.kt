@@ -19,8 +19,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.ext.undoActions
+import com.jervisffb.test.jump
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
@@ -61,12 +63,10 @@ class JumpTests: JervisGameBB2025Test() {
             state.getPlayerById("H1".playerId).state = playerState
             val jumpingPlayer = state.getPlayerById("A1".playerId)
             controller.rollForward(
-                PlayerSelected(jumpingPlayer.id),
-                PlayerActionSelected(PlayerStandardActionType.MOVE),
+                *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
                 MoveTypeSelected(MoveType.JUMP),
                 FieldSquareSelected(11, 5),
-                4.d6,
-                NoRerollSelected()
+                *jump(4.d6),
             )
             assertEquals(PlayerState.STANDING, jumpingPlayer.state)
             assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
@@ -79,8 +79,7 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
         )
 
@@ -104,8 +103,7 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A2".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
         )
 
@@ -129,8 +127,7 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A2".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 4),
             4.d6, // 2 Modifiers from leaving, no to enter, so should fail
@@ -150,8 +147,7 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H2".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 6),
             4.d6, // 1 Marked Modifiers from entering, so a 4 will fail
@@ -173,8 +169,7 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H2".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A2".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 7),
             4.d6, // 1 Marked Modifiers from leaving, 2 from entering
@@ -193,12 +188,10 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            3.d6, // 1 Marked Modifiers from leaving/entering
-            NoRerollSelected(),
+            *jump(3.d6), // 1 Marked Modifiers from leaving/entering
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
         assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
@@ -209,12 +202,10 @@ class JumpTests: JervisGameBB2025Test() {
         state.getPlayerById("H1".playerId).state = PlayerState.PRONE
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            1.d6,
-            NoRerollSelected(),
+            *jump(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
         assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
@@ -230,8 +221,7 @@ class JumpTests: JervisGameBB2025Test() {
         jumpingPlayer.rushesLeft = 2
 
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
             *rushRoll(2.d6),
@@ -253,8 +243,7 @@ class JumpTests: JervisGameBB2025Test() {
         jumpingPlayer.rushesLeft = 2
 
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
             *rushRoll(2.d6),
@@ -279,12 +268,10 @@ class JumpTests: JervisGameBB2025Test() {
         jumpingPlayer.rushesLeft = 2
 
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
-            1.d6, // Rush
-            NoRerollSelected(),
+            *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
         assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
@@ -300,8 +287,7 @@ class JumpTests: JervisGameBB2025Test() {
         jumpingPlayer.rushesLeft = 2
 
         controller.rollForward(
-            PlayerSelected(jumpingPlayer.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
             FieldSquareSelected(11, 5),
             *rushRoll(2.d6),

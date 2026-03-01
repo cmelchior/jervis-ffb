@@ -21,6 +21,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.rushRoll
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -83,8 +84,7 @@ class RushingTests: JervisGameBB2025Test() {
             *moveTo(21, 13),
             *moveTo(22, 13),
             *moveTo(23, 13), // Rush
-            1.d6, // Fail Rush
-            NoRerollSelected(),
+            *rushRoll(1.d6), // Fail Rush
         )
         assertEquals(PlayerState.FALLEN_OVER, state.getPlayerById("A8".playerId).state)
         assertEquals(TurnOver.STANDARD, state.turnOver)

@@ -231,7 +231,7 @@ object BB2025BothDown: Procedure() {
                 null
             }
         }
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val bothDownContext = state.getContext<BothDownContext>()
             val context = RiskingInjuryContext(
                 player = bothDownContext.defender,

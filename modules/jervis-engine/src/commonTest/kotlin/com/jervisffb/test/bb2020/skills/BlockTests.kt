@@ -3,9 +3,11 @@ package com.jervisffb.test.bb2020.skills
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
@@ -47,10 +49,20 @@ class BlockTests: JervisGameBB2020Test() {
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
         assertEquals(FieldCoordinate(12, 5), defender.location)
+        assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        assertEquals(PlayerState.STANDING, attacker.state)
+        controller.rollForward(
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertEquals(PlayerState.PRONE, defender.state)
+        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
+        controller.rollForward(
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertEquals(PlayerState.PRONE, defender.state)
+        assertEquals(PlayerState.PRONE, attacker.state)
     }
 
     @Test

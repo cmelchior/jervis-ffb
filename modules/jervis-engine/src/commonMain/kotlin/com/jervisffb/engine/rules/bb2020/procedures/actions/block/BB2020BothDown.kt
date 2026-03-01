@@ -10,8 +10,6 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
-import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -25,7 +23,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.getContext
@@ -50,7 +47,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * 3. Defender chooses to use block
  * 4. Attacker chooses to use block
  */
-object BothDown: Procedure() {
+object BB2020BothDown: Procedure() {
     override val initialNode: Node = DefenderChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
@@ -192,16 +189,7 @@ object BothDown: Procedure() {
                     ExitProcedure()
                 )
             } else {
-                buildCompositeCommand {
-                    if (!context.attackUsesBlock) {
-                        add(SetTurnOver(TurnOver.STANDARD))
-                        add(SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
-                    }
-                    if (!context.defenderUsesBlock) {
-                        add(SetPlayerState(context.defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
-                    }
-                    add(GotoNode(ResolveDefenderInjury))
-                }
+                GotoNode(ResolveDefenderInjury)
             }
         }
     }

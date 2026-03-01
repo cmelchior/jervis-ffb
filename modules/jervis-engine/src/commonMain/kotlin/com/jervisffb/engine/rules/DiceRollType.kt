@@ -54,6 +54,7 @@ enum class DiceRollType {
     SOLID_DEFENSE,
     SUDDEN_DEATH,
     STANDING_UP,
+    STEADY_FOOTING,
     SWELTERING_HEAT,
     TAKE_ROOT,
     THROW_A_ROCK,

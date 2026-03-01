@@ -41,10 +41,10 @@ import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -320,7 +320,7 @@ object JumpStep : Procedure() {
             val context = state.getContext<MoveContext>()
             return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(

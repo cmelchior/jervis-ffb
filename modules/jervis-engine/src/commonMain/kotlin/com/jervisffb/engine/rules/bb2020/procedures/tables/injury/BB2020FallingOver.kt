@@ -1,9 +1,10 @@
-package com.jervisffb.engine.rules.common.procedures.tables.injury
+package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -13,27 +14,33 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoSquare
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Resolve a player falling over as described on page 27 in the rulebook.
+ * Resolve a player falling over.
+ *
+ * See page 27 in the BB2020 rulebook.
  */
-object FallingOver: Procedure() {
+object BB2020FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<RiskingInjuryContext>()
         return buildCompositeCommand {
+            add(SetPlayerState(context.player, PlayerState.FALLEN_OVER, hasTackleZones = false))
             /**
              * If the player falling over, carried a ball, they will drop the ball, and it
              * will bounce from this square.
              *
              * In case a ball was lying on the ground in the square the player was falling
-             * over in. It will bounce from the square as part of [MovePlayerIntoSquare],
+             * over in. It will bounce from the square as part of [com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoSquare],
              * so when we get to this procedure and the player drops the ball, there should only
              * be one ball in the square.
              */

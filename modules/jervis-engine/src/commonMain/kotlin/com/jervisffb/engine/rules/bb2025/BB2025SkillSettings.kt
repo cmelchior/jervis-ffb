@@ -49,6 +49,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Sidestep
 import com.jervisffb.engine.rules.bb2025.skills.Sprint
 import com.jervisffb.engine.rules.bb2025.skills.Stab
 import com.jervisffb.engine.rules.bb2025.skills.StandFirm
+import com.jervisffb.engine.rules.bb2025.skills.SteadyFooting
 import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
@@ -246,9 +247,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.STEADY_FOOTING -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Steady Footing", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        SteadyFooting(player, category, expiresAt)
+                    }
                 }
                 SkillType.STRIP_BALL -> {
                     // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->

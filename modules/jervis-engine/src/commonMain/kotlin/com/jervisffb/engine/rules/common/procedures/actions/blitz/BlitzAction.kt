@@ -14,7 +14,6 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -45,7 +44,9 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
@@ -53,7 +54,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -276,7 +276,6 @@ object BlitzAction : Procedure() {
                     add(SetPlayerRushesLeft(context.player, context.player.rushesLeft - 1))
                     add(GotoNode(ResolveBlock))
                 } else {
-                    add(SetPlayerState(context.player, PlayerState.FALLEN_OVER))
                     add(GotoNode(ResolveFallingOverBeforeBlock))
                 }
             }
@@ -288,7 +287,12 @@ object BlitzAction : Procedure() {
             val context = state.getContext<BlitzActionContext>()
             return SetContext(RiskingInjuryContext(context.attacker, mode = RiskingInjuryMode.FALLING_OVER))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> BB2020FallingOver
+                GameVersion.BB2025 -> BB2025FallingOver
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome of rolling for falling over, the player's action
             // ended in a turnover

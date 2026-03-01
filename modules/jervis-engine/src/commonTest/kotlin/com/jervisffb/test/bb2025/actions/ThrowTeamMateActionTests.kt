@@ -1,12 +1,10 @@
 package com.jervisffb.test.bb2025.actions
 
-import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerDeselected
@@ -27,15 +25,9 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.FullGame
 import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
-import com.jervisffb.test.bb2020.advancedHumanTeamAway
-import com.jervisffb.test.bb2020.createAdvancedHomeTeam
-import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.landingRoll
@@ -43,7 +35,6 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushTo
-import com.jervisffb.test.teamSetup
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
@@ -60,62 +51,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
 
     @BeforeTest
     override fun setUp() {
-        // Create new teams that have the option to throw a team-mate.
-        // Remove Bone Head from the ogre to make testing easier.
-        homeTeam = createAdvancedHomeTeam(rules)
-        awayTeam = advancedHumanTeamAway(rules)
-        homeTeam["H1".playerId].positionSkills.removeFirst()
-        awayTeam["A1".playerId].positionSkills.removeFirst()
-        state = createDefaultGameStateBB2020(rules, homeTeam, awayTeam)
-        homeTeam = state.homeTeam
-        awayTeam = state.awayTeam
-        controller = GameEngineController(state)
-        controller.startTestMode(FullGame)
-        controller.rollForward(
-            *defaultPregame(),
-            *arrayOf(*homeSetup(), *awaySetup()),
-            *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 5),
-                deviate = DiceRollResults(4.d8, 1.d6),
-                bounce = 4.d8
-            ),
-        )
-    }
-
-    private fun homeSetup(endSetup: Boolean = true): Array<GameAction> {
-        val setup = buildList {
-            // Place Hafling behind Ogre, ready to be thrown
-            add("H1".playerId to FieldCoordinate(12, 5))
-            add("H13".playerId to  FieldCoordinate(11, 5))
-            add("H2".playerId to FieldCoordinate(12, 6))
-            add("H3".playerId to FieldCoordinate(12, 7))
-            add("H4".playerId to FieldCoordinate(12, 8))
-            add("H5".playerId to FieldCoordinate(12, 9))
-            add("H6".playerId to FieldCoordinate(11, 1))
-            add("H7".playerId to FieldCoordinate(10, 1))
-            add("H8".playerId to FieldCoordinate(10, 13))
-            add("H9".playerId to FieldCoordinate(11, 13))
-            add("H10".playerId to  FieldCoordinate(9, 7))
-        }
-        return teamSetup(setup, endSetup)
-    }
-
-    private fun awaySetup(endSetup: Boolean = true): Array<GameAction> {
-        val setup= listOf(
-            // Place Hafling behind Ogre, ready to be thrown
-            "A1".playerId to FieldCoordinate(13, 5),
-            "A13".playerId to FieldCoordinate(14, 5),
-            "A2".playerId to FieldCoordinate(13, 6),
-            "A3".playerId to FieldCoordinate(13, 7),
-            "A4".playerId to FieldCoordinate(13, 8),
-            "A5".playerId to FieldCoordinate(13, 9),
-            "A6".playerId to FieldCoordinate(14, 1),
-            "A7".playerId to FieldCoordinate(15, 1),
-            "A8".playerId to FieldCoordinate(15, 13),
-            "A9".playerId to FieldCoordinate(14, 13),
-            "A10".playerId to FieldCoordinate(16, 7),
-        )
-        return teamSetup(setup, endSetup)
+        setupAndStartThrowTeamMateGame()
     }
 
     @Test
@@ -441,7 +377,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             4.d8, // Bounce to empty square
         )
         // Thrown player is knocked down on landing after hitting another player
-        assertEquals(PlayerState.KNOCKED_DOWN, awayTeam["A13".playerId].state)
+        assertEquals(PlayerState.FALLEN_OVER, awayTeam["A13".playerId].state)
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll for thrown player
         )
@@ -488,7 +424,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
             4.d8, // Player bounce after landing
         )
-        assertEquals(PlayerState.KNOCKED_DOWN, awayTeam["A13".playerId].state)
+        assertEquals(PlayerState.FALLEN_OVER, awayTeam["A13".playerId].state)
         controller.rollForward(
             DiceRollResults(7.d6, 1.d6), // Armour roll on thrown player
             DiceRollResults(1.d6, 1.d6), // Injury Roll on thrown player
@@ -517,7 +453,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun turnoverIfThrownPlayerIsKnockedDownWithBall() {
+    fun turnoverIfThrownPlayerFallsOverWithBall() {
         controller.rollForward(
             // Hafling picks up ball
             *activatePlayer("A13", PlayerStandardActionType.MOVE),

@@ -290,6 +290,7 @@ class BlockActionTests: JervisGameBB2025Test() {
             *standardBlock("H1", 6.dblock),
             DirectionSelected(Direction.LEFT), // First push
             DirectionSelected(Direction.UP_LEFT), // 2nd push
+            Cancel // Do not follow up
         )
         assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         assertEquals(PlayerState.KNOCKED_DOWN, homeTeam["H1".playerId].state)

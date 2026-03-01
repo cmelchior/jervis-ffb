@@ -9,8 +9,6 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -23,19 +21,18 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
-import com.jervisffb.engine.rules.common.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 
@@ -142,8 +139,6 @@ object StandardMoveStep: Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 return compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -183,8 +178,6 @@ object StandardMoveStep: Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER, hasTackleZones = false),
-                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -222,7 +215,12 @@ object StandardMoveStep: Procedure() {
             val context = state.getContext<MoveContext>()
             return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> BB2020FallingOver
+                GameVersion.BB2025 -> BB2025FallingOver
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(

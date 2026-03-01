@@ -23,6 +23,7 @@ import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
+import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
@@ -40,6 +41,7 @@ import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
+import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -75,6 +77,7 @@ import kotlin.time.ExperimentalTime
  * - Really Stupid
  * - Rush
  * - Shadowing
+ * - Steady Footing
  * - Unchannelled Fury
  */
 abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
@@ -377,6 +380,22 @@ object ShadowingWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<ShadowingRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+object SteadyFootingWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "steady-footing"
+    override val rollDiceNode: Node = SteadyFootingRoll.RollDie
+    override val chooseRerollSourceNode: Node = SteadyFootingRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = SteadyFootingRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<SteadyFootingRollContext>().player.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<SteadyFootingRollContext>()
         return context.roll!!.originalRoll
     }
 }
