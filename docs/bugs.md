@@ -3,6 +3,7 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Team Badge Outline does not rescale when the game window size changes.
 - The DevModeGameActions do not work in P2P due to too strict checking for action owners.
 - In a P2P Game, both Host and Client can select the same team
 - Move Counter is not updated on forced follow-up during a blitz, like when using Taunt

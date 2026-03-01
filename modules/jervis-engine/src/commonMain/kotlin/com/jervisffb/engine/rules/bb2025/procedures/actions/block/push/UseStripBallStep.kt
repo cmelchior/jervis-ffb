@@ -7,21 +7,28 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
+import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
@@ -36,9 +43,47 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * See [BB2025PushBack] and [MultipleBlockAction] for more details on each.
  */
 object UseStripBallStep: Procedure() {
-    override val initialNode: Node = ChooseToUseStripBall
+    override val initialNode: Node = CheckIfStripBallIsApplicable
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
+    object CheckIfStripBallIsApplicable: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BlockContext>()
+            val player = context.attacker
+            val defenderHasBall = context.defender.hasBall()
+            val hasStripBall = player.isSkillAvailable(SkillType.STRIP_BALL)
+            return if (defenderHasBall && hasStripBall) {
+                GotoNode(ChooseToUseSureHands)
+            } else {
+                ExitProcedure()
+            }
+        }
+    }
+
+    object ChooseToUseSureHands: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().firstPushee.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PushContext>()
+            val defenderCanUseSureHands = context.firstPushee.isSkillAvailable(SkillType.SURE_HANDS)
+            return when (defenderCanUseSureHands) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val useSureHands = (action == Confirm)
+            return if (useSureHands) {
+                val player = state.getContext<PushContext>().firstPushee
+                compositeCommandOf(
+                    ReportSkillUsed(player, SkillType.SURE_HANDS),
+                    ExitProcedure(),
+                )
+            } else {
+                GotoNode(ChooseToUseStripBall)
+            }
+        }
+    }
 
     object ChooseToUseStripBall: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? {
@@ -46,24 +91,29 @@ object UseStripBallStep: Procedure() {
             return context.attacker.team
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val player = state.getContext<BlockContext>().attacker
-            return when (player.isSkillAvailable(SkillType.STRIP_BALL)) {
+            val context = state.getContext<BlockContext>()
+            val pushContext = state.getContext<PushContext>()
+            val player = context.attacker
+            val defenderHasBall = context.defender.hasBall()
+            val hasStripBall = player.isSkillAvailable(SkillType.STRIP_BALL)
+            val defenderUsedStandFirm = (pushContext.pushChain.firstOrNull()?.usedStandFirm == true)
+            return when (hasStripBall && defenderHasBall && !defenderUsedStandFirm) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
-
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
             val useStripBall = (action == Confirm)
             return if (useStripBall) {
+                val ball = context.defender.ball!!
                 compositeCommandOf(
                     ReportSkillUsed(context.attacker, SkillType.STRIP_BALL),
-                    // TODO Prepare ball for bouncing
-                    // GotoNode(BounceStrippedBall)
-                    ExitProcedure()
+                    SetCurrentBall(ball),
+                    SetBallLocation(ball, context.defender.coordinates),
+                    SetBallState.bouncing(ball),
+                    GotoNode(BounceStrippedBall)
                 )
-
             } else {
                 ExitProcedure()
             }
@@ -71,12 +121,12 @@ object UseStripBallStep: Procedure() {
     }
 
     object BounceStrippedBall: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            TODO("Not yet implemented")
-        }
-
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                ExitProcedure()
+            )
         }
     }
 }

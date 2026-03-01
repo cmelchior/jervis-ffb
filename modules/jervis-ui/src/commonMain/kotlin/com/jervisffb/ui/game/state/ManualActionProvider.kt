@@ -51,6 +51,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
@@ -620,6 +621,10 @@ open class ManualActionProvider(
             }
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.USE_SURE_HANDS_ON_STRIP_BALL) && (currentNode == UseStripBallStep.ChooseToUseSureHands)) {
+            return Confirm
+        }
+
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_THICK_SKULL) && currentNode == InjuryRoll.ChooseToUseThickSkull) {
             return Confirm
         }
@@ -646,6 +651,10 @@ open class ManualActionProvider(
                     || currentNode == BB2025KnockedDown.ChooseToUseSteadyFooting
             )
         ) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STRIP_BALL) && currentNode == UseStripBallStep.ChooseToUseStripBall) {
             return Confirm
         }
 

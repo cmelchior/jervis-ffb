@@ -27,6 +27,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
@@ -67,6 +68,7 @@ import kotlin.time.ExperimentalTime
  * - Sidestep (skill usage)
  * - Stand Firm (skill usage)
  * - Steady Footing (skill usage)
+ * - Strip Ball (skill usage)
  * - Tackle (skill usage)
  * - Taunt (skill usage)
  * - Follow Up
@@ -158,6 +160,8 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
         return when (val currentNode = state.stack.currentNode()) {
             BB2020BothDown.AttackerChooseToUseBlock -> context.attacker.coordinates
             BB2020BothDown.DefenderChooseToUseBlock -> context.defender.coordinates
+            BB2025BothDown.AttackerChooseToUseBlock -> context.attacker.coordinates
+            BB2025BothDown.DefenderChooseToUseBlock -> context.attacker.coordinates
             else -> error("Unsupported node: $currentNode")
         }
     }
@@ -301,6 +305,29 @@ object UseSteadyFootingWheelController: UseSkillWheelController(SkillType.STEADY
     }
 }
 
+
+object UseStripBallWheelController: UseSkillWheelController(SkillType.STRIP_BALL) {
+    override val nodes: Set<Node> = setOf(
+        UseStripBallStep.ChooseToUseStripBall,
+        UseStripBallStep.ChooseToUseStripBall
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<PushContext>()
+        val player = context.firstPusher
+        return player.coordinates
+    }
+}
+
+object UseSureHandsWheelController: UseSkillWheelController(SkillType.SURE_HANDS) {
+    override val nodes: Set<Node> = setOf(
+        UseStripBallStep.ChooseToUseSureHands,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<PushContext>()
+        val player = context.firstPushee
+        return player.coordinates
+    }
+}
 
 object UseTauntWheelController: UseSkillWheelController(SkillType.TAUNT) {
     override val nodes: Set<Node> = setOf(

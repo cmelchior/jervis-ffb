@@ -50,6 +50,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Sprint
 import com.jervisffb.engine.rules.bb2025.skills.Stab
 import com.jervisffb.engine.rules.bb2025.skills.StandFirm
 import com.jervisffb.engine.rules.bb2025.skills.SteadyFooting
+import com.jervisffb.engine.rules.bb2025.skills.StripBall
 import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
@@ -252,9 +253,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.STRIP_BALL -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Strip Ball", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        StripBall(player, category, expiresAt)
+                    }
                 }
                 SkillType.SURE_HANDS -> {
                     addNoValueEntry("Sure Hands", type, SkillCategory.GENERAL) { player, category,expiresAt ->

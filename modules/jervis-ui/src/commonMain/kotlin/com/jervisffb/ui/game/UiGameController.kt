@@ -67,6 +67,8 @@ import com.jervisffb.ui.game.state.actionwheel.UseSafePassWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStandFirmWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSteadyFootingWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseStripBallWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseSureHandsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseThickSkullWheelController
@@ -186,6 +188,8 @@ class UiGameController(
         UseSidestepWheelController,
         UseStandFirmWheelController,
         UseSteadyFootingWheelController,
+        UseStripBallWheelController,
+        UseSureHandsWheelController,
         UseTackleWheelController,
         UseTauntWheelController,
         UseThickSkullWheelController,

@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
@@ -514,6 +515,20 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     }
                 }
                 else -> null
+            }
+        },
+
+        UseStripBallStep.ChooseToUseStripBall to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Strip Ball?"
+                false -> "Waiting for opponent to use Strip Ball"
+            }
+        },
+
+        UseStripBallStep.ChooseToUseSureHands to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Sure Hands to prevent Strip Ball from being used?"
+                false -> "Waiting for opponent to use Strip Ball"
             }
         },
     )

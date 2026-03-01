@@ -724,6 +724,17 @@ of unspecified scenarios with regard to how the thrown player be handled?
 For this reason, Jervis assumes that Safe Pass is only applicable for normal
 Pass actions (and by extension, throwing bombs).
 
+### Page 136 - Strip Ball
+Strip Ball requires that a player is "Pushed Back" (note, this is different
+than the Push Back result on the Block die). Since Stand Firm prevents a player
+from being Pushed Back, this also prevents the Strip Ball skill from being used.
+
+FUMBBL has a similar interpretation.
+
+When Strip Ball and Sure Hands interact, the order is unclear. But it shouldn't 
+matter, so to simplify the rules engine, Jervis is asking the pushed player to 
+use Sure Hands, before asking the attacker to use Strip Ball.
+
 ### Page 137 - Tentacles
 This skill explicitly mentions Dodge, Jump and Leap, but not Pogo, so it is 
 assumed that this skill cannot affect a player using Pogo. 

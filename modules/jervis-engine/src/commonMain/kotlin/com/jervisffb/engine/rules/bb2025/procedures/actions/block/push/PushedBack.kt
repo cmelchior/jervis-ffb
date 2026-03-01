@@ -75,9 +75,7 @@ object PushedBack: Procedure() {
     }
 
     object UseStripBall: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return UseStripBallStep
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = UseStripBallStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ResolveEventsInPushChain)
         }
@@ -91,22 +89,4 @@ object PushedBack: Procedure() {
             return ExitProcedure()
         }
     }
-
-//    // TODO
-//    object DecideToUseStripBall: ComputationNode() {
-//        override fun apply(state: Game, rules: Rules): Command {
-//            val isMultipleBlock = state.hasContext<BB2020MultipleBlockContext>()
-//            return when (isMultipleBlock) {
-//                true -> ExitProcedure()
-//                false -> GotoNode(ResolveRemainingPushSequenceForSingleBlock)
-//            }
-//        }
-//    }
-//
-//    object ResolveRemainingPushSequenceForSingleBlock: ParentNode() {
-//        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020PushStepResolveSingleBlockPushChain
-//        override fun onExitNode(state: Game, rules: Rules): Command {
-//            return ExitProcedure()
-//        }
-//    }
 }
