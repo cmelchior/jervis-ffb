@@ -65,8 +65,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.FOUL),
             PlayerSelected("H1".playerId),
-            DiceRollResults(6.d6, 5.d6), // Armour roll
-            Cancel, // Do not use Dirty Player
+            DiceRollResults(6.d6, 5.d6), // Armour roll. Break without Dirty Player
             DiceRollResults(1.d6, 5.d6), // Injury Roll
             Confirm, // Use Dirty Player
             Confirm, // Use Thick Skull
@@ -123,8 +122,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.FOUL),
             PlayerSelected("H1".playerId),
-            DiceRollResults(6.d6, 5.d6), // Armour roll
-            Cancel, // Do not use Dirty Player
+            DiceRollResults(6.d6, 5.d6), // Armour roll. Break without Dirty Player
             DiceRollResults(2.d6, 5.d6), // Injury Roll
             Confirm, // Use Dirty Player
             Confirm, // Use Thick Skull

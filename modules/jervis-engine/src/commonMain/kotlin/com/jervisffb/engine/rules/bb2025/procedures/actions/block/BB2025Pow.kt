@@ -88,7 +88,11 @@ object BB2025Pow: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val defender = context.firstPushee
-            val injuryContext = RiskingInjuryContext(defender, isPartOfMultipleBlock = context.isMultipleBlock)
+            val injuryContext = RiskingInjuryContext(
+                player = defender,
+                causedBy = context.firstPusher,
+                isPartOfMultipleBlock = context.isMultipleBlock
+            )
             return SetContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown

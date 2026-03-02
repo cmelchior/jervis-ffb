@@ -35,7 +35,7 @@ import com.jervisffb.engine.utils.sum
 enum class RiskingInjuryMode {
     FALLING_OVER,
     KNOCKED_DOWN,
-    PUSHED_INTO_CROWD,
+    PUSHED_INTO_CROWD, // Or fallen through a Trapdoor
     FOUL,
     HIT_BY_ROCK,
     // Player is injured after being thrown (normally the same as Falling Over),
@@ -47,12 +47,16 @@ enum class RiskingInjuryMode {
 // What do we need to track?
 data class RiskingInjuryContext(
     val player: Player,
+    // If the Injury is caused by another player. This allows this player to use their
+    // skills to modify the armour/injury rolls.
+    val causedBy: Player? = null,
     val isPartOfMultipleBlock: Boolean = false,
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN,
 
     // Armour roll
     val armourRoll: List<D6Result> = listOf(),
     val armourModifiers: List<DiceModifier> = listOf(),
+    val useClawsOnArmourRoll: Boolean = false,
 
     // Injury roll
     val injuryRoll: List<D6Result> = emptyList(),
@@ -89,6 +93,17 @@ data class RiskingInjuryContext(
     val regenerationReRoll: D6Result? = null,
     val regenerationSuccess: Boolean = false
 ): ProcedureContext {
+
+    private fun checkIfOpponentCanUseSkills(): Boolean {
+        if (causedBy == null) return false
+        val rules = causedBy.team.game.rules
+        return rules.isStanding(causedBy) && !rules.isDistracted(causedBy)
+    }
+
+    // Returns `true` if this injury is caused by another player that is able to use
+    // their skills to modify the armour/injury roll
+    val canOpponentUseSkills = checkIfOpponentCanUseSkills()
+
     val injuryRollResult: Int
         get() = injuryRoll.sum() + injuryModifiers.sum()
     val armourResult: Int

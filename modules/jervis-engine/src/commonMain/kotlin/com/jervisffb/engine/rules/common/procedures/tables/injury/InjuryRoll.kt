@@ -17,18 +17,22 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.InjuryModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
@@ -46,10 +50,10 @@ import com.jervisffb.engine.utils.sum
  * The result is stored in [RiskingInjuryContext] and it is up
  * to the caller to determine what to do with the result.
  *
- * TODO Note, Mighty Blow specifically say "When an opposition player is knocked
- *  down" (page 80) and "Pushed into the Crows" (page 58) says "A player that
- *  is pushed into the crowd is immediately removed from play". So this would
- *  mean that any effect that requires a "Knocked Down" player doesn't apply.
+ * Mighty Blow specifically say "Whenever this player Knocks Down an opposition
+ * player during a Block Action..." (page 131 in BB2025 rulebook), but when you
+ * are pushed into the crowd, the player is never Knocked Down. So Mighty Blow
+ * does not apply there
  */
 object InjuryRoll: Procedure() {
     override val initialNode: Node = RollDice
@@ -77,8 +81,84 @@ object InjuryRoll: Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.INJURY, roll),
                     SetContext(updatedContext),
-                    GotoNode(ChooseToUseDirtyPlayer),
+                    GotoNode(CheckIfMultipleBlowIsApplicable),
                 )
+            }
+        }
+    }
+
+    // Mighty Blow only works on Knocked Down players during Blocks (Animal Savagery TBD)
+    object CheckIfMultipleBlowIsApplicable: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            // This should be safe as there is no way a Player can be Knocked Down during a Block unless
+            // they are either the attacker or the defender. All other injuries will be crowd-surfs.
+            val isBlock = state.hasContext<BlockContext>()
+            val isKnockedDown = (context.mode == RiskingInjuryMode.KNOCKED_DOWN)
+
+            // Since the opponent using Mighty Blow, might already be prone, we cannot rely on
+            // normal checks.
+            val opponentCanUseSkills = context.canOpponentUseSkills
+            val opponentHasMightyBlow = (context.causedBy?.hasSkill(SkillType.MIGHTY_BLOW) == true)
+            val isMightyBlowAvailable = if (opponentHasMightyBlow) {
+                val skill = context.causedBy.getSkill(SkillType.MIGHTY_BLOW)
+                !skill.used
+            } else {
+                false
+            }
+
+            return if (
+                isBlock
+                && isKnockedDown
+                && opponentCanUseSkills
+                && isMightyBlowAvailable
+            ) {
+                GotoNode(ChooseToUseMightyBlow)
+            } else {
+                GotoNode(ChooseToUseDirtyPlayer)
+            }
+        }
+    }
+
+    object ChooseToUseMightyBlow: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val injuryContext = state.getContext<RiskingInjuryContext>()
+            return injuryContext.causedBy?.team ?: error("Missing team: $injuryContext")
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val hasMightyBlow = (context.causedBy?.hasSkill(SkillType.MIGHTY_BLOW) == true)
+            return if (hasMightyBlow) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val mbPlayer = context.causedBy!!
+            val useMightyBlow = (action is Confirm)
+            return if (useMightyBlow) {
+                val mbSkill = mbPlayer.getSkill(SkillType.MIGHTY_BLOW)
+                val updatedModifiers = context.injuryModifiers + listOf(MightyBlowModifier(mbSkill.value as Int))
+                val modifiersTotal = updatedModifiers.sum()
+                val newResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], modifiersTotal)
+                compositeCommandOf(
+                    ReportSkillUsed(mbPlayer, SkillType.MIGHTY_BLOW),
+                    SetSkillUsed(mbPlayer, mbSkill, true),
+                    SetContext(
+                        context.copy(
+                            injuryModifiers = context.injuryModifiers + listOf(MightyBlowModifier(mbSkill.value as Int)),
+                            injuryResult = newResult
+                        )
+                    ),
+                    ExitProcedure()
+                )
+            } else {
+                // Dirty Player will never work in the same context as Mighty Blow, so we can exit here
+                ExitProcedure()
             }
         }
     }

@@ -426,7 +426,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PlayerState.FALLEN_OVER, awayTeam["A13".playerId].state)
         controller.rollForward(
-            DiceRollResults(7.d6, 1.d6), // Armour roll on thrown player
+            DiceRollResults(6.d6, 2.d6), // Armour roll on thrown player
             DiceRollResults(1.d6, 1.d6), // Injury Roll on thrown player
         )
         assertEquals(awayTeam, state.activeTeam)

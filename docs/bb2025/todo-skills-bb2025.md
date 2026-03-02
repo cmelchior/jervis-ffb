@@ -258,11 +258,18 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Allow offensive assists
   - [x] Allow defensive assists
 - [ ] Juggernaut
-- [ ] Mighty Blow
+- [x] Mighty Blow
+  - [x] Works on Armour
+  - [x] Works on Injury if not used on Armour
+  - [x] Is not used if no effect
+  - [x] Does not work if Distracted
+  - [x] Works for both Attacker and Defender
 - [ ] Multiple Block
     - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
     - [ ] Tackle is available for both blocks
     - [ ] Taunt does not work against Multiple Block
+    - [ ] Mighty Blow works on both block
+    - [ ] Wrestle works on both block
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push
@@ -279,6 +286,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 ## Traits
 
 - [ ] Animal Savagery*
+  - [ ] Must use Mighty Blow on Armour 
+  - [ ] Must use Claw
 - [ ] Animosity (X)*
 - [ ] Always Hungry*
 - [ ] Ball & Chain*

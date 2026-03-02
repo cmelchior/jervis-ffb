@@ -134,6 +134,7 @@ object FoulStep: Procedure() {
             val foulContext = state.getContext<FoulContext>()
             val injuryContext = RiskingInjuryContext(
                 player = foulContext.victim!!,
+                causedBy = foulContext.fouler,
                 mode = RiskingInjuryMode.FOUL,
                 armourModifiers = listOf(
                     OffensiveAssistArmourModifier(foulContext.foulAssists),

@@ -7,8 +7,11 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.ArmourModifier
 import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
@@ -37,6 +40,24 @@ class DirtyPlayerTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun doNotUseSkillIfNoImpact() {
+        homeTeam["H1".playerId].state = PlayerState.PRONE
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.FOUL),
+            PlayerSelected("H1".playerId),
+            DiceRollResults(3.d6, 6.d6),
+        )
+        assertFalse(state.getContext<RiskingInjuryContext>().armourModifiers.any { it == ArmourModifier.DIRTY_PLAYER })
+        controller.rollForward(
+            DiceRollResults(1.d6, 2.d6),
+            Confirm, // Dirty Player on Injury
+        )
+        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+    }
+
+    @Test
     fun useOnArmourRoll() {
         homeTeam["H1".playerId].state = PlayerState.PRONE
         controller.rollForward(
@@ -57,8 +78,7 @@ class DirtyPlayerTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
             PlayerSelected("H1".playerId),
-            DiceRollResults(3.d6, 6.d6),
-            Cancel,
+            DiceRollResults(3.d6, 6.d6), // Break armour without Dirty Player
             DiceRollResults(3.d6, 4.d6),
             Confirm, // With +1 from Dirty Player, should move from Stunned to KO
             Cancel // Do not use apothecary

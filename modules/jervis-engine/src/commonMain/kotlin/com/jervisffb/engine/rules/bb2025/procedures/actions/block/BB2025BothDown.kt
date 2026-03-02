@@ -235,6 +235,7 @@ object BB2025BothDown: Procedure() {
             val bothDownContext = state.getContext<BothDownContext>()
             val context = RiskingInjuryContext(
                 player = bothDownContext.defender,
+                causedBy = bothDownContext.attacker,
                 isPartOfMultipleBlock = false,
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )
@@ -262,6 +263,7 @@ object BB2025BothDown: Procedure() {
             val bothDownContext = state.getContext<BothDownContext>()
             val context = RiskingInjuryContext(
                 player = bothDownContext.attacker,
+                causedBy = bothDownContext.defender,
                 isPartOfMultipleBlock = false,
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )

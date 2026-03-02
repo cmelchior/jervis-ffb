@@ -8,16 +8,16 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Mighty Blow (Active) skill.
+ * Representation of the "Mighty Blow (Active)" skill.
  *
  * See page 131 in the BB2025 rulebook.
  */
 class MightyBlow(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.STRENGTH,
+    override val value: Int = 1,
     override val expiresAt: Duration,
 ) : BB2025IntSkill {
-    override val value: Int = 1
     override val type: SkillType = SkillType.MIGHTY_BLOW
     override val skillId: SkillId = type.id(value)
     override val name: String = buildString {
@@ -25,8 +25,8 @@ class MightyBlow(
         if (value > 1) append("(+$value)")
     }
     override val compulsory: Boolean = false
-    override val resetAt: Duration = Duration.PERMANENT
-    override var used: Boolean = false // This skill is always available
+    override val resetAt: Duration = Duration.END_OF_ACTION
+    override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
     override val keywords: List<SkillKeyword> = listOf(

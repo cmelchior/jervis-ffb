@@ -45,6 +45,7 @@ import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -65,7 +66,12 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * skills and actions. It is also very vaguely worded, and the description
  * doesn't cover a lot of edge cases.
  *
- * It is especially unclear how "performed simultaneously" should be
+ * For that reason, it is up to [BB2025MultipleBlockContext] to handle tracking
+ * and resetting of the [Skill.used] state of skills used during a Multiple
+ * Block. We can only rely on [Skill.resetAt] for skills that can only be used
+ * once across blocks.
+ *
+ * It is also especially unclear how "performed simultaneously" should be
  * interpreted. A full discussion on how to interpret the rules for Multiple
  * Block is in `rules-faq-bb2025.md`, so here we will just focus on the
  * implementation.
@@ -75,16 +81,16 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *
  * 1. Select the Multiple Block Special Action.
  *
- * 2. Select target 1. Only a normal block is allowed.
+ * 2. Select Target 1. Only a normal block is allowed.
  *
- * 3. Select target 2. Only a normal block is allowed.
+ * 3. Select Target 2. Only a normal block is allowed.
  *
  * 4. Roll block dice for Target 1.
  *
  * 5. Roll block dice for Target 2.
  *
- * 6. Choose reroll type or accept roll for all dice against Target 1 and Target
- *    2. This is done at the same time for both targets.
+ * 6. Choose a reroll type or accept roll for all dice against both targets. This
+ *    is done at the same time.
  *    - Brawler
  *    - Hatred
  *    - Pro
@@ -93,58 +99,65 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *
  * 7. Use skills that modify the final results. This is done at the same time
  *    for both targets.
- *    - Juggernaut
+ *     - Juggernaut
  *
- * 8. Select the final dice results for both target 1 and target 2. This is done
- *    at the same time for both targets.
+ * 8. Select the final dice results for both targets. This is done at the same
+ *    time.
  *
  * 9. Choose which target to resolve block for first, now named Block A and
  *    Block B.
  *
- * 10. Resolve Block A. What happens differs slightly depending on the block
+ * 10. Resolve Block A. What happens, differs slightly depending on the block
  *     dice:
- *  	  - PlayerDown
- *  	    - Mark Attacker as being Knocked Down, but is not Knocked Down yet.
- *  		- If Attacker is holding the ball, mark it as loose and bouncing, but do
- *  	      not roll for bouncing yet.
+ *     - PlayerDown
+ *         - Mark Attacker as being Knocked Down, but player is not Knocked Down
+ *           yet.
+ *         - If Attacker is holding the ball, mark it as loose and bouncing, but do
+ *           not roll for bouncing yet.
  *
- *  	 - BothDown
- *  	   - Handle skills that trigger on Both Down.
- *  	   - Mark Defender/Attacker as being Knocked Down, but is not Knocked Down yet.
- *  	   - If Defender is holding the ball, mark it as loose and bouncing, but do
- *  	     not roll for bouncing yet.
- *  	   - If Attacker is holding the ball, mark it as loose and bouncing, but do
- *  	     not roll for bouncing yet.
+ *     - BothDown
+ *         - Handle skills that trigger on Both Down. First Defender, then
+ *           Attacker.
+ *         - Mark Defender/Attacker as being Knocked Down, but they are not
+ *           Knocked Down yet. No skills that trigger on being Knocked Down are
+ *           applied yet.
+ *         - If Defender is holding the ball, mark it as loose and bouncing, but do
+ *           not roll for bouncing yet.
+ *         - If Attacker is holding the ball, mark it as loose and bouncing, but do
+ *           not roll for bouncing yet.
  *
- *  	 - Push Back
- *  		- Create the Push Chain, i.e., determine were all pushed players will
- *  	      be pushed to. Using skills as appropriate.
- *  		- Do not move players yet.
- *  	    - Do not roll any dice yet.
+ *     - Push Back
+ *         - Create the Push Chain, i.e., determine were all pushed players will
+ *           be pushed to. Using skills as appropriate.
+ *             - Sidestep
+ *             - Grab
+ *             - Stand Firm
+ *         - Do not move any players yet.
+ *         - Do not roll any dice yet.
  *
- *  	 - Stumble
- *  		- Choose to use Tackle and Dodge.
- *  	    - Stumble is converted to either a Push Back or Pow and will use their
- *            resolution order.
+ *     - Stumble
+ *         - Choose to use Tackle and Dodge.
+ *         - Stumble is converted to either a Push Back or Pow and will use their
+ *           resolution order.
  *
- *  	 - Pow
- *  		- Create Push Chain. See Push Back for details.
- *  	    - Handle Defender skills that affect Knoked Down.
- *  	    - Mark Defender as Knocked Down.
- *  	    - Do not roll for Armour / Injury yet. Add Defender to the Injury Pool.
- *          - If Defender is holding the ball, mark it as loose and bouncing, but do
- *            not roll for bouncing yet.
+ *     - Pow
+ *         - Create Push Chain. See Push Back for details.
+ *         - Mark Defender as being Knocked Down, but they are not Knocked Down
+ *           yet. No skills that trigger on being Knocked Down are applied yet.
+ *         - If Defender is holding the ball, mark it as loose and bouncing, but do
+ *           not roll for bouncing yet.
  *
- * 11. Resolve Block B, using the same steps as Block A.
+ * 11. Resolve Block B, using the same steps as Block A. No dice have been rolled
+ *     yet.
  *
- * 12. Move all Players in Push Chain A.
+ * 12. Move all Players in Push Chain A (if any).
  *
- * 12. Move all Players in Push Chain B. Note, a Push Chain is defined by
- *     the squares affected and not players, so by resolving Push Chain A first
+ * 12. Move all Players in Push Chain B (if any). Note, a Push Chain is defined by
+ *     the squares affected and not players, so by resolving Push Chain A first,
  *     some players might be moved twice or end up in a position not intended
  *     when only looking at a single Push Chain.
- **
- * 13. Follow-up? Ignored when using Multiple Block.
+ *
+ * 13. Follow-up is not applicable when using Multiple Block.
  *
  * 14. Decide if Strip Ball is used against Defender A.
  *
@@ -154,28 +167,52 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *     from Defender A and all the way through the Push Chain. We will check for
  *     touchdowns at every step, but the entire chain must still be resolved
  *     regardless of a touchdown being scored in the middle. For each square
- *     resolve events in the following order.
+ *     resolve events in the same order as for single blocks:.
  *     - Check for a loose ball. If found, it will bounce.
- *     - If standing on a Trapdoor. Roll to see if the player falls through. If
- *       Yes:
- *          - Roll for Injury immediately and resolve it
- *          - If holding a ball, resolve bouncing from the square.
- *      - If pushed into the crowd:
- *          - Roll for Injury immediately and resolve it.
- *          - Throw the ball back in.
- *      - Check for Touchdown from the player standing in the square.
+ *     - If standing on a Trapdoor. Roll to see if the player falls through.
+ *       If Yes:
+ *         - Roll for Injury immediately and resolve it
+ *         - If holding a ball, resolve bouncing from the square.
+ *         - Will not suffer the consequences of being Knocked Down (if any).
+ *     - If pushed into the crowd:
+ *         - Roll for Injury immediately and resolve it.
+ *         - Throw the ball back in.
+ *     - Check for Touchdown from the player standing in the square.
  *
  * 17. Resolve Push Chain for Block B. Using the same sequence as for Block A.
  *
- * 18. Resolve Knocked Down for Block A.
+ * 18. Resolve Events in Attacker's square, if not done already as part of a Push
+ *     Chain. This concludes the Pushed Back sequence, and we can continue with the
+ *     Knocked Down
  *
- * 19. Resolve Knocked Down for Block B
+ * 19. Resolve skills for Block A that trigger on Knocked Down.
+ *     - Safe Pair of Hands
+ *     - Steady Footing
+ *     - Saboteur
  *
- * 18. Bounce loose ball in the Attackers square.
+ * 20. Resolve skills for Block B that trigger on Knocked Down.
  *
- * 19. Check for touchdown in the Attackers square.
+ * 21. Put Attacker and Defenders Prone as needed.
  *
- * 20. Use Pile Driver on any adjacent players.
+ * 22. Roll Armour and Injury for Defender A. If injuries, do not resolve
+ *     completely, but add to a Defender Injury Pool instead.
+ *
+ * 23. Roll Armour and Injury for Defender B. If injuries, do not resolve
+ *     completely, but add to a Defender Injury Pool instead.
+ *
+ * 24. Roll Armour and Injury for Attacker A, first for Block A, then for Block B.
+ *     Injuries are added to the Attacker Injury Pool.
+ *
+ * 25. Resolve Defender Injury Pool, ie. resolve apothecary and regen both
+ *     players at the same time
+ *
+ * 26. Resolve Attacker Injury Pool, ie. resolve apothecary and regen for both
+ *     injuries at the same time.
+ *
+ * 27. If defenders or attackers dropped a ball as part of being Knocked Down.
+ *     Bounce now: Defender A, Defender B, then Attacker.
+ *
+ * 27. If Attacker is still standing, holding the ball. Check for a Touchdown.
  */
 object MultipleBlockAction: Procedure() {
     override val initialNode: Node = SelectDefenderOrAbortActionOrContinueBlock

@@ -488,6 +488,12 @@ This interpretation is mostly chosen because it reduces the complexity of the
 rule engine. It should be re-evaluated in case that NAF / FUMBBL / FAQ takes
 the opposite stance.
 
+### Page 131 - Mighty Blow
+Mighty Blow specifically says "Whenever this player Knocks Down an opposition 
+player during a Block Action...", but when you are pushed into the crowd, the 
+player is never Knocked Down. This means that Mighty Blow cannot be used on
+crowd injuries.
+
 ### Page 132 - Multiple Block
 When using Multiple Block, it is unclear what "Both Block actions are performed 
 simultaneously" means exactly? Does it apply to all steps of both blocks or only

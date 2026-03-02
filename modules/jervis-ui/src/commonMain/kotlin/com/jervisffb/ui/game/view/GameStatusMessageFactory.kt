@@ -531,6 +531,21 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 false -> "Waiting for opponent to use Strip Ball"
             }
         },
+
+        ArmourRoll.ChooseToUseMightyBlow to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Mighty Blow to injure opponent?"
+                false -> "Waiting for opponent to use Mighty Blow"
+            }
+        },
+
+        InjuryRoll.ChooseToUseMightyBlow to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Mighty Blow on Injury Roll?"
+                false -> "Waiting for opponent to use Mighty Blow"
+            }
+        },
+
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

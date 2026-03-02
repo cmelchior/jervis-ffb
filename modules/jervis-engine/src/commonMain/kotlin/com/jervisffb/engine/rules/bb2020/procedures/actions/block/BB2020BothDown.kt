@@ -212,6 +212,7 @@ object BB2020BothDown: Procedure() {
             return SetContext(
                 RiskingInjuryContext(
                     player = context.defender,
+                    causedBy = context.attacker,
                     isPartOfMultipleBlock = blockContext.isUsingMultiBlock
                 )
             )
@@ -240,6 +241,7 @@ object BB2020BothDown: Procedure() {
             return SetContext(
                 RiskingInjuryContext(
                     player = context.attacker,
+                    causedBy = context.defender,
                     isPartOfMultipleBlock = blockContext.isUsingMultiBlock
                 )
             )

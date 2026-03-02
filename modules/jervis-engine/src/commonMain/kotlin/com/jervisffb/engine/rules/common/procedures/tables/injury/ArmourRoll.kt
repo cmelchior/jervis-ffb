@@ -17,22 +17,28 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.ArmourModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.sum
 
 /**
  * Implement the armour roll.
@@ -44,20 +50,20 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * to the caller to determine what to do with the result.
  *
  * Developer's Commentary:
+ * There are quite a lot of skills that affect Armour Rolls, especially as they
+ * can occur in different scenarios. This procedure is capturing all of them.
  *
- * Regarding Claws and Mighty Blow:
- *  - There would be multiple ways to implement the flow
- *      a. Select all skills that apply at once
- *      b. Select them one at a time
-*   - It isn't clear what approach is the best (can also be deferred a bit)
- *    Although Claws would realistically always be the best option, if MB(4+)
- *    exists, then a 7 + MB would break Armour 10, where 7 + Claw would not.
+ * For now, we just go through all relevant skills in an arbitrary order. Since
+ * all of the skills can be applied after rolling the dice, this is where
+ * we choose to apply them.
  *
- *  - No matter what the UI can choose to do it differently, but it would
- *    be nice to not encode rules logic there.
+ * This also allows us to skip skills like Claw (when rolling 7 or less) or
+ * Mighty Blow (if they don't make a difference)
  *
- *  - Roll -> Apply Claw -> Apply MB -> ... others?
- *  - Roll -> Apply Skills (find all skills that apply)
+ * 1. Claw (Knocked Down - Block)
+ * 2. Mighty Blow (Knocked Down - Block)
+ * 3. Dirty Player (Knocked Down - Foul)
+ * 4. TBD: Chainsaw, Arm Bar, Others?
  */
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
@@ -83,7 +89,8 @@ object ArmourRoll: Procedure() {
                 val context = state.getContext<RiskingInjuryContext>()
 
                 // Determine result of armour roll
-                // TODO This logic needs to be expanded to support things like Mighty Blow, Claw, Chainsaw and others.
+                // All skills that can modify an armour roll can be used both before and after the roll,
+                // but since there is no advantage to using them before, we will only apply them after.
                 val roll = listOf(die1, die2)
                 val updatedContext = state.getContext<RiskingInjuryContext>().copy(
                     armourRoll = roll,
@@ -91,12 +98,115 @@ object ArmourRoll: Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
                     SetContext(updatedContext),
-                    GotoNode(ChooseToUseDirtyPlayer)
+                    GotoNode(DecideOnModifierPath)
                 )
             }
         }
     }
 
+    object DecideOnModifierPath: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            return when (context.mode) {
+                RiskingInjuryMode.KNOCKED_DOWN -> GotoNode(CheckIfMultipleBlowIsApplicable)
+                RiskingInjuryMode.FOUL -> GotoNode(ChooseToUseDirtyPlayer)
+                // None of these have skills that can affect the armour roll
+                RiskingInjuryMode.FALLING_OVER,
+                RiskingInjuryMode.PUSHED_INTO_CROWD,
+                RiskingInjuryMode.BAD_LANDING,
+                RiskingInjuryMode.HIT_BY_ROCK -> ExitProcedure()
+            }
+        }
+    }
+
+    // Mighty Blow only works on Knocked Down players during Blocks (Animal Savagery TBD)
+    // Also, to clean up the action flow, we skip Mighty Blow if using it wouldn't matter.
+    object CheckIfMultipleBlowIsApplicable: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            // This should be safe as there is no way a Player can be Knocked Down during a Block unless
+            // they are either the attacker or the defender. All other injuries will be crowd-surfs.
+            val isBlock = state.hasContext<BlockContext>()
+            val isKnockedDown = (context.mode == RiskingInjuryMode.KNOCKED_DOWN)
+
+            // Since the opponent using Mighty Blow, might already be prone, we cannot rely on
+            // normal checks.
+            val opponentCanUseSkills = context.canOpponentUseSkills
+            val opponentHasMightyBlow = (context.causedBy?.hasSkill(SkillType.MIGHTY_BLOW) == true)
+
+            // We only want to use Mighty Blow if it makes a difference, i.e. Armour Roll should be
+            // Target AV - 1.
+            val target = context.player.armorValue
+            val roll = context.armourRoll.sum() + context.armourModifiers.sum()
+            val mbModifier: Int = if (opponentHasMightyBlow) {
+                val skill = context.causedBy.getSkill(SkillType.MIGHTY_BLOW)
+                when (skill) {
+                    is com.jervisffb.engine.rules.bb2025.skills.MightyBlow -> skill.value!!
+                    is com.jervisffb.engine.rules.bb2020.skills.MightyBlow -> skill.value!!
+                    else -> 0
+                }
+            } else {
+                0
+            }
+            val mbWillMatter = roll < target
+                && mbModifier > 0
+                && (roll + mbModifier) >= target
+
+            return if (
+                isBlock
+                && isKnockedDown
+                && opponentCanUseSkills
+                && opponentHasMightyBlow
+                && mbWillMatter
+            ) {
+                GotoNode(ChooseToUseMightyBlow)
+            } else {
+                GotoNode(ChooseToUseDirtyPlayer)
+            }
+        }
+    }
+
+    // This procedure assumes that `CheckIfMultipleBlowIsApplicable` filtered out invalid scenarios.
+    object ChooseToUseMightyBlow: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val injuryContext = state.getContext<RiskingInjuryContext>()
+            return injuryContext.causedBy?.team ?: error("Missing team: $injuryContext")
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val hasMightyBlow = (context.causedBy?.hasSkill(SkillType.MIGHTY_BLOW) == true)
+            return if (hasMightyBlow) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val mbPlayer = context.causedBy!!
+            val useMightyBlow = (action is Confirm)
+            return if (useMightyBlow) {
+                val mbSkill = mbPlayer.getSkill(SkillType.MIGHTY_BLOW)
+                compositeCommandOf(
+                    ReportSkillUsed(mbPlayer, SkillType.MIGHTY_BLOW),
+                    SetSkillUsed(mbPlayer, mbSkill, true),
+                    SetContext(
+                        context.copy(
+                            armourModifiers = context.armourModifiers + listOf(MightyBlowModifier(mbSkill.value as Int))
+                        )
+                    ),
+                    ExitProcedure()
+                )
+            } else {
+                // Dirty Player will never work in the same context as Mighty Blow, so we can exit here
+                ExitProcedure()
+            }
+        }
+    }
+
+    // Only on Fouls
     object ChooseToUseDirtyPlayer: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team {
             return state.getContext<RiskingInjuryContext>().player.team.otherTeam()
@@ -104,8 +214,12 @@ object ArmourRoll: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             val isFoul = (context.mode == RiskingInjuryMode.FOUL)
-            val hasDirtyPlayer = (state.getContextOrNull<FoulContext>()?.fouler?.isSkillAvailable(SkillType.DIRTY_PLAYER) == true)
-            return if (isFoul && hasDirtyPlayer) {
+            val hasDirtyPlayer = (context.causedBy?.isSkillAvailable(SkillType.DIRTY_PLAYER) == true)
+            val target = context.player.armorValue
+            val roll = context.armourResult
+            val dirtyPlayerWillHaveImpact = roll < target && (roll + ArmourModifier.DIRTY_PLAYER.modifier) >= target
+
+            return if (isFoul && hasDirtyPlayer && dirtyPlayerWillHaveImpact) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)

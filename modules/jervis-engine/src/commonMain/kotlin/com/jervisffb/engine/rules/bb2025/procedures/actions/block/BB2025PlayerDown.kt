@@ -32,7 +32,11 @@ object BB2025PlayerDown: Procedure() {
     override val initialNode: Node = CheckForMultipleBlock
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<BlockContext>()
-        val injuryContext = RiskingInjuryContext(context.attacker, context.isUsingMultiBlock)
+        val injuryContext = RiskingInjuryContext(
+            player = context.attacker,
+            causedBy = context.defender,
+            isPartOfMultipleBlock = context.isUsingMultiBlock
+        )
         return SetContext(injuryContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {

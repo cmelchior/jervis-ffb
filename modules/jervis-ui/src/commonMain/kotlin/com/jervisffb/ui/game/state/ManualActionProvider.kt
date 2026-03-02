@@ -658,6 +658,21 @@ open class ManualActionProvider(
             return Confirm
         }
 
+        // Use Mighty Blow if Armour isn't already broken
+        if (menuViewModel.isFeatureEnabled(Feature.USE_MIGHTY_BLOW_ON_ARMOUR) && (currentNode == ArmourRoll.ChooseToUseMightyBlow)) {
+            val context = controller.state.getContextOrNull<RiskingInjuryContext>()
+            if (context?.armourBroken != true) {
+                return Confirm
+            } else {
+                return Cancel
+            }
+        }
+
+        // Always use Dirty Player on Injury (if possible)
+        if (menuViewModel.isFeatureEnabled(Feature.USE_MIGHTY_BLOW_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseMightyBlow)) {
+            return Confirm
+        }
+
         return null
     }
 

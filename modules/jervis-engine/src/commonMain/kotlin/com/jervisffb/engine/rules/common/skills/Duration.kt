@@ -1,6 +1,22 @@
 package com.jervisffb.engine.rules.common.skills
 
-// When does the "used" state reset?
+import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
+import com.jervisffb.engine.model.inducements.InducementEffect
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
+import com.jervisffb.engine.model.modifiers.StatModifier
+
+/**
+ * Enum for descripting the duration of [Skill], [StatModifier],
+ * [PlayerStatusEffect], [InducementEffect], or other effects that can have a
+ * temporary lifetime.
+ *
+ * Developer's Commentary:
+ * Tracking the duration of skill usages during Multiple Block is complex, as it
+ * has a different flow compared to single blocks. To avoid having that
+ * complexity leak into this enum, we leave it up to
+ * [BB2025MultipleBlockContext] to track the lifetime of relevant skills during
+ * a Multiple Block.
+ */
 enum class Duration {
     IMMEDIATE, // The effect expires immediately.
     START_OF_ACTIVATION, // The effect expires when the player is activated

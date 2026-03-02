@@ -5,6 +5,10 @@ enum class ArmourModifier(override val modifier: Int, override val description: 
     MARKED(1, "Marked"),
 }
 
+data class MightyBlowModifier(override val modifier: Int = 1) : DiceModifier {
+    override val description: String = "Mighty Blow"
+}
+
 // Modifiers added du to offensive assists during a foul
 data class OffensiveAssistArmourModifier(
     val count: Int,

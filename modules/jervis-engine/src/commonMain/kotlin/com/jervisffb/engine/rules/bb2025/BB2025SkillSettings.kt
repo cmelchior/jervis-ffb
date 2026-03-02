@@ -446,8 +446,8 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.MIGHTY_BLOW -> {
-                    addIntEntry("Mighty Blow", type, SkillCategory.STRENGTH, 1) { player, category, _, expiresAt ->
-                        MightyBlow(player, category, expiresAt)
+                    addIntEntry("Mighty Blow", type, SkillCategory.STRENGTH, 1) { player, category, value, expiresAt ->
+                        MightyBlow(player, category, value!!, expiresAt)
                     }
                 }
                 SkillType.MULTIPLE_BLOCK -> {

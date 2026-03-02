@@ -52,7 +52,7 @@ class GameEngineControllerTests {
         assertEquals(3, controller.currentActionIndex().value)
         controller.handleAction(Undo)
         assertEquals(4, controller.currentActionIndex().value)
-        controller.handleAction(6.d3)
+        controller.handleAction(2.d3)
         assertEquals(5, controller.currentActionIndex().value)
     }
 

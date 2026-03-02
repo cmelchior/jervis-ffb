@@ -116,9 +116,9 @@ data class CoinTossResult(val result: Coin) : GameAction {
 @Serializable
 data class D2Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 2
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D2Result> {
         return D2Result.Companion.allOptions().toMutableList().apply {
@@ -136,9 +136,9 @@ data class D2Result(override val value: Int) : DieResult() {
 @Serializable
 data class D3Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 4)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 3
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D3Result> {
         return D3Result.Companion.allOptions().toMutableList().apply {
@@ -159,9 +159,9 @@ data class D3Result(override val value: Int) : DieResult() {
 @Serializable
 data class D4Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 5)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 4
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D4Result> {
         return D4Result.Companion.allOptions().toMutableList().apply {
@@ -179,9 +179,9 @@ data class D4Result(override val value: Int) : DieResult() {
 @Serializable
 data class D6Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 6
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D6Result> {
         return D6Result.Companion.allOptions().toMutableList().apply {
@@ -210,9 +210,9 @@ data class D6Result(override val value: Int) : DieResult() {
 @Serializable
 data class D8Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 8
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D8Result> {
         return D8Result.Companion.allOptions().toMutableList().apply {
@@ -232,12 +232,10 @@ data class D8Result(override val value: Int) : DieResult() {
 
 @Serializable
 data class D12Result(override val value: Int) : DieResult() {
-    constructor() : this(
-        Random.nextInt(1, 13),
-    ) // Fix issues with serialization not serializing `result`. Figure out why
-
+    constructor() : this(Random.nextInt(1, 13)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 12
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D12Result> {
         return Companion.allOptions().toMutableList().apply {
@@ -254,12 +252,10 @@ data class D12Result(override val value: Int) : DieResult() {
 
 @Serializable
 data class D16Result(override val value: Int) : DieResult() {
-    constructor() : this(
-        Random.nextInt(1, 17),
-    ) // Fix issues with serialization not serializing `result`. Figure out why
-
+    constructor() : this(Random.nextInt(1, 17)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 16
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D16Result> {
         return D16Result.Companion.allOptions().toMutableList().apply {
@@ -276,12 +272,10 @@ data class D16Result(override val value: Int) : DieResult() {
 
 @Serializable
 data class D20Result(override val value: Int) : DieResult() {
-    constructor() : this(
-        Random.nextInt(1, 21),
-    ) // Fix issues with serialization not serializing `result`. Figure out why
-
+    constructor() : this(Random.nextInt(1, 21)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 20
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D20Result> {
         return D20Result.Companion.allOptions().toMutableList().apply {
@@ -300,9 +294,9 @@ data class D20Result(override val value: Int) : DieResult() {
 @Serializable
 data class DBlockResult(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
-
     override val min: Short = 1
     override val max: Short = 6
+    init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<DBlockResult> {
         return DBlockResult.Companion.allOptions().toMutableList().apply {
@@ -461,7 +455,7 @@ sealed class DieResult : Number(), GameAction {
     abstract val min: Short
     abstract val max: Short
 
-    init {
+    protected fun checkRange() {
         if (value !in min..max) {
             throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
         }

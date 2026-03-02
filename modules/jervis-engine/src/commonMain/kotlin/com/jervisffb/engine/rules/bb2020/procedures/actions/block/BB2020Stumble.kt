@@ -146,6 +146,7 @@ object BB2020Stumble: Procedure() {
             val blockContext = state.getContext<BlockContext>()
             val injuryContext = RiskingInjuryContext(
                 player = defender,
+                causedBy = blockContext.attacker,
                 isPartOfMultipleBlock = blockContext.isUsingMultiBlock
             )
             return SetContext(injuryContext)
