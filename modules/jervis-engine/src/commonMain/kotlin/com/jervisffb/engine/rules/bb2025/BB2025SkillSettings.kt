@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
+import com.jervisffb.engine.rules.bb2025.skills.Defensive
 import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
@@ -110,9 +111,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.DEFENSIVE -> {
-                    // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Defensive", type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                        Defensive(player, category, expiresAt)
+                    }
                 }
                 SkillType.HIT_AND_RUN -> {
                     // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->

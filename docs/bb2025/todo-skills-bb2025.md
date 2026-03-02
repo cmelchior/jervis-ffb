@@ -32,7 +32,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Diving Catch
 - [ ] Diving Tackle
 - [ ] Dodge
-- [ ] Defensive
+- [x] Defensive
+  - [x] Prevents Guard
+  - [x] Prevents Put the Boot In
 - [ ] Hit and Run
 - [ ] Jump Up
 - [ ] Leap

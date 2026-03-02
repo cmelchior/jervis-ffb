@@ -413,6 +413,14 @@ the opponent can just decide to not intercept.
 
 So for ease of use, this skill is always used when available.
 
+### Page 127 - Defensive
+Since both Guard and "Put the Boot In" are applied automatically (as there is
+no use case for making it optional), the same reasoning applies to Defensive as 
+it only disables those two skills.
+
+If this changes for either Guard or "Put the Boot In" in the future, it should
+also change for Defensive.
+
 ### Page 128 - Eye Gouge
 Eye Gouge says it can trigger when an opposition player is Pushed Back, but it
 is unclear if being chain-pushed also count as being Pushed Back.

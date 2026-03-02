@@ -93,10 +93,24 @@ object FoulStep: Procedure() {
                 return GotoNode(RollForFoul)
             }
             val context = state.getContext<FoulContext>()
+
+            // We always apply "Put the Boot In" and Defensive modifiers.
+            // They are technically optional skills, but there should be no reason (not
+            // even a bad one) to not apply them.
             val bootAssists = context.victim!!.coordinates.getSurroundingCoordinates(rules)
                 .mapNotNull { state.field[it].player }
                 .filter { it != context.fouler }
-                .filter { it.isSkillAvailable(SkillType.PUT_THE_BOOT_IN) }
+                .filter { player ->
+                    val hasPutTheBootIn = player.isSkillAvailable(SkillType.PUT_THE_BOOT_IN)
+                    val ignorePutTheBootIn = rules.getMarkingPlayers(
+                        game = state,
+                        markedTeam = player.team,
+                        square = player.coordinates
+                    ).any {
+                        it.isSkillAvailable(SkillType.DEFENSIVE)
+                    }
+                    hasPutTheBootIn && !ignorePutTheBootIn
+                }
                 .filter { rules.isStanding(it) && rules.isMarked(it) }
 
             return buildCompositeCommand {

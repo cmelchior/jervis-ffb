@@ -407,9 +407,22 @@ abstract class Rules(
         if (assister.team == target.team) return false
         if (!assister.location.isAdjacent(this, target.location)) return false
         if (!canMarkPlayers(assister)) return false
-        // We always apply Guard. It is technically an optional skill, but there
-        // should be no downside to always applying it.
-        if (assister.isSkillAvailable(SkillType.GUARD)) return true
+
+        // We always apply Guard and Defensive.
+        // They are technically optional skills, but there should be no reason
+        // (not even a bad one) to not apply them.
+        val hasGuard = assister.isSkillAvailable(SkillType.GUARD)
+        if (hasGuard) {
+            val state = assister.team.game
+            val ignoreGuard = getMarkingPlayers(
+                game = state,
+                markedTeam = assister.team,
+                square = assister.coordinates
+            ).any {
+                it.isSkillAvailable(SkillType.DEFENSIVE)
+            }
+            if (!ignoreGuard) return true
+        }
 
         // A player can only assist if they themselves are not being marked.
         // This logic does not take into account any skills.
