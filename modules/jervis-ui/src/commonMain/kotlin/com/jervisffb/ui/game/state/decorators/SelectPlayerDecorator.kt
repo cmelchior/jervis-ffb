@@ -32,12 +32,17 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
 
             // Calculate dice decorators (if any)
             var dice = when (state.stack.currentNode()) {
-                BlockAction.SelectDefenderOrEndAction -> {
+                com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectDefenderOrEndAction -> {
                     val attacker = state.activePlayer!!
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
                 }
-                BlitzAction.MoveOrBlockOrEndAction -> {
+                com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectDefenderOrEndAction -> {
+                    val attacker = state.activePlayer!!
+                    val defender = state.getPlayerById(playerId)
+                    calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
+                }
+                com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.MoveOrBlockOrEndAction -> {
                     val attacker = state.activePlayer!!
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = true)
