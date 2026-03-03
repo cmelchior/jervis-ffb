@@ -114,6 +114,7 @@ object ArmourRoll: Procedure() {
                 RiskingInjuryMode.FALLING_OVER,
                 RiskingInjuryMode.PUSHED_INTO_CROWD,
                 RiskingInjuryMode.BAD_LANDING,
+                RiskingInjuryMode.STAB,
                 RiskingInjuryMode.HIT_BY_ROCK -> ExitProcedure()
             }
         }

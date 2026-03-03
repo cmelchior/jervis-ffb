@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -120,10 +121,12 @@ abstract class BB2020Rules(
 
             // Add any special actions that are provided by skills
             player.skills.filterIsInstance<SpecialActionProvider>().forEach {
+                val skill = it as? Skill<*>
+                val isSkillAvailable = (skill != null && player.isSkillAvailable(skill.type))
                 val type = it.specialAction
                 val isSkillActionUsed = it.isSpecialActionUsed
                 val isActionAvailable = state.activeTeamOrThrow().turnData.availableSpecialActions[type]!! > 0
-                if (!isSkillActionUsed && isActionAvailable) {
+                if (isSkillAvailable && !isSkillActionUsed && isActionAvailable) {
                     add(teamActions[type])
                 }
             }

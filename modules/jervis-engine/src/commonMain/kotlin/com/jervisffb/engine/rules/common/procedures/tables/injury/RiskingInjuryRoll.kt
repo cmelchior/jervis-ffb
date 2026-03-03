@@ -41,7 +41,8 @@ enum class RiskingInjuryMode {
     // Player is injured after being thrown (normally the same as Falling Over),
     // but we need to know the difference in order to trigger turnovers
     // correctly.
-    BAD_LANDING
+    BAD_LANDING,
+    STAB // Armour/Injury is rolled as part of a Stab
 }
 
 // What do we need to track?
@@ -157,8 +158,13 @@ object RiskingInjuryRoll: Procedure() {
                 GotoNode(RollForInjury)
             } else {
                 // If armour is not broken, player is just placed prone.
+                // Unless it is a Stab, which has special rules.
+                val isStab = (context.mode == RiskingInjuryMode.STAB)
                 compositeCommandOf(
-                    SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false),
+                    when (isStab) {
+                        false -> SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false)
+                        true -> null
+                    },
                     ExitProcedure()
                 )
             }

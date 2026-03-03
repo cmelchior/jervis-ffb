@@ -49,6 +49,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.Si
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
@@ -169,16 +171,11 @@ object BlitzAction : Procedure() {
                         GotoNode(ResolveMove)
                     )
                 }
-
                 is PlayerSelected -> {
-                    val blockContext = BlockContext(
-                        attacker = context.attacker,
-                        defender = action.getPlayer(state),
-                        isBlitzing = true
-                    )
                     compositeCommandOf(
-                        SetContext(context.copy(hasBlocked = true)),
-                        SetContext(blockContext),
+                        SetContext(
+                            context.copy(defender = action.getPlayer(state), hasBlocked = true)
+                        ),
                         GotoNode(SelectBlockType)
                     )
                 }
@@ -308,7 +305,14 @@ object BlitzAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> {
+                    SetContext(
+                        StabContext(
+                            attacker = context.attacker,
+                            defender = context.defender!!
+                        )
+                    )
+                }
                 BlockType.STANDARD -> {
                     SetContext(
                         BlockContext(
@@ -327,7 +331,7 @@ object BlitzAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> StabStep
                 BlockType.STANDARD -> {
                     when (rules.baseVersion) {
                         GameVersion.BB2020 -> StandardBlockStep
@@ -349,7 +353,7 @@ object BlitzAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> RemoveContext<StabContext>()
                 BlockType.STANDARD -> RemoveContext<BlockContext>()
             }
 
@@ -359,7 +363,7 @@ object BlitzAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> (state.getContext<StabContext>().stabResult != null)
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
 
@@ -374,7 +378,7 @@ object BlitzAction : Procedure() {
                     .contains(context.defender.coordinates)
 
             return if (state.endActionImmediately()) {
-                return compositeCommandOf(
+                compositeCommandOf(
                     removeContextCommand,
                     ExitProcedure()
                 )

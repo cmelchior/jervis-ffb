@@ -8,6 +8,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockActionContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId
@@ -24,7 +25,8 @@ import com.jervisffb.ui.menu.LocalFieldDataWrapper
 object SelectBlockTypeWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(
         com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectBlockType,
-        com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType
+        com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
+        com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.SelectBlockType
     )
 
     override fun onDecorateActions(
@@ -42,7 +44,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         }.toMutableList()
 
         val wheelState = ActionWheelUiStateData(
-            center = blockContext?.defender?.coordinates,
+            center = state.activePlayer?.coordinates,
             bottomItems = wheelOptions,
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,

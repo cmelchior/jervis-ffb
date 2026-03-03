@@ -1,6 +1,5 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DirectionSelected
@@ -17,7 +16,6 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -25,6 +23,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
@@ -88,13 +87,8 @@ class TackleTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            5.dblock, // Stumble result
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock(defender, 5.dblock), // Stumble
             Confirm, // Use Tackle
             DirectionSelected(Direction.UP_LEFT),
             Cancel // Do not follow up
@@ -114,7 +108,6 @@ class TackleTests: JervisGameBB2025Test() {
             PlayerSelected(attacker.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
             PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
             5.dblock, // Stumble result
             NoRerollSelected(),
             SelectSingleBlockDieResult(),

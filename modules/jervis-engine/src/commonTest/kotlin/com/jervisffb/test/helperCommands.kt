@@ -27,8 +27,8 @@ import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
-import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.collections.plus
 
@@ -164,12 +164,12 @@ fun defaultKickOffAwayTeam(
     bounce
 )
 
-fun activatePlayer(playerId: String, type: PlayerStandardActionType) = arrayOf(
+fun activatePlayer(playerId: String, type: ActionType) = arrayOf(
     PlayerSelected(PlayerId(playerId)),
     PlayerActionSelected(type),
 )
 
-fun activatePlayer(player: Player, type: PlayerStandardActionType) = arrayOf(
+fun activatePlayer(player: Player, type: ActionType) = arrayOf(
     PlayerSelected(player.id),
     PlayerActionSelected(type),
 )
@@ -225,7 +225,15 @@ fun skipTurns(count: Int) = Array(count) { EndTurn }
 
 // Do a standard 1 die block with no reroll
 fun standardBlock(target: Player, die: DBlockResult) = standardBlock(target.id.value, die)
-fun standardBlock(target: String,  die: DBlockResult) = arrayOf(
+fun standardBlock(target: String, die: DBlockResult) = arrayOf(
+    PlayerSelected(target.playerId),
+    die,
+    NoRerollSelected(),
+    SelectSingleBlockDieResult(),
+)
+
+fun blitzBlock(player: Player, die: DBlockResult) = blitzBlock(player.id.value, die)
+fun blitzBlock(target: String, die: DBlockResult) = arrayOf(
     PlayerSelected(target.playerId),
     BlockTypeSelected(BlockType.STANDARD),
     die,

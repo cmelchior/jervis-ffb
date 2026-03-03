@@ -1,11 +1,9 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
@@ -18,10 +16,10 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.test.JervisGameBB2020Test
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultAwaySetup
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffEvent
@@ -29,8 +27,8 @@ import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.standardBlock
 import com.jervisffb.test.teamSetup
-import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -440,13 +438,8 @@ class KickOffTests: JervisGameBB2020Test() {
                 bounce = null
             ),
             PlayerSelected("A1".playerId), // Touchback
-            PlayerSelected("A1".playerId), // Select Player
-            PlayerActionSelected(PlayerStandardActionType.BLOCK), // Select Block Action
-            PlayerSelected("H1".playerId), // Target
-            BlockTypeSelected(BlockType.STANDARD), // Select Block type
-            1.dblock, // Roll Skull
-            NoRerollSelected(0), // Do not reroll
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 1.dblock),
             DiceRollResults(1.d6, 1.d6), // Armour roll
             5.d8 // Bounce
         )

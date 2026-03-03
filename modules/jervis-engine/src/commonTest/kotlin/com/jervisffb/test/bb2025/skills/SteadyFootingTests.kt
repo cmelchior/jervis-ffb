@@ -23,6 +23,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
@@ -118,7 +119,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id), // Select target of blitz
-            *standardBlock("H1", 1.dblock),
+            *blitzBlock("H1", 1.dblock),
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6),
             *moveTo(13, 4),

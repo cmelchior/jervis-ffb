@@ -2,7 +2,6 @@ package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.calculateBlockDiceToRoll
 
@@ -16,7 +15,6 @@ data class BlockContext(
     val defender: Player,
     val isBlitzing: Boolean = false,
     val isUsingJuggernaught: Boolean = false,
-    val blockType: BlockType? = null,
     val isUsingMultiBlock: Boolean = false,
     val offensiveAssists: Int = 0,
     val defensiveAssists: Int = 0,

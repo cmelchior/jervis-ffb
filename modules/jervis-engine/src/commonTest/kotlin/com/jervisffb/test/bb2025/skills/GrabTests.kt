@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import kotlin.test.BeforeTest
@@ -179,7 +180,7 @@ class GrabTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender),
-            *standardBlock("H1", 3.dblock),
+            *blitzBlock("H1", 3.dblock),
         )
         val actions = controller.getAvailableActions()
         assertEquals(3, actions.get<SelectDirection>().directions.size)

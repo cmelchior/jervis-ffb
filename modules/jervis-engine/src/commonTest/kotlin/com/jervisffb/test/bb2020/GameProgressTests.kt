@@ -179,7 +179,6 @@ class GameProgressTests: JervisGameBB2020Test() {
         val player = awayTeam[1.playerNo]
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            PlayerSelected("H1".playerId),
             EndAction
         )
         assertEquals(Availability.AVAILABLE, player.available)

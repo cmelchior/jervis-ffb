@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectPlayer
@@ -19,10 +18,15 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushTo
@@ -31,6 +35,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 
 /**
  * Class responsible for testing the Blitz action.
@@ -49,8 +54,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A9".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
         )
         assertEquals(2, controller.getAvailableActions().count())
         assertEquals(1, controller.getAvailableActions().actions.count { it is EndActionWhenReady })
@@ -68,8 +72,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A9".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             *moveTo(13, 13),
             EndAction
@@ -84,8 +87,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A9".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             EndAction
         )
@@ -99,15 +101,10 @@ class BlitzActionTests: JervisGameBB2025Test() {
         attacker.hasTackleZones = false
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             MoveTypeSelected(MoveType.STAND_UP),
-            PlayerSelected(defender.id),
-            BlockTypeSelected(BlockType.STANDARD),
-            6.dblock, // Block roll
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *blitzBlock(defender, 6.dblock),
             DirectionSelected(Direction.LEFT),
             Cancel,
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -144,8 +141,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A10".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             *moveTo(15, 7),
             *moveTo(14, 7),
@@ -166,17 +162,12 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
         )
         assertEquals(6, attacker.movesLeft)
         controller.rollForward(
-            PlayerSelected(defender.id), // Start Blitz Action
-            PlayerSelected(defender.id), // Start Block Sub action
-            BlockTypeSelected(BlockType.STANDARD),
-            6.dblock, // Block roll
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            PlayerSelected(defender.id),
+            *blitzBlock(defender, 6.dblock),
             DirectionSelected(Direction.LEFT),
             Cancel, // Do not follow up
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -189,8 +180,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A10".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             *moveTo(15, 7),
             *moveTo(14, 7),
@@ -223,8 +213,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A10".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id),
             *moveTo(15, 7),
             *moveTo(14, 7),
@@ -252,8 +241,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
-            PlayerSelected(attacker.id),
-            PlayerActionSelected(PlayerStandardActionType.BLITZ),
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender.id), // Select target of blitz
             PlayerSelected(defender.id), // Start block
             BlockTypeSelected(BlockType.STANDARD),
@@ -272,5 +260,18 @@ class BlitzActionTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(11, 6), defender.location)
         assertEquals(PlayerState.STANDING, defender.state)
+    }
+
+    @Test
+    fun clearContextWhenDoneWithAction() {
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLITZ),
+            PlayerSelected("H1".playerId),
+            *blitzBlock("H1", 1.dblock),
+            DiceRollResults(1.d6, 1.d6)
+        )
+        assertNull(state.activePlayer)
+        assertFalse(state.hasContext<BlockContext>())
+        assertFalse(state.hasContext<BlitzActionContext>())
     }
 }

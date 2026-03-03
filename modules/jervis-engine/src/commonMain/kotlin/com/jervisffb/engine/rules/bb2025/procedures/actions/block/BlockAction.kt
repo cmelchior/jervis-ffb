@@ -30,9 +30,10 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -88,10 +89,11 @@ object BlockAction : Procedure() {
                     val context = BlockActionContext(
                         attacker = state.activePlayer!!,
                         defender = action.getPlayer(state),
+                        blockType = BlockType.STANDARD,
                     )
                     compositeCommandOf(
                         SetContext(context),
-                        GotoNode(SelectBlockType),
+                        GotoNode(ResolveBlock),
                     )
                 }
                 else -> INVALID_ACTION(action)
@@ -134,7 +136,14 @@ object BlockAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> {
+                    SetContext(
+                        StabContext(
+                            attacker = context.attacker,
+                            defender = context.defender,
+                        )
+                    )
+                }
                 BlockType.STANDARD -> {
                     SetContext(
                         BlockContext(
@@ -153,7 +162,7 @@ object BlockAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> StabStep
                 BlockType.STANDARD -> SingleStandardBlockStep
             }
         }
@@ -171,7 +180,7 @@ object BlockAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> RemoveContext<StabContext>()
                 BlockType.STANDARD -> RemoveContext<BlockContext>()
             }
 
@@ -181,13 +190,14 @@ object BlockAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
-                BlockType.STAB -> TODO()
+                BlockType.STAB -> (state.getContext<StabContext>().stabResult != null)
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
 
             // After the Push was resolved, if the target is still standing
             // and the attacker has frenzy and was able to follow up, a
             // second block is thrown
+            // TODO Should only trigger if a player was Pushed Back
             val hasFrenzy = context.attacker.isSkillAvailable(SkillType.FRENZY)
             val isNextToTarget = (
                 rules.isStanding(context.attacker) &&

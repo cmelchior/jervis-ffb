@@ -1,6 +1,5 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.Confirm
@@ -29,7 +28,6 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
@@ -45,8 +43,8 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
+import com.jervisffb.test.standardBlock
 import com.jervisffb.test.throwBall
-import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -547,13 +545,8 @@ class TouchdownTests: JervisGameBB2020Test() {
 
         assertEquals(0, state.awayScore)
         controller.rollForward(
-            PlayerSelected("A5".playerId),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected("H3".playerId),
-            BlockTypeSelected(BlockType.STANDARD),
-            3.dblock, // Pushback
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A5", PlayerStandardActionType.BLOCK),
+            *standardBlock("H3", 3.dblock),
             DirectionSelected(Direction.UP_LEFT),
             DirectionSelected(Direction.LEFT),
             Confirm // Follow up
@@ -583,13 +576,8 @@ class TouchdownTests: JervisGameBB2020Test() {
 
         assertEquals(0, state.awayScore)
         controller.rollForward(
-            PlayerSelected("A6".playerId),
-            PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD),
-            3.dblock, // Pushback
-            NoRerollSelected(),
-            SelectSingleBlockDieResult(),
+            *activatePlayer("A6", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 3.dblock),
             DirectionSelected(Direction.RIGHT),
             Confirm // Follow up
         )

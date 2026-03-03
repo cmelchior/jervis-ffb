@@ -1,6 +1,5 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
@@ -8,7 +7,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.bb2025.skills.Defensive
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -38,7 +36,6 @@ class DefensiveTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         assertEquals(1, controller.getAvailableActions().get<RollDice>().dice.size)
     }
@@ -53,7 +50,6 @@ class DefensiveTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         assertEquals(2, controller.getAvailableActions().get<RollDice>().dice.size)
     }
@@ -66,7 +62,6 @@ class DefensiveTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
             PlayerSelected("H2".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         assertEquals(1, controller.getAvailableActions().get<RollDice>().dice.size)
     }
@@ -83,7 +78,6 @@ class DefensiveTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         assertEquals(2, controller.getAvailableActions().get<RollDice>().dice.size)
     }

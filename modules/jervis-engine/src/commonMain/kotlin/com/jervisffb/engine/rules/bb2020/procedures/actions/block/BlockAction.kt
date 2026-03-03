@@ -37,34 +37,38 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
- * Procedure for controlling a player's Standard Block action. Multiple Block, Stab, Projectile Vomit, etc. have
- * their own actions.
+ * Procedure for controlling a player's Standard Block action. Multiple Block,
+ * Stab, Projectile Vomit, etc. have their own actions.
  *
  * See page 56 in the rulebook.
  *
  * Developer's Commentary:
- * A block action consists of quite a few steps, and because Multiple Block require us to run these in lock-step,
- * it means we need to split them up into multiple procedures so we can switch context after each step.
+ * A block action consists of quite a few steps, and because Multiple Block
+ * require us to run these in lock-step, it means we need to split them up into
+ * multiple procedures so we can switch context after each step.
  *
- * This means that this complexity also bleeds into normal single blocks, at least if we want to avoid duplicating
- * the logic.
+ * This means that this complexity also bleeds into normal single blocks, at
+ * least if we want to avoid duplicating the logic.
  *
- * For that reason, any action that is either a "block action" or a "special action" that can replace a block, it must
- * fulfill the following requirements:
+ * For that reason, any action that is either a "block action" or a "special
+ * action" that can replace a block, it must fulfill the following requirements:
  *
  * 1. Have an enum defined in [com.jervisffb.rules.BlockType]
  *
  * 2. It must split its behavior into sub-procedures that cover the following phases:
  *    a. Select Modifiers (e.g. assists, Horns, Dauntless)
- *    b. Roll block dice or dice that isn't injury/armour rolls, e.g. Projectile Vomit roll to see who is hit.
+ *    b. Roll block dice or dice that isn't injury/armour rolls, e.g. Projectile
+ *       Vomit roll to see who is hit.
  *    c. Select type of reroll or keep the result.
  *    d. Reroll dice using the selected reroll.
  *    e. For blocks with multiple dice you have to choose the final result.
- *    f. Apply the final result (multiple blocks also affect injury rolls, but this is handled in RiskingInjuryRoll)
+ *    f. Apply the final result (multiple blocks also affect injury rolls, but
+ *       this is handled in RiskingInjuryRoll)
  *    g. Handle injuries
  *
- * 3. It is up to [StandardBlockStep] and [MultipleBlockAction] to correctly set up the call order of these as well
- *    making sure that they have the correct context's set.
+ * 3. It is up to [StandardBlockStep] and [MultipleBlockAction] to correctly set
+ *    up the call order of these as well making sure that they have the correct
+ *    context's set.
  */
 object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
@@ -103,10 +107,12 @@ object BlockAction : Procedure() {
                     val context = BlockActionContext(
                         attacker = state.activePlayer!!,
                         defender = action.getPlayer(state),
+                        // First block is always normal, otherwise a more specific action was selected
+                        blockType = BlockType.STANDARD,
                     )
                     compositeCommandOf(
                         SetContext(context),
-                        GotoNode(SelectBlockType),
+                        GotoNode(ResolveBlock),
                     )
                 }
                 else -> INVALID_ACTION(action)

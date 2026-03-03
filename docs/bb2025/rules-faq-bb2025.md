@@ -738,6 +738,14 @@ of unspecified scenarios with regard to how the thrown player be handled?
 For this reason, Jervis assumes that Safe Pass is only applicable for normal
 Pass actions (and by extension, throwing bombs).
 
+### Page 136 - Stab
+Stab is not available when starting from prone as it is an Active skill that
+requires a tackle zone when activating the player. Doing a Blitz-Stab from Prone
+will still work as the player will be standing by the time the Block is 
+performed.
+
+FUMBBL has a similar interpretation.
+
 ### Page 136 - Strip Ball
 Strip Ball requires that a player is "Pushed Back" (note, this is different
 than the Push Back result on the Block die). Since Stand Firm prevents a player

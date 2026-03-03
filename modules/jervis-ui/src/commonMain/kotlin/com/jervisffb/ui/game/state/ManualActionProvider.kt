@@ -39,7 +39,6 @@ import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -83,7 +82,6 @@ import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
 import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
-import com.jervisffb.ui.game.state.decorators.SelectBlockTypeDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
 import com.jervisffb.ui.game.state.decorators.SelectFieldLocationDecorator
@@ -148,7 +146,6 @@ open class ManualActionProvider(
         EndActionWhenReady::class to EndActionDecorator,
         EndSetupWhenReady::class to EndSetupDecorator,
         EndTurnWhenReady::class to EndTurnDecorator,
-        SelectBlockType::class to SelectBlockTypeDecorator,
         SelectDirection::class to SelectDirectionDecorator,
         SelectDogout::class to SelectDogoutDecorator,
         SelectFieldLocation::class to SelectFieldLocationDecorator,

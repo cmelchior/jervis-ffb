@@ -10,6 +10,7 @@ import com.jervisffb.engine.rules.common.actions.BlockType
 data class BlockActionContext(
     val attacker: Player,
     val defender: Player,
-    val blockType: BlockType? = null,
+    // Only relevant for Frenzy, where the 2nd block might change type.
+    val blockType: BlockType = BlockType.STANDARD,
     val hasBlocked: Boolean = false,
 ): ProcedureContext

@@ -1,6 +1,5 @@
 package com.jervisffb.test.bb2025.actions
 
-import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
@@ -20,11 +19,12 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.BlockActionContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
@@ -102,13 +102,13 @@ class BlockActionTests: JervisGameBB2025Test() {
         assertTrue(activePlayerCanBlock())
     }
 
+
     @Test
-    fun endActionBeforeSelectingBlockTypeDoesNotMarkPlayerAsActivated() {
+    fun endActionBeforeSelectingTargetNotMarkPlayerAsActivated() {
         val player = state.getPlayerById("A4".playerId)
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
-            PlayerSelected("H4".playerId),
             EndAction
         )
         assertEquals(Availability.AVAILABLE, player.available)
@@ -125,7 +125,6 @@ class BlockActionTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         val context = state.getContext<BlockContext>()
         assertEquals(0, context.defensiveAssists)
@@ -140,7 +139,6 @@ class BlockActionTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD)
         )
         val context = state.getContext<BlockContext>()
         assertEquals(0, context.defensiveAssists)
@@ -156,7 +154,6 @@ class BlockActionTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
             PlayerSelected("H1".playerId),
-            BlockTypeSelected(BlockType.STANDARD),
             DiceRollResults(1.dblock, 2.dblock),
             CalculatedAction { _, _ ->
                 controller.getAvailableActions().filterIsInstance<SelectRerollOption>()
@@ -190,6 +187,18 @@ class BlockActionTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(11, 5), defender.location)
         assertEquals(PlayerState.STANDING, defender.state)
+    }
+
+    @Test
+    fun clearContextWhenDoneWithAction() {
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 1.dblock),
+            DiceRollResults(1.d6, 1.d6)
+        )
+        assertNull(state.activePlayer)
+        assertFalse(state.hasContext<BlockContext>())
+        assertFalse(state.hasContext<BlockActionContext>())
     }
 
     @Test

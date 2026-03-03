@@ -91,7 +91,7 @@ object ActivatePlayer : Procedure() {
             // to a turnover or failing some roll), the action is always considered used.
             if (context.markActionAsUsed || state.endActionImmediately()) {
                 val activeTeam = state.activeTeamOrThrow()
-                val markActionAsUsedCommand = when (val type = context.declaredAction!!.type) {
+                val markActionAsUsedCommand = when (context.declaredAction!!.type) {
                     PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.MOVE)
                     PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
                     PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.HAND_OFF)
@@ -135,8 +135,8 @@ object ActivatePlayer : Procedure() {
             // player to be activated again if they haven't done anything else that
             // is considered irreversible.
             if (
-                player.available == Availability.IS_ACTIVE &&
-                (context.clearedNegativeEffects || context.rolledForNegaTrait)
+                player.available == Availability.IS_ACTIVE
+                && (context.clearedNegativeEffects || context.rolledForNegaTrait)
             ) {
                 add(SetPlayerAvailability(player, Availability.AVAILABLE))
             }

@@ -108,6 +108,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
+    - [ ] 2nd Block can only be thrown if the target is Pushed Back
+    - [ ] 2nd Block can be another Special Action like Stab
     - [ ] Must rush if needed
     - [ ] 2nd block isn't taken in case of a touchdown
     - [ ] Cannot take 2nd block if no more move/rushes left
@@ -266,6 +268,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works for both Attacker and Defender
 - [ ] Multiple Block
     - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
+    - [ ] Only normal blocks are available, no special actions
     - [ ] Tackle is available for both blocks
     - [ ] Taunt does not work against Multiple Block
     - [ ] Mighty Blow works on both block
@@ -345,7 +348,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Regeneration
 - [ ] Right Stuff*
 - [ ] Secret Weapon*
-- [ ] Stab
+- [x] Stab
+  - [x] Replace Block
+  - [x] Mighty Blow does not work on Stab
+  - [x] Unsuccesfull Stab on Armour does nothing
+  - [x] Can be used during a Blitz
+  - [x] Cannot move after Stabbing during a Blitz
+  - [ ] Is not available when starting from Prone
 - [ ] Stunty*
 - [ ] Swarming
 - [ ] Swoop

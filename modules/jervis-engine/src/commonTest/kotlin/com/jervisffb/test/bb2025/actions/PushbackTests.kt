@@ -26,6 +26,7 @@ import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
@@ -284,7 +285,7 @@ class PushbackTests: JervisGameBB2025Test() {
             *activatePlayer("A10", PlayerStandardActionType.BLITZ),
             PlayerSelected("H4".playerId),
             SmartMoveTo(20, 1),
-            *standardBlock("H4", 4.dblock),
+            *blitzBlock("H4", 4.dblock),
             DirectionSelected(Direction.UP),
             Confirm, // Follow up
             DiceRollResults(1.d6, 1.d6), // Crowd Injury roll

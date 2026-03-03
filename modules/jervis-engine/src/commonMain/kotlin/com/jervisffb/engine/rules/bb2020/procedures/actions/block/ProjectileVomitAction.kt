@@ -24,7 +24,6 @@ import com.jervisffb.engine.model.context.BlockActionContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -85,7 +84,6 @@ object ProjectileVomitAction : Procedure() {
                 BlockContext(
                     attacker = actionContext.attacker,
                     defender = actionContext.defender,
-                    blockType = BlockType.STANDARD
                 )
             )
         }

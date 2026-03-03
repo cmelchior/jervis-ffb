@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
 /**
- * Represents the Stab (Active) skill.
+ * Represents the "Stab (Active)" skill.
  *
  * See page 136 in the BB2025 rulebook.
  */
