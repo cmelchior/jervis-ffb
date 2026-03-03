@@ -40,6 +40,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
+import kotlinx.collections.immutable.toPersistentList
 
 /**
  * Implement the Quality Roll as described on page 53 in the rulebook.
@@ -150,7 +151,7 @@ object QualityRoll: Procedure() {
             Range.QUICK_PASS -> null
             Range.SHORT_PASS -> QualityModifier.SHORT_PASS
             else -> INVALID_GAME_STATE("Unsupported range: ${context.range}")
-        }?.let { it ->  modifiers.add(it) }
+        }?.let { modifiers.add(it) }
 
         // Marked modifiers for thrower
         rules.addMarkedModifiers(
@@ -188,13 +189,13 @@ object QualityRoll: Procedure() {
                     rerollSource = state.rerollContext!!.source,
                     rerolledResult = d6
                 ),
-                qualityRollModifiers = modifiers,
+                qualityRollModifiers = modifiers.toPersistentList(),
                 qualityRollResult = result
             )
         } else {
             context.copy(
-                qualityRoll = D6DieRoll.Companion.create(state, d6),
-                qualityRollModifiers = modifiers,
+                qualityRoll = D6DieRoll.create(state, d6),
+                qualityRollModifiers = modifiers.toPersistentList(),
                 qualityRollResult = result
             )
         }

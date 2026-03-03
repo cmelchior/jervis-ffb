@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.JumpRollContext
+import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
@@ -48,6 +49,8 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId
@@ -71,6 +74,7 @@ import kotlin.time.ExperimentalTime
  * - Dodge
  * - Interception
  * - Jump
+ * - Landing
  * - Leap
  * - Pickup
  * - Pogo
@@ -232,7 +236,7 @@ object AccuracyBB2020WheelController : D6WithRerollWheelController() {
 /**
  * Define the Action Wheel layout when rolling for Accuracy (passing) in BB2025.
  */
-object AccuracyBB2025WheelController : D6WithRerollWheelController() {
+object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
     override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie
     override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource
@@ -245,6 +249,22 @@ object AccuracyBB2025WheelController : D6WithRerollWheelController() {
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<PassContext>()
         return context.passingRoll!!.originalRoll
+    }
+}
+
+object AccuracyBB2025ThrowTeamMateWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "quality"
+    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.RollDie
+    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ThrowTeamMateContext>().thrower.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<ThrowTeamMateContext>()
+        return context.qualityRoll!!.originalRoll
     }
 }
 
@@ -498,6 +518,23 @@ object PogoWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<PogoRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
+/**
+ * Define the Action-Wheel layout when rolling for Landing after being thrown.
+ */
+object LandingWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "landing"
+    override val rollDiceNode: Node = LandingRoll.RollDie
+    override val chooseRerollSourceNode: Node = LandingRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = LandingRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ThrowTeamMateContext>().thrownPlayer!!.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<LandingRollContext>()
         return context.roll?.originalRoll!!
     }
 }

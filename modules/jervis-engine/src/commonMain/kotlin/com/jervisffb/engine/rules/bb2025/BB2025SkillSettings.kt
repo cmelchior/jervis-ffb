@@ -52,6 +52,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Stab
 import com.jervisffb.engine.rules.bb2025.skills.StandFirm
 import com.jervisffb.engine.rules.bb2025.skills.SteadyFooting
 import com.jervisffb.engine.rules.bb2025.skills.StripBall
+import com.jervisffb.engine.rules.bb2025.skills.StrongArm
 import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
@@ -461,9 +462,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.STRONG_ARM -> {
-                    // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Strong Arm", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                        StrongArm(player, category, expiresAt)
+                    }
                 }
                 SkillType.THICK_SKULL -> {
                     addNoValueEntry("Thick Skull", type, SkillCategory.STRENGTH) { player, category,expiresAt ->

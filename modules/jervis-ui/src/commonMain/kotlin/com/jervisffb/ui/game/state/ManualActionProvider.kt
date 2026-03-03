@@ -57,6 +57,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
@@ -574,7 +575,6 @@ open class ManualActionProvider(
 
         // When rerolling Catch rolls, prefer to use the free reroll from the Catch skill
         if (menuViewModel.isFeatureEnabled(Feature.USE_CATCH_SKILL_REROLL) && (currentNode == CatchRoll.ChooseReRollSource)) {
-            val context = controller.state.getContext<CatchRollContext>()
             val availableRerollOptions = availableActions.getOrNull<SelectRerollOption>()
             availableRerollOptions?.options?.firstOrNull {
                 val source = it.getRerollSource(controller.state)
@@ -670,6 +670,10 @@ open class ManualActionProvider(
 
         // Always use Dirty Player on Injury (if possible)
         if (menuViewModel.isFeatureEnabled(Feature.USE_MIGHTY_BLOW_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseMightyBlow)) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STRONG_ARM) && (currentNode == ThrowTeammateAccuracyRoll.ChooseToUseStrongArm)) {
             return Confirm
         }
 

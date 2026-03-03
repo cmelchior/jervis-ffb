@@ -227,8 +227,7 @@ inline fun assert(condition: Boolean, lazyMessage: () -> String = { "A invariant
 }
 
 @JvmName("sumOfDieResults")
-fun List<DieResult>.sum(): Int = fold(0) { acc, el -> acc + el.value }
-
+fun List<DieResult>.sum(): Int = this.sumOf { it.value }
 fun List<DiceModifier>.sum(): Int = this.sumOf { it.modifier }
 
 @JvmName("sumOfStatModifiers")

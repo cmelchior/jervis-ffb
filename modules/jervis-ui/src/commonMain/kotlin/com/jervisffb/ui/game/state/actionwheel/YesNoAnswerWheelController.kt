@@ -30,12 +30,14 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpS
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -70,6 +72,7 @@ import kotlin.time.ExperimentalTime
  * - Stand Firm (skill usage)
  * - Steady Footing (skill usage)
  * - Strip Ball (skill usage)
+ * - Strong Arm (skill usage)
  * - Tackle (skill usage)
  * - Taunt (skill usage)
  * - Follow Up
@@ -306,7 +309,6 @@ object UseSteadyFootingWheelController: UseSkillWheelController(SkillType.STEADY
     }
 }
 
-
 object UseStripBallWheelController: UseSkillWheelController(SkillType.STRIP_BALL) {
     override val nodes: Set<Node> = setOf(
         UseStripBallStep.ChooseToUseStripBall,
@@ -315,6 +317,17 @@ object UseStripBallWheelController: UseSkillWheelController(SkillType.STRIP_BALL
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<PushContext>()
         val player = context.firstPusher
+        return player.coordinates
+    }
+}
+
+object UseStrongArmWheelController: UseSkillWheelController(SkillType.STRONG_ARM) {
+    override val nodes: Set<Node> = setOf(
+        ThrowTeammateAccuracyRoll.ChooseToUseStrongArm,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<ThrowTeamMateContext>()
+        val player = context.thrower
         return player.coordinates
     }
 }

@@ -49,6 +49,9 @@ import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
+import com.jervisffb.engine.utils.sum
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 // See page 53 in the BB2020 rulebook
 // See page 77 in the BB2025 rulebook
@@ -68,7 +71,7 @@ data class ThrowTeamMateContext(
     val target: FieldCoordinate? = null,
     val range: Range? = null,
     val qualityRoll: D6DieRoll? = null,
-    val qualityRollModifiers: List<DiceModifier> = emptyList(),
+    val qualityRollModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val qualityRollResult: ThrowPlayerResult? = null,
     // If a player without TZ or prone/stunned are thrown they will bounce one
     // extra time before landing.
@@ -82,7 +85,16 @@ data class ThrowTeamMateContext(
     // If the player scattered, deviated or bounced into the crowd while holding the ball.
     // The ball should be thrown in from this field.
     val outOfBoundsAt: FieldCoordinate? = null
-) : ProcedureContext
+) : ProcedureContext {
+    val isQualityRollSuccess: Boolean
+        get() {
+            val pa = thrower.passing
+            val roll = qualityRoll
+            if (pa == null || pa == 0) return false
+            if (roll == null) return false
+            return pa >= roll.result.value + qualityRollModifiers.sum()
+        }
+}
 
 /**
  * Procedure for controlling a player's Throw team-mate action.

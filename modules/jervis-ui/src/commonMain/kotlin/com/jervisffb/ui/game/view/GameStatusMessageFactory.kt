@@ -18,6 +18,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -35,6 +37,7 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
@@ -97,6 +100,20 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         Bounce.RollDirection to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Roll D8 to Bounce the Ball"
+                else -> null
+            }
+        },
+
+        ThrowPlayerStep.BouncePlayer to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D8 to Bounce the Player"
+                else -> null
+            }
+        },
+
+        com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D8 to Bounce the Player"
                 else -> null
             }
         },
@@ -546,6 +563,50 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             }
         },
 
+        ThrowTeammateAccuracyRoll.ChooseToUseStrongArm to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Strong Arm to improve the Accuracy Roll?"
+                false -> "Waiting for opponent to use Strong Arm"
+            }
+        },
+
+        ThrowTeammateAccuracyRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to Throw a Player"
+                else -> null
+            }
+        },
+        ThrowTeammateAccuracyRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Accuracy Result or Reroll D6?"
+                else -> null
+            }
+        },
+        ThrowTeammateAccuracyRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Throw a Player"
+                else -> null
+            }
+        },
+
+        LandingRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 to Land"
+                else -> null
+            }
+        },
+        LandingRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Landing Result or Reroll D6?"
+                else -> null
+            }
+        },
+        LandingRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Land"
+                else -> null
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

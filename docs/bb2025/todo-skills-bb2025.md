@@ -277,7 +277,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Does not work if distracted
   - [x] Prevent Follow Up
   - [x] No players are moved if using Stand Firm during the Chain Push
-- [ ] Strong Arm
+- [x] Strong Arm
+  - [x] Works on Quick Pass
+  - [x] Works on Safe Pass
+  - [x] Is optional
 - [x] Thick Skull
   - [x] Stunty rolling 7 (incl modifiers)
   - [x] Normal player rolling 8 (incl modifiers)

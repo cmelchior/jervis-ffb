@@ -100,7 +100,7 @@ object ThrowPlayerStep: Procedure() {
                         Range.OUT_OF_RANGE -> false
                     }
                 }
-                .map { TargetSquare.Companion.throwTarget(it) }
+                .map { TargetSquare.throwTarget(it) }
                 .let { SelectFieldLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
@@ -137,7 +137,7 @@ object ThrowPlayerStep: Procedure() {
                                             range = distance,
                                         )
                                     ),
-                                    GotoNode(TestForQuality)
+                                    GotoNode(TestForAccuracy)
                                 )
                             }
                         }
@@ -147,7 +147,7 @@ object ThrowPlayerStep: Procedure() {
         }
     }
 
-    object TestForQuality: ParentNode() {
+    object TestForAccuracy: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowTeammateAccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
@@ -334,7 +334,7 @@ object ThrowPlayerStep: Procedure() {
                     // Lose the ball before rolling for injury, so the ball doesn't end up in the Dogout.
                     addAll(
                         SetBallLocation(thrownPlayer.ball!!, context.target!!),
-                        SetBallState.Companion.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
+                        SetBallState.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
                         SetTurnOver(TurnOver.STANDARD)
                     )
                 }
@@ -548,7 +548,6 @@ object ThrowPlayerStep: Procedure() {
         // If there was a ball in the square the player fell over in, it will now bounce;
         // otherwise there is nothing to do. Note, if the player was holding a ball, it
         // will already have bounced. so this only happens for a ball laying on the ground.
-        val throwContext = state.getContext<ThrowTeamMateContext>()
         val ball = state.balls.firstOrNull { it.state == BallState.BOUNCING }
         return buildCompositeCommand {
             add(RemoveContext<RiskingInjuryContext>())

@@ -30,7 +30,8 @@ import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
-import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025WheelController
+import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025PassWheelController
+import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025ThrowTeamMateWheelController
 import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
 import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
@@ -40,6 +41,7 @@ import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
+import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
 import com.jervisffb.ui.game.state.actionwheel.LeapWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.PogoWheelController
@@ -69,6 +71,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStandFirmWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStripBallWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseStrongArmWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSureHandsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
@@ -152,7 +155,8 @@ class UiGameController(
     )
     val actionWheelControllers = setOf(
         AccuracyBB2020WheelController,
-        AccuracyBB2025WheelController,
+        AccuracyBB2025PassWheelController,
+        AccuracyBB2025ThrowTeamMateWheelController,
         BounceRollWheelController,
         BoneHeadWheelController,
         CatchWheelController,
@@ -160,6 +164,7 @@ class UiGameController(
         DodgeWheelController,
         InterceptionWheelController,
         JumpWheelController,
+        LandingWheelController,
         LeapWheelController,
         PickupWheelController,
         PogoWheelController,
@@ -191,6 +196,7 @@ class UiGameController(
         UseStandFirmWheelController,
         UseSteadyFootingWheelController,
         UseStripBallWheelController,
+        UseStrongArmWheelController,
         UseSureHandsWheelController,
         UseTackleWheelController,
         UseTauntWheelController,
