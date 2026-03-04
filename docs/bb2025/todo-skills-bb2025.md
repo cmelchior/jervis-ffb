@@ -365,7 +365,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Adjacent player with Really Stupid cannot offer help
   - [x] Distracted adjacent player cannot offer help
 - [ ] Regeneration
-- [ ] Right Stuff*
+- [x] Right Stuff*
+  - [x] Can be thrown using Throw Team-mate
+  - [x] Can be thrown prone when using Throw Team-mate
 - [ ] Secret Weapon*
 - [x] Stab
   - [x] Replace Block
