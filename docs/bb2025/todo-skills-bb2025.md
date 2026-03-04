@@ -377,7 +377,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Cannot move after Stabbing during a Blitz
   - [x] Is not available when starting from Prone
   - [x] Is not available if not starting next to an opponent
-- [ ] Stunty*
+- [x] Stunty*
+  - [x] No marked negative modifiers when Dodging
+  - [x] -1 to intercept
+  - [x] Roll on Stunty Injury Table
 - [ ] Swarming
 - [ ] Swoop
 - [ ] Take Root*

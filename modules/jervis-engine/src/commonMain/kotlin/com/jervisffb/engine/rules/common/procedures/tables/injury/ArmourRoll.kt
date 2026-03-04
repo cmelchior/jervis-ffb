@@ -31,12 +31,11 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.ArmourModifier
-import com.jervisffb.engine.model.modifiers.MightyBlowModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowArmourModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 
@@ -196,7 +195,7 @@ object ArmourRoll: Procedure() {
                     SetSkillUsed(mbPlayer, mbSkill, true),
                     SetContext(
                         context.copy(
-                            armourModifiers = context.armourModifiers + listOf(MightyBlowModifier(mbSkill.value as Int))
+                            armourModifiers = context.armourModifiers + listOf(MightyBlowArmourModifier(mbSkill.value as Int))
                         )
                     ),
                     ExitProcedure()

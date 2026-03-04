@@ -340,7 +340,6 @@ object DodgeRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team {
             return state.getContext<DodgeRollContext>().player.team.otherTeam()
         }
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
@@ -359,12 +358,7 @@ object DodgeRoll: Procedure() {
                 listOf(ContinueWhenReady)
             }
         }
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<DodgeRollContext>()
             return when (action) {
                 is PlayerSelected -> {
@@ -389,11 +383,7 @@ object DodgeRoll: Procedure() {
      */
     object ChooseReRollSource : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
-
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<GameActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayer = context.player
             val availableReRolls: SelectRerollOption? = calculateAvailableRerollsFor(
@@ -409,12 +399,7 @@ object DodgeRoll: Procedure() {
                 listOf(SelectNoReroll(context.isSuccess)) + availableReRolls
             }
         }
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
@@ -434,15 +419,8 @@ object DodgeRoll: Procedure() {
      * Use the selected reroll source.
      */
     object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = state.rerollContext!!.source.rerollProcedure
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = state.rerollContext!!.source.rerollProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             return if (context.rerollAllowed) {
                 GotoNode(ReRollDie)
@@ -454,12 +432,10 @@ object DodgeRoll: Procedure() {
 
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
-
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
         ): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-
         override fun applyAction(
             action: GameAction,
             state: Game,

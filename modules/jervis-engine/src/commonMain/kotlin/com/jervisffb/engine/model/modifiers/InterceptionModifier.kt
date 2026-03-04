@@ -5,5 +5,6 @@ enum class InterceptionModifier(override val modifier: Int, override val descrip
     EXTRA_ARMS(1, "Extra Arms"),
     INACCURATE_PASS(-2, "Inaccurate Pass"),
     MARKED(-1, "Marked"),
-    VERY_LONG_LEGS(2, "Very Long Legs")
+    VERY_LONG_LEGS(2, "Very Long Legs"),
+    STUNTY(-1, "Stunty")
 }

@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetKickingTeam
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -42,7 +43,9 @@ data class CoinTossContext(
 object DetermineKickingTeam : Procedure() {
     override val initialNode: Node = SelectCoinSide
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return RemoveContext<CoinTossContext>()
+    }
 
     object SelectCoinSide : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.receivingTeam

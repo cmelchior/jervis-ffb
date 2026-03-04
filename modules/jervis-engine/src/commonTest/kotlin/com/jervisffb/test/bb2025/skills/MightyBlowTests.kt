@@ -10,7 +10,8 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.MightyBlowModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowArmourModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowInjuryModifier
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -51,7 +52,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // Armour
             Confirm // Use Mighty Blow
         )
-        assertNotNull(state.getContext<RiskingInjuryContext>().armourModifiers.single { it is MightyBlowModifier })
+        assertNotNull(state.getContext<RiskingInjuryContext>().armourModifiers.single { it is MightyBlowArmourModifier })
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Defender Injury
         )
@@ -73,7 +74,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // Armour
             Confirm // Use Mighty Blow
         )
-        assertNotNull(state.getContext<RiskingInjuryContext>().armourModifiers.single { it is MightyBlowModifier })
+        assertNotNull(state.getContext<RiskingInjuryContext>().armourModifiers.single { it is MightyBlowArmourModifier })
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Defender Injury
         )
@@ -112,7 +113,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             Confirm, // Attacker uses block
             DiceRollResults(3.d6, 6.d6), // Armour
         )
-        assertFalse(state.getContext<RiskingInjuryContext>().armourModifiers.any { it is MightyBlowModifier })
+        assertFalse(state.getContext<RiskingInjuryContext>().armourModifiers.any { it is MightyBlowArmourModifier })
         controller.rollForward(
             DiceRollResults(6.d6, 1.d6), // Defender Injury
             Confirm, // Use Mighty Blow
@@ -139,7 +140,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 6.d6), // Injury
             Confirm, // Use Mighty Blow
         )
-        assertNotNull(state.getContext<RiskingInjuryContext>().injuryModifiers.single { it is MightyBlowModifier })
+        assertNotNull(state.getContext<RiskingInjuryContext>().injuryModifiers.single { it is MightyBlowInjuryModifier })
         controller.rollForward(
             Cancel, // Do not use apothecary
         )

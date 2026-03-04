@@ -31,6 +31,8 @@ import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.rules.common.tables.LastingInjuryResult
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 enum class RiskingInjuryMode {
     FALLING_OVER,
@@ -62,7 +64,7 @@ data class RiskingInjuryContext(
 
     // Injury roll
     val injuryRoll: List<D6Result> = emptyList(),
-    val injuryModifiers: List<DiceModifier> = listOf(),
+    val injuryModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val injuryResult: InjuryResult? = null,
     val useThickSkullOnInjuryRoll: Boolean = false,
 

@@ -32,7 +32,7 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.InjuryModifier
-import com.jervisffb.engine.model.modifiers.MightyBlowModifier
+import com.jervisffb.engine.model.modifiers.MightyBlowInjuryModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
@@ -57,7 +57,13 @@ import com.jervisffb.engine.utils.sum
  */
 object InjuryRoll: Procedure() {
     override val initialNode: Node = RollDice
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<RiskingInjuryContext>()
+        return when (context.player.isSkillAvailable(SkillType.STUNTY)) {
+            true -> SetContext(context.copy(injuryModifiers = context.injuryModifiers.add(InjuryModifier.STUNTY)))
+            false -> null
+        }
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RiskingInjuryContext>()
 
@@ -72,7 +78,7 @@ object InjuryRoll: Procedure() {
                 // Determine result of injury roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow and others.
                 val roll = listOf(die1, die2)
-                val result = rules.injuryTable.roll(die1, die2)
+                val result = rules.injuryTable.roll(die1, die2, context.injuryModifiers.sum())
                 val updatedContext = context.copy(
                     injuryRoll = roll,
                     injuryResult = result,
@@ -142,7 +148,7 @@ object InjuryRoll: Procedure() {
             val useMightyBlow = (action is Confirm)
             return if (useMightyBlow) {
                 val mbSkill = mbPlayer.getSkill(SkillType.MIGHTY_BLOW)
-                val updatedModifiers = context.injuryModifiers + listOf(MightyBlowModifier(mbSkill.value as Int))
+                val updatedModifiers = context.injuryModifiers.add(MightyBlowInjuryModifier(mbSkill.value as Int))
                 val modifiersTotal = updatedModifiers.sum()
                 val newResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], modifiersTotal)
                 compositeCommandOf(
@@ -150,7 +156,7 @@ object InjuryRoll: Procedure() {
                     SetSkillUsed(mbPlayer, mbSkill, true),
                     SetContext(
                         context.copy(
-                            injuryModifiers = context.injuryModifiers + listOf(MightyBlowModifier(mbSkill.value as Int)),
+                            injuryModifiers = updatedModifiers,
                             injuryResult = newResult
                         )
                     ),
@@ -184,7 +190,7 @@ object InjuryRoll: Procedure() {
             return buildCompositeCommand {
                 if (usedDirtyPlayer) {
                     val fouler = state.getContext<FoulContext>().fouler
-                    val updatedModifiers = context.injuryModifiers + InjuryModifier.DIRTY_PLAYER
+                    val updatedModifiers = context.injuryModifiers.add(InjuryModifier.DIRTY_PLAYER)
                     val updatedContext = context.copy(
                         injuryModifiers = updatedModifiers,
                         injuryResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], updatedModifiers.sum())

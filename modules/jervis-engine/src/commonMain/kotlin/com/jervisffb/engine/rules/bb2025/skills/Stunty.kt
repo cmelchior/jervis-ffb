@@ -8,7 +8,7 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Stunty* (Passive) skill.
+ * Representation of the "Stunty* (Passive)" skill.
  *
  * See page 136 in the BB2025 rulebook.
  */

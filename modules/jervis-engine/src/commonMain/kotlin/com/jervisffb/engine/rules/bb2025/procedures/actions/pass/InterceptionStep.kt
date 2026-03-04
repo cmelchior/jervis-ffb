@@ -220,6 +220,9 @@ object InterceptionStep: Procedure() {
             if (player.isSkillAvailable(SkillType.VERY_LONG_LEGS)) {
                 modifiers.add(InterceptionModifier.VERY_LONG_LEGS)
             }
+            if (player.isSkillAvailable(SkillType.STUNTY)) {
+                modifiers.add(InterceptionModifier.STUNTY)
+            }
             val context = InterceptionRollContext(
                 player = player,
                 target = player.agility,
