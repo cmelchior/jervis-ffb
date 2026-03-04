@@ -323,6 +323,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Chainsaw*
 - [ ] Decay*
 - [ ] Hypnotic Gaze
+- [x] Insignificant*
 - [ ] Kick Team-mate
 - [ ] Loner (X+)*
 - [ ] My Ball* 
@@ -381,7 +382,6 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] No marked negative modifiers when Dodging
   - [x] -1 to intercept
   - [x] Roll on Stunty Injury Table
-- [ ] Swarming
 - [ ] Swoop
 - [ ] Take Root*
 - [x] Titchy*

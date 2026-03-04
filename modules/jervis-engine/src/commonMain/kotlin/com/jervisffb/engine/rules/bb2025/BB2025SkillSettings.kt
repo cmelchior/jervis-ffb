@@ -24,6 +24,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
+import com.jervisffb.engine.rules.bb2025.skills.Insignificant
 import com.jervisffb.engine.rules.bb2025.skills.Juggernaut
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
@@ -539,7 +540,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.INSIGNIFICANT -> {
-                    // TODO()
+                    addNoValueEntry("Insignificant", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        Insignificant(player, category, expiresAt)
+                    }
                 }
                 SkillType.KICK_TEAMMATE -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
