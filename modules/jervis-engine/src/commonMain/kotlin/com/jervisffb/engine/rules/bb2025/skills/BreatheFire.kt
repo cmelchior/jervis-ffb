@@ -12,7 +12,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
 /**
- * Representation of the Breathe Fire (Active) skill.
+ * Representation of the "Breathe Fire (Active)" skill.
  *
  * See page 126 in the BB2025 rulebook.
  */

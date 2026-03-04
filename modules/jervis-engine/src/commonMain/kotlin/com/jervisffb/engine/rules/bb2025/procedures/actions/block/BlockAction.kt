@@ -32,6 +32,8 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
@@ -134,9 +136,16 @@ object BlockAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
             return when (context.blockType) {
-                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.BREATHE_FIRE -> {
+                    SetContext(
+                        BreatheFireContext(
+                            attacker = context.attacker,
+                            defender = context.defender,
+                        )
+                    )
+                }
                 BlockType.PROJECTILE_VOMIT -> {
                     SetContext(
                         ProjectileVomitContext(
@@ -167,9 +176,9 @@ object BlockAction : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getContext<BlockActionContext>()
             return when (context.blockType) {
-                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.BREATHE_FIRE -> BreatheFireStep
                 BlockType.PROJECTILE_VOMIT -> ProjectileVomitStep
                 BlockType.STAB -> StabStep
                 BlockType.STANDARD -> SingleStandardBlockStep
@@ -185,9 +194,9 @@ object BlockAction : Procedure() {
 
             // Check if Block Action was completed or not
             val removeContextCommand = when (context.blockType) {
-                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.BREATHE_FIRE -> RemoveContext<BreatheFireContext>()
                 BlockType.PROJECTILE_VOMIT -> RemoveContext<ProjectileVomitContext>()
                 BlockType.STAB -> RemoveContext<StabContext>()
                 BlockType.STANDARD -> RemoveContext<BlockContext>()
@@ -195,9 +204,9 @@ object BlockAction : Procedure() {
 
             // Remove state required for the specific block type
             val hasBlocked = when (context.blockType) {
-                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.BREATHE_FIRE -> (state.getContext<BreatheFireContext>().result != null)
                 BlockType.PROJECTILE_VOMIT -> (state.getContext<ProjectileVomitContext>().injuryResult != null)
                 BlockType.STAB -> (state.getContext<StabContext>().stabResult != null)
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted

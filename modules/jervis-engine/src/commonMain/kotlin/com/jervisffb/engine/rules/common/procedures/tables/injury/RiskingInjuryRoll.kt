@@ -44,7 +44,6 @@ enum class RiskingInjuryMode {
     BAD_LANDING,
     STAB, // Armour/Injury is rolled as part of a Stab
     PROJECTILE_VOMIT, // Armour/Injury is rolled as part of a Projectile Vomit attack
-    BREATHE_FIRE, // Armour/Injury is rolled as part of a Breathe Fire attack
 }
 
 // What do we need to track?

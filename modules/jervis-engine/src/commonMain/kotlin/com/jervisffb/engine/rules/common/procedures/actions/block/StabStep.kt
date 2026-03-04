@@ -24,12 +24,16 @@ import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class StabContext(
@@ -47,7 +51,14 @@ data class StabContext(
  */
 object StabStep: Procedure() {
     override val initialNode: Node = DecideOnFirstStep
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<StabContext>()
+        val isBlitz = state.hasContext<BlitzActionContext>()
+        return when (isBlitz) {
+            true -> ReportSkillUsed(context.attacker, SkillType.STAB)
+            false -> null
+        }
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<StabContext>()
         val activateContext = state.getContext<ActivatePlayerContext>()

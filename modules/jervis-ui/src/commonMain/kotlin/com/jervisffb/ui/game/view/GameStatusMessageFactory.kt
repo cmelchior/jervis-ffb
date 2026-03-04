@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
@@ -624,6 +625,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         ProjectileVomitRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Projectile Vomit"
+                else -> null
+            }
+        },
+
+        BreatheFireRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Breathe Fire"
+                else -> null
+            }
+        },
+        BreatheFireRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Breathe Fire Result or Reroll D6?"
+                else -> null
+            }
+        },
+        BreatheFireRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Breathe Fire"
                 else -> null
             }
         },

@@ -13,6 +13,7 @@ enum class DiceRollType {
     BLOODLUST,
     BONE_HEAD,
     BOUNCE,
+    BREATHE_FIRE,
     BRILLIANT_COACHING,
     CASUALTY,
     CATCH,

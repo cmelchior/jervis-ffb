@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -25,51 +26,52 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.reports.ReportBreatheFireResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
-data class ProjectileVomitContext(
-    val attacker: Player,
-    val defender: Player? = null,
-    val vomitRoll: D6DieRoll? = null,
-    val injuryResult: RiskingInjuryContext? = null,
-): ProcedureContext {
-    val isSuccess: Boolean
-        get() {
-            return vomitRoll?.let {
-                it.result.value > 1
-            } ?: false
-        }
+enum class BreatheFireResult {
+    ATTACKER_KNOCKED_DOWN,
+    TARGET_KNOCKED_DOWN,
+    NO_EFFECT
 }
 
+data class BreatheFireContext(
+    val attacker: Player,
+    val defender: Player? = null,
+    val breatheRoll: D6DieRoll? = null,
+    val result: BreatheFireResult? = null,
+    val injuryResult: RiskingInjuryContext? = null,
+): ProcedureContext
+
 /**
- * Procedure for handling the "Vomit"-part of a Projectile Vomit Special Action.
- * It is in its own procedure, so we can more easily support Block, Blitz and
- * Frenzy.
+ * Procedure for handling the "Breathe Fire"-part of a Breathe Fire Special
+ * Action. It is in its own procedure, so we can more easily support Block,
+ * Blitz, and Frenzy.
  *
- * See [ProjectileVomitAction], [BlockAction] and [BlitzAction].
+ * See [BreatheFireAction], [BlockAction] and [BlitzAction].
  */
-object ProjectileVomitStep: Procedure() {
+object BreatheFireStep: Procedure() {
     override val initialNode: Node = DecideOnFirstStep
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val context = state.getContext<ProjectileVomitContext>()
+        val context = state.getContext<BreatheFireContext>()
         val isBlitz = state.hasContext<BlitzActionContext>()
         return when (isBlitz) {
-            true -> ReportSkillUsed(context.attacker, SkillType.PROJECTILE_VOMIT)
+            true -> ReportSkillUsed(context.attacker, SkillType.BREATHE_FIRE)
             false -> null
         }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        val context = state.getContext<ProjectileVomitContext>()
+        val context = state.getContext<BreatheFireContext>()
         val activateContext = state.getContext<ActivatePlayerContext>()
         return if (context.injuryResult != null) {
             // For a Block, this doesn't matter, but during a Blitz, the player is not
@@ -80,15 +82,15 @@ object ProjectileVomitStep: Procedure() {
         }
     }
     override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<ProjectileVomitContext>()
+        state.assertContext<BreatheFireContext>()
     }
 
     // During a Blitz, the target is pre-defined, so we can skip this step
     object DecideOnFirstStep: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<ProjectileVomitContext>()
+            val context = state.getContext<BreatheFireContext>()
             return when (context.defender != null) {
-                true -> GotoNode(RollForProjectileVomit)
+                true -> GotoNode(RollForBreatheFire)
                 false -> GotoNode(SelectDefenderOrEndAction)
             }
         }
@@ -111,10 +113,10 @@ object ProjectileVomitStep: Procedure() {
             return when (action) {
                 EndAction -> ExitProcedure()
                 is PlayerSelected -> {
-                    val context = state.getContext<ProjectileVomitContext>()
+                    val context = state.getContext<BreatheFireContext>()
                     compositeCommandOf(
                         SetContext(context.copy(defender = action.getPlayer(state))),
-                        GotoNode(RollForProjectileVomit),
+                        GotoNode(RollForBreatheFire),
                     )
                 }
                 else -> INVALID_ACTION(action)
@@ -122,35 +124,52 @@ object ProjectileVomitStep: Procedure() {
         }
     }
 
-    object RollForProjectileVomit: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ProjectileVomitRoll
+    object RollForBreatheFire: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BreatheFireRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<ProjectileVomitContext>()
-            val result = context.vomitRoll?.result ?: error("Missing die roll: $context")
-            val success = (result.value > 1)
-            return when (success) {
-                true -> GotoNode(RollArmourAndInjuryForDefender)
-                false -> GotoNode(RollArmourAndInjuryForAttacker)
+            val context = state.getContext<BreatheFireContext>()
+            val diceRoll = context.breatheRoll?.result ?: error("Missing die roll: $context")
+
+            val defender = context.defender!!
+            val modifier = if (defender.strength >= 5) -1 else 0
+            val d6Result = diceRoll.value + modifier
+            val breathFireResult = when {
+                d6Result <= 1 -> BreatheFireResult.ATTACKER_KNOCKED_DOWN
+                d6Result in 2..3 -> BreatheFireResult.NO_EFFECT
+                d6Result >= 4 -> BreatheFireResult.TARGET_KNOCKED_DOWN
+                else -> error("Unsupported value: $d6Result")
+            }
+            val updatedContext = context.copy(result = breathFireResult)
+
+            return buildCompositeCommand {
+                add(ReportBreatheFireResult(updatedContext))
+                add(SetContext(updatedContext))
+                val nextNode = when (breathFireResult) {
+                    BreatheFireResult.ATTACKER_KNOCKED_DOWN -> ResolveAttackerKnockedDown
+                    BreatheFireResult.TARGET_KNOCKED_DOWN -> ResolveDefenderKnockedDown
+                    BreatheFireResult.NO_EFFECT -> ResolveNoEffect
+                }
+                add(GotoNode(nextNode))
             }
         }
     }
 
-    object RollArmourAndInjuryForAttacker: ParentNode() {
+    object ResolveAttackerKnockedDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<ProjectileVomitContext>()
+            val context = state.getContext<BreatheFireContext>()
             val injuryContext = RiskingInjuryContext(
                 player = context.attacker,
-                causedBy = null,
-                mode = RiskingInjuryMode.PROJECTILE_VOMIT
+                causedBy = null, // The opponent does not get to use their skills on a failed Breathe Fire
+                mode = RiskingInjuryMode.KNOCKED_DOWN
             )
             return SetContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            val vomitContext = state.getContext<ProjectileVomitContext>()
+            val breatheContext = state.getContext<BreatheFireContext>()
             return compositeCommandOf(
-                SetContext(vomitContext.copy(
+                SetContext(breatheContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
@@ -159,27 +178,33 @@ object ProjectileVomitStep: Procedure() {
         }
     }
 
-    object RollArmourAndInjuryForDefender: ParentNode() {
+    object ResolveDefenderKnockedDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<ProjectileVomitContext>()
+            val context = state.getContext<BreatheFireContext>()
             val injuryContext = RiskingInjuryContext(
                 player = context.defender!!,
-                causedBy = null,
-                mode = RiskingInjuryMode.PROJECTILE_VOMIT
+                causedBy = null, // The attacker does not get to use other skills on the armour/injury roll
+                mode = RiskingInjuryMode.KNOCKED_DOWN
             )
             return SetContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            val vomitContext = state.getContext<ProjectileVomitContext>()
+            val breatheContext = state.getContext<BreatheFireContext>()
             return compositeCommandOf(
-                SetContext(vomitContext.copy(
+                SetContext(breatheContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
+        }
+    }
+
+    object ResolveNoEffect: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

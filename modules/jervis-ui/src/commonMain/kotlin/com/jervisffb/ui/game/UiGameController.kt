@@ -35,6 +35,7 @@ import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025ThrowTeamMateWheelC
 import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
 import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.BreatheFireWheelController
 import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
@@ -160,6 +161,7 @@ class UiGameController(
         AccuracyBB2025ThrowTeamMateWheelController,
         BounceRollWheelController,
         BoneHeadWheelController,
+        BreatheFireWheelController,
         CatchWheelController,
         DeviateRollWheelController,
         DodgeWheelController,

@@ -309,7 +309,17 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Use action if failing roll
   - [ ] Can use skills to reroll Bone Head (Pro)
 - [ ] Blood Lust (X+)*
-- [ ] Breathe Fire
+- [x] Breathe Fire
+    - [x] Replace Block
+    - [x] Mighty Blow does not work on Breathe Fire
+    - [x] Can be used during a Blitz
+    - [x] Cannot move after Breathe Fire during a Blitz
+    - [x] Hit opponent (4+)
+    - [x] Hit player (1)
+    - [x] Nothing happens (2-3)
+    - [x] -1 modifier to roll on 5+ ST
+    - [x] Is not available when starting from Prone
+    - [x] Is not available if not starting next to an opponent
 - [ ] Chainsaw*
 - [ ] Decay*
 - [ ] Hypnotic Gaze
@@ -335,7 +345,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Cannot Pogo over a Giant since the rules specify a "single square"
     - [x] Modifiers on leaving and entering
     - [x] No negative modifiers when using Pogo
-- [ ] Projectile Vomit
+- [x] Projectile Vomit
     - [x] Replace Block
     - [x] Mighty Blow does not work on Projectile Vomit
     - [x] Unsuccessful Projectile Vomit on Armour does nothing

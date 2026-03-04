@@ -45,6 +45,8 @@ import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -72,6 +74,7 @@ import kotlin.time.ExperimentalTime
  *
  * - Accuracy
  * - BoneHead
+ * - Breathe Fire
  * - Catch
  * - Dodge
  * - Interception
@@ -542,9 +545,6 @@ object LandingWheelController : D6WithRerollWheelController() {
     }
 }
 
-/**
- * Define the Action-Wheel layout when rolling for Landing after being thrown.
- */
 object ProjectileVomitWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "projectile-vomit"
     override val rollDiceNode: Node = ProjectileVomitRoll.RollDie
@@ -558,5 +558,20 @@ object ProjectileVomitWheelController : D6WithRerollWheelController() {
         return context.vomitRoll?.originalRoll!!
     }
 }
+
+object BreatheFireWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "breathe-fire"
+    override val rollDiceNode: Node = BreatheFireRoll.RollDie
+    override val chooseRerollSourceNode: Node = BreatheFireRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = BreatheFireRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<BreatheFireContext>().attacker.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<BreatheFireContext>()
+        return context.breatheRoll?.originalRoll!!
+    }
+}
+
 
 

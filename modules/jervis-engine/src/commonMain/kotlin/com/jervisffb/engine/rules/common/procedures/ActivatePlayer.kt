@@ -103,7 +103,6 @@ object ActivatePlayer : Procedure() {
                     PlayerStandardActionType.SPECIAL -> null
                     PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
                     PlayerSpecialActionType.BOMBARDIER -> TODO()
-                    PlayerSpecialActionType.BREATHE_FIRE -> TODO()
                     PlayerSpecialActionType.CHAINSAW -> TODO()
                     PlayerSpecialActionType.HYPNOTIC_GAZE -> TODO()
                     PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
@@ -111,6 +110,12 @@ object ActivatePlayer : Procedure() {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill(SkillType.MULTIPLE_BLOCK), true),
                             SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.MULTIPLE_BLOCK)
+                        )
+                    }
+                    PlayerSpecialActionType.BREATHE_FIRE -> {
+                        compositeCommandOf(
+                            SetSpecialActionSkillUsed(player, player.getSkill(SkillType.BREATHE_FIRE), true),
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.BREATHE_FIRE)
                         )
                     }
                     PlayerSpecialActionType.PROJECTILE_VOMIT -> {

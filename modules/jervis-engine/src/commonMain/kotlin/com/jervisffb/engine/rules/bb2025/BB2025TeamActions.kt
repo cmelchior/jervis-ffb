@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabAction
 import com.jervisffb.engine.rules.common.procedures.actions.handoff.HandOffAction
@@ -112,7 +113,6 @@ class BB2025TeamActions : TeamActions() {
             val action = when (it) {
 //                PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
 //                PlayerSpecialActionType.BOMBARDIER -> TODO()
-//                PlayerSpecialActionType.BREATHE_FIRE -> TODO()
 //                PlayerSpecialActionType.CHAINSAW -> TODO()
 //                PlayerSpecialActionType.HYPNOTIC_GAZE -> TODO()
 //                PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
@@ -124,6 +124,17 @@ class BB2025TeamActions : TeamActions() {
                         availablePrTurn = Int.MAX_VALUE,
                         procedure = MultipleBlockAction,
                         worksDuringBlitz = false,
+                        compulsory = false,
+                    )
+                }
+                PlayerSpecialActionType.BREATHE_FIRE -> {
+                    PlayerAction(
+                        name = "Breathe Fire",
+                        type = PlayerSpecialActionType.BREATHE_FIRE,
+                        countsAs = PlayerStandardActionType.BLOCK,
+                        availablePrTurn = Int.MAX_VALUE,
+                        procedure = BreatheFireAction,
+                        worksDuringBlitz = true,
                         compulsory = false,
                     )
                 }
