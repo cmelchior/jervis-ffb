@@ -42,7 +42,9 @@ enum class RiskingInjuryMode {
     // but we need to know the difference in order to trigger turnovers
     // correctly.
     BAD_LANDING,
-    STAB // Armour/Injury is rolled as part of a Stab
+    STAB, // Armour/Injury is rolled as part of a Stab
+    PROJECTILE_VOMIT, // Armour/Injury is rolled as part of a Projectile Vomit attack
+    BREATHE_FIRE, // Armour/Injury is rolled as part of a Breathe Fire attack
 }
 
 // What do we need to track?
@@ -158,10 +160,10 @@ object RiskingInjuryRoll: Procedure() {
                 GotoNode(RollForInjury)
             } else {
                 // If armour is not broken, player is just placed prone.
-                // Unless it is a Stab, which has special rules.
-                val isStab = (context.mode == RiskingInjuryMode.STAB)
+                // Unless it is a Stab or Projectile Vomit, which has special rules.
+                val standOnFailure = (context.mode in listOf(RiskingInjuryMode.STAB, RiskingInjuryMode.PROJECTILE_VOMIT))
                 compositeCommandOf(
-                    when (isStab) {
+                    when (standOnFailure) {
                         false -> SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false)
                         true -> null
                     },

@@ -45,6 +45,7 @@ import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
 import com.jervisffb.ui.game.state.actionwheel.LeapWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.PogoWheelController
+import com.jervisffb.ui.game.state.actionwheel.ProjectileVomitWheelController
 import com.jervisffb.ui.game.state.actionwheel.ReallyStupidWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
@@ -168,6 +169,7 @@ class UiGameController(
         LeapWheelController,
         PickupWheelController,
         PogoWheelController,
+        ProjectileVomitWheelController,
         ReallyStupidWheelController,
         UnchannelledFuryWheelController,
         RushWheelController,

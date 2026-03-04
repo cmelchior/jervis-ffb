@@ -22,11 +22,9 @@ import com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.PlayerAction
-import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import io.ktor.http.parameters
 import kotlinx.serialization.Serializable
 
 /**
@@ -117,12 +115,8 @@ abstract class BB2025Rules(
 
             // Add any special actions that are provided by skills
             player.skills.filterIsInstance<SpecialActionProvider>().forEach {
-                val skill = it as? Skill<*>
-                val isSkillAvailable = (skill != null && player.isSkillAvailable(skill.type))
-                val type = it.specialAction
-                val isSkillActionUsed = it.isSpecialActionUsed
-                val isActionAvailable = state.activeTeamOrThrow().turnData.availableSpecialActions[type]!! > 0
-                if (isSkillAvailable && !isSkillActionUsed && isActionAvailable) {
+                if (it.isActionAvailable(state, this@BB2025Rules)) {
+                    val type = it.specialAction
                     add(teamActions[type])
                 }
             }

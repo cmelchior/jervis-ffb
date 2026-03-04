@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
@@ -604,6 +605,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         LandingRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 to Land"
+                else -> null
+            }
+        },
+
+        ProjectileVomitRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Projectile Vomit"
+                else -> null
+            }
+        },
+        ProjectileVomitRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Projectile Vomit Result or Reroll D6?"
+                else -> null
+            }
+        },
+        ProjectileVomitRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Projectile Vomit"
                 else -> null
             }
         },

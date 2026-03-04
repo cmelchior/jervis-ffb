@@ -45,6 +45,8 @@ import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
@@ -78,6 +80,7 @@ import kotlin.time.ExperimentalTime
  * - Leap
  * - Pickup
  * - Pogo
+ * - Projectile Vomit
  * - Really Stupid
  * - Rush
  * - Shadowing
@@ -538,4 +541,22 @@ object LandingWheelController : D6WithRerollWheelController() {
         return context.roll?.originalRoll!!
     }
 }
+
+/**
+ * Define the Action-Wheel layout when rolling for Landing after being thrown.
+ */
+object ProjectileVomitWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "projectile-vomit"
+    override val rollDiceNode: Node = ProjectileVomitRoll.RollDie
+    override val chooseRerollSourceNode: Node = ProjectileVomitRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ProjectileVomitRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ProjectileVomitContext>().attacker.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<ProjectileVomitContext>()
+        return context.vomitRoll?.originalRoll!!
+    }
+}
+
 

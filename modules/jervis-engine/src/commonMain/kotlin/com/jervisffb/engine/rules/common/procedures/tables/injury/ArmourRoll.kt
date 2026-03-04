@@ -115,6 +115,8 @@ object ArmourRoll: Procedure() {
                 RiskingInjuryMode.PUSHED_INTO_CROWD,
                 RiskingInjuryMode.BAD_LANDING,
                 RiskingInjuryMode.STAB,
+                RiskingInjuryMode.PROJECTILE_VOMIT,
+                RiskingInjuryMode.BREATHE_FIRE,
                 RiskingInjuryMode.HIT_BY_ROCK -> ExitProcedure()
             }
         }

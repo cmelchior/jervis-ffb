@@ -1,7 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
@@ -24,4 +26,7 @@ class ProjectileVomit(
     override val workWhenProne: Boolean = false
     override val specialAction = PlayerSpecialActionType.PROJECTILE_VOMIT
     override var isSpecialActionUsed: Boolean = false
+    override fun isActionAvailable(state: Game, rules: Rules): Boolean {
+        return false
+    }
 }

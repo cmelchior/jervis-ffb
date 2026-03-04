@@ -336,6 +336,15 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Modifiers on leaving and entering
     - [x] No negative modifiers when using Pogo
 - [ ] Projectile Vomit
+    - [x] Replace Block
+    - [x] Mighty Blow does not work on Projectile Vomit
+    - [x] Unsuccessful Projectile Vomit on Armour does nothing
+    - [x] Can be used during a Blitz
+    - [x] Cannot move after Projectile Vomit during a Blitz
+    - [x] Hit opponent
+    - [x] Hit player
+    - [x] Is not available when starting from Prone
+    - [x] Is not available if not starting next to an opponent
 - [ ] Really Stupid*
   - [ ] Pro can be used as a reroll
   - [x] Clear after activating
@@ -354,7 +363,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Unsuccesfull Stab on Armour does nothing
   - [x] Can be used during a Blitz
   - [x] Cannot move after Stabbing during a Blitz
-  - [ ] Is not available when starting from Prone
+  - [x] Is not available when starting from Prone
+  - [x] Is not available if not starting next to an opponent
 - [ ] Stunty*
 - [ ] Swarming
 - [ ] Swoop

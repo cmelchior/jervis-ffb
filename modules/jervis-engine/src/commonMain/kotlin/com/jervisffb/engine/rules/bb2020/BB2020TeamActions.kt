@@ -2,7 +2,6 @@ package com.jervisffb.engine.rules.bb2020
 
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.ProjectileVomitAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
@@ -10,6 +9,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabAction
 import com.jervisffb.engine.rules.common.procedures.actions.handoff.HandOffAction
 import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction

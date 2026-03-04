@@ -150,7 +150,7 @@ object BlockAction : Procedure() {
     object ResolveBlock : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
-            return when (context.blockType!!) {
+            return when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
@@ -169,7 +169,7 @@ object BlockAction : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getContext<BlockActionContext>()
-            return when (context.blockType!!) {
+            return when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
@@ -187,7 +187,7 @@ object BlockAction : Procedure() {
             val context = state.getContext<BlockActionContext>()
 
             // Check if Block Action was completed or not
-            val removeContextCommand = when (context.blockType!!) {
+            val removeContextCommand = when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
@@ -255,7 +255,7 @@ object BlockAction : Procedure() {
             BlockType.entries.forEach { type ->
                 when (type) {
                     BlockType.BREATHE_FIRE -> if (player.isSkillAvailable(SkillType.BREATHE_FIRE)) add(type)
-                    BlockType.CHAINSAW -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
+                    BlockType.CHAINSAW -> if (player.isSkillAvailable(SkillType.CHAINSAW)) add(type)
                     BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
                     BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
                     BlockType.STAB -> if (player.isSkillAvailable(SkillType.STAB)) add(type)

@@ -32,6 +32,8 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
@@ -131,11 +133,18 @@ object BlockAction : Procedure() {
     object ResolveBlock : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
-            return when (context.blockType!!) {
+            return when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> {
+                    SetContext(
+                        ProjectileVomitContext(
+                            attacker = context.attacker,
+                            defender = context.defender,
+                        )
+                    )
+                }
                 BlockType.STAB -> {
                     SetContext(
                         StabContext(
@@ -157,11 +166,11 @@ object BlockAction : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getContext<BlockActionContext>()
-            return when (context.blockType!!) {
+            return when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> ProjectileVomitStep
                 BlockType.STAB -> StabStep
                 BlockType.STANDARD -> SingleStandardBlockStep
             }
@@ -175,11 +184,11 @@ object BlockAction : Procedure() {
             val context = state.getContext<BlockActionContext>()
 
             // Check if Block Action was completed or not
-            val removeContextCommand = when (context.blockType!!) {
+            val removeContextCommand = when (context.blockType) {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> RemoveContext<ProjectileVomitContext>()
                 BlockType.STAB -> RemoveContext<StabContext>()
                 BlockType.STANDARD -> RemoveContext<BlockContext>()
             }
@@ -189,7 +198,7 @@ object BlockAction : Procedure() {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> (state.getContext<ProjectileVomitContext>().injuryResult != null)
                 BlockType.STAB -> (state.getContext<StabContext>().stabResult != null)
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
@@ -235,7 +244,7 @@ object BlockAction : Procedure() {
             BlockType.entries.forEach { type ->
                 when (type) {
                     BlockType.BREATHE_FIRE -> if (player.isSkillAvailable(SkillType.BREATHE_FIRE)) add(type)
-                    BlockType.CHAINSAW -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
+                    BlockType.CHAINSAW -> if (player.isSkillAvailable(SkillType.CHAINSAW)) add(type)
                     BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
                     BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
                     BlockType.STAB -> if (player.isSkillAvailable(SkillType.STAB)) add(type)

@@ -49,6 +49,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.Si
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
@@ -304,7 +306,14 @@ object BlitzAction : Procedure() {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> {
+                    SetContext(
+                        ProjectileVomitContext(
+                            attacker = context.attacker,
+                            defender = context.defender!!
+                        )
+                    )
+                }
                 BlockType.STAB -> {
                     SetContext(
                         StabContext(
@@ -330,7 +339,7 @@ object BlitzAction : Procedure() {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> ProjectileVomitStep
                 BlockType.STAB -> StabStep
                 BlockType.STANDARD -> {
                     when (rules.baseVersion) {
@@ -352,7 +361,7 @@ object BlitzAction : Procedure() {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> RemoveContext<ProjectileVomitContext>()
                 BlockType.STAB -> RemoveContext<StabContext>()
                 BlockType.STANDARD -> RemoveContext<BlockContext>()
             }
@@ -362,7 +371,7 @@ object BlitzAction : Procedure() {
                 BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
-                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.PROJECTILE_VOMIT -> (state.getContext<ProjectileVomitContext>().injuryResult != null)
                 BlockType.STAB -> (state.getContext<StabContext>().stabResult != null)
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
