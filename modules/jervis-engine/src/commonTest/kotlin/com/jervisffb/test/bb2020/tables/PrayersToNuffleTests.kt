@@ -321,7 +321,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         // Team is marked as having the prayer, even if no one could actually get it
         assertEquals(SetupTeam, controller.currentProcedure()!!.procedure)
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
-        assertEquals(0, awayTeam.filter { it.getStatModifiers().contains(PrayerStatModifier.IRON_MAN)}.size)
+        assertEquals(0, awayTeam.filter { it.statModifiers.contains(PrayerStatModifier.IRON_MAN)}.size)
     }
 
     @Test
@@ -583,7 +583,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             ),
         )
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
-        assertEquals(0, homeTeam.count { it.getStatModifiers().contains(PrayerStatModifier.GREASY_CLEATS) })
+        assertEquals(0, homeTeam.count { it.statModifiers.contains(PrayerStatModifier.GREASY_CLEATS) })
     }
 
     @Test

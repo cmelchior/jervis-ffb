@@ -94,7 +94,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [x] Block
   - [x] Using Block is optional
   - [x] Block does not work when distracted
-- [ ] Dauntless
+- [x] Dauntless
+  - [x] Added before all other modifiers (especially Horns)
+  - [x] Skip if Stronger than opponent
+  - [x] Works on Blitz
+  - [x] Works on Block
+  - [x] Unmodified Strength is ignoring all temporary modifiers.
 - [ ] Fend
     - [x] Prevent follow up
     - [ ] Does not work against Ball & Chain
@@ -108,6 +113,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Frenzy*
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
+    - [ ] Horns work on both Frenzy Blocks
+    - [ ] Does not force the use of Sprint
     - [ ] 2nd Block can only be thrown if the target is Pushed Back
     - [ ] 2nd Block can be another Special Action like Stab
     - [ ] Must rush if needed
@@ -174,7 +181,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Secure the Ball
   - [x] Works on Interceptions
 - [ ] Foul Appearance*
-- [ ] Horns
+- [x] Horns
+  - [x] Add +1 to ST for block action during Blitz
+  - [x] Does not work on Block
 - [ ] Iron Hard Skin
 - [ ] Monstrous Mouth
 - [ ] Prehensile Tail
@@ -273,6 +282,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Taunt does not work against Multiple Block
     - [ ] Mighty Blow works on both block
     - [ ] Wrestle works on both block
+    - [ ] Most roll for Dauntless on both blocks
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push
@@ -387,7 +397,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [x] Titchy*
   - [x] +1 when making a dodge
   - [x] Does not give -1 when dodging into a square marked by this player
-- [ ] Throw Team-mate
+- [x] Throw Team-mate
 - [ ] Timmm-ber!
 - [ ] Unchannelled Fury*
   - [ ] Pro can be used as a reroll

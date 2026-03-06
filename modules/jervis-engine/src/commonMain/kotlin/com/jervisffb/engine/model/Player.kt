@@ -156,6 +156,12 @@ class Player(
     var baseArmorValue: Int = 0
     val armourModifiers = mutableListOf<StatModifier>()
     var armorValue: Int = 0
+
+    val statModifiers: List<StatModifier>
+        get() {
+            return moveModifiers + strengthModifiers + agilityModifiers + passingModifiers + armourModifiers
+        }
+
     // Some effects are hard to put into other buckets, like a player that failed a Blood Lust roll
     // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
     // to mark the player somehow. This is done through a PlayerStatusEffect.
@@ -247,10 +253,6 @@ class Player(
         if (!success) {
             INVALID_GAME_STATE("Could not remove $modifier from $name")
         }
-    }
-
-    fun getStatModifiers(): List<StatModifier> {
-        return armourModifiers + moveModifiers + passingModifiers + agilityModifiers + strengthModifiers
     }
 
     fun addStatusEffect(effect: PlayerStatusEffect) {

@@ -210,7 +210,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     // Find all temporary player stat characteristics modifiers
     val removableStatModifiers = teams.flatMap { team ->
         team.flatMap { player ->
-            player.getStatModifiers()
+            player.statModifiers
                 .filter { it.expiresAt == duration }
                 .map { RemovePlayerStatModifier(player, it) }
         }

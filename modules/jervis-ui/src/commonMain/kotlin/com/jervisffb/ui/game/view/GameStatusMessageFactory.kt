@@ -35,6 +35,7 @@ import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
@@ -644,6 +645,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         BreatheFireRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Breathe Fire"
+                else -> null
+            }
+        },
+
+        DauntlessRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Dauntless"
+                else -> null
+            }
+        },
+        DauntlessRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Dauntless Result or Reroll D6?"
+                else -> null
+            }
+        },
+        DauntlessRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Dauntless"
                 else -> null
             }
         },

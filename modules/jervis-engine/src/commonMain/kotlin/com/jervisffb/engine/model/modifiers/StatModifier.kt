@@ -41,3 +41,9 @@ enum class SkillStatModifier(
 ): StatModifier {
     HORNS("Horns (+1 ST)", 1, Type.ST, expiresAt = Duration.END_OF_ACTION),
 }
+
+data class DauntlessStrengthModifier(override val modifier: Int) : StatModifier {
+    override val description: String = "Dauntless (+${modifier} ST)"
+    override val type: Type = Type.ST
+    override val expiresAt: Duration = Duration.END_OF_ACTION
+}

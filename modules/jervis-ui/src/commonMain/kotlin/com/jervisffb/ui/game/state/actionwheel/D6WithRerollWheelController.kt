@@ -47,6 +47,8 @@ import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -76,6 +78,7 @@ import kotlin.time.ExperimentalTime
  * - BoneHead
  * - Breathe Fire
  * - Catch
+ * - Dauntless
  * - Dodge
  * - Interception
  * - Jump
@@ -309,6 +312,23 @@ object DodgeWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<DodgeRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+object DauntlessWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "dauntless"
+    override val rollDiceNode: Node = DauntlessRoll.RollDie
+    override val chooseRerollSourceNode: Node = DauntlessRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = DauntlessRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<DauntlessRollContext>()
+        return context.attacker.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<DauntlessRollContext>()
         return context.roll!!.originalRoll
     }
 }

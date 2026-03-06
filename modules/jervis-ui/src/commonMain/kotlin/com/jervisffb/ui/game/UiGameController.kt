@@ -37,6 +37,7 @@ import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.BreatheFireWheelController
 import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
+import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
@@ -163,6 +164,7 @@ class UiGameController(
         BoneHeadWheelController,
         BreatheFireWheelController,
         CatchWheelController,
+        DauntlessWheelController,
         DeviateRollWheelController,
         DodgeWheelController,
         InterceptionWheelController,

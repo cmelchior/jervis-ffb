@@ -413,6 +413,13 @@ the opponent can just decide to not intercept.
 
 So for ease of use, this skill is always used when available.
 
+### Page 127 - Dauntless
+While this skill is optional, it only affects how many dice are rolled and not
+the final outcome. This combined with the fact that there is no scenario where
+you might want to _not_ use Dauntless, Jervis always apply it.
+
+This is similar to Guard and Horns.
+
 ### Page 127 - Defensive
 Since both Guard and "Put the Boot In" are applied automatically (as there is
 no use case for making it optional), the same reasoning applies to Defensive as 
@@ -441,8 +448,18 @@ as well.
 
 ### Page 129 - Guard
 While this skill is optional, it only affects how many dice are rolled and not
-the final outcome. This combined with the fact that there are no scenario where
-you might want to _not_ use Guard, we always apply it.
+the final outcome. This combined with the fact that there is no scenario where
+you might want to _not_ use Guard, Jervis always apply it.
+
+### Page 129 - Horns
+While Horns are technically an optional skill, similar to Guard, there doesn't
+seem to be any reason for _not_ using it.
+
+So for that reason Jervis will always apply it.
+
+Another question is whether Horns will automatically be applied to the 2nd block
+when using Frenzy. The skill wording doesn't make this 100% clear, but given
+that Horns are always applied, this doesn't matter (for now).
 
 ### Page 129 - Juggernaut
 Juggernaut cancels Fend, Stand Firm and Wrestle for both the blocked player

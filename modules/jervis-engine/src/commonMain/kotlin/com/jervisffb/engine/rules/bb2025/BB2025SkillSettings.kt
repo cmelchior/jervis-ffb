@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
+import com.jervisffb.engine.rules.bb2025.skills.Dauntless
 import com.jervisffb.engine.rules.bb2025.skills.Defensive
 import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
@@ -226,9 +227,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.DAUNTLESS -> {
-                    // addEntry(type, SkillCategory.GENERAL) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Dauntless", type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                        Dauntless(player, category, expiresAt)
+                    }
                 }
                 SkillType.FEND -> {
                     addNoValueEntry("Fend", type, SkillCategory.GENERAL) { player, category,expiresAt ->

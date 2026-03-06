@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -69,6 +68,10 @@ import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.lighten
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Player Stat Card used on the Game Screen. They will be visible to the
+ * left and right of the field.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
@@ -324,6 +327,16 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                         textDecoration = if (it.used) TextDecoration.LineThrough else TextDecoration.None,
                                     )
                                 }
+                                player.model.statModifiers.forEach {
+                                    Text(
+                                        fontSize = skillFontSize,
+                                        lineHeight = 1.5.em,
+                                        color = JervisTheme.contentTextColor,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(0.jdp).fillMaxWidth(),
+                                        text = it.description
+                                    )
+                                }
                             }
                         }
                         Spacer(modifier = Modifier.height(borderSize))
@@ -401,7 +414,7 @@ private fun StatusText(text: String, backgroundColor: Color, textColor: Color = 
 }
 
 @Composable
-private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
+private fun PlayerName(name: String, borderSize: Dp) {
     // Because Compose does not support drop shadow on Outlined Text
     // we fake it by first blurring the outline and then render the rest
     val playerNameStyle = MaterialTheme.typography.bodySmall.copy(
