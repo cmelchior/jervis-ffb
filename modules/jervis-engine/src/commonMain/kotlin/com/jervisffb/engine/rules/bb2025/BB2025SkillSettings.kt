@@ -49,6 +49,7 @@ import com.jervisffb.engine.rules.bb2025.skills.RightStuff
 import com.jervisffb.engine.rules.bb2025.skills.SafePass
 import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.bb2025.skills.Sidestep
+import com.jervisffb.engine.rules.bb2025.skills.SneakyGit
 import com.jervisffb.engine.rules.bb2025.skills.Sprint
 import com.jervisffb.engine.rules.bb2025.skills.Stab
 import com.jervisffb.engine.rules.bb2025.skills.StandFirm
@@ -208,9 +209,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.SNEAKY_GIT -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Sneaky Git", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        SneakyGit(player, category, expiresAt)
+                    }
                 }
                 SkillType.VIOLENT_INNOVATOR -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

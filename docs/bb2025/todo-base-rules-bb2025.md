@@ -459,9 +459,11 @@ book.
     - [x] Cannot hand-off to opponent
     - [ ] Target must be Standing and not have lost their tackle zones
 - [x] Argue the Call Table
-    - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
+    - [x] You're Outta Here
     - [x] I Don't Care
     - [x] Well, When You Put It Like That...
+    - [ ] Bans Coach / Cannot argue again
+    - [ ] Bans Coach - Does not affect Brilliant Coaching
 - [ ] Pass Action
     - [x] 1 pass action pr turn
     - [x] Action used without throwing

@@ -37,6 +37,7 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
@@ -665,6 +666,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when {
                 (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Dauntless"
                 else -> null
+            }
+        },
+
+        FoulStep.ChooseToUseSneakyGit to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Sneaky Git?"
+                false -> "Waiting for player to use Sneaky Git"
             }
         },
     )

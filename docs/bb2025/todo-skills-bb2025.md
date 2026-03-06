@@ -55,6 +55,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Sidestep is not available if there are no valid target squares
   - [x] Is not available if Distracted
 - [ ] Sprint
+  - [ ] Is optional
+  - [ ] Adds 1 extra move pr action
 - [x] Sure Feet
   - [x] Reroll failed Rush
   - [x] Reroll successful Rush
@@ -69,6 +71,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Eye Gouge
 - [ ] Fumblerooskie
 - [ ] Lethal Flight
+- [ ] Lone Fouler
 - [ ] Pile Driver
 - [x] Put the Boot In
   - [x] Doesn't work when prone
@@ -86,7 +89,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Only works when a player dodges, not leaps or teleports
   - [x] Only one player can select shadowing 
   - [x] Can only use up to shadowing MA
-- [ ] Sneaky Git
+- [x] Sneaky Git
+  - [x] Works on double armour if not broken
+  - [x] Does not work on double armour if broken
+  - [x] Does not work on double injury
+  - [x] Is optional
+  - [ ] When combined with Lone Fouler, only consider last roll
 - [ ] Violent Innovator
 
 ## General Skills

@@ -145,11 +145,16 @@ object FoulStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val foulContext =state.getContext<FoulContext>()
+            val foulContext = state.getContext<FoulContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val spottedByRefArmour: Boolean = (injuryContext.armourRoll[0] == injuryContext.armourRoll[1])
             val spottedByRefInjury: Boolean = (injuryContext.injuryRoll.isNotEmpty() && (injuryContext.injuryRoll[0] == injuryContext.injuryRoll[1]))
             val spottedByRef = spottedByRefArmour || spottedByRefInjury
+
+            // Check pre-conditions for Sneaky Git
+            val isArmourBroken = injuryContext.armourBroken
+            val isSneakyGitApplicable = !isArmourBroken && spottedByRefArmour
+
             return buildCompositeCommand {
                 add(RemoveContext<RiskingInjuryContext>())
                 add(
@@ -159,14 +164,53 @@ object FoulStep: Procedure() {
                         hasFouled = true
                     ))
                 )
-                if (spottedByRef) {
+
+                if (isSneakyGitApplicable) {
+                    add(GotoNode(ChooseToUseSneakyGit))
+                } else if (spottedByRef) {
                     // Regardless of the result of rolling on the Argue the Ref table
                     // a turn-over always happens.
-                    add(SetTurnOver(TurnOver.STANDARD))
-                    add(GotoNode(DecideToArgueTheCall))
+                    addAll(
+                        SetTurnOver(TurnOver.STANDARD),
+                        GotoNode(DecideToArgueTheCall)
+                    )
                 } else {
                     add(ExitProcedure())
                 }
+            }
+        }
+    }
+
+    object ChooseToUseSneakyGit: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<FoulContext>().fouler.team
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<FoulContext>()
+            val hasSneakyGit = (context.fouler.isSkillAvailable(SkillType.SNEAKY_GIT))
+            return if (hasSneakyGit) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<FoulContext>()
+            val useSkill = (action == Confirm)
+            return when (useSkill) {
+                true -> compositeCommandOf(
+                    ReportSkillUsed(context.fouler, SkillType.SNEAKY_GIT),
+                    SetContext(context.copy(spottedByTheRef = false)),
+                    ExitProcedure()
+                )
+                // Regardless of the result of rolling on the Argue the Ref table
+                // a turn-over always happens.
+                false -> compositeCommandOf(
+                    SetTurnOver(TurnOver.STANDARD),
+                    GotoNode(DecideToArgueTheCall)
+                )
             }
         }
     }

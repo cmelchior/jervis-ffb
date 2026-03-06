@@ -20,6 +20,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -27,8 +28,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Tests for the outcomes of rolling on Argue the Call Table as defined
- * on page 63 in the rulebook.
+ * Tests for the outcomes of rolling on Argue the Call Table.
+ *
+ * See page 63 in the BB2020 rulebook.
+ * See page 69 in the BB2025 rulebook.
  */
 class ArgueTheCallTests: JervisGameBB2025Test() {
 
@@ -138,5 +141,11 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.STANDING, awayTeam["A6".playerId].state)
         assertEquals(FieldCoordinate(13, 4), awayTeam["A6".playerId].location)
         assertFalse(awayTeam.coachBanned)
+    }
+
+    @Ignore
+    @Test
+    fun cannotArgueTheCallWhenCoachIsBanned() {
+        TODO()
     }
 }

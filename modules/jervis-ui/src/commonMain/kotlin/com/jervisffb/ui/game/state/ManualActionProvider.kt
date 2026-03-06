@@ -65,6 +65,7 @@ import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
@@ -671,6 +672,10 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STRONG_ARM) && (currentNode == ThrowTeammateAccuracyRoll.ChooseToUseStrongArm)) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_SNEAKY_GIT) && (currentNode == FoulStep.ChooseToUseSneakyGit)) {
             return Confirm
         }
 

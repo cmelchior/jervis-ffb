@@ -69,6 +69,7 @@ import kotlin.time.ExperimentalTime
  * - Mighty Blow (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
+ * - Sneaky Git (skill usage)
  * - Stand Firm (skill usage)
  * - Steady Footing (skill usage)
  * - Strip Ball (skill usage)
@@ -282,6 +283,17 @@ object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
             FollowUpStep.ChooseToUseFend -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
+        return player.coordinates
+    }
+}
+
+object UseSneakyGitWheelController: UseSkillWheelController(SkillType.SNEAKY_GIT) {
+    override val nodes: Set<Node> = setOf(
+        FoulStep.ChooseToUseSneakyGit
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<FoulContext>()
+        val player = context.fouler
         return player.coordinates
     }
 }

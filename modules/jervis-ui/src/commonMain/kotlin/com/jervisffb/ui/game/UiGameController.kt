@@ -71,6 +71,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseLeapWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseMightyBlowController
 import com.jervisffb.ui.game.state.actionwheel.UseSafePassWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSidestepWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseSneakyGitWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStandFirmWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStripBallWheelController
@@ -199,6 +200,7 @@ class UiGameController(
         UseMightyBlowController,
         UseSafePassWheelController,
         UseSidestepWheelController,
+        UseSneakyGitWheelController,
         UseStandFirmWheelController,
         UseSteadyFootingWheelController,
         UseStripBallWheelController,
