@@ -257,7 +257,10 @@ object FoulStep: Procedure() {
                 ArgueTheCallResult.YOURE_OUTTA_HERE -> {
                     compositeCommandOf(
                         SetCoachBanned(context.fouler.team, true),
-                        AddDiceModifier(BrilliantCoachingModifiers.YOU_ARE_OUTTA_HERE, context.fouler.team.brilliantCoachingModifiers),
+                        when (rules.baseVersion == GameVersion.BB2020) {
+                            true -> AddDiceModifier(BrilliantCoachingModifiers.YOU_ARE_OUTTA_HERE, context.fouler.team.brilliantCoachingModifiers)
+                            false -> null
+                        },
                         banPlayer(context.fouler),
                         if (foulerHadBall) GotoNode(BounceBallWhenBanned) else ExitProcedure()
                     )

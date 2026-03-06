@@ -462,8 +462,8 @@ book.
     - [x] You're Outta Here
     - [x] I Don't Care
     - [x] Well, When You Put It Like That...
-    - [ ] Bans Coach / Cannot argue again
-    - [ ] Bans Coach - Does not affect Brilliant Coaching
+    - [x] Bans Coach / Cannot argue again
+    - [x] Bans Coach - Does not affect Brilliant Coaching
 - [ ] Pass Action
     - [x] 1 pass action pr turn
     - [x] Action used without throwing

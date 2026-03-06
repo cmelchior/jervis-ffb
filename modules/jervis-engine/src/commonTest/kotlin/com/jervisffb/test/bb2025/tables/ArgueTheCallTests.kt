@@ -42,7 +42,7 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun youAreOuttaHere() {
+    fun youAreOuttaHere_bansCoach() {
         homeTeam["H1".playerId].state = PlayerState.PRONE
 
         // Foul 1st time and get the coach banned
@@ -56,51 +56,8 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         )
         assertEquals(homeTeam, state.activeTeam)
         assertTrue(awayTeam.coachBanned)
-        assertEquals(1, awayTeam.brilliantCoachingModifiers.size)
-        assertContains(awayTeam.brilliantCoachingModifiers, BrilliantCoachingModifiers.YOU_ARE_OUTTA_HERE)
-
-        // Do a 2nd Foul and check that it is no longer possible to argue the call
-        controller.rollForward(
-            EndTurn, // Give control back to away team
-            *activatePlayer("A1", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),  // Start the foul
-            DiceRollResults(2.d6, 2.d6), // Caught again by the ref. Is sent off without being offered the chance to argue
-        )
-        assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerState.BANNED, awayTeam["A1".playerId].state)
-        assertEquals(DogOut, awayTeam["A1".playerId].location)
-
-        // Skip to next halfs
-        controller.rollForward(
-            *skipTurns(13),
-        )
-        // Unban players (to avoid breaking setup)
-        awayTeam["A1".playerId].state = PlayerState.RESERVE
-        awayTeam["A6".playerId].state = PlayerState.RESERVE
-        controller.rollForward(
-            *defaultSetup(homeFirst = false),
-        )
-        assertEquals(4, homeTeam.rerolls.size)
-        assertEquals(4, awayTeam.rerolls.size)
-        assertEquals(0, homeTeam.assistantCoaches)
-        assertEquals(0, awayTeam.assistantCoaches)
-
-        // And Brilliant Coaching now has a penalty when rolling on the Kick-off Table
-        controller.rollForward(
-            *defaultKickOffAwayTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 4.d6), // Roll Brilliant Coaching
-                    1.d6, // Brilliant coaching - Kicking Team (away)
-                    1.d6 // Brilliant coaching - Receiving Team (home)
-                )
-            )
-        )
-        assertEquals(5, homeTeam.rerolls.size)
-        assertEquals(1, homeTeam.rerolls.filterIsInstance<BrilliantCoachingReroll>().size)
-        assertEquals(0, awayTeam.rerolls.filterIsInstance<BrilliantCoachingReroll>().size)
+        assertTrue(awayTeam.brilliantCoachingModifiers.isEmpty())
     }
-
-
 
     @Test
     fun iDontCare() {
@@ -143,9 +100,81 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         assertFalse(awayTeam.coachBanned)
     }
 
-    @Ignore
     @Test
     fun cannotArgueTheCallWhenCoachIsBanned() {
-        TODO()
+        homeTeam["H1".playerId].state = PlayerState.PRONE
+
+        // Foul 1st time and get the coach banned
+        controller.rollForward(
+            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected("H1".playerId), // Start foul
+            DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
+            Confirm,
+            1.d6, // Roll You're Outta Here
+        )
+        assertEquals(homeTeam, state.activeTeam)
+        assertTrue(awayTeam.coachBanned)
+
+        // Do a 2nd Foul and check that it is no longer possible to argue the call
+        controller.rollForward(
+            EndTurn, // Give control back to away team
+            *activatePlayer("A1", PlayerStandardActionType.FOUL),
+            PlayerSelected("H1".playerId),  // Start the foul
+            DiceRollResults(2.d6, 2.d6), // Caught again by the ref. Is sent off without being offered the chance to argue
+        )
+        assertEquals(homeTeam, state.activeTeam)
+        assertEquals(PlayerState.BANNED, awayTeam["A1".playerId].state)
+        assertEquals(DogOut, awayTeam["A1".playerId].location)
+    }
+
+    // In BB2020, a banned coach caused a -1 on Brilliant Coaching, in BB2025
+    // this does not happen
+    @Test
+    fun bannedCoachDoesNotAffectBrilliantCoaching() {
+        homeTeam["H1".playerId].state = PlayerState.PRONE
+
+        // Foul 1st time and get the coach banned
+        controller.rollForward(
+            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected("H1".playerId), // Start foul
+            DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
+            Confirm,
+            1.d6, // Roll You're Outta Here
+        )
+        assertEquals(homeTeam, state.activeTeam)
+        assertTrue(awayTeam.coachBanned)
+        assertTrue(awayTeam.brilliantCoachingModifiers.isEmpty())
+
+        // Skip to next halfs
+        controller.rollForward(
+            *skipTurns(15),
+        )
+        // Unban players (to avoid breaking setup)
+        awayTeam["A1".playerId].state = PlayerState.RESERVE
+        awayTeam["A6".playerId].state = PlayerState.RESERVE
+        controller.rollForward(
+            *defaultSetup(homeFirst = false),
+        )
+        assertEquals(4, homeTeam.rerolls.size)
+        assertEquals(4, awayTeam.rerolls.size)
+        assertEquals(0, homeTeam.assistantCoaches)
+        assertEquals(0, awayTeam.assistantCoaches)
+
+        // Brilliant Coaching should work as normal
+        assertTrue(awayTeam.coachBanned)
+        controller.rollForward(
+            *defaultKickOffAwayTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 4.d6), // Roll Brilliant Coaching
+                    1.d6, // Brilliant coaching - Kicking Team (away)
+                    1.d6 // Brilliant coaching - Receiving Team (home)
+                )
+            )
+        )
+        assertEquals(4, homeTeam.rerolls.size)
+        assertEquals(0, homeTeam.rerolls.filterIsInstance<BrilliantCoachingReroll>().size)
+        assertEquals(0, awayTeam.rerolls.filterIsInstance<BrilliantCoachingReroll>().size)
     }
 }
