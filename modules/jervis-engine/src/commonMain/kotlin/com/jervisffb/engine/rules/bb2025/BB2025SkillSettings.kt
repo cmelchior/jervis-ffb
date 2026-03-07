@@ -30,6 +30,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Juggernaut
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
+import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
 import com.jervisffb.engine.rules.bb2025.skills.Loner
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2025.skills.MultipleBlock
@@ -179,9 +180,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.LONE_FOULER -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Lone Fouler", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        LoneFouler(player, category, expiresAt)
+                    }
                 }
                 SkillType.PILE_DRIVER -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

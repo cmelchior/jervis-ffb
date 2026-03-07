@@ -55,7 +55,7 @@ object InterceptionRoll : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<InterceptionRollContext>()
                 val resultContext = rollContext.copy(
-                    roll = D6DieRoll.Companion.create(state, d6),
+                    roll = D6DieRoll.create(state, d6),
                     isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
                 )
                 return compositeCommandOf(

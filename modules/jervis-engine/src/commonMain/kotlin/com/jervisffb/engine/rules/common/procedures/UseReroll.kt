@@ -38,22 +38,10 @@ object UseProReroll : Procedure() {
  */
 object UseLonerReroll : Procedure() {
     override val initialNode: Node = UseReroll
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     object UseReroll : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
         }
     }

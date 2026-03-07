@@ -505,6 +505,12 @@ This interpretation is mostly chosen because it reduces the complexity of the
 rule engine. It should be re-evaluated in case that NAF / FUMBBL / FAQ takes
 the opposite stance.
 
+### Page 130 - Lone Fouler
+Lone Fouler only works if there are no Offensive or Defensive assists. It is 
+worth noting that these are not optional (following the NAF ruling on this),
+which means that it isn't possible to not use offensive assists in order to 
+trigger a reroll.
+
 ### Page 131 - Mighty Blow
 Mighty Blow specifically says "Whenever this player Knocks Down an opposition 
 player during a Block Action...", but when you are pushed into the crowd, the 

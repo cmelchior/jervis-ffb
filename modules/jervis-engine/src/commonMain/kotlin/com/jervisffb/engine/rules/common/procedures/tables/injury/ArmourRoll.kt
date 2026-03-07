@@ -10,6 +10,8 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -25,9 +27,11 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.ArmourModifier
@@ -36,6 +40,8 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 
@@ -59,10 +65,14 @@ import com.jervisffb.engine.utils.sum
  * This also allows us to skip skills like Claw (when rolling 7 or less) or
  * Mighty Blow (if they don't make a difference)
  *
+ * Block:
  * 1. Claw (Knocked Down - Block)
  * 2. Mighty Blow (Knocked Down - Block)
- * 3. Dirty Player (Knocked Down - Foul)
  * 4. TBD: Chainsaw, Arm Bar, Others?
+ *
+ * Foul:
+ * 1. Dirty Player (AV Roll - Modifier)
+ * 2. Lone Fouler (AV Roll - Reroll)
  */
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
@@ -74,16 +84,8 @@ object ArmourRoll: Procedure() {
 
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team.otherTeam()
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<GameActionDescriptor> = listOf(RollDice(Dice.D6, Dice.D6))
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6, Dice.D6))
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
                 val context = state.getContext<RiskingInjuryContext>()
 
@@ -92,8 +94,45 @@ object ArmourRoll: Procedure() {
                 // but since there is no advantage to using them before, we will only apply them after.
                 val roll = listOf(die1, die2)
                 val updatedContext = state.getContext<RiskingInjuryContext>().copy(
-                    armourRoll = roll,
+                    armourRoll = listOf(
+                        D6DieRoll.create(state, die1),
+                        D6DieRoll.create(state, die2),
+                    ),
                 )
+                compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.ARMOUR, roll),
+                    SetContext(updatedContext),
+                    GotoNode(DecideOnModifierPath)
+                )
+            }
+        }
+    }
+
+    object ReRollDice : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val context = state.getContext<RiskingInjuryContext>()
+            return context.causedBy?.team ?: error("Missing causedBy: $context")
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return listOf(RollDice(Dice.D6, Dice.D6))
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return castDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
+                val context = state.getContext<RiskingInjuryContext>()
+                val reroll = state.rerollContext ?: error("Missing rerollContext")
+                val originalRoll = context.armourRoll
+                val updatedD1 = originalRoll.first().copyReroll(
+                    reroll.source,
+                    die1
+                )
+                val updatedD2 = originalRoll.last().copyReroll(
+                    reroll.source,
+                    die2
+                )
+                val updatedContext = context.copy(
+                    armourRoll = listOf(updatedD1, updatedD2)
+                )
+                val roll = listOf(die1, die2)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
                     SetContext(updatedContext),
@@ -107,7 +146,7 @@ object ArmourRoll: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             return when (context.mode) {
-                RiskingInjuryMode.KNOCKED_DOWN -> GotoNode(CheckIfMultipleBlowIsApplicable)
+                RiskingInjuryMode.KNOCKED_DOWN -> GotoNode(CheckIfMightyBlowIsApplicable)
                 RiskingInjuryMode.FOUL -> GotoNode(ChooseToUseDirtyPlayer)
                 // None of these have skills that can affect the armour roll
                 RiskingInjuryMode.FALLING_OVER,
@@ -122,7 +161,7 @@ object ArmourRoll: Procedure() {
 
     // Mighty Blow only works on Knocked Down players during Blocks (Animal Savagery TBD)
     // Also, to clean up the action flow, we skip Mighty Blow if using it wouldn't matter.
-    object CheckIfMultipleBlowIsApplicable: ComputationNode() {
+    object CheckIfMightyBlowIsApplicable: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             // This should be safe as there is no way a Player can be Knocked Down during a Block unless
@@ -142,7 +181,7 @@ object ArmourRoll: Procedure() {
             val mbModifier: Int = if (opponentHasMightyBlow) {
                 val skill = context.causedBy.getSkill(SkillType.MIGHTY_BLOW)
                 when (skill) {
-                    is com.jervisffb.engine.rules.bb2025.skills.MightyBlow -> skill.value!!
+                    is com.jervisffb.engine.rules.bb2025.skills.MightyBlow -> skill.value
                     is com.jervisffb.engine.rules.bb2020.skills.MightyBlow -> skill.value!!
                     else -> 0
                 }
@@ -162,7 +201,7 @@ object ArmourRoll: Procedure() {
             ) {
                 GotoNode(ChooseToUseMightyBlow)
             } else {
-                GotoNode(ChooseToUseDirtyPlayer)
+                ExitProcedure()
             }
         }
     }
@@ -240,7 +279,45 @@ object ArmourRoll: Procedure() {
                     add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
                     add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
                 }
-                add(ExitProcedure())
+                add(GotoNode(ChooseToUseLoneFouler))
+            }
+        }
+    }
+
+    object ChooseToUseLoneFouler: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val context = state.getContext<RiskingInjuryContext>()
+            return context.causedBy?.team ?: error("Missing causedBy: $context")
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val fouler = context.causedBy ?: error("Missing fouler: $context")
+            val hasLoneFouler = fouler.isSkillAvailable(SkillType.LONE_FOULER)
+            val isLoneFoulerRerollAvailable = when (hasLoneFouler) {
+                true -> fouler.getSkill<LoneFouler>().canReroll(state, DiceRollType.ARMOUR, context.armourRoll, null)
+                false -> false
+            }
+            return when (isLoneFoulerRerollAvailable) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val useLoneFouler = (action is Confirm)
+            val fouler = context.causedBy ?: error("Missing fouler: $context")
+            return when (useLoneFouler) {
+                true -> {
+                    val rerollContext = UseRerollContext(DiceRollType.ARMOUR, fouler.getSkill<LoneFouler>())
+                    compositeCommandOf(
+                        ReportSkillUsed(fouler, SkillType.LONE_FOULER),
+                        SetSkillRerollUsed(fouler.getSkill<LoneFouler>(), true),
+                        SetOldContext(Game::rerollContext, rerollContext),
+                        SetContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER })),
+                        GotoNode(ReRollDice)
+                    )
+                }
+                false -> ExitProcedure()
             }
         }
     }

@@ -66,6 +66,7 @@ import kotlin.time.ExperimentalTime
  * - Fend (skill usage)
  * - Grab (skill usage)
  * - Leap (skill usage)
+ * - Lone Fouler (skill usage)
  * - Mighty Blow (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
@@ -386,6 +387,17 @@ object UseLeapWheelController: UseSkillWheelController(SkillType.LEAP) {
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<MoveContext>()
         val player = context.player
+        return player.coordinates
+    }
+}
+
+object UseLoneFoulerWheelController: UseSkillWheelController(SkillType.LONE_FOULER) {
+    override val nodes: Set<Node> = setOf(
+        ArmourRoll.ChooseToUseLoneFouler
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<RiskingInjuryContext>()
+        val player = context.causedBy ?: error("Missing causedBy: $state")
         return player.coordinates
     }
 }

@@ -675,6 +675,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 false -> "Waiting for player to use Sneaky Git"
             }
         },
+
+        ArmourRoll.ChooseToUseLoneFouler to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Lone Fouler?"
+                false -> "Waiting for player to use Lone Fouler"
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

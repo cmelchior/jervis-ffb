@@ -71,7 +71,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Eye Gouge
 - [ ] Fumblerooskie
 - [ ] Lethal Flight
-- [ ] Lone Fouler
+- [x] Lone Fouler
+  - [x] "Failed" rolls also take into account other modifiers
+  - [x] Only works if no offensive assists
+  - [x] Only works if no defensive assists
+  - [x] Modifiers are also optional on the reroll
+  - [x] Does not work if Put the Boot In is used
 - [ ] Pile Driver
 - [x] Put the Boot In
   - [x] Doesn't work when prone

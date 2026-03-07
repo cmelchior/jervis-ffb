@@ -70,8 +70,9 @@ object FoulStep: Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<FoulContext>()
 
     object CalculateAssists: ComputationNode() {
-        // For now, assume that both sides want all assists to count at all time
-        // Could there be a case where the defender wants the foul to succeed?
+        // The rules for assists are a bit ambiguous written, but NAF has ruled that
+        // they are mandatory. Jervis has adopted a similar approach, so we just calculate
+        // them here.
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<FoulContext>()
             val fouler = context.fouler
@@ -79,7 +80,7 @@ object FoulStep: Procedure() {
             val offensiveAssists = rules.calculateOffensiveAssists(fouler, victim)
             val defensiveAssists = rules.calculateDefensiveAssists(victim, fouler)
             return compositeCommandOf(
-                SetContext(context.copy(foulStandardAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 GotoNode(CalculatePutTheBootInAssists)
             )
         }
@@ -136,9 +137,12 @@ object FoulStep: Procedure() {
                 player = foulContext.victim!!,
                 causedBy = foulContext.fouler,
                 mode = RiskingInjuryMode.FOUL,
-                armourModifiers = listOf(
-                    OffensiveAssistArmourModifier(foulContext.foulAssists),
-                    DefensiveAssistsArmourModifier(foulContext.defensiveAssists)
+                armourModifiers = listOfNotNull(
+                    when (foulContext.offensiveAssists > 0 || foulContext.putTheBootInAssists > 0) {
+                        true -> OffensiveAssistArmourModifier(foulContext.offensiveAssists + foulContext.putTheBootInAssists,)
+                        false -> null
+                    },
+                    if (foulContext.defensiveAssists > 0) DefensiveAssistsArmourModifier(foulContext.defensiveAssists) else null
                 )
             )
             return SetContext(injuryContext)
@@ -147,7 +151,7 @@ object FoulStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val foulContext = state.getContext<FoulContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            val spottedByRefArmour: Boolean = (injuryContext.armourRoll[0] == injuryContext.armourRoll[1])
+            val spottedByRefArmour: Boolean = (injuryContext.armourRoll[0].result == injuryContext.armourRoll[1].result)
             val spottedByRefInjury: Boolean = (injuryContext.injuryRoll.isNotEmpty() && (injuryContext.injuryRoll[0] == injuryContext.injuryRoll[1]))
             val spottedByRef = spottedByRefArmour || spottedByRefInjury
 

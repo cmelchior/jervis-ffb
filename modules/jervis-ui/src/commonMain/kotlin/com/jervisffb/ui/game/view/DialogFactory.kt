@@ -73,6 +73,7 @@ object DialogFactory {
                     )
                 }
 
+                is ArmourRoll.ReRollDice,
                 is ArmourRoll.RollDice -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
                     MultipleChoiceUserInputDialog.createArmourRollDialog(player)

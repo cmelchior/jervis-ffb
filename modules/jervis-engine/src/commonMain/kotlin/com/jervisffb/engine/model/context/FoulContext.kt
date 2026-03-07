@@ -8,7 +8,7 @@ import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 data class FoulContext(
     val fouler: Player,
     val victim: Player? = null,
-    val foulStandardAssists: Int = 0,
+    val offensiveAssists: Int = 0,
     val putTheBootInAssists: Int = 0,
     val defensiveAssists: Int = 0,
     val injuryRoll: RiskingInjuryContext? = null,
@@ -18,7 +18,4 @@ data class FoulContext(
     val argueTheCall: Boolean = false,
     val argueTheCallRoll: D6Result? = null,
     val argueTheCallResult: ArgueTheCallResult? = null
-) : ProcedureContext {
-    val foulAssists: Int
-        get() = foulStandardAssists + putTheBootInAssists
-}
+) : ProcedureContext

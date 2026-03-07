@@ -25,6 +25,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
@@ -58,7 +59,7 @@ data class RiskingInjuryContext(
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN,
 
     // Armour roll
-    val armourRoll: List<D6Result> = listOf(),
+    val armourRoll: List<D6DieRoll> = listOf(),
     val armourModifiers: List<DiceModifier> = listOf(),
     val useClawsOnArmourRoll: Boolean = false,
 
