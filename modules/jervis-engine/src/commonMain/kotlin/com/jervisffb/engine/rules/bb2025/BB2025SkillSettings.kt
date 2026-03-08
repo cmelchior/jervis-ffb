@@ -48,6 +48,7 @@ import com.jervisffb.engine.rules.bb2025.skills.QuickFoul
 import com.jervisffb.engine.rules.bb2025.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2025.skills.Regeneration
 import com.jervisffb.engine.rules.bb2025.skills.RightStuff
+import com.jervisffb.engine.rules.bb2025.skills.SafePairOfHands
 import com.jervisffb.engine.rules.bb2025.skills.SafePass
 import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.bb2025.skills.Sidestep
@@ -137,9 +138,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.SAFE_PAIR_OF_HANDS -> {
-                    // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Safe Pair of Hands", type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                        SafePairOfHands(player, category, expiresAt)
+                    }
                 }
                 SkillType.SIDESTEP -> {
                     addNoValueEntry("Sidestep", type, SkillCategory.AGILITY) { player, category,expiresAt ->

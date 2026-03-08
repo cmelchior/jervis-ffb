@@ -46,8 +46,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Modifiers on leaving and entering
     - [x] Leap modifier is optional
     - [x] Leap modifier only work if there are more than one negative modifier
-- [ ] Safe Pair of Hands
-  - [ ] Does not work against Strip Ball (NAF)
+- [x] Safe Pair of Hands
+  - [x] Does not work against Strip Ball Pow (NAF)
+  - [x] Works on Knocked Down
+  - [x] Works on Falling Over
+  - [x] Works on being Placed Prone
+  - [x] Does not work if no unoccupied adjacent squares
 - [x] Sidestep
   - [x] Sidestep is optional
   - [x] Player with sidestep choose the target square.
@@ -348,6 +352,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Mighty Blow does not work on Breathe Fire
     - [x] Can be used during a Blitz
     - [x] Cannot move after Breathe Fire during a Blitz
+    - [x] Hit opponent (natural 6)
     - [x] Hit opponent (4+)
     - [x] Hit player (1)
     - [x] Nothing happens (2-3)

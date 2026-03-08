@@ -750,6 +750,10 @@ Technically, using the skill should be optional, but there doesn't seem to be
 any use case for this (even a bad one), so until such a use case surfaces, this 
 skill is always used.
 
+### Page 135 - Safe Pair of Hands
+The skill requires an adjacent unoccupied square. If one isn't available, this 
+skill cannot be used.
+
 ### Page 135 - Safe Pass
 The skill uses the wording "Passing Ability Test", which is the same wording
 used for rolling for the throw in both Pass and Throw Team-mate actions. But 

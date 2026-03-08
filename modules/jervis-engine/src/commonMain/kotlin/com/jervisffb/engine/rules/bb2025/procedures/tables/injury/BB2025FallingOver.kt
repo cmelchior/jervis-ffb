@@ -33,6 +33,7 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportSteadyFootingResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -50,10 +51,9 @@ object BB2025FallingOver: Procedure() {
     override val initialNode: Node = ChooseToUseSteadyFooting
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        return if (state.currentBallOrNull() != null) {
-            SetCurrentBall(null)
-        } else {
-            null
+        return when (state.currentBallOrNull() != null) {
+            true -> SetCurrentBall(null)
+            false -> null
         }
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -82,13 +82,13 @@ object BB2025FallingOver: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val useSteadyFooting = (action == Confirm)
-            if (useSteadyFooting) {
-                return compositeCommandOf(
+            return if (useSteadyFooting) {
+                compositeCommandOf(
                     ReportSkillUsed(context.player, SkillType.STEADY_FOOTING),
                     GotoNode(RollForSteadyFooting)
                 )
             } else {
-                return GotoNode(PlayerFallsOver)
+                GotoNode(ResolveSafePairOfHands)
             }
         }
     }
@@ -108,8 +108,15 @@ object BB2025FallingOver: Procedure() {
                     ExitProcedure()
                 )
             } else {
-                GotoNode(PlayerFallsOver)
+                GotoNode(ResolveSafePairOfHands)
             }
+        }
+    }
+
+    object ResolveSafePairOfHands: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = SafePairOfHandsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(PlayerFallsOver)
         }
     }
 

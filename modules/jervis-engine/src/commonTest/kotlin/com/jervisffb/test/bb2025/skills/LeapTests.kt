@@ -16,7 +16,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.bb2025.skills.Leap
+import com.jervisffb.engine.rules.bb2025.skills.SafePairOfHands
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -33,7 +33,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the [Leap] skill.
+ * Class testing usage of the [SafePairOfHands] skill.
  */
 
 class LeapTests: JervisGameBB2025Test() {

@@ -34,6 +34,7 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportSteadyFootingResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -79,13 +80,12 @@ object BB2025KnockedDown: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val useSteadyFooting = (action == Confirm)
-            if (useSteadyFooting) {
-                return compositeCommandOf(
+            return when (useSteadyFooting) {
+                true -> compositeCommandOf(
                     ReportSkillUsed(context.player, SkillType.STEADY_FOOTING),
                     GotoNode(RollForSteadyFooting)
                 )
-            } else {
-                return GotoNode(KnockdownPlayer)
+                false -> GotoNode(ResolveSafePairOfHands)
             }
         }
     }
@@ -105,8 +105,15 @@ object BB2025KnockedDown: Procedure() {
                     ExitProcedure()
                 )
             } else {
-                GotoNode(KnockdownPlayer)
+                GotoNode(ResolveSafePairOfHands)
             }
+        }
+    }
+
+    object ResolveSafePairOfHands: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = SafePairOfHandsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(KnockdownPlayer)
         }
     }
 

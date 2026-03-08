@@ -57,6 +57,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRol
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
@@ -680,6 +681,10 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_EYE_GOUGE) && (currentNode == CreatePushChainStep.ChooseToUseEyeGouge)) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_SAFE_PAIR_OF_HANDS) && (currentNode == SafePairOfHandsStep.ChooseToUseSafePairOfHands)) {
             return Confirm
         }
 

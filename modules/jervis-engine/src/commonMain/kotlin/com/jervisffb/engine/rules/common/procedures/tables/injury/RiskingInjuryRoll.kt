@@ -36,6 +36,7 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 enum class RiskingInjuryMode {
+    PLACED_PRONE, // Not really an Injury, but easier to track through this
     FALLING_OVER,
     KNOCKED_DOWN,
     PUSHED_INTO_CROWD, // Or fallen through a Trapdoor

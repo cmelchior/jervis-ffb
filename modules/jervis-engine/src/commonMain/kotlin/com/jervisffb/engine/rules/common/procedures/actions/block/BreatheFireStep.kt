@@ -31,6 +31,7 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025PlacedProne
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
@@ -41,6 +42,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 
 enum class BreatheFireResult {
     ATTACKER_KNOCKED_DOWN,
+    TARGET_PLACED_PRONE,
     TARGET_KNOCKED_DOWN,
     NO_EFFECT
 }
@@ -134,9 +136,10 @@ object BreatheFireStep: Procedure() {
             val modifier = if (defender.strength >= 5) -1 else 0
             val d6Result = diceRoll.value + modifier
             val breathFireResult = when {
-                d6Result <= 1 -> BreatheFireResult.ATTACKER_KNOCKED_DOWN
+                d6Result == 6 -> BreatheFireResult.TARGET_KNOCKED_DOWN
+                d6Result >= 4 -> BreatheFireResult.TARGET_PLACED_PRONE
                 d6Result in 2..3 -> BreatheFireResult.NO_EFFECT
-                d6Result >= 4 -> BreatheFireResult.TARGET_KNOCKED_DOWN
+                d6Result <= 1 -> BreatheFireResult.ATTACKER_KNOCKED_DOWN
                 else -> error("Unsupported value: $d6Result")
             }
             val updatedContext = context.copy(result = breathFireResult)
@@ -146,6 +149,7 @@ object BreatheFireStep: Procedure() {
                 add(SetContext(updatedContext))
                 val nextNode = when (breathFireResult) {
                     BreatheFireResult.ATTACKER_KNOCKED_DOWN -> ResolveAttackerKnockedDown
+                    BreatheFireResult.TARGET_PLACED_PRONE -> ResolveDefenderPlacedProne
                     BreatheFireResult.TARGET_KNOCKED_DOWN -> ResolveDefenderKnockedDown
                     BreatheFireResult.NO_EFFECT -> ResolveNoEffect
                 }
@@ -165,6 +169,30 @@ object BreatheFireStep: Procedure() {
             return SetContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val injuryContext = state.getContext<RiskingInjuryContext>()
+            val breatheContext = state.getContext<BreatheFireContext>()
+            return compositeCommandOf(
+                SetContext(breatheContext.copy(
+                    injuryResult = injuryContext
+                )),
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
+        }
+    }
+
+    object ResolveDefenderPlacedProne: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<BreatheFireContext>()
+            val injuryContext = RiskingInjuryContext(
+                player = context.defender!!,
+                causedBy = null, // The opponent does not get to use their skills on a failed Breathe Fire
+                mode = RiskingInjuryMode.PLACED_PRONE
+            )
+            return SetContext(injuryContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025PlacedProne
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val breatheContext = state.getContext<BreatheFireContext>()

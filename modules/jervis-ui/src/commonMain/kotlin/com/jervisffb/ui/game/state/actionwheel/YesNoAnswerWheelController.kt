@@ -31,6 +31,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripB
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Pickup
@@ -69,6 +70,7 @@ import kotlin.time.ExperimentalTime
  * - Leap (skill usage)
  * - Lone Fouler (skill usage)
  * - Mighty Blow (skill usage)
+ * - Safe Pair of Hands (skill usage)
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
  * - Sneaky Git (skill usage)
@@ -198,6 +200,17 @@ object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
             BB2020BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
             else -> error("Unsupported node: $currentNode")
         }
+    }
+}
+
+object UseSafePairOfHandsWheelController: UseSkillWheelController(SkillType.SAFE_PAIR_OF_HANDS) {
+    override val nodes: Set<Node> = setOf(
+        SafePairOfHandsStep.ChooseToUseSafePairOfHands,
+    )
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<RiskingInjuryContext>().player
+        return player.coordinates
     }
 }
 

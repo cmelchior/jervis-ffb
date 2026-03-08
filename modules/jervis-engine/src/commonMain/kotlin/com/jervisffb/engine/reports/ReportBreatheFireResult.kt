@@ -13,6 +13,10 @@ class ReportBreatheFireResult(
                 val player = context.attacker
                 "${player.name} chokes on their own fire and is Knocked Down"
             }
+            BreatheFireResult.TARGET_PLACED_PRONE -> {
+                val player = context.defender!!
+                "${player.name} gets slightly burned and is placed Prone"
+            }
             BreatheFireResult.TARGET_KNOCKED_DOWN -> {
                 val player = context.defender!!
                 "${player.name} is scorched by flames and is Knocked Down"

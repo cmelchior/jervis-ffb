@@ -149,12 +149,13 @@ object ArmourRoll: Procedure() {
                 RiskingInjuryMode.KNOCKED_DOWN -> GotoNode(CheckIfMightyBlowIsApplicable)
                 RiskingInjuryMode.FOUL -> GotoNode(ChooseToUseDirtyPlayer)
                 // None of these have skills that can affect the armour roll
-                RiskingInjuryMode.FALLING_OVER,
-                RiskingInjuryMode.PUSHED_INTO_CROWD,
                 RiskingInjuryMode.BAD_LANDING,
-                RiskingInjuryMode.STAB,
+                RiskingInjuryMode.FALLING_OVER,
+                RiskingInjuryMode.HIT_BY_ROCK,
+                RiskingInjuryMode.PLACED_PRONE,
                 RiskingInjuryMode.PROJECTILE_VOMIT,
-                RiskingInjuryMode.HIT_BY_ROCK -> ExitProcedure()
+                RiskingInjuryMode.PUSHED_INTO_CROWD,
+                RiskingInjuryMode.STAB -> ExitProcedure()
             }
         }
     }

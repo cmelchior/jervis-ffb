@@ -20,6 +20,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.Secure
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -687,6 +688,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Eye Gouge?"
                 false -> "Waiting for player to use Eye Gouge"
+            }
+        },
+
+        SafePairOfHandsStep.ChooseToUseSafePairOfHands to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Safe Pair of Hands?"
+                false -> "Waiting for player to use Safe Pair of Hands"
             }
         }
     )

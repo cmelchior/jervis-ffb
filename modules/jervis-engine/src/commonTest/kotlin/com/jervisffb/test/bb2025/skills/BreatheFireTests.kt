@@ -78,18 +78,16 @@ class BreatheFireTests: JervisGameBB2025Test() {
             *activatePlayer(attacker2, PlayerSpecialActionType.BREATHE_FIRE),
             PlayerSelected(defender2),
             *breatheFireRoll(4.d6),
-            DiceRollResults(6.d6, 6.d6), // Armour Roll -> Target 2
-            DiceRollResults(1.d6, 1.d6), // Injury Roll -> Target 2
         )
         assertNull(state.activePlayer)
         assertEquals(PlayerState.STANDING, defender1.state)
-        assertEquals(PlayerState.STUNNED, defender2.state)
+        assertEquals(PlayerState.PRONE, defender2.state)
         assertEquals(Availability.HAS_ACTIVATED, attacker1.available)
         assertEquals(Availability.HAS_ACTIVATED, attacker2.available)
     }
 
     @Test
-    fun breatheOnTarget() {
+    fun breathePlaceTargetProne() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.addSkill(SkillType.BREATHE_FIRE)
         val defender = state.getPlayerById("H1".playerId)
@@ -97,6 +95,21 @@ class BreatheFireTests: JervisGameBB2025Test() {
             *activatePlayer(attacker, PlayerSpecialActionType.BREATHE_FIRE),
             PlayerSelected(defender),
             *breatheFireRoll(4.d6),
+        )
+        assertNull(state.activePlayer)
+        assertEquals(Availability.HAS_ACTIVATED, attacker.available)
+        assertEquals(PlayerState.PRONE, defender.state)
+    }
+
+    @Test
+    fun breatheKnockPlayerDown() {
+        val attacker = state.getPlayerById("A1".playerId)
+        attacker.addSkill(SkillType.BREATHE_FIRE)
+        val defender = state.getPlayerById("H1".playerId)
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerSpecialActionType.BREATHE_FIRE),
+            PlayerSelected(defender),
+            *breatheFireRoll(6.d6),
             DiceRollResults(3.d6, 6.d6),
             DiceRollResults(1.d6, 6.d6)
         )
