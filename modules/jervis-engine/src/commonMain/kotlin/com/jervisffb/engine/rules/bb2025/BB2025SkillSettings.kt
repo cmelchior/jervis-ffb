@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
+import com.jervisffb.engine.rules.bb2025.skills.EyeGouge
 import com.jervisffb.engine.rules.bb2025.skills.Fend
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
@@ -165,9 +166,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.EYE_GOUGE -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Eye Gouge", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        EyeGouge(player, category, expiresAt)
+                    }
                 }
                 SkillType.FUMBLEROOSKIE -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

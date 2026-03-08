@@ -40,7 +40,7 @@ object FullGame : Procedure() {
                     GotoNode(RunExtraTime),
                 )
             } else {
-                val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_GAME)
+                val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_GAME)
                 return compositeCommandOf(
                     ReportGameResult(state, false, false),
                     *resetCommands,
@@ -53,7 +53,7 @@ object FullGame : Procedure() {
     object RunExtraTime: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ExtraTime
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_GAME)
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_GAME)
             return compositeCommandOf(
                 *resetCommands,
                 GotoNode(PostGameSequence)

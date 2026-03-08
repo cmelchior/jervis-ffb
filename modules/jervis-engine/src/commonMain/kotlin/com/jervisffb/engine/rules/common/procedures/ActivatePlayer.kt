@@ -85,6 +85,9 @@ object ActivatePlayer : Procedure() {
         val player = context.player
         return buildCompositeCommand {
             add(SetActivePlayer(null))
+            addAll(
+                *getResetPlayerTemporaryModifiersCommands(state, rules, player, Duration.END_OF_ACTIVATION)
+            )
 
             // If the action was considered "used", we should remove it from the pool
             // of available actions. If an action was ended prematurely (either due
@@ -170,7 +173,7 @@ object ActivatePlayer : Procedure() {
             }
 
             return compositeCommandOf(
-                *getResetTemporaryModifiersCommands(state, rules, Duration.START_OF_ACTIVATION),
+                *getResetPlayerTemporaryModifiersCommands(state, rules, player, Duration.START_OF_ACTIVATION),
                 enableTackleZonesCommand,
                 SetActivePlayer(player),
                 SetPlayerAvailability(player, Availability.IS_ACTIVE),

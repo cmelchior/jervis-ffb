@@ -44,7 +44,7 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -112,7 +112,7 @@ object PassAction : Procedure() {
                     markActionAsUsed = (context.hasMoved || context.passingRoll != null)
                 )
             ),
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
     override fun isValid(state: Game, rules: Rules) {

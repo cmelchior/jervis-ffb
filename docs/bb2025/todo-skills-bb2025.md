@@ -68,7 +68,18 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Is optional
   - [x] Works on either Armour or Injury
   - [x] Can be used on every Foul Action.
-- [ ] Eye Gouge
+- [x] Eye Gouge
+  - [x] Is Optional
+  - [x] Works on Foul Assists
+  - [x] Works on Block Assists
+  - [x] Next activation clear the status
+  - [x] Status is kept across end-of-half
+  - [x] Does not work in Chain Pushes
+  - [x] Apply on Pushback
+  - [x] Apply on Pushback into Crowd
+  - [x] Apply on POW
+  - [x] Apply on Stumble
+  - [x] Does not work against Stand Firm
 - [ ] Fumblerooskie
 - [ ] Lethal Flight
 - [x] Lone Fouler

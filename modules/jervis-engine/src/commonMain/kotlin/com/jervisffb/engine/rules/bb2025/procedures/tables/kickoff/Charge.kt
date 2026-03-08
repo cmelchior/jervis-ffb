@@ -54,7 +54,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.ForegoActivation
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.procedures.getResetPlayerAvailabilityCommands
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetTeamTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -305,7 +305,7 @@ object Charge : Procedure() {
 
             // Ending a Charge isn't considered a real "end-of-turn", so we only reset state we used for
             // book keeping, but not anything that would trigger at the end of a turn.
-            val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
             return compositeCommandOf(
                 *progressStunnedCommands,
                 *resetPlayerAvailabilityCommands,

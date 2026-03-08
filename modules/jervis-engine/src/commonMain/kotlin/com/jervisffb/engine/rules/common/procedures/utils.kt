@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
+import kotlin.collections.plus
 
 /**
  * Returns a list of all possible move actions for a given player.
@@ -202,71 +203,99 @@ fun getResetPlayerAvailabilityCommands(state: Game, rules: Rules): Array<Command
 }
 
 /**
- * Returns all commands that reset temporary table results, stat and skill modifiers for all teams.
+ * Get commands that reset all Temporary Skills and Effects that apply to a single player.
+ * See [getResetTeamTemporaryModifiersCommands] for resetting everything related to teams,
+ * including players.
  */
-fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Duration): Array<Command> {
-    val teams = listOf(state.homeTeam, state.awayTeam)
+fun getResetPlayerTemporaryModifiersCommands(
+    state: Game,
+    rules: Rules,
+    player: Player,
+    duration: Duration
+): Array<Command> {
+    val builder = mutableListOf<Command>()
+    gatherResetPlayerTemporaryModifiersCommands(player, duration, builder)
+    return builder.toTypedArray()
+}
 
+private fun gatherResetPlayerTemporaryModifiersCommands(
+    player: Player,
+    duration: Duration,
+    builder: MutableList<Command>
+) {
     // Find all temporary player stat characteristics modifiers
-    val removableStatModifiers = teams.flatMap { team ->
-        team.flatMap { player ->
-            player.statModifiers
-                .filter { it.expiresAt == duration }
-                .map { RemovePlayerStatModifier(player, it) }
-        }
-    }
+    val removableStatModifiers = player.statModifiers
+        .filter { it.expiresAt == duration }
+        .map { RemovePlayerStatModifier(player, it) }
+    builder.addAll(removableStatModifiers)
 
     // Find all temporary player skills
-    val removableSkills = teams.flatMap { team ->
-        team.flatMap { player ->
-            player.extraSkills
-                .filter { it.expiresAt == duration }
-                .map { RemovePlayerSkill(player, it) }
-        }
-    }
+    val removableSkills = player.extraSkills
+        .filter { it.expiresAt == duration }
+        .map { RemovePlayerSkill(player, it) }
+    builder.addAll(removableSkills)
+
+    // Reset skills that have been used
+    val resetSkills = player.skills
+        .filter { it.resetAt == duration }
+        .map { SetSkillUsed(player, it, false) }
+    builder.addAll(resetSkills)
+
+    // Reset skill rerolls that have been used
+    val resetSkillRerolls = player.skills
+        .filterIsInstance<RerollSource>()
+        .filter { it.rerollResetAt == duration }
+        .map { SetSkillRerollUsed(it, false) }
+    builder.addAll(resetSkillRerolls)
 
     // Shadowing is special as it tracks move usage, we need to reset its counter at the end of a turn
     val resetShadowingCounter = if (duration == Duration.END_OF_TURN) {
-        teams.flatMap { team ->
-            team.flatMap { player ->
-                val shadowingSkill = player.getSkillOrNull(SkillType.SHADOWING)
-                if (shadowingSkill is com.jervisffb.engine.rules.bb2025.skills.Shadowing) {
-                    listOf(ResetShadowingSkill(player))
-                } else {
-                    emptyList()
-                }
-            }
+        val shadowingSkill = player.getSkillOrNull(SkillType.SHADOWING)
+        if (shadowingSkill is com.jervisffb.engine.rules.bb2025.skills.Shadowing) {
+            listOf(ResetShadowingSkill(player))
+        } else {
+            emptyList()
         }
     } else {
-        emptyList<Command>()
+        emptyList()
     }
-
-
-    // Reset skills that have been used
-    val resetSkills = teams.flatMap { team ->
-        team.flatMap { player ->
-            player.skills
-                .filter { it.resetAt == duration }
-                .map { SetSkillUsed(player, it, false) }
-        }
-    }
-
-    // Reset skills that have been used
-    val resetSkillRerolls = teams.flatMap { team ->
-        team.flatMap { player ->
-            player.skills
-                .filterIsInstance<RerollSource>()
-                .filter { it.rerollResetAt == duration }
-                .map { SetSkillRerollUsed(it, false) }
-        }
-    }
+    builder.addAll(resetShadowingCounter)
 
     // Find all other temporary effects
-    val removableTemporaryEffects = teams.flatMap { team ->
-        team.flatMap { player ->
-            player.statusEffects
-                .filter { it.duration == duration }
-                .map { RemovePlayerStatusEffect(player, it) }
+    val removableTemporaryEffects = player.statusEffects
+        .filter { it.duration == duration }
+        .map { RemovePlayerStatusEffect(player, it) }
+    builder.addAll(removableTemporaryEffects)
+}
+
+/**
+ * Returns all commands that reset temporary table results, stat and skill modifiers for all teams.
+ */
+fun getResetTeamTemporaryModifiersCommands(
+    state: Game,
+    rules: Rules,
+    duration: Duration
+): Array<Command> {
+    if (duration in Duration.singlePlayerDurations) {
+        error("Wrong use of API. Use `getResetPlayerTemporaryModifiersCommands` instead")
+    }
+    val builder = mutableListOf<Command>()
+    gatherResetTeamTemporaryModifiersCommands(state, rules, duration, builder)
+    return builder.toTypedArray()
+}
+
+private fun gatherResetTeamTemporaryModifiersCommands(
+    state: Game,
+    rules: Rules,
+    duration: Duration,
+    builder: MutableList<Command>
+) {
+    val teams = listOf(state.homeTeam, state.awayTeam)
+
+    // Find and reset all temporary state associated with a single player.
+    teams.forEach { team ->
+        team.forEach { player ->
+            gatherResetPlayerTemporaryModifiersCommands(player, duration, builder)
         }
     }
 
@@ -277,6 +306,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
             .filter { it.duration == duration }
             .map { RemoveTeamReroll(team, it) }
     }
+    builder.addAll(removableRerolls)
 
     // Leader rerolls are only removed between normal halfs. They are kept
     // when entering overtime.
@@ -292,13 +322,17 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     } else {
         emptyList()
     }
+    builder.addAll(removableLeaderRerolls)
 
     // Find all active Prayers of Nuffle that expires at the given duration
     val removablePrayers = teams.flatMap { team ->
         team.activePrayersToNuffle
             .filter { it.duration == duration }
-            .map { RemovePrayersToNuffle(team, it) }
+            .map {
+                RemovePrayersToNuffle(team, it)
+            }
     }
+    builder.addAll(removablePrayers)
 
     // All active special play cards that has ended their duration are marked
     // as played
@@ -307,19 +341,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
             .filter { it.isActive && duration == duration }
             .map { SetSpecialPlayCardActive(it, false) }
     }
-
-    return (
-        removableStatModifiers
-            + removableSkills
-            + resetShadowingCounter
-            + resetSkills
-            + resetSkillRerolls
-            + removableTemporaryEffects
-            + removableRerolls
-            + removableLeaderRerolls
-            + removablePrayers
-            + specialPlayCards
-    ).toTypedArray()
+    builder.addAll(specialPlayCards)
 }
 
 /**

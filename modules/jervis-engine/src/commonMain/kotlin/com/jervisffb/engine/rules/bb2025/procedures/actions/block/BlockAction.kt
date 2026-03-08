@@ -38,7 +38,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomi
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -67,7 +67,7 @@ object BlockAction : Procedure() {
             SetContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>(),
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
 

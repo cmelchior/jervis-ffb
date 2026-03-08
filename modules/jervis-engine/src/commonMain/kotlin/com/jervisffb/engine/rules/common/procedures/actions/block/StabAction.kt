@@ -16,7 +16,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
 
 data class StabActionContext(
@@ -51,7 +51,7 @@ object StabAction : Procedure() {
             ),
             RemoveContext<StabContext>(),
             RemoveContext<StabActionContext>(),
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
 

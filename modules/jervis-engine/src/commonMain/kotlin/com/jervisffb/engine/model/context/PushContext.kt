@@ -38,6 +38,8 @@ data class PushContext(
     val pushedIntoTheCrowd: Boolean = false
 ) : ProcedureContext {
 
+    val isFirstBlock: Boolean = (pushChain.size == 1)
+
     // Tracks if the attacker is using Juggernaut.
     val isAttackerUsingFrenzy: Boolean = firstPusher.hasSkill(SkillType.FRENZY)
 

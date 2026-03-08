@@ -43,7 +43,7 @@ import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -90,7 +90,7 @@ object HandOffAction : Procedure() {
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
             SetContext(activePlayerContext.copy(markActionAsUsed = context.hasMoved || context.catcher != null)),
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
     override fun isValid(state: Game, rules: Rules) {

@@ -398,7 +398,8 @@ abstract class Rules(
      * Return `true` if the [assister] player can offer either an offensive or
      * defensive assist against [target], `false` if not.
      *
-     * See page 57 in the rulebook.
+     * See page 57 in the BB2020 rulebook.
+     * See page 61 in the BB2025 rulebook.
      */
     fun canOfferAssist(
         assister: Player,
@@ -407,6 +408,8 @@ abstract class Rules(
         if (assister.team == target.team) return false
         if (!assister.location.isAdjacent(this, target.location)) return false
         if (!canMarkPlayers(assister)) return false
+        // Eye Gouge is only present in BB2025, but should be safe to check for in common code
+        if (assister.statusEffects.any { it.type == PlayerStatusEffectType.EYE_GOUGE }) return false
 
         // We always apply Guard and Defensive.
         // They are technically optional skills, but there should be no reason

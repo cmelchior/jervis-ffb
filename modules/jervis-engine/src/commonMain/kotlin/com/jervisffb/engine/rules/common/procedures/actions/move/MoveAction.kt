@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -40,7 +40,7 @@ object MoveAction : Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, state.activePlayer!!, Duration.END_OF_ACTION),
         )
     }
     override fun isValid(state: Game, rules: Rules) {

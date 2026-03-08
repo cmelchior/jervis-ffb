@@ -35,7 +35,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -73,7 +73,7 @@ object FoulAction : Procedure() {
                     markActionAsUsed = context.hasFouled || context.hasMoved
                 )
             ),
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, context.fouler, Duration.END_OF_ACTION),
         )
     }
 

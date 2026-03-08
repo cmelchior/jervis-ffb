@@ -43,7 +43,7 @@ import com.jervisffb.engine.reports.ReportStartingTurn
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.procedures.getResetPlayerAvailabilityCommands
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetTeamTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.rules.common.procedures.tables.prayers.ResolveThrowARock
@@ -230,7 +230,7 @@ object TeamTurn : Procedure() {
             // - Special Play Cards
             // - Temporary Skills/Characteristics are removed
             // - Stunned Players are now prone
-            val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
             val nextNodeCommand = if (state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(
                     PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)

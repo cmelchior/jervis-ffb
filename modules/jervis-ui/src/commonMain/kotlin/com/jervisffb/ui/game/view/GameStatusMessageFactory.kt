@@ -682,6 +682,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 false -> "Waiting for player to use Lone Fouler"
             }
         },
+
+        CreatePushChainStep.ChooseToUseEyeGouge to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Eye Gouge?"
+                false -> "Waiting for player to use Eye Gouge"
+            }
+        }
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

@@ -58,7 +58,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
@@ -101,7 +101,7 @@ object BlitzAction : Procedure() {
             } else {
                 SetContext(activateContext.copy(markActionAsUsed = false))
             },
-            *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+            *getResetPlayerTemporaryModifiersCommands(state, rules, activateContext.player, Duration.END_OF_ACTION),
         )
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -412,7 +412,7 @@ object BlitzAction : Procedure() {
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),
                     GotoNode(RemainingMovesOrEndAction),
-                    *getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_ACTION),
+                    *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
                 )
             }
         }

@@ -372,7 +372,11 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                         StatusText("Chomped", JervisTheme.statusChomped)
                                     }
                                     PlayerStatusEffectType.EYE_GOUGE -> {
-                                        StatusText("Eye Gouge", JervisTheme.statusEyeGouge)
+                                        StatusText(
+                                            "Eye Gouge",
+                                            backgroundColor = JervisTheme.statusEyeGouge,
+                                            textColor = JervisTheme.white,
+                                        )
                                     }
                                     PlayerStatusEffectType.DODGY_SNACK -> {
                                         StatusText("Dodgy Snack", JervisTheme.statusDodgySnack)

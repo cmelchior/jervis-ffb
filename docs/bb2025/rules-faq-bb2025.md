@@ -430,10 +430,11 @@ also change for Defensive.
 
 ### Page 128 - Eye Gouge
 Eye Gouge says it can trigger when an opposition player is Pushed Back, but it
-is unclear if being chain-pushed also count as being Pushed Back.
+is unclear if being chain-pushed also counts as being Pushed Back.
 
-For now, NAF has ruled that it does not. Thus, Eye Gouge will not trigger on
-chain-pushes, but can only be used by the attacker when performing a Block.
+For now, NAF and FUMBBL has ruled that it does not. Thus, Eye Gouge will not 
+trigger on chain-pushes, but can only be used by the attacker when performing a 
+Block.
 
 Jervis has adopted a similar interpretation.
 

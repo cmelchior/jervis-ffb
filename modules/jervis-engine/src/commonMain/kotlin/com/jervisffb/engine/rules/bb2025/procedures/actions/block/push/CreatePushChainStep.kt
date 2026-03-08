@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -31,6 +32,8 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
@@ -65,14 +68,21 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  *    b. Can be used on chain pushes.
  *
  * 3. Player A must decide whether to use Grab. Page 128 in the BB2025 rulebook.
- *    a. Cannot be used while blitzing.
- *    b. Cannot be used on chain pushes.
- *    c. Cannot be used if no unoccupied squares exist adjacent to Player B.
+ *    a. Cannot be used if Player B used Stand Firm.
+ *    b. Cannot be used while blitzing.
+ *    c. Cannot be used on chain pushes.
+ *    d. Cannot be used if no unoccupied squares exist adjacent to Player B.
  *
  * 4. Player B must decide whether to use Sidestep. Page 135 in the BB2025
  *    rulebook.
- *.   a. Cannot be used if Player A used Grab.
- *    b. Cannot be used if no unoccupied squares exist adjacent to Player B.
+ *    a. Cannot be used if Player B used Stand Firm.
+ *    b. Cannot be used if Player A used Grab.
+ *    c. Cannot be used if no unoccupied squares exist adjacent to Player B.
+ *
+ * 5. Player A must decide whether to use Eye Gouge. Page 128 in the BB2025
+ *    rulebook.
+ *    a. Cannot be used if Player B used Stand Firm.
+ *.   b. Cannot be used during chain-pushes
  */
 object CreatePushChainStep: Procedure() {
     override val initialNode: Node = DecideToUseJuggernaut
@@ -227,13 +237,41 @@ object CreatePushChainStep: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(pushData.pushee, SkillType.SIDESTEP),
                         SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
-                        GotoNode(SelectPushDirection)
+                        GotoNode(ChooseToUseEyeGouge)
                     )
                 }
                 Cancel, Continue -> {
-                    GotoNode(SelectPushDirection)
+                    GotoNode(ChooseToUseEyeGouge)
                 }
                 else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object ChooseToUseEyeGouge: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<PushContext>().firstPusher.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PushContext>()
+            val hasEyeGouge = context.firstPusher.isSkillAvailable(SkillType.EYE_GOUGE)
+            val defenderIsGougedAlready = context.firstPushee.statusEffects.any { it.type == PlayerStatusEffectType.EYE_GOUGE }
+            val standFirmUsed = context.pushChain.first().usedStandFirm
+            return when (context.isFirstBlock && !standFirmUsed && hasEyeGouge && !defenderIsGougedAlready) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PushContext>()
+            val useSkill = (action == Confirm)
+            return when (useSkill) {
+                true -> compositeCommandOf(
+                    ReportSkillUsed(context.firstPusher, SkillType.EYE_GOUGE),
+                    AddPlayerStatusEffect(context.firstPushee, PlayerStatusEffect.eyeGouge()),
+                    GotoNode(SelectPushDirection),
+                )
+                false -> GotoNode(SelectPushDirection)
             }
         }
     }

@@ -381,6 +381,10 @@ book.
 - [ ] Conceding
     - [ ] Free if 3 or less players at beginning of turn
 
+## End of Action
+- [ ] Clarify what end-of-action means for e.g. Blitz.
+- [ ] Tests for effects that expire at end-of-action.
+
 ## End of Drive
 
 - [ ] Deal with Secret Weapons

@@ -45,7 +45,7 @@ object ExtraTime : Procedure() {
 
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         // Remove modifiers that only last this half
-        val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_HALF)
+        val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_HALF)
         return compositeCommandOf(
             *resetCommands
         )

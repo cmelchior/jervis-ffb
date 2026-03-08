@@ -28,5 +28,13 @@ enum class Duration {
     END_OF_GAME, // The effect lasts for the entire game, but doesn't carry over to the next game
     SPECIAL, // The duration of this effect is too hard to put into a bucket and must be handled manually.
     STANDING_UP, // The effect expires when the player is going from prone to standing up.
-    PERMANENT, // The effect is a permanent change to the team.
+    PERMANENT; // The effect is a permanent change to the team.
+
+    companion object {
+        val singlePlayerDurations = setOf(
+            START_OF_ACTIVATION,
+            END_OF_ACTIVATION,
+            END_OF_ACTION
+        )
+    }
 }

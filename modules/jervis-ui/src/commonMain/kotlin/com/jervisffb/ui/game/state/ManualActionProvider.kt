@@ -679,6 +679,10 @@ open class ManualActionProvider(
             return Confirm
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_EYE_GOUGE) && (currentNode == CreatePushChainStep.ChooseToUseEyeGouge)) {
+            return Confirm
+        }
+
         return null
     }
 

@@ -63,6 +63,7 @@ import kotlin.time.ExperimentalTime
  * During Block action:
  * - Block (skill usage)
  * - Dodge (skill usage)
+ * - Eye Gouge (skill usage)
  * - Fend (skill usage)
  * - Grab (skill usage)
  * - Leap (skill usage)
@@ -272,6 +273,16 @@ object UseDirtyPlayerWheelController: UseSkillWheelController(SkillType.DIRTY_PL
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<FoulContext>().fouler
         return player.coordinates
+    }
+}
+
+object UseEyeGougeWheelController: UseSkillWheelController(SkillType.EYE_GOUGE) {
+    override val nodes: Set<Node> = setOf(
+        CreatePushChainStep.ChooseToUseEyeGouge
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<PushContext>()
+        return context.firstPusher.coordinates
     }
 }
 
