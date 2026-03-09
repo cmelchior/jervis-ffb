@@ -154,6 +154,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Frenzy 2nd block is not taken when defender is using Fend (as they cannot follow up)
     - [ ] Works on players with the Foul Appearance trait
     - [ ] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
+    - [ ] Foul Appearance must be rolled for both blocks. If failed on first block, 2nd block isn't happening
 - [x] Kick
   - [x] Usage is optional
   - [x] Reduces distance from D6 to D3
@@ -209,6 +210,16 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Secure the Ball
   - [x] Works on Interceptions
 - [ ] Foul Appearance*
+  - [x] Requires 2+ to attack 
+  - [x] Block
+  - [x] Blitz
+  - [x] Breathe Fire
+  - [ ] Chainsaw
+  - [ ] Hypnotic Gaze
+  - [ ] Multiple Block
+  - [ ] Only stops one block during Multiple Block
+  - [x] Projectile Vomit
+  - [x] Stab
 - [x] Horns
   - [x] Add +1 to ST for block action during Blitz
   - [x] Does not work on Block

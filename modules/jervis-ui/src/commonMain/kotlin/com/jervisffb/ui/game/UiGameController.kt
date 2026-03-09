@@ -41,6 +41,7 @@ import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
+import com.jervisffb.ui.game.state.actionwheel.FoulAppearanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
 import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
@@ -171,6 +172,7 @@ class UiGameController(
         DauntlessWheelController,
         DeviateRollWheelController,
         DodgeWheelController,
+        FoulAppearanceWheelController,
         InterceptionWheelController,
         JumpWheelController,
         LandingWheelController,

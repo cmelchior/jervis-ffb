@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -25,6 +26,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
@@ -42,14 +44,8 @@ data class ProjectileVomitContext(
     val defender: Player? = null,
     val vomitRoll: D6DieRoll? = null,
     val injuryResult: RiskingInjuryContext? = null,
-): ProcedureContext {
-    val isSuccess: Boolean
-        get() {
-            return vomitRoll?.let {
-                it.result.value > 1
-            } ?: false
-        }
-}
+    val isSuccess: Boolean = false,
+): ProcedureContext
 
 /**
  * Procedure for handling the "Vomit"-part of a Projectile Vomit Special Action.
@@ -83,12 +79,12 @@ object ProjectileVomitStep: Procedure() {
         state.assertContext<ProjectileVomitContext>()
     }
 
-    // During a Blitz, the target is pre-defined, so we can skip this step
+    // During a Blitz or Frenzy, the target is pre-defined, so we can skip this step
     object DecideOnFirstStep: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<ProjectileVomitContext>()
             return when (context.defender != null) {
-                true -> GotoNode(RollForProjectileVomit)
+                true -> GotoNode(CheckForFoulAppearance)
                 false -> GotoNode(SelectDefenderOrEndAction)
             }
         }
@@ -114,10 +110,42 @@ object ProjectileVomitStep: Procedure() {
                     val context = state.getContext<ProjectileVomitContext>()
                     compositeCommandOf(
                         SetContext(context.copy(defender = action.getPlayer(state))),
-                        GotoNode(RollForProjectileVomit),
+                        GotoNode(CheckForFoulAppearance),
                     )
                 }
                 else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object CheckForFoulAppearance: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<ProjectileVomitContext>()
+            val hasFoulAppearance = context.defender?.isSkillAvailable(SkillType.FOUL_APPEARANCE) ?: error("Missing defender: $context")
+            return when (hasFoulAppearance) {
+                true -> null
+                false -> RollForProjectileVomit
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val breatheContext = state.getContext<ProjectileVomitContext>()
+            val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
+            return SetContext(foulAppearanceContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val activePlayerContext = state.getContext<ActivatePlayerContext>()
+            val context = state.getContext<FoulAppearanceContext>()
+            return buildCompositeCommand {
+                add(RemoveContext<FoulAppearanceContext>())
+                when (context.isSuccess) {
+                    true -> add(GotoNode(RollForProjectileVomit))
+                    // Projectile Vomit ends the Action immediately, regardless of a failed Foul Appearance roll or not.
+                    false -> addAll(
+                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        ExitProcedure()
+                    )
+                }
             }
         }
     }

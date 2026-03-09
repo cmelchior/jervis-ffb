@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.bb2025.skills.EyeGouge
 import com.jervisffb.engine.rules.bb2025.skills.Fend
+import com.jervisffb.engine.rules.bb2025.skills.FoulAppearance
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.bb2025.skills.Grab
@@ -310,9 +311,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.FOUL_APPEARANCE -> {
-                    // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Foul Appearance", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                        FoulAppearance(player, category, expiresAt)
+                    }
                 }
                 SkillType.HORNS -> {
                     addNoValueEntry("Horns", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->

@@ -22,7 +22,10 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -34,34 +37,52 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
+data class FoulAppearanceContext(
+    val attacker: Player,
+    val defender: Player,
+    val roll: D6DieRoll? = null,
+    val isSuccess: Boolean = false,
+): ProcedureContext
+
 /**
- * Implement the Projectile Vomit Roll as described on page 133 in the BB2025
- * rulebook.
+ * Procedure for handling Foul Appearance when triggered as part of a Block or a
+ * Special Action.
  *
- * The result is stored in [ProjectileVomitContext] and it is up to the caller to
- * determine what to do with the result.
+ * If the roll is failed, the current action ends immediately. This is handled
+ * here, so callers of this procedure just need to exit as quickly as possible.
  */
-object ProjectileVomitRoll: Procedure() {
+object FoulAppearanceRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<ProjectileVomitContext>()
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<FoulAppearanceContext>()
+        return when (context.isSuccess) {
+            true -> null
+            false -> {
+                val activePlayerContext = state.getContext<ActivatePlayerContext>()
+                SetContext(activePlayerContext.copy(activationEndsImmediately = true))
+            }
+        }
+    }
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<FoulAppearanceContext>()
+    }
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ProjectileVomitContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulAppearanceContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val context = state.getContext<ProjectileVomitContext>()
+                val context = state.getContext<FoulAppearanceContext>()
                 val updatedContext = context.copy(
-                    vomitRoll = D6DieRoll.create(state, d6),
-                    isSuccess = isSuccess(d6),
+                    roll = D6DieRoll.create(state, d6),
+                    isSuccess = isSuccessful(d6)
                 )
                 return compositeCommandOf(
                     SetContext(updatedContext),
-                    ReportDiceRoll(DiceRollType.PROJECTILE_VOMIT, d6),
+                    ReportDiceRoll(DiceRollType.FOUL_APPEARANCE, d6),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -69,15 +90,15 @@ object ProjectileVomitRoll: Procedure() {
     }
 
     object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ProjectileVomitContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulAppearanceContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<ProjectileVomitContext>()
+            val context = state.getContext<FoulAppearanceContext>()
             val player = context.attacker
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
                 player,
-                DiceRollType.PROJECTILE_VOMIT,
-                context.vomitRoll!!,
+                DiceRollType.FOUL_APPEARANCE,
+                context.roll!!,
                 context.isSuccess
             )
             return if (availableRerolls == null) {
@@ -92,7 +113,7 @@ object ProjectileVomitRoll: Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.PROJECTILE_VOMIT, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(DiceRollType.FOUL_APPEARANCE, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         ReportRerollUsed(action.getRerollSource(state)),
@@ -116,29 +137,29 @@ object ProjectileVomitRoll: Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ProjectileVomitContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulAppearanceContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val context = state.getContext<ProjectileVomitContext>()
+                val context = state.getContext<FoulAppearanceContext>()
                 val updatedContext = context.copy(
-                    vomitRoll = context.vomitRoll!!.copyReroll(
+                    roll = context.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isSuccess(d6),
+                    isSuccess = isSuccessful(d6)
                 )
                 compositeCommandOf(
                     SetContext(updatedContext),
-                    ReportDiceRoll(DiceRollType.PROJECTILE_VOMIT, d6),
+                    ReportDiceRoll(DiceRollType.FOUL_APPEARANCE, d6),
                     ExitProcedure(),
                 )
             }
         }
     }
 
-    // -- HELPER METHODS --
-    private fun isSuccess(d6: D6Result): Boolean {
+    // -- HELPER FUNCTIONS --
+    private fun isSuccessful(d6: D6Result): Boolean {
         return d6.value >= 2
     }
 }

@@ -22,7 +22,7 @@ class Frenzy(
     override val skillId: SkillId = type.id()
     override val name: String = type.description
     override val compulsory: Boolean = true
-    override val resetAt: Duration = Duration.PERMANENT
+    override val resetAt: Duration = Duration.END_OF_ACTION
     override var used: Boolean = false // This skill is always available
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false

@@ -1,6 +1,9 @@
 package com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock
 
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -10,7 +13,11 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Procedure for handling a single standard block once attacker and defender
@@ -56,10 +63,41 @@ import com.jervisffb.engine.rules.Rules
  * [com.jervisffb.engine.rules.bb2025.procedures.actions.block.shared] package.
  */
 object SingleStandardBlockStep : Procedure() {
-    override val initialNode: Node = DetermineAssists
+    override val initialNode: Node = CheckForFoulAppearance
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
+
+    object CheckForFoulAppearance: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<BlockContext>()
+            val hasFoulAppearance = context.defender.isSkillAvailable(SkillType.FOUL_APPEARANCE)
+            return when (hasFoulAppearance) {
+                true -> null
+                false -> DetermineAssists
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
+            val foulAppearanceContext = FoulAppearanceContext(blockContext.attacker, blockContext.defender)
+            return SetContext(foulAppearanceContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
+            val context = state.getContext<FoulAppearanceContext>()
+            return buildCompositeCommand {
+                add(RemoveContext<FoulAppearanceContext>())
+                when (context.isSuccess) {
+                    true -> add(GotoNode(DetermineAssists))
+                    false -> addAll(
+                        SetContext(blockContext.copy(aborted = true)),
+                        ExitProcedure()
+                    )
+                }
+            }
+        }
+    }
 
     object DetermineAssists: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockDetermineModifiers

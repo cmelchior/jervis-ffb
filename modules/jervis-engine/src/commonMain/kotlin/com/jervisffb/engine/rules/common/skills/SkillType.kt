@@ -75,7 +75,7 @@ enum class SkillType(val description: String) {
     CLAWS("Claws"),
     DISTURBING_PRESENCE("Disturbing Presence"),
     EXTRA_ARMS("Extra Arms"),
-    FOUL_APPEARANCE("Full Appearance"),
+    FOUL_APPEARANCE("Foul Appearance"),
     HORNS("Horns"),
     IRON_HARD_SKIN("Iron Hard Skin"),
     MONSTROUS_MOUTH("Monstrous Mouth"),

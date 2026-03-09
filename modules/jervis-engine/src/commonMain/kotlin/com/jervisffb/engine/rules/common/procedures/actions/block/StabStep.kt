@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -25,6 +26,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
@@ -79,7 +81,7 @@ object StabStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<StabContext>()
             return when (context.defender != null) {
-                true -> GotoNode(RollForArmourAnInjury)
+                true -> GotoNode(CheckForFoulAppearance)
                 false -> GotoNode(SelectDefenderOrEndAction)
             }
         }
@@ -105,10 +107,42 @@ object StabStep: Procedure() {
                     val context = state.getContext<StabContext>().copy(defender = action.getPlayer(state))
                     compositeCommandOf(
                         SetContext(context),
-                        GotoNode(RollForArmourAnInjury),
+                        GotoNode(CheckForFoulAppearance),
                     )
                 }
                 else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object CheckForFoulAppearance: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<StabContext>()
+            val hasFoulAppearance = context.defender?.isSkillAvailable(SkillType.FOUL_APPEARANCE) ?: error("Missing defender: $context")
+            return when (hasFoulAppearance) {
+                true -> null
+                false -> RollForArmourAnInjury
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val breatheContext = state.getContext<StabContext>()
+            val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
+            return SetContext(foulAppearanceContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val activePlayerContext = state.getContext<ActivatePlayerContext>()
+            val context = state.getContext<FoulAppearanceContext>()
+            return buildCompositeCommand {
+                add(RemoveContext<FoulAppearanceContext>())
+                when (context.isSuccess) {
+                    true -> add(GotoNode(RollForArmourAnInjury))
+                    // Stab ends the Action immediately, regardless of a failed Foul Appearance roll or not.
+                    false -> addAll(
+                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        ExitProcedure()
+                    )
+                }
             }
         }
     }

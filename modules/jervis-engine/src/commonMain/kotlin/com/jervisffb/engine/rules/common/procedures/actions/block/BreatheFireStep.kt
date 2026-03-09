@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportBreatheFireResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
@@ -87,12 +88,12 @@ object BreatheFireStep: Procedure() {
         state.assertContext<BreatheFireContext>()
     }
 
-    // During a Blitz, the target is pre-defined, so we can skip this step
+    // During a Blitz or Frenzy, the target is pre-defined, so we can skip this step
     object DecideOnFirstStep: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BreatheFireContext>()
             return when (context.defender != null) {
-                true -> GotoNode(RollForBreatheFire)
+                true -> GotoNode(CheckForFoulAppearance)
                 false -> GotoNode(SelectDefenderOrEndAction)
             }
         }
@@ -118,10 +119,42 @@ object BreatheFireStep: Procedure() {
                     val context = state.getContext<BreatheFireContext>()
                     compositeCommandOf(
                         SetContext(context.copy(defender = action.getPlayer(state))),
-                        GotoNode(RollForBreatheFire),
+                        GotoNode(CheckForFoulAppearance),
                     )
                 }
                 else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object CheckForFoulAppearance: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<BreatheFireContext>()
+            val hasFoulAppearance = context.defender?.isSkillAvailable(SkillType.FOUL_APPEARANCE) ?: error("Missing defender: $context")
+            return when (hasFoulAppearance) {
+                true -> null
+                false -> RollForBreatheFire
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val breatheContext = state.getContext<BreatheFireContext>()
+            val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
+            return SetContext(foulAppearanceContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val activePlayerContext = state.getContext<ActivatePlayerContext>()
+            val context = state.getContext<FoulAppearanceContext>()
+            return buildCompositeCommand {
+                add(RemoveContext<FoulAppearanceContext>())
+                when (context.isSuccess) {
+                    true -> add(GotoNode(RollForBreatheFire))
+                    // Breathe Fire ends the Action immediately, regardless of a failed Foul Appearance roll or not.
+                    false -> addAll(
+                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        ExitProcedure()
+                    )
+                }
             }
         }
     }

@@ -37,6 +37,7 @@ import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -696,7 +697,26 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 true -> "Use Safe Pair of Hands?"
                 false -> "Waiting for player to use Safe Pair of Hands"
             }
-        }
+        },
+
+        FoulAppearanceRoll.RollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Roll D6 for Foul Appearance"
+                else -> null
+            }
+        },
+        FoulAppearanceRoll.ChooseReRollSource to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient) -> "Accept Foul Appearance Result or Reroll D6?"
+                else -> null
+            }
+        },
+        FoulAppearanceRoll.ReRollDie to { isActiveClient, serverDiceRolls, state ->
+            when {
+                (isActiveClient && !serverDiceRolls) -> "Re-roll D6 for Foul Appearance"
+                else -> null
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

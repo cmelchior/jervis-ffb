@@ -21,6 +21,7 @@ enum class DiceRollType {
     CHARGE,
     CHEERING_FANS,
     FAN_FACTOR,
+    FOUL_APPEARANCE,
     DAUNTLESS,
     DODGE,
     DODGY_SNACK_ROLL_OFF,

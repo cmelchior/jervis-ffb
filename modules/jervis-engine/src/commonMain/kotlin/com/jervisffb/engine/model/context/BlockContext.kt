@@ -22,6 +22,7 @@ data class BlockContext(
     val hasAcceptedResult: Boolean = false, // Do not want to reroll any further
     var resultIndex: Int = -1, // Index into `roll` that defines the selected roll
     val didFollowUp: Boolean = false,
+    // Block was aborted before rolling any dice
     val aborted: Boolean = false,
 ): ProcedureContext {
     val result: DBlockResult
