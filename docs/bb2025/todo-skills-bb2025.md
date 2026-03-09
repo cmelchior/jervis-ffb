@@ -214,7 +214,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Does not work on Block
 - [ ] Iron Hard Skin
 - [ ] Monstrous Mouth
-- [ ] Prehensile Tail
+- [x] Prehensile Tail
+  - [x] Adds -1 negative modifier
+  - [x] Only one player can use it
 - [ ] Tentacles
 - [x] Two Heads
   - [x] Use skill on dodge

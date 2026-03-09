@@ -245,12 +245,16 @@ object DodgeRoll: Procedure() {
                 }
                 .mapNotNull { state.field[it].player }
                 .filter { it.isSkillAvailable(SkillType.PREHENSILE_TAIL) }
-                .map { SelectPlayer(it) }
-
-            return if (eligiblePlayers.isEmpty()) {
+                .let { players ->
+                    when (players.isNotEmpty()) {
+                        true -> SelectPlayer.fromPlayers(players)
+                        false -> null
+                    }
+                }
+            return if (eligiblePlayers == null) {
                 listOf(ContinueWhenReady)
             } else {
-                eligiblePlayers + CancelWhenReady
+                listOf(eligiblePlayers, CancelWhenReady)
             }
         }
 
