@@ -116,25 +116,25 @@ object ResolveMoveTypeStep : Procedure() {
                 // Securing the Ball takes precedence over picking up the ball.
                 secureTheBall && !endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
                         GotoNode(SecureTheBall)
                     )
                 }
                 pickupBall && !endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
                         GotoNode(PickUpBall)
                     )
                 }
                 endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
                         ExitProcedure()
                     )
                 }
                 else -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
                         if (player.hasBall()) GotoNode(CheckForScoring) else ExitProcedure()
                     )
                 }
@@ -143,7 +143,6 @@ object ResolveMoveTypeStep : Procedure() {
     }
 
     // If a player moved into the ball as part of a Secure The Ball action, they must now attempt to secure it.
-    // This is NOT a Pickup.
     object SecureTheBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()

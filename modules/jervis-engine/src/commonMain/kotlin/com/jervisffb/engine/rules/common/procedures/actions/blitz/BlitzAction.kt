@@ -96,10 +96,9 @@ object BlitzAction : Procedure() {
         val blitzContext = state.getContext<BlitzActionContext>()
         return compositeCommandOf(
             RemoveContext<BlitzActionContext>(),
-            if (blitzContext.hasBlocked || blitzContext.hasMoved) {
-                SetContext(activateContext.copy(markActionAsUsed = true))
-            } else {
-                SetContext(activateContext.copy(markActionAsUsed = false))
+            when (blitzContext.hasBlocked || blitzContext.hasMoved) {
+                true -> SetContext(activateContext.copy(markActionAsUsed = true))
+                false -> null
             },
             *getResetPlayerTemporaryModifiersCommands(state, rules, activateContext.player, Duration.END_OF_ACTION),
         )

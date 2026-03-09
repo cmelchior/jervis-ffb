@@ -23,6 +23,7 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
@@ -151,11 +152,13 @@ object FollowUpStep: Procedure() {
         // The following rules are in effect:
         // - If the attacker used Frenzy, they must follow up if allowed.
         // - If the attacker used Multiple Block, they cannot follow up.
+        // - If the attacker is Rooted, they cannot follow up.
         // - If the defender is using Stand Firm, they cannot follow up.
         // - If the defender used Taunt, the attacker must follow up, unless they are Rooted or used Multiple Block.
         // - If the defender is using Fend, the attacker cannot follow up.
         // - If the defender is using Taunt, the attacker must follow up if allowed.
-        val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend || context.isDefenderUsingStandFirm /* Add support for Rooted */
+        val isRooted = context.firstPusher.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+        val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend || context.isDefenderImmovable || isRooted
         val mustFollowUp = context.defenderIsUsingTaunt || context.isAttackerUsingFrenzy
         return when {
             cannotFollowUp -> FollowUpStatus.NOT_ALLOWED

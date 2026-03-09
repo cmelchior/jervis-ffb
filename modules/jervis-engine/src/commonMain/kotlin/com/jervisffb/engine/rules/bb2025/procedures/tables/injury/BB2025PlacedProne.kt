@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.bb2025.procedures.tables.injury
 
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
@@ -21,6 +22,7 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -56,8 +58,12 @@ object BB2025PlacedProne: Procedure() {
             val context = state.getContext<RiskingInjuryContext>()
             val activePlayerContext = state.getContext<ActivatePlayerContext>()
             val player = context.player
+            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
             return buildCompositeCommand {
                 add(SetPlayerState(player, PlayerState.PRONE, hasTackleZones = false))
+                if (rootedStatus != null) {
+                    add(RemovePlayerStatusEffect(player, rootedStatus))
+                }
                 // Being placed prone is only a turnover if it is the active player and they hold the ball.
                 // If they do not hold the ball, their activation still ends immediately.
                 val isActive = (activePlayerContext.player == player)

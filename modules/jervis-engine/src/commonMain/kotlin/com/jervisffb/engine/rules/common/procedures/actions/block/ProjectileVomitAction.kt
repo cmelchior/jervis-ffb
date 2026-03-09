@@ -40,9 +40,7 @@ object ProjectileVomitAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val actionContext = state.getContext<ProjectileVomitActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(
-                markActionAsUsed = (actionContext.hasVomited))
-            ),
+            SetContext(activatePlayerContext.copyWithMarkedAction(actionContext.hasVomited)),
             RemoveContext<ProjectileVomitContext>(),
             RemoveContext<ProjectileVomitActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),

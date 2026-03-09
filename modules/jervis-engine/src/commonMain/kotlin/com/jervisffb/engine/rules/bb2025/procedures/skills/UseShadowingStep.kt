@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -52,6 +53,7 @@ object UseShadowingStep: Procedure() {
                 }
                 .mapNotNull { state.field[it].player }
                 .filter { it.isSkillAvailable(SkillType.SHADOWING) }
+                .filterNot { it.hasStatusEffect(PlayerStatusEffectType.ROOTED) }
                 .let { playerList ->
                     if (playerList.isNotEmpty()) {
                         SelectPlayer.fromPlayers(playerList)

@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
@@ -60,6 +60,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  *    includes selecting a target.
  * 5. Roll for all Nega-traits in order, stop at the first failure (no player
  *    normally has multiple of these).
+ *    a. Take Root: They might become rooted, but are otherwise free to act.
  *    a. Bone Head / Really Stupid: They might end the activation here, loose tackle zones and the action is used.
  *    b. Unchannelled Fury: They might end the activation here and the action is used.
  *    c. Animal Savagery: They might hit a nearby player or end their activation and loose tackle zones.
@@ -92,7 +93,7 @@ object ActivatePlayer : Procedure() {
             // If the action was considered "used", we should remove it from the pool
             // of available actions. If an action was ended prematurely (either due
             // to a turnover or failing some roll), the action is always considered used.
-            if (context.markActionAsUsed || state.endActionImmediately()) {
+            if (actionCountAsUsed(context)) {
                 val activeTeam = state.activeTeamOrThrow()
                 val markActionAsUsedCommand = when (context.declaredAction!!.type) {
                     PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.MOVE)
@@ -142,10 +143,7 @@ object ActivatePlayer : Procedure() {
             // performed or canceled before it was "used". In that case, we allow the
             // player to be activated again if they haven't done anything else that
             // is considered irreversible.
-            if (
-                player.available == Availability.IS_ACTIVE
-                && (context.clearedNegativeEffects || context.rolledForNegaTrait)
-            ) {
+            if (player.available == Availability.IS_ACTIVE && !actionCountAsUsed(context)) {
                 add(SetPlayerAvailability(player, Availability.AVAILABLE))
             }
         }
@@ -161,8 +159,8 @@ object ActivatePlayer : Procedure() {
             // a player to temporarily lose their tackle zone behave this way:
             // Bone Head, Hypnotic Gaze, Really Stupid
             val enableTackleZonesCommand = if (
-                player.state == PlayerState.STANDING &&
-                !player.hasTackleZones
+                player.state == PlayerState.STANDING
+                && !player.hasTackleZones
             ) {
                 compositeCommandOf(
                     SetHasTackleZones(player, true),
@@ -221,7 +219,7 @@ object ActivatePlayer : Procedure() {
                         SetContext(state.getContext<ActivatePlayerContext>().copy(declaredAction = selectedAction)),
                         ReportActionSelected(activePlayer, selectedAction),
                         if (hasNegaTrait) {
-                            GotoNode(CheckForBoneHead)
+                            GotoNode(CheckForTakeRoot)
                         } else {
                             GotoNode(CheckForOpponentInterruptSkills)
                         }
@@ -232,17 +230,39 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object CheckForBoneHead: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill(SkillType.BONE_HEAD)) {
-                GotoNode(ResolveBoneHead)
+    object CheckForTakeRoot: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val player = state.activePlayer ?: error("Missing active player")
+            val hasTakeRoot = player.isSkillAvailable(SkillType.TAKE_ROOT)
+            val isStanding = rules.isStanding(player)
+            val isAlreadyRooted = player.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+            return when (hasTakeRoot && isStanding && !isAlreadyRooted) {
+                true -> null
+                false -> CheckForBoneHead
+            }
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = TakeRootRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            val player = context.player
+            return if (context.activationEndsImmediately) {
+                compositeCommandOf(
+                    SetPlayerAvailability(player, Availability.HAS_ACTIVATED),
+                    GotoNode(CheckForBoneHead),
+                )
             } else {
-                GotoNode(CheckForReallyStupid)
+                GotoNode(CheckForBoneHead)
             }
         }
     }
 
-    object ResolveBoneHead: ParentNode() {
+    object CheckForBoneHead: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            return when (state.activePlayer!!.isSkillAvailable(SkillType.BONE_HEAD)) {
+                true -> null
+                false -> CheckForReallyStupid
+            }
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BoneHeadRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
@@ -259,17 +279,13 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object CheckForReallyStupid: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill(SkillType.REALLY_STUPID)) {
-                GotoNode(ResolveReallyStupid)
-            } else {
-                GotoNode(CheckForUnchannelledFury)
+    object CheckForReallyStupid: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            return when (state.activePlayer!!.isSkillAvailable(SkillType.REALLY_STUPID)) {
+                true -> null
+                false -> CheckForUnchannelledFury
             }
         }
-    }
-
-    object ResolveReallyStupid: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ReallyStupidRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
@@ -286,17 +302,13 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object CheckForUnchannelledFury: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill(SkillType.UNCHANNELLED_FURY)) {
-                GotoNode(ResolveUnchannelledFury)
-            } else {
-                GotoNode(CheckForBloodLust)
+    object CheckForUnchannelledFury: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            return when (state.activePlayer!!.isSkillAvailable(SkillType.UNCHANNELLED_FURY)) {
+                true -> null
+                false -> CheckForBloodLust
             }
         }
-    }
-
-    object ResolveUnchannelledFury: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = UnchannelledFuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
@@ -313,18 +325,13 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object CheckForAnimalSavagery: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill(SkillType.ANIMAL_SAVAGERY)) {
-                GotoNode(ResolveAnimalSavagery)
-            } else {
-                GotoNode(CheckForBloodLust)
+    object CheckForAnimalSavagery: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            return when (state.activePlayer!!.isSkillAvailable(SkillType.ANIMAL_SAVAGERY)) {
+                true -> null
+                false -> CheckForBloodLust
             }
         }
-    }
-
-
-    object ResolveAnimalSavagery: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = AnimalSavageryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
@@ -339,17 +346,13 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object CheckForBloodLust: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill(SkillType.BLOOD_LUST)) {
-                GotoNode(ResolveBloodLust)
-            } else {
-                GotoNode(CheckForOpponentInterruptSkills)
+    object CheckForBloodLust: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            return when (state.activePlayer!!.isSkillAvailable(SkillType.BLOOD_LUST)) {
+                true -> null
+                false -> CheckForOpponentInterruptSkills
             }
         }
-    }
-
-    object ResolveBloodLust: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BloodLustRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Blood Lust does not cause the activation to end, it only goes into affect
@@ -360,7 +363,7 @@ object ActivatePlayer : Procedure() {
 
     /**
      * Some skills trigger when an opponent player are about to start their action,
-     * like Dump-off and Foul Appearance. This step checks for these cases
+     * like Dump-off. This step checks for these cases
      */
     object CheckForOpponentInterruptSkills: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = CheckForActionInterruptSkills
@@ -383,10 +386,10 @@ object ActivatePlayer : Procedure() {
             return if (context.player.hasStatusEffect(PlayerStatusEffectType.BLOOD_LUST)) {
                 GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
-                return compositeCommandOf(
+                compositeCommandOf(
                     SetPlayerAvailability(
                         player = state.activePlayer!!,
-                        availability = if (context.markActionAsUsed || context.activationEndsImmediately) {
+                        availability = if (actionCountAsUsed(context)) {
                             Availability.HAS_ACTIVATED
                         } else {
                             Availability.AVAILABLE
@@ -422,9 +425,20 @@ object ActivatePlayer : Procedure() {
                 SkillType.BONE_HEAD,
                 SkillType.BLOOD_LUST,
                 SkillType.REALLY_STUPID,
+                SkillType.TAKE_ROOT,
                 SkillType.UNCHANNELLED_FURY -> true
                 else -> false
             }
         }
+    }
+
+    /**
+     * An action can end in a lot of ways, but basically any side-effect should
+     * count the action as "used".
+     */
+    fun actionCountAsUsed(context: ActivatePlayerContext): Boolean {
+        return context.rolledForNegaTrait
+            || context.clearedNegativeEffects
+            || context.markActionAsUsed
     }
 }

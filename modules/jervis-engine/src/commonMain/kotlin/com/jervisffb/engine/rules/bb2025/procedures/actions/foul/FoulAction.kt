@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2025.procedures.actions.foul
 
-import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -88,11 +87,6 @@ object FoulAction : Procedure() {
             // Check if adjacent to target of the Foul
             val foulContext= state.getContext<FoulContext>()
             val fouler = foulContext.fouler
-            if (foulContext.hasMoved) {
-                options.add(EndActionWhenReady)
-            } else {
-                options.add(DeselectPlayer(fouler))
-            }
             val availableTargetPlayers = fouler.team.otherTeam()
                 .filter {
                     // You cannot foul your own players, so no need to check for STUNNED_OWN_TURN

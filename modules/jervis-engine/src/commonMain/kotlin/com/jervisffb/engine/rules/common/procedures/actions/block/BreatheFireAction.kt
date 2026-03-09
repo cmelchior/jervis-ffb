@@ -40,9 +40,7 @@ object BreatheFireAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val actionContext = state.getContext<BreatheFireActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(
-                markActionAsUsed = (actionContext.hasBreathed))
-            ),
+            SetContext(activatePlayerContext.copyWithMarkedAction(actionContext.hasBreathed)),
             RemoveContext<BreatheFireContext>(),
             RemoveContext<BreatheFireActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),

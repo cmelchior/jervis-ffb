@@ -50,10 +50,12 @@ object UseStripBallStep: Procedure() {
     object CheckIfStripBallIsApplicable: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
+            val pushContext = state.getContext<PushContext>()
             val player = context.attacker
             val defenderHasBall = context.defender.hasBall()
             val hasStripBall = player.isSkillAvailable(SkillType.STRIP_BALL)
-            return if (defenderHasBall && hasStripBall) {
+            val defenderIsImmovable = pushContext.isDefenderImmovable
+            return if (defenderHasBall && hasStripBall && !defenderIsImmovable) {
                 GotoNode(ChooseToUseSureHands)
             } else {
                 ExitProcedure()
@@ -92,12 +94,10 @@ object UseStripBallStep: Procedure() {
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BlockContext>()
-            val pushContext = state.getContext<PushContext>()
             val player = context.attacker
             val defenderHasBall = context.defender.hasBall()
             val hasStripBall = player.isSkillAvailable(SkillType.STRIP_BALL)
-            val defenderUsedStandFirm = (pushContext.pushChain.firstOrNull()?.usedStandFirm == true)
-            return when (hasStripBall && defenderHasBall && !defenderUsedStandFirm) {
+            return when (hasStripBall && defenderHasBall) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }

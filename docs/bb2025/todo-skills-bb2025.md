@@ -143,7 +143,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Works during Block and Blitz
     - [ ] Horns work on both Frenzy Blocks
     - [ ] Does not force the use of Sprint
-    - [ ] 2nd Block can only be thrown if the target is Pushed Back
+    - [ ] 2nd Block can only be thrown if the target is Pushed Back.
+    - [ ] Cannot do 2nd Block on Rooted player
     - [ ] 2nd Block can be another Special Action like Stab
     - [ ] Must rush if needed
     - [ ] 2nd block isn't taken in case of a touchdown
@@ -436,11 +437,35 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Roll on Stunty Injury Table
 - [ ] Swoop
 - [ ] Take Root*
+  - [x] Roll on activation if standing
+  - [x] Roll for other negatraits if Take Root failed
+  - [x] 2+ to succeed
+  - [x] Cannot move 
+  - [x] Cannot move during Blitz
+  - [x] Cannot move during Hand-off
+  - [x] Cannot move during Pass
+  - [x] Cannot move during Foul
+  - [x] Cannot move during Secure the Ball
+  - [x] Cannot move during Throw Team-mate
+  - [x] Cannot jump
+  - [x] Cannot leap
+  - [x] Cannot follow-up
+  - [x] Cannot be thrown
+  - [x] Cannot be pushed back
+  - [x] Prevents Strip Ball
+  - [x] Status not cleared on next action
+  - [x] Clear status at end of drive
+  - [x] Clear status after Knocked Down
+  - [x] Clear status after being placed Prone
+  - [ ] Diving Tackle clears Rooted
+  - [ ] Prevents Trickster 
+  - [x] Prevents Shadowing
 - [x] Titchy*
   - [x] +1 when making a dodge
   - [x] Does not give -1 when dodging into a square marked by this player
 - [x] Throw Team-mate
 - [ ] Timmm-ber!
+- [ ] Trickster
 - [ ] Unchannelled Fury*
   - [ ] Pro can be used as a reroll
   - [x] Roll after selecting action

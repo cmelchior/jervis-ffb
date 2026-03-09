@@ -12,7 +12,7 @@ import com.jervisffb.engine.rules.Rules
 
 /**
  * Some skills trigger when an opponent player are about to start their action,
- * like Dump-off and Foul Appearance. This procedure is responsible for checking for
+ * like Dump-off. This procedure is responsible for checking for
  * these cases and potentially react to them.
  */
 object CheckForActionInterruptSkills: Procedure() {

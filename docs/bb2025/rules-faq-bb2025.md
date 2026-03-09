@@ -351,6 +351,24 @@ details):
 7. Knock defender down (if applicable). Roll for Armour and Injury. If they had
    the ball, it will now bounce.
 
+### Page 64 - Blitz Action
+Technically, selecting the target of the Blitz is part of declaring the action.
+This has an impact when paired with nega-traits as the correct ordering would
+be:
+
+1. Activate Player
+2. Declare Blitz
+3. Select Target
+4. Roll for Negatraits, like Bone Head
+
+However, this sequence complicates Activating Players quite a lot and since it
+doesn't have a practical impact, Jervis has changed the order to be:
+
+1. Activate Player
+2. Declare Blitz
+3. Roll for Negatraits, like Bone Head
+4. Resolve Blitz, including selecting the target as the first step.
+
 ### Page 69 - Foul Action and Lone Fouler
 It is ambiguous what happens if you reroll a natural double in a Foul Action
 with Lone Fouler.
@@ -784,6 +802,34 @@ FUMBBL has a similar interpretation.
 When Strip Ball and Sure Hands interact, the order is unclear. But it shouldn't 
 matter, so to simplify the rules engine, Jervis is asking the pushed player to 
 use Sure Hands, before asking the attacker to use Strip Ball.
+
+### Page 137 - Take Root
+
+#### Take Root and Diving Tackle
+The interaction between Take Root and Diving Tackle is unclear as Take  Root 
+says that Rooted is removed when "Placed Prone", and Diving Tackle says 
+"...place this player Prone...".
+
+This leaves it open to interpretation if you can use Diving Tackle on a player
+that is Rooted. Some arguments:
+
+1. For: FUMBBL is currently allowing Diving Tackle to be used.
+2. For: The definition of Placed Prone does not specify anything about where it 
+   happens.
+3. Against: Take Root says "... may not leave their current square for any 
+   reason..", and Rooted is not cleared until _after_ the player is in a 
+   different square.
+4. Both: The FAQ for BB2020 made it clear that both Wrestle and Pile Driver 
+   could be used when Rooted. Diving Tackle was not mentioned.
+
+While a somewhat arbitrary choice, Jervis will be using the FUMBBL 
+interpretation, mostly because it will make it easier to interop with FUMBBL
+replay files.
+
+#### Take Root and Declaring Actions
+Take Root only says you are not allowed to "Perform" Move Actions. This 
+means it is still allowed to "Declare" them, but the only thing you can do in
+that case is just ending the action straight away.
 
 ### Page 137 - Tentacles
 This skill explicitly mentions Dodge, Jump and Leap, but not Pogo, so it is 

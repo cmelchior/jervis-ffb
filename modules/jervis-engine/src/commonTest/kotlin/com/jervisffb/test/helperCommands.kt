@@ -316,6 +316,11 @@ fun steadyFootingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelec
     reroll,
 )
 
+fun takeRoot(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun throwBall(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll

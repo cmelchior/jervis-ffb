@@ -108,9 +108,7 @@ object PassAction : Procedure() {
         return compositeCommandOf(
             RemoveContext<PassContext>(),
             SetContext(
-                activePlayerContext.copy(
-                    markActionAsUsed = (context.hasMoved || context.passingRoll != null)
-                )
+                activePlayerContext.copyWithMarkedAction(context.hasMoved || context.passingRoll != null)
             ),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )

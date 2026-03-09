@@ -46,8 +46,8 @@ object MovePlayersInPushChainStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
 
-            // If Stand Firm was used, no players are moved, so just exit early
-            if (context.isDefenderUsingStandFirm) {
+            // If Stand Firm was used, or player is Rooted, no players are moved, so just exit early.
+            if (context.isDefenderImmovable) {
                 return ExitProcedure()
             }
 

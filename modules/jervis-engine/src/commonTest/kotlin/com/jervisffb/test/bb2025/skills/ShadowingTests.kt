@@ -78,10 +78,10 @@ class ShadowingTests: JervisGameBB2025Test() {
 
     @Test
     fun onlyOnePlayerCanUseShadowing() {
-        val shadowingPlayer2 = homeTeam[PlayerNo(2)]
+        val shadowingPlayer = homeTeam[PlayerNo(2)]
         val movingPlayer = awayTeam[PlayerNo(1)]
 
-        shadowingPlayer2.addSkill(SkillType.SHADOWING.id())
+        shadowingPlayer.addSkill(SkillType.SHADOWING)
 
         controller.rollForward(
             *activatePlayer(movingPlayer, PlayerStandardActionType.MOVE),
@@ -90,7 +90,7 @@ class ShadowingTests: JervisGameBB2025Test() {
         )
         assertEquals(2, controller.getAvailableActions().get<SelectPlayer>().players.size)
         controller.rollForward(
-            PlayerSelected(shadowingPlayer2),
+            PlayerSelected(shadowingPlayer),
             4.d6, // Shadowing roll
             EndAction,
             EndTurn

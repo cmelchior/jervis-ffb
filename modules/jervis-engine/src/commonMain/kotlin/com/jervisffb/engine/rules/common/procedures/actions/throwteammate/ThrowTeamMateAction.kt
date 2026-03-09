@@ -31,9 +31,11 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportPickingUpPlayerToThrow
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.RightStuff
@@ -123,9 +125,7 @@ object ThrowTeamMateAction : Procedure() {
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
             SetContext(
-                activePlayerContext.copy(
-                    markActionAsUsed = (context.hasMoved || context.qualityRoll != null)
-                )
+                activePlayerContext.copyWithMarkedAction(context.hasMoved || context.qualityRoll != null)
             ),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )
@@ -152,31 +152,37 @@ object ThrowTeamMateAction : Procedure() {
             // Find possible move types
             options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
 
-            // If the thrower is next to a standing player with "Right Stuff", they can be selected for the throw
-            if (thrower.state == PlayerState.STANDING && throwerLocation is OnFieldLocation) {
-                val eligiblePlayers = throwerLocation.getSurroundingCoordinates(rules, 1).mapNotNull {
-                    val player = state.field[it].player
-
-                    val maxStrength = when (val rightStuffSkill = player?.getSkillOrNull(SkillType.RIGHT_STUFF)) {
-                        null -> Int.MIN_VALUE
-                        is RightStuff -> rightStuffSkill.maxStrength
-                        is com.jervisffb.engine.rules.bb2025.skills.RightStuff -> rightStuffSkill.maxStrength
-                        else -> INVALID_GAME_STATE("Unknown Right Stuff skill type: ${rightStuffSkill::class.simpleName}")
+            // If the thrower is next to a player with "Right Stuff", they can be selected for the throw
+            if (rules.isStanding(thrower)) {
+                (throwerLocation as OnFieldLocation).getSurroundingCoordinates(rules, 1)
+                    .mapNotNull {
+                        state.field[it].player
                     }
+                    .mapNotNull { player ->
+                        val maxStrength = when (val rightStuffSkill = player.getSkillOrNull(SkillType.RIGHT_STUFF)) {
+                            null -> Int.MIN_VALUE
+                            is RightStuff -> rightStuffSkill.maxStrength
+                            is com.jervisffb.engine.rules.bb2025.skills.RightStuff -> rightStuffSkill.maxStrength
+                            else -> INVALID_GAME_STATE("Unknown Right Stuff skill type: ${rightStuffSkill::class.simpleName}")
+                        }
 
-                    val canBeThrown = player != null
-                        && player.team == thrower.team
-                        && player.hasSkill(SkillType.RIGHT_STUFF)
-                        && player.strength <= maxStrength
-                    if (canBeThrown) {
-                        player
-                    } else {
-                        null
+                        // Rooted players cannot leave their square, so they cannot be thrown.
+                        val isRooted = player.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+
+                        val canBeThrown = player.team == thrower.team
+                            && player.isSkillAvailable(SkillType.RIGHT_STUFF)
+                            && player.strength <= maxStrength
+                            && !isRooted
+                        if (canBeThrown) {
+                            player
+                        } else {
+                            null
+                        }
+                    }.let { eligiblePlayers ->
+                        if (eligiblePlayers.isNotEmpty()) {
+                            options.add(SelectPlayer.fromPlayers(eligiblePlayers))
+                        }
                     }
-                }
-                if (eligiblePlayers.isNotEmpty()) {
-                    options.add(SelectPlayer.fromPlayers(eligiblePlayers))
-                }
             }
 
             // End the pass action before trying to throw the ball

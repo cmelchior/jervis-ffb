@@ -450,7 +450,10 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
 
     @Test
     fun fallOverOnCrashLanding() {
-        awayTeam["A13".playerId].state = PlayerState.PRONE
+        awayTeam["A13".playerId].apply {
+            state = PlayerState.PRONE
+            hasTackleZones = true
+        }
         controller.rollForward(
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),

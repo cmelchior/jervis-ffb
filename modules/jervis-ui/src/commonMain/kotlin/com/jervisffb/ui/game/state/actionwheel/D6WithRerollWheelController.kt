@@ -43,6 +43,8 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
+import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
+import com.jervisffb.engine.rules.common.procedures.TakeRootRollContext
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireContext
@@ -94,6 +96,7 @@ import kotlin.time.ExperimentalTime
  * - Rush
  * - Shadowing
  * - Steady Footing
+ * - Take Root
  * - Unchannelled Fury
  */
 abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
@@ -463,6 +466,22 @@ object SteadyFootingWheelController : D6WithRerollWheelController() {
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<SteadyFootingRollContext>()
         return context.roll!!.originalRoll
+    }
+}
+
+object TakeRootWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "take-root"
+    override val rollDiceNode: Node = TakeRootRoll.RollDie
+    override val chooseRerollSourceNode: Node = TakeRootRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = TakeRootRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ActivatePlayerContext>().player.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<TakeRootRollContext>()
+        return context.roll.originalRoll
     }
 }
 

@@ -43,10 +43,11 @@ data class PushContext(
     // Tracks if the attacker is using Juggernaut.
     val isAttackerUsingFrenzy: Boolean = firstPusher.hasSkill(SkillType.FRENZY)
 
-    // Tracks if Stand Firm is used anywhere in the Push or Chain of Pushes. This will prevent
-    // all players from being moved.
-    val isDefenderUsingStandFirm: Boolean
-        get() = pushChain.any { it.usedStandFirm }
+    // Tracks if a defender in the Push Chain cannot be moved, and thus stops
+    // the Push Chain. This can happen if Stand Firm is used or a player is
+    // Rooted.
+    val isDefenderImmovable: Boolean
+        get() = pushChain.any { it.usedStandFirm || it.defenderIsRooted }
 
     // Returns last "pusher" in the push chain
     fun pusher(): Player {
@@ -63,13 +64,16 @@ data class PushContext(
         val pushee: Player,
         // Where is the pushee being pushed from?
         val from: FieldCoordinate,
-        // Where is the pushee being pushed to?
-        var to: FieldCoordinate? = null, // If `null` push direction has not been selected yet
+        // Where is the pushee being pushed to? Should have the same value as
+        // `from` if the pushee cannot be pushed. `null` should only represent
+        // a push direction has not been determined yet.
+        var to: FieldCoordinate? = null,
         val isBlitzing: Boolean = false, // If first pusher is doing a Blitz
         val isChainPush: Boolean = false, // True for every push beyond the first
         var usedGrab: Boolean = false,
         var usedStandFirm: Boolean = false,
         var usedSideStep: Boolean = false,
+        var defenderIsRooted: Boolean = false,
         // Set to `true` if we checked the player in this step for scoring
         var checkedForScoringAfterTrapdoors: Boolean = false,
     )

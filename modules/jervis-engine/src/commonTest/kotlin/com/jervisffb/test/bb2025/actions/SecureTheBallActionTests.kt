@@ -21,6 +21,7 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -90,7 +91,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
 
     // If the pickup fails and ends up in the hands of another team player, it is still a turnover
     @Test
-    fun turnoverIfPlayerDoesNotHaveBallWhenActionEnds() {
+    fun turnoverIfAnotherPlayerCatchesIt() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.MOVE),
             SmartMoveTo(17, 6),
@@ -103,6 +104,18 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
             *catch(6.d6)
         )
         assertTrue(awayTeam["A10".playerId].hasBall())
+        assertEquals(state.homeTeam, state.activeTeam)
+    }
+
+    @Test
+    fun turnoverIfPlayerDoesNotHaveBallWhenActionEnds() {
+        controller.rollForward(
+            *activatePlayer("A8", PlayerStandardActionType.SECURE_THE_BALL),
+            *moveTo(15, 12), // We need to move; otherwise, the action is just treated as canceled.
+            EndAction
+        )
+        assertNull(state.activePlayer)
+        assertFalse(awayTeam["A8".playerId].hasBall())
         assertEquals(state.homeTeam, state.activeTeam)
     }
 

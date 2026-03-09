@@ -66,6 +66,16 @@ object PushedBack: Procedure() {
     }
 
     object ChooseToFollowUp: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<PushContext>()
+            // If one of the defenders could not be moved (for whatever reason),
+            // We can neither Follow-up, nor use Strip Ball, so we just skip those
+            // steps.
+            return when (context.isDefenderImmovable) {
+                true -> ResolveEventsInPushChain
+                false -> null
+            }
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return FollowUpStep
         }

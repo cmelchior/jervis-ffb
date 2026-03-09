@@ -20,6 +20,7 @@ import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
@@ -62,30 +63,33 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  *    a. Juggernaut prevents the use of Stand Firm in chain pushes (NAF Ruling).
  *    b. Juggernaut prevents the use of Fend when following up.
  *
- * 2. Player B must decide whether to use Stand Firm. Page 136 in the BB2025
+ * 2. Player B checks for Rooted. If rooted, Player B cannot be pushed back.
+ *    a. Is also checked on Chain Pushes.
+ *
+ * 3. Player B must decide whether to use Stand Firm. Page 136 in the BB2025
  *    rulebook.
  *    a. Cannot be used if Player A used Juggernaut.
  *    b. Can be used on chain pushes.
  *
- * 3. Player A must decide whether to use Grab. Page 128 in the BB2025 rulebook.
+ * 4. Player A must decide whether to use Grab. Page 128 in the BB2025 rulebook.
  *    a. Cannot be used if Player B used Stand Firm.
  *    b. Cannot be used while blitzing.
  *    c. Cannot be used on chain pushes.
  *    d. Cannot be used if no unoccupied squares exist adjacent to Player B.
  *
- * 4. Player B must decide whether to use Sidestep. Page 135 in the BB2025
+ * 5. Player B must decide whether to use Sidestep. Page 135 in the BB2025
  *    rulebook.
  *    a. Cannot be used if Player B used Stand Firm.
  *    b. Cannot be used if Player A used Grab.
  *    c. Cannot be used if no unoccupied squares exist adjacent to Player B.
  *
- * 5. Player A must decide whether to use Eye Gouge. Page 128 in the BB2025
+ * 6. Player A must decide whether to use Eye Gouge. Page 128 in the BB2025
  *    rulebook.
  *    a. Cannot be used if Player B used Stand Firm.
  *.   b. Cannot be used during chain-pushes
  */
 object CreatePushChainStep: Procedure() {
-    override val initialNode: Node = DecideToUseJuggernaut
+    override val initialNode: Node = CheckForRooted
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val blockContext = state.getContext<BlockContext>()
@@ -110,6 +114,22 @@ object CreatePushChainStep: Procedure() {
         }
     }
 
+    object CheckForRooted: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PushContext>()
+            val pushData = context.pushChain.last()
+            val defenderIsRooted = pushData.pushee.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+            return when (defenderIsRooted) {
+                true -> compositeCommandOf(
+                    SetContextProperty(PushContext.PushData::to, pushData, pushData.pushee.coordinates),
+                    SetContextProperty(PushContext.PushData::defenderIsRooted, pushData, defenderIsRooted),
+                    ExitProcedure()
+                )
+                false -> GotoNode(DecideToUseStandFirm)
+            }
+        }
+    }
+
     // TODO Is this where we decide on Juggernaut? Or should we somehow make it a node outside
     //  the push chain (since it doesn't apply to chain pushes)
     // TODO Juggernaut probably doesn't apply to chain pushes?
@@ -129,7 +149,7 @@ object CreatePushChainStep: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
+                    compositeCommandOf(
                         // SetContextProperty(PushContext.PushData::usingJuggernaut, pushData, true),
                         GotoNode(DecideToUseStandFirm)
                     )
@@ -163,8 +183,9 @@ object CreatePushChainStep: Procedure() {
                     val pushData = context.pushChain.last()
                     compositeCommandOf(
                         ReportSkillUsed(pushData.pushee, SkillType.STAND_FIRM),
+                        SetContextProperty(PushContext.PushData::to, pushData, pushData.pushee.coordinates),
                         SetContextProperty(PushContext.PushData::usedStandFirm, pushData, true),
-                        GotoNode(DecideToUseGrab)
+                        ExitProcedure()
                     )
                 }
                 Cancel, Continue -> {
@@ -371,7 +392,7 @@ object CreatePushChainStep: Procedure() {
                         compositeCommandOf(
                             *updateActions,
                             AddContextListItem(context.pushChain, newPush),
-                            GotoNode(DecideToUseJuggernaut)
+                            GotoNode(CheckForRooted)
                         )
                     }
                     commands

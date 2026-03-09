@@ -64,7 +64,7 @@ object BlockAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val blockActionContext = state.getContextOrNull<BlockActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
+            SetContext(activatePlayerContext.copyWithMarkedAction(blockActionContext?.hasBlocked == true)),
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),

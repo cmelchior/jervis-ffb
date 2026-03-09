@@ -46,9 +46,7 @@ object StabAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val actionContext = state.getContext<StabActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(
-                markActionAsUsed = (actionContext.hasStabbed))
-            ),
+            SetContext(activatePlayerContext.copyWithMarkedAction(actionContext.hasStabbed)),
             RemoveContext<StabContext>(),
             RemoveContext<StabActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),

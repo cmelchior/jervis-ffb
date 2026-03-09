@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
@@ -31,6 +32,7 @@ import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportSteadyFootingResult
 import com.jervisffb.engine.rules.Rules
@@ -121,8 +123,12 @@ object BB2025KnockedDown: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val player = context.player
+            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
             return buildCompositeCommand {
                 add(SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
+                if (rootedStatus != null) {
+                    add(RemovePlayerStatusEffect(player, rootedStatus))
+                }
                 // Note, in BB2020, thrown players where knocked down after landing on other players,
                 // but this was explicitly not a turnover (after errata). The wording in BB2025
                 // is the original wording, so landing on your team players is always a turnover for now.

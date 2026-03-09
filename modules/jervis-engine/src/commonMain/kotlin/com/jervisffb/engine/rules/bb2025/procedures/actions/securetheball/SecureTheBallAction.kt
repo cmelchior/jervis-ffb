@@ -25,6 +25,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
@@ -62,13 +63,17 @@ object SecureTheBallAction : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<SecureTheBallContext>()
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
+
+        // If the player never even reached a ball, it is a turnover when the action ends.
+        val successfullySecuredTheBall = context.securedTheBall
+        val isActionUsed = ActivatePlayer.actionCountAsUsed(activePlayerContext)
         return compositeCommandOf(
             RemoveContext<SecureTheBallContext>(),
-            SetContext(
-                activePlayerContext.copy(
-                    markActionAsUsed = context.hasMoved
-                )
-            )
+            SetContext(activePlayerContext.copyWithMarkedAction(context.hasMoved)),
+            when (isActionUsed && !successfullySecuredTheBall) {
+                true -> SetTurnOver(TurnOver.STANDARD)
+                false -> null
+            }
         )
     }
 

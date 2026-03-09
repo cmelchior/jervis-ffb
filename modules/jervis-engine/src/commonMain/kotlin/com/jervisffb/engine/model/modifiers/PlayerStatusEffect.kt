@@ -43,5 +43,7 @@ data class PlayerStatusEffect(
         fun boneHead() = PlayerStatusEffect(PlayerStatusEffectType.BONE_HEAD, Duration.START_OF_ACTIVATION)
         fun reallyStupid() = PlayerStatusEffect(PlayerStatusEffectType.REALLY_STUPID, Duration.START_OF_ACTIVATION)
         fun bloodLust() = PlayerStatusEffect(PlayerStatusEffectType.BLOOD_LUST, Duration.END_OF_ACTIVATION)
+        // Will be removed at end-of-drive, unless manually removed before (by being knocked down or placed prone)
+        fun rooted() = PlayerStatusEffect(PlayerStatusEffectType.ROOTED, Duration.END_OF_DRIVE)
     }
 }

@@ -64,6 +64,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
+import com.jervisffb.engine.rules.bb2025.skills.TakeRoot
 import com.jervisffb.engine.rules.bb2025.skills.Taunt
 import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
@@ -629,9 +630,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.TAKE_ROOT -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Take Root", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        TakeRoot(player, category, expiresAt)
+                    }
                 }
                 SkillType.TITCHY -> {
                     addNoValueEntry("Titchy", type, SkillCategory.TRAITS) { player, category,expiresAt ->

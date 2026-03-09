@@ -89,7 +89,7 @@ object HandOffAction : Procedure() {
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
-            SetContext(activePlayerContext.copy(markActionAsUsed = context.hasMoved || context.catcher != null)),
+            SetContext(activePlayerContext.copyWithMarkedAction(context.hasMoved || context.catcher != null)),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )
     }

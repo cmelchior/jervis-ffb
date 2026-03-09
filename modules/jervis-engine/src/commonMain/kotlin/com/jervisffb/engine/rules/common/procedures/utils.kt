@@ -28,13 +28,13 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
-import kotlin.collections.plus
 
 /**
  * Returns a list of all possible move actions for a given player.
@@ -51,6 +51,19 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
 
     val rules = state.rules
     val options = mutableListOf<MoveType>()
+
+    // Standup
+    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
+        options.add(MoveType.STAND_UP)
+    }
+
+    // If Player is Rooted, they cannot leave their current square, so exit early
+    if (player.hasStatusEffect(PlayerStatusEffectType.ROOTED)) {
+        return when (options.isNotEmpty()){
+            true -> SelectMoveType(options)
+            false -> null
+        }
+    }
 
     // Normal move (with a potential rush)
     if (player.movesLeft + player.rushesLeft >= 1 && rules.isStanding(player)) {
@@ -84,11 +97,6 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     }
     if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.POGO_STICK)) {
         options.add(MoveType.POGO)
-    }
-
-    // Standup
-    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
-        options.add(MoveType.STAND_UP)
     }
 
     // Skills

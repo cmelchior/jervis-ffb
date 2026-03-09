@@ -580,7 +580,10 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     @Test
     fun thrownPronePlayerCanMoveIfNotActivated() {
         val thrownPlayer = awayTeam["A13".playerId]
-        thrownPlayer.state = PlayerState.PRONE
+        thrownPlayer.apply {
+            state = PlayerState.PRONE
+            hasTackleZones = false
+        }
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
