@@ -437,8 +437,10 @@ object ActivatePlayer : Procedure() {
      * count the action as "used".
      */
     fun actionCountAsUsed(context: ActivatePlayerContext): Boolean {
-        return context.rolledForNegaTrait
-            || context.clearedNegativeEffects
-            || context.markActionAsUsed
+        return context.declaredAction != null
+            && (context.rolledForNegaTrait
+                || context.clearedNegativeEffects
+                || context.markActionAsUsed
+            )
     }
 }
