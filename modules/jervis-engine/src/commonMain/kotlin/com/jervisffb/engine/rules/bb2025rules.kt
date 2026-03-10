@@ -50,15 +50,17 @@ abstract class BB2025Rules(
                 }
                 if (turnData.blockActions > 0) {
                     val isStanding = (player.state == PlayerState.STANDING)
+                    // Jump Up can only be used on Block Actions, not Special Actions
+                    val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP) && player.state == PlayerState.PRONE
                     val hasEligibleTargets = (player.location as OnFieldLocation)
                         .getSurroundingCoordinates(this@BB2025Rules, 1)
                         .mapNotNull { state.field[it].player }
                         .filter { otherPlayer -> otherPlayer.team != player.team }
                         .filter { otherPlayer -> isStanding(otherPlayer)}
-                        .any { otherPlayer -> isMarking(player, otherPlayer)}
-
-                    // TODO Also check for Jump Up
-                    if (isStanding && hasEligibleTargets) {
+                        .any { otherPlayer ->
+                            isMarking(player, otherPlayer) || hasJumpUp
+                        }
+                    if ((isStanding || hasJumpUp) && hasEligibleTargets) {
                         add(teamActions.block)
                     }
                 }

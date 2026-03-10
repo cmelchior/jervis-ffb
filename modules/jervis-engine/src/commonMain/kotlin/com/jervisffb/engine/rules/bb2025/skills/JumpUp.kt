@@ -8,23 +8,23 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the "Timmm-ber! (Passive)" skill.
+ * Representation of the "Jump Up (Active)" skill.
  *
- * See page 137 in the BB2025 rulebook.
+ * See page 130 in the BB2025 rulebook.
  */
-class Timmmber(
+class JumpUp(
     override val player: Player,
-    override val category: SkillCategory = SkillCategory.TRAITS,
+    override val category: SkillCategory = SkillCategory.AGILITY,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
-    override val type: SkillType = SkillType.TIMMMBER
+    override val type: SkillType = SkillType.JUMP_UP
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false
-    override val workWithoutTackleZones: Boolean = true
+    override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = true
-    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.PASSIVE)
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 }

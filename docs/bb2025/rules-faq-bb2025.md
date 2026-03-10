@@ -491,6 +491,10 @@ In particular, this means that in a Chain Push scenario, a player with
 Juggernaut will cancel Stand Firm for all opponent players, but not players on 
 their own team.
 
+### Page 130 - Jump Up
+While Jump Up is technically optional, Jervis will always apply it as the coach
+can just not use the extra movement.
+
 ### Page 130 - Kick
 Jervis uses the NAF interpretation, which means that you are allowed to roll the
 deviate die (D6) and then choose to treat the roll as either a D6 or D3.

@@ -277,9 +277,13 @@ fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == typ
 // This method assumes the player is on the field
 fun Player.isSkillAvailable(type: SkillType): Boolean {
     return getSkillOrNull(type)?.let { skill ->
-        if (!hasTackleZones && !skill.workWithoutTackleZones) {
+
+        // Check for distracted state
+        if (!hasTackleZones && !skill.workWithoutTackleZones && this.state == PlayerState.STANDING) {
             return@let false
         }
+
+        // Check for Prone state
         // TODO Is a Stunned player considered Prone or are they completely separate?
         val isProne = (state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN)
         if (isProne && !skill.workWhenProne) {

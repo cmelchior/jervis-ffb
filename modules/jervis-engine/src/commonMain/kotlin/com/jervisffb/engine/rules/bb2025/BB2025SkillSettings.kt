@@ -29,6 +29,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
 import com.jervisffb.engine.rules.bb2025.skills.Insignificant
 import com.jervisffb.engine.rules.bb2025.skills.Juggernaut
+import com.jervisffb.engine.rules.bb2025.skills.JumpUp
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
@@ -130,9 +131,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.JUMP_UP -> {
-                    // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Jump Up", type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                        JumpUp(player, category, expiresAt)
+                    }
                 }
                 SkillType.LEAP -> {
                     addNoValueEntry("Leap", type, SkillCategory.AGILITY) { player, category,expiresAt ->
@@ -640,7 +641,7 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.TIMMMBER -> {
-                    addNoValueEntry("Timmm-ber", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Timmm-ber!", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Timmmber(player, category, expiresAt)
                     }
                 }

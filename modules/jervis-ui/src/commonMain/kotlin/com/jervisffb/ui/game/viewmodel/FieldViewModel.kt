@@ -13,7 +13,9 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -144,12 +146,15 @@ class FieldViewModel(
             // over already existing move decorations.
             val activePlayer: Player? = uiSnapshot.game.activePlayer
             val requiresStandingUp = (activePlayer?.state == PlayerState.PRONE)
+            val standingUpIsFree = (activePlayer?.hasSkill(SkillType.JUMP_UP) == true)
 
             // Use path finder
             val pathList = uiSnapshot.pathFinder?.let { pathFinder ->
                 if (showPathFinder(activePlayer, mouseEnter)) {
-                    val standingUpPenalty = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
-                    // TODO This logic fails when Undo'ing. Figure out why.
+                    val standingUpPenalty = when {
+                        requiresStandingUp && !standingUpIsFree -> rules.moveRequiredForStandingUp
+                        else -> 0
+                    }
                     val path: List<FieldCoordinate> = uiSnapshot.pathFinder.getClosestPathTo(mouseEnter!!, (activePlayer!!.movesLeft - standingUpPenalty))
 
                     // Create the action triggered if clicking the mouse-over field.
@@ -191,16 +196,13 @@ class FieldViewModel(
 
                     // Annotate all fields with "Move Used" amount + add action on the square
                     // that is currently being hovered over.
-                    val standingUpModifier = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
+                    val standingUpModifier = if (requiresStandingUp && !standingUpIsFree) rules.moveRequiredForStandingUp else 0
                     val currentMovesLeft = activePlayer.move - activePlayer.movesLeft
                     path.mapIndexed { index, pathSquare ->
-                        val currentSquareData = uiSnapshot.squares[pathSquare]!!
-
                         val shownMoveValue = when (index) {
                             0 -> currentMovesLeft + index + 1 + standingUpModifier
                             else -> currentMovesLeft + index + 1 + standingUpModifier
                         }
-
                         UiPathFinderData(
                             coordinate = pathSquare,
                             futureMoveDistance = shownMoveValue,

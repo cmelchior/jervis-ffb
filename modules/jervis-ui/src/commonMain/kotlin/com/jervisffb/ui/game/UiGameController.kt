@@ -14,6 +14,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
@@ -22,6 +23,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.ui.game.animations.AnimationFactory
@@ -43,6 +45,7 @@ import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.FoulAppearanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
+import com.jervisffb.ui.game.state.actionwheel.JumpUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
 import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
 import com.jervisffb.ui.game.state.actionwheel.LeapWheelController
@@ -176,6 +179,7 @@ class UiGameController(
         FoulAppearanceWheelController,
         InterceptionWheelController,
         JumpWheelController,
+        JumpUpWheelController,
         LandingWheelController,
         LeapWheelController,
         PickupWheelController,
@@ -567,14 +571,13 @@ class UiGameController(
             return
         }
 
-
         // Track standing up so we can adjust "Move used" correctly.
         if (delta.containsAction(MoveTypeSelected(MoveType.STAND_UP))) {
             val activePlayer = state.activePlayer!!
-            if (activePlayer.move >= rules.moveRequiredForStandingUp) {
+            if (activePlayer.move >= rules.moveRequiredForStandingUp && !activePlayer.hasSkill(SkillType.JUMP_UP)) {
                 uiIndicators.addMoveUsedToStandUp(rules.moveRequiredForStandingUp)
             } else {
-                uiIndicators.addMoveUsedToStandUp(activePlayer.move)
+                uiIndicators.addMoveUsedToStandUp(0)
             }
         }
 

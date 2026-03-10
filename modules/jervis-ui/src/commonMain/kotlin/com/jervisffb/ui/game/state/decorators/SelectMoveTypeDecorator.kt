@@ -11,9 +11,11 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -181,10 +183,15 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
         if (requiresRush || requiresDodge) {
             addSelectableRushSquares(activeLocation, state, acc, actionProvider)
         } else {
+            val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP)
+            val maxMove = when (hasJumpUp) {
+                false -> (player.move - state.rules.moveRequiredForStandingUp)
+                true -> player.move
+            }
             val allPaths = state.rules.pathFinder.calculateAllPaths(
                 state,
                 activeLocation as FieldCoordinate,
-                (player.move - state.rules.moveRequiredForStandingUp).coerceAtLeast(0),
+                maxMove.coerceAtLeast(0),
             )
             acc.pathFinder = allPaths
         }

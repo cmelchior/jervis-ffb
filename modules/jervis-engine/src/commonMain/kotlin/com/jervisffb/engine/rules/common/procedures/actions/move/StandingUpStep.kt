@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.HelpingHandsModifier
 import com.jervisffb.engine.reports.ReportStandingUp
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -67,10 +68,15 @@ object StandingUpStep : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
             val movingPlayer = context.player
-            return if (movingPlayer.movesLeft >= rules.moveRequiredForStandingUp) {
+            val hasJumpUp = movingPlayer.isSkillAvailable(SkillType.JUMP_UP)
+            return if (movingPlayer.movesLeft >= rules.moveRequiredForStandingUp || hasJumpUp) {
+                val adjustedMovesLeft = when (hasJumpUp) {
+                    true -> movingPlayer.movesLeft
+                    else -> movingPlayer.movesLeft - rules.moveRequiredForStandingUp
+                }
                 compositeCommandOf(
                     SetPlayerState(movingPlayer, PlayerState.STANDING, hasTackleZones = true),
-                    SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - rules.moveRequiredForStandingUp),
+                    SetPlayerMoveLeft(movingPlayer, adjustedMovesLeft),
                     SetContext(context.copy(hasMoved = true)),
                     ExitProcedure()
                 )
@@ -81,7 +87,7 @@ object StandingUpStep : Procedure() {
     }
 
     object RollForStandingUp : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             // The only modifier for Standing Up currently comes from Timm-ber!
             // We will apply these automatically since doing it or not, has no
             // side effects, and if you do not want the player to stand up,

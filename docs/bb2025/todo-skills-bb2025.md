@@ -36,7 +36,17 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Prevents Guard
   - [x] Prevents Put the Boot In
 - [ ] Hit and Run
-- [ ] Jump Up
+- [x] Jump Up
+  - [x] Ignores 4+ to stand up if < 3 moves
+  - [x] Agility Roll + 1 to block
+  - [x] Does not work on Special Actions when Prone (Stab, Projectile Vomit, Breathe Fire)
+  - [x] Free to stand up during Move
+  - [x] Free to stand up during Blitz
+  - [x] Free to stand up during Hand-off
+  - [x] Free to stand up during Pass
+  - [x] Free to stand up during Foul
+  - [x] Free to stand up during Secure the Ball
+  - [x] Free to stand up during Throw Team-mate
 - [ ] Leap
     - [x] Leap over any square using Jump rules
     - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.

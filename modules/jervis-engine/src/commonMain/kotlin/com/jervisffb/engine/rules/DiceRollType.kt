@@ -31,6 +31,7 @@ enum class DiceRollType {
     INJURY,
     INTERCEPTION, // Only used in BB2025
     JUMP,
+    JUMP_UP,
     KICK_OFF_TABLE,
     LANDING,
     LASTING_INJURY,

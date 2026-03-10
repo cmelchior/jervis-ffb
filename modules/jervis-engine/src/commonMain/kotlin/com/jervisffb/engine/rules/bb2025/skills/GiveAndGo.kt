@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Represents the "Give and Go" skill.
  *
- * See page XXX in the BB2025 rulebook.
+ * See page 128 in the BB2025 rulebook.
  */
 class GiveAndGo(
     override val player: Player,

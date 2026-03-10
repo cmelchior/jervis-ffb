@@ -28,6 +28,8 @@ import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
@@ -87,6 +89,7 @@ import kotlin.time.ExperimentalTime
  * - Foul Appearance
  * - Interception
  * - Jump
+ * - Jump Up
  * - Landing
  * - Leap
  * - Pickup
@@ -498,6 +501,20 @@ object JumpWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<JumpRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+object JumpUpWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "jump-up"
+    override val rollDiceNode: Node = JumpUpRoll.RollDie
+    override val chooseRerollSourceNode: Node = JumpUpRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = JumpUpRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<JumpUpRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<JumpUpRollContext>()
         return context.roll!!.originalRoll
     }
 }

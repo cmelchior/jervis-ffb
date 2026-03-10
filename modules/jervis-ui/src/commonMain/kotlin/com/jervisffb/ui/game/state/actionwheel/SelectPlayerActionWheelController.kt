@@ -12,10 +12,12 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId
@@ -46,7 +48,6 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
 
         // If prone, also add a "Stand Up & And Action". But only if the
         // action has a move component. Similar to FUMBBL.
-        // TODO If the player has Jump Up, all non-move actions can also do this.
         val activePlayer = acc.game.activePlayer ?: error("No active player")
         if (activePlayer.state == PlayerState.PRONE) {
             // val oldData = acc.fieldSquares[activePlayer.location as FieldCoordinate]!!
@@ -100,7 +101,16 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
                 PlayerStandardActionType.MOVE -> "Move" to ActionIcon.MOVE
                 PlayerStandardActionType.PASS -> "Pass" to ActionIcon.PASS
                 PlayerStandardActionType.HAND_OFF -> "Hand-off" to ActionIcon.HANDOFF
-                PlayerStandardActionType.BLOCK -> "Block" to ActionIcon.BLOCK
+                PlayerStandardActionType.BLOCK -> {
+                    val currentPlayer = state.activePlayer
+                    val hasJumpUp = currentPlayer?.isSkillAvailable(SkillType.JUMP_UP) ?: false
+                    val isProne = currentPlayer?.state == PlayerState.PRONE
+                    val title = when (isProne && hasJumpUp) {
+                        true -> "Jump Up & Block"
+                        false -> "Block"
+                    }
+                    title to ActionIcon.BLOCK
+                }
                 PlayerStandardActionType.BLITZ -> "Blitz" to ActionIcon.BLITZ
                 PlayerStandardActionType.FOUL -> "Foul" to ActionIcon.FOUL
                 PlayerStandardActionType.SPECIAL -> "Special" to ActionIcon.CONFIRM // What to do here?

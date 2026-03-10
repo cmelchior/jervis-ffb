@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -58,7 +59,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * for more information about BB2020 and [com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep] for BB2025.
  */
 object BlockAction : Procedure() {
-    override val initialNode: Node = SelectDefenderOrEndAction
+    override val initialNode: Node = CheckForJumpUp
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
@@ -69,6 +70,40 @@ object BlockAction : Procedure() {
             RemoveContext<BlockActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
         )
+    }
+
+    object CheckForJumpUp: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val player = state.activePlayer ?: error("Missing active player")
+            val isProne = (player.state == PlayerState.PRONE)
+            val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP)
+            return when (isProne && hasJumpUp) {
+                true -> null
+                false -> SelectDefenderOrEndAction
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val context = state.getContext<ActivatePlayerContext>()
+            return SetContext(JumpUpRollContext(context.player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = JumpUpRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val jumpUpContext = state.getContext<JumpUpRollContext>()
+            val activePlayerContext = state.getContext<ActivatePlayerContext>()
+            return when (jumpUpContext.isSuccess) {
+                true -> compositeCommandOf(
+                    SetPlayerState(jumpUpContext.player, PlayerState.STANDING, hasTackleZones = true),
+                    GotoNode(SelectDefenderOrEndAction),
+                )
+                false -> compositeCommandOf(
+                    SetContext(activePlayerContext.copy(
+                        activationEndsImmediately = true,
+                        markActionAsUsed = true
+                    )),
+                    ExitProcedure()
+                )
+            }
+        }
     }
 
     object SelectDefenderOrEndAction : ActionNode() {
