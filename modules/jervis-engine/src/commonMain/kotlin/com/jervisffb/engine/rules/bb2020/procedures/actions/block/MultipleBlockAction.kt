@@ -17,9 +17,11 @@ import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.RemoveContextUsingType
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -155,7 +157,7 @@ object MultipleBlockAction: Procedure() {
     override val initialNode: Node = SelectDefenderOrAbortActionOrContinueBlock
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val activeContext = state.getContext<ActivatePlayerContext>()
-        return SetContext(
+        return AddContext(
             BB2020MultipleBlockContext(
                 attacker = activeContext.player
             )
@@ -164,7 +166,7 @@ object MultipleBlockAction: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<BB2020MultipleBlockContext>()
         return compositeCommandOf(
-            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = !context.actionAborted)),
+            UpdateContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = !context.actionAborted)),
             RemoveContext<BB2020MultipleBlockContext>()
         )
     }
@@ -217,7 +219,7 @@ object MultipleBlockAction: Procedure() {
             return when (action) {
                 Cancel -> {
                     compositeCommandOf(
-                        SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = false)),
+                        UpdateContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = false)),
                         ExitProcedure()
                     )
                 }
@@ -226,7 +228,7 @@ object MultipleBlockAction: Procedure() {
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(
-                        SetContext(context.copy(activeDefender = null, actionAborted = false)),
+                        UpdateContext(context.copy(activeDefender = null, actionAborted = false)),
                         GotoNode(RollDiceForTarget1)
                     )
                 }
@@ -238,7 +240,7 @@ object MultipleBlockAction: Procedure() {
                         else -> {
                             val updatedContext = context.copyAndUnsetDefender(player)
                             compositeCommandOf(
-                                SetContext(updatedContext),
+                                UpdateContext(updatedContext),
                                 GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                             )
                         }
@@ -249,7 +251,7 @@ object MultipleBlockAction: Procedure() {
                     when {
                         context.defender1 == null -> {
                             compositeCommandOf(
-                                SetContext(
+                                UpdateContext(
                                     context.copy(
                                         defender1 = player,
                                         defender1Location = player.coordinates,
@@ -261,7 +263,7 @@ object MultipleBlockAction: Procedure() {
                         }
                         context.defender2 == null -> {
                             compositeCommandOf(
-                                SetContext(
+                                UpdateContext(
                                     context.copy(
                                         defender2 = player,
                                         defender2Location = player.coordinates,
@@ -307,7 +309,7 @@ object MultipleBlockAction: Procedure() {
                         )
                     }
                     compositeCommandOf(
-                        SetContext(context.copyAndUnsetDefender(player)),
+                        UpdateContext(context.copyAndUnsetDefender(player)),
                         GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                     )
                 }
@@ -316,7 +318,7 @@ object MultipleBlockAction: Procedure() {
                         val type = typeSelected.type
                         val updatedContext = context.copyAndSetBlockTypeForActiveDefender(type)
                         compositeCommandOf(
-                            SetContext(updatedContext),
+                            UpdateContext(updatedContext),
                             GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                         )
                     }
@@ -411,7 +413,7 @@ object MultipleBlockAction: Procedure() {
                     else -> INVALID_GAME_STATE("No matching defender: $player")
                 }
                 compositeCommandOf(
-                    SetContext(context.copy(activeDefender = activeDefenderIndex)),
+                    UpdateContext(context.copy(activeDefender = activeDefenderIndex)),
                     GotoNode(ResolveFirstPlayer)
                 )
             }
@@ -460,7 +462,7 @@ object MultipleBlockAction: Procedure() {
             val contextClass = context.getContextForCurrentBlock()::class
             val updateMultipleBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
-                RemoveContext(contextClass),
+                RemoveContextUsingType(contextClass),
                 SetTurnOver(null),
                 updateMultipleBlockContextCommand,
                 SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, nextDefender),
@@ -489,7 +491,7 @@ object MultipleBlockAction: Procedure() {
             val contextClass = context.getContextForCurrentBlock()::class
             val updatedMultiBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
-                RemoveContext(contextClass),
+                RemoveContextUsingType(contextClass),
                 SetTurnOver(context.postponeTurnOver),
                 updatedMultiBlockContextCommand,
                 SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, null),
@@ -548,7 +550,7 @@ object MultipleBlockAction: Procedure() {
             val context = state.getContext<BB2020MultipleBlockContext>().defender1PushChain!!
             val push = context.pushChain.first { checkPlayerForTouchdown(it) }
             val player = push.pushee
-            return SetContext(ScoringATouchDownContext(player))
+            return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -575,7 +577,7 @@ object MultipleBlockAction: Procedure() {
             val context = state.getContext<BB2020MultipleBlockContext>().defender2PushChain!!
             val push = context.pushChain.first { checkPlayerForTouchdown(it) }
             val player = push.pushee
-            return SetContext(ScoringATouchDownContext(player))
+            return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -604,7 +606,7 @@ object MultipleBlockAction: Procedure() {
                 resolveNextBallEventsInPushChain(pushData)
             }
             return handleBallCommand ?: compositeCommandOf(
-                SetContext(context.copy(defender1BallsHandled = true)),
+                UpdateContext(context.copy(defender1BallsHandled = true)),
                 GotoNode(ResolveBlock2DefendersBallEvents)
             )
         }
@@ -622,7 +624,7 @@ object MultipleBlockAction: Procedure() {
                 resolveNextBallEventsInPushChain(pushData)
             }
             return handleBallCommand ?: compositeCommandOf(
-                SetContext(context.copy(defender2BallsHandled = true)),
+                UpdateContext(context.copy(defender2BallsHandled = true)),
                 ExitProcedure()
             )
         }
@@ -646,7 +648,7 @@ object MultipleBlockAction: Procedure() {
     object ThrowInCurrentBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetContext(
+            return AddContext(
                 ThrowInContext(
                     ball,
                     ball.outOfBoundsAt!!
@@ -679,8 +681,8 @@ object MultipleBlockAction: Procedure() {
         val context = state.getContext<BB2020MultipleBlockContext>()
         val updatedContext = context.copy(activeDefender = activeDefender)
         return compositeCommandOf(
-            SetContext(updatedContext),
-            SetContext(updatedContext.getContextForCurrentBlock())
+            UpdateContext(updatedContext),
+            AddContext(updatedContext.getContextForCurrentBlock())
         )
     }
 
@@ -693,7 +695,7 @@ object MultipleBlockAction: Procedure() {
         val updateMultipleBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
         val contextClass = context.getContextForCurrentBlock()::class
         return compositeCommandOf(
-            RemoveContext(contextClass),
+            RemoveContextUsingType(contextClass),
             updateMultipleBlockContextCommand
         )
     }

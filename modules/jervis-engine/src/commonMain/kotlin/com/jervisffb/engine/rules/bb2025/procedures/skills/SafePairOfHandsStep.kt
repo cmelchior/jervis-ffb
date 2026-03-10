@@ -42,7 +42,7 @@ object SafePairOfHandsStep: Procedure() {
             val context = state.getContext<RiskingInjuryContext>()
             val hasSafePairOfHands = context.player.isSkillAvailable(SkillType.SAFE_PAIR_OF_HANDS)
             val hasBall = context.player.hasBall()
-            val hasValidTargets = context.player.coordinates.getSurroundingCoordinates(rules).any { !state.field[it].isOccupied() }
+            val hasValidTargets = context.player.location.isOnField(rules) && context.player.coordinates.getSurroundingCoordinates(rules).any { !state.field[it].isOccupied() }
             return when (hasBall && hasSafePairOfHands && hasValidTargets) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)

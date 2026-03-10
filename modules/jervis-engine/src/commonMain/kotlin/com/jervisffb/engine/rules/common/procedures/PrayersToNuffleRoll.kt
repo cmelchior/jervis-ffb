@@ -7,8 +7,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.AddPrayersToNuffle
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -35,7 +34,7 @@ import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 object PrayersToNuffleRoll : Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<PrayersToNuffleRollContext>()
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PrayersToNuffleRollContext>()
 
     object RollDie : ActionNode() {
@@ -59,11 +58,13 @@ object PrayersToNuffleRoll : Procedure() {
                     )
                 } else {
                     compositeCommandOf(
-                        SetContext(context.copy(
-                            rollsRemaining = context.rollsRemaining - 1,
-                            result = result,
-                            resultApplied = false
-                        )),
+                        UpdateContext(
+                            context.copy(
+                                rollsRemaining = context.rollsRemaining - 1,
+                                result = result,
+                                resultApplied = false
+                            )
+                        ),
                         ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, dieRoll),
                         GotoNode(ApplyTableResult),
                     )

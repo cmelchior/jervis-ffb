@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -63,7 +63,7 @@ object GreasyCleats : Procedure() {
                     castAction<PlayerSelected>(action) {
                         compositeCommandOf(
                             AddPlayerStatModifier(it.getPlayer(state), PrayerStatModifier.GREASY_CLEATS),
-                            SetContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),
+                            UpdateContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),
                             ReportGameProgress("${it.getPlayer(state).name} received Greasy Cleats (-1 MA)"),
                             ExitProcedure()
                         )

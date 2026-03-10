@@ -19,8 +19,9 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -80,7 +81,7 @@ object FoulStep: Procedure() {
             val offensiveAssists = rules.calculateOffensiveAssists(fouler, victim)
             val defensiveAssists = rules.calculateDefensiveAssists(victim, fouler)
             return compositeCommandOf(
-                SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                UpdateContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 GotoNode(CalculatePutTheBootInAssists)
             )
         }
@@ -119,7 +120,7 @@ object FoulStep: Procedure() {
                     add(ReportSkillUsed(player, SkillType.PUT_THE_BOOT_IN))
                 }
                 addAll(
-                    SetContext(
+                    UpdateContext(
                         context.copy(
                             putTheBootInAssists = bootAssists.size
                         )
@@ -145,7 +146,7 @@ object FoulStep: Procedure() {
                     if (foulContext.defensiveAssists > 0) DefensiveAssistsArmourModifier(foulContext.defensiveAssists) else null
                 )
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -162,7 +163,7 @@ object FoulStep: Procedure() {
             return buildCompositeCommand {
                 add(RemoveContext<RiskingInjuryContext>())
                 add(
-                    SetContext(foulContext.copy(
+                    UpdateContext(foulContext.copy(
                         injuryRoll = injuryContext,
                         spottedByTheRef = spottedByRef,
                         hasFouled = true
@@ -206,7 +207,7 @@ object FoulStep: Procedure() {
             return when (useSkill) {
                 true -> compositeCommandOf(
                     ReportSkillUsed(context.fouler, SkillType.SNEAKY_GIT),
-                    SetContext(context.copy(spottedByTheRef = false)),
+                    UpdateContext(context.copy(spottedByTheRef = false)),
                     ExitProcedure()
                 )
                 // Regardless of the result of rolling on the Argue the Ref table
@@ -237,13 +238,13 @@ object FoulStep: Procedure() {
                 Cancel, Continue -> {
                     compositeCommandOf(
                         banPlayer(context.fouler),
-                        SetContext(context.copy(argueTheCall = false)),
+                        UpdateContext(context.copy(argueTheCall = false)),
                         if (foulerHadBall) GotoNode(BounceBallWhenBanned) else ExitProcedure()
                     )
                 }
                 Confirm -> {
                     compositeCommandOf(
-                        SetContext(context.copy(argueTheCall = true)),
+                        UpdateContext(context.copy(argueTheCall = true)),
                         GotoNode(RollForArgueThCall)
                     )
                 }

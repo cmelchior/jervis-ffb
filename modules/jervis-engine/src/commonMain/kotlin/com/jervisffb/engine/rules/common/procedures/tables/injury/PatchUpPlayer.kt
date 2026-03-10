@@ -20,7 +20,7 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -110,7 +110,7 @@ object PatchUpPlayer: Procedure() {
                 val updatedContext = context.copy(regenerationRoll = d6, regenerationSuccess = isSuccess)
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.REGENERATION, d6),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     if (isSuccess) GotoNode(ApplyInjury) else GotoNode(ChooseToUseMortuaryAssistant),
                 )
             }
@@ -145,7 +145,7 @@ object PatchUpPlayer: Procedure() {
                     compositeCommandOf(
                         SetApothecaryUsed(team, apothecary, true),
                         ReportApothecaryUsed(team, apothecary),
-                        SetContext(context.copy(regenerationApothecaryUsed = apothecary)),
+                        UpdateContext(context.copy(regenerationApothecaryUsed = apothecary)),
                     )
                 }
                 Cancel,
@@ -185,7 +185,7 @@ object PatchUpPlayer: Procedure() {
                     compositeCommandOf(
                         SetApothecaryUsed(team, apothecary, true),
                         ReportApothecaryUsed(team, apothecary),
-                        SetContext(context.copy(regenerationApothecaryUsed = apothecary)),
+                        UpdateContext(context.copy(regenerationApothecaryUsed = apothecary)),
                         GotoNode(ReRollRegeneration)
                     )
                 }
@@ -213,7 +213,7 @@ object PatchUpPlayer: Procedure() {
                 val updatedContext = context.copy(regenerationReRoll = d6, regenerationSuccess = isSuccess)
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.REGENERATION, d6),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     GotoNode(ApplyInjury)
                 )
             }

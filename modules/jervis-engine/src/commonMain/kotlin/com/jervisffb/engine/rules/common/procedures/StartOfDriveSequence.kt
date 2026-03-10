@@ -4,7 +4,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -36,28 +37,32 @@ object StartOfDriveSequence : Procedure() {
     object SetupKickingTeam : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetContext(SetupTeamContext(state.kickingTeam)),
+                AddContext(SetupTeamContext(state.kickingTeam)),
                 ReportSetupKickingTeam(state.kickingTeam),
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(SetupReceivingTeam)
+            return compositeCommandOf(
+                RemoveContext<SetupTeamContext>(),
+                GotoNode(SetupReceivingTeam)
+            )
         }
     }
 
     object SetupReceivingTeam : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
-
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetContext(SetupTeamContext(state.receivingTeam)),
+                AddContext(SetupTeamContext(state.receivingTeam)),
                 ReportSetupReceivingTeam(state.receivingTeam),
             )
         }
-
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(KickOff)
+            return compositeCommandOf(
+                RemoveContext<SetupTeamContext>(),
+                GotoNode(KickOff)
+            )
         }
     }
 

@@ -11,8 +11,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -65,9 +66,8 @@ object BlockAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val blockActionContext = state.getContextOrNull<BlockActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copyWithMarkedAction(blockActionContext?.hasBlocked == true)),
-            RemoveContext<BlockContext>(),
-            RemoveContext<BlockActionContext>(),
+            UpdateContext(activatePlayerContext.copyWithMarkedAction(blockActionContext?.hasBlocked == true)),
+            if (blockActionContext != null) RemoveContext(blockActionContext) else null,
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
@@ -84,7 +84,7 @@ object BlockAction : Procedure() {
         }
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val context = state.getContext<ActivatePlayerContext>()
-            return SetContext(JumpUpRollContext(context.player))
+            return AddContext(JumpUpRollContext(context.player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = JumpUpRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -96,7 +96,7 @@ object BlockAction : Procedure() {
                     GotoNode(SelectDefenderOrEndAction),
                 )
                 false -> compositeCommandOf(
-                    SetContext(activePlayerContext.copy(
+                    UpdateContext(activePlayerContext.copy(
                         activationEndsImmediately = true,
                         markActionAsUsed = true
                     )),
@@ -131,7 +131,7 @@ object BlockAction : Procedure() {
                         blockType = BlockType.STANDARD,
                     )
                     compositeCommandOf(
-                        SetContext(context),
+                        AddContext(context),
                         GotoNode(ResolveBlock),
                     )
                 }
@@ -158,7 +158,7 @@ object BlockAction : Procedure() {
                     castAction<BlockTypeSelected>(action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
-                            SetContext(context.copy(blockType = typeSelected.type)),
+                            UpdateContext(context.copy(blockType = typeSelected.type)),
                             GotoNode(ResolveBlock),
                         )
                     }
@@ -174,7 +174,7 @@ object BlockAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.BREATHE_FIRE -> {
-                    SetContext(
+                    AddContext(
                         BreatheFireContext(
                             attacker = context.attacker,
                             defender = context.defender,
@@ -182,7 +182,7 @@ object BlockAction : Procedure() {
                     )
                 }
                 BlockType.PROJECTILE_VOMIT -> {
-                    SetContext(
+                    AddContext(
                         ProjectileVomitContext(
                             attacker = context.attacker,
                             defender = context.defender,
@@ -190,7 +190,7 @@ object BlockAction : Procedure() {
                     )
                 }
                 BlockType.STAB -> {
-                    SetContext(
+                    AddContext(
                         StabContext(
                             attacker = context.attacker,
                             defender = context.defender,
@@ -198,7 +198,7 @@ object BlockAction : Procedure() {
                     )
                 }
                 BlockType.STANDARD -> {
-                    SetContext(
+                    AddContext(
                         BlockContext(
                             context.attacker,
                             context.defender,
@@ -263,14 +263,14 @@ object BlockAction : Procedure() {
             return if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
                     GotoNode(SelectBlockType),
                 )
             } else {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     ExitProcedure()
                 )
             }

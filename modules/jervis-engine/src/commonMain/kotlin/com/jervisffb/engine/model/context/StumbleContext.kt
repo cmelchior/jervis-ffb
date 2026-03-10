@@ -7,6 +7,7 @@ data class StumbleContext(
     val defender: Player,
     val attackerUsesTackle: Boolean = false,
     val defenderUsesDodge: Boolean = false,
+    val pushContext: PushContext? = null,
 ) : ProcedureContext {
     fun isDefenderDown(): Boolean {
         return !defenderUsesDodge || attackerUsesTackle

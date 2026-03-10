@@ -13,7 +13,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -60,7 +60,7 @@ object InjuryRoll: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
         return when (context.player.isSkillAvailable(SkillType.STUNTY)) {
-            true -> SetContext(context.copy(injuryModifiers = context.injuryModifiers.add(InjuryModifier.STUNTY)))
+            true -> UpdateContext(context.copy(injuryModifiers = context.injuryModifiers.add(InjuryModifier.STUNTY)))
             false -> null
         }
     }
@@ -86,7 +86,7 @@ object InjuryRoll: Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.INJURY, roll),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     GotoNode(CheckIfMultipleBlowIsApplicable),
                 )
             }
@@ -154,7 +154,7 @@ object InjuryRoll: Procedure() {
                 compositeCommandOf(
                     ReportSkillUsed(mbPlayer, SkillType.MIGHTY_BLOW),
                     SetSkillUsed(mbPlayer, mbSkill, true),
-                    SetContext(
+                    UpdateContext(
                         context.copy(
                             injuryModifiers = updatedModifiers,
                             injuryResult = newResult
@@ -195,7 +195,7 @@ object InjuryRoll: Procedure() {
                         injuryModifiers = updatedModifiers,
                         injuryResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], updatedModifiers.sum())
                     )
-                    add(SetContext(updatedContext))
+                    add(UpdateContext(updatedContext))
                     add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
                     add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
                 }
@@ -231,7 +231,7 @@ object InjuryRoll: Procedure() {
                     val roll = context.injuryRollResult
                     val reduceToStunned = ((isStunty && roll == 7) || (!isStunty && roll == 8))
                     val newInjury = if (reduceToStunned) InjuryResult.STUNNED else context.injuryResult!!
-                    add(SetContext(context.copy(injuryResult = newInjury, useThickSkullOnInjuryRoll = true)))
+                    add(UpdateContext(context.copy(injuryResult = newInjury, useThickSkullOnInjuryRoll = true)))
                     add(ReportSkillUsed(context.player, SkillType.THICK_SKULL))
                 }
                 add(ExitProcedure())

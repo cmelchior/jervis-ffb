@@ -11,8 +11,9 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -59,7 +60,7 @@ object BB2025BothDown: Procedure() {
     override val initialNode: Node = DefenderChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
-        return SetContext(
+        return AddContext(
             BothDownContext(
                 blockContext.attacker,
                 blockContext.defender,
@@ -94,7 +95,7 @@ object BB2025BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(defenderUsesWrestle = useWrestle)),
+                UpdateContext(context.copy(defenderUsesWrestle = useWrestle)),
                 GotoNode(AttackerChooseToUseWrestle)
             )
         }
@@ -121,7 +122,7 @@ object BB2025BothDown: Procedure() {
             }
             val updatedContext = context.copy(attackerUsesWrestle = useWrestle)
             return compositeCommandOf(
-                SetContext(updatedContext),
+                UpdateContext(updatedContext),
                 if (updatedContext.attackerUsesWrestle || updatedContext.defenderUsesWrestle) {
                     GotoNode(ResolveBothDown)
                 } else {
@@ -151,7 +152,7 @@ object BB2025BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(defenderUsesBlock = useBlock)),
+                UpdateContext(context.copy(defenderUsesBlock = useBlock)),
                 GotoNode(AttackerChooseToUseBlock)
             )
         }
@@ -177,7 +178,7 @@ object BB2025BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(attackUsesBlock = useBlock)),
+                UpdateContext(context.copy(attackUsesBlock = useBlock)),
                 GotoNode(ResolveBothDown)
             )
         }
@@ -212,7 +213,7 @@ object BB2025BothDown: Procedure() {
                 var updatedContext = multiContext.copyAndKnockDownActiveDefender(defenderKnockedDown)
                 updatedContext = updatedContext.copy(attackerKnockedDown = attackerKnockedDown)
                 return compositeCommandOf(
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     ExitProcedure()
                 )
             }
@@ -239,7 +240,7 @@ object BB2025BothDown: Procedure() {
                 isPartOfMultipleBlock = false,
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -267,7 +268,7 @@ object BB2025BothDown: Procedure() {
                 isPartOfMultipleBlock = false,
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {

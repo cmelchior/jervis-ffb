@@ -12,8 +12,8 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -75,13 +75,11 @@ import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
  * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
  */
 object MovePlayerIntoSquare : Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<MovePlayerIntoSquareContext>()
-    }
     override val initialNode: Node = MoveIntoSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return RemoveContext<MovePlayerIntoSquareContext>()
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<MovePlayerIntoSquareContext>()
     }
 
     // Move the player into the target square
@@ -172,7 +170,7 @@ object MovePlayerIntoSquare : Procedure() {
             return compositeCommandOf(
                 SetPlayerLocation(context.player, DogOut),
                 SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
-                SetContext(
+                AddContext(
                     RiskingInjuryContext(
                         player = context.player,
                         mode = RiskingInjuryMode.PUSHED_INTO_CROWD
@@ -185,6 +183,7 @@ object MovePlayerIntoSquare : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
                 if (context.player.hasBall()) {
                     // TODO Should also bounce the ball
                     SetTurnOver(TurnOver.STANDARD)

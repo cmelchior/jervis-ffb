@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -54,7 +54,7 @@ object CasualtyRoll: Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CASUALTY, d16),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     ExitProcedure()
                 )
             }

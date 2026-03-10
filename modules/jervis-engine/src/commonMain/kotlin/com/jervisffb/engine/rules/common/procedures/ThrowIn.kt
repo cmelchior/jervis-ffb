@@ -10,7 +10,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -75,7 +77,7 @@ object ThrowIn : Procedure() {
                 val ball = context.ball
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.THROWIN_DIRECTION, d3),
-                    SetContext(context.copy(
+                    UpdateContext(context.copy(
                         directionRoll =  d3,
                         direction = direction,
                     )),
@@ -123,7 +125,7 @@ object ThrowIn : Procedure() {
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
-                        SetContext(context.copy(distance = dice)),
+                        UpdateContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         SetBallState.outOfBounds(ball, outOfBoundsAt),
                         GotoNode(ResolveOutOfBounds)
@@ -131,7 +133,7 @@ object ThrowIn : Procedure() {
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
-                        SetContext(context.copy(distance = dice)),
+                        UpdateContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         GotoNode(ResolveLandOnField)
                     )
@@ -145,11 +147,14 @@ object ThrowIn : Procedure() {
             // Replace the current throw in context
             // TODO Does this ruin reporting logging?
             val oldContext = state.getContext<ThrowInContext>()
-            return SetContext(ThrowInContext(oldContext.ball, oldContext.ball.outOfBoundsAt!!))
+            return AddContext(ThrowInContext(oldContext.ball, oldContext.ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<ThrowInContext>(),
+                ExitProcedure()
+            )
         }
     }
 

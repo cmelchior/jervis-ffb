@@ -9,8 +9,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -53,7 +54,7 @@ object SecureTheBallAction : Procedure() {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(SecureTheBallContext(player))
+            AddContext(SecureTheBallContext(player))
         )
     }
 
@@ -69,7 +70,7 @@ object SecureTheBallAction : Procedure() {
         val isActionUsed = ActivatePlayer.actionCountAsUsed(activePlayerContext)
         return compositeCommandOf(
             RemoveContext<SecureTheBallContext>(),
-            SetContext(activePlayerContext.copyWithMarkedAction(context.hasMoved)),
+            UpdateContext(activePlayerContext.copyWithMarkedAction(context.hasMoved)),
             when (isActionUsed && !successfullySecuredTheBall) {
                 true -> SetTurnOver(TurnOver.STANDARD)
                 false -> null
@@ -96,8 +97,8 @@ object SecureTheBallAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.player, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
-                        SetContext(moveContext),
+                        UpdateContext(context.copy(hasMoved = true)),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -117,8 +118,9 @@ object SecureTheBallAction : Procedure() {
             val endNow = state.endActionImmediately()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(moveContext.copy(hasMoved = true)))
+                    add(UpdateContext(moveContext.copy(hasMoved = true)))
                 }
+                add(RemoveContext(moveContext))
                 if (endNow) {
                     // Some turnover happened while securing the ball.
                     // This does not include falling over due to movement

@@ -14,8 +14,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -103,7 +104,7 @@ object InterceptionStep: Procedure() {
             val anyVeryLongLegs = candidates.any { it.isSkillAvailable(SkillType.VERY_LONG_LEGS) }
             return if (candidates.isNotEmpty() && context.thrower.isSkillAvailable(SkillType.CLOUD_BURSTER)) {
                 compositeCommandOf(
-                    SetContext(context.copy(useCloudBurster = true)),
+                    UpdateContext(context.copy(useCloudBurster = true)),
                     ReportSkillUsed(thrower, SkillType.CLOUD_BURSTER),
                     if (anyVeryLongLegs) GotoNode(SelectPlayerForInterception) else ExitProcedure()
                 )
@@ -151,7 +152,7 @@ object InterceptionStep: Procedure() {
                     castAction<PlayerSelected>(action) {
                         val context = state.getContext<InterceptionContext>()
                         compositeCommandOf(
-                            SetContext(context.copy(interceptingPlayer = it.getPlayer(state))),
+                            UpdateContext(context.copy(interceptingPlayer = it.getPlayer(state))),
                             GotoNode(ChooseToUseExtraArms)
                         )
                     }
@@ -188,7 +189,7 @@ object InterceptionStep: Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useExtraArms = useExtraArms)),
+                UpdateContext(context.copy(useExtraArms = useExtraArms)),
                 GotoNode(RollForInterception)
             )
         }
@@ -228,7 +229,7 @@ object InterceptionStep: Procedure() {
                 target = player.agility,
                 modifiers = modifiers
             )
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = InterceptionRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -237,7 +238,7 @@ object InterceptionStep: Procedure() {
             val interferencePlayer = interceptionContxt.interceptingPlayer ?: INVALID_GAME_STATE("Missing interception player")
             return if (rollContext.isSuccess) {
                 compositeCommandOf(
-                    SetContext(
+                    UpdateContext(
                         interceptionContxt.copy(
                             interceptionRoll = rollContext,
                             didIntercept = true
@@ -252,7 +253,7 @@ object InterceptionStep: Procedure() {
             } else {
                 // Player failed to intercept the ball
                 compositeCommandOf(
-                    SetContext(
+                    UpdateContext(
                         interceptionContxt.copy(
                             interceptionRoll = rollContext,
                         )

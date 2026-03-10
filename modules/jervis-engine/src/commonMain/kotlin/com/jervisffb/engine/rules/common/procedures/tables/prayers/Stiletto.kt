@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -74,7 +74,7 @@ object Stiletto : Procedure() {
                                     expiresAt = Duration.END_OF_DRIVE
                                 )
                             ),
-                            SetContext(context.copy(resultApplied = true)),
+                            UpdateContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Stiletto"),
                             ExitProcedure(),
                         )

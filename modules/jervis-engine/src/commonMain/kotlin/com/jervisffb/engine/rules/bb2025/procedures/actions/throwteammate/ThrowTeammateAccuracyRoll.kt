@@ -16,7 +16,8 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -60,7 +61,7 @@ object ThrowTeammateAccuracyRoll: Procedure() {
     override val initialNode: Node = ChooseToUseStrongArm
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ThrowTeamMateContext>()
-        return SetContext(addInitialModifiersToContext(context, state, rules))
+        return AddContext(addInitialModifiersToContext(context, state, rules))
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowTeamMateContext>()
@@ -84,7 +85,7 @@ object ThrowTeammateAccuracyRoll: Procedure() {
             return if (useStrongArm) {
                 compositeCommandOf(
                     ReportSkillUsed(context.thrower, SkillType.STRONG_ARM),
-                    SetContext(context.copy(qualityRollModifiers = context.qualityRollModifiers.add(QualityModifier.STRONG_ARM))),
+                    UpdateContext(context.copy(qualityRollModifiers = context.qualityRollModifiers.add(QualityModifier.STRONG_ARM))),
                     GotoNode(RollDie)
                 )
             } else {
@@ -103,7 +104,7 @@ object ThrowTeammateAccuracyRoll: Procedure() {
                 val updatedContext = updateThrowTeamMateContext(state, d6, reroll = false)
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -171,7 +172,7 @@ object ThrowTeammateAccuracyRoll: Procedure() {
                 val updatedContext = updateThrowTeamMateContext(state, d6, reroll = true)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     ExitProcedure(),
                 )
             }

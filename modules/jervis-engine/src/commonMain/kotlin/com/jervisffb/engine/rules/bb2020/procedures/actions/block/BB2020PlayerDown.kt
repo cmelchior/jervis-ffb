@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -27,7 +27,7 @@ object BB2020PlayerDown: Procedure() {
             causedBy = context.defender,
             isPartOfMultipleBlock = context.isUsingMultiBlock
         )
-        return SetContext(injuryContext)
+        return AddContext(injuryContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return ReportPlayerDownResult(state.getContext<BlockContext>().attacker)

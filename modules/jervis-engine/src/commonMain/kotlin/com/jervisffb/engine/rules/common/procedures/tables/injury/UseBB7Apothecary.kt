@@ -15,7 +15,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetApothecaryUsed
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -75,7 +75,7 @@ object UseBB7Apothecary: Procedure() {
                     compositeCommandOf(
                         SetApothecaryUsed(team, apothecary, true),
                         ReportApothecaryUsed(team, apothecary),
-                        SetContext(context.copy(apothecaryUsed = apothecary)),
+                        UpdateContext(context.copy(apothecaryUsed = apothecary)),
                         if (context.injuryResult == InjuryResult.KO) ExitProcedure() else GotoNode(ApothecaryInjuryReroll)
                     )
                 }
@@ -103,7 +103,7 @@ object UseBB7Apothecary: Procedure() {
                 val success = (d6.value >= 4)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BB7_APOTHECARY, d6),
-                    SetContext(context.copy(
+                    UpdateContext(context.copy(
                         apothecaryInjuryRoll = d6,
                         apothecaryInjuryRollSuccess = success
                     )),

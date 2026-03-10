@@ -9,8 +9,8 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -60,7 +60,7 @@ object TheKickOffEvent : Procedure() {
                 val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.KICK_OFF_TABLE, listOf(firstD6, secondD6)),
-                    SetContext(KickOffEventContext(roll = DiceRollResults(firstD6, secondD6), result = result)),
+                    AddContext(KickOffEventContext(roll = DiceRollResults(firstD6, secondD6), result = result)),
                     GotoNode(ResolveKickOffTableEvent),
                 )
             }
@@ -96,7 +96,7 @@ object TheKickOffEvent : Procedure() {
     object ScatterBallBeforeLanding : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.singleBall()
-            return SetContext(
+            return AddContext(
                 ScatterRollContext(
                     from = ball.location,
                 )

@@ -18,8 +18,8 @@ import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnMarker
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -78,7 +78,7 @@ object TeamTurn : Procedure() {
 
     object UseSpecialEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
+            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -113,7 +113,7 @@ object TeamTurn : Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
+                        AddContext(ActivatePlayerContext(action.getPlayer(state))),
                         GotoNode(ActivatePlayer),
                     )
                 }
@@ -134,10 +134,9 @@ object TeamTurn : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ActivatePlayerContext>(),
-                if (state.turnOver != null) {
-                    GotoNode(ResolveEndOfTurn)
-                } else {
-                    GotoNode(SelectPlayerOrEndTurn)
+                when (state.turnOver != null) {
+                    true -> GotoNode(ResolveEndOfTurn)
+                    false -> GotoNode(SelectPlayerOrEndTurn)
                 }
             )
         }

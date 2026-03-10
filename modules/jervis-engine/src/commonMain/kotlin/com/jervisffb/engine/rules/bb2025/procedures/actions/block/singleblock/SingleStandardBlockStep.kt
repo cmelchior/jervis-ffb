@@ -2,8 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -80,7 +81,7 @@ object SingleStandardBlockStep : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             val foulAppearanceContext = FoulAppearanceContext(blockContext.attacker, blockContext.defender)
-            return SetContext(foulAppearanceContext)
+            return AddContext(foulAppearanceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -91,7 +92,7 @@ object SingleStandardBlockStep : Procedure() {
                 when (context.isSuccess) {
                     true -> add(GotoNode(DetermineAssists))
                     false -> addAll(
-                        SetContext(blockContext.copy(aborted = true)),
+                        UpdateContext(blockContext.copy(aborted = true)),
                         ExitProcedure()
                     )
                 }

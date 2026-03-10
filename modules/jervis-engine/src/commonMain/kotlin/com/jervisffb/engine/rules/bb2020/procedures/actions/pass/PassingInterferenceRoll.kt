@@ -13,7 +13,7 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -56,12 +56,12 @@ object PassingInterferenceRoll : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<PassingInterferenceRollContext>()
                 val resultContext = rollContext.copy(
-                    roll = D6DieRoll.Companion.create(state, d6),
+                    roll = D6DieRoll.create(state, d6),
                     isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PASSING_INTERFERENCE, d6),
-                    SetContext(resultContext),
+                    UpdateContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -131,7 +131,7 @@ object PassingInterferenceRoll : Procedure() {
                     isSuccess = testAgainstAgility(context.player, d6, context.modifiers)
                 )
                 compositeCommandOf(
-                    SetContext(rerollResult),
+                    UpdateContext(rerollResult),
                     ExitProcedure(),
                 )
             }

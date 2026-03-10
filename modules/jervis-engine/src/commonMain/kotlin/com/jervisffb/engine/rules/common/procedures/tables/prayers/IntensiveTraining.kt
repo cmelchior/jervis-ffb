@@ -11,7 +11,8 @@ import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -69,7 +70,7 @@ object IntensiveTraining : Procedure() {
                 else -> {
                     castAction<PlayerSelected>(action) {
                         compositeCommandOf(
-                            SetContext(IntensiveTrainingContext(it.getPlayer(state))),
+                            AddContext(IntensiveTrainingContext(it.getPlayer(state))),
                             GotoNode(SelectSkill)
                         )
                     }
@@ -92,6 +93,7 @@ object IntensiveTraining : Procedure() {
                 val context = state.getContext<IntensiveTrainingContext>()
                 val skill = rules.createSkill(context.player, it.skill, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(
+                    RemoveContext(context),
                     AddPlayerSkill(context.player, skill),
                     ReportGameProgress("${context.player.name} receives ${skill.name} due to Intensive Training"),
                     ExitProcedure()

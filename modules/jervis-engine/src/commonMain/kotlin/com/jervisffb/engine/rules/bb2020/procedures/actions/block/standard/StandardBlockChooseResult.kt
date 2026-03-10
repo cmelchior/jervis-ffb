@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -66,7 +66,7 @@ object StandardBlockChooseResult: Procedure() {
                     INVALID_GAME_STATE("No matching roll for $selectedDie: ${context.roll}")
                 }
                 compositeCommandOf(
-                    SetContext(context.copy(resultIndex = selectedIndex)),
+                    UpdateContext(context.copy(resultIndex = selectedIndex)),
                     ExitProcedure()
                 )
             }

@@ -13,8 +13,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -77,7 +78,7 @@ object OfficiousRef : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
                     ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
-                    SetContext(
+                    AddContext(
                         OfficiousRefContext(
                             kickingTeamRoll = d6,
                             kickingTeamFanFactor = fanFactor,
@@ -103,7 +104,7 @@ object OfficiousRef : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
                     ReportGameProgress("${state.receivingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
-                    SetContext(state.getContext<OfficiousRefContext>().copy(
+                    UpdateContext(state.getContext<OfficiousRefContext>().copy(
                         receivingTeamRoll = d6,
                         receivingTeamFanFactor = fanFactor,
                         receivingTeamResult = result
@@ -134,7 +135,7 @@ object OfficiousRef : Procedure() {
                     castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
-                            SetContext(context.copy(kickingTeamPlayerSelected = player)),
+                            UpdateContext(context.copy(kickingTeamPlayerSelected = player)),
                             GotoNode(RollForKickingTeamSelectedPlayer)
                         )
                     }
@@ -157,7 +158,7 @@ object OfficiousRef : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),
                     createPlayerChangeCommands(player, d6),
-                    SetContext(context.copy(kickingTeamRefereeRoll = d6)),
+                    UpdateContext(context.copy(kickingTeamRefereeRoll = d6)),
                     GotoNode(SelectPlayerFromKickingTeam)
                 )
             }
@@ -190,7 +191,7 @@ object OfficiousRef : Procedure() {
                     castAction<RandomPlayersSelected>(action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
-                            SetContext(context.copy(receivingTeamPlayerSelected = player)),
+                            UpdateContext(context.copy(receivingTeamPlayerSelected = player)),
                             GotoNode(RollForReceivingTemSelectedPlayer)
                         )
                     }
@@ -213,7 +214,7 @@ object OfficiousRef : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),
                     createPlayerChangeCommands(player, d6),
-                    SetContext(context.copy(receivingTeamRefereeRoll = d6)),
+                    UpdateContext(context.copy(receivingTeamRefereeRoll = d6)),
                     ExitProcedure()
                 )
             }

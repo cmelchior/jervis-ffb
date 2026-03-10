@@ -15,7 +15,7 @@ import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetSpecialActionSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -95,7 +95,8 @@ object ActivatePlayer : Procedure() {
             // to a turnover or failing some roll), the action is always considered used.
             if (actionCountAsUsed(context)) {
                 val activeTeam = state.activeTeamOrThrow()
-                val markActionAsUsedCommand = when (context.declaredAction!!.type) {
+                val declaredAction = context.declaredAction?.type ?: error("Missing declared action: $context")
+                val markActionAsUsedCommand = when (declaredAction) {
                     PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.MOVE)
                     PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
                     PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.HAND_OFF)
@@ -164,7 +165,7 @@ object ActivatePlayer : Procedure() {
             ) {
                 compositeCommandOf(
                     SetHasTackleZones(player, true),
-                    SetContext(context.copy(clearedNegativeEffects = true))
+                    UpdateContext(context.copy(clearedNegativeEffects = true))
                 )
             } else {
                 null
@@ -215,8 +216,9 @@ object ActivatePlayer : Procedure() {
                 is PlayerActionSelected -> {
                     val selectedAction = rules.teamActions[action.action]
                     val hasNegaTrait = hasNegaTrait(activePlayer)
+                    val activePlayerContext = state.getContext<ActivatePlayerContext>()
                     compositeCommandOf(
-                        SetContext(state.getContext<ActivatePlayerContext>().copy(declaredAction = selectedAction)),
+                        UpdateContext(activePlayerContext.copy(declaredAction = selectedAction)),
                         ReportActionSelected(activePlayer, selectedAction),
                         if (hasNegaTrait) {
                             GotoNode(CheckForTakeRoot)

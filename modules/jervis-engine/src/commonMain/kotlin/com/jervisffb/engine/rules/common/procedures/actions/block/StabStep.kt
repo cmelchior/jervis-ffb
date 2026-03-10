@@ -9,8 +9,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -67,7 +68,7 @@ object StabStep: Procedure() {
         return if (context.stabResult != null) {
             // For a Block, this doesn't matter, but during a Blitz, the player is not
             // allowed to move further.
-            SetContext(activateContext.copy(activationEndsImmediately = true))
+            UpdateContext(activateContext.copy(activationEndsImmediately = true))
         } else {
             null
         }
@@ -91,14 +92,16 @@ object StabStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.activePlayer!!
-            val eligibleDefenders: GameActionDescriptor =
+            val eligibleDefenders =
                 attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }
                     .map { state.field[it].player!! }
-                    .let { SelectPlayer.fromPlayers(it) }
 
-            return listOf(eligibleDefenders, EndActionWhenReady)
+            return when (eligibleDefenders.isNotEmpty()) {
+                true -> listOf(SelectPlayer.fromPlayers(eligibleDefenders), EndActionWhenReady)
+                false -> listOf(EndActionWhenReady)
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
@@ -106,7 +109,7 @@ object StabStep: Procedure() {
                 is PlayerSelected -> {
                     val context = state.getContext<StabContext>().copy(defender = action.getPlayer(state))
                     compositeCommandOf(
-                        SetContext(context),
+                        UpdateContext(context),
                         GotoNode(CheckForFoulAppearance),
                     )
                 }
@@ -127,7 +130,7 @@ object StabStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val breatheContext = state.getContext<StabContext>()
             val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
-            return SetContext(foulAppearanceContext)
+            return AddContext(foulAppearanceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -139,7 +142,7 @@ object StabStep: Procedure() {
                     true -> add(GotoNode(RollForArmourAnInjury))
                     // Stab ends the Action immediately, regardless of a failed Foul Appearance roll or not.
                     false -> addAll(
-                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        UpdateContext(activePlayerContext.copy(activationEndsImmediately = true)),
                         ExitProcedure()
                     )
                 }
@@ -155,14 +158,14 @@ object StabStep: Procedure() {
                 causedBy = context.attacker,
                 mode = RiskingInjuryMode.STAB
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val stabContext = state.getContext<StabContext>()
             return compositeCommandOf(
-                SetContext(stabContext.copy(
+                UpdateContext(stabContext.copy(
                     stabResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),

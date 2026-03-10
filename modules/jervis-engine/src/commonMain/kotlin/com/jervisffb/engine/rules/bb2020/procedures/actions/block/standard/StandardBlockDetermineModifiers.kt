@@ -4,7 +4,7 @@ import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -69,7 +69,7 @@ object StandardBlockDetermineModifiers: Procedure() {
             val offensiveAssists = rules.calculateOffensiveAssists(context.attacker, context.defender)
             val defensiveAssists = rules.calculateDefensiveAssists(context.defender, context.attacker)
             return compositeCommandOf(
-                SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                UpdateContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 ExitProcedure()
             )
         }

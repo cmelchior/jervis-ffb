@@ -4,8 +4,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -38,11 +38,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
     override val initialNode: Node = CheckForTrapDoors
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return compositeCommandOf(
-            RemoveContext<ThrowInContext>()
-        )
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<PushContext>()
         if (context.isMultipleBlock) {
@@ -73,7 +69,7 @@ object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
             val context = state.getContext<PushContext>()
             val push = context.pushChain.first { checkPlayerForTouchdown(it) }
             val player = push.pushee
-            return SetContext(ScoringATouchDownContext(player))
+            return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -108,7 +104,7 @@ object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val player = context.firstPusher
-            return SetContext(ScoringATouchDownContext(player))
+            return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -192,7 +188,7 @@ object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
     object ThrowInBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetContext(
+            return AddContext(
                 ThrowInContext(
                     ball,
                     ball.outOfBoundsAt!!

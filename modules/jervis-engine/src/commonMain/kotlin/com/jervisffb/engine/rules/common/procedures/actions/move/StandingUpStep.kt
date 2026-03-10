@@ -5,8 +5,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -48,9 +49,7 @@ data class StandingUpRollContext(
 object StandingUpStep : Procedure() {
     override val initialNode: Node = AttemptToStandUpAutomatically
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return RemoveContext<StandingUpRollContext>()
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<MoveContext>()
         val player = context.player
@@ -77,7 +76,7 @@ object StandingUpStep : Procedure() {
                 compositeCommandOf(
                     SetPlayerState(movingPlayer, PlayerState.STANDING, hasTackleZones = true),
                     SetPlayerMoveLeft(movingPlayer, adjustedMovesLeft),
-                    SetContext(context.copy(hasMoved = true)),
+                    UpdateContext(context.copy(hasMoved = true)),
                     ExitProcedure()
                 )
             } else {
@@ -104,7 +103,7 @@ object StandingUpStep : Procedure() {
                     }
                 modifiers.add(HelpingHandsModifier(helpers))
             }
-            return SetContext(StandingUpRollContext(player, modifiers))
+            return AddContext(StandingUpRollContext(player, modifiers))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandingUpRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -113,7 +112,8 @@ object StandingUpStep : Procedure() {
             val context = state.getContext<StandingUpRollContext>()
             return if (context.isSuccess) {
                 compositeCommandOf(
-                    SetContext(moveContext.copy(hasMoved = true)),
+                    RemoveContext<StandingUpRollContext>(),
+                    UpdateContext(moveContext.copy(hasMoved = true)),
                     SetPlayerMoveLeft(context.player, 0),
                     SetPlayerState(context.player, PlayerState.STANDING, hasTackleZones = true),
                     ReportStandingUp(context),
@@ -121,8 +121,8 @@ object StandingUpStep : Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetContext(moveContext.copy(hasMoved = true)),
-                    SetContext(activeContext.copy(activationEndsImmediately = true)),
+                    UpdateContext(moveContext.copy(hasMoved = true)),
+                    UpdateContext(activeContext.copy(activationEndsImmediately = true)),
                     ReportStandingUp(context),
                     ExitProcedure()
                 )

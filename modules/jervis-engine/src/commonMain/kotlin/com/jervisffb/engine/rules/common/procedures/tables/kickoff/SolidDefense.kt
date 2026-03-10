@@ -16,8 +16,9 @@ import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -84,7 +85,7 @@ object SolidDefense : Procedure() {
                 val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SOLID_DEFENSE, d3),
-                    SetContext(SolidDefenseContext(roll = d3)),
+                    AddContext(SolidDefenseContext(roll = d3)),
                     ReportGameProgress("Solid Defense: ${state.kickingTeam.name} may move [${d3.value} + $extraPlayerCount = ${d3.value + extraPlayerCount}] players"),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
@@ -120,7 +121,7 @@ object SolidDefense : Procedure() {
                     castAction<PlayerSelected>(action) {
                         val context = state.getContext<SolidDefenseContext>()
                         compositeCommandOf(
-                            SetContext(context.copy(currentPlayer = it.getPlayer(state))),
+                            UpdateContext(context.copy(currentPlayer = it.getPlayer(state))),
                             GotoNode(PlacePlayer),
                         )
                     }
@@ -160,7 +161,7 @@ object SolidDefense : Procedure() {
                 if (isPlayerMoved) {
                     compositeCommandOf(
                         SetPlayerLocation(movingPlayer, squareSelected.coordinate),
-                        SetContext(
+                        UpdateContext(
                             context.copy(
                                 currentPlayer = null,
                                 playersMoved = context.playersMoved.plus(movingPlayer)
@@ -170,7 +171,7 @@ object SolidDefense : Procedure() {
                     )
                 } else {
                     compositeCommandOf(
-                        SetContext(context.copy(currentPlayer = null)),
+                        UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 }

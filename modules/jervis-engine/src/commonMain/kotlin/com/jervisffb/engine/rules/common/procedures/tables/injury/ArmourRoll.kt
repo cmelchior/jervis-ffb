@@ -15,7 +15,7 @@ import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -101,7 +101,7 @@ object ArmourRoll: Procedure() {
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     GotoNode(DecideOnModifierPath)
                 )
             }
@@ -135,7 +135,7 @@ object ArmourRoll: Procedure() {
                 val roll = listOf(die1, die2)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     GotoNode(DecideOnModifierPath)
                 )
             }
@@ -233,7 +233,7 @@ object ArmourRoll: Procedure() {
                 compositeCommandOf(
                     ReportSkillUsed(mbPlayer, SkillType.MIGHTY_BLOW),
                     SetSkillUsed(mbPlayer, mbSkill, true),
-                    SetContext(
+                    UpdateContext(
                         context.copy(
                             armourModifiers = context.armourModifiers + listOf(MightyBlowArmourModifier(mbSkill.value as Int))
                         )
@@ -276,7 +276,7 @@ object ArmourRoll: Procedure() {
                     val updatedContext = context.copy(
                         armourModifiers = context.armourModifiers + ArmourModifier.DIRTY_PLAYER,
                     )
-                    add(SetContext(updatedContext))
+                    add(UpdateContext(updatedContext))
                     add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
                     add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
                 }
@@ -314,7 +314,7 @@ object ArmourRoll: Procedure() {
                         ReportSkillUsed(fouler, SkillType.LONE_FOULER),
                         SetSkillRerollUsed(fouler.getSkill<LoneFouler>(), true),
                         SetOldContext(Game::rerollContext, rerollContext),
-                        SetContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER })),
+                        UpdateContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER })),
                         GotoNode(ReRollDice)
                     )
                 }

@@ -14,7 +14,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -108,7 +108,8 @@ object RushRoll: Procedure() {
         }
 
         return if (modifiers.isNotEmpty()) {
-            SetContext(state.getContext<RushRollContext>().copyAndAddModifier(*modifiers.toTypedArray()))
+            val rushContext = state.getContext<RushRollContext>()
+            UpdateContext(rushContext.copyAndAddModifier(*modifiers.toTypedArray()))
         } else {
             null
         }
@@ -127,7 +128,7 @@ object RushRoll: Procedure() {
                 val success = isRushSuccess(d6, context.modifiers)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RUSH, d6),
-                    SetContext(context.copy(
+                    UpdateContext(context.copy(
                         roll = D6DieRoll.create(state, d6),
                         isSuccess = success,
                     )),
@@ -211,7 +212,7 @@ object RushRoll: Procedure() {
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RUSH, d6),
-                    SetContext(rerollResult),
+                    UpdateContext(rerollResult),
                     ExitProcedure(),
                 )
             }

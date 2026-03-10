@@ -13,8 +13,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -112,7 +113,7 @@ object ThrowTeamMateAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(
+            AddContext(
                 ThrowTeamMateContext(
                     thrower = player,
                 )
@@ -124,7 +125,7 @@ object ThrowTeamMateAction : Procedure() {
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
-            SetContext(
+            UpdateContext(
                 activePlayerContext.copyWithMarkedAction(context.hasMoved || context.qualityRoll != null)
             ),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
@@ -204,7 +205,7 @@ object ThrowTeamMateAction : Procedure() {
                         || thrownPlayer.state == PlayerState.STUNNED_OWN_TURN
                     compositeCommandOf(
                         ReportPickingUpPlayerToThrow(context, thrownPlayer),
-                        SetContext(
+                        UpdateContext(
                             context.copy(
                                 thrownPlayer = thrownPlayer,
                                 willCrashLand = willCrashLand
@@ -217,7 +218,7 @@ object ThrowTeamMateAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(moveContext),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -236,8 +237,9 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(context.copy(hasMoved = true)))
+                    add(UpdateContext(context.copy(hasMoved = true)))
                 }
+                add(RemoveContext(moveContext))
                 if (state.endActionImmediately()) {
                     add(ExitProcedure())
                 } else if (!rules.isStanding(context.thrower)) {

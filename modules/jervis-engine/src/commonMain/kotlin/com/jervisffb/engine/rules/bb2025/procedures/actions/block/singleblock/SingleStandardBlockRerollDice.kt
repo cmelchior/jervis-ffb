@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -77,7 +77,7 @@ object SingleStandardBlockRerollDice: Procedure() {
                 }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BLOCK, rerolls),
-                    SetContext(blockContext.copy(roll = updatedRoll)),
+                    UpdateContext(blockContext.copy(roll = updatedRoll)),
                     ExitProcedure(),
                 )
             }

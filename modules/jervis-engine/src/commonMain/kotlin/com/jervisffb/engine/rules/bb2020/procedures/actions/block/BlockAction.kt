@@ -10,8 +10,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -77,9 +78,8 @@ object BlockAction : Procedure() {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val blockActionContext = state.getContextOrNull<BlockActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
-            RemoveContext<BlockContext>(),
-            RemoveContext<BlockActionContext>(),
+            UpdateContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
+            if (blockActionContext != null) RemoveContext(blockActionContext) else null,
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
@@ -111,7 +111,7 @@ object BlockAction : Procedure() {
                         blockType = BlockType.STANDARD,
                     )
                     compositeCommandOf(
-                        SetContext(context),
+                        AddContext(context),
                         GotoNode(ResolveBlock),
                     )
                 }
@@ -138,7 +138,7 @@ object BlockAction : Procedure() {
                     castAction<BlockTypeSelected>(action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
-                            SetContext(context.copy(blockType = typeSelected.type)),
+                            UpdateContext(context.copy(blockType = typeSelected.type)),
                             GotoNode(ResolveBlock),
                         )
                     }
@@ -157,7 +157,7 @@ object BlockAction : Procedure() {
                 BlockType.PROJECTILE_VOMIT -> TODO()
                 BlockType.STAB -> TODO()
                 BlockType.STANDARD -> {
-                    SetContext(
+                    AddContext(
                         BlockContext(
                             context.attacker,
                             context.defender,
@@ -230,14 +230,14 @@ object BlockAction : Procedure() {
             return if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
                     GotoNode(SelectBlockType),
                 )
             } else {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     ExitProcedure()
                 )
             }

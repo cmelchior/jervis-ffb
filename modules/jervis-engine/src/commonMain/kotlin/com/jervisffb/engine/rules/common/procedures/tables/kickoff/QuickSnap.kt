@@ -14,8 +14,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -62,7 +63,7 @@ object QuickSnap : Procedure() {
                 val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUICK_SNAP, d3),
-                    SetContext(QuickSnapContext(roll = d3)),
+                    AddContext(QuickSnapContext(roll = d3)),
                     ReportQuickSnapResult(state.receivingTeam, d3, extraPlayerCount),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
@@ -84,7 +85,10 @@ object QuickSnap : Procedure() {
                     .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() - context.playersMoved.toSet()
-                listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
+                when (eligiblePlayers.isNotEmpty()) {
+                    true -> listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
+                    false -> listOf(EndSetupWhenReady)
+                }
             }
         }
 
@@ -95,7 +99,7 @@ object QuickSnap : Procedure() {
                     castAction<PlayerSelected>(action) {
                         val context = state.getContext<QuickSnapContext>()
                         compositeCommandOf(
-                            SetContext(context.copy(currentPlayer = it.getPlayer(state))),
+                            UpdateContext(context.copy(currentPlayer = it.getPlayer(state))),
                             GotoNode(SelectSquare),
                         )
                     }
@@ -124,12 +128,12 @@ object QuickSnap : Procedure() {
                 return if (squareSelected.coordinate == context.currentPlayer!!.coordinates) {
                     // If the same field is selected, just treat the player as not having moved at all
                     compositeCommandOf(
-                        SetContext(context.copy(currentPlayer = null)),
+                        UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 } else {
                     compositeCommandOf(
-                        SetContext(context.copy(target = squareSelected.coordinate)),
+                        UpdateContext(context.copy(target = squareSelected.coordinate)),
                         GotoNode(MovePlayer),
                     )
                 }
@@ -148,7 +152,7 @@ object QuickSnap : Procedure() {
     object MovePlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<QuickSnapContext>()
-            return SetContext(
+            return AddContext(
                 MovePlayerIntoSquareContext(
                     player = context.currentPlayer!!,
                     target = context.target!!
@@ -161,7 +165,7 @@ object QuickSnap : Procedure() {
             val updatedPlayersMoved = context.playersMoved + context.currentPlayer!!
             return compositeCommandOf(
                 RemoveContext<MovePlayerIntoSquareContext>(),
-                SetContext(context.copy(
+                UpdateContext(context.copy(
                     playersMoved = updatedPlayersMoved,
                     currentPlayer = null,
                     target = null,

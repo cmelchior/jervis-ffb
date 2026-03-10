@@ -7,8 +7,10 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -70,7 +72,7 @@ object MoveAction : Procedure() {
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(
-                        SetContext(MoveContext(state.activePlayer!!, action.moveType)),
+                        AddContext(MoveContext(state.activePlayer!!, action.moveType)),
                         GotoNode(ResolveMoveType)
                     )
                 }
@@ -83,10 +85,12 @@ object MoveAction : Procedure() {
     object ResolveMoveType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.endActionImmediately()) {
-                ExitProcedure()
-            } else {
-                GotoNode(SelectMoveType)
+            return buildCompositeCommand {
+                add(RemoveContext<MoveContext>())
+                when (state.endActionImmediately()) {
+                    true -> add(ExitProcedure())
+                    false -> add(GotoNode(SelectMoveType))
+                }
             }
         }
     }

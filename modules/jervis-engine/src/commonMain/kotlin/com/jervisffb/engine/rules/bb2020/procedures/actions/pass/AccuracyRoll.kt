@@ -18,7 +18,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -68,12 +68,12 @@ object AccuracyRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = setInitialModifiers(state, rules)
-        return SetContext(context)
+        return UpdateContext(context)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
         val updatedContext = updatePassContextWithResult(context)
-        return SetContext(updatedContext)
+        return UpdateContext(updatedContext)
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PassContext>()
 
@@ -85,7 +85,7 @@ object AccuracyRoll: Procedure() {
                 val context = state.getContext<PassContext>()
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    SetContext(context.copy(passingRoll = D6DieRoll.Companion.create(state, d6))),
+                    UpdateContext(context.copy(passingRoll = D6DieRoll.create(state, d6))),
                     GotoNode(ChooseToUseAccurate),
                 )
             }
@@ -114,7 +114,7 @@ object AccuracyRoll: Procedure() {
                 when (action) {
                     Confirm -> {
                         ReportSkillUsed(context.thrower, SkillType.ACCURATE)
-                        SetContext(context.copyAndAdd(passingModifier = AccuracyModifier.ACCURATE))
+                        UpdateContext(context.copyAndAdd(passingModifier = AccuracyModifier.ACCURATE))
                     }
 
                     Cancel,
@@ -149,7 +149,7 @@ object AccuracyRoll: Procedure() {
                 when (action) {
                     Confirm -> {
                         ReportSkillUsed(context.thrower, SkillType.CANNONEER)
-                        SetContext(context.copyAndAdd(passingModifier = AccuracyModifier.CANNONEER))
+                        UpdateContext(context.copyAndAdd(passingModifier = AccuracyModifier.CANNONEER))
                     }
 
                     Cancel,
@@ -221,7 +221,7 @@ object AccuracyRoll: Procedure() {
                 val context = state.getContext<PassContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    SetContext(
+                    UpdateContext(
                         context.copy(
                             passingRoll = context.passingRoll!!.copyReroll(
                                 rerollSource = state.rerollContext!!.source,

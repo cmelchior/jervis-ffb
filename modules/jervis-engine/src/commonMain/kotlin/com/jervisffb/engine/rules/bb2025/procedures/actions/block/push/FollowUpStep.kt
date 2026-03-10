@@ -9,8 +9,8 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -81,7 +81,7 @@ object FollowUpStep: Procedure() {
             return buildCompositeCommand {
                 if (useFend) {
                     add(ReportSkillUsed(context.firstPushee, SkillType.FEND))
-                    add(SetContext(context.copy(defenderIsUsingFend = true)))
+                    add(UpdateContext(context.copy(defenderIsUsingFend = true)))
                 }
                 add(GotoNode(ChooseToUseTaunt))
             }
@@ -108,7 +108,7 @@ object FollowUpStep: Procedure() {
             return buildCompositeCommand {
                 if (useTaunt) {
                     add(ReportSkillUsed(context.firstPushee, SkillType.TAUNT))
-                    add(SetContext(context.copy(defenderIsUsingTaunt = true)))
+                    add(UpdateContext(context.copy(defenderIsUsingTaunt = true)))
                 }
                 add(GotoNode(ChooseToFollowUp))
             }

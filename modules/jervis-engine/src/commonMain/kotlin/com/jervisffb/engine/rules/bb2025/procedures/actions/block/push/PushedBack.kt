@@ -2,7 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block.push
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -11,7 +13,9 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
+import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.createPushContext
@@ -31,11 +35,15 @@ object PushedBack: Procedure() {
     override val initialNode: Node = CreatePushChain
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
-        return SetContext(newContext)
+        return AddContext(newContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PushContext>()
+        // We need to preserve PushContext for Stumble reporting
+        val stumbleContext = state.getContextOrNull<StumbleContext>()
         return compositeCommandOf(
+            RemoveContext(context),
+            if (stumbleContext != null) UpdateContext(stumbleContext.copy(pushContext = context)) else null,
             ReportPushResult(context.firstPusher, context.pushChain.first().from, context.followsUp)
         )
     }

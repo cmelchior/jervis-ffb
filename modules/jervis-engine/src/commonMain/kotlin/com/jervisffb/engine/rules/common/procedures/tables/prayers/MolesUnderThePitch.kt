@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.common.procedures.tables.prayers
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -30,7 +30,7 @@ object MolesUnderThePitch : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                SetContext(context.copy(resultApplied = true)),
+                UpdateContext(context.copy(resultApplied = true)),
                 ReportGameProgress("${context.team.name} released Moles Under the Pitch"),
                 ExitProcedure(),
             )

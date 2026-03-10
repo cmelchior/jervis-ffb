@@ -3,8 +3,9 @@ package com.jervisffb.engine.rules.common.procedures.actions.block
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -34,13 +35,13 @@ object BreatheFireAction : Procedure() {
         val context = BreatheFireActionContext(
             attacker = activateContext.player,
         )
-        return SetContext(context)
+        return AddContext(context)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
         val actionContext = state.getContext<BreatheFireActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copyWithMarkedAction(actionContext.hasBreathed)),
+            UpdateContext(activatePlayerContext.copyWithMarkedAction(actionContext.hasBreathed)),
             RemoveContext<BreatheFireContext>(),
             RemoveContext<BreatheFireActionContext>(),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activatePlayerContext.player, Duration.END_OF_ACTION),
@@ -53,7 +54,7 @@ object BreatheFireAction : Procedure() {
             val context = BreatheFireContext(
                 attacker = actionContext.attacker
             )
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BreatheFireStep
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -61,7 +62,7 @@ object BreatheFireAction : Procedure() {
             val breatheContext = state.getContext<BreatheFireContext>()
             return buildCompositeCommand {
                 if (breatheContext.result != null) {
-                    add(SetContext(actionContext.copy(
+                    add(UpdateContext(actionContext.copy(
                         hasBreathed = true
                     )))
                 }

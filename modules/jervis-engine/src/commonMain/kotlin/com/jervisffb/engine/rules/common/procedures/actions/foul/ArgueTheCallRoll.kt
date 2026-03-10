@@ -11,7 +11,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.ext.d6
@@ -68,7 +68,7 @@ object ArgueTheCallRoll: Procedure() {
                     argueTheCallResult = result
                 )
                 return compositeCommandOf(
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     nextNodeCommand
                 )
             }
@@ -91,7 +91,7 @@ object ArgueTheCallRoll: Procedure() {
                         INVALID_GAME_STATE("Wrong value for Friends with the Ref: ${context.argueTheCallRoll}")
                     }
                     compositeCommandOf(
-                        SetContext(context.copy(argueTheCallResult = ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT)),
+                        UpdateContext(context.copy(argueTheCallResult = ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT)),
                         ExitProcedure()
                     )
                 }

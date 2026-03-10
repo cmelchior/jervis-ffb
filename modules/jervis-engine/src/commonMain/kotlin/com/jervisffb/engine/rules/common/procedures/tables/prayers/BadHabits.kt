@@ -12,8 +12,9 @@ import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -66,7 +67,7 @@ object BadHabits : Procedure() {
                 val availablePlayers = getEligiblePlayers(prayerContext, rules)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BAD_HABITS, d3),
-                    SetContext(BadHabitsContext(roll = d3, mustSelectPlayers = min(availablePlayers.size, d3.value))),
+                    AddContext(BadHabitsContext(roll = d3, mustSelectPlayers = min(availablePlayers.size, d3.value))),
                     GotoNode(SelectPlayers)
                 )
             }
@@ -114,7 +115,7 @@ object BadHabits : Procedure() {
 
                         compositeCommandOf(
                             *addLonerCommands,
-                            SetContext(prayerContext.copy(resultApplied = true)),
+                            UpdateContext(prayerContext.copy(resultApplied = true)),
                             ExitProcedure()
                         )
                     }

@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -50,7 +50,7 @@ object StandardBlockRollDice: Procedure() {
                     }
                 return compositeCommandOf(
                     ReportDiceRoll(roll),
-                    SetContext(state.getContext<BlockContext>().copy(roll = roll)),
+                    UpdateContext(state.getContext<BlockContext>().copy(roll = roll)),
                     ExitProcedure(),
                 )
             }

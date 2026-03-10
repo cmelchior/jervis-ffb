@@ -13,8 +13,9 @@ import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -59,7 +60,7 @@ object PitchInvasion : Procedure() {
                 val fanFactor = state.kickingTeam.fanFactor
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_FAN_FACTOR, d6),
-                    SetContext(PitchInvasionContext(kickingRoll = d6, kickingResult = d6.value + fanFactor)),
+                    AddContext(PitchInvasionContext(kickingRoll = d6, kickingResult = d6.value + fanFactor)),
                     ReportPitchInvasionRoll(state.kickingTeam, d6, fanFactor),
                     GotoNode(RollForReceivingTeamFans),
                 )
@@ -83,7 +84,7 @@ object PitchInvasion : Procedure() {
                 }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_FAN_FACTOR, d6),
-                    SetContext(context.copy(receivingRoll = d6, receivingResult = result)),
+                    UpdateContext(context.copy(receivingRoll = d6, receivingResult = result)),
                     ReportPitchInvasionRoll(state.receivingTeam, d6, fanFactor),
                     nextNode,
                 )
@@ -99,7 +100,7 @@ object PitchInvasion : Procedure() {
                 val context = state.getContext<PitchInvasionContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
-                    SetContext(context.copy(receivingPlayersAffected = d3.value)),
+                    UpdateContext(context.copy(receivingPlayersAffected = d3.value)),
                     GotoNode(SelectReceivingTeamAffectedPlayers),
                 )
             }
@@ -148,7 +149,7 @@ object PitchInvasion : Procedure() {
                 val context = state.getContext<PitchInvasionContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
-                    SetContext(context.copy(kickingPlayersAffected = d3.value)),
+                    UpdateContext(context.copy(kickingPlayersAffected = d3.value)),
                     GotoNode(SelectKickingTeamAffectedPlayers),
                 )
             }

@@ -3,9 +3,10 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -41,7 +42,7 @@ object BB2025Pow: Procedure() {
         val pushContext = createPushContext(state)
         return compositeCommandOf(
             ReportPowResult(pushContext.firstPusher, pushContext.firstPushee),
-            SetContext(pushContext)
+            AddContext(pushContext)
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -66,7 +67,7 @@ object BB2025Pow: Procedure() {
                     add(SetContextProperty(property, multipleBlockContext, pushContext))
                 }
                 addAll(
-                    SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
+                    UpdateContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
                     GotoNode(ResolveDefenderKnockedDown)
                 )
             }
@@ -93,7 +94,7 @@ object BB2025Pow: Procedure() {
                 causedBy = context.firstPusher,
                 isPartOfMultipleBlock = context.isMultipleBlock
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {

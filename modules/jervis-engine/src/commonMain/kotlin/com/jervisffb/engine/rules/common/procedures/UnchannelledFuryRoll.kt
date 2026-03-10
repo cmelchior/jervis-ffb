@@ -15,8 +15,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -68,11 +69,13 @@ object UnchannelledFuryRoll: Procedure() {
             if (!context.isSuccess) {
                 add(AddPlayerStatusEffect(context.player, PlayerStatusEffect.unchannelledFury()))
                 add(
-                    SetContext(activateContext.copy(
-                        rolledForNegaTrait = true,
-                        activationEndsImmediately = true,
-                        markActionAsUsed = true
-                    ))
+                    UpdateContext(
+                        activateContext.copy(
+                            rolledForNegaTrait = true,
+                            activationEndsImmediately = true,
+                            markActionAsUsed = true
+                        )
+                    )
                 )
             }
         }
@@ -92,7 +95,7 @@ object UnchannelledFuryRoll: Procedure() {
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.UNCHANNELLED_FURY, d6),
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -164,7 +167,7 @@ object UnchannelledFuryRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     ExitProcedure(),
                 )
             }

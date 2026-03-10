@@ -11,8 +11,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -52,7 +53,7 @@ object FoulAction : Procedure() {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(FoulContext(player))
+            AddContext(FoulContext(player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -61,7 +62,7 @@ object FoulAction : Procedure() {
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
             RemoveContext<FoulContext>(),
-            SetContext(
+            UpdateContext(
                 activePlayerContext.copy(
                     markActionAsUsed = context.hasFouled || context.hasMoved
                 )
@@ -89,7 +90,7 @@ object FoulAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.getContext<FoulContext>()
                     compositeCommandOf(
-                        SetContext(context.copy(victim = action.getPlayer(state))),
+                        UpdateContext(context.copy(victim = action.getPlayer(state))),
                         GotoNode(MoveOrFoulOrEndAction)
                     )
                 }
@@ -127,15 +128,15 @@ object FoulAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.fouler, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
-                        SetContext(moveContext),
+                        UpdateContext(context.copy(hasMoved = true)),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val foulContext = state.getContext<FoulContext>()
                     compositeCommandOf(
-                        SetContext(foulContext.copy(victim = action.getPlayer(state))),
+                        UpdateContext(foulContext.copy(victim = action.getPlayer(state))),
                         GotoNode(ResolveFoul)
                     )
                 }
@@ -155,8 +156,9 @@ object FoulAction : Procedure() {
             val endNow = state.endActionImmediately()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(context.copy(hasMoved = true)))
+                    add(UpdateContext(context.copy(hasMoved = true)))
                 }
+                add(RemoveContext(moveContext))
                 if (endNow) {
                     add(ExitProcedure())
                 } else if (!rules.isStanding(context.fouler)) {

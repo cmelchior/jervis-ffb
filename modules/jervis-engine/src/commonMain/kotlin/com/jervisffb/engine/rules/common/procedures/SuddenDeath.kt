@@ -8,7 +8,8 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetSuddenDeathGoals
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -38,7 +39,7 @@ data class SuddenDeathContext(
 object SuddenDeath : Procedure() {
     override val initialNode: Node = HomeTeamRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        return SetContext(SuddenDeathContext())
+        return AddContext(SuddenDeathContext())
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
@@ -52,7 +53,7 @@ object SuddenDeath : Procedure() {
                 val context = state.getContext<SuddenDeathContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SUDDEN_DEATH, d6),
-                    SetContext(context.copy(homeRolls = context.homeRolls + d6)),
+                    UpdateContext(context.copy(homeRolls = context.homeRolls + d6)),
                     GotoNode(AwayTeamRoll)
                 )
             }
@@ -80,7 +81,7 @@ object SuddenDeath : Procedure() {
                     if (rollOffWinner == null) SimpleLogEntry("Roll-off is a draw", category = LogCategory.GAME_PROGRESS) else null,
                     if (rollOffWinner != null) SimpleLogEntry("${rollOffWinner.name} wins ${rollOffs}. roll-off", category = LogCategory.GAME_PROGRESS) else null,
                     if (rollOffWinner != null) SetSuddenDeathGoals(rollOffWinner, goals) else null,
-                    SetContext(context.copy(
+                    UpdateContext(context.copy(
                         awayRolls = context.awayRolls + d6,
                         rollOffs = rollOffs
                     )),

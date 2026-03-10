@@ -16,7 +16,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetApothecaryUsed
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -78,14 +78,14 @@ object UseBB11Apothecary: Procedure() {
                     compositeCommandOf(
                         SetApothecaryUsed(team, apothecary, true),
                         ReportApothecaryUsed(team, apothecary),
-                        SetContext(context.copy(apothecaryUsed = apothecary)),
+                        UpdateContext(context.copy(apothecaryUsed = apothecary)),
                         if (context.injuryResult == InjuryResult.KO) ExitProcedure() else GotoNode(ApothecaryCasualtyReRoll)
                     )
                 }
                 Cancel,
                 Continue -> {
                     compositeCommandOf(
-                        SetContext(context.copy(
+                        UpdateContext(context.copy(
                             finalCasualtyResult = context.casualtyResult,
                             finalLastingInjury = context.lastingInjuryResult,
                         )),
@@ -113,7 +113,7 @@ object UseBB11Apothecary: Procedure() {
                 val result = rules.casualtyTable.roll(d16)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CASUALTY, d16),
-                    SetContext(context.copy(
+                    UpdateContext(context.copy(
                         apothecaryCasualtyRoll = d16,
                         apothecaryCasualtyResult = result)
                     ),
@@ -135,7 +135,7 @@ object UseBB11Apothecary: Procedure() {
                 val result = rules.lastingInjuryTable.roll(d6)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.LASTING_INJURY, d6),
-                    SetContext(context.copy(apothecaryLastingInjuryRoll = d6, apothecaryLastingInjuryResult = result)),
+                    UpdateContext(context.copy(apothecaryLastingInjuryRoll = d6, apothecaryLastingInjuryResult = result)),
                     GotoNode(SelectInjury),
                 )
             }
@@ -167,7 +167,7 @@ object UseBB11Apothecary: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(updatedContext),
+                UpdateContext(updatedContext),
                 ExitProcedure()
             )
         }

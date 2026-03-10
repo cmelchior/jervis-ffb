@@ -18,10 +18,10 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.ReplaceContextListItem
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -45,7 +45,6 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
-import com.jervisffb.engine.rules.common.procedures.ThrowInContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
@@ -215,7 +214,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                 Confirm -> {
                     val context = state.getContext<PushContext>()
                     val pushData = context.pushChain.last()
-                    return compositeCommandOf(
+                    compositeCommandOf(
                         SetContextProperty(PushContext.PushData::usedStandFirm, pushData, true),
                         GotoNode(DecideToUseGrab)
                     )
@@ -481,21 +480,16 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                 // But it will not happen until later in Push sequence.
                 if (player.hasBall()) {
                     val ball = player.ball!!
-                    val throwContext = ThrowInContext(
-                        ball = ball,
-                        outOfBoundsAt = pushStep.from,
-                    )
                     addAll(
                         SetBallLocation(ball, pushStep.to!!),
                         SetBallState.outOfBounds(ball, pushStep.from),
-                        SetContext(throwContext)
                     )
                 }
                 val injuryContext = RiskingInjuryContext(
                     player = context.pushChain.last().pushee,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
                 )
-                add(SetContext(injuryContext))
+                add(AddContext(injuryContext))
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
@@ -517,7 +511,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
             ) {
                 listOf(ContinueWhenReady)
             } else {
-                return listOf(
+                listOf(
                     CancelWhenReady,
                     ConfirmWhenReady
                 )

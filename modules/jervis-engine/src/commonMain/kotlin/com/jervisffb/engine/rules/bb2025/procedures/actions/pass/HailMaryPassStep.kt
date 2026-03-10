@@ -16,8 +16,9 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.ext.d6
@@ -92,7 +93,7 @@ object HailMaryPassStep: Procedure() {
                         val newLocation = it.coordinate
                         compositeCommandOf(
                             ReportStartingPass(context),
-                            SetContext(
+                            UpdateContext(
                                 context.copy(
                                     target = newLocation,
                                     range = distance
@@ -131,7 +132,7 @@ object HailMaryPassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.Companion.scattered(ball),
                 SetBallLocation(ball, context.target!!),
-                SetContext(
+                AddContext(
                     ScatterRollContext(
                         from = context.target
                     )
@@ -149,7 +150,7 @@ object HailMaryPassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.outOfBounds(ball, context.outOfBoundsAt),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(ResolveGoingOutOfBounds)
                 )
@@ -157,7 +158,7 @@ object HailMaryPassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.scattered(ball),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(ResolveBounceOrCatch)
                 )
@@ -192,7 +193,7 @@ object HailMaryPassStep: Procedure() {
                 compositeCommandOf(
                     ReportSkillUsed(context.thrower, SkillType.SAFE_PASS),
                     SetBallState.carried(ball, context.thrower),
-                    SetContext(context.copy(useSafePass = true)),
+                    UpdateContext(context.copy(useSafePass = true)),
                     ExitProcedure()
                 )
             } else {
@@ -211,7 +212,7 @@ object HailMaryPassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.bouncing(ball),
-                SetContext(passContext.copy(target = null)),
+                UpdateContext(passContext.copy(target = null)),
                 SetBallLocation(ball, state.getContext<PassContext>().thrower.coordinates),
                 SetTurnOver(TurnOver.STANDARD), // A Fumbled Pass is always a turn-over, regardless of where the ball lands
             )
@@ -227,7 +228,7 @@ object HailMaryPassStep: Procedure() {
     object ResolveGoingOutOfBounds: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetContext(ThrowInContext(ball, ball.outOfBoundsAt!!))
+            return AddContext(ThrowInContext(ball, ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {

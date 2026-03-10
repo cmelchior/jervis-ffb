@@ -16,8 +16,9 @@ import com.jervisffb.engine.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -65,11 +66,13 @@ object BoneHeadRoll: Procedure() {
                 add(AddPlayerStatusEffect(context.player, PlayerStatusEffect.boneHead()))
                 add(SetHasTackleZones(context.player, false))
                 add(
-                    SetContext(activateContext.copy(
-                        rolledForNegaTrait = true,
-                        activationEndsImmediately = true,
-                        markActionAsUsed = true
-                    ))
+                    UpdateContext(
+                        activateContext.copy(
+                            rolledForNegaTrait = true,
+                            activationEndsImmediately = true,
+                            markActionAsUsed = true
+                        )
+                    )
                 )
             }
         }
@@ -89,7 +92,7 @@ object BoneHeadRoll: Procedure() {
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BONE_HEAD, d6),
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -161,7 +164,7 @@ object BoneHeadRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     ExitProcedure(),
                 )
             }

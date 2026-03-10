@@ -16,8 +16,9 @@ import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -41,7 +42,6 @@ import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
@@ -81,15 +81,15 @@ object HandOffAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(HandOffContext(player))
+            AddContext(HandOffContext(player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<HandOffContext>()
+        val handOffContext = state.getContext<HandOffContext>()
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
-            RemoveContext<ThrowTeamMateContext>(),
-            SetContext(activePlayerContext.copyWithMarkedAction(context.hasMoved || context.catcher != null)),
+            RemoveContext(handOffContext),
+            UpdateContext(activePlayerContext.copyWithMarkedAction(handOffContext.hasMoved || handOffContext.catcher != null)),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
         )
     }
@@ -140,15 +140,15 @@ object HandOffAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(handOffContext.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(handOffContext.copy(hasMoved = true)),
-                        SetContext(moveContext),
+                        UpdateContext(handOffContext.copy(hasMoved = true)),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val ball = handOffContext.thrower.ball!!
                     compositeCommandOf(
-                        SetContext(handOffContext.copy(catcher = action.getPlayer(state))),
+                        UpdateContext(handOffContext.copy(catcher = action.getPlayer(state))),
                         SetCurrentBall(ball),
                         SetBallState.accurateThrow(ball),
                         SetBallLocation(ball, action.getPlayer(state).coordinates),
@@ -171,8 +171,9 @@ object HandOffAction : Procedure() {
             val endNow = state.endActionImmediately()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(handOffContext.copy(hasMoved = true)))
+                    add(UpdateContext(handOffContext.copy(hasMoved = true)))
                 }
+                add(RemoveContext(moveContext))
                 if (endNow) {
                     add(ExitProcedure())
                 } else if (!rules.isStanding(handOffContext.thrower)) {
@@ -232,7 +233,7 @@ object HandOffAction : Procedure() {
 
             return buildCompositeCommand {
                 add(SetCurrentBall(null))
-                add(SetContext(context.copy(hasHandedOff = true)))
+                add(UpdateContext(context.copy(hasHandedOff = true)))
                 if (!teamHasBall) {
                     add(SetTurnOver(TurnOver.STANDARD))
                 }
@@ -269,7 +270,7 @@ object HandOffAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(moveContext),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

@@ -19,8 +19,7 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -51,7 +50,7 @@ data class SetupTeamContext(
 object SetupTeam : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<SetupTeamContext>()
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<SetupTeamContext>()
 
     object SelectPlayerOrEndSetup : ActionNode() {
@@ -80,7 +79,7 @@ object SetupTeam : Procedure() {
                 else -> {
                     castAction<PlayerSelected>(action) { playerSelected ->
                         compositeCommandOf(
-                            SetContext(context.copy(currentPlayer = playerSelected.getPlayer(state))),
+                            UpdateContext(context.copy(currentPlayer = playerSelected.getPlayer(state))),
                             GotoNode(PlacePlayer),
                         )
                     }
@@ -117,7 +116,7 @@ object SetupTeam : Procedure() {
                     compositeCommandOf(
                         SetPlayerLocation(player, DogOut),
                         SetPlayerState(player, PlayerState.RESERVE),
-                        SetContext(context.copy(currentPlayer = null)),
+                        UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 }
@@ -129,7 +128,7 @@ object SetupTeam : Procedure() {
                     compositeCommandOf(
                         SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
                         SetPlayerState(player, PlayerState.STANDING),
-                        SetContext(context.copy(currentPlayer = null)),
+                        UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 }

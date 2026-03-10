@@ -9,8 +9,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -79,7 +80,7 @@ object BreatheFireStep: Procedure() {
         return if (context.injuryResult != null) {
             // For a Block, this doesn't matter, but during a Blitz, the player is not
             // allowed to move further.
-            SetContext(activateContext.copy(activationEndsImmediately = true))
+            UpdateContext(activateContext.copy(activationEndsImmediately = true))
         } else {
             null
         }
@@ -118,7 +119,7 @@ object BreatheFireStep: Procedure() {
                 is PlayerSelected -> {
                     val context = state.getContext<BreatheFireContext>()
                     compositeCommandOf(
-                        SetContext(context.copy(defender = action.getPlayer(state))),
+                        UpdateContext(context.copy(defender = action.getPlayer(state))),
                         GotoNode(CheckForFoulAppearance),
                     )
                 }
@@ -139,7 +140,7 @@ object BreatheFireStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val breatheContext = state.getContext<BreatheFireContext>()
             val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
-            return SetContext(foulAppearanceContext)
+            return AddContext(foulAppearanceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -151,7 +152,7 @@ object BreatheFireStep: Procedure() {
                     true -> add(GotoNode(RollForBreatheFire))
                     // Breathe Fire ends the Action immediately, regardless of a failed Foul Appearance roll or not.
                     false -> addAll(
-                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        UpdateContext(activePlayerContext.copy(activationEndsImmediately = true)),
                         ExitProcedure()
                     )
                 }
@@ -179,7 +180,7 @@ object BreatheFireStep: Procedure() {
 
             return buildCompositeCommand {
                 add(ReportBreatheFireResult(updatedContext))
-                add(SetContext(updatedContext))
+                add(UpdateContext(updatedContext))
                 val nextNode = when (breathFireResult) {
                     BreatheFireResult.ATTACKER_KNOCKED_DOWN -> ResolveAttackerKnockedDown
                     BreatheFireResult.TARGET_PLACED_PRONE -> ResolveDefenderPlacedProne
@@ -199,14 +200,14 @@ object BreatheFireStep: Procedure() {
                 causedBy = null, // The opponent does not get to use their skills on a failed Breathe Fire
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val breatheContext = state.getContext<BreatheFireContext>()
             return compositeCommandOf(
-                SetContext(breatheContext.copy(
+                UpdateContext(breatheContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
@@ -223,14 +224,14 @@ object BreatheFireStep: Procedure() {
                 causedBy = null, // The opponent does not get to use their skills on a failed Breathe Fire
                 mode = RiskingInjuryMode.PLACED_PRONE
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025PlacedProne
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val breatheContext = state.getContext<BreatheFireContext>()
             return compositeCommandOf(
-                SetContext(breatheContext.copy(
+                UpdateContext(breatheContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
@@ -247,14 +248,14 @@ object BreatheFireStep: Procedure() {
                 causedBy = null, // The attacker does not get to use other skills on the armour/injury roll
                 mode = RiskingInjuryMode.KNOCKED_DOWN
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val breatheContext = state.getContext<BreatheFireContext>()
             return compositeCommandOf(
-                SetContext(breatheContext.copy(
+                UpdateContext(breatheContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),

@@ -14,8 +14,9 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -98,7 +99,7 @@ object LeapStep : Procedure() {
                     castAction<FieldSquareSelected>(action) { target ->
                         val context = state.getContext<MoveContext>()
                         compositeCommandOf(
-                            SetContext(context.copy(target = target.coordinate)),
+                            UpdateContext(context.copy(target = target.coordinate)),
                             GotoNode(CheckIfRushingIsNeeded)
                         )
                     }
@@ -135,24 +136,23 @@ object LeapStep : Procedure() {
     object RushTwice: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
-            return SetContext(RushRollContext(moveContext.player, moveContext.target!!))
+            return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val moveContext = state.getContext<MoveContext>()
             val rushContext = state.getContext<RushRollContext>()
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(rushContext),
                     GotoNode(RushOnce)
                 )
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(rushContext),
                     GotoNode(ResolvePlayerFallingOver)
                 )
             }
@@ -165,7 +165,7 @@ object LeapStep : Procedure() {
     object RushOnce: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
-            return SetContext(RushRollContext(moveContext.player, moveContext.target!!))
+            return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -177,13 +177,13 @@ object LeapStep : Procedure() {
                     SetPlayerRushesLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerLocation(moveContext.player, moveContext.target!!),
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(rushContext),
                     GotoNode(ChooseToUseVeryLongLegs)
                 )
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(rushContext),
                     GotoNode(ResolvePlayerFallingOver)
                 )
             }
@@ -207,7 +207,7 @@ object LeapStep : Procedure() {
             val context = state.getContext<MoveContext>()
             val usingVeryLongLegs = (action is Confirm)
             return compositeCommandOf(
-                SetContext(context.copy(useVeryLongLegs = usingVeryLongLegs)),
+                UpdateContext(context.copy(useVeryLongLegs = usingVeryLongLegs)),
                 GotoNode(ChooseToUseLeapModifier)
             )
         }
@@ -230,7 +230,7 @@ object LeapStep : Procedure() {
             val context = state.getContext<MoveContext>()
             val useLeapModifier = (action is Confirm)
             return compositeCommandOf(
-                SetContext(context.copy(useLeapModifier = useLeapModifier)),
+                UpdateContext(context.copy(useLeapModifier = useLeapModifier)),
                 GotoNode(CalculateLeapRollModifiers)
             )
         }
@@ -241,7 +241,7 @@ object LeapStep : Procedure() {
             val context = state.getContext<MoveContext>()
             val modifiers = calculateLeapModifiers(state)
             return compositeCommandOf(
-                SetContext(
+                AddContext(
                     LeapRollContext(
                         player = context.player,
                         modifiers = modifiers,
@@ -266,7 +266,7 @@ object LeapStep : Procedure() {
                 compositeCommandOf(
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
-                    RemoveContext<LeapRollContext>(),
+                    RemoveContext(leapContext),
                     ReportLeapResult(leapContext, moveContext.target!!),
                     GotoNode(ResolveMove)
                 )
@@ -274,14 +274,14 @@ object LeapStep : Procedure() {
                 // Leap failed catastrophically, player Falls Over in starting square
                 compositeCommandOf(
                     SetPlayerLocation(player, moveContext.startingSquare),
-                    RemoveContext<LeapRollContext>(),
+                    RemoveContext(leapContext),
                     ReportLeapResult(leapContext, moveContext.startingSquare),
                     GotoNode(ResolvePlayerFallingOver)
                 )
             } else {
                 // Leap failed, player Falls Over in target square
                 compositeCommandOf(
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(leapContext),
                     ReportLeapResult(leapContext, moveContext.target!!),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -307,12 +307,13 @@ object LeapStep : Procedure() {
     object ResolvePlayerFallingOver: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
+            return AddContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
         }

@@ -11,8 +11,9 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -22,7 +23,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -35,6 +35,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedD
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Resolve a Stumble when selected on a block die.
@@ -50,15 +51,14 @@ object BB2025Stumble: Procedure() {
             blockContext.attacker,
             blockContext.defender,
         )
-        return SetContext(stumbleContext)
+        return AddContext(stumbleContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<PushContext>()
         val stumbleContext = state.getContext<StumbleContext>()
+        val pushContext = stumbleContext.pushContext ?: INVALID_GAME_STATE("StumbleContext should contain PushContext: $stumbleContext")
         return compositeCommandOf(
-            RemoveContext<PushContext>(),
             RemoveContext<StumbleContext>(),
-            ReportStumbleResult(context.firstPusher, context.firstPushee, stumbleContext.isDefenderDown())
+            ReportStumbleResult(pushContext.firstPusher, pushContext.firstPushee, stumbleContext.isDefenderDown())
         )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
@@ -79,7 +79,7 @@ object BB2025Stumble: Procedure() {
             val useTackle = (action == Confirm)
             val updatedContext = state.getContext<StumbleContext>().copy(attackerUsesTackle = useTackle)
             return buildCompositeCommand {
-                add(SetContext(updatedContext))
+                add(UpdateContext(updatedContext))
                 if (useTackle) {
                     add(ReportSkillUsed(updatedContext.attacker, SkillType.TACKLE))
                     add(GotoNode(ResolvePush))
@@ -110,7 +110,7 @@ object BB2025Stumble: Procedure() {
             }
             val updatedContext = state.getContext<StumbleContext>().copy(defenderUsesDodge = useDodge)
             return compositeCommandOf(
-                SetContext(updatedContext),
+                UpdateContext(updatedContext),
                 GotoNode(ResolvePush)
             )
         }
@@ -142,9 +142,7 @@ object BB2025Stumble: Procedure() {
                 causedBy = blockContext.attacker,
                 isPartOfMultipleBlock = blockContext.isUsingMultiBlock
             )
-            return compositeCommandOf(
-                SetContext(injuryContext)
-            )
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {

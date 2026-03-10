@@ -5,7 +5,7 @@ import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -89,7 +89,7 @@ object MovePlayersInPushChainStep: Procedure() {
                         }
                     }
                 }
-                add(SetContext(context.copy(pushedIntoTheCrowd = pushedIntoCrowd)))
+                add(UpdateContext(context.copy(pushedIntoTheCrowd = pushedIntoCrowd)))
                 add(ExitProcedure())
             }
         }

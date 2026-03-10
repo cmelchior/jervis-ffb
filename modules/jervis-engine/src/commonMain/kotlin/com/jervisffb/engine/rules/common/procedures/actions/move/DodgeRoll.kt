@@ -21,7 +21,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -116,7 +116,7 @@ object DodgeRoll: Procedure() {
                 val context = state.getContext<DodgeRollContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
-                    SetContext(context.copy(roll = D6DieRoll.create(state, d6))),
+                    UpdateContext(context.copy(roll = D6DieRoll.create(state, d6))),
                     GotoNode(CalculateMandatoryModifiers)
                 )
             }
@@ -155,7 +155,7 @@ object DodgeRoll: Procedure() {
                 }
             }
             return compositeCommandOf(
-                SetContext(context.copy(rollModifiers = modifiers)),
+                UpdateContext(context.copy(rollModifiers = modifiers)),
                 GotoNode(ChooseToUseTwoHeads)
             )
         }
@@ -182,7 +182,7 @@ object DodgeRoll: Procedure() {
                 when (action) {
                     Confirm -> {
                         ReportSkillUsed(context.player, SkillType.TWO_HEADS)
-                        SetContext(context.copyAndAddModifier(DodgeRollModifier.TWO_HEADS))
+                        UpdateContext(context.copyAndAddModifier(DodgeRollModifier.TWO_HEADS))
                     }
                     Cancel,
                     Continue -> null
@@ -216,7 +216,7 @@ object DodgeRoll: Procedure() {
                     val modifier = BreakTackleModifier(player.strength, rules.baseVersion)
                     compositeCommandOf(
                         ReportSkillUsed(context.player, SkillType.BREAK_TACKLE),
-                        SetContext(context.copyAndAddModifier(modifier)),
+                        UpdateContext(context.copyAndAddModifier(modifier)),
                         SetSkillUsed(player = player, skill = player.getSkill(SkillType.BREAK_TACKLE), used = true),
                         GotoNode(ChooseToUsePrehensileTail)
                     )
@@ -265,7 +265,7 @@ object DodgeRoll: Procedure() {
                     val player = action.getPlayer(state)
                     compositeCommandOf(
                         ReportSkillUsed(player, SkillType.PREHENSILE_TAIL),
-                        SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
+                        UpdateContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
                         GotoNode(ChooseToUseDivingTackle)
                     )
                 }
@@ -312,7 +312,7 @@ object DodgeRoll: Procedure() {
                     val skill = player.getSkill(SkillType.DIVING_TACKLE)
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
-                        SetContext(context.copyAndAddModifier(DodgeRollModifier.DIVING_TACKLE)),
+                        UpdateContext(context.copyAndAddModifier(DodgeRollModifier.DIVING_TACKLE)),
                         GotoNode(CalculateSuccess)
                     )
                 }
@@ -334,7 +334,7 @@ object DodgeRoll: Procedure() {
             val afterReroll = (context.roll?.rerolledResult != null)
             val success = testAgainstAgility(context.player, context.roll!!.result, context.rollModifiers)
             return compositeCommandOf(
-                SetContext(context.copy(isSuccess = success)),
+                UpdateContext(context.copy(isSuccess = success)),
                 if (afterReroll) ExitProcedure() else GotoNode(ChooseToUseTackle)
             )
         }
@@ -369,7 +369,7 @@ object DodgeRoll: Procedure() {
                     val tacklePlayer = action.getPlayer(state)
                     compositeCommandOf(
                         ReportSkillUsed(tacklePlayer, SkillType.TACKLE),
-                        SetContext(context.copy(useTackle = tacklePlayer)),
+                        UpdateContext(context.copy(useTackle = tacklePlayer)),
                         GotoNode(ChooseReRollSource)
                     )
                 }
@@ -456,7 +456,7 @@ object DodgeRoll: Procedure() {
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
-                    SetContext(rerolledDodgeRoll),
+                    UpdateContext(rerolledDodgeRoll),
                     GotoNode(CalculateSuccess),
                 )
             }

@@ -12,8 +12,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.UseShadowingSkill
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -78,7 +78,7 @@ object UseShadowingStep: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(player, SkillType.SHADOWING),
                         UseShadowingSkill(player),
-                        SetContext(shadowingContext),
+                        AddContext(shadowingContext),
                         GotoNode(RollShadowingDie),
                     )
                 }

@@ -13,8 +13,9 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -82,7 +83,7 @@ object PassingInterferenceStep: Procedure() {
                     castAction<PlayerSelected>(action) {
                         val context = state.getContext<PassingInterferenceContext>()
                         compositeCommandOf(
-                            SetContext(context.copy(interferencePlayer = it.getPlayer(state))),
+                            UpdateContext(context.copy(interferencePlayer = it.getPlayer(state))),
                             GotoNode(RollForInterference)
                         )
                     }
@@ -118,7 +119,7 @@ object PassingInterferenceStep: Procedure() {
                 target = player.agility,
                 modifiers = modifiers
             )
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -127,7 +128,7 @@ object PassingInterferenceStep: Procedure() {
             val interferencePlayer = interferenceContext.interferencePlayer ?: INVALID_GAME_STATE("Missing interference player")
             return if (rollContext.isSuccess) {
                 compositeCommandOf(
-                    SetContext(
+                    UpdateContext(
                         interferenceContext.copy(
                             didDeflect = true,
                             interferenceRoll = rollContext,
@@ -142,7 +143,7 @@ object PassingInterferenceStep: Procedure() {
             } else {
                 // Player failed to deflect the ball, abort immediately.
                 return compositeCommandOf(
-                    SetContext(
+                    UpdateContext(
                         interferenceContext.copy(
                             interferenceRoll = rollContext,
                         )

@@ -49,7 +49,7 @@ class FuzzTester {
 
     @Test
     fun runRandomBB2020Games() {
-        runFuzzTest(games = 1000, batchSize = 100) { _: Int, seed: Long ->
+        runFuzzTest(games = 100_000, batchSize = 5_000) { _: Int, seed: Long ->
             val random = Random(seed)
             val state = createDefaultGameStateBB2020(StandardBB2020Rules())
             val controller = GameEngineController(state)
@@ -65,7 +65,6 @@ class FuzzTester {
     @Test
     fun runRandomBB2025Games() {
         runFuzzTest(games = 100_000, batchSize = 5_000) { _, seed->
-            val seed = Random.nextLong()
             val random = Random(seed)
             val state = createDefaultGameStateBB2025(StandardBB2025Rules())
             val controller = GameEngineController(state, validateActions = false)
@@ -74,6 +73,11 @@ class FuzzTester {
                 val availableActions = controller.getAvailableActions()
                 val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
                 controller.handleAction(userAction)
+            }
+            // Check that all procedures cleaned up after themselves
+            // Disabled while this change is being implemented
+            if (!state.contexts.isEmpty()) {
+                error("Some procedure contexts are still present after finishing a game")
             }
         }
     }
@@ -105,7 +109,6 @@ class FuzzTester {
                         } catch (e: Exception) {
                             fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
                         }
-
                     }
                 }
             }

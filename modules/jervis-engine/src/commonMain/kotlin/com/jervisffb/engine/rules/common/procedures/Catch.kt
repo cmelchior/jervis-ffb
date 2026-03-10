@@ -11,8 +11,9 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -58,7 +59,7 @@ object Catch : Procedure() {
         val catchingPlayer = state.field[ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
         val rollContext = CatchRollContext(catchingPlayer, ball, diceRollTarget)
-        return SetContext(rollContext)
+        return AddContext(rollContext)
     }
     override fun isValid(state: Game, rules: Rules) {
         // Check that this is only called on a standing player with tackle zones
@@ -116,7 +117,7 @@ object Catch : Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useExtraArms = useExtraArms)),
+                UpdateContext(context.copy(useExtraArms = useExtraArms)),
                 GotoNode(ChooseToUseNervesOfSteel)
             )
         }
@@ -145,7 +146,7 @@ object Catch : Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useNervesOfSteel = useNervesOfSteel)),
+                UpdateContext(context.copy(useNervesOfSteel = useNervesOfSteel)),
                 GotoNode(CalculateModifiers)
             )
         }
@@ -188,7 +189,7 @@ object Catch : Procedure() {
 
             // TODO Check for disturbing presence.
             return compositeCommandOf(
-                SetContext(context.copy(modifiers = modifiers)),
+                UpdateContext(context.copy(modifiers = modifiers)),
                 GotoNode(RollToCatch)
             )
         }
@@ -209,7 +210,7 @@ object Catch : Procedure() {
                     )
                     if (ball.state == BallState.DEFLECTED) {
                         addAll(
-                            SetContext(passingInterferenceContext!!.copy(didIntercept = true)),
+                            UpdateContext(passingInterferenceContext!!.copy(didIntercept = true)),
                             ReportInterception(context.catchingPlayer, true)
                         )
                     }
@@ -240,7 +241,7 @@ object Catch : Procedure() {
             return when (ball.state) {
                 BallState.SCATTERED -> {
                     val scatterContext = ScatterRollContext(from = ball.location)
-                    SetContext(scatterContext)
+                    AddContext(scatterContext)
                 }
                 else -> null
             }
@@ -284,7 +285,7 @@ object Catch : Procedure() {
                         RemoveContext<ScatterRollContext>(),
                         SetBallLocation(ball, scatterContext.landsAt!!),
                         SetBallState.outOfBounds(ball, scatterContext.outOfBoundsAt),
-                        SetContext(ThrowInContext(
+                        AddContext(ThrowInContext(
                             ball = ball,
                             outOfBoundsAt = scatterContext.outOfBoundsAt,
                         )),
@@ -316,8 +317,9 @@ object Catch : Procedure() {
             }
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val throwInContext = state.getContextOrNull<ThrowInContext>()
             return compositeCommandOf(
-                RemoveContext<ThrowInContext>(),
+                if (throwInContext != null) RemoveContext<ThrowInContext>() else null,
                 ExitProcedure()
             )
         }
@@ -327,7 +329,7 @@ object Catch : Procedure() {
     object CheckForTouchDown : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<CatchRollContext>()
-            return SetContext(ScoringATouchDownContext(context.catchingPlayer))
+            return AddContext(ScoringATouchDownContext(context.catchingPlayer))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {

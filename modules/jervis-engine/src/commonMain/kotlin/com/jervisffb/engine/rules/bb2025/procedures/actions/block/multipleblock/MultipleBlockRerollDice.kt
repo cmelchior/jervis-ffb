@@ -9,7 +9,8 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -59,14 +60,14 @@ object MultipleBlockRerollDice: Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> {
                     val updatedContext= context.copyAndUpdateHasAcceptedResult(action.dicePoolId, true)
-                    SetContext(updatedContext)
+                    UpdateContext(updatedContext)
                 }
                 is RerollOptionSelected -> {
                     // Store the index to the current active reroll, so we can easily look it up later.
                     val updatedMbContext = context.copy(activeDefender = action.dicePoolId)
                     val rerollContext = updatedMbContext.createRerollContext(state, action)
                     compositeCommandOf(
-                        SetContext(updatedMbContext),
+                        AddContext(updatedMbContext),
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(ReRollDie),
                     )

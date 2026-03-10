@@ -14,8 +14,9 @@ import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -99,15 +100,15 @@ object PassAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(PassContext(thrower = player))
+            AddContext(PassContext(thrower = player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
-            RemoveContext<PassContext>(),
-            SetContext(
+            RemoveContext(context),
+            UpdateContext(
                 activePlayerContext.copyWithMarkedAction(context.hasMoved || context.passingRoll != null)
             ),
             *getResetPlayerTemporaryModifiersCommands(state, rules, activePlayerContext.player, Duration.END_OF_ACTION),
@@ -163,7 +164,7 @@ object PassAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(moveContext),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -178,18 +179,19 @@ object PassAction : Procedure() {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their pass action.
             val moveContext = state.getContext<MoveContext>()
-            val context = state.getContext<PassContext>()
+            val passContext = state.getContext<PassContext>()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(context.copy(hasMoved = true)))
+                    add(UpdateContext(passContext.copy(hasMoved = true)))
                 }
+                add(RemoveContext(moveContext))
                 if (state.endActionImmediately()) {
                     add(ExitProcedure())
-                } else if (!rules.isStanding(context.thrower)) {
+                } else if (!rules.isStanding(passContext.thrower)) {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {
-                    if (context.hasThrown) {
+                    if (passContext.hasThrown) {
                         add(GotoNode(MoveOrEndAction))
                     } else {
                         add(GotoNode(MoveOrPassOrEndAction))
@@ -219,7 +221,7 @@ object PassAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return compositeCommandOf(
-                SetContext(context.copy(type = PassType.HAIL_MARY_PASS)),
+                UpdateContext(context.copy(type = PassType.HAIL_MARY_PASS)),
                 SetCurrentBall(context.thrower.ball)
             )
         }
@@ -248,7 +250,7 @@ object PassAction : Procedure() {
                     abortUsingSafePass -> {
                         // If Safe Pass was used, activation ends immediately, but no turnover occurs
                         val activateContext = state.getContext<ActivatePlayerContext>()
-                        add(SetContext(activateContext.copy(activationEndsImmediately = true)))
+                        add(UpdateContext(activateContext.copy(activationEndsImmediately = true)))
                         add(ExitProcedure())
                     }
                     else -> {
@@ -293,7 +295,7 @@ object PassAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(moveContext),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

@@ -10,8 +10,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -72,7 +73,7 @@ object Pickup : Procedure() {
             val ball = state.currentBall()
             val pickupPlayer = state.field[ball.location].player!!
             val rollContext = PickupRollContext(pickupPlayer, ball)
-            SetContext(rollContext)
+            AddContext(rollContext)
         } else {
             null
         }
@@ -133,7 +134,7 @@ object Pickup : Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useBigHands = useBigHands)),
+                UpdateContext(context.copy(useBigHands = useBigHands)),
                 GotoNode(ChooseToUseExtraArms)
             )
         }
@@ -162,7 +163,7 @@ object Pickup : Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useExtraArms = useExtraArms)),
+                UpdateContext(context.copy(useExtraArms = useExtraArms)),
                 GotoNode(CalculateModifiers)
             )
         }
@@ -192,7 +193,7 @@ object Pickup : Procedure() {
             }
 
             return compositeCommandOf(
-                SetContext(context.copy(modifiers = modifiers)),
+                UpdateContext(context.copy(modifiers = modifiers)),
                 GotoNode(RollToPickup)
             )
         }
@@ -234,7 +235,7 @@ object Pickup : Procedure() {
     object CheckForScoring : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PickupRollContext>()
-            return SetContext(ScoringATouchDownContext(context.player))
+            return AddContext(ScoringATouchDownContext(context.player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {

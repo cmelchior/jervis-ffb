@@ -8,8 +8,9 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.AddTeamReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -49,7 +50,7 @@ object BrilliantCoaching : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
-                    SetContext(BrilliantCoachingContext(d6, state.kickingTeam.brilliantCoachingModifiers)),
+                    AddContext(BrilliantCoachingContext(d6, state.kickingTeam.brilliantCoachingModifiers)),
                     GotoNode(ReceivingTeamRollDie),
                 )
             }
@@ -63,9 +64,13 @@ object BrilliantCoaching : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
+                val context = state.getContext<BrilliantCoachingContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
-                    SetContext(state.getContext<BrilliantCoachingContext>().copy(receivingTeamRoll = d6, receivingTeamModifiers = state.receivingTeam.brilliantCoachingModifiers)),
+                    UpdateContext(context.copy(
+                        receivingTeamRoll = d6,
+                        receivingTeamModifiers = state.receivingTeam.brilliantCoachingModifiers)
+                    ),
                     GotoNode(ResolveBrilliantCoaching),
                 )
             }

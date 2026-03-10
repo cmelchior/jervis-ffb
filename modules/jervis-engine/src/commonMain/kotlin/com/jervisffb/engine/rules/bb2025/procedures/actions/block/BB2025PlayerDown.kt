@@ -2,7 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -37,10 +39,13 @@ object BB2025PlayerDown: Procedure() {
             causedBy = context.defender,
             isPartOfMultipleBlock = context.isUsingMultiBlock
         )
-        return SetContext(injuryContext)
+        return AddContext(injuryContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return ReportPlayerDownResult(state.getContext<BlockContext>().attacker)
+        return compositeCommandOf(
+            RemoveContext<RiskingInjuryContext>(),
+            ReportPlayerDownResult(state.getContext<BlockContext>().attacker)
+        )
     }
 
     object CheckForMultipleBlock: ComputationNode() {
@@ -51,7 +56,7 @@ object BB2025PlayerDown: Procedure() {
                 true -> {
                     val multiContext = state.getContext<BB2025MultipleBlockContext>()
                     compositeCommandOf(
-                        SetContext(multiContext.copy(attackerKnockedDown = true)),
+                        UpdateContext(multiContext.copy(attackerKnockedDown = true)),
                         ExitProcedure(),
                     )
                 }

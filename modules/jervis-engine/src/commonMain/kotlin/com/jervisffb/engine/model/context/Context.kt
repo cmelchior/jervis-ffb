@@ -16,6 +16,6 @@ import com.jervisffb.engine.model.Team
  * @see [Game.getContext]
  * @see [Game.assertContext]
  * @see [Game.contexts]
- * @see [com.jervisffb.engine.commands.context.RemoveContext]
+ * @see [com.jervisffb.engine.commands.context.RemoveContextUsingType]
  */
 interface ProcedureContext

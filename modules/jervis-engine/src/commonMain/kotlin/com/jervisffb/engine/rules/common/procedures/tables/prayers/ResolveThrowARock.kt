@@ -14,8 +14,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -58,7 +59,7 @@ object ResolveThrowARock : Procedure() {
         // not checking for it, which means it would be allowed. But due to how
         // Stalling is defined, it will probably never happen.
         val stallingPlayers = state.activeTeamOrThrow().filter { it.isStalling && it.location.isOnField(rules) }
-        return SetContext(ThrowARockContext(stallingPlayers = stallingPlayers))
+        return AddContext(ThrowARockContext(stallingPlayers = stallingPlayers))
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<ThrowARockContext>()
@@ -91,7 +92,7 @@ object ResolveThrowARock : Procedure() {
                         currentPlayer = context.stallingPlayers.last()
                     )
                     compositeCommandOf(
-                        SetContext(updatedContext),
+                        UpdateContext(updatedContext),
                         GotoNode(RollDie)
                     )
                 }
@@ -130,7 +131,7 @@ object ResolveThrowARock : Procedure() {
     object ResolveInjuryByRock: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowARockContext>()
-            return SetContext(
+            return AddContext(
                 RiskingInjuryContext(
                     player = throwContext.currentPlayer!!,
                     mode = RiskingInjuryMode.HIT_BY_ROCK

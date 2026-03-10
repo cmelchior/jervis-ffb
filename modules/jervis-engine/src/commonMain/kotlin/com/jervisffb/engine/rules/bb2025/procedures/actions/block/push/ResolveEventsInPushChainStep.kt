@@ -6,8 +6,9 @@ import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -22,6 +23,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
@@ -93,7 +95,7 @@ data class ResolvePushChainEventsContext(
 object ResolveEventsInPushChainStep: Procedure() {
     override val initialNode: Node = DetermineNextSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        return SetContext(ResolvePushChainEventsContext())
+        return AddContext(ResolvePushChainEventsContext())
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<ResolvePushChainEventsContext>()
@@ -110,22 +112,26 @@ object ResolveEventsInPushChainStep: Procedure() {
             // in the Push Chain multiple times.
             return if (nextPush != null && nextPush.to!! !in resolveContext.visitedSquares) {
                 compositeCommandOf(
-                    SetContext(resolveContext.copy(
-                        currentPushChainIndex = nextIndex,
-                        currentPushStep = nextPush,
-                        visitedSquares = resolveContext.visitedSquares.add(nextPush.to!!)
-                    )),
+                    UpdateContext(
+                        resolveContext.copy(
+                            currentPushChainIndex = nextIndex,
+                            currentPushStep = nextPush,
+                            visitedSquares = resolveContext.visitedSquares.add(nextPush.to!!)
+                        )
+                    ),
                     GotoNode(ResolveBouncingBall)
                 )
 
             } else if (!resolveContext.attackerResolved) {
                 compositeCommandOf(
-                    SetContext(resolveContext.copy(
-                        currentPushChainIndex = nextIndex,
-                        currentPushStep = null,
-                        resolvingAttacker = pushContext.firstPusher,
-                        attackerResolved = true
-                    )),
+                    UpdateContext(
+                        resolveContext.copy(
+                            currentPushChainIndex = nextIndex,
+                            currentPushStep = null,
+                            resolvingAttacker = pushContext.firstPusher,
+                            attackerResolved = true
+                        )
+                    ),
                 )
             } else {
                 ExitProcedure()
@@ -195,26 +201,22 @@ object ResolveEventsInPushChainStep: Procedure() {
                 // But it will not happen until next step in the sequence
                 if (player.hasBall()) {
                     val ball = player.ball!!
-                    val throwContext = ThrowInContext(
-                        ball = ball,
-                        outOfBoundsAt = pushStep.from,
-                    )
                     addAll(
                         SetBallLocation(ball, pushStep.to!!),
                         SetBallState.outOfBounds(ball, pushStep.from),
-                        SetContext(throwContext)
                     )
                 }
                 val injuryContext = RiskingInjuryContext(
                     player = player,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
                 )
-                add(SetContext(injuryContext))
+                add(AddContext(injuryContext))
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val ball = state.balls.firstOrNull { it.state == BallState.OUT_OF_BOUNDS }
+            val throwInContext = state.getContextOrNull<ThrowInContext>()
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),
                 if (ball != null) SetCurrentBall(ball) else null,
@@ -226,7 +228,7 @@ object ResolveEventsInPushChainStep: Procedure() {
     object ThrowInBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetContext(
+            return AddContext(
                 ThrowInContext(
                     ball,
                     ball.outOfBoundsAt!!
@@ -253,7 +255,7 @@ object ResolveEventsInPushChainStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val context = state.getContext<ResolvePushChainEventsContext>()
             val player = context.getCurrentPlayer()
-            return SetContext(ScoringATouchDownContext(player))
+            return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {

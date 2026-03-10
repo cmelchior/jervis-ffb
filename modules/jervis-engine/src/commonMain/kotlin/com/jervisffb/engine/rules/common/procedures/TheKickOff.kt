@@ -16,13 +16,13 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
-import com.jervisffb.engine.actions.TargetSquare.Companion.direction
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetKickingPlayer
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -150,7 +150,7 @@ object TheKickOff : Procedure() {
 
     object TheKickDeviates : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(DeviateRollContext(from = state.currentBall().location))
+            return AddContext(DeviateRollContext(from = state.currentBall().location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -160,20 +160,13 @@ object TheKickOff : Procedure() {
 
     object ChooseToUseKick: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return if (state.kickingPlayer?.isSkillAvailable(SkillType.KICK) == true) {
-                listOf(ConfirmWhenReady, CancelWhenReady)
-            } else {
-                listOf(ContinueWhenReady)
+            return when (state.kickingPlayer?.isSkillAvailable(SkillType.KICK) == true) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false ->listOf(ContinueWhenReady)
             }
         }
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val useKick = (action is Confirm)
             val context = state.getContext<DeviateRollContext>()
 
@@ -181,6 +174,7 @@ object TheKickOff : Procedure() {
                 val newLocation = context.landsAt ?: error("Missing landing coordinate: $context")
                 val ball = state.currentBall()
                 return compositeCommandOf(
+                    RemoveContext<DeviateRollContext>(),
                     if (context.outOfBoundsAt != null) SetBallState.outOfBounds(ball, context.outOfBoundsAt) else SetBallState.deviating(ball),
                     SetBallLocation(ball, newLocation),
                     ReportKickResult(state.kickingTeam, context.deviateRoll.first() as D8Result, context.deviateRoll.last() as D6Result, newLocation, rules),
@@ -204,6 +198,7 @@ object TheKickOff : Procedure() {
                     }
                 }
                 return compositeCommandOf(
+                    RemoveContext<DeviateRollContext>(),
                     ReportKickSkillResult(state.kickingPlayer!!, d6, d6.toD3()),
                     if (outOfBoundsAt != null) SetBallState.outOfBounds(ball, outOfBoundsAt) else SetBallState.deviating(ball),
                     SetBallLocation(ball, newLocation),

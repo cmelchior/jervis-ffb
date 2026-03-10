@@ -8,7 +8,8 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -86,7 +87,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                             else -> INVALID_ACTION(playerSelected)
                         }
                         compositeCommandOf(
-                            SetContext(context.copy(activeDefender = index)),
+                            UpdateContext(context.copy(activeDefender = index)),
                             GotoNode(PatchUpSelectedDefender)
                         )
                     }
@@ -103,7 +104,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                 1 -> context.defender2InjuryContext!!
                 else -> INVALID_GAME_STATE("Invalid active defender: ${context.activeDefender}")
             }
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -114,7 +115,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                 else -> INVALID_GAME_STATE("Invalid active defender: ${context.activeDefender}")
             }
             return compositeCommandOf(
-                SetContext(updatedContext),
+                UpdateContext(updatedContext),
                 GotoNode(SelectDefender)
             )
         }
@@ -128,7 +129,7 @@ object MultipleBlockResolveInjuries: Procedure() {
         }
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BB2020MultipleBlockContext>()
-            return SetContext(context.attackerInjuryContext.first())
+            return AddContext(context.attackerInjuryContext.first())
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {

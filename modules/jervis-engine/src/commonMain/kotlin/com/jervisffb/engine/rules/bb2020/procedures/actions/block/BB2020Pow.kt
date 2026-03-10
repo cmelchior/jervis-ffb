@@ -5,9 +5,10 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -44,7 +45,7 @@ object BB2020Pow: Procedure() {
         val pushContext = createPushContext(state)
         return compositeCommandOf(
             ReportPowResult(pushContext.firstPusher, pushContext.firstPushee),
-            SetContext(pushContext)
+            AddContext(pushContext)
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -69,7 +70,7 @@ object BB2020Pow: Procedure() {
                     add(SetContextProperty(property, multipleBlockContext, pushContext))
                 }
                 addAll(
-                    SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
+                    UpdateContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
                     GotoNode(ResolveDefenderDownInjury)
                 )
             }
@@ -117,7 +118,7 @@ object BB2020Pow: Procedure() {
             )
             return buildCompositeCommand {
                 addAll(
-                    SetContext(injuryContext)
+                    AddContext(injuryContext)
                 )
                 if (defender.hasBall()) {
                     val ball = defender.ball!!

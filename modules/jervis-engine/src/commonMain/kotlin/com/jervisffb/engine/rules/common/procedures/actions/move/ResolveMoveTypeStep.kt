@@ -4,8 +4,9 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -116,25 +117,25 @@ object ResolveMoveTypeStep : Procedure() {
                 // Securing the Ball takes precedence over picking up the ball.
                 secureTheBall && !endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
+                        if (moveContext.hasMoved) UpdateContext(activeContext.copyWithMarkedAction(true)) else null,
                         GotoNode(SecureTheBall)
                     )
                 }
                 pickupBall && !endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
+                        if (moveContext.hasMoved) UpdateContext(activeContext.copyWithMarkedAction(true)) else null,
                         GotoNode(PickUpBall)
                     )
                 }
                 endNow -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
+                        if (moveContext.hasMoved) UpdateContext(activeContext.copyWithMarkedAction(true)) else null,
                         ExitProcedure()
                     )
                 }
                 else -> {
                     compositeCommandOf(
-                        if (moveContext.hasMoved) SetContext(activeContext.copyWithMarkedAction(true)) else null,
+                        if (moveContext.hasMoved) UpdateContext(activeContext.copyWithMarkedAction(true)) else null,
                         if (player.hasBall()) GotoNode(CheckForScoring) else ExitProcedure()
                     )
                 }
@@ -188,7 +189,7 @@ object ResolveMoveTypeStep : Procedure() {
     object CheckForScoring : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return SetContext(ScoringATouchDownContext(context.player))
+            return AddContext(ScoringATouchDownContext(context.player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {

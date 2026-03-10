@@ -10,8 +10,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -75,7 +76,7 @@ object StandardMoveStep: Procedure() {
                 EndAction -> ExitProcedure()
                 else -> castAction<FieldSquareSelected>(action) {
                     compositeCommandOf(
-                        SetContext(context.copy(target = it.coordinate, hasMoved = true)),
+                        UpdateContext(context.copy(target = it.coordinate, hasMoved = true)),
                         GotoNode(MovePlayer),
                     )
                 }
@@ -88,7 +89,7 @@ object StandardMoveStep: Procedure() {
     object MovePlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
-            return SetContext(
+            return AddContext(
                 MovePlayerIntoSquareContext(
                     player = moveContext.player,
                     target = moveContext.target!!,
@@ -97,11 +98,13 @@ object StandardMoveStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.turnOver != null) {
-                ExitProcedure() // Something went wrong when moving the player
-            } else {
-                GotoNode(CheckIfRushingIsNeeded)
-            }
+            return compositeCommandOf(
+                RemoveContext<MovePlayerIntoSquareContext>(),
+                when (state.turnOver != null) {
+                    true -> ExitProcedure() // Something went wrong when moving the player
+                    false -> GotoNode(CheckIfRushingIsNeeded)
+                }
+            )
         }
     }
 
@@ -123,7 +126,7 @@ object StandardMoveStep: Procedure() {
     object ResolveRush: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
-            return SetContext(RushRollContext(moveContext.player, moveContext.target!!))
+            return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -133,13 +136,13 @@ object StandardMoveStep: Procedure() {
                 compositeCommandOf(
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
-                    RemoveContext<RushRollContext>(),
+                    RemoveContext(rushContext),
                     GotoNode(CheckIfDodgeIsNeeded)
                 )
             } else {
                 // Rush failed, player is Knocked Down in target square
-                return compositeCommandOf(
-                    RemoveContext<RushRollContext>(),
+                compositeCommandOf(
+                    RemoveContext(rushContext),
                     GotoNode(ResolvePlayerFallingOver)
                 )
             }
@@ -161,7 +164,7 @@ object StandardMoveStep: Procedure() {
     object ResolveDodge: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
-            return SetContext(context = DodgeRollContext(
+            return AddContext(context = DodgeRollContext(
                 moveContext.player,
                 moveContext.startingSquare,
                 moveContext.target!!
@@ -213,7 +216,7 @@ object StandardMoveStep: Procedure() {
     object ResolvePlayerFallingOver: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
+            return AddContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when (rules.baseVersion) {
@@ -224,6 +227,7 @@ object StandardMoveStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
         }

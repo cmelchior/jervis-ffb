@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -71,7 +71,7 @@ object BlessedStatueOfNuffle : Procedure() {
                                 player,
                                 rules.createSkill(player, SkillType.PRO.id(), Duration.END_OF_GAME)
                             ),
-                            SetContext(context.copy(resultApplied = true)),
+                            UpdateContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Blessed Statue of Nuffle (Pro)"),
                             ExitProcedure(),
                         )

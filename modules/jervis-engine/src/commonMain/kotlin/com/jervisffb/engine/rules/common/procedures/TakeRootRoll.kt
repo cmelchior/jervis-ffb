@@ -15,8 +15,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -65,9 +66,11 @@ object TakeRootRoll: Procedure() {
                 addAll(
                     AddPlayerStatusEffect(context.player, PlayerStatusEffect.rooted()),
                     ReportFailedTakeRoot(context.player),
-                    SetContext(activateContext.copy(
-                        rolledForNegaTrait = true,
-                    ))
+                    UpdateContext(
+                        activateContext.copy(
+                            rolledForNegaTrait = true,
+                        )
+                    )
                 )
             }
         }
@@ -86,7 +89,7 @@ object TakeRootRoll: Procedure() {
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.TAKE_ROOT, d6),
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -158,7 +161,7 @@ object TakeRootRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    SetContext(rollContext),
+                    AddContext(rollContext),
                     ExitProcedure(),
                 )
             }

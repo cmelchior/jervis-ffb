@@ -237,7 +237,7 @@ fun List<StatModifier>.sum(): Int = this.sumOf { it.modifier }
 
 class InvalidActionException(message: String) : RuntimeException(message)
 
-class InvalidGameStateException(message: String) : IllegalStateException(message)
+class InvalidGameStateException(message: String, cause: Throwable? = null) : IllegalStateException(message, cause)
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothing {

@@ -11,8 +11,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -40,7 +41,7 @@ import com.jervisffb.engine.rules.Rules
 object SwelteringHeat : Procedure() {
     override val initialNode: Node = RollForHomeTeam
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        return SetContext(SwelteringHeatContext())
+        return AddContext(SwelteringHeatContext())
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
@@ -57,7 +58,7 @@ object SwelteringHeat : Procedure() {
             return castDiceRoll<D3Result>(action) { d3 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
-                    SetContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
+                    UpdateContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
                     GotoNode(SelectPlayersOnHomeTeam)
                 )
             }
@@ -99,7 +100,7 @@ object SwelteringHeat : Procedure() {
             return castDiceRoll<D3Result>(action) { d3 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
-                    SetContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
+                    UpdateContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
                     GotoNode(SelectPlayersOnAwayTeam)
                 )
             }

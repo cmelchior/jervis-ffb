@@ -2,7 +2,8 @@ package com.jervisffb.engine.rules.common.procedures
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -80,8 +81,8 @@ object PreGame : Procedure() {
             val rolls = difference / rules.prayersToNufflePrice // 1 roll for every 50.000 TV difference
             return if (rolls > 0 && prayersEnabled) {
                 val context = PrayersToNuffleRollContext(team, rollsRemaining = rolls)
-                return compositeCommandOf(
-                    SetContext(context),
+                compositeCommandOf(
+                    AddContext(context),
                     GotoNode(ThePrayersToNuffleTable)
                 )
             } else {
@@ -94,7 +95,10 @@ object PreGame : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? = null
         override fun getChildProcedure(state: Game, rules: Rules) = PrayersToNuffleRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(DetermineKickingTeam)
+            return compositeCommandOf(
+                RemoveContext<PrayersToNuffleRollContext>(),
+                GotoNode(DetermineKickingTeam)
+            )
         }
     }
 

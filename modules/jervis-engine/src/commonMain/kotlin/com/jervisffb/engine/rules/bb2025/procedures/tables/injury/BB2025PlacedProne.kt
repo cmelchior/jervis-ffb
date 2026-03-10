@@ -9,7 +9,7 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -69,7 +69,7 @@ object BB2025PlacedProne: Procedure() {
                 val isActive = (activePlayerContext.player == player)
                 val hasBall = player.hasBall()
                 if (isActive) {
-                    add(SetContext(activePlayerContext.copy(activationEndsImmediately = true)))
+                    add(UpdateContext(activePlayerContext.copy(activationEndsImmediately = true)))
                 }
                 if (hasBall) {
                     val ball = player.ball!!

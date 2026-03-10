@@ -11,6 +11,7 @@ class CompositeCommand(val commands: List<Command>) : Command {
         private val commands = mutableListOf<Command>()
         fun add(command: Command) = commands.add(command)
         fun addAll(vararg commands: Command) = commands.forEach { add(it) }
+        fun addAllNonNull(vararg commands: Command?) = commands.filterNotNull().forEach { add(it) }
         fun build(): CompositeCommand {
             return CompositeCommand(commands)
         }

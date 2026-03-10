@@ -13,8 +13,9 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -92,7 +93,7 @@ object PassStep: Procedure() {
                         val newLocation = it.coordinate
                         compositeCommandOf(
                             ReportStartingPass(context),
-                            SetContext(
+                            UpdateContext(
                                 context.copy(
                                     target = newLocation,
                                     range = distance
@@ -147,7 +148,7 @@ object PassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.Companion.scattered(ball),
                 SetBallLocation(ball, context.target!!),
-                SetContext(
+                AddContext(
                     ScatterRollContext(
                         from = context.target
                     )
@@ -165,7 +166,7 @@ object PassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.outOfBounds(ball, context.outOfBoundsAt),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
@@ -173,7 +174,7 @@ object PassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.scattered(ball),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
@@ -191,7 +192,7 @@ object PassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.Companion.deviating(ball),
                 SetBallLocation(ball, passContext.thrower.coordinates),
-                SetContext(DeviateRollContext(passContext.thrower.coordinates))
+                AddContext(DeviateRollContext(passContext.thrower.coordinates))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
@@ -205,7 +206,7 @@ object PassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.outOfBounds(ball, context.outOfBoundsAt),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
@@ -213,7 +214,7 @@ object PassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.Companion.deviating(ball),
                     SetBallLocation(ball, context.landsAt!!),
-                    SetContext(passContext.copy(target = context.landsAt)),
+                    UpdateContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
@@ -231,7 +232,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.Companion.bouncing(ball),
-                SetContext(passContext.copy(target = null)),
+                UpdateContext(passContext.copy(target = null)),
                 SetBallLocation(ball, state.getContext<PassContext>().thrower.coordinates),
                 SetTurnOver(TurnOver.STANDARD), // A Fumbled Pass is always a turn-over, regardless of where the ball lands
             )
@@ -254,7 +255,7 @@ object PassStep: Procedure() {
                 thrower = passContext.thrower,
                 target = state.currentBall().outOfBoundsAt!!,
             )
-            return SetContext(interferenceContext)
+            return AddContext(interferenceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -264,13 +265,13 @@ object PassStep: Procedure() {
             val context = state.getContext<PassingInterferenceContext>()
             return if (!context.continueThrow) {
                 compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
+                    UpdateContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     RemoveContext<PassingInterferenceContext>(),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
+                    UpdateContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     RemoveContext<PassingInterferenceContext>(),
                     GotoNode(ResolveGoingOutOfBounds)
                 )
@@ -288,7 +289,7 @@ object PassStep: Procedure() {
                 thrower = passContext.thrower,
                 target = state.currentBall().location,
             )
-            return SetContext(interferenceContext)
+            return AddContext(interferenceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -298,13 +299,13 @@ object PassStep: Procedure() {
             val context = state.getContext<PassingInterferenceContext>()
             return if (!context.continueThrow) {
                 compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
+                    UpdateContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     RemoveContext<PassingInterferenceContext>(),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
-                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
+                    UpdateContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     RemoveContext<PassingInterferenceContext>(),
                     GotoNode(ResolveBounceOrCatch)
                 )
@@ -319,7 +320,7 @@ object PassStep: Procedure() {
     object ResolveGoingOutOfBounds: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetContext(ThrowInContext(ball, ball.outOfBoundsAt!!))
+            return AddContext(ThrowInContext(ball, ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {

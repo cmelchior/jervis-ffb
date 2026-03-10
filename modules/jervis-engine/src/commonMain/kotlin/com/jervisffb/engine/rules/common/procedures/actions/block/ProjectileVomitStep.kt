@@ -9,8 +9,9 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -70,7 +71,7 @@ object ProjectileVomitStep: Procedure() {
         return if (context.injuryResult != null) {
             // For a Block, this doesn't matter, but during a Blitz, the player is not
             // allowed to move further.
-            SetContext(activateContext.copy(activationEndsImmediately = true))
+            UpdateContext(activateContext.copy(activationEndsImmediately = true))
         } else {
             null
         }
@@ -109,7 +110,7 @@ object ProjectileVomitStep: Procedure() {
                 is PlayerSelected -> {
                     val context = state.getContext<ProjectileVomitContext>()
                     compositeCommandOf(
-                        SetContext(context.copy(defender = action.getPlayer(state))),
+                        UpdateContext(context.copy(defender = action.getPlayer(state))),
                         GotoNode(CheckForFoulAppearance),
                     )
                 }
@@ -130,7 +131,7 @@ object ProjectileVomitStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val breatheContext = state.getContext<ProjectileVomitContext>()
             val foulAppearanceContext = FoulAppearanceContext(breatheContext.attacker, breatheContext.defender!!)
-            return SetContext(foulAppearanceContext)
+            return AddContext(foulAppearanceContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulAppearanceRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -142,7 +143,7 @@ object ProjectileVomitStep: Procedure() {
                     true -> add(GotoNode(RollForProjectileVomit))
                     // Projectile Vomit ends the Action immediately, regardless of a failed Foul Appearance roll or not.
                     false -> addAll(
-                        SetContext(activePlayerContext.copy(activationEndsImmediately = true)),
+                        UpdateContext(activePlayerContext.copy(activationEndsImmediately = true)),
                         ExitProcedure()
                     )
                 }
@@ -171,14 +172,14 @@ object ProjectileVomitStep: Procedure() {
                 causedBy = null,
                 mode = RiskingInjuryMode.PROJECTILE_VOMIT
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val vomitContext = state.getContext<ProjectileVomitContext>()
             return compositeCommandOf(
-                SetContext(vomitContext.copy(
+                UpdateContext(vomitContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
@@ -195,14 +196,14 @@ object ProjectileVomitStep: Procedure() {
                 causedBy = null,
                 mode = RiskingInjuryMode.PROJECTILE_VOMIT
             )
-            return SetContext(injuryContext)
+            return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val vomitContext = state.getContext<ProjectileVomitContext>()
             return compositeCommandOf(
-                SetContext(vomitContext.copy(
+                UpdateContext(vomitContext.copy(
                     injuryResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),

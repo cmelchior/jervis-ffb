@@ -10,8 +10,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -56,7 +57,7 @@ object SecureTheBallStep: Procedure() {
         val ball = state.currentBall()
         val securingPlayer = state.field[ball.location].player!!
         val secureContext = SecureTheBallRollContext(securingPlayer, ball)
-        return SetContext(secureContext)
+        return AddContext(secureContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<SecureTheBallRollContext>()
@@ -112,7 +113,7 @@ object SecureTheBallStep: Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useBigHands = useBigHands)),
+                UpdateContext(context.copy(useBigHands = useBigHands)),
                 GotoNode(ChooseToUseExtraArms)
             )
         }
@@ -141,7 +142,7 @@ object SecureTheBallStep: Procedure() {
                 } else {
                     null
                 },
-                SetContext(context.copy(useExtraArms = useExtraArms)),
+                UpdateContext(context.copy(useExtraArms = useExtraArms)),
                 GotoNode(CalculateModifiers)
             )
         }
@@ -171,7 +172,7 @@ object SecureTheBallStep: Procedure() {
             }
 
             return compositeCommandOf(
-                SetContext(context.copy(modifiers = modifiers)),
+                UpdateContext(context.copy(modifiers = modifiers)),
                 GotoNode(RollToSecureBall)
             )
         }
@@ -186,14 +187,14 @@ object SecureTheBallStep: Procedure() {
             return if (rollContext.isSuccess) {
                 compositeCommandOf(
                     SetBallState.carried(ball, rollContext.player),
-                    SetContext(actionContext.copy(roll = rollContext, securedTheBall = true)),
+                    UpdateContext(actionContext.copy(roll = rollContext, securedTheBall = true)),
                     ReportSecuredTheBallResult(rollContext),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.bouncing(ball),
-                    SetContext(actionContext.copy(roll = rollContext, securedTheBall = false)),
+                    UpdateContext(actionContext.copy(roll = rollContext, securedTheBall = false)),
                     ReportSecuredTheBallResult(rollContext),
                     GotoNode(SecuringTheBallFailed),
                 )

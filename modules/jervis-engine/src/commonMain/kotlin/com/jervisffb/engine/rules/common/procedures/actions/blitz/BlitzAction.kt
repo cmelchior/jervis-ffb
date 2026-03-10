@@ -18,8 +18,9 @@ import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -88,16 +89,16 @@ object BlitzAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(BlitzActionContext(player))
+            AddContext(BlitzActionContext(player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val activateContext = state.getContext<ActivatePlayerContext>()
         val blitzContext = state.getContext<BlitzActionContext>()
         return compositeCommandOf(
-            RemoveContext<BlitzActionContext>(),
+            RemoveContext(blitzContext),
             when (blitzContext.hasBlocked || blitzContext.hasMoved) {
-                true -> SetContext(activateContext.copy(markActionAsUsed = true))
+                true -> UpdateContext(activateContext.copy(markActionAsUsed = true))
                 false -> null
             },
             *getResetPlayerTemporaryModifiersCommands(state, rules, activateContext.player, Duration.END_OF_ACTION),
@@ -127,7 +128,7 @@ object BlitzAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.getContext<BlitzActionContext>()
                     compositeCommandOf(
-                        SetContext(context.copy(defender = action.getPlayer(state))),
+                        UpdateContext(context.copy(defender = action.getPlayer(state))),
                         GotoNode(MoveOrBlockOrEndAction)
                     )
                 }
@@ -170,15 +171,16 @@ object BlitzAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetContext(moveContext),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetContext(
-                            context.copy(defender = action.getPlayer(state), hasBlocked = true)
-                        ),
+                        UpdateContext(context.copy(
+                            defender = action.getPlayer(state),
+                            hasBlocked = true
+                        )),
                         GotoNode(SelectBlockType)
                     )
                 }
@@ -199,23 +201,25 @@ object BlitzAction : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val blitzContext = state.getContext<BlitzActionContext>()
             val endNow = state.endActionImmediately()
-            return if (!rules.isStanding(blitzContext.attacker) && !endNow) {
-                compositeCommandOf(
-                    if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
-                    RemoveContext<MoveContext>(),
-                    if (!state.isTurnOver()) SetTurnOver(TurnOver.STANDARD) else null,
-                    ExitProcedure()
-                )
-            } else if (!endNow) {
-                compositeCommandOf(
-                    if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
-                    RemoveContext<MoveContext>(),
-                    GotoNode(if (blitzContext.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
-                )
-            } else {
-                // Something caused Blitz to end prematurely.
-                ExitProcedure()
+            return buildCompositeCommand {
+                add(RemoveContext(moveContext))
+                if (!rules.isStanding(blitzContext.attacker) && !endNow) {
+                    addAllNonNull(
+                        if (moveContext.hasMoved) UpdateContext(blitzContext.copy(hasMoved = true)) else null,
+                        if (!state.isTurnOver()) SetTurnOver(TurnOver.STANDARD) else null,
+                        ExitProcedure()
+                    )
+                } else if (!endNow) {
+                    addAllNonNull(
+                        if (moveContext.hasMoved) UpdateContext(blitzContext.copy(hasMoved = true)) else null,
+                        GotoNode(if (blitzContext.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
+                    )
+                } else {
+                    // Something caused Blitz to end prematurely.
+                    add(ExitProcedure())
+                }
             }
+
         }
     }
 
@@ -236,7 +240,7 @@ object BlitzAction : Procedure() {
                     castAction<BlockTypeSelected>(action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
-                            SetContext(context.copy(blockType = typeSelected.type)),
+                            UpdateContext(context.copy(blockType = typeSelected.type)),
                             GotoNode(UseMoveToBlock),
                         )
                     }
@@ -263,17 +267,17 @@ object BlitzAction : Procedure() {
     }
 
     object RushBeforeBlock : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val blitzContext = state.getContext<BlitzActionContext>()
-            return SetContext(RushRollContext(blitzContext.attacker, blitzContext.attacker.location as OnFieldLocation))
+            return AddContext(RushRollContext(blitzContext.attacker, blitzContext.attacker.location as OnFieldLocation))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<RushRollContext>()
+            val rushContext = state.getContext<RushRollContext>()
             return buildCompositeCommand {
-                add(RemoveContext<RushRollContext>())
-                if (context.isSuccess) {
-                    add(SetPlayerRushesLeft(context.player, context.player.rushesLeft - 1))
+                add(RemoveContext(rushContext))
+                if (rushContext.isSuccess) {
+                    add(SetPlayerRushesLeft(rushContext.player, rushContext.player.rushesLeft - 1))
                     add(GotoNode(ResolveBlock))
                 } else {
                     add(GotoNode(ResolveFallingOverBeforeBlock))
@@ -285,7 +289,7 @@ object BlitzAction : Procedure() {
     object ResolveFallingOverBeforeBlock: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlitzActionContext>()
-            return SetContext(RiskingInjuryContext(context.attacker, mode = RiskingInjuryMode.FALLING_OVER))
+            return AddContext(RiskingInjuryContext(context.attacker, mode = RiskingInjuryMode.FALLING_OVER))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when (rules.baseVersion) {
@@ -296,7 +300,10 @@ object BlitzAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome of rolling for falling over, the player's action
             // ended in a turnover
-            return ExitProcedure()
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
         }
     }
 
@@ -307,7 +314,7 @@ object BlitzAction : Procedure() {
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.BREATHE_FIRE -> {
-                    SetContext(
+                    AddContext(
                         BreatheFireContext(
                             context.attacker,
                             context.defender!!,
@@ -315,7 +322,7 @@ object BlitzAction : Procedure() {
                     )
                 }
                 BlockType.PROJECTILE_VOMIT -> {
-                    SetContext(
+                    AddContext(
                         ProjectileVomitContext(
                             attacker = context.attacker,
                             defender = context.defender!!
@@ -323,7 +330,7 @@ object BlitzAction : Procedure() {
                     )
                 }
                 BlockType.STAB -> {
-                    SetContext(
+                    AddContext(
                         StabContext(
                             attacker = context.attacker,
                             defender = context.defender!!
@@ -331,7 +338,7 @@ object BlitzAction : Procedure() {
                     )
                 }
                 BlockType.STANDARD -> {
-                    SetContext(
+                    AddContext(
                         BlockContext(
                             context.attacker,
                             context.defender!!,
@@ -402,14 +409,14 @@ object BlitzAction : Procedure() {
             } else if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
                     GotoNode(SelectBlockType),
                 )
             } else {
                 compositeCommandOf(
                     removeContextCommand,
-                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     GotoNode(RemainingMovesOrEndAction),
                     *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
                 )
@@ -439,8 +446,8 @@ object BlitzAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
-                        SetContext(moveContext),
+                        UpdateContext(context.copy(hasMoved = true)),
+                        AddContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

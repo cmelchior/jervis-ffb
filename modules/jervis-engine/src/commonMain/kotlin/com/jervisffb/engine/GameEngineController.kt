@@ -38,6 +38,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.engine.utils.InvalidGameStateException
 import com.jervisffb.engine.utils.isRandomAction
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
@@ -438,7 +439,17 @@ class GameEngineController(
 
     private fun executeCommand(command: Command) {
         deltaBuilder.addCommand(command)
-        command.execute(state)
+        try {
+            command.execute(state)
+        } catch (ex: Exception) {
+            val message = ex.message?.let {
+                when (it.isBlank()) {
+                    true -> "<no-message>"
+                    false -> it
+                }
+            } ?: "<no-message>"
+            throw InvalidGameStateException("[${stack.stateToPrettyString()}] $message", ex)
+        }
     }
 
     private fun logInternalEvent(log: LogEntry) {

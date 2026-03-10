@@ -27,8 +27,6 @@ data class PushContext(
     var defenderIsUsingTaunt: Boolean = false,
     // If `true`, the `firstPusher` will follow up after resolving the rest of the chain.
     var followsUp: Boolean = false,
-    // Temporary state tracking the current player being resolved for this push step.
-    var fullyResolveInProgress: Player? = null,
     // Track any balls that must bounce after the push is resolved.
     // Either because a player was pushed into it, or because a trapdoor
     // swallowed a player with a ball. Balls should be added and resolved in
@@ -40,7 +38,7 @@ data class PushContext(
 
     val isFirstBlock: Boolean = (pushChain.size == 1)
 
-    // Tracks if the attacker is using Juggernaut.
+    // Tracks if the attacker is using Frenzy
     val isAttackerUsingFrenzy: Boolean = firstPusher.hasSkill(SkillType.FRENZY)
 
     // Tracks if a defender in the Push Chain cannot be moved, and thus stops

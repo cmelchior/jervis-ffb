@@ -4,9 +4,10 @@ import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -74,13 +75,13 @@ fun createPushContext(state: Game): PushContext {
 object BB2020PushBack: Procedure() {
     override val initialNode: Node = ResolveInitialPushSequence
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val newContext = createPushContext(state)
-        return SetContext(newContext)
+        val context = createPushContext(state)
+        return AddContext(context)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PushContext>()
         return compositeCommandOf(
-            RemoveContext<PushContext>(),
+            RemoveContext(context),
             ReportPushResult(context.firstPusher, context.pushChain.first().from, context.followsUp)
         )
     }
@@ -97,7 +98,7 @@ object BB2020PushBack: Procedure() {
             val pushContext = state.getContext<PushContext>()
             val defenderHasBall = pushContext.firstPushee.hasBall()
             return buildCompositeCommand {
-                add(SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)))
+                add(UpdateContext(blockContext.copy(didFollowUp = pushContext.followsUp)))
                 if (blockContext.isUsingMultiBlock) {
                     val multipleBlockContext = state.getContext<BB2020MultipleBlockContext>()
                     val property = if (multipleBlockContext.activeDefender == 0) {

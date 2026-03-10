@@ -13,7 +13,7 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -58,7 +58,7 @@ object CatchRoll : Procedure() {
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CATCH, d6),
-                    SetContext(resultContext),
+                    UpdateContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -129,7 +129,7 @@ object CatchRoll : Procedure() {
                     isSuccess = testAgainstAgility(catchRollContext.catchingPlayer, d6, catchRollContext.modifiers)
                 )
                 compositeCommandOf(
-                    SetContext(rerollResult),
+                    UpdateContext(rerollResult),
                     ExitProcedure(),
                 )
             }

@@ -11,8 +11,9 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -51,7 +52,7 @@ object BB2020BothDown: Procedure() {
     override val initialNode: Node = DefenderChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
-        return SetContext(
+        return AddContext(
             BothDownContext(
                 blockContext.attacker,
                 blockContext.defender,
@@ -59,9 +60,10 @@ object BB2020BothDown: Procedure() {
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BothDownContext>()
         return compositeCommandOf(
-            ReportBothDownResult(state.getContext<BothDownContext>()),
-            RemoveContext<BothDownContext>()
+            ReportBothDownResult(context),
+            RemoveContext(context)
         )
     }
 
@@ -86,7 +88,7 @@ object BB2020BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(defenderUsesWrestle = useWrestle)),
+                UpdateContext(context.copy(defenderUsesWrestle = useWrestle)),
                 GotoNode(AttackerChooseToUseWrestle)
             )
         }
@@ -114,7 +116,7 @@ object BB2020BothDown: Procedure() {
             }
             val updatedContext = context.copy(attackerUsesWrestle = useWrestle)
             return compositeCommandOf(
-                SetContext(updatedContext),
+                UpdateContext(updatedContext),
                 if (updatedContext.attackerUsesWrestle || updatedContext.defenderUsesWrestle) {
                     GotoNode(ResolveBothDown)
                 } else {
@@ -144,7 +146,7 @@ object BB2020BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(defenderUsesBlock = useBlock)),
+                UpdateContext(context.copy(defenderUsesBlock = useBlock)),
                 GotoNode(AttackerChooseToUseBlock)
             )
         }
@@ -170,7 +172,7 @@ object BB2020BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(context.copy(attackUsesBlock = useBlock)),
+                UpdateContext(context.copy(attackUsesBlock = useBlock)),
                 GotoNode(ResolveBothDown)
             )
         }
@@ -209,7 +211,7 @@ object BB2020BothDown: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             val context = state.getContext<BothDownContext>()
-            return SetContext(
+            return AddContext(
                 RiskingInjuryContext(
                     player = context.defender,
                     causedBy = context.attacker,
@@ -238,7 +240,7 @@ object BB2020BothDown: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val blockContext = state.getContext<BlockContext>()
             val context = state.getContext<BothDownContext>()
-            return SetContext(
+            return AddContext(
                 RiskingInjuryContext(
                     player = context.attacker,
                     causedBy = context.defender,

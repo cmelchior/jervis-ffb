@@ -12,8 +12,9 @@ import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetKickingTeam
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -55,7 +56,7 @@ object DetermineKickingTeam : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<CoinSideSelected>(action) {
                 compositeCommandOf(
-                    SetContext(CoinTossContext(sideSelected = it.side)),
+                    AddContext(CoinTossContext(sideSelected = it.side)),
                     GotoNode(CoinToss),
                 )
             }
@@ -72,7 +73,7 @@ object DetermineKickingTeam : Procedure() {
                 // so if it lands there, they get to choose first.
                 val winner = if (context.sideSelected == coinToss.result) state.receivingTeam else state.kickingTeam
                 compositeCommandOf(
-                    SetContext(state.getContext<CoinTossContext>().copy(coinToss = coinToss, winner = winner)),
+                    UpdateContext(context.copy(coinToss = coinToss, winner = winner)),
                     GotoNode(ChooseKickingTeam),
                 )
             }

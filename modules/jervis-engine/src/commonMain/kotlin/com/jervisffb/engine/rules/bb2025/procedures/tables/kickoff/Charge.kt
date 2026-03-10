@@ -24,8 +24,9 @@ import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -45,6 +46,7 @@ import com.jervisffb.engine.model.context.ChargeContext
 import com.jervisffb.engine.model.context.ForegoActivationContext
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportEndingCharge
 import com.jervisffb.engine.reports.ReportStartingCharge
@@ -151,8 +153,9 @@ object Charge : Procedure() {
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContextOrNull<ChargeContext>()
         return compositeCommandOf(
-            RemoveContext<ChargeContext>(),
+            if (context != null) RemoveContext(context) else null,
             SetActiveTeam(null),
             SetTurnOver(null),
             SetCurrentBall(state.singleBall()),
@@ -185,7 +188,7 @@ object Charge : Procedure() {
                         )
                     } else {
                         addAll(
-                            SetContext(
+                            AddContext(
                                 ChargeContext(
                                     roll = roll,
                                     playersToSelect = playersToSelect,
@@ -214,7 +217,7 @@ object Charge : Procedure() {
             return castAction<PlayersSelected>(action) {
                 val context = state.getContext<ChargeContext>()
                 compositeCommandOf(
-                    SetContext(context.copy(selectedPlayers = it.getPlayers(state).toSet())),
+                    UpdateContext(context.copy(selectedPlayers = it.getPlayers(state).toSet())),
                     GotoNode(SelectPlayerOrEndTurn),
                 )
             }
@@ -236,13 +239,13 @@ object Charge : Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
+                        AddContext(ActivatePlayerContext(action.getPlayer(state))),
                         GotoNode(ActivatePlayer),
                     )
                 }
                 is ForegoActivationSelected -> {
                     compositeCommandOf(
-                        SetContext(ForegoActivationContext(action.getPlayer(state), isEndingTurn = false)),
+                        AddContext(ForegoActivationContext(action.getPlayer(state), isEndingTurn = false)),
                         GotoNode(ForegoPlayerActivation),
                     )
                 }
@@ -259,13 +262,12 @@ object Charge : Procedure() {
             val chargeContext = state.getContext<ChargeContext>()
             return buildCompositeCommand {
                 if (context.markActionAsUsed) {
-                    add(SetContext(chargeContext.copy(activatedPlayers = chargeContext.activatedPlayers.add(context.player))))
+                    add(UpdateContext(chargeContext.copy(activatedPlayers = chargeContext.activatedPlayers.add(context.player))))
                 }
-                add(RemoveContext<ActivatePlayerContext>())
-                if (state.turnOver != null) {
-                    add(GotoNode(ResolveEndOfTurn))
-                } else {
-                    add(GotoNode(SelectPlayerOrEndTurn))
+                add(RemoveContext(context))
+                when (state.turnOver != null) {
+                    true -> add(GotoNode(ResolveEndOfTurn))
+                    false -> add(GotoNode(SelectPlayerOrEndTurn))
                 }
             }
         }
@@ -280,7 +282,7 @@ object Charge : Procedure() {
             val chargeContext = state.getContext<ChargeContext>()
             return compositeCommandOf(
                 RemoveContext<ForegoActivationContext>(),
-                SetContext(chargeContext.copy(activatedPlayers = chargeContext.activatedPlayers.add(context.player))),
+                UpdateContext(chargeContext.copy(activatedPlayers = chargeContext.activatedPlayers.add(context.player))),
                 GotoNode(SelectPlayerOrEndTurn),
             )
         }

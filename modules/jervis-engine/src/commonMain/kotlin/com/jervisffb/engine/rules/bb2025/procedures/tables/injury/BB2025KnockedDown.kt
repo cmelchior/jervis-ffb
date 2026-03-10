@@ -15,7 +15,8 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -96,18 +97,22 @@ object BB2025KnockedDown: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val context = SteadyFootingRollContext(injuryContext.player, RiskingInjuryMode.KNOCKED_DOWN)
-            return SetContext(context)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SteadyFootingRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<SteadyFootingRollContext>()
             return if (context.isSuccess) {
                 compositeCommandOf(
+                    RemoveContext(context),
                     ReportSteadyFootingResult(context, RiskingInjuryMode.KNOCKED_DOWN),
                     ExitProcedure()
                 )
             } else {
-                GotoNode(ResolveSafePairOfHands)
+                compositeCommandOf(
+                    RemoveContext(context),
+                    GotoNode(ResolveSafePairOfHands)
+                )
             }
         }
     }

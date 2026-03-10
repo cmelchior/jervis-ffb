@@ -8,7 +8,7 @@ import com.jervisffb.engine.commands.AddGoal
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -108,7 +108,7 @@ object ScoringATouchdown : Procedure() {
             val touchdownAlreadyHappened = state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN || state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN
             return if (isInEndZone && isOnOpponentSide && player.hasBall() && !touchdownAlreadyHappened) {
                 compositeCommandOf(
-                    SetContext(context.copy(isTouchdownScored = true)),
+                    UpdateContext(context.copy(isTouchdownScored = true)),
                     GotoNode(RollForBallClone)
                 )
             } else {

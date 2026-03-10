@@ -4,8 +4,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -53,7 +53,7 @@ object ChangingWeather : Procedure() {
 
     object ScatterBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(
+            return AddContext(
                 ScatterRollContext(
                     from = state.singleBall().location
                 )

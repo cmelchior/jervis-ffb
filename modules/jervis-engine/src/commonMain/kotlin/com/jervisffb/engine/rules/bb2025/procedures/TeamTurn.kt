@@ -20,8 +20,9 @@ import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnMarker
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -89,7 +90,7 @@ object TeamTurn : Procedure() {
 
     object UseSpecialEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
+            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -121,13 +122,13 @@ object TeamTurn : Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
+                        AddContext(ActivatePlayerContext(action.getPlayer(state))),
                         GotoNode(ActivatePlayer),
                     )
                 }
                 is ForegoActivationSelected -> {
                     compositeCommandOf(
-                        SetContext(ForegoActivationContext(action.getPlayer(state), isEndingTurn = false)),
+                        AddContext(ForegoActivationContext(action.getPlayer(state), isEndingTurn = false)),
                         GotoNode(ForegoPlayerActivation),
                     )
                 }
@@ -143,7 +144,7 @@ object TeamTurn : Procedure() {
                         GotoNode(ResolveEndOfTurn)
                     } else {
                         compositeCommandOf(
-                            SetContext(ForegoActivationContext(availablePlayers.first(), isEndingTurn = true)),
+                            AddContext(ForegoActivationContext(availablePlayers.first(), isEndingTurn = true)),
                             GotoNode(ForegoPlayerActivation),
                         )
                     }
@@ -165,7 +166,7 @@ object TeamTurn : Procedure() {
             return when {
                 context.isEndingTurn && availablePlayers.isNotEmpty() -> {
                     compositeCommandOf(
-                        SetContext(context.copy(player = availablePlayers.first())),
+                        UpdateContext(context.copy(player = availablePlayers.first())),
                         GotoNode(ForegoPlayerActivation)
                     )
                 }

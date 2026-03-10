@@ -7,8 +7,9 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -53,7 +54,7 @@ object CheeringFans : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
-                    SetContext(CheeringFansContext(d6)),
+                    AddContext(CheeringFansContext(d6)),
                     GotoNode(ReceivingTeamRollDie),
                 )
             }
@@ -69,7 +70,7 @@ object CheeringFans : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
-                    SetContext(state.getContext<CheeringFansContext>().copy(receivingTeamRoll = d6)),
+                    UpdateContext(state.getContext<CheeringFansContext>().copy(receivingTeamRoll = d6)),
                     GotoNode(ResolveCheeringFans),
                 )
             }
@@ -105,7 +106,7 @@ object CheeringFans : Procedure() {
                             context.receivingTeamRoll,
                             state.receivingTeam.cheerleaders,
                         ),
-                        SetContext(state.getContext<CheeringFansContext>().copy(winner = state.kickingTeam)),
+                        UpdateContext(state.getContext<CheeringFansContext>().copy(winner = state.kickingTeam)),
                         GotoNode(WinnerRollsOnPrayersToNuffle),
                     )
                 }
@@ -119,7 +120,7 @@ object CheeringFans : Procedure() {
                             context.receivingTeamRoll,
                             state.receivingTeam.cheerleaders,
                         ),
-                        SetContext(state.getContext<CheeringFansContext>().copy(winner = state.receivingTeam)),
+                        UpdateContext(state.getContext<CheeringFansContext>().copy(winner = state.receivingTeam)),
                         GotoNode(WinnerRollsOnPrayersToNuffle),
                     )
                 }
@@ -130,9 +131,14 @@ object CheeringFans : Procedure() {
     object WinnerRollsOnPrayersToNuffle : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
-            return SetContext(PrayersToNuffleRollContext(context.winner!!, 1))
+            return AddContext(PrayersToNuffleRollContext(context.winner!!, 1))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PrayersToNuffleRoll
-        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<PrayersToNuffleRollContext>(),
+                ExitProcedure()
+            )
+        }
     }
 }

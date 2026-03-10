@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -78,7 +78,7 @@ object ScatterRoll : Procedure() {
                 @Suppress("DATA_CLASS_INVISIBLE_COPY_USAGE_WARNING")
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SCATTER, dice),
-                    SetContext(
+                    UpdateContext(
                         state.getContext<ScatterRollContext>().copy(
                             scatterRoll = dice,
                             landsAt = scatteredLocation,

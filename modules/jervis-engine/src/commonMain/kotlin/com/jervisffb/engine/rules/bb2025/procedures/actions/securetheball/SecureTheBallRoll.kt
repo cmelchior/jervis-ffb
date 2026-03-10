@@ -13,7 +13,7 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -64,7 +64,7 @@ object SecureTheBallRoll : Procedure() {
                     isSuccess = isSecuringSuccessful(d6, context.modifiers),
                 )
                 return compositeCommandOf(
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     ReportDiceRoll(DiceRollType.SECURE_THE_BALL, d6),
                     GotoNode(ChooseReRollSource),
                 )
@@ -144,7 +144,7 @@ object SecureTheBallRoll : Procedure() {
                     isSuccess = isSecuringSuccessful(d6, context.modifiers)
                 )
                 compositeCommandOf(
-                    SetContext(updatedContext),
+                    UpdateContext(updatedContext),
                     ReportDiceRoll(DiceRollType.SECURE_THE_BALL, d6),
                     ExitProcedure(),
                 )

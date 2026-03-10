@@ -19,8 +19,9 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -123,7 +124,7 @@ object ThrowPlayerStep: Procedure() {
                             if (automaticFumble) {
                                 // Having a PA of - is an automatic fumble, no dice is rolled
                                 addAll(
-                                    SetContext(
+                                    UpdateContext(
                                         context.copy(
                                             target = newLocation,
                                             range = distance,
@@ -135,7 +136,7 @@ object ThrowPlayerStep: Procedure() {
                             } else {
                                 // Otherwise, the player needs to roll for the throw
                                 addAll(
-                                    SetContext(
+                                    UpdateContext(
                                         context.copy(
                                             target = newLocation,
                                             range = distance,
@@ -189,7 +190,7 @@ object ThrowPlayerStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
             val deviateContext = DeviateRollContext(context.thrower.coordinates)
-            return SetContext(deviateContext)
+            return AddContext(deviateContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -202,7 +203,7 @@ object ThrowPlayerStep: Procedure() {
                         location = deviateContext.landsAt!!,
                         isThrown = false,
                     ),
-                    SetContext(
+                    UpdateContext(
                         throwContext.copy(
                             target = deviateContext.landsAt,
                             outOfBoundsAt = deviateContext.outOfBoundsAt
@@ -218,7 +219,7 @@ object ThrowPlayerStep: Procedure() {
                         deviateContext.landsAt!!,
                         isThrown = true,
                     ),
-                    SetContext(throwContext.copy(target = deviateContext.landsAt)),
+                    UpdateContext(throwContext.copy(target = deviateContext.landsAt)),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(ScatterPlayer)
                 )
@@ -234,7 +235,7 @@ object ThrowPlayerStep: Procedure() {
             val scatterContext = ScatterRollContext(
                 from = context.thrownPlayer!!.coordinates
             )
-            return SetContext(scatterContext)
+            return AddContext(scatterContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScatterRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -248,7 +249,7 @@ object ThrowPlayerStep: Procedure() {
                         location = scatterContext.landsAt!!,
                         isThrown = false,
                     ),
-                    SetContext(
+                    UpdateContext(
                         throwContext.copy(
                             target = scatterContext.landsAt,
                             outOfBoundsAt = scatterContext.outOfBoundsAt
@@ -266,7 +267,7 @@ object ThrowPlayerStep: Procedure() {
                         location = landsAt,
                         isThrown = true,
                     ),
-                    SetContext(throwContext.copy(target = landsAt)),
+                    UpdateContext(throwContext.copy(target = landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     if (state.field[landsAt].isOccupied()) {
                         GotoNode(ResolveLandingInOccupiedSquare)
@@ -323,7 +324,7 @@ object ThrowPlayerStep: Procedure() {
                         location = target,
                         isThrown = true,
                     ),
-                    SetContext(
+                    UpdateContext(
                         throwContext.copy(
                             target = target,
                             outOfBoundsAt = if (landingNode == ResolveLandingInTheCrowd) throwContext.thrownPlayer.coordinates else null
@@ -351,8 +352,8 @@ object ThrowPlayerStep: Procedure() {
             val injuryContext = RiskingInjuryContext(playerInSquare)
             return compositeCommandOf(
                 ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
-                SetContext(injuryContext),
-                SetContext(throwContext.copy(knockedDownWhenLanding = true))
+                AddContext(injuryContext),
+                UpdateContext(throwContext.copy(knockedDownWhenLanding = true))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
@@ -381,18 +382,18 @@ object ThrowPlayerStep: Procedure() {
                     // Lose the ball before rolling for injury, so the ball doesn't end up in the Dogout.
                     addAll(
                         SetBallLocation(thrownPlayer.ball!!, context.target!!),
-                        SetBallState.Companion.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
+                        SetBallState.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
                         SetTurnOver(TurnOver.STANDARD)
                     )
                 }
-                add(SetContext(injuryContext))
+                add(AddContext(injuryContext))
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
-                RemoveContext<ThrowInContext>(),
+                RemoveContext<RiskingInjuryContext>(),
                 if (throwContext.outOfBoundsAt != null && state.balls.any { it.outOfBoundsAt != null }) {
                     GotoNode(ThrowBallBackIn)
                 } else {
@@ -411,12 +412,13 @@ object ThrowPlayerStep: Procedure() {
             val context = ThrowInContext(ball, ball.outOfBoundsAt!!)
             return compositeCommandOf(
                 SetCurrentBall(ball),
-                SetContext(context)
+                AddContext(context)
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
+                RemoveContext<ThrowInContext>(),
                 SetCurrentBall(null),
                 ExitProcedure()
             )
@@ -464,7 +466,7 @@ object ThrowPlayerStep: Procedure() {
                 modifiers,
                 LandingModifier.MARKED
             )
-            return SetContext(LandingRollContext(thrownPlayer, diceRollTarget, modifiers))
+            return AddContext(LandingRollContext(thrownPlayer, diceRollTarget, modifiers))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = LandingRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -492,7 +494,7 @@ object ThrowPlayerStep: Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             val player = context.thrownPlayer ?: INVALID_GAME_STATE("Could not find thrown player: $context")
             val target = context.target ?: INVALID_GAME_STATE("Could not find target location: $context")
-            return SetContext(MovePlayerIntoSquareContext(player, target))
+            return AddContext(MovePlayerIntoSquareContext(player, target))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -520,7 +522,7 @@ object ThrowPlayerStep: Procedure() {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val ball = state.field[throwContext.thrownPlayer!!.coordinates].balls.single()
             val pickupContext = PickupRollContext(throwContext.thrownPlayer, ball)
-            return SetContext(pickupContext)
+            return AddContext(pickupContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -558,7 +560,7 @@ object ThrowPlayerStep: Procedure() {
                     SetBallState.Companion.bouncing(it)
                 },
                 SetPlayerState(thrownPlayer, PlayerState.FALLEN_OVER),
-                SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
+                AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020FallingOver
@@ -580,7 +582,7 @@ object ThrowPlayerStep: Procedure() {
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
                     SetBallState.bouncing(it)
                 },
-                SetContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
+                AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
@@ -592,7 +594,7 @@ object ThrowPlayerStep: Procedure() {
     object CheckForScoring : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
-            return SetContext(ScoringATouchDownContext(context.thrownPlayer!!))
+            return AddContext(ScoringATouchDownContext(context.thrownPlayer!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
