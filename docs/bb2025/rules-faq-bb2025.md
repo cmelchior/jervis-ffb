@@ -446,6 +446,26 @@ it only disables those two skills.
 If this changes for either Guard or "Put the Boot In" in the future, it should
 also change for Defensive.
 
+### Page 127 - Diving Catch
+The behavior of Diving Catch is not defined in the case of the ball landing near
+multiple players with this skill. This leaves questions like, can multiple 
+players attempt to catch the ball? Which order do they do it in? Especially if
+on different teams.
+
+All of these questions were answered in a FAQ for BB2020, so these answers are
+also adopted for BB2025:
+
+1. All players with Diving Catch can choose to use the skill to attempt to catch
+   the ball.
+2. The order is defined by the active teams coach, including the order of
+   players on the opposing team.
+
+The +1 modifier from Diving Catch apply when "...attempting to Catch the ball 
+as part of a Pass Action if they are in the target square.". This means that
+the Diving Catch modifier can apply multiple times, e.g., you fail the first
+catch, the ball bounces around, and end up in the target square again. 
+
+
 ### Page 128 - Eye Gouge
 Eye Gouge says it can trigger when an opposition player is Pushed Back, but it
 is unclear if being chain-pushed also counts as being Pushed Back.
@@ -496,11 +516,23 @@ While Jump Up is technically optional, Jervis will always apply it as the coach
 can just not use the extra movement.
 
 ### Page 130 - Kick
-Jervis uses the NAF interpretation, which means that you are allowed to roll the
-deviate die (D6) and then choose to treat the roll as either a D6 or D3.
+The behavior of Kick if unclear.
 
-In the rulebook, D3's are defined as Rolling a D6, taking half the value and 
-round up.
+In the rulebook, the wording for Kick is "...then when kicking Deviates, this 
+player's Coach may choose...". This combined with a D3 being defined as 
+"Sometimes you will be asked to 'roll a D3'; to do this, roll a D6 and half 
+the value shown on the dice, rounding any fractions up."
+
+This means it is possible to interpret it as either:
+
+1. You must choose to roll a D3 or D6 before the roll. FUMBBL uses this 
+   interpretation.
+2. You can choose to treat the D6 as a D3 after the roll. NAF uses this 
+   interpretation.
+
+For now, Jervis uses the NAF interpretation, which means that you are allowed to
+roll the deviate die (D6) and then choose to treat the roll as either a D6 or 
+D3.
 
 ### Page 130 - Leap
 Leap make it clear that reducing the difficulty of the Leap is only allowed if

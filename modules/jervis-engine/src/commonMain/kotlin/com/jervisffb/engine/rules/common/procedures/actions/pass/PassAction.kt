@@ -67,7 +67,8 @@ data class PassContext(
     val thrower: Player,
     val type: PassType = PassType.STANDARD,
     val hasMoved: Boolean = false,
-    // Target of the pass in the current step. This means it will be updated when the ball scatters, deviates etc.
+    // Target of the Pass in the current step. This means it will be updated when the ball scatters or deviates, but
+    // not bounces after it lands.
     val target: FieldCoordinate? = null,
     val range: Range? = null,
     val useNervesOfSteel: Boolean = false,

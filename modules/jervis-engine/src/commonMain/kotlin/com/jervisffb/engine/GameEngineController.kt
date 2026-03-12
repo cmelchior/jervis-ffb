@@ -448,7 +448,7 @@ class GameEngineController(
                     false -> it
                 }
             } ?: "<no-message>"
-            throw InvalidGameStateException("[${stack.stateToPrettyString()}] $message", ex)
+            throw InvalidGameStateException("${stack.stateToPrettyString()}: $message", ex)
         }
     }
 

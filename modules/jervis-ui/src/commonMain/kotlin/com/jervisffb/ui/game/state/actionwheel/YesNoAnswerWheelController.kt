@@ -9,6 +9,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.BothDownContext
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
@@ -34,6 +35,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowT
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
+import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
@@ -63,6 +65,7 @@ import kotlin.time.ExperimentalTime
  *
  * During Block action:
  * - Block (skill usage)
+ * - Diving Catch (ball on target)
  * - Dodge (skill usage)
  * - Eye Gouge (skill usage)
  * - Fend (skill usage)
@@ -173,6 +176,16 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
             BB2025BothDown.DefenderChooseToUseBlock -> context.attacker.coordinates
             else -> error("Unsupported node: $currentNode")
         }
+    }
+}
+
+object UseDivingCatchWheelController: UseSkillWheelController(SkillType.DIVING_CATCH) {
+    override val nodes: Set<Node> = setOf(
+        Catch.ChooseToUseDivingCatch,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<CatchContext>().catchingPlayer
+        return player.coordinates
     }
 }
 

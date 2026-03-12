@@ -13,7 +13,7 @@ import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ActivatePlayerContext
-import com.jervisffb.engine.model.context.CatchRollContext
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.LandingRollContext
@@ -296,11 +296,11 @@ object CatchWheelController : D6WithRerollWheelController() {
     override val rerollDiceNode: Node = CatchRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
-        return state.getContext<CatchRollContext>().catchingPlayer.coordinates
+        return state.getContext<CatchContext>().catchingPlayer.coordinates
     }
 
     override fun getOriginalRoll(state: Game): D6Result {
-        val context = state.getContext<CatchRollContext>()
+        val context = state.getContext<CatchContext>()
         return context.roll!!.originalRoll
     }
 }

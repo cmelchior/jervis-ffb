@@ -22,7 +22,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Ball
-import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -61,7 +60,10 @@ object ThrowIn : Procedure() {
     override val initialNode: Node = RollDirection
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowInContext>()
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<ThrowInContext>()
+        state.currentBallOrNull() ?: error("Missing current ball")
+    }
 
     object RollDirection : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
@@ -159,23 +161,7 @@ object ThrowIn : Procedure() {
     }
 
     object ResolveLandOnField : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            val ball = state.getContext<ThrowInContext>().ball
-            val canCatch = state.field[ball.location].player?.let { rules.canCatch(it) } ?: false
-            return if (!canCatch) {
-                SetBallState.bouncing(ball)
-            } else {
-                null
-            }
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val ball = state.getContext<ThrowInContext>().ball
-            return if (ball.state != BallState.BOUNCING) {
-                Catch
-            } else {
-                Bounce
-            }
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

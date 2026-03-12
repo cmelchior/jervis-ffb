@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.NoOpCommand
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
@@ -28,9 +27,11 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -348,20 +349,17 @@ object PassStep: Procedure() {
             val ball = state.currentBall()
             val playerInSquare = state.field[ball.location].player
             val canCatch = playerInSquare?.let { rules.canCatch(it) } ?: false
-            return if (!canCatch) {
-                SetBallState.Companion.bouncing(ball)
-            } else {
-                NoOpCommand
+            return when (!canCatch) {
+                true -> SetBallState.bouncing(ball)
+                false -> AddContext(CatchContext(playerInSquare, ball))
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return if (state.currentBall().state == BallState.BOUNCING) {
-                Bounce
-            } else {
-                Catch
+            return when (state.currentBall().state == BallState.BOUNCING) {
+                true -> Bounce
+                false -> Catch
             }
         }
-
         // TODO How to check for Star Player Points
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
@@ -371,6 +369,7 @@ object PassStep: Procedure() {
                         state.currentBall()
                     )
                 ) SetTurnOver(TurnOver.STANDARD) else null,
+                if (state.hasContext<CatchContext>()) RemoveContext<CatchContext>() else null,
                 ExitProcedure()
             )
         }

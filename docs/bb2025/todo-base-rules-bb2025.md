@@ -211,6 +211,7 @@ book.
         - [x] Can forego activations
         - [x] Move player under ball on receiver side
         - [x] Stunned players are marked as STUNNED after Charge ended
+        - [x] Amount of players selected are a max limit, not a requirement
     - [x] Dodgy Snack
         - [x] On 2+, player stays on field with -1 AV, MA
         - [x] On 1, player is put in Reserves until end of drive.

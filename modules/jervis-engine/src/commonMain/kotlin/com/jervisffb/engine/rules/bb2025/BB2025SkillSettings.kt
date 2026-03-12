@@ -14,6 +14,7 @@ import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
 import com.jervisffb.engine.rules.bb2025.skills.Dauntless
 import com.jervisffb.engine.rules.bb2025.skills.Defensive
 import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
+import com.jervisffb.engine.rules.bb2025.skills.DivingCatch
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
@@ -106,9 +107,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.DIVING_CATCH -> {
-                    // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Diving Catch", type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                        DivingCatch(player, category, expiresAt)
+                    }
                 }
                 SkillType.DIVING_TACKLE -> {
                     addNoValueEntry("Diving Tackle", type, SkillCategory.AGILITY) { player, category,expiresAt ->

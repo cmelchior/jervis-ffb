@@ -27,12 +27,14 @@ import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.rules.common.procedures.Bounce
+import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
@@ -757,6 +759,34 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 else -> null
             }
         },
+
+        ResolveBallLandingOnField.InactiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
+            when {
+                (isActiveClient) -> "Select Players wanting to use Diving Catch"
+                else -> "Waiting for opponent to choose players to use Diving Catch"
+            }
+        },
+
+        ResolveBallLandingOnField.ActiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
+            when {
+                (isActiveClient) -> "Select Players wanting to use Diving Catch"
+                else -> "Waiting for opponent to choose players to use Diving Catch"
+            }
+        },
+
+        ResolveBallLandingOnField.ChooseDivingCatchPlayer to { isActiveClient, _, state ->
+            when {
+                (isActiveClient) -> "Select player that should attempt to catch the ball using Diving Catch"
+                else -> "Waiting for opponent to choose player to perform a Diving Catch"
+            }
+        },
+
+        Catch.ChooseToUseDivingCatch to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Diving Catch?"
+                false -> "Waiting for opponent to use Diving Catch"
+            }
+        }
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

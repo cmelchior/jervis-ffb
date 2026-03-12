@@ -343,9 +343,13 @@ fun <T> List<T>.combinations(size: Int): List<Set<T>> {
     if (size == 0) return listOf(emptySet())
     if (this.size < size) return emptyList()
 
-    return this.withIndex().flatMap { (index, element) ->
-        this.drop(index + 1).combinations(size - 1).map { setOf(element) + it }
-    }
+    return this.withIndex()
+        .flatMap { (index: Int, element: T) ->
+            this.drop(index + 1)
+                .combinations(size - 1)
+                .map { setOf(element) + it
+                }
+        }
 }
 
 /**

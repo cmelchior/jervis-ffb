@@ -11,7 +11,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.NoOpCommand
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetTurnOver
@@ -28,7 +27,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
-import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
@@ -39,7 +37,7 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.Catch
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
@@ -337,24 +335,7 @@ object PassStep: Procedure() {
      * to be caught.
      */
     object ResolveBounceOrCatch: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val ball = state.currentBall()
-            val playerInSquare = state.field[ball.location].player
-            val canCatch = playerInSquare?.let { rules.canCatch(it) } ?: false
-            return if (!canCatch) {
-                SetBallState.bouncing(ball)
-            } else {
-                NoOpCommand
-            }
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return if (state.currentBall().state == BallState.BOUNCING) {
-                Bounce
-            } else {
-                Catch
-            }
-        }
-
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
         // TODO How to check for Star Player Points
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()

@@ -362,6 +362,10 @@ data class DiceRollResults(val rolls: List<DieResult>) : GameAction, List<DieRes
 data class PlayersSelected(
     val players: List<PlayerId>,
 ): GameAction {
+    init {
+        require(players.isNotEmpty()) { "PlayersSelected must have at least one player" }
+    }
+
     fun getPlayers(state: Game): List<Player> {
         return players.map {
             state.getPlayerById(it)

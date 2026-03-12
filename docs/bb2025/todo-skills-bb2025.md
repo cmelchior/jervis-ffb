@@ -29,7 +29,18 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Only works on failed catches
     - [x] Does not work if missing tackle zones
     - [ ] Works multiple times pr. turn
-- [ ] Diving Catch
+- [x] Diving Catch
+  - [x] Cannot catch if ball landing on Player in adjacent square
+  - [x] Cannot catch bouncing ball in adjacent square
+  - [x] Catch Throw-In in adjacent square
+  - [x] Catch Pass in adjacent square
+  - [x] Catch Scattereed Ball in adjacent square
+  - [x] Catch Kick-off in adjacent square
+  - [x] Catch Hail Mary Pass in adjacent square
+  - [x] +1 to Catch Pass Action landing on target square
+  - [x] All players can attempt to catch
+  - [x] Active coach determines the order
+  - [x] Kicking Team can use during Kick-off (=touchback)
 - [ ] Diving Tackle
 - [ ] Dodge
 - [x] Defensive

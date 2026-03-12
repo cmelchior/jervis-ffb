@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.state.decorators
 
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.model.Game
@@ -28,18 +29,8 @@ object SelectPlayersDecorator : FieldActionDecorator<SelectPlayers> {
                 } else {
                     screenModel.selectedPlayersInUi.remove(player.id)
                 }
-                // Enable/Disable "end" button
-                if (screenModel.selectedPlayersInUi.size == descriptor.count) {
-                    screenModel.isGameStatusBoxEnabled.value = true
-                } else {
-                    screenModel.isGameStatusBoxEnabled.value = false
-                }
-                // Configure button title
-                if (screenModel.selectedPlayersInUi.size < descriptor.count) {
-                    screenModel.gameStatusBoxTitle.value = "Select ${descriptor.count - screenModel.selectedPlayersInUi.size} players"
-                } else {
-                    screenModel.gameStatusBoxTitle.value = "Finish selecting players"
-                }
+                screenModel.isGameStatusBoxEnabled.value = true
+                screenModel.gameStatusBoxTitle.value = "End Player Selection (${screenModel.selectedPlayersInUi.size})"
             }
             acc.updatePlayer(playerId) {
                 it.copy(selectedAction = selectedAction)
@@ -47,12 +38,16 @@ object SelectPlayersDecorator : FieldActionDecorator<SelectPlayers> {
         }
         acc.updateGameStatus {
             it.copy(
-                centerBadgeText = "Select ${descriptor.count} players",
+                centerBadgeText = "End Player Selection (0)", // "Select up to ${descriptor.count} players",
                 centerBadgeAction = { model ->
-                    val action = PlayersSelected(model.getSelectedPlayers())
+                    val players = model.getSelectedPlayers()
+                    val action = when (players.isNotEmpty()) {
+                        true -> PlayersSelected(model.getSelectedPlayers())
+                        false -> Cancel
+                    }
                     actionProvider.userActionSelected(action)
                 },
-                centerBadgeEnabled = false
+                centerBadgeEnabled = true
             )
         }
     }

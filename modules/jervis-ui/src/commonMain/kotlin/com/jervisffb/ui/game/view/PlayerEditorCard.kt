@@ -602,10 +602,13 @@ fun SelectSkillButton(
         {
             when (isActive) {
                 true -> {
-                    val action = RemovePlayerSkill(player.id, skill.existingSkill!!.skillId)
-                    skillLabel = skill.factory.name
-                    isActive = !isActive
-                    handleAction(action)
+                    skill.existingSkill?.let { existingSkill ->
+                        val action = RemovePlayerSkill(player.id, existingSkill.skillId)
+                        skillLabel = skill.factory.name
+                        isActive = !isActive
+                        handleAction(action)
+                    }
+                    Unit
                 }
                 false -> {
                     if (skill.options?.options?.isNotEmpty() == true) {

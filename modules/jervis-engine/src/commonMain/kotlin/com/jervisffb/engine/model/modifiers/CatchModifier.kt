@@ -1,13 +1,14 @@
 package com.jervisffb.engine.model.modifiers
 
 enum class CatchModifier(override val modifier: Int, override val description: String) : DiceModifier {
-    CONVERT_DEFLECTION(-1, "Deflection"),
     BOUNCING(-1, "Bouncing ball"),
-    THROW_IN(-1, "Throw-in"),
-    SCATTERED(-1, "Scattered"),
+    CONVERT_DEFLECTION(-1, "Deflection"),
     DEVIATED(-1, "Deviated"),
-    MARKED(-1, "Marked"),
     DISTURBING_PRESENCE(-1, "Disturbing Presence"),
-    POURING_RAIN(-1, "Pouring Rain"),
+    DIVING_CATCH(1, "Diving Catch"),
     EXTRA_ARMS(1, "Extra Arms"),
+    MARKED(-1, "Marked"),
+    POURING_RAIN(-1, "Pouring Rain"),
+    SCATTERED(-1, "Scattered"),
+    THROW_IN(-1, "Throw-in"),
 }

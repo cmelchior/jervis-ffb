@@ -23,11 +23,13 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportBounce
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Resolve a Bounce until it is either caught or lands on the ground.
@@ -137,7 +139,17 @@ object Bounce : Procedure() {
     }
 
     object ResolveCatch : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
+            val player = state.field[ball.location].player ?: INVALID_GAME_STATE("Missing player on: ${ball.location}")
+            return AddContext(CatchContext(player, ball))
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
-        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<CatchContext>(),
+                ExitProcedure()
+            )
+        }
     }
 }

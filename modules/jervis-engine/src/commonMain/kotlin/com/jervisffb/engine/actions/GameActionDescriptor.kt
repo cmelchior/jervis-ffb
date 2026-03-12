@@ -315,26 +315,44 @@ data object SelectDogout : GameActionDescriptor {
     override fun createAll(): List<GameAction> = listOf(DogoutSelected)
 }
 
+/**
+ * Select [1, count] players. If 0 players are selected, [Cancel] should
+ * be used instead.
+ */
 data class SelectPlayers(
     val count: Int,
     val players: List<PlayerId>
 ): GameActionDescriptor {
+    constructor(players: List<Player>): this(players.size, players.map { it.id })
+
+    init {
+        require(count > 0) { "Count must be bigger than 0: $count" }
+    }
     override val size: Int
         get() {
             var results = 0
-            for (i in 0 until count) {
-                results *= (players.size - i)
+            for (n in 1..count) {
+                var combinations = 1
+                for (i in 1 until n) {
+                    combinations *= (players.size - i)
+                    combinations /= (i + 1)
+                }
+                results += combinations
             }
             return results
         }
     override fun createRandom(random: Random): PlayersSelected {
-        players.shuffled(random).subList(0, count).let { selectedPlayers ->
+        val playersCount = random.nextInt(count + 1)
+        players.shuffled(random).subList(0, playersCount).let { selectedPlayers ->
             return PlayersSelected(selectedPlayers)
         }
     }
+    // This can probably explode a bit for large `count`. Something to keep an eye out for.
     override fun createAll(): List<PlayersSelected> {
-        return players.combinations(count).map { players ->
-            PlayersSelected(players.toList())
+        return (0..count).flatMap { n ->
+            players.combinations(n).map { players ->
+                PlayersSelected(players.toList())
+            }
         }
     }
 }

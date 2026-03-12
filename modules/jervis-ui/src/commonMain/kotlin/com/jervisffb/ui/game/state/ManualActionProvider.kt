@@ -21,6 +21,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SelectBlockType
@@ -61,9 +62,11 @@ import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
+import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
@@ -686,6 +689,20 @@ open class ManualActionProvider(
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_SAFE_PAIR_OF_HANDS) && (currentNode == SafePairOfHandsStep.ChooseToUseSafePairOfHands)) {
             return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_DIVING_CATCH_ON_TARGET) && currentNode == Catch.ChooseToUseDivingCatch) {
+            return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_DIVING_CATCH_ON_ADJACENT)
+            && (currentNode == ResolveBallLandingOnField.InactiveTeamChoosesDivingCatchPlayers
+                || currentNode == ResolveBallLandingOnField.ActiveTeamChoosesDivingCatchPlayers)
+        ) {
+            // Return all available players
+            availableActions.getOrNull<SelectPlayers>()?.let {
+                return PlayersSelected(it.players)
+            }
         }
 
         return null

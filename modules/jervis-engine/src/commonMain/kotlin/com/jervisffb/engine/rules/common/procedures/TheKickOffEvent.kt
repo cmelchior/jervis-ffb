@@ -19,6 +19,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
+import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -141,23 +142,14 @@ object TheKickOffEvent : Procedure() {
     }
 
     object ResolveBallLanding : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            val ballLocation = state.singleBall().location
-            val canCatch = state.field[ballLocation].player?.let { rules.canCatch(it) } ?: false
-            return compositeCommandOf(
-                if (!canCatch) {
-                    SetBallState.bouncing(state.singleBall())
-                } else {
-                    null
-                }
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return if (state.singleBall().state != BallState.BOUNCING) Catch else Bounce
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
         override fun onExitNode(state: Game, rules: Rules): Command {
+            // Some effect, like the ball bouncing or Diving Catch might cause the ball to end
+            // up on the opponent side. Instead of trying to fix that, at every possible scenario
+            // we check here if the ball is in a legal position.
+            val isOnReceivingSide = isOnTeamSide(state.singleBall(), state.receivingTeam)
             return compositeCommandOf(
-                if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
+                if (!isOnReceivingSide) {
                     GotoNode(SelectTouchBack)
                 } else {
                     ExitProcedure()
@@ -178,9 +170,6 @@ object TheKickOffEvent : Procedure() {
     }
 
     object BounceFromPronePlayer: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return super.onEnterNode(state, rules)
-        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If ball went out of bounds, another touchback is awarded.
@@ -194,4 +183,22 @@ object TheKickOffEvent : Procedure() {
             }
         }
     }
+
+    // -- HELPER FUNCTIONS --
+    private fun isOnTeamSide(ball: Ball, team: Team): Boolean {
+        if (ball.state == BallState.OUT_OF_BOUNDS) return false
+        val rules = team.game.rules
+        val isHomeTeam = team.isHomeTeam()
+        val ballCoordinates = when (ball.carriedBy != null) {
+            true -> ball.carriedBy!!.coordinates
+            false -> ball.location
+        }
+        return when (isHomeTeam) {
+            true -> ballCoordinates.isOnHomeSide(rules)
+            false -> ballCoordinates.isOnAwaySide(rules)
+        }
+    }
+
 }
+
+

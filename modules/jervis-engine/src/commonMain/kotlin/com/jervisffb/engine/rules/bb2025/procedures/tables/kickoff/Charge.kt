@@ -1,5 +1,9 @@
 package com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff
 
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.EndTurn
@@ -34,7 +38,6 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
@@ -209,17 +212,26 @@ object Charge : Procedure() {
             val availablePlayers = state.kickingTeam
                 .filter { rules.isOpen(it) }
                 .map { it.id }
-            return listOf(
-                SelectPlayers(context.playersToSelect, availablePlayers)
-            )
+
+            return when (availablePlayers.isNotEmpty()) {
+                true -> listOf(SelectPlayers(context.playersToSelect, availablePlayers), CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castAction<PlayersSelected>(action) {
-                val context = state.getContext<ChargeContext>()
-                compositeCommandOf(
-                    UpdateContext(context.copy(selectedPlayers = it.getPlayers(state).toSet())),
-                    GotoNode(SelectPlayerOrEndTurn),
-                )
+            return when (action) {
+                is PlayersSelected -> {
+                    val context = state.getContext<ChargeContext>()
+                    compositeCommandOf(
+                        UpdateContext(context.copy(selectedPlayers = action.getPlayers(state).toSet())),
+                        GotoNode(SelectPlayerOrEndTurn),
+                    )
+                }
+                Continue,
+                Cancel -> {
+                    GotoNode(SelectPlayersToActivate)
+                }
+                else -> INVALID_ACTION(action)
             }
         }
     }

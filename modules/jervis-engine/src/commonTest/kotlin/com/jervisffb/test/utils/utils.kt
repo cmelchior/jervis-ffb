@@ -87,5 +87,3 @@ fun SelectSingleBlockDieResult(index: Int = 0): GameAction {
 inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
 }
-
-

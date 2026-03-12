@@ -68,6 +68,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBlockWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDirtyPlayerWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseDivingCatchWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseEyeGougeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseFendWheelController
@@ -203,6 +204,7 @@ class UiGameController(
         UseBigHandWheelController,
         UseBlockWheelController,
         UseDirtyPlayerWheelController,
+        UseDivingCatchWheelController,
         UseDodgeWheelController,
         UseEyeGougeWheelController,
         UseFendWheelController,

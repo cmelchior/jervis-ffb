@@ -131,7 +131,7 @@ fun teamSetup(setup: List<Pair<PlayerId, FieldCoordinate>>, endSetup: Boolean = 
     }
 }
 
-fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
+fun defaultKickOffEvent(): Array<GameAction?> = arrayOf(
     DiceRollResults(3.d6, 4.d6), // Roll on kick-off table
     1.d6, // Brilliant coaching
     1.d6 // Brilliant coaching
@@ -141,7 +141,7 @@ fun defaultKickOffHomeTeam(
     selectKicker: PlayerSelected? = PlayerSelected(PlayerId("H10")), // Select Kicker
     placeKick: FieldSquareSelected = FieldSquareSelected(19, 7), // Center of Away Half,
     deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [18,7]
-    kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
+    kickoffEvent: Array<GameAction?> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
     selectKicker,
@@ -154,7 +154,7 @@ fun defaultKickOffHomeTeam(
 fun defaultKickOffAwayTeam(
     placeKick: FieldSquareSelected = FieldSquareSelected(6, 7), // Center of Away Half,
     deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [5,7]
-    kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
+    kickoffEvent: Array<GameAction?> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [4,7]
 ) = arrayOf(
     PlayerSelected(PlayerId("A10")), // Select Kicker

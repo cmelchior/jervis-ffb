@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.PassingInterferenceRollContext
 import com.jervisffb.engine.model.context.assertContext
@@ -142,7 +143,7 @@ object PassingInterferenceStep: Procedure() {
                 )
             } else {
                 // Player failed to deflect the ball, abort immediately.
-                return compositeCommandOf(
+                compositeCommandOf(
                     UpdateContext(
                         interferenceContext.copy(
                             interferenceRoll = rollContext,
@@ -157,6 +158,11 @@ object PassingInterferenceStep: Procedure() {
     }
 
     object ConvertDeflectionToInterception: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
+            val player = state.getContext<PassingInterferenceContext>().interferencePlayer ?: INVALID_GAME_STATE("Missing interference player")
+            return AddContext(CatchContext(player,  ball))
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassingInterferenceContext>()
@@ -176,9 +182,13 @@ object PassingInterferenceStep: Procedure() {
             val endPass = rules.teamHasBall(context.thrower.team, ball)
 
             return when {
-                isThrowContinues || endPass -> ExitProcedure()
+                isThrowContinues || endPass -> compositeCommandOf(
+                    RemoveContext<CatchContext>(),
+                    ExitProcedure()
+                )
                 isTurnover -> {
                     compositeCommandOf(
+                        RemoveContext<CatchContext>(),
                         SetTurnOver(TurnOver.STANDARD),
                         ExitProcedure()
                     )

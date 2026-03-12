@@ -22,7 +22,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.CatchRollContext
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -37,21 +37,21 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 /**
  * Procedure for handling a Catch Roll as described on page 51 in the rulebook.
  * It is only responsible for handling the actual dice roll. The result is stored
- * in [CatchRollContext] and it is up to the caller of the procedure to choose
+ * in [CatchContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
 object CatchRoll : Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchContext>()
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<CatchRollContext>()
+                val rollContext = state.getContext<CatchContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.create(state, d6),
                     isSuccess = testAgainstAgility(rollContext.catchingPlayer, d6, rollContext.modifiers)
@@ -67,9 +67,9 @@ object CatchRoll : Procedure() {
 
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<CatchRollContext>()
+            val context = state.getContext<CatchContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
                 context.catchingPlayer,
@@ -116,11 +116,11 @@ object CatchRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val catchRollContext = state.getContext<CatchRollContext>()
+                val catchRollContext = state.getContext<CatchContext>()
                 val rerollResult = catchRollContext.copy(
                     roll = catchRollContext.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,

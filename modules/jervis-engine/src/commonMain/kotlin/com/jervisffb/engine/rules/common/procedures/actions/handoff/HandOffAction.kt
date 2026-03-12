@@ -32,6 +32,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
@@ -202,9 +203,19 @@ object HandOffAction : Procedure() {
     }
 
     object ResolveCatch : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            // Determine target and modifiers for the Catch roll
+            val ball = state.currentBall()
+            val catchingPlayer = state.field[ball.location].player!!
+            val rollContext = CatchContext(catchingPlayer, ball)
+            return AddContext(rollContext)
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(ChooseStepAfterHandOff)
+            return compositeCommandOf(
+                RemoveContext<CatchContext>(),
+                GotoNode(ChooseStepAfterHandOff)
+            )
         }
     }
 

@@ -216,10 +216,7 @@ data class ActionRequest(
             }
             Undo -> (id.value >= 1)
             is PlayersSelected -> {
-                actions.singleInstanceOfOrNull<SelectPlayers>()?.let {
-                    if (it.count != action.players.size) return false
-                    it.players.containsAll(action.players)
-                } ?: false
+                actions.singleInstanceOfOrNull<SelectPlayers>()?.players?.containsAll(action.players) ?: false
             }
 
             is DevModeGameAction -> false // Dev Actions should never be handled here

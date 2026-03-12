@@ -14,7 +14,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.context.CatchRollContext
+import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
@@ -131,7 +131,7 @@ class WeatherTests: JervisGameBB2020Test() {
             ),
             4.d6 // Attempt to catch the ball. Should fail due to -2 to catch.
         )
-        val context = state.getContext<CatchRollContext>()
+        val context = state.getContext<CatchContext>()
         assertContains(context.modifiers, CatchModifier.POURING_RAIN)
         assertFalse(context.isSuccess)
     }
