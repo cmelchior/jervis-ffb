@@ -9,6 +9,8 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
@@ -89,7 +91,23 @@ inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
 }
 
+/**
+ * Modify the Player state, so they will be considered Prone.
+ */
 fun Player.makeProne() {
     state = PlayerState.PRONE
     hasTackleZones = false
+}
+
+/**
+ * Modify the Player state, so they will be considered Distracted.
+ * Note, Distracted doesn't exists in BB2020, but here we interpret it as being
+ * Standing without TackleZones
+ */
+fun Player.markAsDistracted() {
+    if (state != PlayerState.STANDING) error("Player must be standing to be marked as distracted")
+    hasTackleZones = false
+    if (this.team.game.rules.baseVersion == GameVersion.BB2025) {
+        statusEffects.add(PlayerStatusEffect.distracted())
+    }
 }

@@ -49,7 +49,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Jump
   - [x] Works on Dodge
   - [x] Works on Leap
-- [ ] Dodge
+- [x] Dodge
+  - [x] Is optional
+  - [x] Can reroll successful dodge rolls
+  - [x] Works once pr. turn
+  - [x] Prevents being Knocked Down on a Stumble
+  - [x] Does not work if Distracted
 - [x] Defensive
   - [x] Prevents Guard
   - [x] Prevents Put the Boot In

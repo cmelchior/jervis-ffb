@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
@@ -94,7 +95,7 @@ object BB2025Stumble: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().defender.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
-            return if (stumbleContext.defender.hasSkill(SkillType.DODGE)) {
+            return if (stumbleContext.defender.isSkillAvailable(SkillType.DODGE)) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
