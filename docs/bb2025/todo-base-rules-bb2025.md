@@ -301,7 +301,7 @@ book.
     - [ ] Follows the chart in the rulebook
     - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
 - [ ] Catch (basic, no skills)
-    - [ ] No -1 for Scatter And Deviating Ball
+    - [x] No -1 for Scatter And Deviating Ball
     - [ ] Accurate pass
     - [ ] Deflection into Interception
     - [ ] Bouncing ball

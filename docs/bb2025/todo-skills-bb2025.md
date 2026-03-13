@@ -18,17 +18,17 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## Agility Skills
 
-- [ ] Catch
+- [x] Catch
     - [x] Reroll catching the landing after kickoff
     - [x] Reroll catching a successful Pass
     - [x] Reroll catching a bouncing ball
     - [x] Reroll catching a hand-off
-    - [ ] Reroll catching a deviated ball
+    - [x] Reroll catching a deviated ball
     - [x] Reroll catching a scattered ball
     - [x] Reroll catching a bouncing ball
     - [x] Only works on failed catches
     - [x] Does not work if missing tackle zones
-    - [ ] Works multiple times pr. turn
+    - [x] Works multiple times pr. turn
 - [x] Diving Catch
   - [x] Cannot catch if ball landing on Player in adjacent square
   - [x] Cannot catch bouncing ball in adjacent square

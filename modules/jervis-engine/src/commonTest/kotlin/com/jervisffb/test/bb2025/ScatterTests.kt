@@ -6,6 +6,8 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.context.CatchContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultKickOffHomeTeam
@@ -46,6 +48,32 @@ class ScatterTests: JervisGameBB2025Test() {
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(FieldCoordinate(15,5), state.singleBall().location)
+    }
+
+    @Test
+    fun noNegativeModifierOnCatch() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(17, 7),
+                deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
+                kickoffEvent = arrayOf(
+                    DiceRollResults(4.d6, 4.d6), // Weather change (to trigger scatter)
+                    DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to field with player
+                ),
+                bounce = null
+            ),
+        )
+        val player = awayTeam["A10".playerId]
+        assertTrue(rules.canCatch(player))
+        assertEquals(3, player.agility)
+        assertTrue(state.getContext<CatchContext>().modifiers.isEmpty())
+        controller.rollForward(
+            3.d6 // No -1 to catch
+        )
+        assertTrue(player.hasBall())
     }
 
     @Test

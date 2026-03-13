@@ -8,6 +8,8 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.context.CatchContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultKickOffEvent
@@ -58,6 +60,25 @@ class DeviateTests: JervisGameBB2025Test() {
             6.d6 // Catch Landing
         )
         assertTrue(awayTeam["A11".playerId].hasBall())
+    }
+
+    @Test
+    fun noNegativeModifierOnCatch() {
+        val catcher = awayTeam["A11".playerId]
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            PlayerSelected(PlayerId("H10")), // Select Kicker
+            FieldSquareSelected(19, 7), // Center of Away Half
+            DiceRollResults(5.d8, 3.d6),
+            *defaultKickOffEvent(),
+        )
+        assertEquals(3, catcher.agility)
+        assertTrue(state.getContext<CatchContext>().modifiers.isEmpty())
+        controller.rollForward(
+            3.d6
+        )
+        assertTrue(catcher.hasBall())
     }
 
     @Test

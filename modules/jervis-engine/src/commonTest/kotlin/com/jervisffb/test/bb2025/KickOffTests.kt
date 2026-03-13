@@ -3,7 +3,6 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
@@ -21,6 +20,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.catch
 import com.jervisffb.test.defaultAwaySetup
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffEvent
@@ -219,8 +219,7 @@ class KickOffTests: JervisGameBB2025Test() {
                 deviate = DiceRollResults(4.d8, 1.d6),
                 bounce = null
             ),
-            3.d6, // First Catch roll fails
-            NoRerollSelected(0), // Player has catch, but do not use it.
+            *catch(2.d6), // First Catch roll fails
             4.d8, // Bounce
             6.d6 // 2nd catch roll
         )
@@ -239,7 +238,7 @@ class KickOffTests: JervisGameBB2025Test() {
                 deviate = DiceRollResults(2.d8, 1.d6),
                 bounce = null
             ),
-            3.d6, // First roll fails
+            2.d6, // First roll fails
         )
         // Instead of asking for reroll (since no team reroll is available), we
         // should go directly to bounce

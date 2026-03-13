@@ -127,7 +127,7 @@ class WeatherTests: JervisGameBB2025Test() {
                 deviate = DiceRollResults(4.d8, 3.d6), // Land on A10 at [16,7]
                 bounce = null
             ),
-            4.d6 // Attempt to catch the ball. Should fail due to -2 to catch.
+            3.d6 // Attempt to catch the ball. Should fail due to -1 to catch.
         )
         val context = state.getContext<CatchContext>()
         assertContains(context.modifiers, CatchModifier.POURING_RAIN)

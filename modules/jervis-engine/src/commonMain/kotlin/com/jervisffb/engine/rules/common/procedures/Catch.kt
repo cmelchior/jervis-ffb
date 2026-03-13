@@ -39,6 +39,7 @@ import com.jervisffb.engine.reports.ReportInterception
 import com.jervisffb.engine.reports.ReportNoBallAffectingAction
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
@@ -173,8 +174,18 @@ object Catch : Procedure() {
             val modifiers = mutableListOf<DiceModifier>()
             val ballStateModifier = when (context.ball.state) {
                 BallState.BOUNCING -> CatchModifier.BOUNCING
-                BallState.DEVIATING -> CatchModifier.DEVIATED
-                BallState.SCATTERED -> CatchModifier.SCATTERED
+                BallState.DEVIATING -> {
+                    when (rules.baseVersion) {
+                        GameVersion.BB2020 -> CatchModifier.DEVIATED
+                        GameVersion.BB2025 -> null
+                    }
+                }
+                BallState.SCATTERED -> {
+                    when (rules.baseVersion) {
+                        GameVersion.BB2020 -> CatchModifier.SCATTERED
+                        GameVersion.BB2025 -> null
+                    }
+                }
                 BallState.THROW_IN -> CatchModifier.THROW_IN
                 BallState.DEFLECTED -> CatchModifier.CONVERT_DEFLECTION
                 else -> null
