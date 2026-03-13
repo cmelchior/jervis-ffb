@@ -64,7 +64,7 @@ data class SkillId(val type: SkillType, val value: SkillValue = SkillValue.None)
             is SkillValue.Keyword -> "(${value.value.description})"
             SkillValue.None -> ""
         }
-        return "${type.name}$$valueDescription"
+        return "${type.name}$valueDescription"
     }
 }
 
