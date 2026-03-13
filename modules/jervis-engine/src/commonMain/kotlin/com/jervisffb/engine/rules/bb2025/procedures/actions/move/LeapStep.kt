@@ -46,6 +46,7 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
+import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.max
 
 /**
@@ -239,11 +240,12 @@ object LeapStep : Procedure() {
     object CalculateLeapRollModifiers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            val modifiers = calculateLeapModifiers(state)
+            val modifiers = calculateLeapModifiers(state).toPersistentList()
             return compositeCommandOf(
                 AddContext(
                     LeapRollContext(
                         player = context.player,
+                        startingSquare = context.startingSquare,
                         modifiers = modifiers,
                     )
                 ),
@@ -286,17 +288,6 @@ object LeapStep : Procedure() {
                     GotoNode(ResolvePlayerFallingOver)
                 )
             }
-        }
-    }
-
-    object CheckDivingTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            TODO("Not yet implemented")
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
         }
     }
 

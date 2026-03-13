@@ -286,6 +286,11 @@ fun jump(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arra
     reroll,
 )
 
+fun leap(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun dauntlessRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,

@@ -72,14 +72,25 @@ import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.DodgeRollContext
+import com.jervisffb.engine.model.context.JumpRollContext
+import com.jervisffb.engine.model.context.LeapRollContext
+import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
@@ -400,4 +411,61 @@ fun formatDiceRoll(roll: D6DieRoll, modifiers: List<DiceModifier>): String {
             append(" ${prefix}${modifier.modifier} ${modifier.description}")
         }
     }
+}
+
+/**
+ * Check if using Diving Tackle would matter in the current context
+ */
+fun doDivingTackleHaveAnAffect(state: Game): Boolean {
+    val context = state.getContext<MoveContext>()
+    val movingPlayer = context.player
+    val startingSquare = context.startingSquare
+
+    // First check if the opponent even has Diving Tackle
+    val opponentHasDivingTackle = startingSquare.getSurroundingCoordinates(state.rules)
+        .filter { coord ->
+            state.field[coord].player?.let { player ->
+                player.team != movingPlayer.team
+            } ?: false
+        }
+        .mapNotNull { state.field[it].player }
+        .any { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
+
+    if (!opponentHasDivingTackle) {
+        return false
+    }
+
+    // Then check rolls and modifiers
+    val (rollValue, modifiedResult) = when (state.stack.currentProcedure()?.procedure) {
+        DodgeRoll -> state.getContext<DodgeRollContext>().let {
+            state.getContext<DodgeRollContext>().let {
+                (it.roll?.result?.value ?: 0) to it.modifiedResult
+            }
+        }
+        JumpRoll -> {
+            state.getContext<JumpRollContext>().let {
+                (it.roll?.result?.value ?: 0) to it.modifiedResult
+            }
+        }
+        LeapRoll -> {
+            state.getContext<LeapRollContext>().let {
+                (it.roll?.result?.value ?: 0) to it.modifiedResult
+            }
+        }
+        else -> error("Unexpected procedure: ${state.stack.currentProcedure()?.procedure}")
+    }
+
+    val isNaturalSix = (rollValue == 6)
+    val modifier = when (state.stack.currentProcedure()?.procedure) {
+        DodgeRoll -> DodgeRollModifier.DIVING_TACKLE.modifier * -1
+        JumpRoll -> DodgeRollModifier.DIVING_TACKLE.modifier * -1
+        LeapRoll -> DodgeRollModifier.DIVING_TACKLE.modifier * -1
+        else -> error("Unexpected procedure: ${state.stack.currentProcedure()?.procedure}")
+    }
+    val divingTackleHasEffect = modifiedResult >= movingPlayer.agility && modifiedResult <= movingPlayer.agility + modifier
+    if (isNaturalSix || !divingTackleHasEffect) {
+        return false
+    }
+
+    return true
 }

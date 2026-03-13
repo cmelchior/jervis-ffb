@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionStep
@@ -13,6 +14,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -28,6 +30,9 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
         InterceptionStep.SelectPlayerForInterception,
         DodgeRoll.ChooseToUseTackle,
         DodgeRoll.ChooseToUsePrehensileTail,
+        DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
+        JumpRoll.ChooseToUseDivingTackleAfterReRoll,
+        LeapRoll.ChooseToUseDivingTackleAfterReRoll,
     )
 
     private val nodesForContextMenu = setOf(
@@ -71,6 +76,9 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
                 InterceptionStep.SelectPlayerForInterception -> "Do not intercept"
                 DodgeRoll.ChooseToUseTackle -> "Do not use Tackle"
                 DodgeRoll.ChooseToUsePrehensileTail -> "Do not use Prehensile Tail"
+                DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
+                JumpRoll.ChooseToUseDivingTackleAfterReRoll,
+                LeapRoll.ChooseToUseDivingTackleAfterReRoll -> "Do not use Diving Tackle"
                 else -> error("Unsupported node: ${state.stack.currentNode()}")
             }
             acc.updateGameStatus {

@@ -41,7 +41,14 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] All players can attempt to catch
   - [x] Active coach determines the order
   - [x] Kicking Team can use during Kick-off (=touchback)
-- [ ] Diving Tackle
+- [x] Diving Tackle
+  - [x] Used after all other modifiers
+  - [x] Used after reroll has been decided
+  - [x] Only one player can use it
+  - [x] Leap does not reduce this modifier
+  - [x] Works on Jump
+  - [x] Works on Dodge
+  - [x] Works on Leap
 - [ ] Dodge
 - [x] Defensive
   - [x] Prevents Guard
@@ -58,7 +65,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Free to stand up during Foul
   - [x] Free to stand up during Secure the Ball
   - [x] Free to stand up during Throw Team-mate
-- [ ] Leap
+- [x] Leap
     - [x] Leap over any square using Jump rules
     - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
     - [x] If Rushing twice and fail, ends up in starting square

@@ -465,6 +465,18 @@ as part of a Pass Action if they are in the target square.". This means that
 the Diving Catch modifier can apply multiple times, e.g., you fail the first
 catch, the ball bounces around, and end up in the target square again. 
 
+### Page 127 - Diving Tackle
+In BB2025, Diving Tackle is now always applied after all rerolls and modifiers
+have been applied, not before. This is a change from BB2020, where it could
+be applied both before and after rolling the die.
+
+This has a few implications:
+
+1. The UI should not accept "success" on a Dodge Roll automatically without 
+   also assuming that Diving Tackle is used.
+2. Diving Tackle is applied after Leap. This means that Leap cannot reduce the
+   modifier from Diving Tackle. See a more expanded discussion in the Leap
+   section.
 
 ### Page 128 - Eye Gouge
 Eye Gouge says it can trigger when an opposition player is Pushed Back, but it

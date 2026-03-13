@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
@@ -86,4 +87,9 @@ fun SelectSingleBlockDieResult(index: Int = 0): GameAction {
  */
 inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
+}
+
+fun Player.makeProne() {
+    state = PlayerState.PRONE
+    hasTackleZones = false
 }

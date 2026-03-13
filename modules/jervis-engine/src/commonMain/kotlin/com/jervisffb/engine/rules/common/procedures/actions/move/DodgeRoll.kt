@@ -19,6 +19,8 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -31,6 +33,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -39,6 +42,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
+import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -47,10 +51,12 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import kotlinx.collections.immutable.toPersistentList
 
 /**
  * Handle a player making a dodge roll.
@@ -155,7 +161,7 @@ object DodgeRoll: Procedure() {
                 }
             }
             return compositeCommandOf(
-                UpdateContext(context.copy(rollModifiers = modifiers)),
+                UpdateContext(context.copy(rollModifiers = modifiers.toPersistentList())),
                 GotoNode(ChooseToUseTwoHeads)
             )
         }
@@ -266,12 +272,12 @@ object DodgeRoll: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(player, SkillType.PREHENSILE_TAIL),
                         UpdateContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
-                        GotoNode(ChooseToUseDivingTackle)
+                        GotoNode(ChooseToUseDivingTackleBeforeRoll)
                     )
                 }
                 is Cancel,
                 is Continue -> {
-                    GotoNode(ChooseToUseDivingTackle)
+                    GotoNode(ChooseToUseDivingTackleBeforeRoll)
                 }
                 else -> INVALID_ACTION(action)
             }
@@ -281,8 +287,10 @@ object DodgeRoll: Procedure() {
     /**
      * Choose whether to use Diving Tackle (if applicable).
      * If multiple players have it, only 1 can use it.
+     * It is only BB2020 that allows you to use it before rolling, in BB2025,
+     * this choice is after.
      */
-    object ChooseToUseDivingTackle: ActionNode() {
+    object ChooseToUseDivingTackleBeforeRoll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
@@ -296,8 +304,9 @@ object DodgeRoll: Procedure() {
                 .mapNotNull { state.field[it].player }
                 .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
                 .map { SelectPlayer(it) }
+            val canUseBeforeRoll = (rules.baseVersion == GameVersion.BB2020)
 
-            return if (eligiblePlayers.isEmpty()) {
+            return if (!canUseBeforeRoll || eligiblePlayers.isEmpty()) {
                 listOf(ContinueWhenReady)
             } else {
                 eligiblePlayers + CancelWhenReady
@@ -310,33 +319,19 @@ object DodgeRoll: Procedure() {
                 is PlayerSelected -> {
                     val player = action.getPlayer(state)
                     val skill = player.getSkill(SkillType.DIVING_TACKLE)
+                    val updatedModifiers = context.rollModifiers.add(DodgeRollModifier.DIVING_TACKLE)
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
-                        UpdateContext(context.copyAndAddModifier(DodgeRollModifier.DIVING_TACKLE)),
-                        GotoNode(CalculateSuccess)
+                        UpdateContext(context.copy(
+                            rollModifiers = updatedModifiers,
+                        )),
+                        GotoNode(ChooseToUseTackle)
                     )
                 }
                 is Cancel,
-                is Continue -> {
-                    GotoNode(CalculateSuccess)
-                }
+                is Continue -> GotoNode(ChooseToUseTackle)
                 else -> INVALID_ACTION(action)
             }
-        }
-    }
-
-    /**
-     * After selecting all modifiers. Calculate if the roll was successful or not.
-     */
-    object CalculateSuccess: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<DodgeRollContext>()
-            val afterReroll = (context.roll?.rerolledResult != null)
-            val success = testAgainstAgility(context.player, context.roll!!.result, context.rollModifiers)
-            return compositeCommandOf(
-                UpdateContext(context.copy(isSuccess = success)),
-                if (afterReroll) ExitProcedure() else GotoNode(ChooseToUseTackle)
-            )
         }
     }
 
@@ -370,14 +365,25 @@ object DodgeRoll: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(tacklePlayer, SkillType.TACKLE),
                         UpdateContext(context.copy(useTackle = tacklePlayer)),
-                        GotoNode(ChooseReRollSource)
+                        GotoNode(CalculateSuccessBeforeReroll)
                     )
                 }
                 Cancel, Continue -> {
-                    GotoNode(ChooseReRollSource)
+                    GotoNode(CalculateSuccessBeforeReroll)
                 }
                 else -> INVALID_ACTION(action)
             }
+        }
+    }
+
+    object CalculateSuccessBeforeReroll: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<DodgeRollContext>()
+            val success = isSuccess(context)
+            return compositeCommandOf(
+                UpdateContext(context.copy(isSuccess = success)),
+                GotoNode(ChooseReRollSource)
+            )
         }
     }
 
@@ -405,8 +411,8 @@ object DodgeRoll: Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                Continue -> ExitProcedure()
-                is NoRerollSelected -> ExitProcedure()
+                Continue,
+                is NoRerollSelected -> GotoNode(ChooseToUseDivingTackleAfterReRoll)
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.DODGE, action.getRerollSource(state))
                     compositeCommandOf(
@@ -429,7 +435,7 @@ object DodgeRoll: Procedure() {
             return if (context.rerollAllowed) {
                 GotoNode(ReRollDie)
             } else {
-                ExitProcedure()
+                GotoNode(ChooseToUseDivingTackleAfterReRoll)
             }
         }
     }
@@ -452,14 +458,74 @@ object DodgeRoll: Procedure() {
                     roll = dodgeContext.roll!!.copyReroll(
                         rerollSource = rerollContext.source,
                         rerolledResult = d6,
-                    )
+                    ),
+                    isSuccess = isSuccess(dodgeContext, overrideD6 = d6)
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
                     UpdateContext(rerolledDodgeRoll),
-                    GotoNode(CalculateSuccess),
+                    GotoNode(ChooseToUseDivingTackleAfterReRoll),
                 )
             }
         }
+    }
+
+    object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<DodgeRollContext>()
+            val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
+                .filter { coord ->
+                    state.field[coord].player?.let { player ->
+                        player.team != context.player.team
+                    } ?: false
+                }
+                .mapNotNull { state.field[it].player }
+                .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
+
+            return if (eligiblePlayers.isNotEmpty()) {
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers), CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<DodgeRollContext>()
+            return when (action) {
+                is PlayerSelected -> {
+                    val player = action.getPlayer(state)
+                    val skill = player.getSkill(SkillType.DIVING_TACKLE)
+                    val updatedModifiers = context.rollModifiers.add(DodgeRollModifier.DIVING_TACKLE)
+                    val success = isSuccess(context, overrideModifiers = updatedModifiers)
+                    compositeCommandOf(
+                        ReportSkillUsed(player, skill),
+                        UpdateContext(context.copy(
+                            rollModifiers = updatedModifiers,
+                            isSuccess = success
+                        )),
+                        SetPlayerState(player, PlayerState.PRONE, hasTackleZones = false),
+                        SetPlayerLocation(player, context.startingSquare),
+                        ExitProcedure()
+                    )
+                }
+                Cancel,
+                Continue -> ExitProcedure()
+                else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    // -- HELPER METHODS --
+    private fun isSuccess(
+        context: DodgeRollContext,
+        overrideD6: D6Result? = null,
+        overrideModifiers: List<DiceModifier>? = null
+    ): Boolean {
+        val player = context.player
+        val d6 = overrideD6 ?: context.roll!!.result
+        val modifiers = overrideModifiers ?: context.rollModifiers
+        return testAgainstAgility(player, d6, modifiers)
     }
 }

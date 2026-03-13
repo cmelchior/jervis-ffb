@@ -53,6 +53,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePus
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
@@ -71,6 +72,7 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -79,6 +81,7 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.engine.utils.doDivingTackleHaveAnAffect
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
@@ -445,9 +448,21 @@ open class ManualActionProvider(
         }
 
         // Do not reroll successful rolls that are considered "successful"
+        // If we are in the middle of a Dodge, Jump or Leap, we will assume that Diving Tackle
+        // will be used right after, i.e. you might want to reroll something that rolls equal to
+        // agility, which is normally a success.
         if (menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
-                return NoRerollSelected()
+                // Check if Diving Tackle can be used right after the reroll, in that case, we should
+                // not automate this action
+                val currentProcedure = controller.currentProcedure()?.procedure
+                val automateAction = when (currentProcedure != null && (currentProcedure == DodgeRoll || currentProcedure == JumpRoll || currentProcedure == LeapRoll)) {
+                    true ->!doDivingTackleHaveAnAffect(controller.state)
+                    false -> true
+                }
+                if (automateAction) {
+                    return NoRerollSelected()
+                }
             }
         }
 
@@ -703,6 +718,13 @@ open class ManualActionProvider(
             availableActions.getOrNull<SelectPlayers>()?.let {
                 return PlayersSelected(it.players)
             }
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.IGNORE_DIVING_TACKLE_IF_NO_EFFECT)
+            && (currentNode == DodgeRoll.ChooseToUseDivingTackleAfterReRoll || currentNode == JumpRoll.ChooseToUseDivingTackleAfterReRoll || currentNode == LeapRoll.ChooseToUseDivingTackleAfterReRoll)
+            && !doDivingTackleHaveAnAffect(controller.state)
+        ) {
+            return Cancel
         }
 
         return null

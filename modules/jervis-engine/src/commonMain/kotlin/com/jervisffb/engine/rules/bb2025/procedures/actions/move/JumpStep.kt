@@ -46,6 +46,7 @@ import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
+import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.max
 
 /**
@@ -228,7 +229,8 @@ object JumpStep : Procedure() {
                 AddContext(
                     JumpRollContext(
                         player = player,
-                        modifiers = modifiers,
+                        startingSquare = moveContext.startingSquare,
+                        modifiers = modifiers.toPersistentList(),
                     )
                 ),
                 GotoNode(RollForJump)

@@ -786,7 +786,26 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 true -> "Use Diving Catch?"
                 false -> "Waiting for opponent to use Diving Catch"
             }
-        }
+        },
+
+        DodgeRoll.ChooseToUseDivingTackleAfterReRoll to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Select a player to use Diving Tackle"
+                false -> "Waiting for opponent to use Diving Tackle"
+            }
+        },
+        JumpRoll.ChooseToUseDivingTackleAfterReRoll to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Select a player to use Diving Tackle"
+                false -> "Waiting for opponent to use Diving Tackle"
+            }
+        },
+        LeapRoll.ChooseToUseDivingTackleAfterReRoll to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Select a player to use Diving Tackle."
+                false -> "Waiting for opponent to use Diving Tackle"
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

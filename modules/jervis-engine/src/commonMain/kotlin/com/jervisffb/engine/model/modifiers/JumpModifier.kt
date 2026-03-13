@@ -2,5 +2,6 @@ package com.jervisffb.engine.model.modifiers
 
 enum class JumpModifier(override val modifier: Int, override val description: String) : DiceModifier {
     MARKED(-1, "Marked"),
-    VERY_LONG_LEGS(1, "Very Long Legs")
+    VERY_LONG_LEGS(1, "Very Long Legs"),
+    DIVING_TACKLE(-2, "Diving Tackle"),
 }
