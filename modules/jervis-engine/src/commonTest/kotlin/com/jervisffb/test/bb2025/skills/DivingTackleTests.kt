@@ -21,8 +21,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
 import com.jervisffb.test.leap
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.makeProne
-import io.ktor.client.request.invoke
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -102,7 +101,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
     fun leapDoesNotConsiderDivingTackleModifier() {
         val leapingPlayer = state.getPlayerById("A1".playerId)
         leapingPlayer.addSkill(SkillType.LEAP)
-        homeTeam["H1".playerId].makeProne()
+        homeTeam["H1".playerId].putProne()
         homeTeam["H2".playerId].addSkill(SkillType.DIVING_TACKLE)
         assertEquals(3, leapingPlayer.agility)
         controller.rollForward(
@@ -121,7 +120,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
     @Test
     fun workOnJump() {
         val leapingPlayer = state.getPlayerById("A1".playerId)
-        homeTeam["H1".playerId].makeProne()
+        homeTeam["H1".playerId].putProne()
         homeTeam["H2".playerId].addSkill(SkillType.DIVING_TACKLE)
         assertEquals(3, leapingPlayer.agility)
         controller.rollForward(

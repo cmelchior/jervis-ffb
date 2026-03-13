@@ -20,6 +20,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,8 +37,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         super.setUp()
         startDefaultGame()
         val player = state.getPlayerById("A10".playerId)
-        player.state = PlayerState.PRONE
-        player.hasTackleZones = false
+        player.putProne()
     }
 
     @Test
@@ -48,14 +48,10 @@ class JumpUpTests: JervisGameBB2025Test() {
             addSkill(SkillType.PROJECTILE_VOMIT)
             addSkill(SkillType.STAB)
             addSkill(SkillType.BREATHE_FIRE)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         listOf("H1", "H2").forEach {
-            homeTeam[it.playerId].apply {
-                state = PlayerState.PRONE
-                hasTackleZones = false
-            }
+            homeTeam[it.playerId].putProne()
         }
         controller.rollForward(
             PlayerSelected(attacker),
@@ -71,8 +67,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A1".playerId]
         attacker.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         val defender = homeTeam["H1".playerId]
         assertEquals(3, attacker.agility)
@@ -93,8 +88,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A1".playerId]
         attacker.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
@@ -111,13 +105,11 @@ class JumpUpTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A1".playerId]
         attacker.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         listOf("H1", "H2").forEach {
             homeTeam[it.playerId].apply {
-                state = PlayerState.PRONE
-                hasTackleZones = false
+                putProne()
             }
         }
         controller.rollForward(
@@ -131,8 +123,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val player = awayTeam["A1".playerId]
         player.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.MOVE),
@@ -149,8 +140,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val player = awayTeam["A1".playerId]
         player.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.BLITZ),
@@ -165,15 +155,11 @@ class JumpUpTests: JervisGameBB2025Test() {
 
     @Test
     fun standUpForFreeDuringFoulAction() {
-        homeTeam["H3".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H3".playerId].putProne()
         val player = awayTeam["A1".playerId]
         player.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.FOUL),
@@ -190,8 +176,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val player = awayTeam["A1".playerId]
         player.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.PASS),
@@ -208,8 +193,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         val player = awayTeam["A1".playerId]
         player.apply {
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.HAND_OFF),
@@ -227,8 +211,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         player.apply {
             addSkill(SkillType.THROW_TEAMMATE)
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.THROW_TEAM_MATE),
@@ -246,8 +229,7 @@ class JumpUpTests: JervisGameBB2025Test() {
         player.apply {
             addSkill(SkillType.THROW_TEAMMATE)
             addSkill(SkillType.JUMP_UP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.SECURE_THE_BALL),

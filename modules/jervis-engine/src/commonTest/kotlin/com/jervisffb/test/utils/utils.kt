@@ -94,17 +94,17 @@ inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
 /**
  * Modify the Player state, so they will be considered Prone.
  */
-fun Player.makeProne() {
+fun Player.putProne() {
     state = PlayerState.PRONE
     hasTackleZones = false
 }
 
 /**
  * Modify the Player state, so they will be considered Distracted.
- * Note, Distracted doesn't exists in BB2020, but here we interpret it as being
+ * Note, Distracted doesn't exist in BB2020, but here we interpret it as being
  * Standing without TackleZones
  */
-fun Player.markAsDistracted() {
+fun Player.makeDistracted() {
     if (state != PlayerState.STANDING) error("Player must be standing to be marked as distracted")
     hasTackleZones = false
     if (this.team.game.rules.baseVersion == GameVersion.BB2025) {

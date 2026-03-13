@@ -32,6 +32,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.putProne
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -155,10 +156,7 @@ class EyeGougeTests: JervisGameBB2025Test() {
     fun workOnBlockAssists() {
         // Allow A2 to assist on H1, it it didn't have Eye Gouge
         listOf("H2", "H3").forEach {
-            state.getPlayerById(it.playerId).apply {
-                state = PlayerState.PRONE
-                hasTackleZones = false
-            }
+            state.getPlayerById(it.playerId).putProne()
         }
         val player = state.getPlayerById("A1".playerId)
         val assister = state.getPlayerById("A2".playerId)

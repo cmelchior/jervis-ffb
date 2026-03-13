@@ -34,6 +34,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -382,7 +383,7 @@ class PassActionTests: JervisGameBB2025Test() {
         // Make some players invalid for selection
         homeTeam["H2".playerId].state = PlayerState.PRONE
         homeTeam["H3".playerId].state = PlayerState.STUNNED
-        homeTeam["H4".playerId].hasTackleZones = false
+        homeTeam["H4".playerId].makeDistracted()
 
         val modifiedInterceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
         assertEquals(2, modifiedInterceptors.size)
@@ -434,9 +435,9 @@ class PassActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
         homeTeam["H2".playerId].agility = 1 // Make interceptor super human
-        awayTeam["A1".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A2".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A3".playerId].hasTackleZones = false // Remove mark
+        awayTeam["A1".playerId].makeDistracted() // Remove mark
+        awayTeam["A2".playerId].makeDistracted()  // Remove mark
+        awayTeam["A3".playerId].makeDistracted()  // Remove mark
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
             3.d6, // Intercept (with -3 modifier) - Will fail
@@ -464,9 +465,9 @@ class PassActionTests: JervisGameBB2025Test() {
         )
         assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
         homeTeam["H2".playerId].agility = 1 // Make interceptor super human
-        awayTeam["A1".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A2".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A3".playerId].hasTackleZones = false // Remove mark
+        awayTeam["A1".playerId].makeDistracted()  // Remove mark
+        awayTeam["A2".playerId].makeDistracted()  // Remove mark
+        awayTeam["A3".playerId].makeDistracted()  // Remove mark
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
             2.d6, // Intecept (with -2 modifier) - Will fail

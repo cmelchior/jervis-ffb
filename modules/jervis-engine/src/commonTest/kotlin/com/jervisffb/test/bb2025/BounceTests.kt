@@ -17,6 +17,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -86,7 +87,7 @@ class BounceTests: JervisGameBB2025Test() {
             *catch(1.d6), // Fail to catch
         )
         val player = awayTeam["A6".playerId]
-        player.hasTackleZones = false
+        player.makeDistracted()
         assertFalse(rules.canCatch(player))
         controller.rollForward(
             4.d8, // Bounce to another player

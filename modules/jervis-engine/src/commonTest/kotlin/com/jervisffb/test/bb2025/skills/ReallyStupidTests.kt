@@ -17,6 +17,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.reallyStupid
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -148,7 +149,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
 
     @Test
     fun distractedAdjacentPlayerCannotHelp() {
-        awayTeam["A2".playerId].hasTackleZones = false
+        awayTeam["A2".playerId].makeDistracted()
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             3.d6,

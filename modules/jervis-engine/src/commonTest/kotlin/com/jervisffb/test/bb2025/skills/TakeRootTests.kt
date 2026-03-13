@@ -34,6 +34,7 @@ import com.jervisffb.test.skipTurns
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.takeRoot
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -186,10 +187,7 @@ class TakeRootTests: JervisGameBB2025Test() {
 
     @Test
     fun cannotMoveDuringFoul() {
-        homeTeam["H3".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H3".playerId].putProne()
         val player = awayTeam["A1".playerId]
         player.addSkill(SkillType.TAKE_ROOT)
         controller.rollForward(
@@ -260,10 +258,7 @@ class TakeRootTests: JervisGameBB2025Test() {
 
     @Test
     fun cannotJumpWhenRooted() {
-        state.getPlayerById("H1".playerId).apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        state.getPlayerById("H1".playerId).putProne()
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         jumpingPlayer.addSkill(SkillType.TAKE_ROOT)
         controller.rollForward(
@@ -279,10 +274,7 @@ class TakeRootTests: JervisGameBB2025Test() {
 
     @Test
     fun cannotLeapWhenRooted() {
-        state.getPlayerById("H1".playerId).apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        state.getPlayerById("H1".playerId).putProne()
         val jumpingPlayer = state.getPlayerById("A1".playerId)
         jumpingPlayer.apply {
             addSkill(SkillType.TAKE_ROOT)

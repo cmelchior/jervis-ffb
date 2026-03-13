@@ -2,7 +2,6 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.bb2025.skills.RightStuff
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -12,6 +11,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -41,10 +41,7 @@ class RightStuffTests: JervisGameBB2025Test() {
     @Test
     fun enableThrowTeamMateWhenProne() {
         val thrownPlayer = awayTeam["A13".playerId]
-        thrownPlayer.apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        thrownPlayer.putProne()
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             *moveTo(14, 4),

@@ -14,6 +14,7 @@ import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -116,7 +117,7 @@ class ScatterTests: JervisGameBB2025Test() {
             ),
         )
         val player = awayTeam["A10".playerId]
-        player.hasTackleZones = false
+        player.makeDistracted()
         assertFalse(rules.canCatch(player))
         controller.rollForward(
             DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to field with player

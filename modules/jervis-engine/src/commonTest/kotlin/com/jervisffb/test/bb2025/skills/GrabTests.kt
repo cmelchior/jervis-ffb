@@ -21,6 +21,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,14 +70,8 @@ class GrabTests: JervisGameBB2025Test() {
         SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
         SetPlayerLocation(homeTeam[7.playerNo], FieldCoordinate(12, 4)).execute(state)
         SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(13, 4)).execute(state)
-        homeTeam[7.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
-        homeTeam[8.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam[7.playerNo].putProne()
+        homeTeam[8.playerNo].putProne()
         val attacker = awayTeam[1.playerNo]
         val defender = homeTeam[1.playerNo]
         attacker.addSkill(SkillType.GRAB)
@@ -133,14 +128,8 @@ class GrabTests: JervisGameBB2025Test() {
         SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
         SetPlayerLocation(homeTeam[7.playerNo], FieldCoordinate(12, 4)).execute(state)
         SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(13, 4)).execute(state)
-        homeTeam[7.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
-        homeTeam[8.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam[7.playerNo].putProne()
+        homeTeam[8.playerNo].putProne()
         val attacker = awayTeam[1.playerNo]
         val chainPushedPlayer = homeTeam[4.playerNo]
         attacker.addSkill(SkillType.GRAB)

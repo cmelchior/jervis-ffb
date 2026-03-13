@@ -17,6 +17,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -59,8 +60,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
         defender.apply { defender
             addSkill(SkillType.STUNTY)
             addSkill(SkillType.THICK_SKULL)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.FOUL),
@@ -116,8 +116,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
         attacker.addSkill(SkillType.DIRTY_PLAYER)
         defender.apply { defender
             addSkill(SkillType.THICK_SKULL)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.FOUL),

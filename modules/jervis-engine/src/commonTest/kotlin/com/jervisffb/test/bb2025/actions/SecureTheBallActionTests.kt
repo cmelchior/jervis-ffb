@@ -23,6 +23,7 @@ import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -163,7 +164,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
         SetBallLocation(state.singleBall(), FieldCoordinate(14, 7)).execute(state)
         homeTeam.forEach { player ->
             if (player.location.isOnField(rules)) {
-                player.hasTackleZones = false
+                player.makeDistracted()
                 assertTrue(rules.isDistracted(player), "Player ${player.id} is not distracted")
             }
         }

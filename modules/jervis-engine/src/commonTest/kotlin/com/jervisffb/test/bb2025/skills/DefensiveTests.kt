@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -72,7 +73,7 @@ class DefensiveTests: JervisGameBB2025Test() {
         val assister = homeTeam["H2".playerId]
         assister.apply {
             addSkill(SkillType.DEFENSIVE)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(assister))
         controller.rollForward(
@@ -109,7 +110,7 @@ class DefensiveTests: JervisGameBB2025Test() {
         val assister = awayTeam["A2".playerId]
         assister.apply {
             addSkill(SkillType.PUT_THE_BOOT_IN)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(assister))
 

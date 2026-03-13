@@ -18,6 +18,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -100,8 +101,8 @@ class MarkedTests: JervisGameBB2025Test() {
 
     @Test
     fun noTackleZone_cannotMarkPlayers() {
-        homeTeam["H1".playerId].hasTackleZones = false
-        homeTeam["H2".playerId].hasTackleZones = false
+        homeTeam["H1".playerId].makeDistracted()
+        homeTeam["H2".playerId].makeDistracted()
         val player = awayTeam["A1".playerId]
         val marks = rules.calculateMarks(state, awayTeam, player.coordinates)
         assertEquals(0, marks)
@@ -111,7 +112,7 @@ class MarkedTests: JervisGameBB2025Test() {
 
     @Test
     fun noTackleZone_cannotDeflectPass() {
-        homeTeam["H1".playerId].hasTackleZones = false // In [12, 5]
+        homeTeam["H1".playerId].makeDistracted() // In [12, 5]
         homeTeam["H2".playerId].state = PlayerState.PRONE // In [12, 6]
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
@@ -128,7 +129,7 @@ class MarkedTests: JervisGameBB2025Test() {
 
     @Test
     fun noTackleZone_cannotCatchBall() {
-        awayTeam["A7".playerId].hasTackleZones = false
+        awayTeam["A7".playerId].makeDistracted()
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),

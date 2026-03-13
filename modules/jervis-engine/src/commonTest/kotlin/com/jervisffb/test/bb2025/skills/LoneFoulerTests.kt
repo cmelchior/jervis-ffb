@@ -18,6 +18,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.putProne
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -42,10 +43,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             addSkill(SkillType.LONE_FOULER)
         }
         val target = homeTeam["H1".playerId]
-        target.apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        target.putProne()
         assertEquals(9, target.armorValue)
         // Armour roll only succeeed because of Dirty Player
         controller.rollForward(
@@ -65,15 +63,9 @@ class LoneFoulerTests: JervisGameBB2025Test() {
     fun doesNotWorkIfOffensiveAssists() {
         val fouler = awayTeam["A6".playerId]
         fouler.addSkill(SkillType.LONE_FOULER)
-        homeTeam["H2".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H2".playerId].putProne()
         val target = homeTeam["H1".playerId]
-        target.apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        target.putProne()
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
             SmartMoveTo(13, 4),
@@ -96,10 +88,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
         fouler.addSkill(SkillType.LONE_FOULER)
         val target = homeTeam["H1".playerId]
         listOf("A1", "A2", "A3", "H1").forEach {
-            state.getPlayerById(it.playerId).apply {
-                state = PlayerState.PRONE
-                hasTackleZones = false
-            }
+            state.getPlayerById(it.playerId).putProne()
         }
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
@@ -125,10 +114,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             addSkill(SkillType.LONE_FOULER)
         }
         listOf("A1", "A2", "A3", "H1").forEach {
-            state.getPlayerById(it.playerId).apply {
-                state = PlayerState.PRONE
-                hasTackleZones = false
-            }
+            state.getPlayerById(it.playerId).putProne()
         }
         val target = homeTeam["H1".playerId]
         assertEquals(9, target.armorValue)
@@ -153,10 +139,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
         val fouler = awayTeam["A6".playerId]
         fouler.addSkill(SkillType.LONE_FOULER)
         val target = homeTeam["H1".playerId]
-        target.apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        target.putProne()
         val assister = awayTeam["A1".playerId]
         assister.addSkill(SkillType.PUT_THE_BOOT_IN)
         assertEquals(9, target.armorValue)

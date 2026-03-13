@@ -21,7 +21,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSkillReroll
-import com.jervisffb.test.utils.markAsDistracted
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -112,7 +112,7 @@ class DodgeSkillTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             addSkill(SkillType.DODGE)
-            markAsDistracted()
+            makeDistracted()
         }
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),

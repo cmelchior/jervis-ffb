@@ -20,6 +20,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -155,7 +156,7 @@ class TauntTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             addSkill(SkillType.TAUNT)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(defender))
         controller.rollForward(

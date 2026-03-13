@@ -12,6 +12,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.makeDistracted
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -95,8 +97,8 @@ class PutTheBootInTests: JervisGameBB2025Test() {
 
     @Test
     fun cannotUseItIfDistracted() {
-        homeTeam["H1".playerId].state = PlayerState.PRONE
-        awayTeam["A2".playerId].hasTackleZones = false
+        homeTeam["H1".playerId].putProne()
+        awayTeam["A2".playerId].makeDistracted()
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
             PlayerSelected("H1".playerId),

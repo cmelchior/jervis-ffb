@@ -20,6 +20,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -155,7 +156,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
         defender.apply {
             addSkill(SkillType.BLOCK)
             addSkill(SkillType.MIGHTY_BLOW)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(defender))
         assertEquals(9, attacker.armorValue)

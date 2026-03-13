@@ -16,6 +16,7 @@ import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -83,10 +84,12 @@ class DeviateTests: JervisGameBB2025Test() {
 
     @Test
     fun bounceIfPlayerInLandingSquareCannotCatch() {
-        awayTeam["A11".playerId].hasTackleZones = false
         controller.rollForward(
             *defaultPregame(),
-            *defaultSetup(),
+            *defaultSetup()
+        )
+        awayTeam["A11".playerId].makeDistracted()
+        controller.rollForward(
             PlayerSelected(PlayerId("H10")), // Select Kicker
             FieldSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 3.d6),

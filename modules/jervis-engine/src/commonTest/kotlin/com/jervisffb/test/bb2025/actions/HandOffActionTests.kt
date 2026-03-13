@@ -21,6 +21,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -58,8 +59,8 @@ class HandOffActionTests: JervisGameBB2025Test() {
     fun cannotHandOffToPlayerWithNoTackleZone() {
         // It does not say anything about Distracted (which is probably just a mistake),
         // but for now we only check for the Tackle Zone.
-        awayTeam["A6".playerId].hasTackleZones = false
-        awayTeam["A7".playerId].hasTackleZones = false
+        awayTeam["A6".playerId].makeDistracted()
+        awayTeam["A7".playerId].makeDistracted()
 
         val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)

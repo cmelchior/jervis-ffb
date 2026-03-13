@@ -22,6 +22,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSkillReroll
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -117,9 +118,9 @@ class ExtraArmsTests: JervisGameBB2025Test() {
             agility = 1
             addSkill(SkillType.EXTRA_ARMS)
         }
-        awayTeam["A1".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A2".playerId].hasTackleZones = false // Remove mark
-        awayTeam["A3".playerId].hasTackleZones = false // Remove mark
+        awayTeam["A1".playerId].makeDistracted() // Remove mark
+        awayTeam["A2".playerId].makeDistracted() // Remove mark
+        awayTeam["A3".playerId].makeDistracted() // Remove mark
         controller.rollForward(
             PlayerSelected("H2".playerId), // Select Interceptor
             Confirm, // Use Extra Arms

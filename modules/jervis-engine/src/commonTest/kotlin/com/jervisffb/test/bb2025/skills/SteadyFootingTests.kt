@@ -34,6 +34,7 @@ import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.steadyFootingRoll
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -181,7 +182,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             addSkill(SkillType.STEADY_FOOTING)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(defender))
         controller.rollForward(
@@ -280,7 +281,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         val thrownPlayer = awayTeam["A13".playerId]
         thrownPlayer.apply {
             addSkill(SkillType.STEADY_FOOTING)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(awayTeam["A13".playerId]))
         controller.rollForward(

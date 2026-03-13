@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,8 +39,7 @@ class StandingUpTests: JervisGameBB2025Test() {
         super.setUp()
         startDefaultGame()
         val player = state.getPlayerById("A10".playerId)
-        player.state = PlayerState.PRONE
-        player.hasTackleZones = false
+        player.putProne()
     }
 
     @Test
@@ -100,10 +100,7 @@ class StandingUpTests: JervisGameBB2025Test() {
     fun failingStandingUpRollEndsAction() {
 
         // Put down opponent player (so we have a target for foul actions)
-        state.getPlayerById("H1".playerId).let {
-            it.state = PlayerState.PRONE
-            it.hasTackleZones = false
-        }
+        state.getPlayerById("H1".playerId).putProne()
 
         // Force player to roll to stand up
         val player = state.getPlayerById("A10".playerId)

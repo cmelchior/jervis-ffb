@@ -28,6 +28,7 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.hasSkill
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -171,17 +172,20 @@ class CatchSkillTests: JervisGameBB2025Test() {
 
     @Test
     fun doesNotWorkWithMissingTackleZones() {
-        awayTeam["A7".playerId].hasTackleZones = false
         controller.rollForward(
             *defaultPregame(),
-            *defaultSetup(),
+            *defaultSetup()
+        )
+        val catcher = awayTeam["A7".playerId]
+        catcher.makeDistracted()
+        controller.rollForward(
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(16, 1),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player with Catch
                 bounce = null
             ),
         )
-        assertTrue(awayTeam["A7".playerId].hasSkill<CatchSkill>())
+        assertTrue(catcher.hasSkill<CatchSkill>())
         controller.rollForward(
             // Bounce, because catch doesn't work without tackle zones
             // Technically, you cannot even do the basic "catch" without tackle

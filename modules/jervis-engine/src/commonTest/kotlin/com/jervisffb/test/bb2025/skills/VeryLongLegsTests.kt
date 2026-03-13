@@ -36,6 +36,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -83,10 +84,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
 
     @Test
     fun isOptional() {
-        homeTeam["H1".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H1".playerId].putProne()
         assertEquals(3, awayTeam["A1".playerId].agility)
         awayTeam["A1".playerId].addSkill(SkillType.VERY_LONG_LEGS)
         controller.rollForward(
@@ -179,10 +177,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
 
     @Test
     fun worksOnJump() {
-        homeTeam["H1".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H1".playerId].putProne()
         assertEquals(3, awayTeam["A1".playerId].agility)
         awayTeam["A1".playerId].addSkill(SkillType.VERY_LONG_LEGS)
         controller.rollForward(

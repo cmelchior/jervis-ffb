@@ -33,6 +33,7 @@ import com.jervisffb.test.bb2020.skills.BlockTests
 import com.jervisffb.test.bb2020.skills.DodgeSkillTests
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -86,7 +87,7 @@ class BlockActionTests: JervisGameBB2025Test() {
         )
 
         // If blocking player doesn't have a tacklezone, they cannot block anyone
-        player.hasTackleZones = false
+        player.makeDistracted()
         assertFalse(activePlayerCanBlock())
 
         // Non-standing players cannot be blocked

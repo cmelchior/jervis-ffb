@@ -18,6 +18,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.projectileVomitRoll
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -194,8 +195,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.apply {
             addSkill(SkillType.PROJECTILE_VOMIT)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(PlayerSelected(attacker))
         assertFalse(

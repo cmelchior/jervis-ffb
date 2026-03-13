@@ -17,6 +17,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -63,7 +64,7 @@ class ShadowingTests: JervisGameBB2025Test() {
     fun cannotUseShadowingIfDistracted() {
         val shadowingPlayer = homeTeam[1.playerNo]
         val activePlayer = awayTeam[1.playerNo]
-        shadowingPlayer.hasTackleZones = false
+        shadowingPlayer.makeDistracted()
 
         controller.rollForward(
             *activatePlayer(activePlayer, PlayerStandardActionType.MOVE),

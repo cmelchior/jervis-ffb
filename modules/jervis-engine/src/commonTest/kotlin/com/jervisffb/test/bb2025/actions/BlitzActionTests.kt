@@ -31,6 +31,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -97,8 +98,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
     @Test
     fun declareBlitzFromProne() {
         val attacker = state.getPlayerById("A1".playerId)
-        attacker.state = PlayerState.PRONE
-        attacker.hasTackleZones = false
+        attacker.putProne()
         val defender = state.getPlayerById("H1".playerId)
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
@@ -123,8 +123,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
         state.homeTeam
             .filter { it.location.isOnField(rules) }
             .forEach {
-                it.state = PlayerState.PRONE
-                it.hasTackleZones = false
+                it.putProne()
             }
         controller.rollForward(PlayerSelected(attacker.id))
 

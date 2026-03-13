@@ -18,6 +18,8 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.makeDistracted
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -67,14 +69,8 @@ class SidestepTests: JervisGameBB2025Test() {
         SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
         SetPlayerLocation(homeTeam[7.playerNo], FieldCoordinate(12, 4)).execute(state)
         SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(13, 4)).execute(state)
-        homeTeam[7.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
-        homeTeam[8.playerNo].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam[7.playerNo].putProne()
+        homeTeam[8.playerNo].putProne()
         val defender = homeTeam[1.playerNo]
         defender.addSkill(SkillType.SIDESTEP)
         controller.rollForward(
@@ -102,8 +98,7 @@ class SidestepTests: JervisGameBB2025Test() {
         SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
         player.apply {
             addSkill(SkillType.SIDESTEP)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
@@ -155,7 +150,7 @@ class SidestepTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             addSkill(SkillType.SIDESTEP)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(defender))
         controller.rollForward(

@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -147,8 +148,7 @@ class StabTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.apply {
             addSkill(SkillType.STAB)
-            state = PlayerState.PRONE
-            hasTackleZones = false
+            putProne()
         }
         controller.rollForward(PlayerSelected(attacker))
         assertFalse(

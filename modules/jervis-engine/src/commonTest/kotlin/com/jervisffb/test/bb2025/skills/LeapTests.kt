@@ -25,6 +25,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -305,10 +306,7 @@ class LeapTests: JervisGameBB2025Test() {
 
     @Test
     fun skipLeapModifierIfOnlyOneMark() {
-        homeTeam["H2".playerId].apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        homeTeam["H2".playerId].putProne()
         val leapingPlayer = state.getPlayerById("A1".playerId)
         leapingPlayer.addSkill(SkillType.LEAP)
         controller.rollForward(

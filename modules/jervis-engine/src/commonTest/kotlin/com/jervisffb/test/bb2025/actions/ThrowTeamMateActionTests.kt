@@ -37,6 +37,8 @@ import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.hasSkill
+import com.jervisffb.test.utils.makeDistracted
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -413,7 +415,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     // Landing in an Occupied Square takes precedence over Crash Landing
     @Test
     fun crashLandOnAnotherPlayer() {
-        awayTeam["A13".playerId].hasTackleZones = false
+        awayTeam["A13".playerId].makeDistracted()
         controller.rollForward(
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
@@ -580,10 +582,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     @Test
     fun thrownPronePlayerCanMoveIfNotActivated() {
         val thrownPlayer = awayTeam["A13".playerId]
-        thrownPlayer.apply {
-            state = PlayerState.PRONE
-            hasTackleZones = false
-        }
+        thrownPlayer.putProne()
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),

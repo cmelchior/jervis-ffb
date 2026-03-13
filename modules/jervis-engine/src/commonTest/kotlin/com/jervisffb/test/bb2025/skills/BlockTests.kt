@@ -16,6 +16,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -99,7 +100,7 @@ class BlockTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             addSkill(SkillType.BLOCK)
-            hasTackleZones = false
+            makeDistracted()
         }
         assertTrue(rules.isDistracted(defender))
         controller.rollForward(
