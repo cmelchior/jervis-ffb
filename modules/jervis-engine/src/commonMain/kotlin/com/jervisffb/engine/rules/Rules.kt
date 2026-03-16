@@ -322,9 +322,9 @@ abstract class Rules(
      * Returns `true` if the player is considered `Marked as described on
      * page 26 in the rulebook.
      *
-     * @param player the player that is checked for marks.
+     * @param player The player that is checked for marks.
      * @param location The location the player is in. Can be overridden to fake the player
-     * being in another location (used, e.g., when checking if dodging is needed).
+     *     being in another location (used, e.g., when checking if dodging is needed).
      */
     fun isMarked(player: Player, location: Location = player.location): Boolean {
         if (!location.isOnField(this)) return false
@@ -340,7 +340,7 @@ abstract class Rules(
     }
 
     /**
-     * Returns `true` if [player] count as marking [target], `false` if not.
+     * Returns `true` if [player] count as marking [target], `false` if not.*
      */
     fun isMarking(player: Player, target: Player): Boolean {
         if (!player.location.isOnField(this)) return false

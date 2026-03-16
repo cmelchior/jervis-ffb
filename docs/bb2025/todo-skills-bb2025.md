@@ -58,7 +58,15 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [x] Defensive
   - [x] Prevents Guard
   - [x] Prevents Put the Boot In
-- [ ] Hit and Run
+- [x] Hit and Run
+  - [x] Works on Block
+  - [x] Works Blitz
+  - [x] Works on Stab (Block)
+  - [x] Works on Stab (Blitz)
+  - [x] Only available if there are valid squares
+  - [x] Cannot move to squares marked by opponent
+  - [x] Cannot move to squares where player will mark opponent
+  - [x] Bug: Single player standing alone
 - [x] Jump Up
   - [x] Ignores 4+ to stand up if < 3 moves
   - [x] Agility Roll + 1 to block
@@ -358,6 +366,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Mighty Blow works on both block
     - [ ] Wrestle works on both block
     - [ ] Most roll for Dauntless on both blocks
+    - [ ] Hit and Run trigger after both blocks (re-check this)
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push

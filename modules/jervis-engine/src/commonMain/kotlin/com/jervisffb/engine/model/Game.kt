@@ -145,6 +145,9 @@ class Game(
      */
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null // TODO Move into a context?
+    fun activePlayerOrThrow(): Player {
+        return activePlayer ?: INVALID_GAME_STATE("No active player")
+    }
 
     // Kick-off events are not considered any teams turn, which means
     // a number of rules are not applicable there.

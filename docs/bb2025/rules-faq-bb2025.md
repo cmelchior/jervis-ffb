@@ -502,6 +502,18 @@ While this skill is optional, it only affects how many dice are rolled and not
 the final outcome. This combined with the fact that there is no scenario where
 you might want to _not_ use Guard, Jervis always apply it.
 
+### Page 129 - Hit and Run
+The interaction between Hit and Run and Multiple Block is a bit unclear as a
+strictly RAW could indicate that you could use Hit and Run on both blocks, 
+potentially moving the player twice.
+
+However, that opens up a lot of questions with regard to the exact timing and 
+checking for Hit and Run constraints.
+
+So since allowing Hit and Run twice would complicate the implementation on top 
+of being an extremely generous interpretation, for now Jervis will only check 
+for Hit and Run after both blocks in a Multiple Block has been fully resolved.
+
 ### Page 129 - Horns
 While Horns are technically an optional skill, similar to Guard, there doesn't
 seem to be any reason for _not_ using it.

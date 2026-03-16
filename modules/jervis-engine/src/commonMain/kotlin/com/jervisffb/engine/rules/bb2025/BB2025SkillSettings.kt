@@ -27,6 +27,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Grab
 import com.jervisffb.engine.rules.bb2025.skills.Guard
 import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.bb2025.skills.Hatred
+import com.jervisffb.engine.rules.bb2025.skills.HitAndRun
 import com.jervisffb.engine.rules.bb2025.skills.Horns
 import com.jervisffb.engine.rules.bb2025.skills.Insignificant
 import com.jervisffb.engine.rules.bb2025.skills.Juggernaut
@@ -127,9 +128,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.HIT_AND_RUN -> {
-                    // addEntry(type, SkillCategory.AGILITY) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Hit and Run", type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                        HitAndRun(player, category, expiresAt)
+                    }
                 }
                 SkillType.JUMP_UP -> {
                     addNoValueEntry("Jump Up", type, SkillCategory.AGILITY) { player, category,expiresAt ->

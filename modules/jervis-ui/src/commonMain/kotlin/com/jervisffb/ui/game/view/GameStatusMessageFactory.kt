@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
@@ -804,6 +805,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Select a player to use Diving Tackle."
                 false -> "Waiting for opponent to use Diving Tackle"
+            }
+        },
+
+        HitAndRunStep.ChooseToUseHitAndRun to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Hit and Run?"
+                false -> "Waiting for opponent to use Hit and Run"
             }
         },
     )

@@ -31,6 +31,7 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -169,8 +170,15 @@ object StabStep: Procedure() {
                     stabResult = injuryContext
                 )),
                 RemoveContext<RiskingInjuryContext>(),
-                ExitProcedure()
+                GotoNode(CheckForHitAndRun),
             )
+        }
+    }
+
+    object CheckForHitAndRun: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = HitAndRunStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

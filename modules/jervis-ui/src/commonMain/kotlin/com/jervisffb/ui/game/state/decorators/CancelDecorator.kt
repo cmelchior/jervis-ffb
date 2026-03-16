@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
@@ -33,6 +34,7 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
         DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
         JumpRoll.ChooseToUseDivingTackleAfterReRoll,
         LeapRoll.ChooseToUseDivingTackleAfterReRoll,
+        HitAndRunStep.SelectTargetSquareOrCancel
     )
 
     private val nodesForContextMenu = setOf(
@@ -79,6 +81,7 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
                 DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
                 JumpRoll.ChooseToUseDivingTackleAfterReRoll,
                 LeapRoll.ChooseToUseDivingTackleAfterReRoll -> "Do not use Diving Tackle"
+                HitAndRunStep.SelectTargetSquareOrCancel -> "Do not use Hit and Run"
                 else -> error("Unsupported node: ${state.stack.currentNode()}")
             }
             acc.updateGameStatus {

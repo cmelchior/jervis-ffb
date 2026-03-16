@@ -234,14 +234,15 @@ data class TargetSquare(
 
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
-        SETUP,
         DIRECTION,
-        STAND_UP,
+        HIT_AND_RUN,
+        JUMP,
+        KICK,
+        LEAP,
         MOVE,
         RUSH,
-        JUMP,
-        LEAP,
-        KICK,
+        SETUP,
+        STAND_UP,
         THROW_TARGET
     }
 
@@ -255,6 +256,7 @@ data class TargetSquare(
         fun leap(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.LEAP)
         fun kick(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.KICK)
         fun throwTarget(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.THROW_TARGET)
+        fun hitAndRun(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.HIT_AND_RUN)
     }
 }
 

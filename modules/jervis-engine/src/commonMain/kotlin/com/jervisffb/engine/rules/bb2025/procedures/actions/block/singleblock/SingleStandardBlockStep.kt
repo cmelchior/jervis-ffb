@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -150,8 +151,20 @@ object SingleStandardBlockStep : Procedure() {
     object ResolveBlockResult : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockApplyResult
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // Once the block die is resolved, the block step is over
-            // and all injuries have been resolved
+            val context = state.getContext<BlockContext>()
+            val player = context.attacker
+            return when (rules.isStanding(player) && player.isSkillAvailable(SkillType.HIT_AND_RUN)) {
+                true -> GotoNode(ResolveHitAndRun)
+                // Once the block die is resolved, the block step is over
+                // and all injuries have been resolved
+                false -> ExitProcedure()
+            }
+        }
+    }
+
+    object ResolveHitAndRun: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = HitAndRunStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }
     }

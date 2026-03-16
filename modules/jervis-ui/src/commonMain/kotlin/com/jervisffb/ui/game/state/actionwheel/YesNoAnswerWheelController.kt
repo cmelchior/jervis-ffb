@@ -26,6 +26,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
@@ -70,6 +71,7 @@ import kotlin.time.ExperimentalTime
  * - Eye Gouge (skill usage)
  * - Fend (skill usage)
  * - Grab (skill usage)
+ * - Hit an Run (skill usage)
  * - Leap (skill usage)
  * - Lone Fouler (skill usage)
  * - Mighty Blow (skill usage)
@@ -195,6 +197,16 @@ object UseGrabWheelController: UseSkillWheelController(SkillType.GRAB) {
     )
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val player = state.getContext<PushContext>().firstPusher
+        return player.coordinates
+    }
+}
+
+object UseHitAndRunWheelController: UseSkillWheelController(SkillType.HIT_AND_RUN) {
+    override val nodes: Set<Node> = setOf(
+        HitAndRunStep.ChooseToUseHitAndRun,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.activePlayerOrThrow()
         return player.coordinates
     }
 }
