@@ -16,10 +16,10 @@ object BallCarriedStatusIndicator: FieldStatusIndicator {
         acc: UiSnapshotAccumulator
     ) {
         state.balls.forEach { ball ->
-            if (ball.location.isOnField(state.rules)) {
-                state.field[ball.location].let { fieldSquare ->
+            if (ball.coordinates.isOnField(state.rules)) {
+                state.field[ball.coordinates].let { fieldSquare ->
                     val ballCarried = (fieldSquare.player?.hasBall() == true)
-                    acc.updateSquare(ball.location) {
+                    acc.updateSquare(ball.coordinates) {
                         it.copy(isBallCarried = ballCarried)
                     }
                 }

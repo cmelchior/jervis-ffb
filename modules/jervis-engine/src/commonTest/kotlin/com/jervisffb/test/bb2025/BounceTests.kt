@@ -48,7 +48,7 @@ class BounceTests: JervisGameBB2025Test() {
             1.d8 // Bounce
         )
         // Just check a single direction
-        assertEquals(FieldCoordinate(16,6), state.singleBall().location)
+        assertEquals(FieldCoordinate(16,6), state.singleBall().coordinates)
     }
 
     @Test

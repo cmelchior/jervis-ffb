@@ -148,8 +148,8 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
             val ball = state.field[context.player.coordinates].balls.single()
-            if (ball.location != context.player.coordinates) {
-                INVALID_GAME_STATE("Ball ${ball.location} must be at ${context.player.coordinates}")
+            if (ball.coordinates != context.player.coordinates) {
+                INVALID_GAME_STATE("Ball ${ball.coordinates} must be at ${context.player.coordinates}")
             }
             return SetCurrentBall(ball)
         }
@@ -168,8 +168,8 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
             val ball = state.field[context.player.coordinates].balls.single()
-            if (!context.player.coordinates.overlap(ball.location)) {
-                INVALID_GAME_STATE("Ball ${ball.location} must be at ${context.player.coordinates}")
+            if (!context.player.coordinates.overlap(ball.coordinates)) {
+                INVALID_GAME_STATE("Ball ${ball.coordinates} must be at ${context.player.coordinates}")
             }
             return SetCurrentBall(ball)
         }

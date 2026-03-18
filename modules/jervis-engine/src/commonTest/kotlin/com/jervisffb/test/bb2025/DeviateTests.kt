@@ -97,7 +97,7 @@ class DeviateTests: JervisGameBB2025Test() {
             8.d8 // Bounce because A11 cannot catch
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23,8), state.singleBall().location)
+        assertEquals(FieldCoordinate(23,8), state.singleBall().coordinates)
     }
 
     @Test
@@ -115,6 +115,6 @@ class DeviateTests: JervisGameBB2025Test() {
             5.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(24,7), state.singleBall().location)
+        assertEquals(FieldCoordinate(24,7), state.singleBall().coordinates)
     }
 }

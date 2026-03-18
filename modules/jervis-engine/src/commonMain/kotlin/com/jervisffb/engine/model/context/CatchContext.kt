@@ -20,7 +20,7 @@ data class CatchContext(
     val rerolled: Boolean = roll?.rerollSource != null && roll.rerolledResult != null
 
     // The catch is done as a Diving Catch, not a catch where the ball lands in the players square
-    val isAttemptingDivingCatch: Boolean = (catchingPlayer.coordinates != ball.location)
+    val isAttemptingDivingCatch: Boolean = (catchingPlayer.coordinates != ball.coordinates)
 
     // What is the target roll of the Catch roll?
     val rollTarget: Int = catchingPlayer.agility

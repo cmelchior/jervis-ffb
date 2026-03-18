@@ -110,7 +110,7 @@ class DeviateTests: JervisGameBB2020Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23,8), state.singleBall().location)
+        assertEquals(FieldCoordinate(23,8), state.singleBall().coordinates)
     }
 
     @Test

@@ -222,7 +222,7 @@ class HandOffActionTests: JervisGameBB2025Test() {
         )
         assertFalse(awayTeam["A7".playerId].hasBall())
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15, 0), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 0), state.singleBall().coordinates)
     }
 
     @Test

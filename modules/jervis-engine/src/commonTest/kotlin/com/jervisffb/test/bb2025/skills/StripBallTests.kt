@@ -61,7 +61,7 @@ class StripBallTests: JervisGameBB2025Test() {
         )
 
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 5), ball.location)
+        assertEquals(FieldCoordinate(12, 5), ball.coordinates)
         assertEquals(BallState.ON_GROUND, ball.state)
     }
 
@@ -140,7 +140,7 @@ class StripBallTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(24, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(24, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(0, state.awayScore)
         assertEquals(0, state.homeScore)

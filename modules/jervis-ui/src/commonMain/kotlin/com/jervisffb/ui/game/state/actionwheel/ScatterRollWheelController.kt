@@ -17,7 +17,6 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionButtonData
 import com.jervisffb.ui.game.dialogs.ButtonId
 import com.jervisffb.ui.game.dialogs.DieButtonData
-import com.jervisffb.ui.game.dialogs.HideActionWheel.center
 import com.jervisffb.ui.game.dialogs.RollAnimationData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
@@ -108,7 +107,7 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                 )
             }
             val wheelState = ActionWheelUiStateData(
-                center = acc.game.currentBall().location,
+                center = acc.game.currentBall().coordinates,
                 topItems = diceButtons,
                 topExpandMode = MenuExpandMode.Compact(),
                 topAnimationType = ButtonLayoutMode.ANIMATING_ROLL,

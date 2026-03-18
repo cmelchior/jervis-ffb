@@ -98,7 +98,7 @@ abstract class BB2025Rules(
                     // available. The ball has to be on the floor at the start of the activation.
                     val eligibleBallExists = state.balls.any { ball ->
                         val onTheGround = (ball.state == BallState.ON_GROUND)
-                        val enemiesInRange = ball.location.getSurroundingCoordinates(
+                        val enemiesInRange = ball.coordinates.getSurroundingCoordinates(
                             rules = this@BB2025Rules,
                             distance = 2,
                             includeOutOfBounds = false

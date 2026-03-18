@@ -19,8 +19,8 @@ object BallOnGroundStatusIndicator: FieldStatusIndicator {
         state.balls.forEach { ball ->
             // TODO Something in these checks have the wrong logic. We should not check both "rules state" and "acc" state.
             val isOnGround = (ball.state != BallState.CARRIED && ball.state != BallState.OUT_OF_BOUNDS)
-            if (acc.squares.contains(ball.location)) {
-                acc.updateSquare(ball.location) {
+            if (acc.squares.contains(ball.coordinates)) {
+                acc.updateSquare(ball.coordinates) {
                     it.copy(isBallOnGround = isOnGround)
                 }
             }

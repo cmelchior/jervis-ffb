@@ -63,7 +63,7 @@ class AccurateTests: JervisGameBB2025Test() {
         controller.rollForward(
             1.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(15, 5), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 5), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -83,7 +83,7 @@ class AccurateTests: JervisGameBB2025Test() {
         controller.rollForward(
             1.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(22, 6), state.singleBall().location)
+        assertEquals(FieldCoordinate(22, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -102,7 +102,7 @@ class AccurateTests: JervisGameBB2025Test() {
         controller.rollForward(
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(25, 6), state.singleBall().location)
+        assertEquals(FieldCoordinate(25, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -123,7 +123,7 @@ class AccurateTests: JervisGameBB2025Test() {
             DiceRollResults(2.d8, 2.d8, 4.d8), // Scatter
             7.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(15, 5), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 5), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }

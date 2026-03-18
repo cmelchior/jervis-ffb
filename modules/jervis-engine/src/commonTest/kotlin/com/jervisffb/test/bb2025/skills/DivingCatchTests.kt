@@ -79,7 +79,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             1.d8 // Bounce
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(12, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -257,7 +257,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(13, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -293,7 +293,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(13, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 

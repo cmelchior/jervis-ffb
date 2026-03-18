@@ -288,7 +288,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             val interferenceContext = PassingInterferenceContext(
                 thrower = passContext.thrower,
-                target = state.currentBall().location,
+                target = state.currentBall().coordinates,
             )
             return AddContext(interferenceContext)
         }
@@ -347,7 +347,7 @@ object PassStep: Procedure() {
     object ResolveBounceOrCatch: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val playerInSquare = state.field[ball.location].player
+            val playerInSquare = state.field[ball.coordinates].player
             val canCatch = playerInSquare?.let { rules.canCatch(it) } ?: false
             return when (!canCatch) {
                 true -> SetBallState.bouncing(ball)

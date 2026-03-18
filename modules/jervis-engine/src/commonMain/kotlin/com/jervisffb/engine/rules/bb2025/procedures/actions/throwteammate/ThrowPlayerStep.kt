@@ -465,7 +465,7 @@ object ThrowPlayerStep: Procedure() {
                     !playerHasBall && isTurnOver -> ExitProcedure()
                     !playerHasBall && ballInSquare -> {
                         // Ball in square always bounce when landing
-                        val ball = state.balls.first { it.state == BallState.ON_GROUND && it.location == context.target }
+                        val ball = state.balls.first { it.state == BallState.ON_GROUND && it.coordinates == context.target }
                         compositeCommandOf(
                             SetBallState.bouncing(ball),
                             GotoNode(BounceBallOnLandingSquare)
@@ -524,7 +524,7 @@ object ThrowPlayerStep: Procedure() {
                     throwContext.target!!,
                     isThrown = false,
                 ),
-                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
+                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.coordinates == throwContext.target }?.let {
                     SetBallState.bouncing(it)
                 },
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))

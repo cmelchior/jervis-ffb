@@ -15,7 +15,6 @@ import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ButtonId
 import com.jervisffb.ui.game.dialogs.DieButtonData
-import com.jervisffb.ui.game.dialogs.HideActionWheel.center
 import com.jervisffb.ui.game.dialogs.RollAnimationData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
@@ -49,7 +48,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
             )
         }
         val wheelState = ActionWheelUiStateData(
-            center = acc.game.currentBall().location,
+            center = acc.game.currentBall().coordinates,
             topItems = buttons,
             topExpandMode = MenuExpandMode.FanOut(spread = 360f),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
@@ -84,7 +83,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
                 )
             }
             val wheelState = ActionWheelUiStateData(
-                center = acc.game.currentBall().location,
+                center = acc.game.currentBall().coordinates,
                 topItems = listOf(button),
                 topExpandMode = MenuExpandMode.Compact(),
                 topAnimationType = ButtonLayoutMode.ANIMATING_ROLL,

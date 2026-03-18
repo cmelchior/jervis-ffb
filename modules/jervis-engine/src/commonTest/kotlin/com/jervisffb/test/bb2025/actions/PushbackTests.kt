@@ -149,7 +149,7 @@ class PushbackTests: JervisGameBB2025Test() {
             Confirm, // Follow up
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(11, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(11, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -162,13 +162,13 @@ class PushbackTests: JervisGameBB2025Test() {
             *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT),
         )
-        assertEquals(FieldCoordinate(11, 5), state.singleBall().location)
+        assertEquals(FieldCoordinate(11, 5), state.singleBall().coordinates)
         assertEquals(BallState.BOUNCING, state.singleBall().state)
         controller.rollForward(
             Confirm, // Follow up
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(11, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(11, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -272,7 +272,7 @@ class PushbackTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 3), state.singleBall().coordinates)
         assertEquals(DogOut, homeTeam[4.playerNo].location)
         assertEquals(FieldCoordinate(15, 0), awayTeam[7.playerNo].coordinates)
     }
@@ -297,7 +297,7 @@ class PushbackTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(20, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(20, 3), state.singleBall().coordinates)
         assertEquals(DogOut, homeTeam[4.playerNo].location)
         assertEquals(FieldCoordinate(20, 0), awayTeam[10.playerNo].coordinates)
     }

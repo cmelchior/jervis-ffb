@@ -59,6 +59,6 @@ class KickTests: JervisGameBB2025Test() {
             *defaultKickOffEvent(),
             5.d8 // Bounce to [20,4]
         )
-        assertEquals(FieldCoordinate(20, 4), state.getBall().location)
+        assertEquals(FieldCoordinate(20, 4), state.getBall().coordinates)
     }
 }

@@ -86,13 +86,13 @@ object ResolveBallLandingOnField: Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val ball = state.currentBallOrNull() ?: INVALID_GAME_STATE("Missing current ball")
-        if (!ball.location.isOnField(rules)) INVALID_GAME_STATE("Ball is not on the field: $ball")
+        if (!ball.coordinates.isOnField(rules)) INVALID_GAME_STATE("Ball is not on the field: $ball")
     }
 
     object DetermineIfCatchIsPossible: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val playerInSquare = state.field[ball.location].player
+            val playerInSquare = state.field[ball.coordinates].player
 
             // If there is a player in the landing square, they prevent the use of Diving Catch
             if (playerInSquare?.let { rules.canCatch(it) } == true) {
@@ -100,7 +100,7 @@ object ResolveBallLandingOnField: Procedure() {
             }
 
             // If a player with Diving Catch is adjacent, they get a chance to use Diving Catch before the ball lands.
-            val divingCatchAvailable = ball.location.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
+            val divingCatchAvailable = ball.coordinates.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
                 .mapNotNull { state.field[it].player }
                 .any { it.isSkillAvailable(SkillType.DIVING_CATCH) }
 
@@ -119,7 +119,7 @@ object ResolveBallLandingOnField: Procedure() {
     object CatchBallInLandingSquare: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val player = state.field[ball.location].player ?: INVALID_GAME_STATE("Missing player on: ${ball.location}")
+            val player = state.field[ball.coordinates].player ?: INVALID_GAME_STATE("Missing player on: ${ball.coordinates}")
             return AddContext(CatchContext(player, ball))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
@@ -143,7 +143,7 @@ object ResolveBallLandingOnField: Procedure() {
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val ball = state.currentBall()
-            val players = ball.location.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
+            val players = ball.coordinates.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
                 .mapNotNull { state.field[it].player }
                 .filter { it.team == (state.inactiveTeam ?: state.kickingTeam)}
                 .filter { it.isSkillAvailable(SkillType.DIVING_CATCH) }
@@ -177,7 +177,7 @@ object ResolveBallLandingOnField: Procedure() {
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val ball = state.currentBall()
-            val players = ball.location.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
+            val players = ball.coordinates.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
                 .mapNotNull { state.field[it].player }
                 .filter { it.team == (state.activeTeam ?: state.receivingTeam) }
                 .filter { it.isSkillAvailable(SkillType.DIVING_CATCH) }

@@ -161,7 +161,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultKickOffEvent(),
             4.d8 // Bounce to [17,7]
         )
-        assertEquals(FieldCoordinate(17, 7), state.getBall().location)
+        assertEquals(FieldCoordinate(17, 7), state.getBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
     }
 
@@ -420,7 +420,7 @@ class KickOffTests: JervisGameBB2020Test() {
         )
         assertEquals(1, awayTeam.turnMarker)
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,6), state.singleBall().location)
+        assertEquals(FieldCoordinate(14,6), state.singleBall().coordinates)
     }
 
     // Bugfix: Check that the ball location is updated correctly after awarding a touchback
@@ -444,7 +444,7 @@ class KickOffTests: JervisGameBB2020Test() {
             5.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,5), state.singleBall().location)
+        assertEquals(FieldCoordinate(14,5), state.singleBall().coordinates)
     }
 }
 

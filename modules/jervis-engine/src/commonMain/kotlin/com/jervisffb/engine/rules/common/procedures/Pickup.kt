@@ -71,7 +71,7 @@ object Pickup : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         return if (state.getContextOrNull<PickupRollContext>() == null) {
             val ball = state.currentBall()
-            val pickupPlayer = state.field[ball.location].player!!
+            val pickupPlayer = state.field[ball.coordinates].player!!
             val rollContext = PickupRollContext(pickupPlayer, ball)
             AddContext(rollContext)
         } else {
@@ -83,13 +83,13 @@ object Pickup : Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val ball = state.currentBall()
-        val playerOnBall = state.field[ball.location].player
+        val playerOnBall = state.field[ball.coordinates].player
         if (ball.state != BallState.ON_GROUND) {
             throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
         }
-        if (playerOnBall?.location?.overlap(ball.location) != true) {
+        if (playerOnBall?.location?.overlap(ball.coordinates) != true) {
             throw IllegalStateException(
-                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
+                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().coordinates}",
             )
         }
     }
@@ -178,7 +178,7 @@ object Pickup : Procedure() {
                 rules.addMarkedModifiers(
                     state,
                     context.player.team,
-                    context.ball.location,
+                    context.ball.coordinates,
                     modifiers,
                     PickupModifier.MARKED
                 )

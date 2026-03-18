@@ -45,7 +45,7 @@ class ScatterTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,5), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,5), state.singleBall().coordinates)
     }
 
     @Test
@@ -95,7 +95,7 @@ class ScatterTests: JervisGameBB2020Test() {
             7.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(16, 8), state.singleBall().location)
+        assertEquals(FieldCoordinate(16, 8), state.singleBall().coordinates)
     }
 
     @Test
@@ -124,6 +124,6 @@ class ScatterTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,5), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,5), state.singleBall().coordinates)
     }
 }

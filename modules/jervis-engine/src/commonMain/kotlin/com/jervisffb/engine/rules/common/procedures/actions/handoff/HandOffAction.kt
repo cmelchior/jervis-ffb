@@ -206,7 +206,7 @@ object HandOffAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Determine target and modifiers for the Catch roll
             val ball = state.currentBall()
-            val catchingPlayer = state.field[ball.location].player!!
+            val catchingPlayer = state.field[ball.coordinates].player!!
             val rollContext = CatchContext(catchingPlayer, ball)
             return AddContext(rollContext)
         }

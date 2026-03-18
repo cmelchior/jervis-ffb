@@ -169,7 +169,7 @@ class PassActionTests: JervisGameBB2025Test() {
             *catch(1.d6), // Fail catch
             7.d8
         )
-        assertEquals(FieldCoordinate(15, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -343,7 +343,7 @@ class PassActionTests: JervisGameBB2025Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,6), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,6), state.singleBall().coordinates)
     }
 
     @Test
@@ -526,7 +526,7 @@ class PassActionTests: JervisGameBB2025Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(14, 8), state.singleBall().location)
+        assertEquals(FieldCoordinate(14, 8), state.singleBall().coordinates)
     }
 
     @Test

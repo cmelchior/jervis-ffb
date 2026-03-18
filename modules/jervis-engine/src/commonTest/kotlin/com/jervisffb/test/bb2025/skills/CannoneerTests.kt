@@ -63,7 +63,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(7, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(7, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -84,7 +84,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(4, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(4, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -103,7 +103,7 @@ class CannoneerTests: JervisGameBB2025Test() {
         controller.rollForward(
             5.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(19, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(19, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -124,7 +124,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(8, 6), state.singleBall().location)
+        assertEquals(FieldCoordinate(8, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }

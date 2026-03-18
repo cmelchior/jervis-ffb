@@ -82,7 +82,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
         )
 
         val wheelState = ActionWheelUiStateData(
-            center = acc.game.currentBall().location,
+            center = acc.game.currentBall().coordinates,
             topItems = diceButtons,
             topExpandMode = MenuExpandMode.Compact(),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
@@ -132,7 +132,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                 ),
             )
             val wheelState = ActionWheelUiStateData(
-                center = acc.game.currentBall().location,
+                center = acc.game.currentBall().coordinates,
                 topItems = diceButtons,
                 topExpandMode = MenuExpandMode.Compact(),
                 topAnimationType = ButtonLayoutMode.ANIMATING_ROLL,

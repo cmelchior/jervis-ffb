@@ -74,7 +74,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             DiceRollResults(2.d8, 5.d8, 7.d8),
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(0, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(0, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -97,7 +97,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             DiceRollResults(3.d8, 3.d8, 3.d8),
             3.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(22, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(22, 3), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -120,7 +120,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             DiceRollResults(7.d8, 7.d8, 7.d8),
             7.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(0, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(0, 4), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 

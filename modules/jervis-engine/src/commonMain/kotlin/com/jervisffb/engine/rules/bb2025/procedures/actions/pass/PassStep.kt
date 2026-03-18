@@ -287,7 +287,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             val interferenceContext = InterceptionContext(
                 thrower = passContext.thrower,
-                target = state.currentBall().location,
+                target = state.currentBall().coordinates,
             )
             return AddContext(interferenceContext)
         }

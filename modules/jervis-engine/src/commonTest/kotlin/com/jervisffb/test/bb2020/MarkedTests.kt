@@ -138,6 +138,6 @@ class MarkedTests: JervisGameBB2020Test() {
             *throwBall(4.d6),
             7.d8 // Bounce because player cannot catch
         )
-        assertEquals(FieldCoordinate(15, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 2), state.singleBall().coordinates)
     }
 }

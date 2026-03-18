@@ -103,7 +103,7 @@ object AnimationFactory {
                     }
                 }
             }
-            var to = state.singleBall().location
+            var to = state.singleBall().coordinates
             val outOfBounds = false
             if (to.isOutOfBounds(rules)) {
                 to = state.singleBall().outOfBoundsAt!!

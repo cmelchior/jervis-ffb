@@ -150,7 +150,7 @@ class KickOffTests: JervisGameBB2025Test() {
                 selectKicker = null,
             )
         )
-        assertEquals(FieldCoordinate(17, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(17, 7), state.singleBall().coordinates)
     }
 
     @Test
@@ -186,7 +186,7 @@ class KickOffTests: JervisGameBB2025Test() {
             *defaultKickOffEvent(),
             4.d8 // Bounce to [17,7]
         )
-        assertEquals(FieldCoordinate(17, 7), state.getBall().location)
+        assertEquals(FieldCoordinate(17, 7), state.getBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
     }
 
@@ -420,7 +420,7 @@ class KickOffTests: JervisGameBB2025Test() {
             FieldSquareSelected(25, 0)
         )
         assertEquals(1, awayTeam.turnMarker)
-        assertEquals(FieldCoordinate(25, 0), state.singleBall().location)
+        assertEquals(FieldCoordinate(25, 0), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -445,7 +445,7 @@ class KickOffTests: JervisGameBB2025Test() {
             5.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,5), state.singleBall().location)
+        assertEquals(FieldCoordinate(14,5), state.singleBall().coordinates)
     }
 }
 

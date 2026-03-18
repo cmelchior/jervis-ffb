@@ -59,7 +59,7 @@ object Bounce : Procedure() {
             return castDiceRoll<D8Result>(action) { d8 ->
                 val direction: Direction = rules.direction(d8)
                 val ball = state.currentBall()
-                val newLocation: FieldCoordinate = ball.location.move(direction, 1)
+                val newLocation: FieldCoordinate = ball.coordinates.move(direction, 1)
 
                 // Out of bounds is normally just outside the field, but during kick-off we need to
                 // consider the case where the ball bounces back to the kicking teams side.
@@ -72,7 +72,7 @@ object Bounce : Procedure() {
                     if (outOfBounds) {
                         compositeCommandOf(
                             SetBallLocation(ball, newLocation),
-                            SetBallState.outOfBounds(ball, ball.location),
+                            SetBallState.outOfBounds(ball, ball.coordinates),
                             if (state.abortIfBallOutOfBounds) {
                                 ExitProcedure()
                             } else {
@@ -95,7 +95,7 @@ object Bounce : Procedure() {
                     SetBallLocation(ball, newLocation),
                     ReportBounce(
                         bounceLocation = newLocation,
-                        outOfBoundsAt = if (outOfBounds) ball.location else null,
+                        outOfBoundsAt = if (outOfBounds) ball.coordinates else null,
                         crossedLineOfScrimmageDuringKickOff = (isDuringKickOff && isOnKickingTeamSide)
                     ),
                     nextNode,
@@ -141,7 +141,7 @@ object Bounce : Procedure() {
     object ResolveCatch : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val player = state.field[ball.location].player ?: INVALID_GAME_STATE("Missing player on: ${ball.location}")
+            val player = state.field[ball.coordinates].player ?: INVALID_GAME_STATE("Missing player on: ${ball.coordinates}")
             return AddContext(CatchContext(player, ball))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch

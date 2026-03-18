@@ -234,7 +234,7 @@ class FoulActionTests: JervisGameBB2020Test() {
             5.d8, // Ball bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(14, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(14, 4), state.singleBall().coordinates)
         assertFalse(awayTeam["A10".playerId].hasBall())
     }
 }

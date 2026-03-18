@@ -8,7 +8,7 @@ class Ball {
     // TODO Giant Support
     // Returns the balls location.
     // If carried, UNKNOWN is returned, use `resolvedLocation` instead.
-    var location: FieldCoordinate = FieldCoordinate.UNKNOWN
+    var coordinates: FieldCoordinate = FieldCoordinate.UNKNOWN
 
     // Only != null if CARRIED
     var carriedBy: Player? = null
@@ -21,6 +21,6 @@ class Ball {
      * by a player, in which case the player coordinate is returned.
      */
     fun resolvedLocation(): FieldCoordinate {
-        return carriedBy?.coordinates ?: location
+        return carriedBy?.coordinates ?: coordinates
     }
 }

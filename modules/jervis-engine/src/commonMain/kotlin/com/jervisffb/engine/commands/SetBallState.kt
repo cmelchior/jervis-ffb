@@ -101,7 +101,7 @@ class SetBallState private constructor(
             this.originalState = it.state
             this.originalCarriedBy = it.carriedBy
             this.originalExit = it.outOfBoundsAt
-            this.originalLocation = it.location
+            this.originalLocation = it.coordinates
 
             // Move ball to its new state
             it.state = ballState

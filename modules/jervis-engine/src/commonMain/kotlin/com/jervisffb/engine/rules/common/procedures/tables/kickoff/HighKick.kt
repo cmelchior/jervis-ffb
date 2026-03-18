@@ -56,8 +56,8 @@ object HighKick : Procedure() {
 
             val ball = state.currentBall()
             return if (
-                ball.location.isOnField(rules) &&
-                state.field[ball.location].isUnoccupied() &&
+                ball.coordinates.isOnField(rules) &&
+                state.field[ball.coordinates].isUnoccupied() &&
                 openPlayers != null
             ) {
                 listOf(openPlayers)
@@ -77,7 +77,7 @@ object HighKick : Procedure() {
                 else -> {
                     castAction<PlayerSelected>(action) {
                         compositeCommandOf(
-                            SetPlayerLocation(it.getPlayer(state), state.currentBall().location),
+                            SetPlayerLocation(it.getPlayer(state), state.currentBall().coordinates),
                             ReportGameProgress("${it.getPlayer(state).name} had time to move under the ball due to a High Kick"),
                             ExitProcedure()
                         )

@@ -308,7 +308,7 @@ class TurnOverTests: JervisGameBB2025Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,6), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,6), state.singleBall().coordinates)
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
     }
@@ -383,7 +383,7 @@ class TurnOverTests: JervisGameBB2025Test() {
             3.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(14, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(14, 4), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 

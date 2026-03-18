@@ -39,7 +39,7 @@ object ChangingWeather : Procedure() {
             // If the ball is not out-of-bounds already, it scatters further.
             return if (
                 state.weather == Weather.PERFECT_CONDITIONS &&
-                state.singleBall().location.isOnField(rules)
+                state.singleBall().coordinates.isOnField(rules)
             ) {
                 compositeCommandOf(
                     SetBallState.scattered(state.singleBall()),
@@ -55,7 +55,7 @@ object ChangingWeather : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return AddContext(
                 ScatterRollContext(
-                    from = state.singleBall().location
+                    from = state.singleBall().coordinates
                 )
             )
         }

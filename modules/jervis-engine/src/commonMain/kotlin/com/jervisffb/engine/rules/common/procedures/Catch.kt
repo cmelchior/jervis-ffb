@@ -146,7 +146,7 @@ object Catch : Procedure() {
             val context = state.getContext<CatchContext>()
             val player = context.catchingPlayer
             val hasDivingCatch = player.isSkillAvailable(SkillType.DIVING_CATCH)
-            val isOnTarget = (context.catchingPlayer.location == context.ball.location)
+            val isOnTarget = (context.catchingPlayer.location == context.ball.coordinates)
             return when (hasDivingCatch && isOnTarget) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -197,7 +197,7 @@ object Catch : Procedure() {
                 rules.addMarkedModifiers(
                     state,
                     context.catchingPlayer.team,
-                    context.ball.location,
+                    context.ball.coordinates,
                     modifiers,
                     CatchModifier.MARKED
                 )
@@ -279,7 +279,7 @@ object Catch : Procedure() {
             val ball = state.currentBall()
             return when (ball.state) {
                 BallState.SCATTERED -> {
-                    val scatterContext = ScatterRollContext(from = ball.location)
+                    val scatterContext = ScatterRollContext(from = ball.coordinates)
                     AddContext(scatterContext)
                 }
                 else -> null

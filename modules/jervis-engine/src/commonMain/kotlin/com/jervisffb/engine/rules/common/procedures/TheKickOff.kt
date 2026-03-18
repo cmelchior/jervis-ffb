@@ -150,7 +150,7 @@ object TheKickOff : Procedure() {
 
     object TheKickDeviates : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return AddContext(DeviateRollContext(from = state.currentBall().location))
+            return AddContext(DeviateRollContext(from = state.currentBall().coordinates))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -313,7 +313,7 @@ object TheFUMBBLKickOff : Procedure() {
             return castDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.direction(d8)
                 val ball = state.currentBall()
-                val newLocation = ball.location.move(direction, d6.value)
+                val newLocation = ball.coordinates.move(direction, d6.value)
                 compositeCommandOf(
                     SetBallLocation(ball, newLocation),
                     ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),

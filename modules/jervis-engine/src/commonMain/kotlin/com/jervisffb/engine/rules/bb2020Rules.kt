@@ -26,7 +26,6 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import io.ktor.http.parameters
 import kotlinx.serialization.Serializable
 
 /**
@@ -102,7 +101,7 @@ abstract class BB2020Rules(
                     // available. The ball has to be on the floor at the start of the activation.
                     val eligibleBallExists = state.balls.any { ball ->
                         val onTheGround = (ball.state == BallState.ON_GROUND)
-                        val enemiesInRange = ball.location.getSurroundingCoordinates(
+                        val enemiesInRange = ball.coordinates.getSurroundingCoordinates(
                             rules = this@BB2020Rules,
                             distance = 2,
                             includeOutOfBounds = false

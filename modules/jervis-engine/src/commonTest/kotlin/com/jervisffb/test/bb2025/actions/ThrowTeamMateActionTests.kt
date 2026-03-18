@@ -269,7 +269,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             4.d8 // Ball bounce
         )
         assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(7,4), state.singleBall().location)
+        assertEquals(FieldCoordinate(7,4), state.singleBall().coordinates)
     }
 
     @Test
@@ -288,7 +288,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             4.d8 // Ball bounce
         )
         assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(7,4), state.singleBall().location)
+        assertEquals(FieldCoordinate(7,4), state.singleBall().coordinates)
     }
 
     @Test
@@ -478,7 +478,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.PRONE, homeTeam["H13".playerId].state)
         assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(10, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(10, 4), state.singleBall().coordinates)
     }
 
     @Test
@@ -555,7 +555,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         // Turn-over if player with ball is thrown out of the field
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(PlayerState.RESERVE, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(11, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(11, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -627,14 +627,14 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(PlayerState.PRONE, homeTeam["H13".playerId].state)
         assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(17, 5), state.singleBall().location)
+        assertEquals(FieldCoordinate(17, 5), state.singleBall().coordinates)
     }
 
     @Test
     fun playerWithBallLandsOnGroundWithBall() {
         // Add a 2nd ball
         val newBall = Ball().apply {
-            location = FieldCoordinate(16, 5)
+            coordinates = FieldCoordinate(16, 5)
         }
         state.balls.add(newBall)
         state.field[16, 5].balls.add(newBall)
@@ -662,7 +662,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         state.balls.last().let { ball ->
             assertEquals(newBall, ball)
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(17, 5), ball.location)
+            assertEquals(FieldCoordinate(17, 5), ball.coordinates)
         }
     }
 
@@ -670,7 +670,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     fun playerWithBallLandsBadlyOnAnotherBall() {
         // Add a 2nd ball
         val newBall = Ball().apply {
-            location = FieldCoordinate(16, 5)
+            coordinates = FieldCoordinate(16, 5)
         }
         state.balls.add(newBall)
         state.field[16, 5].balls.add(newBall)
@@ -698,12 +698,12 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         state.balls.first().let { ball ->
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(15, 5), ball.location)
+            assertEquals(FieldCoordinate(15, 5), ball.coordinates)
         }
         state.balls.last().let { ball ->
             assertEquals(newBall, ball)
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(17, 5), ball.location)
+            assertEquals(FieldCoordinate(17, 5), ball.coordinates)
         }
     }
 
@@ -754,6 +754,6 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(0, state.awayScore)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(1, 7), state.singleBall().location)
+        assertEquals(FieldCoordinate(1, 7), state.singleBall().coordinates)
     }
 }

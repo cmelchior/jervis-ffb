@@ -14,8 +14,8 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
         // has a lot of invariants. Maybe move everything into the helper methods in SetBallState)
         // assert(ball.state != BallState.CARRIED)
         val rules: Rules = state.rules
-        this.originalLocation = ball.location
-        ball.location = newLocation
+        this.originalLocation = ball.coordinates
+        ball.coordinates = newLocation
         if (originalLocation.isOnField(rules)) {
             state.field[originalLocation].apply {
                 balls.remove(ball)
@@ -40,6 +40,6 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
                 balls.add(this@SetBallLocation.ball)
             }
         }
-        ball.location = originalLocation
+        ball.coordinates = originalLocation
     }
 }

@@ -55,7 +55,7 @@ object SecureTheBallStep: Procedure() {
     override val initialNode: Node = CheckForNoBallSkill
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val ball = state.currentBall()
-        val securingPlayer = state.field[ball.location].player!!
+        val securingPlayer = state.field[ball.coordinates].player!!
         val secureContext = SecureTheBallRollContext(securingPlayer, ball)
         return AddContext(secureContext)
     }
@@ -66,9 +66,9 @@ object SecureTheBallStep: Procedure() {
         if (state.currentBall().state != BallState.ON_GROUND) {
             throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
         }
-        if (state.activePlayer?.location != state.currentBall().location) {
+        if (state.activePlayer?.location != state.currentBall().coordinates) {
             throw IllegalStateException(
-                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
+                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().coordinates}",
             )
         }
     }
@@ -157,7 +157,7 @@ object SecureTheBallStep: Procedure() {
                 rules.addMarkedModifiers(
                     state,
                     context.player.team,
-                    state.currentBall().location,
+                    state.currentBall().coordinates,
                     modifiers,
                     SecureTheBallModifier.MARKED
                 )

@@ -556,7 +556,7 @@ object ThrowPlayerStep: Procedure() {
                     throwContext.target!!,
                     isThrown = false,
                 ),
-                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
+                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.coordinates == throwContext.target }?.let {
                     SetBallState.Companion.bouncing(it)
                 },
                 SetPlayerState(thrownPlayer, PlayerState.FALLEN_OVER),
@@ -579,7 +579,7 @@ object ThrowPlayerStep: Procedure() {
                     throwContext.target!!,
                     isThrown = false,
                 ),
-                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.location == throwContext.target }?.let {
+                state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.coordinates == throwContext.target }?.let {
                     SetBallState.bouncing(it)
                 },
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))

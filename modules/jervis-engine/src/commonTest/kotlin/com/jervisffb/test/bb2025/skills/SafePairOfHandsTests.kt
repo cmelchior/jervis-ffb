@@ -61,7 +61,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(12, 4), state.singleBall().location)
+        assertEquals(FieldCoordinate(12, 4), state.singleBall().coordinates)
     }
 
     @Test
@@ -87,7 +87,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23, 12), state.singleBall().location)
+        assertEquals(FieldCoordinate(23, 12), state.singleBall().coordinates)
     }
 
     @Test
@@ -106,7 +106,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(11, 5), state.singleBall().location)
+        assertEquals(FieldCoordinate(11, 5), state.singleBall().coordinates)
     }
 
     @Test
@@ -126,7 +126,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
             5.d8, // Bounce. No chance to use Safe Pair of Hands.
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 5), ball.location)
+        assertEquals(FieldCoordinate(12, 5), ball.coordinates)
         assertEquals(BallState.ON_GROUND, ball.state)
     }
 
@@ -148,6 +148,6 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(10, 6), state.singleBall().location)
+        assertEquals(FieldCoordinate(10, 6), state.singleBall().coordinates)
     }
 }

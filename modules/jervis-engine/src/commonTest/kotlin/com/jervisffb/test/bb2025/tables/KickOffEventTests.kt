@@ -239,7 +239,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
 
         val player = state.receivingTeam[10.playerNo]
-        assertEquals(player.location == state.getBall().location, true)
+        assertEquals(player.location == state.getBall().coordinates, true)
         assertFalse(player.hasBall())
         assertEquals(BallState.DEVIATING, state.getBall().state)
     }
@@ -448,7 +448,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(18, 3), state.getBall().location)
+        assertEquals(FieldCoordinate(18, 3), state.getBall().coordinates)
     }
 
     @Test
@@ -491,7 +491,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(14, 5), state.getBall().location)
+        assertEquals(FieldCoordinate(14, 5), state.getBall().coordinates)
     }
 
     @Test

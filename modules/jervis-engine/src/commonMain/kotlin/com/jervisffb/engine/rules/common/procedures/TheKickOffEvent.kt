@@ -99,7 +99,7 @@ object TheKickOffEvent : Procedure() {
             val ball = state.singleBall()
             return AddContext(
                 ScatterRollContext(
-                    from = ball.location,
+                    from = ball.coordinates,
                 )
             )
         }
@@ -122,7 +122,7 @@ object TheKickOffEvent : Procedure() {
             // If on an empty square, bounce
             // if landing on a player, they must/can(?) attempt to catch it
             val ball = state.singleBall()
-            val ballLocation: FieldCoordinate = ball.location
+            val ballLocation: FieldCoordinate = ball.coordinates
 
             // According to Designer's Errata May 2024, it is only a touchback if a ball
             // goes beyond the kicking teams Line of Scrimmage. This rule also generalizes
@@ -130,7 +130,7 @@ object TheKickOffEvent : Procedure() {
             // configured No Man's Land.
             state.abortIfBallOutOfBounds = true // TODO Is there a better way to handle this?
             val outOfBounds =
-                !ball.location.isOnField(rules)
+                !ball.coordinates.isOnField(rules)
                     || (state.kickingTeam.isHomeTeam() && ballLocation.x <= rules.lineOfScrimmageHome)
                     || (state.kickingTeam.isAwayTeam() && ballLocation.x >= rules.lineOfScrimmageAway)
             return if (outOfBounds) {
@@ -191,7 +191,7 @@ object TheKickOffEvent : Procedure() {
         val isHomeTeam = team.isHomeTeam()
         val ballCoordinates = when (ball.carriedBy != null) {
             true -> ball.carriedBy!!.coordinates
-            false -> ball.location
+            false -> ball.coordinates
         }
         return when (isHomeTeam) {
             true -> ballCoordinates.isOnHomeSide(rules)

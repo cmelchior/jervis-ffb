@@ -171,7 +171,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *catch(1.d6),
             7.d8
         )
-        assertEquals(FieldCoordinate(15, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(15, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -346,7 +346,7 @@ class PassActionTests: JervisGameBB2020Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,4), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,4), state.singleBall().coordinates)
     }
 
     @Test
@@ -365,7 +365,7 @@ class PassActionTests: JervisGameBB2020Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,6), state.singleBall().location)
+        assertEquals(FieldCoordinate(15,6), state.singleBall().coordinates)
     }
 
     @Test
@@ -583,7 +583,7 @@ class PassActionTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(9, 2), state.singleBall().location)
+        assertEquals(FieldCoordinate(9, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -641,7 +641,7 @@ class PassActionTests: JervisGameBB2020Test() {
             DiceRollResults(2.d8, 2.d8, 2.d8),
         )
         assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
+        assertEquals(FieldCoordinate(10, -1), state.singleBall().coordinates)
         assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
 
         controller.rollForward(
@@ -655,7 +655,7 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         // Turnover
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(6, 1), state.singleBall().location)
+        assertEquals(FieldCoordinate(6, 1), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -673,7 +673,7 @@ class PassActionTests: JervisGameBB2020Test() {
         )
 
         assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
+        assertEquals(FieldCoordinate(10, -1), state.singleBall().coordinates)
         assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
 
         controller.rollForward(
@@ -689,7 +689,7 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         // Turnover
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(8, 3), state.singleBall().location)
+        assertEquals(FieldCoordinate(8, 3), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }
