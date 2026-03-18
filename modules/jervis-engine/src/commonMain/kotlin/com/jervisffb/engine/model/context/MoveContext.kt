@@ -21,6 +21,9 @@ data class MoveContext(
     val useVeryLongLegs: Boolean = false,
     // `true` if the player uses the +1 Leap Modifier. If the modifier is +0, this should be `false`
     val useLeapModifier: Boolean = false,
+    // `true` if the player was considered "moving" (this includes Standing Up). If `false`, it
+    // means the move was aborted for whatever reason. E.g. if no target square is selected or
+    // Sprint isn't used.
     val hasMoved: Boolean = false,
     val target: FieldCoordinate? = null,
     val startingSquare: FieldCoordinate = when (val location = player.location) {

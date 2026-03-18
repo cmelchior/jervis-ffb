@@ -25,6 +25,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.rushRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
@@ -201,9 +202,8 @@ class BlitzActionTests: JervisGameBB2020Test() {
             *moveTo(13, 3),
             *rushTo(12, 4),
             PlayerSelected(defender.id), // Start block
+            *rushRoll(2.d6), // Needs to rush to make the block
             BlockTypeSelected(BlockType.STANDARD),
-            2.d6, // Needs to rush to make the block
-            NoRerollSelected(),
             4.dblock, // Block roll
             NoRerollSelected(),
             SelectSingleBlockDieResult(),
@@ -235,9 +235,7 @@ class BlitzActionTests: JervisGameBB2020Test() {
             *moveTo(13, 3),
             *rushTo(12, 4, 2.d6),
             PlayerSelected(defender.id), // Start block
-            BlockTypeSelected(BlockType.STANDARD),
-            1.d6, // Fail last rush to make the block
-            NoRerollSelected(),
+            *rushRoll(1.d6), // Fail last rush to make the block
             DiceRollResults(1.d6, 1.d6), // Armour roll
         )
         assertEquals(0, attacker.team.turnData.blitzActions)

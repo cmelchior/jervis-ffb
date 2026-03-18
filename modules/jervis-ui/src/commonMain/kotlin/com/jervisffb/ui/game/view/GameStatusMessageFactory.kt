@@ -40,6 +40,7 @@ import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
@@ -812,6 +813,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Hit and Run?"
                 false -> "Waiting for opponent to use Hit and Run"
+            }
+        },
+
+        BlitzAction.ChooseToUseSprintForBlocking to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Sprint?"
+                false -> "Waiting for opponent to use Sprint"
             }
         },
     )

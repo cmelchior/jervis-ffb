@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
+import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -28,7 +29,11 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.getSkill
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
@@ -36,6 +41,8 @@ import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Handle a player moving a single step using a normal move.
@@ -43,8 +50,18 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryM
  * This sub procedure is purely used by [ResolveMoveTypeStep], which is also
  * responsible for controlling the lifecycle of [MoveContext].
  *
+ * Upper layers do not have full information before getting here, this e.g.
+ * means that we got here because the calling procedure assumed that Spring
+ * will be used, but the actual usage was then rejected, preventing the player
+ * from moving.
+ *
+ * Developer's Commentary
+ * The order of checks during a Move is a bit unclear, so this list is a
+ * best-effort implementation. It might change if new information comes to
+ * light. For now, we check things in the following order:
+ *
  * The order of checks is:
- * 1. Tentacles. The order is a bit unclear.
+ * 1. Tentacles.
  * 2. Rush
  *  a. Sprint
  *  b. Sure Feet
@@ -56,9 +73,35 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryM
  * 4. Shadowing
  */
 object StandardMoveStep: Procedure() {
-    override val initialNode: Node = SelectTargetSquareOrEndAction
+    override val initialNode: Node = CheckForSprint
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
+    // If the moving player has no more moves or rushes left, they will
+    // automatically apply Sprint to gain one extra square of movement.
+    // If this isn't possible, the move is not possible after all and will be
+    // automatically rejected
+    object CheckForSprint: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val movingPlayer = context.player
+            val hasMovesLeft = movingPlayer.movesLeft > 0 || context.player.rushesLeft > 0
+            val hasSprint = movingPlayer.isSkillAvailable(SkillType.SPRINT)
+            return when {
+                hasMovesLeft -> GotoNode(SelectTargetSquareOrEndAction)
+                hasSprint -> {
+                    compositeCommandOf(
+                        ReportSkillUsed(movingPlayer, SkillType.SPRINT),
+                        SetSkillUsed(movingPlayer, movingPlayer.getSkill(SkillType.SPRINT), true),
+                        SetPlayerRushesLeft(movingPlayer, movingPlayer.rushesLeft + SPRINT_EXTRA_RUSHES),
+                        GotoNode(SelectTargetSquareOrEndAction)
+                    )
+                }
+                !hasSprint -> ExitProcedure()
+                else -> INVALID_GAME_STATE("hasMovesLeft=$hasMovesLeft, hasSprint=$hasSprint")
+            }
+        }
+    }
 
     object SelectTargetSquareOrEndAction: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team

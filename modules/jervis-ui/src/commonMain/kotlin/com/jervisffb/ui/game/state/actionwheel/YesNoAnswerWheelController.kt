@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlitzActionContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.CatchContext
@@ -39,6 +40,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedD
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
@@ -79,6 +81,7 @@ import kotlin.time.ExperimentalTime
  * - Safe Pass (skill usage)
  * - Sidestep (skill usage)
  * - Sneaky Git (skill usage)
+ * - Sprint (skill usage)
  * - Stand Firm (skill usage)
  * - Steady Footing (skill usage)
  * - Strip Ball (skill usage)
@@ -344,6 +347,17 @@ object UseSneakyGitWheelController: UseSkillWheelController(SkillType.SNEAKY_GIT
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<FoulContext>()
         val player = context.fouler
+        return player.coordinates
+    }
+}
+
+object UseSprintWheelController: UseSkillWheelController(SkillType.SPRINT) {
+    override val nodes: Set<Node> = setOf(
+        BlitzAction.ChooseToUseSprintForBlocking,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<BlitzActionContext>()
+        val player = context.attacker
         return player.coordinates
     }
 }

@@ -106,7 +106,8 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
 
             MoveType.STANDARD -> {
                 val requiresDodge = state.rules.calculateMarks(state, player.team, activeLocation) > 0
-                val requiresRush = player.movesLeft == 0 && player.rushesLeft > 0
+                // We cannot check amount of rushesLeft here, as they might only be added later (e.g. Spring)
+                val requiresRush = (player.movesLeft == 0)
 
                 // We calculate all paths here, rather than doing it in the ViewModel. Mostly because
                 // it allows us to front-load slightly more computations. But it hasn't been benchmarked,

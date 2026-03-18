@@ -99,9 +99,14 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Sidestep does not work when prone (During chain-pushes)
   - [x] Sidestep is not available if there are no valid target squares
   - [x] Is not available if Distracted
-- [ ] Sprint
-  - [ ] Is optional
-  - [ ] Adds 1 extra move pr action
+- [x] Sprint
+  - [x] Is only optional during Frenzy blocks (automatically used in other places)
+  - [x] Adds 1 extra move pr action
+  - [x] Use to throw a block during a Blitz Action.
+  - [x] Work for Jump
+  - [x] Work for Leap
+  - [x] Work for moves after rushing normally
+  - [x] Works for Pogo
 - [x] Sure Feet
   - [x] Reroll failed Rush
   - [x] Reroll successful Rush
@@ -183,7 +188,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Must take two blocks if player if able
     - [ ] Works during Block and Blitz
     - [ ] Horns work on both Frenzy Blocks
-    - [ ] Does not force the use of Sprint
+    - [ ] Does not force the use of Sprint on the 2nd block
     - [ ] 2nd Block can only be thrown if the target is Pushed Back.
     - [ ] Cannot do 2nd Block on Rooted player
     - [ ] 2nd Block can be another Special Action like Stab

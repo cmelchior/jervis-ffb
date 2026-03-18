@@ -8,3 +8,6 @@ package com.jervisffb.engine.rules
 
 // How many squares of movement are used to Jump/Leap/Pogo
 const val JUMP_DISTANCE = 2
+
+// How many squares of movement gained by using Sprint
+const val SPRINT_EXTRA_RUSHES = 1

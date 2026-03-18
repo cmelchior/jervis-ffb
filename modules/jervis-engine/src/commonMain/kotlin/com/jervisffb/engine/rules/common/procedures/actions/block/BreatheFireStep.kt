@@ -23,6 +23,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.BlitzActionContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -36,7 +37,6 @@ import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedD
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025PlacedProne
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType

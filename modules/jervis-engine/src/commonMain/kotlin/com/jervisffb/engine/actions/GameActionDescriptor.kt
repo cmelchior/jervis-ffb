@@ -219,6 +219,7 @@ data class TargetSquare(
     val type: Type,
     val requiresRush: Boolean = false,
     val requiresDodge: Boolean = false,
+    // Catch-all for Jump, Leap and Pogo
     val requiresJump: Boolean = false
 ) {
     constructor(coordinate: FieldCoordinate, type: Type, requiresRush: Boolean = false, requiresDodge: Boolean = false, requiresJump: Boolean = false) : this(
@@ -240,6 +241,7 @@ data class TargetSquare(
         KICK,
         LEAP,
         MOVE,
+        POGO,
         RUSH,
         SETUP,
         STAND_UP,
@@ -253,7 +255,8 @@ data class TargetSquare(
         fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = TargetSquare(coordinate, Type.MOVE, needRush, needDodge)
         fun rush(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.RUSH)
         fun jump(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.JUMP, needRush, requiresDodge = false, requiresJump = true)
-        fun leap(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.LEAP)
+        fun leap(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.LEAP, needRush, requiresDodge = false, requiresJump = true)
+        fun pogo(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.POGO, needRush, requiresDodge = false, requiresJump = true)
         fun kick(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.KICK)
         fun throwTarget(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.THROW_TARGET)
         fun hitAndRun(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.HIT_AND_RUN)

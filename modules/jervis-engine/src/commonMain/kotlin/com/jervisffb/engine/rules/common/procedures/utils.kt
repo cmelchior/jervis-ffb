@@ -20,7 +20,6 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.InfamousCoachAbility
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
@@ -31,6 +30,7 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -66,12 +66,14 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     }
 
     // Normal move (with a potential rush)
-    if (player.movesLeft + player.rushesLeft >= 1 && rules.isStanding(player)) {
+    // Sprint is still optional, but here we assume it will be used if needed
+    val extraSprintRush = if (player.isSkillAvailable(SkillType.SPRINT)) SPRINT_EXTRA_RUSHES else 0
+    if (player.movesLeft + player.rushesLeft + extraSprintRush >= 1 && rules.isStanding(player)) {
         options.add(MoveType.STANDARD)
     }
 
     // Jump, if next to a prone player and space on the opposite side
-    val hasMoveLeft = player.movesLeft + player.rushesLeft >= 2 && rules.isStanding(player)
+    val hasMoveLeft = player.movesLeft + player.rushesLeft + extraSprintRush >= JUMP_DISTANCE && rules.isStanding(player)
     val legalJumpSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
         .mapNotNull { state.field[it].player }
         .filter { !rules.isStanding(it) }
@@ -89,7 +91,7 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     }
 
     // Leap and Pogo
-    val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 2)
+    val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = JUMP_DISTANCE)
     val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
     val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.field[it].isUnoccupied() }
     if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
@@ -100,7 +102,6 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     }
 
     // Skills
-    // Leap
     // Ball & Chain
     // Others?
 
@@ -143,11 +144,16 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
             val hasMoveLeft = player.movesLeft + player.rushesLeft >= JUMP_DISTANCE && rules.isStanding(player)
             val needRush = player.movesLeft < JUMP_DISTANCE
             if (hasMoveLeft) {
-                val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 2)
+                val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = JUMP_DISTANCE)
                 val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
                 val eligibleTargetSquares = (allSquares - adjacentSquares.toSet())
                     .filter { state.field[it].isUnoccupied() }
-                    .map { TargetSquare.jump(it, needRush) }
+                    .map {
+                        when (type) {
+                            MoveType.LEAP -> TargetSquare.leap(it, needRush)
+                            MoveType.POGO -> TargetSquare.pogo(it, needRush)
+                        }
+                    }
                     .let { SelectFieldLocation(it) }
                 listOf(eligibleTargetSquares)
             } else {
@@ -159,7 +165,9 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
             if (player.movesLeft + player.rushesLeft > 0) {
                 player.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isUnoccupied() }
-                    .map { TargetSquare.move(it, player.movesLeft <= 0, requiresDodge) }
+                    .map {
+                        TargetSquare.move(it, player.movesLeft <= 0, requiresDodge)
+                    }
                     .let { targets ->
                         if (targets.isEmpty()) {
                             emptyList()
@@ -182,12 +190,9 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
  * probably wrong, and it should be called when a player runs out of normal moves.
  */
 fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
-    // We unconditionally use Sprint as the coach can just decide _not_ to use
-    // the extra move. Which is faster than us spending time asking to use the
-    // skill or not.
-    // TODO This is not correct. When combined with Frenzy, there might be cases
-    //  where you do not want to use Sprint.
-    val rushesPrAction = if (player.hasSkill(SkillType.SPRINT)) rules.rushesPrAction + 1 else rules.rushesPrAction
+    // Sprint will be applied later (if neeed), so here we just add the base rushes
+    // available.
+    val rushesPrAction = rules.rushesPrAction
     return SetPlayerRushesLeft(player, rushesPrAction)
 }
 
@@ -370,4 +375,16 @@ fun List<InfamousCoachingStaff>.getAvailableAbilities(trigger: Timing, state: Ga
         .flatMap { it.specialAbilities }
         .filter { it.triggers.contains(trigger) && !it.used }
         .filter { it.isApplicable(state, rules) }
+}
+
+/**
+ * Calculate the estimated amount of moves a player has left. This includes using optional
+ * skills like Sprint
+ */
+fun Player.estimatedMovesLeft(includeSprint: Boolean): Int {
+    val sprintExtraMove = when (includeSprint && isSkillAvailable(SkillType.SPRINT)) {
+        true -> SPRINT_EXTRA_RUSHES
+        false -> 0
+    }
+    return movesLeft + rushesLeft + sprintExtraMove
 }

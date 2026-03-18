@@ -844,6 +844,14 @@ of unspecified scenarios with regard to how the thrown player be handled?
 For this reason, Jervis assumes that Safe Pass is only applicable for normal
 Pass actions (and by extension, throwing bombs).
 
+### Page XXX - Sprint
+Sprint is an optional skill, but for most cases, there is no downside to just 
+applying it automatically. Which is what Jervis does.
+
+The only exception is during a Frenzy Blitz. In this case, the coach might not 
+want to use Sprint to prevent Frenzy from triggering a 2nd block. So in that
+case, Jervis will ask if Sprint should be used before throwing the 2nd block.
+
 ### Page 136 - Stab
 Stab is not available when starting from prone as it is an Active skill that
 requires a tackle zone when activating the player. Doing a Blitz-Stab from Prone

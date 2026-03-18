@@ -1,6 +1,12 @@
 package com.jervisffb.engine.rules.common.procedures.actions.blitz
 
 import com.jervisffb.engine.actions.BlockTypeSelected
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -30,19 +36,20 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.BlitzActionContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.BB2020FallingOver
@@ -59,6 +66,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.StabStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.common.procedures.estimatedMovesLeft
 import com.jervisffb.engine.rules.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -68,15 +76,6 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-
-data class BlitzActionContext(
-    val attacker: Player,
-    val defender: Player? = null,
-    val blockType: BlockType? = null,
-    val hasMoved: Boolean = false,
-    val hasBlocked: Boolean = false,
-    val didFollowUp: Boolean = false,
-) : ProcedureContext
 
 /**
  * Procedure for controlling a player's Blitz action.
@@ -110,18 +109,13 @@ object BlitzAction : Procedure() {
 
     object SelectTargetOrCancel : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzActionContext>().attacker.team
-
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<GameActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<BlitzActionContext>().attacker
             val availableTargetPlayers = attacker.team.otherTeam()
                 .filter { it.location.isOnField(rules) && it.state == PlayerState.STANDING }
 
             return listOf(SelectPlayer.fromPlayers(availableTargetPlayers), EndActionWhenReady)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 EndAction -> ExitProcedure()
@@ -140,7 +134,6 @@ object BlitzAction : Procedure() {
 
     object MoveOrBlockOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzActionContext>().attacker.team
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BlitzActionContext>()
             val blitzer = context.attacker
@@ -150,7 +143,7 @@ object BlitzAction : Procedure() {
             options.addIfNotNull(calculateMoveTypesAvailable(state, blitzer))
 
             // Check if the attacker is adjacent to the target of the Blitz and is able to Block them
-            val hasMovesLeft = blitzer.movesLeft + blitzer.rushesLeft > 0
+            val hasMovesLeft = blitzer.estimatedMovesLeft(includeSprint = true) > 0
             val isStanding = rules.isStanding(blitzer)
             if (context.attacker.location.isAdjacent(rules, context.defender!!.location) && hasMovesLeft && isStanding) {
                 options.add(SelectPlayer(context.defender))
@@ -163,7 +156,6 @@ object BlitzAction : Procedure() {
 
             return options
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlitzActionContext>()
             return when (action) {
@@ -181,7 +173,7 @@ object BlitzAction : Procedure() {
                             defender = action.getPlayer(state),
                             hasBlocked = true
                         )),
-                        GotoNode(SelectBlockType)
+                        GotoNode(UseMoveToBlock)
                     )
                 }
 
@@ -223,45 +215,67 @@ object BlitzAction : Procedure() {
         }
     }
 
-    object SelectBlockType : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzActionContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val attacker = state.getContext<BlitzActionContext>().attacker
-            val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
-            return listOf(SelectBlockType(availableBlockTypes), DeselectPlayer(attacker))
-        }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BlitzActionContext>()
-            return when (action) {
-                is PlayerDeselected -> {
-                    GotoNode(MoveOrBlockOrEndAction)
-                }
-                else -> {
-                    castAction<BlockTypeSelected>(action) { typeSelected ->
-                        val type = typeSelected.type
-                        compositeCommandOf(
-                            UpdateContext(context.copy(blockType = typeSelected.type)),
-                            GotoNode(UseMoveToBlock),
-                        )
-                    }
-                }
-            }
-        }
-    }
-
     object UseMoveToBlock : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BlitzActionContext>()
             val player = context.attacker
-            return if (player.movesLeft > 0) {
-                compositeCommandOf(
-                    SetPlayerMoveLeft(state.activePlayer!!, state.activePlayer!!.movesLeft - 1),
-                    GotoNode(ResolveBlock)
-                )
-            } else if (player.rushesLeft > 0 || player.movesLeft == 0) {
-                GotoNode(RushBeforeBlock)
-            } else {
-                INVALID_GAME_STATE("Player has no moves left. Block should not have been started: ${context.attacker}")
+            return when {
+                player.movesLeft > 0 -> {
+                    // Player has normal moves left to perform the blitz with
+                    compositeCommandOf(
+                        SetPlayerMoveLeft(state.activePlayer!!, state.activePlayer!!.movesLeft - 1),
+                        GotoNode(SelectBlockType)
+                    )
+                }
+                player.rushesLeft > 0 && player.movesLeft == 0 -> {
+                    // Player has a base Rush left, so can just use that
+                    GotoNode(RushBeforeBlock)
+                }
+                player.rushesLeft == 0 && player.movesLeft == 0 && player.isSkillAvailable(SkillType.SPRINT) -> {
+                    // Player has no normal moves or base rushes left. The only
+                    // way to proceed is by using Sprint. Since Sprint is optional,
+                    // not using Sprint cancels the block type that was already chosen.
+                    GotoNode(ChooseToUseSprintForBlocking)
+                }
+                else -> INVALID_GAME_STATE("Invalid state: rushes[${player.rushesLeft}], moves[${player.movesLeft}]")
+            }
+        }
+    }
+
+    // We only got here because we optimistically assume that Spring will be used.
+    // If that doesn't turn out to be the case, the block will be aborted.
+    //
+    // As there are no negative consequences of using Sprint, we will always apply
+    // it, unless the player has Frenzy and is in the process of executing their
+    // 2nd block. In that case, we can not use Sprint to avoid the 2nd block.
+    object ChooseToUseSprintForBlocking: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzActionContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BlitzActionContext>()
+            val player = context.attacker
+            val isSecondFrenzyBlock = (player.getSkillOrNull(SkillType.FRENZY)?.used == true)
+            return when (isSecondFrenzyBlock) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return when (action) {
+                Cancel -> {
+                    GotoNode(RemainingMovesOrEndAction)
+                }
+                Continue,
+                Confirm -> {
+                    val context = state.getContext<BlitzActionContext>()
+                    val player = context.attacker
+                    compositeCommandOf(
+                        ReportSkillUsed(player, SkillType.SPRINT),
+                        SetSkillUsed(player, player.getSkill(SkillType.SPRINT), used = true),
+                        SetPlayerRushesLeft(player, context.attacker.rushesLeft + SPRINT_EXTRA_RUSHES),
+                        GotoNode(RushBeforeBlock)
+                    )
+                }
+                else -> INVALID_ACTION(action)
             }
         }
     }
@@ -278,7 +292,7 @@ object BlitzAction : Procedure() {
                 add(RemoveContext(rushContext))
                 if (rushContext.isSuccess) {
                     add(SetPlayerRushesLeft(rushContext.player, rushContext.player.rushesLeft - 1))
-                    add(GotoNode(ResolveBlock))
+                    add(GotoNode(SelectBlockType))
                 } else {
                     add(GotoNode(ResolveFallingOverBeforeBlock))
                 }
@@ -304,6 +318,41 @@ object BlitzAction : Procedure() {
                 RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
+        }
+    }
+
+    // This procedure assumes that the caller has verified that the player has enough moves left to perform
+    // the block.
+    object SelectBlockType : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzActionContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val attacker = state.getContext<BlitzActionContext>().attacker
+            val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
+            return buildList {
+                add(SelectBlockType(availableBlockTypes))
+                // We can always cancel a block unless the player has Frenzy and is about to throw a
+                // 2nd block, in that case, it isn't optional.
+                // TODO We also need to consider if the player ran out of moves here?
+                if (attacker.getSkillOrNull(SkillType.FRENZY)?.used != true) {
+                    add(DeselectPlayer(attacker))
+                }
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BlitzActionContext>()
+            return when (action) {
+                is PlayerDeselected -> {
+                    GotoNode(MoveOrBlockOrEndAction)
+                }
+                else -> {
+                    castAction<BlockTypeSelected>(action) { typeSelected ->
+                        compositeCommandOf(
+                            UpdateContext(context.copy(blockType = typeSelected.type)),
+                            GotoNode(ResolveBlock),
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -407,11 +456,12 @@ object BlitzAction : Procedure() {
                     ExitProcedure()
                 )
             } else if (hasBlocked && hasFrenzy && isNextToTarget) {
+                val hasMoveLeft = context.attacker.estimatedMovesLeft(includeSprint = true) > 0
                 compositeCommandOf(
                     removeContextCommand,
                     UpdateContext(context.copy(hasBlocked = hasBlocked)),
                     SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
-                    GotoNode(SelectBlockType),
+                    if (hasMoveLeft) GotoNode(UseMoveToBlock) else GotoNode(RemainingMovesOrEndAction),
                 )
             } else {
                 compositeCommandOf(

@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.engine.utils.singleInstanceOf
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalContracts::class)
@@ -110,4 +111,13 @@ fun Player.makeDistracted() {
     if (this.team.game.rules.baseVersion == GameVersion.BB2025) {
         statusEffects.add(PlayerStatusEffect.distracted())
     }
+}
+
+/**
+ * Helper method, checking if a player is standing
+ */
+fun Player.assertStanding() {
+    assertEquals(PlayerState.STANDING, state)
+    assertTrue(hasTackleZones)
+    assertTrue(location.isOnField(team.game.rules))
 }

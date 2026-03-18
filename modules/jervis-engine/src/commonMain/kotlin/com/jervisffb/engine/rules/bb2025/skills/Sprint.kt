@@ -22,7 +22,7 @@ class Sprint(
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val compulsory: Boolean = false
-    override val resetAt: Duration = Duration.PERMANENT
+    override val resetAt: Duration = Duration.END_OF_ACTIVATION
     override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
