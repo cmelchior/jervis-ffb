@@ -14,6 +14,7 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,7 +49,7 @@ class DodgeTests: JervisGameBB2025Test() {
             NoRerollSelected()
         )
         assertEquals(FieldCoordinate(14, 5), player.coordinates)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
     }
 
     @Test
@@ -61,7 +62,7 @@ class DodgeTests: JervisGameBB2025Test() {
         assertFalse(rules.isMarked(player))
         controller.rollForward(SmartMoveTo(13, 4))
         assertTrue(rules.isMarked(player))
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
     }
 
     @Test
@@ -98,7 +99,7 @@ class DodgeTests: JervisGameBB2025Test() {
             NoRerollSelected()
         )
         assertEquals(FieldCoordinate(13, 4), player.coordinates)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
     }
 
     @Test
@@ -126,7 +127,7 @@ class DodgeTests: JervisGameBB2025Test() {
             4.d6 // Succeed
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
         assertEquals(FieldCoordinate(12, 4), player.coordinates)
     }
 }

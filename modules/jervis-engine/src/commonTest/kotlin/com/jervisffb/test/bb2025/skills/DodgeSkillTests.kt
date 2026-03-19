@@ -21,6 +21,8 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSkillReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -51,7 +53,7 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             3.d6
         )
         assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
-        assertEquals(PlayerState.STANDING, movingPlayer.state)
+        movingPlayer.assertStanding()
     }
 
     @Test
@@ -66,7 +68,7 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             6.d6
         )
         assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
-        assertEquals(PlayerState.STANDING, movingPlayer.state)
+        movingPlayer.assertStanding()
     }
 
     @Test
@@ -100,10 +102,10 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 4), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 4)
+        defender.assertStanding()
     }
 
     @Test
@@ -120,9 +122,9 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT),
             Cancel, // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 4), defender.location)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 4)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
     }
 }

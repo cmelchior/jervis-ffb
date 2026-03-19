@@ -17,7 +17,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -34,6 +33,10 @@ import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.steadyFootingRoll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -64,8 +67,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
     }
 
     @Test
@@ -77,21 +80,21 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 2.dblock),
         )
-        assertEquals(FieldCoordinate(12, 5), defender.location)
+        defender.assertCoordinates(12, 5)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(PlayerState.PRONE, defender.state)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        defender.assertProne()
+        attacker.assertStanding()
         controller.rollForward(
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6),
         )
-        assertEquals(PlayerState.PRONE, defender.state)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        defender.assertProne()
+        attacker.assertStanding()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -108,8 +111,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6, reroll = null),
         )
-        assertEquals(FieldCoordinate(11, 6), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(11, 6)
+        defender.assertStanding()
     }
 
     @Test
@@ -130,8 +133,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(0, attacker.team.turnData.blitzActions)
-        assertEquals(FieldCoordinate(13, 4), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(13, 4)
+        attacker.assertStanding()
     }
 
     @Test
@@ -148,8 +151,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6, reroll = null)
         )
-        assertEquals(FieldCoordinate(11, 6), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(11, 6)
+        defender.assertStanding()
         assertTrue(defender.hasBall())
     }
 
@@ -173,7 +176,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
         assertTrue(player.hasBall())
     }
 
@@ -192,8 +195,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             Cancel,
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(FieldCoordinate(11, 6), defender.location)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertCoordinates(11, 6)
+        defender.assertProne()
     }
 
     @Test
@@ -210,8 +213,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *steadyFootingRoll(6.d6),
         )
         assertEquals(jumpingPlayer, state.activePlayer)
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -228,8 +231,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *steadyFootingRoll(6.d6),
         )
         assertEquals(jumpingPlayer, state.activePlayer)
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -248,7 +251,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6),
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -271,8 +274,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         )
         assertEquals(awayTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
+        awayTeam["A13".playerId].assertStanding()
     }
 
     @Test
@@ -300,8 +303,8 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         )
         assertEquals(awayTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
-        assertEquals(PlayerState.PRONE, thrownPlayer.state)
+        homeTeam["H1".playerId].assertStunned()
+        thrownPlayer.assertProne()
     }
 
     @Test
@@ -316,7 +319,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *steadyFootingRoll(6.d6),
         )
         assertEquals(player, state.activePlayer)
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(12, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(12, 4)
     }
 }

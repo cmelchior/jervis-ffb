@@ -12,12 +12,10 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.InterceptionModifier
 import com.jervisffb.engine.model.modifiers.LeapModifier
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRollContext
@@ -36,6 +34,8 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -99,8 +99,8 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             4.d6
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(11, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(11, 4)
     }
 
     @Test
@@ -147,8 +147,8 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             4.d6
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(11, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(11, 4)
     }
 
     @Test
@@ -171,8 +171,8 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             3.d6
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(11, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(11, 4)
     }
 
     @Test
@@ -189,7 +189,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             EndAction
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(11, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(11, 4)
     }
 }

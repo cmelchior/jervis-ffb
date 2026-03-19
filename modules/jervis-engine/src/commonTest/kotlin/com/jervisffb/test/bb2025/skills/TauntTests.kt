@@ -10,7 +10,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Taunt
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -20,6 +19,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -54,7 +54,7 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(12, 5), attacker.location)
+        attacker.assertCoordinates(12, 5)
     }
 
     @Test
@@ -70,7 +70,7 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(12, 5), attacker.location)
+        attacker.assertCoordinates(12, 5)
     }
 
     @Test
@@ -87,7 +87,7 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(12, 5), attacker.location)
+        attacker.assertCoordinates(12, 5)
     }
 
     @Test
@@ -104,7 +104,7 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
     @Test
@@ -124,9 +124,9 @@ class TauntTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP),
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(11, 3), defender.location)
+        defender.assertCoordinates(11, 3)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(11, 4), attacker.location)
+        attacker.assertCoordinates(11, 4)
     }
 
     @Test
@@ -146,7 +146,7 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
+        defender.assertCoordinates(12, 5)
         assertTrue(rules.isStanding(defender))
     }
 
@@ -167,9 +167,9 @@ class TauntTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
+        defender.assertCoordinates(11, 5)
         assertTrue(rules.isStanding(defender))
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
     @Ignore

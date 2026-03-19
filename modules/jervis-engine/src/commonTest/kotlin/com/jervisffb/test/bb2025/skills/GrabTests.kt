@@ -11,7 +11,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Grab
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -21,6 +20,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -58,8 +59,8 @@ class GrabTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_RIGHT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 4), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(13, 4)
+        defender.assertStanding()
         assertNull(state.activePlayer)
     }
 
@@ -88,8 +89,8 @@ class GrabTests: JervisGameBB2025Test() {
             Cancel
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, defender.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
+        defender.assertStanding()
+        defender.assertCoordinates(11, 5)
     }
 
     @Test
@@ -113,8 +114,8 @@ class GrabTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_RIGHT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 4), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(13, 4)
+        defender.assertStanding()
         assertNull(state.activePlayer)
     }
 
@@ -157,8 +158,8 @@ class GrabTests: JervisGameBB2025Test() {
             Cancel // Do not follow up
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, chainPushedPlayer.state)
-        assertEquals(FieldCoordinate(10, 5), chainPushedPlayer.location)
+        chainPushedPlayer.assertStanding()
+        chainPushedPlayer.assertCoordinates(10, 5)
     }
 
     @Test
@@ -180,8 +181,8 @@ class GrabTests: JervisGameBB2025Test() {
             Cancel, // Do not follow up
             EndAction
         )
-        assertEquals(FieldCoordinate(11, 4), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(11, 4)
+        defender.assertStanding()
         assertNull(state.activePlayer)
     }
 }

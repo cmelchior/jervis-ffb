@@ -35,6 +35,8 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectSkillReroll
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -134,7 +136,7 @@ class ChargeTests: JervisGameBB2025Test() {
             )
         )
         assertEquals(FieldCoordinate(11, 4), homeTeam["H10".playerId].coordinates)
-        assertEquals(PlayerState.STANDING, homeTeam["H10".playerId].state)
+        homeTeam["H10".playerId].assertStanding()
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -246,7 +248,7 @@ class ChargeTests: JervisGameBB2025Test() {
             )
         )
         assertEquals(FieldCoordinate(13, 10), homeTeam["H9".playerId].coordinates)
-        assertEquals(PlayerState.STANDING, homeTeam["H9".playerId].state)
+        homeTeam["H9".playerId].assertStanding()
         assertEquals(1, state.awayTeam.turnMarker)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -298,7 +300,7 @@ class ChargeTests: JervisGameBB2025Test() {
                 ),
             )
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H9".playerId].state)
+        homeTeam["H9".playerId].assertStunned()
         assertEquals(1, state.awayTeam.turnMarker)
         assertEquals(awayTeam, state.activeTeam)
     }

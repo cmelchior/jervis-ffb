@@ -34,6 +34,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -343,7 +344,7 @@ class PassActionTests: JervisGameBB2025Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 6)
     }
 
     @Test

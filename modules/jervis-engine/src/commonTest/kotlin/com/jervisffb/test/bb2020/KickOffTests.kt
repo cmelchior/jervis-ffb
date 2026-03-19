@@ -29,6 +29,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.teamSetup
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -60,7 +61,7 @@ class KickOffTests: JervisGameBB2020Test() {
         assertEquals(2, selectPlayersAction.size)
         (selectPlayersAction.first() as PlayerSelected).let {
             assertEquals("H10".playerId, it.playerId)
-            assertEquals(FieldCoordinate(9, 7), state.homeTeam[10.playerNo].location)
+            state.homeTeam[10.playerNo].assertCoordinates(9, 7)
         }
         assertEquals("H11".playerId, (selectPlayersAction.last() as PlayerSelected).playerId)
         controller.handleAction(selectPlayersAction.first())
@@ -420,7 +421,7 @@ class KickOffTests: JervisGameBB2020Test() {
         )
         assertEquals(1, awayTeam.turnMarker)
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(14, 6)
     }
 
     // Bugfix: Check that the ball location is updated correctly after awarding a touchback
@@ -444,7 +445,7 @@ class KickOffTests: JervisGameBB2020Test() {
             5.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,5), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(14, 5)
     }
 }
 

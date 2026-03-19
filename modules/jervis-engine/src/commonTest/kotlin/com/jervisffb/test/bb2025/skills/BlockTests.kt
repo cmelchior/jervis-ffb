@@ -7,7 +7,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Block
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -16,6 +15,10 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,17 +45,17 @@ class BlockTests: JervisGameBB2025Test() {
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 2.dblock),
         )
-        assertEquals(FieldCoordinate(12, 5), defender.location)
+        defender.assertCoordinates(12, 5)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
         controller.rollForward(
             DiceRollResults(6.d6, 6.d6), // Defender Armour
             DiceRollResults(1.d6, 1.d6), // Defender Injury
             DiceRollResults(1.d6, 1.d6), // Attacker Armour
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
-        assertEquals(PlayerState.PRONE, attacker.state)
+        defender.assertStunned()
+        attacker.assertProne()
     }
 
     @Test
@@ -68,10 +71,10 @@ class BlockTests: JervisGameBB2025Test() {
             Confirm, // Attacker uses block
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -87,10 +90,10 @@ class BlockTests: JervisGameBB2025Test() {
             Cancel, // Attacker doesn't use block
         )
         assertTrue(state.isTurnOver())
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -110,9 +113,9 @@ class BlockTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Defender cannot use Block, so gets Knocked Down for Armour Roll
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.PRONE, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertProne()
     }
 }

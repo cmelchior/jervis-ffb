@@ -23,6 +23,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -52,10 +54,10 @@ class StandFirmTests: JervisGameBB2025Test() {
             Confirm, // Use Stand Firm
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -77,12 +79,12 @@ class StandFirmTests: JervisGameBB2025Test() {
             Confirm // Use Stand Firm
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, firstBlockedPlayer.state)
-        assertEquals(FieldCoordinate(12, 5), firstBlockedPlayer.location)
-        assertEquals(PlayerState.STANDING, secondBlockedPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), secondBlockedPlayer.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        firstBlockedPlayer.assertStanding()
+        firstBlockedPlayer.assertCoordinates(12, 5)
+        secondBlockedPlayer.assertStanding()
+        secondBlockedPlayer.assertCoordinates(11, 4)
+        attacker.assertStanding()
+        attacker.assertCoordinates(13, 5)
     }
 
     @Test
@@ -100,10 +102,10 @@ class StandFirmTests: JervisGameBB2025Test() {
             Confirm, // Use Stand Firm
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -123,10 +125,10 @@ class StandFirmTests: JervisGameBB2025Test() {
             Confirm, // Use Stand Firm again
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -149,7 +151,7 @@ class StandFirmTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(11, 5), defender.location)
+        defender.assertCoordinates(11, 5)
         assertEquals(PlayerState.STANDING, defender.state)
         assertNull(state.activePlayer)
     }

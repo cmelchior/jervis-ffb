@@ -17,11 +17,9 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.BlitzActionContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -32,6 +30,9 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -112,10 +113,10 @@ class BlitzActionTests: JervisGameBB2025Test() {
             EndAction
         )
         assertEquals(0, attacker.team.turnData.blitzActions)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
-        assertEquals(PlayerState.PRONE, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 5)
+        defender.assertProne()
     }
 
     @Test
@@ -153,7 +154,7 @@ class BlitzActionTests: JervisGameBB2025Test() {
             *rushTo(12, 3, 2.d6),
             *rushTo(12, 4, 2.d6),
         )
-        assertEquals(FieldCoordinate(12, 5), defender.location)
+        defender.assertCoordinates(12, 5)
         assertEquals(1, controller.getAvailableActions().count())
     }
 
@@ -201,10 +202,10 @@ class BlitzActionTests: JervisGameBB2025Test() {
             EndAction
         )
         assertEquals(0, attacker.team.turnData.blitzActions)
-        assertEquals(FieldCoordinate(12, 4), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 6), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(12, 4)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 6)
+        defender.assertStanding()
     }
 
     @Test
@@ -227,10 +228,10 @@ class BlitzActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Armour roll
         )
         assertEquals(0, attacker.team.turnData.blitzActions)
-        assertEquals(FieldCoordinate(12, 4), attacker.location)
-        assertEquals(PlayerState.PRONE, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(12, 4)
+        attacker.assertProne()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -253,10 +254,10 @@ class BlitzActionTests: JervisGameBB2025Test() {
             EndAction
         )
         assertEquals(0, attacker.team.turnData.blitzActions)
-        assertEquals(FieldCoordinate(13, 4), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 6), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 4)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 6)
+        defender.assertStanding()
     }
 
     @Test

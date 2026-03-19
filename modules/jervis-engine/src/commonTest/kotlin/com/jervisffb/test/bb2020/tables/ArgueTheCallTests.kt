@@ -8,7 +8,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.BrilliantCoachingReroll
@@ -19,6 +18,8 @@ import com.jervisffb.test.defaultKickOffAwayTeam
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -139,8 +140,8 @@ class ArgueTheCallTests: JervisGameBB2020Test() {
         // Check that the player was allowed to remain on the field, but a turnover
         // was still triggered
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerState.STANDING, awayTeam["A6".playerId].state)
-        assertEquals(FieldCoordinate(13, 4), awayTeam["A6".playerId].location)
+        awayTeam["A6".playerId].assertStanding()
+        awayTeam["A6".playerId].assertCoordinates(13, 4)
         assertFalse(awayTeam.coachBanned)
     }
 }

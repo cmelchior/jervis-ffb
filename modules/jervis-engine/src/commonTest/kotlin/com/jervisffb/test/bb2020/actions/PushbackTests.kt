@@ -26,6 +26,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -130,7 +132,7 @@ class PushbackTests: JervisGameBB2020Test() {
         )
         assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
         assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
-        assertEquals(PlayerState.STANDING, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStanding()
         assertNull(state.activePlayer)
     }
 
@@ -236,7 +238,10 @@ class PushbackTests: JervisGameBB2020Test() {
     fun chainPushPronePlayer() {
         SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
         SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
-        homeTeam[10.playerNo].state = PlayerState.STUNNED
+        homeTeam[10.playerNo].apply {
+            state = PlayerState.STUNNED
+            hasTackleZones = false
+        }
         SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
@@ -248,7 +253,7 @@ class PushbackTests: JervisGameBB2020Test() {
         assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
         assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
-        assertEquals(PlayerState.STUNNED, homeTeam[10.playerNo].state)
+        homeTeam[10.playerNo].assertStunned()
     }
 
     @Test

@@ -14,7 +14,6 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
@@ -34,6 +33,9 @@ import com.jervisffb.test.skipTurns
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.takeRoot
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -320,10 +322,10 @@ class TakeRootTests: JervisGameBB2025Test() {
             *standardBlock("H1", 3.dblock),
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -377,8 +379,8 @@ class TakeRootTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertFalse(defender.hasStatusEffect(PlayerStatusEffectType.ROOTED))
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertCoordinates(12, 5)
+        defender.assertProne()
     }
 
     @Test
@@ -396,7 +398,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             *breatheFireRoll(4.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
         assertFalse(defender.hasStatusEffect(PlayerStatusEffectType.ROOTED))
     }
 

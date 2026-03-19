@@ -14,7 +14,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.getSkill
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Sprint
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -30,6 +29,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
@@ -76,7 +76,7 @@ class SprintTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(25, 13), movingPlayer.location)
+        movingPlayer.assertCoordinates(25, 13)
         assertFalse(movingPlayer.getSkill<Sprint>().used)
     }
 

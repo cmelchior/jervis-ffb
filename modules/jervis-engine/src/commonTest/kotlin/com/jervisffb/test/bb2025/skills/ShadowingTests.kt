@@ -8,7 +8,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -17,6 +16,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -56,7 +56,7 @@ class ShadowingTests: JervisGameBB2025Test() {
             *dodge(6.d6),
             EndAction // Shadowing does not trigger for the teams own players
         )
-        assertEquals(FieldCoordinate(14, 9), activePlayer.location)
+        activePlayer.assertCoordinates(14, 9)
         assertEquals(awayTeam, state.activeTeam)
     }
 
@@ -73,7 +73,7 @@ class ShadowingTests: JervisGameBB2025Test() {
             EndAction,
             EndTurn
         )
-        assertEquals(FieldCoordinate(14, 5), activePlayer.location)
+        activePlayer.assertCoordinates(14, 5)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -97,7 +97,7 @@ class ShadowingTests: JervisGameBB2025Test() {
             EndTurn
         )
         assertEquals("H2".playerId, state.field[13, 5].player?.id)
-        assertEquals(FieldCoordinate(14, 5), movingPlayer.location)
+        movingPlayer.assertCoordinates(14, 5)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -113,8 +113,8 @@ class ShadowingTests: JervisGameBB2025Test() {
             3.d6, // Shadowing
             EndAction
         )
-        assertEquals(FieldCoordinate(12, 5), shadowingPlayer.location)
-        assertEquals(FieldCoordinate(14, 5), activePlayer.location)
+        shadowingPlayer.assertCoordinates(12, 5)
+        activePlayer.assertCoordinates(14, 5)
         assertEquals(awayTeam, state.activeTeam)
     }
 
@@ -130,8 +130,8 @@ class ShadowingTests: JervisGameBB2025Test() {
             4.d6, // Shadowing
             EndAction
         )
-        assertEquals(FieldCoordinate(13, 5), shadowingPlayer.location)
-        assertEquals(FieldCoordinate(14, 5), activePlayer.location)
+        shadowingPlayer.assertCoordinates(13, 5)
+        activePlayer.assertCoordinates(14, 5)
         assertEquals(awayTeam, state.activeTeam)
     }
 
@@ -149,8 +149,8 @@ class ShadowingTests: JervisGameBB2025Test() {
             *dodge(6.d6), // The shadowing player has no more move and cannot follow
             EndAction
         )
-        assertEquals(FieldCoordinate(13, 5), shadowingPlayer.location)
-        assertEquals(FieldCoordinate(15, 5), activePlayer.location)
+        shadowingPlayer.assertCoordinates(13, 5)
+        activePlayer.assertCoordinates(15, 5)
         assertEquals(awayTeam, state.activeTeam)
     }
 }

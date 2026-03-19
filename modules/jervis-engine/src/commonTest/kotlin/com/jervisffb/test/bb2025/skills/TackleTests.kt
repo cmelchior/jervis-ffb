@@ -13,7 +13,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -26,6 +25,8 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -59,7 +60,7 @@ class TackleTests: JervisGameBB2025Test() {
             6.d6,
             EndAction,
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A1".playerId].state)
+        awayTeam["A1".playerId].assertStanding()
     }
 
     @Test
@@ -77,7 +78,7 @@ class TackleTests: JervisGameBB2025Test() {
             6.d6,
             EndAction,
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A1".playerId].state)
+        awayTeam["A1".playerId].assertStanding()
     }
 
     @Test
@@ -93,9 +94,9 @@ class TackleTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 4), defender.location)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 4)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
     }
 
@@ -114,9 +115,9 @@ class TackleTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 4), defender.location)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 4)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
     }
 }

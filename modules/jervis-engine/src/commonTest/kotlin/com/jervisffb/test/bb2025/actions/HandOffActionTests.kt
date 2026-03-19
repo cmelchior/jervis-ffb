@@ -21,6 +21,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -75,8 +76,8 @@ class HandOffActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             SmartMoveTo(15, 2)
         )
-        assertEquals(FieldCoordinate(14, 1), awayTeam["A6".playerId].location)
-        assertEquals(FieldCoordinate(15, 1), awayTeam["A7".playerId].location)
+        awayTeam["A6".playerId].assertCoordinates(14, 1)
+        awayTeam["A7".playerId].assertCoordinates(15, 1)
         val actions = controller.getAvailableActions()
         assertNull(actions.singleInstanceOfOrNull<SelectPlayer>())
     }

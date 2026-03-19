@@ -7,10 +7,8 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.rules.bb2025.skills.TwoHeads
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -19,9 +17,11 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -56,8 +56,8 @@ class TwoHeadsTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             EndAction,
         )
-        assertEquals(FieldCoordinate(14, 5), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(14, 5)
+        player.assertStanding()
     }
 
     @Test
@@ -75,8 +75,8 @@ class TwoHeadsTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             EndAction
         )
-        assertEquals(FieldCoordinate(11, 5), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(11, 5)
+        player.assertStanding()
     }
 
     @Test
@@ -93,7 +93,7 @@ class TwoHeadsTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             DiceRollResults(1.d6, 1.d6), // Armour roll
         )
-        assertEquals(FieldCoordinate(14, 5), player.location)
-        assertEquals(PlayerState.PRONE, player.state)
+        player.assertCoordinates(14, 5)
+        player.assertProne()
     }
 }

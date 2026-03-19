@@ -25,6 +25,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -91,8 +93,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             5.d6,
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 4)
     }
 
     @Test
@@ -113,8 +115,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             4.d6,
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 6), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 6)
     }
 
     @Test
@@ -136,8 +138,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             6.d6,
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 7), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 7)
     }
 
     @Test
@@ -154,7 +156,7 @@ class LeapTests: JervisGameBB2025Test() {
             NoRerollSelected(),
         )
         assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), leapingPlayer.location)
+        leapingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -171,7 +173,7 @@ class LeapTests: JervisGameBB2025Test() {
             NoRerollSelected(),
         )
         assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), leapingPlayer.location)
+        leapingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -193,8 +195,8 @@ class LeapTests: JervisGameBB2025Test() {
             5.d6, // Leap
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 5)
 
     }
 
@@ -218,8 +220,8 @@ class LeapTests: JervisGameBB2025Test() {
             5.d6, // Leap
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -239,7 +241,7 @@ class LeapTests: JervisGameBB2025Test() {
             *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), leapingPlayer.location)
+        leapingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -263,7 +265,7 @@ class LeapTests: JervisGameBB2025Test() {
             *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), leapingPlayer.location)
+        leapingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -299,8 +301,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             4.d6,
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 4)
 
     }
 
@@ -320,8 +322,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             4.d6,
         )
-        assertEquals(PlayerState.STANDING, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), leapingPlayer.location)
+        leapingPlayer.assertStanding()
+        leapingPlayer.assertCoordinates(11, 4)
     }
 
     @Ignore

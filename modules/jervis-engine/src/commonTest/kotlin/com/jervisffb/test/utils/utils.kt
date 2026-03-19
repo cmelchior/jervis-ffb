@@ -7,8 +7,10 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.Skill
@@ -18,6 +20,7 @@ import com.jervisffb.engine.utils.singleInstanceOf
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalContracts::class)
@@ -114,10 +117,44 @@ fun Player.makeDistracted() {
 }
 
 /**
- * Helper method, checking if a player is standing
+ * Test Helper, checking if a player is Standing
  */
 fun Player.assertStanding() {
     assertEquals(PlayerState.STANDING, state)
     assertTrue(hasTackleZones)
     assertTrue(location.isOnField(team.game.rules))
 }
+
+/**
+ * Test Helper, checking if a player is Prone
+ */
+fun Player.assertProne() {
+    assertEquals(PlayerState.PRONE, state)
+    assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
+    assertTrue(location.isOnField(team.game.rules), "Prone players should be on the field")
+}
+
+/**
+ * Test Helper, checking if a player is Stunned
+ */
+fun Player.assertStunned() {
+    assertEquals(PlayerState.STUNNED, state)
+    assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
+    assertTrue(location.isOnField(team.game.rules), "Stunned players should be on the field")
+}
+
+/**
+ * Test Helper, checking if a player is on the Field in a given square.
+ */
+fun Player.assertCoordinates(x: Int, y: Int) {
+    assertEquals(FieldCoordinate(x, y), location)
+}
+
+/**
+ * Test Helper, checking if a Ball is on the Field in a given square. This
+ * also requires the ball to not be carried.
+ */
+fun Ball.assertCoordinates(x: Int, y: Int) {
+    assertEquals(FieldCoordinate(x, y), coordinates)
+}
+

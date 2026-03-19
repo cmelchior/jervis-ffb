@@ -12,6 +12,7 @@ import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -45,7 +46,7 @@ class ScatterTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,5), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 5)
     }
 
     @Test
@@ -124,6 +125,6 @@ class ScatterTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,5), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 5)
     }
 }

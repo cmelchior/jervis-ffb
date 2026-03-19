@@ -23,6 +23,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -87,8 +89,8 @@ class PogoTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             3.d6,
         )
-        assertEquals(PlayerState.STANDING, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), pogoingPlayer.location)
+        pogoingPlayer.assertStanding()
+        pogoingPlayer.assertCoordinates(11, 4)
     }
 
     @Test
@@ -110,8 +112,8 @@ class PogoTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             3.d6,
         )
-        assertEquals(PlayerState.STANDING, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(11, 6), pogoingPlayer.location)
+        pogoingPlayer.assertStanding()
+        pogoingPlayer.assertCoordinates(11, 6)
     }
 
     @Test
@@ -127,7 +129,7 @@ class PogoTests: JervisGameBB2025Test() {
             NoRerollSelected(),
         )
         assertEquals(PlayerState.FALLEN_OVER, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), pogoingPlayer.location)
+        pogoingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -143,7 +145,7 @@ class PogoTests: JervisGameBB2025Test() {
             NoRerollSelected(),
         )
         assertEquals(PlayerState.FALLEN_OVER, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), pogoingPlayer.location)
+        pogoingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -164,8 +166,8 @@ class PogoTests: JervisGameBB2025Test() {
             3.d6, // Pogo
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), pogoingPlayer.location)
+        pogoingPlayer.assertStanding()
+        pogoingPlayer.assertCoordinates(11, 5)
 
     }
 
@@ -188,8 +190,8 @@ class PogoTests: JervisGameBB2025Test() {
             3.d6, // Pogo
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), pogoingPlayer.location)
+        pogoingPlayer.assertStanding()
+        pogoingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -209,7 +211,7 @@ class PogoTests: JervisGameBB2025Test() {
             *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), pogoingPlayer.location)
+        pogoingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -233,7 +235,7 @@ class PogoTests: JervisGameBB2025Test() {
             *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, pogoingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), pogoingPlayer.location)
+        pogoingPlayer.assertCoordinates(13, 5)
     }
 
     @Test

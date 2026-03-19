@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -21,6 +20,9 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
 import com.jervisffb.test.leap
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -54,7 +56,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(FieldCoordinate(14, 5), mover.coordinates)
-        assertEquals(PlayerState.PRONE, mover.state)
+        mover.assertProne()
     }
 
     @Test
@@ -73,7 +75,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(FieldCoordinate(14, 5), mover.coordinates)
-        assertEquals(PlayerState.STANDING, mover.state)
+        mover.assertStanding()
     }
 
     @Test
@@ -94,7 +96,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(FieldCoordinate(14, 5), mover.coordinates)
-        assertEquals(PlayerState.PRONE, mover.state)
+        mover.assertProne()
     }
 
     @Test
@@ -113,8 +115,8 @@ class DivingTackleTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), leapingPlayer.location)
+        leapingPlayer.assertProne()
+        leapingPlayer.assertCoordinates(11, 4)
     }
 
     @Test
@@ -132,7 +134,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, leapingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), leapingPlayer.location)
+        leapingPlayer.assertProne()
+        leapingPlayer.assertCoordinates(11, 4)
     }
 }

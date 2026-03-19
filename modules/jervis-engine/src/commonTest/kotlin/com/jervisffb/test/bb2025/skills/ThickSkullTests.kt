@@ -17,6 +17,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -49,7 +50,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 6.d6), // Injury Roll
             Confirm, // Use Thick Skull
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -70,7 +71,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
             Confirm, // Use Dirty Player
             Confirm, // Use Thick Skull
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -106,7 +107,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // Injury Roll
             Confirm, // Use Thick Skull
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -126,7 +127,7 @@ class ThickSkullTests: JervisGameBB2025Test() {
             Confirm, // Use Dirty Player
             Confirm, // Use Thick Skull
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test

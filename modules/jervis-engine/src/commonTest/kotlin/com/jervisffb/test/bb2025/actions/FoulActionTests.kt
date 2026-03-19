@@ -22,6 +22,8 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStunned
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -132,7 +134,7 @@ class FoulActionTests: JervisGameBB2025Test() {
             DiceRollResults(5.d6, 3.d6), // 8 + 1 = Armor break
             DiceRollResults(1.d6, 2.d6), // Stunned
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
     }
 
     @Test
@@ -149,7 +151,7 @@ class FoulActionTests: JervisGameBB2025Test() {
             DiceRollResults(5.d6, 4.d6), // 9 - 1 = Fail armour break
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, homeTeam["H2".playerId].state)
+        homeTeam["H2".playerId].assertProne()
     }
 
     @Test
@@ -164,7 +166,7 @@ class FoulActionTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
             Cancel // Do not argue the call
         )
-        assertEquals(PlayerState.PRONE, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertProne()
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(PlayerState.BANNED, awayTeam["A6".playerId].state)
         assertEquals(DogOut, awayTeam["A6".playerId].location)
@@ -183,7 +185,7 @@ class FoulActionTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 2.d6), // Roll double on injury
             Cancel // Do not argue the call
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(PlayerState.BANNED, awayTeam["A6".playerId].state)
         assertEquals(DogOut, awayTeam["A6".playerId].location)

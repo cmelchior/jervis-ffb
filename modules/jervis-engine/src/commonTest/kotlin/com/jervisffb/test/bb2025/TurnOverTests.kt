@@ -37,6 +37,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -308,7 +309,7 @@ class TurnOverTests: JervisGameBB2025Test() {
             8.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 6)
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
     }

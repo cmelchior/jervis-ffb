@@ -10,12 +10,12 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -97,7 +97,7 @@ class DeviateTests: JervisGameBB2025Test() {
             8.d8 // Bounce because A11 cannot catch
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23,8), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(23, 8)
     }
 
     @Test
@@ -115,6 +115,6 @@ class DeviateTests: JervisGameBB2025Test() {
             5.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(24,7), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(24, 7)
     }
 }

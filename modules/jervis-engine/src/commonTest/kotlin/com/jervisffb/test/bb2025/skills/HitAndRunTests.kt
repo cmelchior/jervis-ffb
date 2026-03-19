@@ -14,7 +14,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
@@ -25,6 +24,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -56,7 +57,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             FieldSquareSelected(14, 6)
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(14, 6), attacker.location)
+        attacker.assertCoordinates(14, 6)
     }
 
     @Test
@@ -75,7 +76,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             FieldSquareSelected(14, 6)
         )
         assertEquals(attacker, state.activePlayer)
-        assertEquals(FieldCoordinate(14, 6), attacker.location)
+        attacker.assertCoordinates(14, 6)
         assertEquals(5, attacker.movesLeft)
     }
 
@@ -94,7 +95,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             FieldSquareSelected(14, 5)
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(14, 5), attacker.location)
+        attacker.assertCoordinates(14, 5)
     }
 
     @Test
@@ -116,7 +117,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             FieldSquareSelected(14, 4)
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(14, 4), attacker.location)
+        attacker.assertCoordinates(14, 4)
     }
 
     @Test
@@ -138,8 +139,8 @@ class HitAndRunTests: JervisGameBB2025Test() {
             FieldSquareSelected(12, 4)
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 4), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(12, 4)
+        attacker.assertStanding()
     }
 
     @Test
@@ -218,7 +219,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             Confirm, // Follow Up
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 6), attacker.location)
+        attacker.assertCoordinates(12, 6)
     }
 
     // Edge case for detecting available squares that was discovered during testing

@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.QualityModifier
@@ -23,6 +22,8 @@ import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.landingRoll
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,7 +57,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -78,7 +79,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(6, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -98,7 +99,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *landingRoll(3.d6), // Fail landing
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertProne()
         assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 }

@@ -31,6 +31,8 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStunned
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -131,8 +133,8 @@ class KickOffEventTests: JervisGameBB2020Test() {
                 ),
             )
         )
-        assertEquals(FieldCoordinate(0, 5), state.getPlayerById("H6".playerId).location)
-        assertEquals(FieldCoordinate(0, 6), state.getPlayerById("H7".playerId).location)
+        state.getPlayerById("H6".playerId).assertCoordinates(0, 5)
+        state.getPlayerById("H7".playerId).assertCoordinates(0, 6)
         assertEquals(awayTeam, state.activeTeamOrThrow())
     }
 
@@ -248,7 +250,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
 
         val player = state.getPlayerById("A10".playerId)
         assertFalse(player.hasBall())
-        assertEquals(FieldCoordinate(11, 7), player.location)
+        player.assertCoordinates(11, 7)
         assertEquals(BallState.DEVIATING, state.getBall().state)
         // Award player moved to the kicking side the ball
         controller.rollForward(PlayerSelected("A10".playerId))
@@ -602,7 +604,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
                 )
             )
         )
-        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
+        state.getPlayerById("A1".playerId).assertStunned()
         assertFalse(state.getPlayerById("A1".playerId).hasTackleZones)
     }
 
@@ -627,7 +629,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
         val homePlayer = state.getPlayerById("H1".playerId)
         assertEquals(PlayerState.BANNED, awayPlayer.state)
         assertEquals(DogOut, awayPlayer.location)
-        assertEquals(PlayerState.STUNNED, homePlayer.state)
+        homePlayer.assertStunned()
     }
 
     @Test
@@ -679,7 +681,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
                 )
             )
         )
-        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
+        state.getPlayerById("A1".playerId).assertStunned()
         assertFalse(state.getPlayerById("A1".playerId).hasBall())
     }
 
@@ -702,9 +704,9 @@ class KickOffEventTests: JervisGameBB2020Test() {
         )
         assertEquals(2, awayTeam.count { it.state == PlayerState.STUNNED })
         assertEquals(1, homeTeam.count { it.state == PlayerState.STUNNED })
-        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
-        assertEquals(PlayerState.STUNNED, state.getPlayerById("A3".playerId).state)
-        assertEquals(PlayerState.STUNNED, state.getPlayerById("H1".playerId).state)
+        state.getPlayerById("A1".playerId).assertStunned()
+        state.getPlayerById("A3".playerId).assertStunned()
+        state.getPlayerById("H1".playerId).assertStunned()
     }
 
     @Test

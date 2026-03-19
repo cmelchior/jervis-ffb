@@ -11,7 +11,6 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -23,6 +22,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -67,8 +68,8 @@ class BreakTackleTests: JervisGameBB2025Test() {
         controller.rollForward(
             NoRerollSelected(),
         )
-        assertEquals(FieldCoordinate(14, 5), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(14, 5)
+        player.assertStanding()
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
     }
 
@@ -86,8 +87,8 @@ class BreakTackleTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             DiceRollResults(3.d6), // Dodge roll, should now succeed (but only with Break Tackle)
         )
-        assertEquals(FieldCoordinate(14, 5), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(14, 5)
+        player.assertStanding()
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
     }
 

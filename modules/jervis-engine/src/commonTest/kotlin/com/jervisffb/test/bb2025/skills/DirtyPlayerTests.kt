@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertStunned
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,7 +53,7 @@ class DirtyPlayerTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 2.d6),
             Confirm, // Dirty Player on Injury
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -67,7 +68,7 @@ class DirtyPlayerTests: JervisGameBB2025Test() {
             Confirm, // With +1 from Dirty Player, should break armour
             DiceRollResults(1.d6, 2.d6),
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }

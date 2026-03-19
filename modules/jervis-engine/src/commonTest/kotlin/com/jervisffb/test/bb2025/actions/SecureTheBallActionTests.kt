@@ -10,7 +10,6 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerKeyword
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
@@ -23,6 +22,7 @@ import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -147,7 +147,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
         val player = state.getPlayerById("A8".playerId)
         val opponent = state.getPlayerById("H3".playerId)
         assertTrue(opponent.hasTackleZones)
-        assertEquals(PlayerState.STANDING, opponent.state)
+        opponent.assertStanding()
 
         controller.rollForward(PlayerSelected(player.id))
 

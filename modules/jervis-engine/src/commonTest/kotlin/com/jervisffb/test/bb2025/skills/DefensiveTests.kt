@@ -12,6 +12,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -100,7 +102,7 @@ class DefensiveTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // With +1 from Boot it should break armour
             DiceRollResults(1.d6, 2.d6),
         )
-        assertEquals(PlayerState.STUNNED, foulTarget.state)
+        foulTarget.assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -125,7 +127,7 @@ class DefensiveTests: JervisGameBB2025Test() {
             PlayerSelected(foulTarget),
             DiceRollResults(2.d6, 6.d6), // With +1 from Boot it should break armour, without it shouldn't
         )
-        assertEquals(PlayerState.PRONE, foulTarget.state)
+        foulTarget.assertProne()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }

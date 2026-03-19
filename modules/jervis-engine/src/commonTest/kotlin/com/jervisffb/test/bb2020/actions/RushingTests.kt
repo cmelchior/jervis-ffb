@@ -10,13 +10,13 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushRoll
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -103,7 +103,7 @@ class RushingTests: JervisGameBB2020Test() {
 
         assertEquals(1, player.rushesLeft)
         assertEquals(0, player.movesLeft)
-        assertEquals(FieldCoordinate(14, 5), player.location)
+        player.assertCoordinates(14, 5)
         assertEquals(MoveAction.SelectMoveType, controller.currentNode())
     }
 }

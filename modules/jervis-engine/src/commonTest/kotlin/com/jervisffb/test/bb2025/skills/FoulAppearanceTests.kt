@@ -10,8 +10,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.FoulAppearance
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
@@ -26,6 +24,8 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.foulAppearanceRoll
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -98,10 +98,10 @@ class FoulAppearanceTests: JervisGameBB2025Test() {
             Cancel, // Do not follow up
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -146,7 +146,7 @@ class FoulAppearanceTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
     }
 
     @Ignore
@@ -187,7 +187,7 @@ class FoulAppearanceTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
     }
 
     @Test
@@ -203,6 +203,6 @@ class FoulAppearanceTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
     }
 }

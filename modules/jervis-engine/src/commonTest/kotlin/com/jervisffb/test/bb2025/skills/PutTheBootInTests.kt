@@ -12,6 +12,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.makeDistracted
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
@@ -45,7 +47,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // With +1 from Boot, should break armour
             DiceRollResults(1.d6, 2.d6),
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -60,7 +62,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             PlayerSelected("H1".playerId),
             DiceRollResults(2.d6, 5.d6), // With +1 from Assist, should only reach 8, thus not breaking armour
         )
-        assertEquals(PlayerState.PRONE, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertProne()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -77,7 +79,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 5.d6), // With +2 from Boot, should breach armour
             DiceRollResults(1.d6, 2.d6),
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H2".playerId].state)
+        homeTeam["H2".playerId].assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -90,7 +92,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             PlayerSelected("H2".playerId),
             DiceRollResults(2.d6, 6.d6), // No assists
         )
-        assertEquals(PlayerState.PRONE, homeTeam["H2".playerId].state)
+        homeTeam["H2".playerId].assertProne()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -104,7 +106,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             PlayerSelected("H1".playerId),
             DiceRollResults(2.d6, 6.d6), // Boot is Distracted, so cannot help
         )
-        assertEquals(PlayerState.PRONE, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertProne()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -118,7 +120,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             PlayerSelected("H1".playerId),
             DiceRollResults(2.d6, 6.d6), // Boot is Prone, so cannot help
         )
-        assertEquals(PlayerState.PRONE, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertProne()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -133,7 +135,7 @@ class PutTheBootInTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // With +1 from Boot, should break armour
             DiceRollResults(1.d6, 2.d6),
         )
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
     }

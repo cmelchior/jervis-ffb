@@ -31,6 +31,8 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -68,7 +70,7 @@ class StuntyTests: JervisGameBB2025Test() {
             *dodge(3.d6),
         )
         assertEquals(FieldCoordinate(12, 4), player.coordinates)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
     }
 
     @Test
@@ -118,8 +120,8 @@ class StuntyTests: JervisGameBB2025Test() {
             Cancel, // Do not use Apothecary
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
         assertEquals(PlayerState.KNOCKED_OUT, defender.state)
     }
 }

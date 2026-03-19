@@ -20,6 +20,8 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -57,7 +59,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Defender Injury
         )
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -79,7 +81,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Defender Injury
         )
-        assertEquals(PlayerState.STUNNED, attacker.state)
+        attacker.assertStunned()
     }
 
     @Test
@@ -97,7 +99,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 5.d6), // Does not break armour
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
     }
 
     @Test
@@ -167,7 +169,7 @@ class MightyBlowTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 6.d6), // Attacker armour roll
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, defender.state)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
+        defender.assertProne()
     }
 }

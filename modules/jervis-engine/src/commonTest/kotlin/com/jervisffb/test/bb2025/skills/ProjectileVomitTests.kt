@@ -18,6 +18,8 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.projectileVomitRoll
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -85,8 +87,8 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Injury Roll -> Target 2
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, defender1.state)
-        assertEquals(PlayerState.STUNNED, defender2.state)
+        defender1.assertStunned()
+        defender2.assertStunned()
         assertEquals(Availability.HAS_ACTIVATED, attacker1.available)
         assertEquals(Availability.HAS_ACTIVATED, attacker2.available)
     }
@@ -108,7 +110,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -129,7 +131,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
         assertEquals(PlayerState.STUNNED_OWN_TURN, attacker.state)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
     }
 
     @Test
@@ -149,7 +151,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
     }
 
     @Test
@@ -164,7 +166,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Armour Roll -> Target 1
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertStanding()
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
         assertEquals(awayTeam, state.activeTeam)
     }
@@ -185,7 +187,7 @@ class ProjectileVomitTests: JervisGameBB2025Test() {
         )
         // Using Projectile Vomit ends Blitz immediately, i.e. no move after is possible
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
         assertEquals(awayTeam, state.activeTeam)
     }

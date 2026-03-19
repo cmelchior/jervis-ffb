@@ -8,7 +8,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -17,6 +16,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -48,7 +48,7 @@ class BounceTests: JervisGameBB2025Test() {
             1.d8 // Bounce
         )
         // Just check a single direction
-        assertEquals(FieldCoordinate(16,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(16, 6)
     }
 
     @Test

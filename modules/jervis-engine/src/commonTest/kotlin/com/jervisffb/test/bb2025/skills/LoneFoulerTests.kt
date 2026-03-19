@@ -18,6 +18,9 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.putProne
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -55,8 +58,8 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 2.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
-        assertEquals(PlayerState.STUNNED, target.state)
+        fouler.assertStanding()
+        target.assertStunned()
     }
 
     @Test
@@ -78,8 +81,8 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 1.d6), // Fail to break armour
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
-        assertEquals(PlayerState.PRONE, target.state)
+        fouler.assertStanding()
+        target.assertProne()
     }
 
     @Test
@@ -102,8 +105,8 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 1.d6), // Fail to break armour
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
-        assertEquals(PlayerState.PRONE, target.state)
+        fouler.assertStanding()
+        target.assertProne()
     }
 
     @Test
@@ -130,7 +133,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             Cancel, // Do not use Apothecary
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
+        fouler.assertStanding()
         assertEquals(PlayerState.KNOCKED_OUT, target.state)
     }
 
@@ -150,7 +153,7 @@ class LoneFoulerTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 3.d6), // Cannot reroll failed AV due to Put the Boot In
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
-        assertEquals(PlayerState.PRONE, target.state)
+        fouler.assertStanding()
+        target.assertProne()
     }
 }

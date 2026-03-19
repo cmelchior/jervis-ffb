@@ -20,6 +20,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -64,8 +66,8 @@ class TitchyTests: JervisGameBB2025Test() {
             DiceRollResults(3.d6), // Good enough, but only with Titchy
             EndAction
         )
-        assertEquals(FieldCoordinate(12, 4), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(12, 4)
+        player.assertStanding()
     }
 
     @Test
@@ -81,8 +83,8 @@ class TitchyTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             EndAction
         )
-        assertEquals(FieldCoordinate(13, 10), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(13, 10)
+        player.assertStanding()
     }
 
     @Test
@@ -103,7 +105,7 @@ class TitchyTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             EndAction
         )
-        assertEquals(FieldCoordinate(13, 10), player.location)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertCoordinates(13, 10)
+        player.assertStanding()
     }
 }

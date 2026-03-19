@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
@@ -18,6 +17,9 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.breatheFireRoll
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -81,8 +83,8 @@ class BreatheFireTests: JervisGameBB2025Test() {
             *breatheFireRoll(4.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, defender1.state)
-        assertEquals(PlayerState.PRONE, defender2.state)
+        defender1.assertStanding()
+        defender2.assertProne()
         assertEquals(Availability.HAS_ACTIVATED, attacker1.available)
         assertEquals(Availability.HAS_ACTIVATED, attacker2.available)
     }
@@ -99,7 +101,7 @@ class BreatheFireTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
     }
 
     @Test
@@ -116,7 +118,7 @@ class BreatheFireTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
     }
 
     @Test
@@ -134,8 +136,8 @@ class BreatheFireTests: JervisGameBB2025Test() {
         // Turnover since player on active team is Knocked Down
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerState.STUNNED, attacker.state)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertStunned()
+        defender.assertStanding()
     }
 
     @Test
@@ -153,8 +155,8 @@ class BreatheFireTests: JervisGameBB2025Test() {
             *breatheFireRoll(4.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, defender.state)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        defender.assertStanding()
+        attacker.assertStanding()
     }
 
     @Test
@@ -169,8 +171,8 @@ class BreatheFireTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(PlayerState.STANDING, defender.state)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        defender.assertStanding()
+        attacker.assertStanding()
     }
 
 
@@ -191,7 +193,7 @@ class BreatheFireTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
     }
 
     @Test
@@ -210,7 +212,7 @@ class BreatheFireTests: JervisGameBB2025Test() {
         )
         // Using Breathe Fire ends Blitz immediately, i.e. no move after is possible
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, defender.state)
+        defender.assertStunned()
         assertEquals(Availability.HAS_ACTIVATED, attacker.available)
         assertEquals(awayTeam, state.activeTeam)
     }

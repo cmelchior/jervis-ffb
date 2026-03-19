@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -21,6 +20,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -66,7 +66,7 @@ class GiveAndGoTests: JervisGameBB2025Test() {
             EndAction
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(16, 5), awayTeam["A10".playerId].location)
+        awayTeam["A10".playerId].assertCoordinates(16, 5)
     }
 
     @Test
@@ -123,7 +123,7 @@ class GiveAndGoTests: JervisGameBB2025Test() {
             EndAction
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(14, 8), awayTeam["A10".playerId].location)
+        awayTeam["A10".playerId].assertCoordinates(14, 8)
     }
 
     @Test

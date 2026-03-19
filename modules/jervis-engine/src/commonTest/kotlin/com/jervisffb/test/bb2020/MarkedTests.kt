@@ -7,7 +7,6 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
@@ -18,6 +17,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -138,6 +138,6 @@ class MarkedTests: JervisGameBB2020Test() {
             *throwBall(4.d6),
             7.d8 // Bounce because player cannot catch
         )
-        assertEquals(FieldCoordinate(15, 2), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 2)
     }
 }

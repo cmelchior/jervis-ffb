@@ -23,6 +23,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -79,7 +80,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             8.d8 // Bounce to [19, 6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(19,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(19, 6)
     }
 
     @Test
@@ -103,7 +104,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             8.d8 // Bounce to [4, 11]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(4,11), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(4, 11)
     }
 
     @Test
@@ -115,7 +116,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             1.d8 // Bounce to [23,5]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23,5), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(23, 5)
     }
 
     @Test
@@ -127,7 +128,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             7.d8 // Bounce to [0,6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(0,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(0, 6)
     }
 
     @Test
@@ -139,7 +140,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             7.d8 // Bounce to [25,6]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(25,6), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(25, 6)
     }
 
     @Test
@@ -151,7 +152,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             2.d8 // Bounce to [0,8]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(0,8), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(0, 8)
     }
 
     @Test
@@ -163,7 +164,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             2.d8 // Bounce to [24,13]
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(24,13), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(24, 13)
     }
 
     @Test
@@ -190,7 +191,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             2.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15,0), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(15, 0)
     }
 
     @Test
@@ -205,7 +206,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             2.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(21,0), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(21, 0)
     }
 
     @Test
@@ -221,7 +222,7 @@ class ThrowInTests: JervisGameBB2025Test() {
             2.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(21,3), state.singleBall().coordinates)
+        state.singleBall().assertCoordinates(21, 3)
     }
 
     // Manipulate game flow so the ball leaves the field after bouncing from a throw.

@@ -6,7 +6,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -20,6 +19,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,7 +57,7 @@ class PrehensileTailTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, movingPlayer.state)
+        movingPlayer.assertProne()
         assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
     }
 
@@ -77,7 +78,7 @@ class PrehensileTailTests: JervisGameBB2025Test() {
             EndAction,
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, movingPlayer.state)
+        movingPlayer.assertStanding()
         assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
     }
 }

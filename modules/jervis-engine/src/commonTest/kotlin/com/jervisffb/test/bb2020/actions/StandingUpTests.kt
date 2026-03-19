@@ -12,12 +12,13 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -75,7 +76,7 @@ class StandingUpTests: JervisGameBB2020Test() {
             EndAction
         )
         assertEquals(4, player.movesLeft)
-        assertEquals(FieldCoordinate(16, 7), player.location)
+        player.assertCoordinates(16, 7)
         assertEquals(Int.MAX_VALUE - 1, player.team.turnData.moveActions)
         assertFalse(player.isActive)
     }
@@ -93,7 +94,7 @@ class StandingUpTests: JervisGameBB2020Test() {
             NoRerollSelected()
         )
         assertEquals(0, player.movesLeft)
-        assertEquals(PlayerState.STANDING, player.state)
+        player.assertStanding()
     }
 
     @Test

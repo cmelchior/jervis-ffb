@@ -25,6 +25,8 @@ import com.jervisffb.test.ext.undoActions
 import com.jervisffb.test.jump
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -68,8 +70,8 @@ class JumpTests: JervisGameBB2025Test() {
                 FieldSquareSelected(11, 5),
                 *jump(4.d6),
             )
-            assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-            assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+            jumpingPlayer.assertStanding()
+            jumpingPlayer.assertCoordinates(11, 5)
             controller.undoActions(6)
         }
     }
@@ -137,8 +139,8 @@ class JumpTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             5.d6,
         )
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 4), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 4)
     }
 
     @Test
@@ -159,8 +161,8 @@ class JumpTests: JervisGameBB2025Test() {
             reroll,
             5.d6,
         )
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 6), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 6)
     }
 
     @Test
@@ -179,8 +181,8 @@ class JumpTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             5.d6,
         )
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 7), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 7)
     }
 
     @Test
@@ -194,7 +196,7 @@ class JumpTests: JervisGameBB2025Test() {
             *jump(3.d6), // 1 Marked Modifiers from leaving/entering
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+        jumpingPlayer.assertCoordinates(11, 5)
     }
 
     @Test
@@ -208,7 +210,7 @@ class JumpTests: JervisGameBB2025Test() {
             *jump(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
+        jumpingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -228,8 +230,8 @@ class JumpTests: JervisGameBB2025Test() {
             4.d6, // Jump
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 5)
 
     }
 
@@ -251,8 +253,8 @@ class JumpTests: JervisGameBB2025Test() {
             4.d6, // Jump
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.STANDING, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+        jumpingPlayer.assertStanding()
+        jumpingPlayer.assertCoordinates(11, 5)
     }
 
     // According to Designer's Commentary, failing the first Rush will leave
@@ -274,7 +276,7 @@ class JumpTests: JervisGameBB2025Test() {
             *rushRoll(1.d6),
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
+        jumpingPlayer.assertCoordinates(13, 5)
     }
 
     @Test
@@ -294,7 +296,7 @@ class JumpTests: JervisGameBB2025Test() {
             *rushRoll(1.d6)
         )
         assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
-        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
+        jumpingPlayer.assertCoordinates(13, 5)
     }
 
     @Test

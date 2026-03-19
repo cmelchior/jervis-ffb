@@ -18,6 +18,9 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
@@ -57,8 +60,8 @@ class SidestepTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_RIGHT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(13, 4), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(13, 4)
+        defender.assertStanding()
         assertNull(state.activePlayer)
     }
 
@@ -86,8 +89,8 @@ class SidestepTests: JervisGameBB2025Test() {
             Cancel
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, defender.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
+        defender.assertStanding()
+        defender.assertCoordinates(11, 5)
     }
 
     @Test
@@ -113,8 +116,8 @@ class SidestepTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(PlayerState.PRONE, player.state)
-        assertEquals(FieldCoordinate(10, 4), player.location)
+        player.assertProne()
+        player.assertCoordinates(10, 4)
         assertNull(state.activePlayer)
     }
 
@@ -139,8 +142,8 @@ class SidestepTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.RIGHT),
             Cancel // Do not follow up
         )
-        assertEquals(PlayerState.STANDING, player.state)
-        assertEquals(FieldCoordinate(12, 4), player.location)
+        player.assertStanding()
+        player.assertCoordinates(12, 4)
         assertNull(state.activePlayer)
     }
 
@@ -164,7 +167,7 @@ class SidestepTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Cancel // Do not follow up
         )
-        assertEquals(FieldCoordinate(11, 5), defender.location)
+        defender.assertCoordinates(11, 5)
         assertEquals(PlayerState.STANDING, defender.state)
         assertNull(state.activePlayer)
     }

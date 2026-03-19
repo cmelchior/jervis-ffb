@@ -7,7 +7,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Fend
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -15,6 +14,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -46,7 +46,7 @@ class FendTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
     @Test
@@ -63,7 +63,7 @@ class FendTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
     @Test
@@ -80,7 +80,7 @@ class FendTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
 
@@ -99,7 +99,7 @@ class FendTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
     }
 
     @Test
@@ -119,7 +119,7 @@ class FendTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
+        defender.assertCoordinates(12, 5)
         assertTrue(rules.isStanding(defender))
     }
 

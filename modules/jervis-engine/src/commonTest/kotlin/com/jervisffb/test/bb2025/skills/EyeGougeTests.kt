@@ -32,6 +32,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.putProne
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -149,7 +150,7 @@ class EyeGougeTests: JervisGameBB2025Test() {
             DiceRollResults(5.d6, 3.d6)
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertProne()
     }
 
     @Test

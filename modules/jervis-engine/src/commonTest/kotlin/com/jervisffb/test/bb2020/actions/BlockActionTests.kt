@@ -30,6 +30,9 @@ import com.jervisffb.test.bb2020.skills.BlockTests
 import com.jervisffb.test.bb2020.skills.DodgeSkillTests
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -174,10 +177,10 @@ class BlockActionTests: JervisGameBB2020Test() {
             DirectionSelected(Direction.LEFT),
             Confirm
         )
-        assertEquals(FieldCoordinate(12, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(12, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -188,10 +191,10 @@ class BlockActionTests: JervisGameBB2020Test() {
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock(defender, 1.dblock),
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        attacker.assertCoordinates(13, 5)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        defender.assertCoordinates(12, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -202,20 +205,20 @@ class BlockActionTests: JervisGameBB2020Test() {
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock(defender, 2.dblock),
         )
-        assertEquals(FieldCoordinate(12, 5), defender.location)
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
+        defender.assertCoordinates(12, 5)
+        attacker.assertCoordinates(13, 5)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
-        assertEquals(PlayerState.STANDING, attacker.state)
+        attacker.assertStanding()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(PlayerState.PRONE, defender.state)
+        defender.assertProne()
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(PlayerState.PRONE, defender.state)
-        assertEquals(PlayerState.PRONE, attacker.state)
+        defender.assertProne()
+        attacker.assertProne()
     }
 
     @Test
@@ -228,10 +231,10 @@ class BlockActionTests: JervisGameBB2020Test() {
             DirectionSelected(Direction.LEFT),
             Cancel,
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 5), defender.location)
-        assertEquals(PlayerState.STANDING, defender.state)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 5)
+        defender.assertStanding()
     }
 
     @Test
@@ -244,9 +247,9 @@ class BlockActionTests: JervisGameBB2020Test() {
             DirectionSelected(Direction.UP_LEFT),
             Cancel,
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 4), defender.location)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 4)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
     }
 
@@ -260,9 +263,9 @@ class BlockActionTests: JervisGameBB2020Test() {
             DirectionSelected(Direction.DOWN_LEFT),
             Cancel,
         )
-        assertEquals(FieldCoordinate(13, 5), attacker.location)
-        assertEquals(PlayerState.STANDING, attacker.state)
-        assertEquals(FieldCoordinate(11, 6), defender.location)
+        attacker.assertCoordinates(13, 5)
+        attacker.assertStanding()
+        defender.assertCoordinates(11, 6)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
     }
 
@@ -281,6 +284,6 @@ class BlockActionTests: JervisGameBB2020Test() {
         assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         assertEquals(PlayerState.KNOCKED_DOWN, homeTeam["H1".playerId].state)
         assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
-        assertEquals(PlayerState.STANDING, homeTeam["H10".playerId].state)
+        homeTeam["H10".playerId].assertStanding()
     }
 }

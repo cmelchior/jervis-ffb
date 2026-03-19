@@ -44,6 +44,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -170,7 +171,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             Confirm, // Accept using Friends with the Ref
         )
         assertTrue(state.getPlayerById("A1".playerId).location.isOnField(rules))
-        assertEquals(PlayerState.STANDING, state.getPlayerById("A1".playerId).state)
+        state.getPlayerById("A1".playerId).assertStanding()
 
         // Check the prayer is gone by the end of drive
         controller.rollForward(

@@ -36,6 +36,10 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertProne
+import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.hasSkill
 import com.jervisffb.test.utils.makeDistracted
 import com.jervisffb.test.utils.putProne
@@ -198,7 +202,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -217,7 +221,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -231,7 +235,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             3.d8, // Bounce
             *landingRoll(6.d6)
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(14, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -249,7 +253,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             SelectTeamReroll<TeamReroll>(),
             3.d6
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -268,8 +272,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *landingRoll(6.d6),
             4.d8 // Ball bounce
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(7,4), state.singleBall().coordinates)
+        awayTeam["A13".playerId].assertStanding()
+        state.singleBall().assertCoordinates(7, 4)
     }
 
     @Test
@@ -287,8 +291,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Fail armour roll
             4.d8 // Ball bounce
         )
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(7,4), state.singleBall().coordinates)
+        awayTeam["A13".playerId].assertProne()
+        state.singleBall().assertCoordinates(7, 4)
     }
 
     @Test
@@ -305,7 +309,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             SelectTeamReroll<TeamReroll>(),
             4.d6
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -321,7 +325,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             SelectTeamReroll<TeamReroll>(),
             4.d6
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(14, 4), awayTeam["A13".playerId].coordinates)
     }
 
@@ -339,7 +343,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             SelectTeamReroll<TeamReroll>(),
             4.d6
         )
-        assertEquals(PlayerState.STANDING, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertStanding()
         assertEquals(FieldCoordinate(10, 5), awayTeam["A13".playerId].coordinates)
     }
 
@@ -359,7 +363,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertProne()
     }
 
     // Landing in an occupied square will knock down the player, then bounce. This will continue
@@ -386,9 +390,9 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         // No turnover, if thrown player was not holding the ball
         assertEquals(awayTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STUNNED, homeTeam["H1".playerId].state)
-        assertEquals(PlayerState.PRONE, homeTeam["H2".playerId].state)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        homeTeam["H1".playerId].assertStunned()
+        homeTeam["H2".playerId].assertProne()
+        awayTeam["A13".playerId].assertProne()
     }
 
     @Test
@@ -408,7 +412,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Armour roll on thrown player
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        awayTeam["A13".playerId].assertProne()
         assertEquals(FieldCoordinate(9, 5), awayTeam["A13".playerId].coordinates)
     }
 
@@ -450,8 +454,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(homeTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, awayTeam["A1".playerId].state)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        awayTeam["A1".playerId].assertProne()
+        awayTeam["A13".playerId].assertProne()
     }
 
     @Test
@@ -475,8 +479,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             2.d8 // Bounce ball
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerState.PRONE, homeTeam["H13".playerId].state)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        homeTeam["H13".playerId].assertProne()
+        awayTeam["A13".playerId].assertProne()
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(FieldCoordinate(10, 4), state.singleBall().coordinates)
     }
@@ -497,8 +501,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Armour roll on thrown player
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(PlayerState.STUNNED, homeTeam["H13".playerId].state)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        homeTeam["H13".playerId].assertStunned()
+        awayTeam["A13".playerId].assertProne()
         assertEquals(FieldCoordinate(10, 5), awayTeam["A13".playerId].coordinates)
     }
 
@@ -570,7 +574,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *landingRoll(6.d6)
         )
         assertEquals(Availability.AVAILABLE, thrownPlayer.available)
-        assertEquals(PlayerState.STANDING, thrownPlayer.state)
+        thrownPlayer.assertStanding()
         controller.rollForward(
             *activatePlayer("A13", PlayerStandardActionType.MOVE),
             *moveTo(15, 0),
@@ -593,7 +597,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         assertEquals(Availability.AVAILABLE, thrownPlayer.available)
-        assertEquals(PlayerState.PRONE, thrownPlayer.state)
+        thrownPlayer.assertProne()
         controller.rollForward(
             *activatePlayer("A13", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STAND_UP),
@@ -625,8 +629,8 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             5.d8 // Bounce ball
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerState.PRONE, homeTeam["H13".playerId].state)
-        assertEquals(PlayerState.PRONE, awayTeam["A13".playerId].state)
+        homeTeam["H13".playerId].assertProne()
+        awayTeam["A13".playerId].assertProne()
         assertEquals(FieldCoordinate(17, 5), state.singleBall().coordinates)
     }
 

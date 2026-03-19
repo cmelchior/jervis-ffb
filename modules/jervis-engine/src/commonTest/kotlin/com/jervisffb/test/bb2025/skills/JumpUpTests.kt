@@ -11,7 +11,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.bb2025.skills.JumpUp
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -20,6 +19,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -96,7 +96,7 @@ class JumpUpTests: JervisGameBB2025Test() {
             NoRerollSelected(),
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.PRONE, attacker.state)
+        attacker.assertProne()
         assertEquals(awayTeam, state.activeTeam)
     }
 

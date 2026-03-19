@@ -14,6 +14,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +46,7 @@ class SneakyGitTests: JervisGameBB2025Test() {
             Confirm, // Use Sneaky Git
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerState.STANDING, fouler.state)
+        fouler.assertStanding()
         assertEquals(awayTeam, state.activeTeam)
     }
 
