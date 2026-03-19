@@ -31,10 +31,11 @@ enum class SkillType(val description: String) {
 
     // Agility
     CATCH("Catch"),
+    DEFENSIVE("Defensive"),
     DIVING_CATCH("Diving Catch"),
     DIVING_TACKLE("Diving Tackle"),
     DODGE("Dodge"),
-    DEFENSIVE("Defensive"),
+    HIT_AND_RUN("Hit and Run"),
     JUMP_UP("Jump Up"),
     LEAP("Leap"),
     SAFE_PAIR_OF_HANDS("Safe Pair of Hands"),
@@ -96,7 +97,7 @@ enum class SkillType(val description: String) {
     ON_THE_BALL("On the Ball"),
     PASS("Pass"),
     PUNT("Punt"),
-    RUNNING_PASS("Running Pass"),
+    RUNNING_PASS("Running Pass"), // BB2020 Only
     SAFE_PASS("Safe Pass"),
 
     // Strength
@@ -126,7 +127,6 @@ enum class SkillType(val description: String) {
     DECAY("Decay"),
     DRUNKARD("Drunkard"),
     HATRED("Hatred"),
-    HIT_AND_RUN("Hit and Run"),
     HYPNOTIC_GAZE("Hypnotic Gaze"),
     INSIGNIFICANT("Insignificant"),
     KICK_TEAMMATE("Kick Team-mate"),

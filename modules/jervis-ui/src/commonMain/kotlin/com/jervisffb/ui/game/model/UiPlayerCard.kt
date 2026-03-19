@@ -43,53 +43,55 @@ class UiPlayerCard(
     data class KeywordOptions(override val options: List<PlayerKeyword>): UiSkillOptions
 
     private fun getSkills(skillSettings: SkillSettings, category: SkillCategory): List<UiSkillData> {
-        return skillSettings.getAvailableSkills(category).flatMap { factory ->
-            val rosterSkill = model.positionSkills.filter { it.type == factory.type }
-            val extraSkill = model.extraSkills.filter { it.type == factory.type }
-            val options = when (factory) {
-                is IntSkillFactory -> IntOptions((1..6).toList())
-                is KeywordSkillFactory -> KeywordOptions(PlayerKeyword.entries.toList())
-                is NoValueSkillFactory -> null
-            }
-            val existingSkills = (rosterSkill + extraSkill)
+        return skillSettings.getAvailableSkills(category)
+            .sortedBy { it.name }
+            .flatMap { factory ->
+                val rosterSkill = model.positionSkills.filter { it.type == factory.type }
+                val extraSkill = model.extraSkills.filter { it.type == factory.type }
+                val options = when (factory) {
+                    is IntSkillFactory -> IntOptions((1..6).toList())
+                    is KeywordSkillFactory -> KeywordOptions(PlayerKeyword.entries.toList())
+                    is NoValueSkillFactory -> null
+                }
+                val existingSkills = (rosterSkill + extraSkill)
 
-            val skillButtons = mutableListOf<UiSkillData>()
-            if (factory is KeywordSkillFactory) {
-                skillButtons.addAll(existingSkills.map { existingSkill ->
-                    UiSkillData(
+                val skillButtons = mutableListOf<UiSkillData>()
+                if (factory is KeywordSkillFactory) {
+                    skillButtons.addAll(existingSkills.map { existingSkill ->
+                        UiSkillData(
+                            skillSettings = skillSettings,
+                            name = existingSkill.name,
+                            existingSkill = existingSkill,
+                            factory = factory,
+                            options = options,
+                            isEnabled = true,
+                            isFactoryButton = false,
+                        )
+                    })
+                    // Factory button (for creating variants)
+                    skillButtons.add(UiSkillData(
                         skillSettings = skillSettings,
-                        name = existingSkill.name,
-                        existingSkill = existingSkill,
+                        name = factory.name,
+                        existingSkill = null,
                         factory = factory,
                         options = options,
-                        isEnabled = true,
+                        isEnabled = false,
+                        isFactoryButton = true,
+                    ))
+                } else {
+                    val currentSkill = existingSkills.firstOrNull()
+                    skillButtons.add(UiSkillData(
+                        skillSettings = skillSettings,
+                        name = currentSkill?.name ?: factory.name,
+                        existingSkill = currentSkill,
+                        factory = factory,
+                        options = options,
+                        isEnabled = (currentSkill != null),
                         isFactoryButton = false,
-                    )
-                })
-                // Factory button (for creating variants)
-                skillButtons.add(UiSkillData(
-                    skillSettings = skillSettings,
-                    name = factory.name,
-                    existingSkill = null,
-                    factory = factory,
-                    options = options,
-                    isEnabled = false,
-                    isFactoryButton = true,
-                ))
-            } else {
-                val currentSkill = existingSkills.firstOrNull()
-                skillButtons.add(UiSkillData(
-                    skillSettings = skillSettings,
-                    name = currentSkill?.name ?: factory.name,
-                    existingSkill = currentSkill,
-                    factory = factory,
-                    options = options,
-                    isEnabled = (currentSkill != null),
-                    isFactoryButton = false,
-                ))
+                    ))
+                }
+                skillButtons
             }
-            skillButtons
-        }
     }
 
     fun getSkillSections(): List<Pair<String, List<UiSkillData>>> {
