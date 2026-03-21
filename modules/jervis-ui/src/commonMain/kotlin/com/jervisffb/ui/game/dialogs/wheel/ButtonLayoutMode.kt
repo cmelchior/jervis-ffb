@@ -5,7 +5,8 @@ package com.jervisffb.ui.game.dialogs.wheel
  * animations.
  */
 enum class ButtonLayoutMode {
-    UNDO,
+    CONTRACT_UNDO, // Hide current due to an Undo Event
+    EXPAND_UNDO, // Expand current menu after reverting state due to Undo
     // The menu is in a steady state, i.e. no animations are running.
     STABLE,
     // No layout changes, just an extra delay
@@ -18,4 +19,12 @@ enum class ButtonLayoutMode {
     // Sub-menus are currently contracting back into their parent menu item.
     // The sub-menu contained only new items.
     CONTRACT_NEW_SUBMENU,
+    // Everything is animating out
+    HIDE
+}
+
+
+fun ButtonLayoutMode?.isHiding(): Boolean {
+    if (this == null) return true
+    return (this == ButtonLayoutMode.HIDE || this == ButtonLayoutMode.CONTRACT_UNDO)
 }

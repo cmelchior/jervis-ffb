@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -13,9 +12,10 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import com.jervisffb.ui.game.view.ActionWheelDialog
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.utils.applyIf
 
 /**
- * Layer 12(low): Context Action Wheel Layer.
+ * Layer 12(low): Context Action-Wheel Layer.
  *
  * This layer is responsible for handling the Action Wheel when it is displayed as a context menu.
  * We have two layers for this to better handle transition between the Action Wheel as a dialog
@@ -25,10 +25,11 @@ import com.jervisffb.ui.game.viewmodel.FieldViewModel
  */
 @Composable
 fun ContextMenuLayer(vm: FieldViewModel) {
-    val contextActionWheelPresent by vm.sharedFieldData.isContextWheelVisible
+    val contextActionWheelPresent by vm.sharedFieldData.isContextActionWheelVisible
     val fieldData by vm.fieldViewData.collectAsState()
-    var currentState by remember(vm.contextMenuViewModel) { vm.contextMenuViewModel }
-    var hideWhenClickOutside by remember(vm.actionWheelViewModel.hideOnClickedOutside) { vm.actionWheelViewModel.hideOnClickedOutside }
+    val currenState by vm.contextMenuViewModel
+    var hideWhenClickOutside by currenState.hideOnClickedOutside
+    val wheelState by currenState.data
 
     // Context menu visibility is different than the Action Wheel. Can we be sure
     // that this always works? I suspect so, since we also check if the main action wheel is present
@@ -48,37 +49,41 @@ fun ContextMenuLayer(vm: FieldViewModel) {
     // Compose creates a custom layer for animations, and somehow it doesn't get the correct
     // dimensions. This requires further investigation. Moving the animation into the Action Wheel
     // itself fixes the issue.
-    if (!contextActionWheelPresent) return
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(vm.contextMenuViewModel) {
-                awaitPointerEventScope {
-                    var pressDetected = false // Track press, so we can filter Release correctly
-                    while (true) {
-                        val e = awaitPointerEvent()
-                        // Action Wheel Buttons might already have consumed the event, which we need to respect here.
-                        if (e.changes.any { it.isConsumed }) continue
-                        if (e.buttons.isSecondaryPressed) continue
-                        when (e.type) {
-                            PointerEventType.Press -> {
-                                // Press is allowed to reach lower layers when the wheel isn't visible
-                                if (vm.sharedFieldData.isContextWheelVisible.value) {
-                                    pressDetected = true
-                                    vm.contextMenuViewModel.let {
-                                        if (hideWhenClickOutside) {
-                                            it.value.hideWheel(true)
+            .applyIf(contextActionWheelPresent) {
+                pointerInput(vm.contextMenuViewModel) {
+                    awaitPointerEventScope {
+                        var pressDetected = false // Track press, so we can filter Release correctly
+                        while (true) {
+                            val e = awaitPointerEvent()
+                            // Action Wheel Buttons might already have consumed the event, which we need to respect here.
+                            if (e.changes.any { it.isConsumed }) continue
+                            if (e.buttons.isSecondaryPressed) continue
+                            when (e.type) {
+                                PointerEventType.Press -> {
+                                    // Press is allowed to reach lower layers when the wheel isn't visible
+                                    if (vm.sharedFieldData.isContextActionWheelVisible.value) {
+                                        pressDetected = true
+                                        vm.contextMenuViewModel.let {
+                                            if (hideWhenClickOutside) {
+                                                it.value.hideWheel()
+                                            }
                                         }
+                                        e.changes.forEach { it.consume() }
+                                    } else {
+                                        pressDetected = false
                                     }
-                                    e.changes.forEach { it.consume() }
-                                } else {
-                                    pressDetected = false
                                 }
-                            }
-                            PointerEventType.Release -> {
-                                if (pressDetected) {
-                                    e.changes.forEach { it.consume() }
-                                    pressDetected = false
+                                PointerEventType.Release -> {
+                                    if (pressDetected) {
+                                        e.changes.forEach { it.consume() }
+                                        pressDetected = false
+                                    }
+                                }
+                                else -> {
+                                    // Need to pass events to Jervis
                                 }
                             }
                         }
@@ -87,7 +92,7 @@ fun ContextMenuLayer(vm: FieldViewModel) {
             }
     ) {
         ActionWheelDialog(
-            uiState = currentState.data,
+            uiState = wheelState,
             vm,
             fieldData,
         )

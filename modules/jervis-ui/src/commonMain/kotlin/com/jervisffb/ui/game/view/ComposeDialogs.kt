@@ -40,10 +40,11 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_dice_roll
-import com.jervisffb.ui.game.dialogs.ButtonId
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
+import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
@@ -51,6 +52,7 @@ import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.utils.JervisLogo
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.hypot
@@ -92,11 +94,11 @@ fun SingleSelectUserActionDialog(
                                     coin = CoinMenuItem(
                                         id = ButtonId("CoinSide"),
                                         value = action.component1(),
-                                        parent = null,
+                                        // parent = null,
                                         label = { description },
-                                        enabled = true,
-                                        onClick = { vm.userActionSelected(action) },
-                                        startAnimationFrom = null
+                                        // enabled = true,
+                                        action = { vm.userActionSelected(action) },
+                                        // startAnimationFrom = null
                                     ),
                                     onClick = { vm.userActionSelected(action) },
                                     dropShadow = false
@@ -108,11 +110,11 @@ fun SingleSelectUserActionDialog(
                                     coin = CoinMenuItem(
                                         id = ButtonId("CoinResult"),
                                         value = action.result,
-                                        parent = null,
+                                        // parent = null,
                                         label = { description },
-                                        enabled = true,
-                                        onClick = { vm.userActionSelected(action) },
-                                        startAnimationFrom = null
+                                        // enabled = true,
+                                        action = { vm.userActionSelected(action) },
+                                        // startAnimationFrom = null
                                     ),
                                     onClick = { vm.userActionSelected(action) },
                                     dropShadow = false
@@ -257,7 +259,7 @@ fun MultipleSelectUserActionDialog(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionWheelDialog(
-    uiState: ActionWheelUiStateData?,
+    uiState: ActionWheelUiState,
     fieldVm: FieldViewModel,
     fieldData: FieldViewData,
 ) {
@@ -268,39 +270,47 @@ fun ActionWheelDialog(
     val boxWidthPx = with(LocalDensity.current) { boxSize.toPx() }
     var showTip by remember { mutableStateOf(false) }
     var tipRotationDegree by remember { mutableStateOf(0f) }
+    var offset: IntOffset? by remember { mutableStateOf(null) }
 
-    val offset = remember(uiState) {
-        val center = uiState?.center
-        if (center == null) {
-            IntOffset(
-                x = ((fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
-                y = ((fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
-            )
-        } else {
-            val data = fieldData.calculateActionWheelPlacement(
-                center,
-                fieldVm,
-                boxWidthPx,
-                ringSizePx,
-            )
-            showTip = data.showTip
-            tipRotationDegree = data.tipRotationDegree
-            data.offset
-        }
-    }
-    uiState?.let { uiState ->
+    uiState.let { uiState ->
         Box(
             modifier = Modifier
                 .wrapContentSize()
-                .offset { offset }
+                .applyIf(offset != null) {
+                    offset { offset ?: IntOffset.Zero }
+                }
         ) {
             ActionWheel(
                 uiState = uiState,
+                offsetDelegate = { state: ActionWheelUiState? ->
+                    if (state?.ringAnimationMode.isHiding()) {
+                        // offset = null
+                        return@ActionWheel
+                    }
+                    val center = uiState.center
+                    if (center == null) {
+                        offset = IntOffset(
+                            x = ((fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
+                            y = ((fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
+                        )
+                    } else {
+                        val data = fieldData.calculateActionWheelPlacement(
+                            center,
+                            fieldVm,
+                            boxWidthPx,
+                            ringSizePx,
+                        )
+                        showTip = data.showTip
+                        tipRotationDegree = data.tipRotationDegree
+                        offset = data.offset
+                    }
+                },
                 ringSize = ringSize,
                 maxSize = boxSize,
                 showTip = showTip,
                 tipRotationDegree = tipRotationDegree,
                 onAnimationFinished = {
+                    fieldVm.actionWheelViewModel.notifyUiHandledActionWheelEvent()
                     if (uiState.animationOnly) {
                         fieldVm.screenModel.uiState.notifyAnimationDone()
                     }

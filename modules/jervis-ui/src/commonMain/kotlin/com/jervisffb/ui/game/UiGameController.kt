@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -339,7 +340,6 @@ class UiGameController(
                 homeDogoutOnClickAction = null,
                 awayDogoutOnClickAction = null,
                 dialogInput = null,
-                actionWheelVisible = false,
                 movesUsed = persistentListOf(),
                 weather = Weather.PERFECT_CONDITIONS,
                 homeTeamInfo = UiTeamInfoUpdate.INITIAL,
@@ -424,14 +424,22 @@ class UiGameController(
                 // TODO Add error handling here. What to do for invalid actions?
                 lastUiState = acc.build()
                 try {
+                    val actionWheelLocation = actionWheelControllers.firstOrNull { it.nodes.contains(currentNode) }?.getActionWheelCenter(state)
                     gameController.handleAction(userAction)
                     actionProvider.actionHandled(actions.team, userAction)
-
                     // Now that we know the next node, we can also determine if the Action Wheel
-                    // is visible next step, if it isn't, we can hide it now
+                    // is visible next step, if it isn't, we can hide it immediately.
 
-                    val shouldHideActionWheel = !checkIfActionWheelIsVisible(gameController, acc)
+                    // If Undo'ing actions, this might happen through short-cuts and not the UI.
+                    // If this happens while a context menu is open, its state will be left hanging.
+                    // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
+                    // reset that state here when the action is Undo or Revert. It also means we do not have
+                    // to deal with "back"-animations.
+                    val shouldHideActionWheel = checkHideActionWheelImmediately(gameController, actionWheelLocation)
                     if (shouldHideActionWheel) {
+                        val isRevertingState = (userAction is Undo || userAction is Revert)
+                        acc.addActionWheelEvent(HideActionWheel(hideImmediately = isRevertingState))
+                        acc.addContextWheelEvent(HideActionWheel(hideImmediately = isRevertingState))
                         acc.emitActionWheelState()
                     }
                 } catch (ex: InvalidActionException) {
@@ -445,13 +453,12 @@ class UiGameController(
         }
     }
 
-    fun checkIfActionWheelIsVisible(gameController: GameEngineController, finalUiState: UiSnapshotAccumulator): Boolean {
-        // If both current and previous node had a visible wheel, we can keep it around
-        val previousNode = gameController.previousNode()
+    fun checkHideActionWheelImmediately(gameController: GameEngineController, lastWheelLocation: FieldCoordinate?): Boolean {
+        // If both current and previous node had a visible wheel in the same location, we can keep it around
+        // Otherwise it should be hidden
         val currentNode = gameController.currentNode()
-        val hadActionWheelInPreviousNode = actionWheelControllers.any { it.nodes.contains(previousNode) }
-        val hasActionWheelInCurrentNode = actionWheelControllers.any { it.nodes.contains(currentNode) }
-        return hadActionWheelInPreviousNode && hasActionWheelInCurrentNode
+        val nextActionWheelPosition = actionWheelControllers.firstOrNull { it.nodes.contains(currentNode) }?.getActionWheelCenter(gameController.state)
+        return lastWheelLocation != null && lastWheelLocation != nextActionWheelPosition
     }
 
     private fun applyUiIndicators(actionRequest: ActionRequest, controller: GameEngineController, acc: UiSnapshotAccumulator) {
@@ -468,9 +475,8 @@ class UiGameController(
 
     // Run animations before we update the UI to represent the state we moved to after applying the last GameAction
     private suspend fun runPreUpdateAnimations(acc: UiSnapshotAccumulator, previousNode: Node?, currentNode: Node?) {
-
         val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
-            controller.nodes.contains(acc.gameController.currentNode())
+            controller.nodes.contains(currentNode)
         }
         if (currentWheelHandler != null) {
             if (currentWheelHandler.onApplyCurrentState(
@@ -483,10 +489,6 @@ class UiGameController(
                 acc.emitActionWheelState()
                 animationDone.receive()
             }
-        } else {
-            acc.addActionWheelEvent(HideActionWheel)
-            acc.addContextWheelEvent(HideActionWheel)
-            acc.emitActionWheelState()
         }
 
         if (!gameController.lastActionWasUndo()) {
@@ -502,7 +504,7 @@ class UiGameController(
         if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
-                acc.addActionWheelEvent(HideActionWheel)
+                acc.addActionWheelEvent(HideActionWheel(hideImmediately = true))
                 acc.emitActionWheelState()
                 animationFlow.emit(animation)
                 animationDone.receive()
@@ -622,10 +624,6 @@ class UiGameController(
 
     fun userSelectedAction(action: GameAction) {
         actionProvider.userActionSelected(action)
-    }
-
-    fun userSelectedMultipleActions(actions: List<GameAction>, delayEvent: Boolean = true) {
-        actionProvider.userMultipleActionsSelected(actions, delayEvent)
     }
 
     fun notifyAnimationDone() {

@@ -45,7 +45,7 @@ fun FieldActionsAndUnderlaysLayers(
 
     val fieldData: Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>> by fieldDataFlow.collectAsState(emptyMap())
     val pathFinderData by pathFinderFlow.collectAsState(null)
-    val isContextMenuVisible by vm.sharedFieldData.isContentMenuVisible
+    val isContextMenuVisible by vm.sharedFieldData.isActionWheelVisible
     if (!isContextMenuVisible) {
         FieldSquares(vm) { modifier: Modifier, x, y ->
             val coordinate = FieldCoordinate(x, y)
@@ -72,10 +72,10 @@ private fun SquareHighlightAndAction(
     pathfinderData: UiPathFinderData?,
 ) {
     val sharedFieldData = vm.sharedFieldData
-    val isActionWheelVisible = sharedFieldData.isContentMenuVisible
+    val isActionWheelVisible = sharedFieldData.isActionWheelVisible
     val bgColor = remember(isActionWheelVisible, square, player) {
         when {
-            sharedFieldData.isContentMenuVisible.value -> Color.Transparent
+            sharedFieldData.isActionWheelVisible.value -> Color.Transparent
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
@@ -100,7 +100,7 @@ private fun SquareHighlightAndAction(
                 .jervisPointerEvent(FieldPointerEventType.PrimaryClickSquare, square.coordinates) {
                     // In that case, it is the square that should handle opening it again, after which control transfers
                     // back to the ActionWheelLayer
-                    if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible.value) {
+                    if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isActionWheelVisible.value) {
                         vm.contextMenuViewModel.value = square.createActionWheelContextMenu(vm.game, sharedFieldData)
                         vm.contextMenuViewModel.value.showWheel()
                     }
@@ -126,12 +126,12 @@ private fun SquareHighlightAndAction(
                 }
             }
     ) {
-        val contentMenuVisible by sharedFieldData.isContentMenuVisible
+        val contentMenuVisible by sharedFieldData.isActionWheelVisible
         // TODO Move this to the Dialog Layer?
         if (contentMenuVisible && !square.useActionWheel) {
             ContextPopupMenu(
                 hidePopup = { dismissed ->
-                    sharedFieldData.setContextWheelVisibility(false)
+                    sharedFieldData.setContextActionWheelVisibility(false)
                     if (dismissed) {
                         square.onMenuHidden?.invoke()
                     }

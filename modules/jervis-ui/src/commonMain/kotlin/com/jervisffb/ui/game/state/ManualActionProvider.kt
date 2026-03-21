@@ -23,7 +23,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
@@ -35,7 +34,6 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -251,16 +249,9 @@ open class ManualActionProvider(
     }
 
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
-        // If Undo'ing actions, this might happen through short-cuts and not the UI.
-        // If this happens while a context menu is open, its state will be left hanging.
-        // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
-        // reset that state here when the action is Undo or Revert.
         // TODO In general we need to rethink the lifecycle of the Action Wheel since we want to enable
-        //  animations between states in the Wheel. At that point, this logic should probably be revisited.
-        if (action is Undo || action is Revert) {
-            sharedData?.setActionWheelVisibility(false)
-            sharedData?.setContextWheelVisibility(false)
-        }
+        //  animations between states in the Wheel. At that point, this logic should probably be changed
+        //  so we temporarily hide the action wheel
     }
 
     override suspend fun getAction(): GameAction {

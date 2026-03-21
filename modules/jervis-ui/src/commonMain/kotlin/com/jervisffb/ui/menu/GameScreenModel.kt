@@ -68,24 +68,24 @@ class LocalFieldDataWrapper {
     var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
     // Used to share mouse events across all field layers
     val pointerBus: PointerEventBus = PointerEventBus()
-    // Indicates whether a context menu is visible.
-    val isContentMenuVisible: State<Boolean>
-        field = mutableStateOf(false)
-
+    // Indicates whether any Action Wheel menu is visible.
     val isActionWheelVisible: State<Boolean>
         field = mutableStateOf(false)
 
-    val isContextWheelVisible: State<Boolean>
+    val isPrimaryActionWheelVisible: State<Boolean>
         field = mutableStateOf(false)
 
-    fun setActionWheelVisibility(visible: Boolean) {
-        isActionWheelVisible.value = visible
-        isContentMenuVisible.value = isActionWheelVisible.value || isContextWheelVisible.value
+    val isContextActionWheelVisible: State<Boolean>
+        field = mutableStateOf(false)
+
+    fun setPrimaryActionWheelVisibility(visible: Boolean) {
+        isPrimaryActionWheelVisible.value = visible
+        isActionWheelVisible.value = isPrimaryActionWheelVisible.value || isContextActionWheelVisible.value
     }
 
-    fun setContextWheelVisibility(visible: Boolean) {
-        isContextWheelVisible.value = visible
-        isContentMenuVisible.value = isActionWheelVisible.value || isContextWheelVisible.value
+    fun setContextActionWheelVisibility(visible: Boolean) {
+        isContextActionWheelVisible.value = visible
+        isActionWheelVisible.value = isPrimaryActionWheelVisible.value || isContextActionWheelVisible.value
     }
 }
 

@@ -51,8 +51,8 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothec
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -94,7 +94,6 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
 
     open val yesLabel: String = "Yes"
     open val noLabel: String = "No"
-    abstract fun getActionWheelCenter(state: Game): FieldCoordinate?
     abstract override val nodes: Set<Node>
 
     override fun onDecorateActions(

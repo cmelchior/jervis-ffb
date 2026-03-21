@@ -56,7 +56,7 @@ val LocalFieldData = staticCompositionLocalOf<LocalFieldDataWrapper> {
  *    background image.
  *
  * ** UI Feedback **
- * 4. Field Actions and Underlay: This layer is responsible attaching action handlers and highlights
+ * 4. Field Actions and Underlay: This layer is responsible for attaching action handlers and highlights
 *     for static effects like fields available for actions, tackle zones or yellow colors for fields
  *    that require a dodge.
  * 5. Hover Underlay: Highlights for dynamic effects like when a mouse hovers over the field

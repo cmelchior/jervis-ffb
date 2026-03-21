@@ -3,6 +3,8 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
@@ -23,6 +25,10 @@ abstract class ActionWheelDialogController {
 
     // Which nodes are part of this Action Wheel?
     abstract val nodes: Set<Node>
+
+    // Where should this ActionWheel be centered?
+    // If `null` it will be centered in the middle of the field.
+    abstract fun getActionWheelCenter(state: Game): FieldCoordinate?
 
     open fun onApplyCurrentState(
         acc: UiSnapshotAccumulator,

@@ -64,12 +64,12 @@ import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
-import com.jervisffb.ui.game.dialogs.DieButtonData
-import com.jervisffb.ui.game.dialogs.RollAnimationData
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
@@ -109,7 +109,6 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
     abstract val rollDiceNode: Node
     abstract val chooseRerollSourceNode: Node
     abstract val rerollDiceNode: Node
-    abstract fun getActionWheelCenter(state: Game): FieldCoordinate?
     abstract fun getOriginalRoll(state: Game): D6Result
     override val nodes: Set<Node> by lazy {
         setOf(

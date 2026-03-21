@@ -94,7 +94,6 @@ class FieldViewModel(
         options = emptyList(),
         team = uiState.state.homeTeam,
         sharedFieldData = sharedFieldData,
-        autoShowOnNewActionButtons = false
     ))
 
     val highlights: StateFlow<FieldCoordinate?>

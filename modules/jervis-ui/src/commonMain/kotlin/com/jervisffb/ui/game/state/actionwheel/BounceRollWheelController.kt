@@ -9,15 +9,17 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ButtonId
-import com.jervisffb.ui.game.dialogs.DieButtonData
-import com.jervisffb.ui.game.dialogs.RollAnimationData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
@@ -30,6 +32,10 @@ import kotlin.time.ExperimentalTime
 object BounceRollWheelController : ActionWheelDialogController() {
 
     override val nodes: Set<Node> = setOf(Bounce.RollDirection)
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.currentBall().coordinates
+    }
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
@@ -48,7 +54,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
             )
         }
         val wheelState = ActionWheelUiStateData(
-            center = acc.game.currentBall().coordinates,
+            center = getActionWheelCenter(acc.game),
             topItems = buttons,
             topExpandMode = MenuExpandMode.FanOut(spread = 360f),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
@@ -83,7 +89,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
                 )
             }
             val wheelState = ActionWheelUiStateData(
-                center = acc.game.currentBall().coordinates,
+                center = getActionWheelCenter(acc.game),
                 topItems = listOf(button),
                 topExpandMode = MenuExpandMode.Compact(),
                 topAnimationType = ButtonLayoutMode.ANIMATING_ROLL,

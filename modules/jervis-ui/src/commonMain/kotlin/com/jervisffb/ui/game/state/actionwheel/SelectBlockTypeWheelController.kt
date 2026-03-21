@@ -5,13 +5,11 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockActionContext
-import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -29,6 +27,10 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.SelectBlockType
     )
 
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.activePlayerOrThrow().coordinates
+    }
+
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
@@ -36,7 +38,6 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         sharedData: LocalFieldDataWrapper
     ) {
         val state = acc.game
-        val blockContext = state.getContextOrNull<BlockActionContext>()
 
         val wheelOptions = actions.get<SelectBlockType>().types.map {
             val id = ButtonId("[BlockType] ${it.name}")
@@ -44,7 +45,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         }.toMutableList()
 
         val wheelState = ActionWheelUiStateData(
-            center = state.activePlayer?.coordinates,
+            center = getActionWheelCenter(acc.game),
             bottomItems = wheelOptions,
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,

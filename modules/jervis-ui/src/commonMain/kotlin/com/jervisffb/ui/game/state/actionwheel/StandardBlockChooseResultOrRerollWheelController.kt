@@ -10,17 +10,19 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
-import com.jervisffb.ui.game.dialogs.DieButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
@@ -38,6 +40,10 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         SingleStandardBlockChooseResult.SelectBlockResult,
         SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll,
     )
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<BlockContext>().defender.coordinates
+    }
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
@@ -87,7 +93,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         }
 
         val wheelState = ActionWheelUiStateData(
-            center = context.defender.coordinates,
+            center = getActionWheelCenter(acc.game),
             topItems = diceButtons,
             topExpandMode = MenuExpandMode.Compact(),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,

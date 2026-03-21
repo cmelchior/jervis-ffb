@@ -13,14 +13,15 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -34,6 +35,11 @@ import com.jervisffb.ui.menu.LocalFieldDataWrapper
  */
 object SelectPlayerActionWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(ActivatePlayer.DeclareActionOrDeselectPlayer)
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.activePlayerOrThrow().coordinates
+    }
+
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
@@ -79,7 +85,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             provider.userActionSelected(PlayerDeselected(activePlayer))
         }
         val wheelState = ActionWheelUiStateData(
-            center = activePlayer.coordinates,
+            center = getActionWheelCenter(acc.game),
             bottomItems = wheelOptions,
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,

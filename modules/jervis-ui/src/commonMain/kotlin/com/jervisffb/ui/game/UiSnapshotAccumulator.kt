@@ -5,7 +5,6 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
-import com.jervisffb.ui.game.dialogs.HideActionWheel
 import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiFieldPlayer
@@ -36,7 +35,6 @@ class UiSnapshotAccumulator(
     val game = uiController.state
 
     private val playersBuilder = previousSnapshot.players.builder()
-    private val squaresBuilder = previousSnapshot.squares.builder()
     private var gameStatusText: String? = null
     private var statusBuilder: UiGameStatusUpdate = UiGameStatusUpdate(gameController.getAvailableActions().team?.id, uiController.state)
     private val unknownActionsBuilder = persistentListOf<GameAction>().builder()
@@ -46,12 +44,10 @@ class UiSnapshotAccumulator(
 
     val movesUsed: List<MoveUsed> = movesUsedBuilder
     val squares: Map<FieldCoordinate, UiFieldSquare>
-        get() = squaresBuilder
+        field = previousSnapshot.squares.builder()
     val stack = uiController.state.stack
     var awayDogoutOnClickAction: (() -> Unit)? = null
     var homeDogoutOnClickAction: (() -> Unit)? = null
-    var actionWheelVisible: Boolean = previousSnapshot.actionWheelVisible
-        private set
     private val actionWheelEvents = mutableListOf<ActionWheelUiState>()
     private val contextWheelEvents = mutableListOf<ActionWheelUiState>()
     var contextMenuActionWheel: SecondaryActionWheelViewModel? = null
@@ -66,12 +62,6 @@ class UiSnapshotAccumulator(
     fun addActionWheelEvent(event: ActionWheelUiState) {
         actionWheelEvents.add(event)
         when (event) {
-            HideActionWheel -> {
-                actionWheelVisible = false
-            }
-            com.jervisffb.ui.game.view.ShowActionWheel -> {
-                actionWheelVisible = true
-            }
             is ActionWheelUiStateData -> {
                 event.lastActionWasUndo = gameController.lastActionWasUndo()
             }
@@ -96,24 +86,24 @@ class UiSnapshotAccumulator(
     }
 
     fun addOrUpdateSquare(coordinate: FieldCoordinate, square: UiFieldSquare) {
-        if (square != squaresBuilder[coordinate]) {
-            squaresBuilder[coordinate] = square
+        if (square != squares[coordinate]) {
+            squares[coordinate] = square
         }
     }
 
     fun updateSquare(coordinate: FieldCoordinate, func: (UiFieldSquare) -> UiFieldSquare) {
-        val currentSquare = squaresBuilder[coordinate] ?: error("Could not find square for coordinate: $coordinate")
+        val currentSquare = squares[coordinate] ?: error("Could not find square for coordinate: $coordinate")
         val newSquare = func(currentSquare)
         // We probably do not need to compare here, since using this method always results in updates (I hope)
         if (currentSquare != newSquare) {
-            squaresBuilder[coordinate] = newSquare
+            squares[coordinate] = newSquare
         }
     }
 
     fun updatePlayer(id: PlayerId, func: (UiFieldPlayer) -> UiFieldPlayer) {
         val currentPlayer = playersBuilder[id] ?: error("Could not find player for id: $id")
         val newPlayer = func(currentPlayer)
-        // We probably do not need to compare here, since using this method always result in updates (I hope)
+        // We probably do not need to compare here, since using this method always results in updates (I hope)
         if (currentPlayer != newPlayer) {
             playersBuilder[id] = newPlayer
         }
@@ -146,7 +136,7 @@ class UiSnapshotAccumulator(
         return UiGameSnapshot(
             actionOwner = uiController.gameController.getAvailableActions().team,
             game = game,
-            squares = squaresBuilder.build(),
+            squares = squares.build(),
             players = playersBuilder.build(),
             freeBalls = freeBalls,
             gameStatusText = gameStatusText,
@@ -155,7 +145,7 @@ class UiSnapshotAccumulator(
             homeDogoutOnClickAction = homeDogoutOnClickAction,
             awayDogoutOnClickAction = awayDogoutOnClickAction,
             dialogInput = dialogInput,
-            actionWheelVisible = actionWheelVisible,
+            // actionWheelVisible = actionWheelVisible,
             movesUsed = movesUsedBuilder.build(),
             weather = weather,
             homeTeamInfo = homeTeamInfo,
@@ -168,7 +158,7 @@ class UiSnapshotAccumulator(
         uiStateFlow.emit(build())
     }
 
-    // Send any current accumulated action wheel events to the UI. The list
+    // Send any current accumulated action-wheel events to the UI. The list
     // is cleared after sending it.
     suspend fun emitActionWheelState() {
         if (contextWheelEvents.isNotEmpty()) {

@@ -1,48 +1,42 @@
 package com.jervisffb.ui.game.dialogs
 
-import com.jervisffb.engine.fsm.Node
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.game.view.ContextMenuOption
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 
 /**
- * Action Wheel View Model for "primary" actions, i.e. a game state
- * with input that _must_ be created using the action wheel. This means
- * the wheel is automatically shown (if not already visible) and it cannot
- * be dismissed.
+ * Action-Wheel View Model for "context" actions, i.e., actions that are not
+ * considered primary at the current Node. This wheel thus needs to be opened
+ * by clicking a player before actions can be used. It can also be dismissed
+ * without generating a [com.jervisffb.engine.actions.GameAction].
  */
 class SecondaryActionWheelViewModel(
     coordinates: FieldCoordinate?,
     options: List<ContextMenuOption>,
     team: Team,
     sharedFieldData: LocalFieldDataWrapper,
-    title: String? = null,
-    startHoverText: String? = null,
-    fallbackToShowStartHoverText: Boolean = false,
-    topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
-    bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
     onMenuHidden: (() -> Unit)? = null,
-    availableInNodes: Set<Node>? = null,
-    autoShowOnNewActionButtons: Boolean = true
 ): AbstractActionWheelViewModel(
         team,
         sharedFieldData,
-        title,
-        startHoverText,
-        fallbackToShowStartHoverText,
-        topExpandMode,
-        bottomExpandMode,
-        availableInNodes,
-        autoShowOnNewActionButtons
     ) {
-    val data: ActionWheelUiStateData
+
+    val initialData: ActionWheelUiState
+    val hideAction = com.jervisffb.ui.game.view.HideActionWheel(hideImmediately = true)
+    val data: MutableState<ActionWheelUiState> = mutableStateOf(hideAction)
 
     init {
-        data = ActionWheelUiStateData(
+        hideOnClickedOutside.value = true
+        initialData = ActionWheelUiStateData(
             center = coordinates,
             bottomItems = options.map { contextOption ->
                 ActionButtonData(
@@ -50,7 +44,7 @@ class SecondaryActionWheelViewModel(
                     label = { contextOption.title },
                     icon = contextOption.icon,
                     action = {
-                        hideWheel(userUiAction = true)
+                        hideWheel()
                         contextOption.command()
                     },
                     enabled = true
@@ -61,22 +55,19 @@ class SecondaryActionWheelViewModel(
             onDismiss = { onMenuHidden?.invoke() },
             hideWhenClickOutside = true
         )
+        data.value = initialData
     }
 
     override fun showWheel() {
-        sharedFieldData.setContextWheelVisibility(true)
-        isVisible.value = true
+        sharedFieldData.setContextActionWheelVisibility(true)
+        data.value = initialData
     }
 
-    override fun hideWheel(userUiAction: Boolean, onDismiss: (() -> Unit)?) {
+    override fun hideWheel(onDismiss: (() -> Unit)?) {
         sharedFieldData.let {
-            if (it.isContentMenuVisible.value) {
-                it.setContextWheelVisibility(false)
-                isVisible.value = false
-                if (!userUiAction) {
-                    onDismiss?.invoke()
-                }
-            }
+            it.setContextActionWheelVisibility(false)
+            data.value = hideAction
+            // Do not use onDismiss here as the Context Menu doesn't generate GameActions
         }
     }
 }

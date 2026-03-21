@@ -1,13 +1,11 @@
 package com.jervisffb.ui.game.view
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -85,16 +83,14 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
-import com.jervisffb.ui.game.dialogs.DieButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
-import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
@@ -107,100 +103,16 @@ import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.scalePixels
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
-import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.hypot
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
-import kotlin.random.Random
-
-sealed interface ActionWheelUiState
-object HideActionWheel : ActionWheelUiState
-object ShowActionWheel : ActionWheelUiState
-data class ActionWheelUiStateData(
-    val center: FieldCoordinate?,
-    val topItems: List<ButtonData> = emptyList(),
-    val topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
-    val topAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
-    val bottomItems: List<ButtonData> = emptyList(),
-    val bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
-    val bottomAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
-    val onDismiss: (() -> Unit)? = null,
-    val animationOnly: Boolean = false,
-    val hideWhenClickOutside: Boolean = false,
-): ActionWheelUiState {
-    var lastActionWasUndo: Boolean = false
-
-    // Only used in `COMPACT` mode and defines the distance in degrees between
-    // each sub item.
-    private val stepAngle = 45.0f
-
-    init {
-        recalculateSubMenuAngles(topItems, topExpandMode, -90f)
-        recalculateSubMenuAngles(bottomItems, bottomExpandMode, 90f)
-    }
-
-    private fun recalculateSubMenuAngles(
-        buttons: List<ButtonData>,
-        expandMode: MenuExpandMode,
-        startAngle: Float
-    ) {
-        if (buttons.isEmpty()) return
-        buttons.forEach {
-            it.defaultStartingAngle = startAngle
-        }
-        when (val mode = expandMode) {
-            MenuExpandMode.None -> error("Not supported")
-            MenuExpandMode.TwoWay -> {
-                buttons.forEachIndexed { index, item ->
-                    when (index) {
-                        0 -> {
-                            item.defaultStartingAngle = 0f
-                            item.targetAngle = -90f
-                        }
-                        1 -> {
-                            item.defaultStartingAngle = 180f
-                            item.targetAngle = 90f
-                        }
-                        else -> error("Too many item: ${buttons.size}")
-                    }
-                }
-            }
-            is MenuExpandMode.FanOut -> {
-                // If no parent, evenly distribute items in the ring.
-                // For an even number of items, one will always be on the `defaultStartAngle`
-                // For an odd number of items, `defaultStartAngle` will be in the middle between two items.
-                // directly on `centerAngle`
-                buttons.forEachIndexed { index, item ->
-                    item.targetAngle = (mode.spread / buttons.size) * index + startAngle
-                }
-            }
-            is MenuExpandMode.Compact -> {
-                // Clump menu items together at `centerAngle`. For an even number of menu items
-                // This means none of them will be directly on `centerAngle`.
-                val offset = if (buttons.size % 2 == 0) stepAngle / 2f else 0f
-                // val parentModifier = if (parent == null) 0 else 1
-                val parentModifier = 0
-                buttons.forEachIndexed { index, item ->
-                    // This will swap direction (starting with clockwise) and gradually move out,
-                    // so [cw(1), ccw(1), cw(2), ccw(2), ...]
-                    val direction = if (index % 2 == 1) -1 else 1
-                    val magnitude = ceil((index + parentModifier) / 2.0).toFloat()
-                    item.targetAngle = (startAngle + offset + direction * magnitude * stepAngle)
-                }
-            }
-        }
-    }
-
-    companion object {
-        val None: ActionWheelUiState = ActionWheelUiStateData(center = null)
-    }
-}
+import kotlin.time.Duration.Companion.milliseconds
 
 data class ItemAnimatable(
     // Used for position around the wheel
@@ -215,28 +127,32 @@ data class ItemAnimatable(
 
 /**
  * This file contains all the composable required to render a "Circular Action Menu".
- * The main entry point is [ActionWheel], which is driven by an instance of
- * [ActionWheelViewModel].
  */
-
 @Composable
 fun ActionWheel(
-    uiState: ActionWheelUiStateData,
+    uiState: ActionWheelUiState,
+    offsetDelegate: (ActionWheelUiState?) -> Unit,
     ringSize: Dp = 250.jdp,
     borderSize: Dp = 20.jdp,
     maxSize: Dp = 300.jdp,
+    maxRingAlpha: Float = 0.75f,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
     onAnimationFinished: () -> Unit,
 ) {
-    val animationDurationMs = 300
-    var previousState by remember { mutableStateOf<ActionWheelUiStateData?>(null) }
+    val animationDurationMs = when {
+        uiState.enableAnimation && uiState.isHiding() -> 100 // Hiding should be faster
+        uiState.enableAnimation -> 300
+        else -> 0
+    }
+    var previousState by remember { mutableStateOf<ActionWheelUiState>(NoActionWheel) }
     val topAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }
     val bottomAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }
     // Track buttons until they removed again (alpha = 0). We cache them here to decouple all current buttons from the
     // ActionWheelUiState, which should only care about the "current" state.
     val topRenderButtons = remember { mutableStateListOf<ButtonData>() }
     val bottomRenderButtons = remember { mutableStateListOf<ButtonData>() }
+    val ringAlpha = remember { Animatable(0f) }
 
     var buttonsEnabled by remember(uiState) { mutableStateOf(false) }
     var hoverText by remember { mutableStateOf<String?>(null) }
@@ -254,22 +170,24 @@ fun ActionWheel(
     // This effect is also responsible for tracking previous items until they are fully gone.
     LaunchedEffect(uiState) {
         hoverText = null
-        if (uiState.lastActionWasUndo) {
+        if (uiState.animationOnly) {
             topAnimatable.clear()
             bottomAnimatable.clear()
-            previousState = null
+            previousState = NoActionWheel
         }
 
         val from = previousState
         val to = uiState
 
         // 1) Make sure render list has union(from, to)
-        val bottomUnion = (from?.bottomItems.orEmpty() + to.bottomItems).reversed().distinctBy { it.id }.reversed()
+        val bottomUnion = (from.bottomItems + to.bottomItems).reversed().distinctBy { it.id }.reversed()
         bottomRenderButtons.clear()
         bottomRenderButtons.addAll(bottomUnion)
-        val topUnion = (from?.topItems.orEmpty() + to.topItems).reversed().distinctBy { it.id }.reversed()
+        val topUnion = (from.topItems + to.topItems).reversed().distinctBy { it.id }.reversed()
         topRenderButtons.clear()
         topRenderButtons.addAll(topUnion)
+
+        offsetDelegate(uiState)
 
         // 2) Run animations. This will animate disappearing items to alpha = 0
         runWheelAnimations(
@@ -278,6 +196,8 @@ fun ActionWheel(
             topAnims = topAnimatable,
             bottomAnims = bottomAnimatable,
             animationDurationMs = animationDurationMs,
+            maxRingAlpha = maxRingAlpha,
+            ringAlpha = ringAlpha,
         )
 
         // 3) After animation completes, remove items that are gone
@@ -286,25 +206,33 @@ fun ActionWheel(
         val stillPresentTopIds = to.topItems.map { it.id }.toSet()
         topRenderButtons.removeAll { it.id !in stillPresentTopIds }
 
+        // When a Wheel is being hidden, we want to reset everything, so we don't accidentially show old
+        // state when showing the wheel the next time.
+        if (to.isHiding()) {
+            bottomRenderButtons.clear()
+            topRenderButtons.clear()
+            topAnimatable.clear()
+            bottomAnimatable.clear()
+        }
+
         previousState = uiState
         buttonsEnabled = true
         onAnimationFinished()
     }
-
+    //  Do not render anything if there is no ui, state, but allow the stack tracking logic to run
+    // as that allows us to reset things correctly.
     Box(
         modifier = Modifier
             .size(maxSize)
-            .alpha(1f)
         ,
         contentAlignment = Alignment.Center
     ) {
         ActionWheelBackgroundRing(
+            ringAlpha,
             ringSize,
             borderSize,
             showTip,
             tipRotationDegree,
-            // Ring should appear slightly before items
-            animationDuration = if (uiState.lastActionWasUndo) 0 else animationDurationMs - 100,
         )
         WheelButtons(
             animationsCache = topAnimatable,
@@ -335,18 +263,20 @@ fun ActionWheel(
     }
 }
 private suspend fun runWheelAnimations(
-    from: ActionWheelUiStateData?,
-    to: ActionWheelUiStateData,
+    from: ActionWheelUiState,
+    to: ActionWheelUiState,
     topAnims: MutableMap<ButtonId, ItemAnimatable>,
     bottomAnims: MutableMap<ButtonId, ItemAnimatable>,
     animationDurationMs: Int,
+    maxRingAlpha: Float,
+    ringAlpha: Animatable<Float, AnimationVector1D>,
 ) = coroutineScope {
     val topJob = async {
         animateRegion(
             animationsCache = topAnims,
             to = to.topItems,
-            from = from?.topItems.orEmpty(),
-            animationMode = if (to.lastActionWasUndo) ButtonLayoutMode.UNDO else to.topAnimationType,
+            from = from.topItems,
+            animationMode = if (to.isLastActionUndo()) ButtonLayoutMode.EXPAND_UNDO else to.topAnimationType,
             animationDuration = animationDurationMs
         )
     }
@@ -354,15 +284,21 @@ private suspend fun runWheelAnimations(
         animateRegion(
             animationsCache = bottomAnims,
             to = to.bottomItems,
-            from = from?.bottomItems.orEmpty(),
-            animationMode = if (to.lastActionWasUndo) ButtonLayoutMode.UNDO else to.bottomAnimationType,
+            from = from.bottomItems,
+            animationMode = if (to.isLastActionUndo()) ButtonLayoutMode.EXPAND_UNDO else to.bottomAnimationType,
             animationDuration = animationDurationMs
         )
     }
-
-
-    topJob.await()
-    bottomJob.await()
+    val ringJob = async {
+        val target = if (to.topItems.isNotEmpty() || to.bottomItems.isNotEmpty()) maxRingAlpha else 0f
+        val isUndo = to.isLastActionUndo()
+        if (isUndo) {
+            ringAlpha.snapTo(target)
+        } else {
+            ringAlpha.animateTo(target, tween(animationDurationMs, easing = LinearEasing))
+        }
+    }
+    awaitAll(topJob, bottomJob, ringJob)
 }
 
 private suspend fun animateRegion(
@@ -410,7 +346,7 @@ private suspend fun animateRegion(
                 }
             }
             if (disappearing.isNotEmpty()) {
-                delay(shortAnimation.toLong())
+                delay(shortAnimation.toLong().milliseconds)
             }
             animatingRoll.forEach {
                 launch {
@@ -426,9 +362,9 @@ private suspend fun animateRegion(
                             // "hiding" the true result a bit and making it look more "random".
                             it.animateRoll?.let { rollAnim ->
                                 anim.displayFace.value = rollAnim.startingValue
-                                delay(100)
+                                delay(100.milliseconds)
                                 anim.displayFace.value = rollAnim.intermediateValue
-                                delay(100)
+                                delay(100.milliseconds)
                                 anim.displayFace.value = rollAnim.endValue
                             }
                         }
@@ -523,7 +459,7 @@ private suspend fun animateRegion(
             }
         }
 
-        ButtonLayoutMode.UNDO -> {
+        ButtonLayoutMode.EXPAND_UNDO -> {
             appearing.forEach {
                 animationsCache[it.id]!!.let { anim ->
                     launch {
@@ -549,6 +485,52 @@ private suspend fun animateRegion(
                 }
             }
         }
+        ButtonLayoutMode.HIDE -> {
+            appearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                    }
+                }
+            }
+            staying.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                    }
+                }
+            }
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.animateTo(0f, tween(shortAnimation))
+                    }
+                }
+            }
+        }
+        ButtonLayoutMode.CONTRACT_UNDO -> {
+            appearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.snapTo(0f)
+                    }
+                }
+            }
+            staying.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.snapTo(0f)
+                    }
+                }
+            }
+            disappearing.forEach {
+                animationsCache[it.id]!!.let { anim ->
+                    launch {
+                        anim.alpha.snapTo(0f)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -564,7 +546,7 @@ private fun WheelButtons(
 ) {
     val radiusPx = with(LocalDensity.current) { wheelRadius.toPx() }
     Box(Modifier.size(wheelRadius), Alignment.Center) {
-        buttons.reversed().forEachIndexed { i, item ->
+        buttons.reversed().forEachIndexed { _, item ->
             val animationData = animationsCache[item.id]
             if (animationData != null) {
                 val angle by animationData.angleDegree.asState()
@@ -674,6 +656,7 @@ private fun MenuItemButton(
                     onExpandedChanged = onPrimaryFocus,
                 )
             }
+            is CoinMenuItem -> TODO("Add support for Coins")
         }
     }
 }
@@ -681,6 +664,7 @@ private fun MenuItemButton(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ActionWheelBackgroundRing(
+    ringAlpha: Animatable<Float, AnimationVector1D>,
     ringSize: Dp,
     borderSize: Dp,
     // Whether to show the tip
@@ -688,11 +672,10 @@ private fun ActionWheelBackgroundRing(
     // How many degrees to rotate the tip in degrees. 0f is top-left
     tipRotation: Float = 0f,
     ringColor: Color = JervisTheme.black,
-    animationDuration: Int,
 ) {
     // We only ever fade in the ring. If it ever fades out again, this is handled
     // by fading out the entire action wheel in upper layers.
-    var visible by remember { mutableStateOf(true) }
+    // var visible by remember(initialVisible) { mutableStateOf(initialVisible) }
     val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
     val imageBrush = remember {
         ShaderBrush(
@@ -703,75 +686,66 @@ private fun ActionWheelBackgroundRing(
             ),
         )
     }
-    val ringAlpha = 0.5f
+    val alpha by ringAlpha.asState()
     val padding = ((hypot(ringSize.value, ringSize.value)).dp - ringSize) / 2f
 
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(
-            animationSpec = tween(durationMillis = max(0, animationDuration), easing = FastOutLinearInEasing)
-        ),
-        exit = fadeOut(
-            animationSpec = tween(durationMillis = max(0, animationDuration), easing = FastOutLinearInEasing)
-        )
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+                this.alpha = alpha
+                clip = false
+                compositingStrategy = CompositingStrategy.Offscreen
+            }
     ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    clip = false
-                    compositingStrategy = CompositingStrategy.Offscreen
-                }
-        ) {
-            val radius = ringSize.toPx() / 2f
-            val center = Offset(size.width / 2f, size.height / 2f)
-            val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
-            if (showTip) {
-                val path = Path().apply {
-                    moveTo(tip.x, tip.y)
-                    lineTo(x = center.x, y = padding.toPx())
-                    arcTo(
-                        rect = Rect(
-                            center = center,
-                            radius = radius
-                        ),
-                        startAngleDegrees = -90f,
-                        sweepAngleDegrees = 270f,
-                        forceMoveTo = true
-                    )
-                    lineTo(x = tip.x, y = tip.y)
-                    close()
-                }
+        val radius = ringSize.toPx() / 2f
+        val center = Offset(size.width / 2f, size.height / 2f)
+        val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
+        if (showTip) {
+            val path = Path().apply {
+                moveTo(tip.x, tip.y)
+                lineTo(x = center.x, y = padding.toPx())
+                arcTo(
+                    rect = Rect(
+                        center = center,
+                        radius = radius
+                    ),
+                    startAngleDegrees = -90f,
+                    sweepAngleDegrees = 270f,
+                    forceMoveTo = true
+                )
+                lineTo(x = tip.x, y = tip.y)
+                close()
+            }
 
-                rotate(degrees = tipRotation) {
-                    drawPath(
-                        path = path,
-                        brush = imageBrush,
-                        alpha = 1f,
-                        colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
-                    )
-                }
-            } else {
-                drawCircle(
+            rotate(degrees = tipRotation) {
+                drawPath(
+                    path = path,
                     brush = imageBrush,
-                    radius = radius,
-                    center = center,
                     alpha = 1f,
-                    colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
+                    colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha.value)),
                 )
             }
-
-            val innerRadius = radius - borderSize.toPx()
-            val innerPath = Path().apply {
-                addOval(Rect(center = center, radius = innerRadius))
-            }
-
-            drawPath(
-                path = innerPath,
-                color = Color.Transparent,
-                blendMode = BlendMode.Clear
+        } else {
+            drawCircle(
+                brush = imageBrush,
+                radius = radius,
+                center = center,
+                alpha = 1f,
+                colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha.value)),
             )
         }
+
+        val innerRadius = radius - borderSize.toPx()
+        val innerPath = Path().apply {
+            addOval(Rect(center = center, radius = innerRadius))
+        }
+
+        drawPath(
+            path = innerPath,
+            color = Color.Transparent,
+            blendMode = BlendMode.Clear
+        )
     }
 }
 
@@ -796,7 +770,7 @@ private fun HoverText(
                 durationMillis = (bgAlpha.value*animationDuration).roundToInt(),
                 easing = LinearOutSlowInEasing.reversed()
             ))
-            delay((bgAlpha.value*animationDuration).roundToInt().toLong())
+            delay((bgAlpha.value*animationDuration).roundToInt().toLong().milliseconds)
             displayedMessage = null
         } else {
             displayedMessage = message
@@ -950,33 +924,34 @@ fun CoinButton(
         ,
         contentAlignment = Alignment.CenterStart,
     ) {
-        if (!coin.animationDone) {
-            CoinAnimation(
-                coin.animatingFrom!!,
-                coin.value,
-                content = { value ->
-                    CoinImage(
-                        value,
-                        buttonSize,
-                        enabled = false,
-                        onClick = { },
-                        dropShadow = dropShadow,
-                    )
-                },
-                onAnimationEnd = {
-                    coin.animationDone = true
-                    onAnimationDone()
-                }
-            )
-        } else {
-            CoinImage(
-                coin.value,
-                buttonSize,
-                enabled = true,
-                onClick = onClick,
-                dropShadow = dropShadow,
-            )
-        }
+// TODO Add support for flipping a Coin
+//        if (!coin.animationDone) {
+//            CoinAnimation(
+//                coin.animatingFrom!!,
+//                coin.value,
+//                content = { value ->
+//                    CoinImage(
+//                        value,
+//                        buttonSize,
+//                        enabled = false,
+//                        onClick = { },
+//                        dropShadow = dropShadow,
+//                    )
+//                },
+//                onAnimationEnd = {
+//                    coin.animationDone = true
+//                    onAnimationDone()
+//                }
+//            )
+//        } else {
+        CoinImage(
+            coin.value,
+            buttonSize,
+            enabled = true,
+            onClick = onClick,
+            dropShadow = dropShadow,
+        )
+//        }
     }
 }
 
@@ -1401,7 +1376,6 @@ private fun DiceButton(
     dropShadowColor: Color = Color.Black,
     dropShadow: Boolean = true,
 ) {
-    val instanceId = remember { Random.nextLong() }
     val useSelectedColorAsHover = false
     var hover: Boolean by remember { mutableStateOf(false) }
     var colorFilter by remember { mutableStateOf<ColorFilter?>(null) }

@@ -13,9 +13,7 @@ import androidx.compose.ui.Modifier
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.SETTINGS_MANAGER
-import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.ShowActionWheel
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import kotlinx.coroutines.launch
 
@@ -40,15 +38,11 @@ fun FieldHoverUnderlayLayer(
     // as it looks confusing with too many things happening at once. The onHover on players will still trigger to show
     // player cards.
     var showingPrimaryWheel by remember { mutableStateOf(false) }
-    val showingSecondaryWheel by remember { vm.sharedFieldData.isContentMenuVisible }
+    val showingSecondaryWheel by remember { vm.sharedFieldData.isActionWheelVisible }
     LaunchedEffect(vm) {
         launch {
             vm.actionWheelViewModel.observe().collect {
-                showingPrimaryWheel = when (it) {
-                    is ActionWheelUiStateData,
-                    ShowActionWheel -> true
-                    else -> false
-                }
+                showingPrimaryWheel = vm.sharedFieldData.isActionWheelVisible.value
             }
         }
     }

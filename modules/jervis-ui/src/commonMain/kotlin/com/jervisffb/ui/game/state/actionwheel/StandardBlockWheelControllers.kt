@@ -9,20 +9,22 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.dialogs.ActionButtonData
-import com.jervisffb.ui.game.dialogs.ButtonId
-import com.jervisffb.ui.game.dialogs.DieButtonData
-import com.jervisffb.ui.game.dialogs.RollAnimationData
+import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
+import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
+import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
@@ -40,6 +42,10 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
         SingleStandardBlockRollDice.RollDice,
         SingleStandardBlockRerollDice.ReRollDie,
     )
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<BlockContext>().defender.coordinates
+    }
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
@@ -80,9 +86,8 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
             )
         )
 
-        val context = acc.game.getContext<BlockContext>()
         val wheelState = ActionWheelUiStateData(
-            center = context.defender.coordinates,
+            center = getActionWheelCenter(acc.game),
             topItems = diceButtons,
             topExpandMode = MenuExpandMode.Compact(),
             topAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
@@ -116,9 +121,8 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                     )
                 )
             }
-            val context = acc.game.getContext<BlockContext>()
             val wheelState = ActionWheelUiStateData(
-                center = context.defender.coordinates,
+                center = getActionWheelCenter(acc.game),
                 topItems = diceButtons,
                 topExpandMode = MenuExpandMode.Compact(),
                 topAnimationType = ButtonLayoutMode.ANIMATING_ROLL,

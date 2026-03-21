@@ -13,37 +13,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
+import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.view.ActionWheelDialog
-import com.jervisffb.ui.game.view.ActionWheelUiStateData
+import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.NoActionWheel
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.utils.applyIf
 
 /**
  * Layer 12: Action Wheel.
  *
- * This layer is responsible for handling the Action Wheel.
+ * This layer is responsible for handling the Action Wheel. It must also intercept
+ * and filter pointer events when the Action Wheel is present.
  *
  * See [Field] for more details about layer ordering.
  */
 @Composable
 fun ActionWheelLayer(vm: FieldViewModel) {
     val fieldData by vm.fieldViewData.collectAsState()
-    // We create an invisible layer for intercepting pointer events when the Action Wheel
-    // is present.
-
-    var currentState by remember { mutableStateOf<ActionWheelUiStateData?>(null) }
-    var showWheel = vm.sharedFieldData.isActionWheelVisible
+    var currentState by remember { mutableStateOf<ActionWheelUiState>(NoActionWheel) }
     var hideWhenClickOutside by remember(vm.actionWheelViewModel.hideOnClickedOutside) { vm.actionWheelViewModel.hideOnClickedOutside }
     LaunchedEffect(vm) {
         vm.actionWheelViewModel.observe().collect {
-            when (it) {
-                is ActionWheelUiStateData -> {
-                    currentState = it
-                }
-                null -> {
-                    currentState = null
-                }
-                else -> { /* Do nothing */ }
-            }
+            currentState = it
         }
     }
 
@@ -60,39 +52,41 @@ fun ActionWheelLayer(vm: FieldViewModel) {
     // Compose creates a custom layer for animations, and somehow it doesn't get the correct
     // dimensions. This requires further investigation. Moving the animation into the Action Wheel
     // itself fixes the issue.
-    if (!showWheel.value || currentState == null) {
-        return
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(vm.actionWheelViewModel.version) {
-                awaitPointerEventScope {
-                    var pressWhenVisible = false // Track press, so we can filter Release correctly
-                    while (true) {
-                        val e = awaitPointerEvent()
-                        // Action Wheel Buttons might already have consumed the event, which we need to respect here.
-                        if (e.changes.any { it.isConsumed }) continue
-                        if (e.buttons.isSecondaryPressed) continue
-                        when (e.type) {
-                            PointerEventType.Press -> {
-                                // Press is allowed to reach lower layers when the wheel isn't visible
-                                if (vm.sharedFieldData.isActionWheelVisible.value) {
-                                    pressWhenVisible = true
-                                    vm.actionWheelViewModel.let {
-                                        if (hideWhenClickOutside) {
-                                            it.hideWheel(true, currentState?.onDismiss)
+            .applyIf(currentState != NoActionWheel && !currentState.isHiding()) {
+                pointerInput(currentState) {
+                    awaitPointerEventScope {
+                        var pressWhenVisible = false // Track press, so we can filter Release correctly
+                        while (true) {
+                            val e = awaitPointerEvent()
+                            // Action Wheel Buttons might already have consumed the event, which we need to respect here.
+                            if (e.changes.any { it.isConsumed }) continue
+                            if (e.buttons.isSecondaryPressed) continue
+                            when (e.type) {
+                                PointerEventType.Press -> {
+                                    // Press is allowed to reach lower layers when the wheel isn't visible
+                                    if (currentState != NoActionWheel && !currentState.isHiding() /*vm.sharedFieldData.isActionWheelVisible.value*/) {
+                                        pressWhenVisible = true
+                                        vm.actionWheelViewModel.let {
+                                            if (hideWhenClickOutside) {
+                                                it.hideWheel(currentState.onDismiss)
+                                            }
                                         }
+                                        e.changes.forEach { it.consume() }
+                                    } else {
+                                        pressWhenVisible = false
                                     }
-                                    e.changes.forEach { it.consume() }
-                                } else {
-                                    pressWhenVisible = false
                                 }
-                            }
-                            PointerEventType.Release -> {
-                                if (pressWhenVisible) {
-                                    e.changes.forEach { it.consume() }
-                                    pressWhenVisible = false
+                                PointerEventType.Release -> {
+                                    if (pressWhenVisible) {
+                                        e.changes.forEach { it.consume() }
+                                        pressWhenVisible = false
+                                    }
+                                }
+                                else -> {
+                                    // Need to pass events to Jervis
                                 }
                             }
                         }
