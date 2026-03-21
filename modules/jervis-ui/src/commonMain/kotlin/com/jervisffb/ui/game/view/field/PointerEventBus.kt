@@ -25,6 +25,20 @@ data class SquarePressedEvent(
 )
 
 /**
+ * Interceptor that can be registered with [PointerEventBus] to intercept
+ * pointer events before they are dispatched to regular listeners.
+ *
+ * For now, this interface contains only the minimal number of methods. More
+ * can be added later if needed.
+ */
+interface PointerEventInterceptor {
+    /**
+     * Return `true` to consume the press, which will prevent the click from reaching other layers.
+     */
+    fun onPress(square: FieldCoordinate, isPrimary: Boolean): Boolean
+}
+
+/**
  * Custom bus for propagating pointer events to the field to all field layers.
  *
  * Compose restrict hit testing to the first node that handles pointer events,
@@ -36,9 +50,11 @@ data class SquarePressedEvent(
  * interested.
  *
  * This also means that layers should not be using `clickable` or `pointerInput`
- * modifiers.
+ * modifiers. Layers that need to intercept events before they reach field squares
+ * should register a [PointerEventInterceptor] instead.
  */
 class PointerEventBus {
+    private val interceptors = mutableListOf<PointerEventInterceptor>()
     private val exitField = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val enterSquare = MutableSharedFlow<FieldCoordinate>(extraBufferCapacity = 1)
     private val exitSquare = MutableSharedFlow<FieldCoordinate>(extraBufferCapacity = 1)
@@ -48,6 +64,9 @@ class PointerEventBus {
 
     var lastSquarePressed: SquarePressedEvent? = null
     var lastMoveSquare: FieldCoordinate? = null
+
+    fun addInterceptor(interceptor: PointerEventInterceptor) { interceptors.add(interceptor) }
+    fun removeInterceptor(interceptor: PointerEventInterceptor) { interceptors.remove(interceptor) }
 
     fun notifyMove(eventSquare: FieldCoordinate) {
         if (lastMoveSquare == eventSquare) return // Ignore mouse events within the same square
@@ -74,7 +93,10 @@ class PointerEventBus {
     }
 
     fun notifyPressSquare(eventSquare: FieldCoordinate, isPrimary: Boolean) {
-        lastSquarePressed = SquarePressedEvent(eventSquare, isPrimary)
+        val consumed = interceptors.any { it.onPress(eventSquare, isPrimary) }
+        if (!consumed) {
+            lastSquarePressed = SquarePressedEvent(eventSquare, isPrimary)
+        }
     }
 
     fun notifyReleaseSquare(eventSquare: FieldCoordinate?) {

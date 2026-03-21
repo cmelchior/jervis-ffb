@@ -70,14 +70,15 @@ val LocalFieldData = staticCompositionLocalOf<LocalFieldDataWrapper> {
  * based on the offset of field squares as well as the calculated size for them. When using
  * `dp` there is a small chance of rounding errors. Something to watch out for.
  *
- * 8. Player: Render player including anything markers, like ball carried, bomb carried etc.
+ * 8. [PlayerLayer]: Render player including anything markers, like ball carried, bomb carried etc.
  * 9. Ball: If a ball or bomb is loose, it is rendered on top of the player
  *
  * ** Action dialogs **
- * 10. Direction arrows: These are rendered on top of everything
- * 11. Animation Layer: This is where animations run (is this true)
- * 12. Action Wheel Layer: This is where the action wheel is rendered
- * 13. Dialog Layer: These are controlled outside the scope of this field.
+ * 10. [DirectionArrowsLayer]: These are rendered on top of everything
+ * 11. [AnimationLayer]: This is where animations run (is this true)
+ * 12a. [ContextMenuLayer]: This is where the action wheel for the "context menu" is rendered
+ * 12b. [ActionWheelLayer]: This is where the action wheel for primary actions is rendered
+ * 13. DialogLayer: These are controlled outside the scope of this field.
  *
  * Developer's Commentary:
  * I am still thinking about these layers. Maybe some of the lower layers needs to change order?
@@ -134,31 +135,20 @@ fun Field(
                                 val e = awaitPointerEvent()
                                 val eventSquare = e.changes.first().position.toFieldSquare(fieldSizeData)
                                 val consumed = e.changes.any { it.isConsumed }
-                                if (!consumed) {
-                                    when (e.type) {
-                                        PointerEventType.Move  -> {
-                                            if (eventSquare != null) {
-                                                pointerBus.notifyMove(eventSquare)
-                                            }
-                                        }
-                                        PointerEventType.Enter -> {
-                                            if (eventSquare != null) {
-                                                pointerBus.notifyEnterField(eventSquare)
-                                            }
-                                        }
-                                        PointerEventType.Exit  -> {
-                                            pointerBus.notifyExitField()
-                                            vm.triggerHoverExit()
-                                        }
-                                        PointerEventType.Press -> {
-                                            if (eventSquare != null) {
-                                                pointerBus.notifyPressSquare(eventSquare, !e.buttons.isSecondaryPressed)
-                                            }
-                                        }
-                                        PointerEventType.Release -> {
-                                            pointerBus.notifyReleaseSquare(eventSquare)
-                                        }
+                                if (consumed) continue
+                                when (e.type) {
+                                    PointerEventType.Move -> {
+                                        // `eventSquare` might be `null` when the mouse enters the "border" around the field.
+                                        // We want to filter that out
+                                        if (eventSquare != null) pointerBus.notifyMove(eventSquare)
                                     }
+                                    PointerEventType.Enter -> if (eventSquare != null) pointerBus.notifyEnterField(eventSquare)
+                                    PointerEventType.Exit -> {
+                                        pointerBus.notifyExitField()
+                                        vm.triggerHoverExit()
+                                    }
+                                    PointerEventType.Press -> if (!consumed && eventSquare != null) pointerBus.notifyPressSquare(eventSquare, !e.buttons.isSecondaryPressed)
+                                    PointerEventType.Release -> if (!consumed) pointerBus.notifyReleaseSquare(eventSquare)
                                 }
                             }
                         }

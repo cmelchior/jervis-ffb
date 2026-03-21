@@ -3,16 +3,14 @@ package com.jervisffb.ui.game.view.field
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.isSecondaryPressed
-import androidx.compose.ui.input.pointer.pointerInput
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.view.ActionWheelDialog
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
-import com.jervisffb.ui.utils.applyIf
 
 /**
  * Layer 12(low): Context Action-Wheel Layer.
@@ -36,13 +34,25 @@ fun ContextMenuLayer(vm: FieldViewModel) {
     // We create an invisible layer for intercepting pointer events when the Action Wheel
     // is present.
 
-    // If the action wheel is available, we need to filter pointer events
-    // to prevent weird behavior. The following logic applies:
-    //
-    // 1. If clicking an Action Wheel button, it will consume the event.
-    // 2. If clicking outside the wheel when it is visible, it will
-    //    hide the wheel. The click should be consumed here.
-    // 3. Hover events should always be allowed through.
+    // When the Context Action-Wheel is visible, intercept all clicks to prevent them from reaching other layers.
+    val localField = LocalFieldData.current
+    DisposableEffect(contextActionWheelPresent) {
+        if (contextActionWheelPresent) {
+            val interceptor = object : PointerEventInterceptor {
+                override fun onPress(square: FieldCoordinate, isPrimary: Boolean): Boolean {
+                    if (!isPrimary) return false
+                    if (hideWhenClickOutside) {
+                        vm.contextMenuViewModel.value.hideWheel()
+                    }
+                    return true
+                }
+            }
+            localField.pointerBus.addInterceptor(interceptor)
+            onDispose { localField.pointerBus.removeInterceptor(interceptor) }
+        } else {
+            onDispose {}
+        }
+    }
 
     // We cannot animate visibility here, either using `AnimatedVisibility` or custom alpha.
     // The reason eludes me a bit, but the animation ends up being clipped. Probably because
@@ -50,46 +60,7 @@ fun ContextMenuLayer(vm: FieldViewModel) {
     // dimensions. This requires further investigation. Moving the animation into the Action Wheel
     // itself fixes the issue.
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .applyIf(contextActionWheelPresent) {
-                pointerInput(vm.contextMenuViewModel) {
-                    awaitPointerEventScope {
-                        var pressDetected = false // Track press, so we can filter Release correctly
-                        while (true) {
-                            val e = awaitPointerEvent()
-                            // Action Wheel Buttons might already have consumed the event, which we need to respect here.
-                            if (e.changes.any { it.isConsumed }) continue
-                            if (e.buttons.isSecondaryPressed) continue
-                            when (e.type) {
-                                PointerEventType.Press -> {
-                                    // Press is allowed to reach lower layers when the wheel isn't visible
-                                    if (vm.sharedFieldData.isContextActionWheelVisible.value) {
-                                        pressDetected = true
-                                        vm.contextMenuViewModel.let {
-                                            if (hideWhenClickOutside) {
-                                                it.value.hideWheel()
-                                            }
-                                        }
-                                        e.changes.forEach { it.consume() }
-                                    } else {
-                                        pressDetected = false
-                                    }
-                                }
-                                PointerEventType.Release -> {
-                                    if (pressDetected) {
-                                        e.changes.forEach { it.consume() }
-                                        pressDetected = false
-                                    }
-                                }
-                                else -> {
-                                    // Need to pass events to Jervis
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        modifier = Modifier.fillMaxSize()
     ) {
         ActionWheelDialog(
             uiState = wheelState,

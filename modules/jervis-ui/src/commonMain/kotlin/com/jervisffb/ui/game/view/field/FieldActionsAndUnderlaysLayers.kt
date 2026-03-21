@@ -45,20 +45,17 @@ fun FieldActionsAndUnderlaysLayers(
 
     val fieldData: Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>> by fieldDataFlow.collectAsState(emptyMap())
     val pathFinderData by pathFinderFlow.collectAsState(null)
-    val isContextMenuVisible by vm.sharedFieldData.isActionWheelVisible
-    if (!isContextMenuVisible) {
-        FieldSquares(vm) { modifier: Modifier, x, y ->
-            val coordinate = FieldCoordinate(x, y)
-            val squareData: UiFieldSquare? = fieldData[coordinate]?.first
-            val playerData: UiFieldPlayer? = fieldData[coordinate]?.second
-            SquareHighlightAndAction(
-                modifier,
-                vm,
-                squareData ?: UiFieldSquare(FieldCoordinate.UNKNOWN),
-                playerData,
-                pathFinderData?.let { it[coordinate] },
-            )
-        }
+    FieldSquares(vm) { modifier: Modifier, x, y ->
+        val coordinate = FieldCoordinate(x, y)
+        val squareData: UiFieldSquare? = fieldData[coordinate]?.first
+        val playerData: UiFieldPlayer? = fieldData[coordinate]?.second
+        SquareHighlightAndAction(
+            modifier,
+            vm,
+            squareData ?: UiFieldSquare(FieldCoordinate.UNKNOWN),
+            playerData,
+            pathFinderData?.let { it[coordinate] },
+        )
     }
 }
 
@@ -72,10 +69,10 @@ private fun SquareHighlightAndAction(
     pathfinderData: UiPathFinderData?,
 ) {
     val sharedFieldData = vm.sharedFieldData
-    val isActionWheelVisible = sharedFieldData.isActionWheelVisible
+    val isActionWheelVisible by sharedFieldData.isActionWheelVisible
     val bgColor = remember(isActionWheelVisible, square, player) {
         when {
-            sharedFieldData.isActionWheelVisible.value -> Color.Transparent
+            isActionWheelVisible -> Color.Transparent
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
