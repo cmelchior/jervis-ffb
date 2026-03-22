@@ -51,9 +51,11 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -135,7 +137,7 @@ fun ActionWheel(
     ringSize: Dp = 250.jdp,
     borderSize: Dp = 20.jdp,
     maxSize: Dp = 300.jdp,
-    maxRingAlpha: Float = 0.75f,
+    maxRingAlpha: Float = 0.50f,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
     onAnimationFinished: () -> Unit,
@@ -677,7 +679,7 @@ private fun ActionWheelBackgroundRing(
     // by fading out the entire action wheel in upper layers.
     // var visible by remember(initialVisible) { mutableStateOf(initialVisible) }
     val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
-    val imageBrush = remember {
+    val imageBrush = remember(chalkTexture) {
         ShaderBrush(
             shader = ImageShader(
                 image = chalkTexture.scalePixels(IconFactory.scaleFactor),
@@ -692,17 +694,15 @@ private fun ActionWheelBackgroundRing(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .graphicsLayer {
-                this.alpha = alpha
-                clip = false
-                compositingStrategy = CompositingStrategy.Offscreen
-            }
+            .alpha(alpha)
     ) {
         val radius = ringSize.toPx() / 2f
         val center = Offset(size.width / 2f, size.height / 2f)
+        val innerRadius = radius - borderSize.toPx()
         val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
         if (showTip) {
             val path = Path().apply {
+                fillType = PathFillType.EvenOdd
                 moveTo(tip.x, tip.y)
                 lineTo(x = center.x, y = padding.toPx())
                 arcTo(
@@ -716,36 +716,25 @@ private fun ActionWheelBackgroundRing(
                 )
                 lineTo(x = tip.x, y = tip.y)
                 close()
+                addOval(Rect(center = center, radius = innerRadius))
             }
 
             rotate(degrees = tipRotation) {
                 drawPath(
                     path = path,
                     brush = imageBrush,
-                    alpha = 1f,
-                    colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha.value)),
+                    colorFilter = ColorFilter.tint(ringColor),
                 )
             }
         } else {
             drawCircle(
                 brush = imageBrush,
-                radius = radius,
+                radius = (radius + innerRadius) / 2f,
                 center = center,
-                alpha = 1f,
-                colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha.value)),
+                colorFilter = ColorFilter.tint(ringColor),
+                style = Stroke(width = borderSize.toPx()),
             )
         }
-
-        val innerRadius = radius - borderSize.toPx()
-        val innerPath = Path().apply {
-            addOval(Rect(center = center, radius = innerRadius))
-        }
-
-        drawPath(
-            path = innerPath,
-            color = Color.Transparent,
-            blendMode = BlendMode.Clear
-        )
     }
 }
 

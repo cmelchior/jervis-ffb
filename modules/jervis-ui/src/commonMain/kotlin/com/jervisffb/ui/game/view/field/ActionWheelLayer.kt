@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.view.ActionWheelDialog
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.game.view.NoActionWheel
