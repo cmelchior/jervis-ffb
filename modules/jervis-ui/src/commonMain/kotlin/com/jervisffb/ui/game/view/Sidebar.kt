@@ -93,7 +93,10 @@ fun Sidebar(
                 }
 
                 // Make sure player stats are shown on top of reserves
-                PlayerStatsCard(vm.hoverPlayer())
+                PlayerStatsCard(
+                    flow = vm.playerStatCardFlow,
+                    onClick = vm::dismissFixedCard
+                )
             }
         }
     }

@@ -21,6 +21,9 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.isOnAwayTeam
+import com.jervisffb.engine.model.isOnHomeTeam
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
@@ -31,6 +34,7 @@ import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.field.FieldSizeData
@@ -42,9 +46,15 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -116,7 +126,6 @@ class GameScreenModel(
         )
     )
 
-    val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val sharedFieldData = LocalFieldDataWrapper()
 
     var fumbbl: FumbblReplayAdapter? = null
@@ -149,6 +158,83 @@ class GameScreenModel(
             Weather.POURING_RAIN -> FieldDetails.RAIN
             Weather.BLIZZARD -> FieldDetails.BLIZZARD
         }
+    }
+
+    val hoverPlayerFlow = MutableStateFlow<Player?>(null)
+    val playerStatCardDismissed = MutableStateFlow(false)
+
+    // Calculate which player to show on either the away or home side
+    private fun computePlayerStatCard(fixedPlayer: Player?, hoveredPlayer: Player?, forHomeSide: Boolean): Player? {
+        fun shouldShowFixedHere(p: Player, homeSide: Boolean): Boolean = when (homeSide) {
+            true -> p.isOnHomeTeam()
+            false -> p.isOnAwayTeam()
+        }
+        return when {
+            // 1. If there is only an active player, it should be shown in the dogout of the team it belongs to.
+            (fixedPlayer != null && hoveredPlayer == null) -> {
+                if (shouldShowFixedHere(fixedPlayer, forHomeSide)) fixedPlayer else null
+            }
+            // 2. If there is no active player, but there is a hovered player, it should be shown in Away dogout (right side of the screen).
+            // The only exception is if the player is in the Away dogout, in which case it should be shown in the Home dogout.
+            (fixedPlayer == null && hoveredPlayer != null) -> {
+                val isInAwayDogout = hoveredPlayer.isOnAwayTeam() && hoveredPlayer.location is DogOut
+                when (forHomeSide) {
+                    true -> if (isInAwayDogout) hoveredPlayer else null
+                    false -> if (!isInAwayDogout) hoveredPlayer else null
+                }
+            }
+            // 3. If there is both and active player and a hovered player, we show the active player in the team dogout
+            // and the hovered player in the opposite team dogout. In the edge case, where you are selecting a player
+            // in the dogout on the opposite side of the active player, the active player should be temporarily
+            // hidden while we only show the hover player.
+            (fixedPlayer != null && hoveredPlayer != null) -> {
+                val showFixedPlayer = shouldShowFixedHere(fixedPlayer, forHomeSide)
+                val isHoveredPlayerInHomeDogout = hoveredPlayer.isOnHomeTeam() && hoveredPlayer.location is DogOut
+                val isHoveredPlayerInAwayDogout = hoveredPlayer.isOnAwayTeam() && hoveredPlayer.location is DogOut
+                val isActivePlayerInHomeDogout = fixedPlayer.isOnHomeTeam()
+                val isActivePlayerInAwayDogout = fixedPlayer.isOnAwayTeam()
+                // Catch edge case where hovering over the other dogout while the active player is being shown
+                // In that case, the hover player should override the active player.
+                if (isActivePlayerInAwayDogout && isHoveredPlayerInHomeDogout) {
+                    return if (forHomeSide) null else hoveredPlayer
+                }
+                if (isActivePlayerInHomeDogout && isHoveredPlayerInAwayDogout) {
+                    return if (forHomeSide) hoveredPlayer else null
+                }
+                // Show either Fixed or Hover player, depending on the location.
+                // If the hover and active player are the same, we only want to show the active player.
+                when (showFixedPlayer) {
+                    true -> fixedPlayer
+                    false -> if (hoveredPlayer.id == fixedPlayer.id) null else hoveredPlayer
+                }
+            }
+            else -> null // Otherwise do not show any player
+        }
+    }
+
+    private val playerStatCardFlow: SharedFlow<Pair<Player?, Player?>> = combine(
+        uiState.uiStateFlow,
+        hoverPlayerFlow,
+        playerStatCardDismissed
+    ) { snapshot, hoveredPlayer, activePlayerDismissed ->
+        val activePlayer = snapshot.game.activePlayer
+        val fixedPlayer = activePlayer?.takeIf { !activePlayerDismissed || hoveredPlayer?.id == activePlayer.id }
+        Pair(
+            computePlayerStatCard(fixedPlayer, hoveredPlayer, forHomeSide = true),
+            computePlayerStatCard(fixedPlayer, hoveredPlayer, forHomeSide = false)
+        )
+    }.shareIn(screenModelScope, SharingStarted.Eagerly, 1)
+
+    fun playerStatCardFlowFor(team: Team): Flow<UiPlayerCard?> =
+        playerStatCardFlow
+            .map { (homeSidePlayer, awaySidePlayer) ->
+                if (team.isHomeTeam()) homeSidePlayer else awaySidePlayer
+            }
+            .distinctUntilChanged { oldPlayer, newPlayer -> oldPlayer?.id == newPlayer?.id }
+            .map { player -> player?.let(::UiPlayerCard) }
+
+    fun dismissPlayerStatCard() {
+        playerStatCardDismissed.value = true
     }
 
     val logsBackgroundColor: Flow<Color> = combine(
@@ -213,6 +299,11 @@ class GameScreenModel(
                 selectedPlayersInUi.clear()
             }
         }
+        uiState.uiStateFlow
+            .map { snapshot -> snapshot.game.activePlayer }
+            .distinctUntilChanged()
+            .onEach { playerStatCardDismissed.value = false }
+            .launchIn(screenModelScope)
     }
 
     /**

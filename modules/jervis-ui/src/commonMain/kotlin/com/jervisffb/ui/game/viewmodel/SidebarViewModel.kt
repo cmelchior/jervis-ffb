@@ -4,7 +4,6 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.utils.safeTryEmit
@@ -20,8 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 
@@ -97,25 +94,7 @@ class SidebarViewModel(
         }
     }
 
-    // Player being hovered over.
-    // All of these will be shown on the away team location, except when hovering over
-    // the away team dugout, which should be shown in the home team
-    fun hoverPlayer(): Flow<UiPlayerCard?> =
-        hoverPlayerChannel
-            .distinctUntilChanged { old, new ->
-                old?.id == new?.id
-            }
-            .filter { player ->
-                if (player == null) return@filter true
-                when (team.isHomeTeam()) {
-                    true -> player.isOnAwayTeam() && player.location is DogOut
-                    false -> !(player.isOnAwayTeam() && player.location is DogOut)
-                }
-            }
-            .distinctUntilChanged { old, new -> old?.id == new?.id }
-            .map { player ->
-                player?.let { UiPlayerCard(it) }
-            }
+    val playerStatCardFlow: Flow<UiPlayerCard?> = gameViewModel.playerStatCardFlowFor(team)
 
     fun reserves(): Flow<List<UiSidebarPlayer>> {
         return dogoutFlow
@@ -148,6 +127,8 @@ class SidebarViewModel(
     fun hoverExit() {
         hoverPlayerChannel.safeTryEmit(null)
     }
+
+    fun dismissFixedCard() = gameViewModel.dismissPlayerStatCard()
 
     private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>>): Flow<List<UiSidebarPlayer>> {
         return dogoutFlow

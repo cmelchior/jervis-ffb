@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -62,6 +63,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.utils.BottomEndFlowRow
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -74,7 +76,7 @@ import kotlinx.coroutines.flow.Flow
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
+fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
     val playerData by flow.collectAsState(null)
     val teamColor = when (playerData?.model?.isOnHomeTeam() == true) {
         true -> JervisTheme.homeTeamColor
@@ -97,10 +99,13 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .applyIf(onClick != null) {
+                    clickable(onClick = onClick!!)
+                }
                 .onPointerEvent(PointerEventType.Enter) { /* Swallow it */ }
                 .onPointerEvent(PointerEventType.Exit) { /* Swallow it */ }
             ,
-            shape = RectangleShape, //RoundedCornerShape(8.dp),
+            shape = RectangleShape,
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = darkerTeamColor),
             // border = BorderStroke(width = bigBorderSize, color = teamColor),
