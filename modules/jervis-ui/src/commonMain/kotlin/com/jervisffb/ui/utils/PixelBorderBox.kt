@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
@@ -41,12 +42,14 @@ fun PixelBorderBox(
     }
 
     Box(
-        modifier = modifier.drawWithPixelBorder(
-            layer = layer,
-            borderEnabled = borderEnabled,
-            layerBitmap = layerBitmap,
-            onCaptureRequested = { captureRequested = true }
-        ),
+        modifier = modifier
+            .onSizeChanged { layerBitmap = null }
+            .drawWithPixelBorder(
+                layer = layer,
+                borderEnabled = borderEnabled,
+                layerBitmap = layerBitmap,
+                onCaptureRequested = { captureRequested = true }
+            ),
     ) {
         content()
     }

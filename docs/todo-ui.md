@@ -2,10 +2,9 @@
 
 This document is used to track various todo lists for the UI.
 
-The TODO list are by no means exhaustive, it is just a place to dump
+The TODO list is by no means exhaustive, it is just a place to dump
 things as they come up.
 
-- Hover over player when Action wheel is visible isn't working
 - Kickoff result animations are not working
 
 ## Todo List
@@ -41,7 +40,6 @@ things as they come up.
   - [ ] When selecting pass target
   - [ ] When selecting foul target
 - [ ] Add numbers to yellow squares to indicate the target number for rush/dodge.
-- [ ] Keep player card open for the currently active player.
 - [ ] Passes going out of bounds currently land in exitAt, make the animation move the
       ball out of bounds.
 - [ ] Set size of player icons and square decorators correctly. Right now they are bit off making them look blurry.
