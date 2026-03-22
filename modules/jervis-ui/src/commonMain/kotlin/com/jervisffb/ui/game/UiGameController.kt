@@ -518,6 +518,8 @@ class UiGameController(
         uiState: UiSnapshotAccumulator
     ) {
         if (action != Undo) {
+            // Run any animations on Wheel Controllers first, before triggering more custom animations.
+            // This is because we want to "finish" rolling dice, before showing the actual result of those dice rolls
             val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
                 controller.nodes.contains(engineController.currentNode())
             }
@@ -526,6 +528,11 @@ class UiGameController(
                     action
                 ) == true) {
                 uiState.emitActionWheelState()
+                animationDone.receive()
+            }
+            val animation = AnimationFactory.getPostActionAnimation(state, action)
+            if (animation != null) {
+                animationFlow.emit(animation)
                 animationDone.receive()
             }
         }

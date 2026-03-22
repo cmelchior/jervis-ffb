@@ -2,12 +2,12 @@
 
 This document is used to track various todo lists for the UI.
 
-The TODO list is by no means exhaustive, it is just a place to dump
-things as they come up.
-
-- Kickoff result animations are not working
+The TODO list is by no means exhaustive, it is just a place to dump things as 
+they come up.
 
 ## Todo List
+- [ ] Move counter does not work correctly doing jump/leaps.
+- [ ] Missing animation when passing the ball
 - [ ] Toggling "Hide Jump if Leap is possible", isn't reactive. You need to re-calculate the decoraters. It would be nicer if the Action Wheel was updated immediately.
 - [ ] Action icon for Pogo
 - [ ] Reroll icon for Pass skill
