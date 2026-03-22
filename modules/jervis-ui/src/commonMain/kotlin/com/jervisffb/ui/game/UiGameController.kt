@@ -23,6 +23,13 @@ import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
+import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.rules.JUMP_DISTANCE
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep as BB2020JumpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep as BB2025JumpStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
@@ -577,12 +584,14 @@ class UiGameController(
         // Clear move markers when an action ends
         if (delta.containsCommand { it is ExitProcedure && it.procedure == ActivatePlayer }) {
             uiIndicators.resetMovesUsed()
+            acc.setMovesUsed(uiIndicators.movesUsed)
             return
         }
 
         // Clear move markers when starting a drive. This also handles after a touchdown
         if (state.currentProcedureState()?.procedure == StartOfDriveSequence) {
             uiIndicators.resetMovesUsed()
+            acc.setMovesUsed(uiIndicators.movesUsed)
             return
         }
 
@@ -597,10 +606,16 @@ class UiGameController(
         }
 
         // Add decoration when moving player
-        // TODO Add support JUMP/LEAP
         val normalMoveStep = delta.steps.lastOrNull()?.let {
             it.procedure == StandardMoveStep && it.action is FieldSquareSelected
         } ?: false
+
+        val jumpMoveStep = delta.steps.lastOrNull()?.let {
+            (it.procedure == BB2020JumpStep || it.procedure == BB2025JumpStep ||
+                it.procedure == LeapStep || it.procedure == PogoStep) &&
+                it.action is FieldSquareSelected
+        } ?: false
+
         if (normalMoveStep) {
             val start = delta.allCommands()
                 .filterIsInstance<SetPlayerLocation>()
@@ -614,6 +629,16 @@ class UiGameController(
                 deltaId = delta.id,
                 action = { uiIndicators.removeLastMoveUsed() }
             )
+        } else if (jumpMoveStep) {
+            val start = state.getContextOrNull<MoveContext>()?.startingSquare
+            if (start != null) {
+                val extraCost = JUMP_DISTANCE - 1
+                uiIndicators.addMoveUsed(start, extraMoveCost = extraCost)
+                uiIndicators.registerUndo(
+                    deltaId = delta.id,
+                    action = { uiIndicators.removeLastMoveUsed(extraMoveCost = extraCost) }
+                )
+            }
         }
         acc.setMovesUsed(uiIndicators.movesUsed)
     }

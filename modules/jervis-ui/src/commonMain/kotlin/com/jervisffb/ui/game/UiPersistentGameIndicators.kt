@@ -24,6 +24,7 @@ class UiPersistentGameIndicators {
     private val blodspots: MutableMap<FieldCoordinate, BloodSpot> = mutableMapOf()
 
     private var usedMoveToStandUp: Int? = null
+    private var extraMoveOffset: Int = 0
     val movesUsed: MutableList<MoveUsed> = mutableListOf() // TODO Probably shouldn't be public
 
     // Track when standing up, so we can adjust showing "Move Used" decorator
@@ -31,9 +32,10 @@ class UiPersistentGameIndicators {
         usedMoveToStandUp = move
     }
 
-    fun addMoveUsed(coordinate: Location) {
+    fun addMoveUsed(coordinate: Location, extraMoveCost: Int = 0) {
         if (coordinate !is FieldCoordinate) TODO("Missing support for $coordinate")
-        this.movesUsed.add(MoveUsed(coordinate, movesUsed.size + (usedMoveToStandUp ?: 0)))
+        this.movesUsed.add(MoveUsed(coordinate, movesUsed.size + extraMoveOffset + (usedMoveToStandUp ?: 0)))
+        extraMoveOffset += extraMoveCost
     }
 
     fun getAllMoveUsed(): Map<FieldCoordinate, Int> {
@@ -49,12 +51,14 @@ class UiPersistentGameIndicators {
         return null
     }
 
-    fun removeLastMoveUsed() {
+    fun removeLastMoveUsed(extraMoveCost: Int = 0) {
         movesUsed.removeLastOrNull()
+        extraMoveOffset -= extraMoveCost
     }
 
     fun resetMovesUsed() {
         usedMoveToStandUp = null
+        extraMoveOffset = 0
         movesUsed.clear()
     }
 
