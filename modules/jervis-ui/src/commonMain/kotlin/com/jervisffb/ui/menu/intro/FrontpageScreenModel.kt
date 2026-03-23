@@ -2,6 +2,7 @@
 
 package com.jervisffb.ui.menu.intro
 
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.BuildConfig
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -12,7 +13,10 @@ import com.jervisffb.ui.menu.StandAloneScreen
 import com.jervisffb.ui.menu.StandAloneScreenModel
 import com.jervisffb.ui.menu.fumbbl.FumbblScreen
 import com.jervisffb.ui.menu.fumbbl.FumbblScreenModel
+import com.jervisffb.utils.AppUpdater
 import com.jervisffb.utils.jervisLogger
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -79,12 +83,16 @@ class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScr
     }
 
     val news: List<NewsEntryData>
+    val clientVersion: String = BuildConfig.releaseVersion
+    val appUpdate: StateFlow<Boolean>
+        field = MutableStateFlow(false)
 
     init {
         // Prepare Git History so it can be displayed on the News section
         // It is formatted here because (for some reason) the BuildConfig plugin has problems
         // doing it in Gradle
         news = formatGitHistory()
+        checkForAppUpdate()
     }
 
     private fun formatGitHistory(): List<NewsEntryData> {
@@ -137,5 +145,9 @@ class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScr
         }
     }
 
-    val clientVersion: String = BuildConfig.releaseVersion
+    private fun checkForAppUpdate() {
+        AppUpdater.checkForUpdate(screenModelScope) { updateAvailable ->
+            appUpdate.value = updateAvailable
+        }
+    }
 }

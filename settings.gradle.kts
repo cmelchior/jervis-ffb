@@ -7,6 +7,7 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
+        maven("https://maven.hq.hydraulic.software")
         maven {
             url = uri("${rootProject.projectDir}/mavenRepo")
         }

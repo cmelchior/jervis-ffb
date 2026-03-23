@@ -53,7 +53,12 @@ Test builds are created on every successful push to the `main` branch.
   https://kotlinlang.org/docs/wasm-troubleshooting.html#browser-versions
 
 * Desktop client installers for Windows, macOS and Linux can be found here:
-  https://jervis.ilios.dk/download/. 
+  https://cmelchior.github.io/jervis-ffb/download.html. They only need to be 
+  installed once and can then update themselves whenever there is a new release.
+  This is done using [Conveyor](https://www.hydraulic.dev/).
+
+  Installers for a single version (without auto-update) can be found 
+  here: https://jervis.ilios.dk/download/. 
 
 * No test build for iPad is currently being created. Instead, this must be
   built from source. 

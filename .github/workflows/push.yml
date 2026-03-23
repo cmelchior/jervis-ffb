@@ -307,3 +307,71 @@ jobs:
             mv ./jervis_old/uploads ./jervis
             rm -rf ./jervis_old
             rm ./jervis_upload/devbuilds.zip
+
+  # Release JVM app via Conveyor, but only from main branch
+  release-via-conveyor:
+    runs-on: ubuntu-latest
+    needs: [ upload-dev-version ]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    permissions:
+      contents: write  # Required to create GitHub Releases
+    env:
+      JERVIS_CONVEYOR_GITHUB_TOKEN: ${{ secrets.JERVIS_CONVEYOR_GITHUB_TOKEN }}
+      JERVIS_MACOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_BASE64 }}
+      JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD }}
+      JERVIS_MACOS_NOTARIZATION_PASSWORD: ${{ secrets.JERVIS_MACOS_NOTARIZATION_PASSWORD }}
+      JERVIS_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.JERVIS_MACOS_NOTARIZATION_TEAM_ID }}
+      JERVIS_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.JERVIS_MACOS_NOTARIZATION_APPLE_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for accurate git commit count (patch version)
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Get distribution version
+        run: echo "JERVIS_APP_VERSION=$(./gradlew -q printDistributionVersion)" >> $GITHUB_ENV
+
+      - name: Build JVM app
+        run: ./gradlew jvmJar -P"jervis.releaseType=dev"
+
+      - name: Decode macOS signing certificate
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/mac_signing_cert.p12
+          echo -n "$JERVIS_MACOS_BUILD_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
+          echo "JERVIS_MACOS_CERTIFICATE_PATH=$CERTIFICATE_PATH" >> "$GITHUB_ENV"
+
+      - name: Run Conveyor
+        uses: hydraulic-software/conveyor/actions/build@v22.0
+        with:
+          command: make copied-site
+          signing_key: ${{ secrets.JERVIS_CONVEYOR_SIGNING_KEY }}
+          agree_to_license: 1
+          extra_flags: -f conveyor.dev.conf --passphrase env:JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD
+
+      - name: Cleanup old releases # Only keep 5 most recent releases
+        run: |
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq 'sort_by(.createdAt) | reverse | .[5:] | .[].tagName' \
+          | while read tag; do
+            echo "Deleting release $tag"
+            gh release delete "$tag" --yes --cleanup-tag
+          done
+        env:
+          GH_TOKEN: ${{ secrets.JERVIS_CONVEYOR_GITHUB_TOKEN }}

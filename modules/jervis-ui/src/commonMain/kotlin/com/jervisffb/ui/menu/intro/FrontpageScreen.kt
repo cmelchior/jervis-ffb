@@ -23,7 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -104,6 +106,19 @@ fun loadJervisFont(): SkiaFont {
 private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val viewModel = rememberScreenModel { FrontpageScreenModel(menuViewModel) }
+    val isUpdateAvailable by viewModel.appUpdate.collectAsState()
+    val version = viewModel.clientVersion
+    val visibleVersionString = remember(isUpdateAvailable) {
+        buildAnnotatedString {
+            append(version)
+            if (isUpdateAvailable) {
+                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                append(" - Update Available")
+                pop()
+            }
+        }
+    }
+
     MenuScreen {
         Row {
             Column(modifier = Modifier.fillMaxWidth(0.67f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
@@ -137,7 +152,7 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
                 ) {
                     Text(
                         modifier = Modifier.clickable { menuViewModel.showAboutDialog(true) }.padding(8.dp),
-                        text = viewModel.clientVersion,
+                        text = visibleVersionString,
                         color = JervisTheme.contentTextColor,
                     )
                 }

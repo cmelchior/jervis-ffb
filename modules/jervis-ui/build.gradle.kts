@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.conveyor)
 }
 
 group = "com.jervisffb"
@@ -215,6 +216,27 @@ compose.desktop {
         }
     }
 }
+
+// BEGIN -- Dependencies and work-around required for Conveyor Support
+// These top-level dependecies are being added to all targets, including iOS
+// and WASM, which is problematic as it will break the build. For that reason,
+// we need to filter them out.
+dependencies {
+    linuxAmd64(compose.desktop.linux_x64)
+    macAmd64(compose.desktop.macos_x64)
+    macAarch64(compose.desktop.macos_arm64)
+    windowsAmd64(compose.desktop.windows_x64)
+}
+
+val nonDesktopTargets = listOf("ios", "wasm")
+configurations.matching { conf ->
+    nonDesktopTargets.any {
+        conf.name.contains(it, ignoreCase = true)
+    }
+}.configureEach {
+    exclude(group = "org.jetbrains.compose.desktop")
+}
+// -- END
 
 // ----
 // Setup conversion of default-client-settings.ini to generated code

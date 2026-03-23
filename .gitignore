@@ -1,6 +1,7 @@
 # IntelliJ
 .gradle/
 .idea/
+
 !.idea/vcs.xml
 .ipynb_checkpoints/
 .kotlin/
@@ -9,7 +10,9 @@ build/
 # The tools folder should be built for each platform, so do not commit build artifacts
 tools/fumbblcli.jar
 
-
+# Conveyor generated config (build artifact from writeConveyorConfig task)
+generated.conveyor.conf
+/output/
 
 # Resources are too expensive to store in Git for now
 # They need to be extracted from the FUMBBL client.

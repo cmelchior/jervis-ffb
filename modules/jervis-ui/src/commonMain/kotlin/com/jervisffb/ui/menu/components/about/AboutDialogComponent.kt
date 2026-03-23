@@ -9,19 +9,29 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.BuildConfig
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
@@ -30,6 +40,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.menu.utils.JervisLogo
+import com.jervisffb.utils.AppUpdater
 import com.jervisffb.utils.openUrlInBrowser
 
 /**
@@ -47,6 +58,11 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
     val showDialog: Boolean by viewModel.isAboutDialogVisible.collectAsState()
     val dialogColor = JervisTheme.rulebookRed
     val textColor = JervisTheme.contentTextColor
+    val isAutoUpdateAvailable = AppUpdater.platformSupportAutoUpdate
+    val isUpdateButtonAvailable by AppUpdater.isUpdateAvailable.collectAsState()
+    val isUpdateInProgress by AppUpdater.isUpdateInProgress.collectAsState()
+    var isCheckForUpdateInProgress by remember { mutableStateOf(false) }
+
     if (!showDialog) return
     JervisDialog(
         title = "About Jervis Fantasy Football",
@@ -59,6 +75,7 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
                 dialogColor,
                 textColor,
                 creditData,
+                isCheckForUpdateInProgress
             )
         },
         buttons = {
@@ -69,6 +86,33 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
                 textColor = buttonTextColor
             )
             Spacer(modifier = Modifier.weight(1f))
+            if (isAutoUpdateAvailable && !isUpdateInProgress) {
+                when {
+                    isUpdateButtonAvailable -> {
+                        JervisButton(
+                            text = "Update Client",
+                            onClick = { AppUpdater.updateNow() },
+                            buttonColor = JervisTheme.rulebookBlue,
+                            textColor = buttonTextColor,
+                        )
+                    }
+                    isAutoUpdateAvailable -> {
+                        JervisButton(
+                            text = "Check for Update",
+                            enabled = !isCheckForUpdateInProgress,
+                            onClick = {
+                                isCheckForUpdateInProgress = true
+                                AppUpdater.checkForUpdate(viewModel.uiScope) {
+                                    isCheckForUpdateInProgress = false
+                                }
+                            },
+                            buttonColor = JervisTheme.rulebookBlue,
+                            textColor = buttonTextColor,
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
             JervisButton(
                 text = "FUMBBL Credits",
                 onClick = { openUrlInBrowser(creditData.fumbblAttributionUrl) },
@@ -101,8 +145,22 @@ private fun ColumnScope.CreditDialogContent(
     dialogColor: Color,
     textColor: Color,
     data: CreditData,
+    isCheckForUpdateInProgress: Boolean,
 ) {
     val columnSpace = 24.dp
+    val isUpdateAvailable by AppUpdater.isUpdateAvailable.collectAsState()
+    val version = BuildConfig.releaseVersion
+    val visibleVersionString = remember(isUpdateAvailable) {
+        buildAnnotatedString {
+            append("$version (${data.gitCommit})")
+            if (isUpdateAvailable) {
+                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                append(" - Update Available")
+                pop()
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .height(350.dp)
@@ -115,7 +173,25 @@ private fun ColumnScope.CreditDialogContent(
         Row {
             CreditLabel("Version:", "", textColor)
             Spacer(modifier = Modifier.width(columnSpace))
-            CreditText("${data.clientVersion} (${data.gitCommit})", textColor)
+            Row(
+                modifier = Modifier.weight(2f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = visibleVersionString,
+                    fontSize = 14.sp,
+                    color = textColor,
+                    fontWeight = FontWeight.Normal,
+                )
+                if (isCheckForUpdateInProgress) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = JervisTheme.rulebookRed,
+                        trackColor = JervisTheme.rulebookPaperMediumDark
+                    )
+                }
+            }
         }
         Row {
             CreditLabel(
@@ -204,6 +280,17 @@ private fun RowScope.CreditLabel(label: String, description: String, textColor: 
 
 @Composable
 private fun RowScope.CreditText(text: String, textColor: Color) {
+    Text(
+        modifier = Modifier.weight(2f),
+        text = text,
+        fontSize = 14.sp,
+        color = textColor,
+        fontWeight = FontWeight.Normal,
+    )
+}
+
+@Composable
+private fun RowScope.CreditText(text: AnnotatedString, textColor: Color) {
     Text(
         modifier = Modifier.weight(2f),
         text = text,

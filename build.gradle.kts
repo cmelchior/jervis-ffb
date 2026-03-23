@@ -10,7 +10,8 @@ plugins {
     alias(libs.plugins.ktor) apply false
     alias(libs.plugins.multiplatform) apply false
     alias(libs.plugins.serialization) apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
+    alias(libs.plugins.conveyor) apply false
+    alias(libs.plugins.ktlint)
 }
 
 allprojects {
@@ -38,6 +39,10 @@ val gitHash: Provider<String> = providers.exec {
     commandLine("git", "rev-parse", "--short",  "HEAD")
 }.standardOutput.asText.map { it.trim() }
 
+val gitCommitCount: Provider<String> = providers.exec {
+    commandLine("git", "rev-list", "--count", "HEAD")
+}.standardOutput.asText.map { it.trim() }
+
 val gitHashLong: Provider<String> = providers.exec {
     commandLine("git", "rev-parse",  "HEAD")
 }.standardOutput.asText.map { it.trim() }
@@ -46,9 +51,19 @@ val gitHistory: Provider<String> = providers.exec {
     commandLine("git", "--no-pager", "log", "-5", "--pretty=format:%at:%s")
 }.standardOutput.asText.map { it.trim() }
 
+
+private fun createVersionStr(): Provider<String> {
+    val majorVersion = providers.gradleProperty("jervis.version.major")
+    val minorVersion = providers.gradleProperty("jervis.version.minor")
+    val patchVersion = gitCommitCount
+    return majorVersion
+        .zip(minorVersion) { major, minor -> "$major.$minor" }
+        .zip(patchVersion) { majorMinor, patch -> "$majorMinor.$patch" }
+}
+
 // Create Maven version
 private fun createMavenVersion(): Provider<String> {
-    val versionStr = providers.gradleProperty("jervis.version")
+    val versionStr = createVersionStr()
     return when (releaseType) {
         ReleaseType.SNAPSHOT -> versionStr.map { "$it-SNAPSHOT" }
         ReleaseType.DEV -> {
@@ -62,7 +77,7 @@ private fun createMavenVersion(): Provider<String> {
 
 // Create Public version (as visible inside the app)
 private fun createProjectVersion(): Provider<String> {
-    val versionStr = providers.gradleProperty("jervis.version")
+    val versionStr = createVersionStr()
     return when (releaseType) {
         ReleaseType.SNAPSHOT -> versionStr.map { "$it.dev.local" }
         ReleaseType.DEV -> {
@@ -74,19 +89,32 @@ private fun createProjectVersion(): Provider<String> {
     }
 }
 
-// Create version used when creating distribution packages.
+// Create version used when creating distribution packages. These versions
+// can only be numbers and dots.
+//
+// See https://conveyor.hydraulic.dev/22.0/configs/names/#appversion
 // See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html#specifying-distribution-properties
-// for restrictions on these.
 private fun createDistributionVersion(): Provider<String> {
-    return providers.gradleProperty("jervis.version")
+    val versionStr = createVersionStr()
+    return versionStr
         .map {
-            if (it.startsWith("0.")) {
-                "1.0.0"
+            // Dmg installers requires major > 0. For now, we hack all versions below 0.x
+            // to be 1.0.
+            if (it.startsWith("0.1.")) {
+                it.replaceFirst("0.1.", "1.0.")
             } else {
                 it
             }
         }
 }
+
+// Current short git hash
+rootProject.ext["gitHash"] = gitHash
+rootProject.ext["gitHashLong"] = gitHashLong
+// Number of commits (we use this as the patch version)
+rootProject.ext["gitCommitCount"] = gitCommitCount
+// History of last 5 commits
+rootProject.ext["gitHistory"] = gitHistory
 
 // Version number used for Maven Artifacts
 rootProject.ext["mavenVersion"] = createMavenVersion()
@@ -94,11 +122,6 @@ rootProject.ext["mavenVersion"] = createMavenVersion()
 rootProject.ext["publicVersion"] = createProjectVersion()
 // Used in Distribution packages (must be SemVer >= 1.0.0)
 rootProject.ext["distributionVersion"] = createDistributionVersion()
-// Current short git hash
-rootProject.ext["gitHash"] = gitHash
-rootProject.ext["gitHashLong"] = gitHashLong
-// History of last 5 commits
-rootProject.ext["gitHistory"] = gitHistory
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
@@ -114,6 +137,21 @@ subprojects {
             reporter(ReporterType.PLAIN)
             reporter(ReporterType.CHECKSTYLE)
         }
+    }
+}
+
+tasks.register<Exec>("createConveyorDevInstallers") {
+    @Suppress("UNCHECKED_CAST")
+    val version = (rootProject.ext["distributionVersion"] as Provider<String>).get()
+    environment("JERVIS_APP_VERSION", version)
+    commandLine("conveyor", "-f", "conveyor.dev.conf", "make", "site")
+}
+
+tasks.register("printDistributionVersion") {
+    @Suppress("UNCHECKED_CAST")
+    val version = rootProject.ext["distributionVersion"] as Provider<String>
+    doLast {
+        println(version.get())
     }
 }
 

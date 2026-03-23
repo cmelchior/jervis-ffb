@@ -48,6 +48,7 @@ kotlin {
                 implementation(libs.coroutines.swing)
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.reflections)
+                implementation(libs.conveyor.control)
             }
         }
 
