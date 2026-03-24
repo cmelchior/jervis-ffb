@@ -40,7 +40,9 @@ val gitHash: Provider<String> = providers.exec {
 }.standardOutput.asText.map { it.trim() }
 
 val gitCommitCount: Provider<String> = providers.exec {
-    commandLine("git", "rev-list", "--count", "HEAD")
+    // We only use for release versions, and since we only do releases from
+    // `main` we just use that branch directly.
+    commandLine("git", "rev-list", "--count", "origin/main")
 }.standardOutput.asText.map { it.trim() }
 
 val gitHashLong: Provider<String> = providers.exec {

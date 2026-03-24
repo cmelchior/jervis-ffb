@@ -333,7 +333,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history needed for accurate git commit count (patch version)
+          fetch-depth: 1
           submodules: "recursive"
 
       - name: Setup Java
