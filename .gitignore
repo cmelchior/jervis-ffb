@@ -7,6 +7,10 @@
 .kotlin/
 build/
 
+# AI folders
+.claude/
+.mcp/
+
 # The tools folder should be built for each platform, so do not commit build artifacts
 tools/fumbblcli.jar
 
