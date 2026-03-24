@@ -12,11 +12,13 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -25,12 +27,16 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.HelpingHandsModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportRerollUsed
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
@@ -43,10 +49,43 @@ import com.jervisffb.engine.utils.sum
  */
 object StandingUpRoll : Procedure() {
 
-    override val initialNode: Node = RollDie
+    override val initialNode: Node = UseTimmber
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<StandingUpRollContext>()
+
+    // The only modifier for Standing Up currently comes from Timm-ber!
+    // We will apply these automatically since doing it or not, has no
+    // side effects, and if you do not want the player to stand up,
+    // you will never attempt it in the first place.
+    object UseTimmber: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<StandingUpRollContext>()
+            val player = context.player
+            val useSkill = player.isSkillAvailable(SkillType.TIMMMBER)
+            val openPlayers = when (useSkill) {
+                true -> {
+                    player.coordinates.getSurroundingCoordinates(rules, 1)
+                        .count { coordinate ->
+                            val neighborPlayer = state.field[coordinate].player
+                            val sameTeam = neighborPlayer?.team == player.team
+                            val isOpen = neighborPlayer?.let { rules.isOpen(it) } ?: false
+                            sameTeam && isOpen
+                        }
+                }
+                false -> 0
+            }
+            return buildCompositeCommand {
+                if (useSkill) {
+                    addAll(
+                        ReportSkillUsed(context.player, SkillType.TIMMMBER),
+                        UpdateContext(context.copy(modifiers = context.modifiers.add(HelpingHandsModifier(openPlayers))))
+                    )
+                }
+                add(GotoNode(RollDie))
+            }
+        }
+    }
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team

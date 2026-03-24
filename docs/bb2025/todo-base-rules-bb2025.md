@@ -82,6 +82,7 @@ book.
     - [x] Cannot mark with no tackle zones
     - [x] Cannot deflect if missing tackle zones
     - [x] Cannot catch if missing tackle zones
+    - [ ] Dodgy Snack is counted as a Modifier
 - [ ] Placed Prone
     - [ ] Ball will bounce from prone player
     - [ ] Activation ends immediately

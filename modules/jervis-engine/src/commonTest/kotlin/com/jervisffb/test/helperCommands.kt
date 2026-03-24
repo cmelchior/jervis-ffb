@@ -316,6 +316,11 @@ fun projectileVomitRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSel
     reroll,
 )
 
+fun standingUpRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun steadyFootingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,

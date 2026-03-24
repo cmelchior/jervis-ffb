@@ -3,6 +3,7 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Using the Player Editor in-game does not correctly modify MovesLeft, since that value is set at the beginning of the turn.
 - Team Badge Outline does not rescale when the game window size changes.
 - The DevModeGameActions do not work in P2P due to too strict checking for action owners.
 - In a P2P Game, both Host and Client can select the same team

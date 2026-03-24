@@ -8,14 +8,14 @@ import com.jervisffb.engine.model.Player
  * Rush or actions that provide more move (I think).
  */
 class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Command {
-    private var originalMove: Int = 0
+    private var originalMovesLeft: Int = 0
 
     init {
         if (remainingMove < 0) throw IllegalArgumentException("Remaining move cannot be negative")
     }
 
     override fun execute(state: Game) {
-        this.originalMove = player.movesLeft
+        this.originalMovesLeft = player.movesLeft
         player.apply {
             movesLeft = remainingMove
         }
@@ -23,7 +23,7 @@ class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Co
 
     override fun undo(state: Game) {
         player.apply {
-            movesLeft = originalMove
+            movesLeft = originalMovesLeft
         }
     }
 }

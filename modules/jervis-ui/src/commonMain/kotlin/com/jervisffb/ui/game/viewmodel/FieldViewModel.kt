@@ -154,7 +154,11 @@ class FieldViewModel(
                         requiresStandingUp && !standingUpIsFree -> rules.moveRequiredForStandingUp
                         else -> 0
                     }
-                    val path: List<FieldCoordinate> = uiSnapshot.pathFinder.getClosestPathTo(mouseEnter!!, (activePlayer!!.movesLeft - standingUpPenalty))
+                    val maxMoves = (activePlayer!!.movesLeft - standingUpPenalty)
+                    val path: List<FieldCoordinate> = when (maxMoves > 0) {
+                        true -> uiSnapshot.pathFinder.getClosestPathTo(mouseEnter!!, maxMoves)
+                        else -> emptyList()
+                    }
 
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {

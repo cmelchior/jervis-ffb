@@ -70,6 +70,17 @@ subjected to any rules that take place at the start or during their activation".
 This means that if a player is Distracted and chooses to forgo their activation, 
 the Distracted status will _not_ be cleared.
 
+### Page 54 - Standing Up
+The rules for standing up state that: "If a player with a Move Allowance 
+Characteristic of 2 or less (regardless of any modifiers) wishes to stand up..."
+
+But it is unclear what modifiers actually apply? Is e.g., a Dodgy Snack a 
+modifier?
+
+For now, Jervis will only take into account base MA + any adjustments with a 
+duration of PERMANENT (e.g. stat increases), when checking if MA < 3. This 
+means that a Mummie (MA 3) with Dodgy Snack, does not roll to stand up.
+
 ### Page 56 - Jumping over Players
 Since players leave their square in a slightly unconventional way, the order
 of checks needs to be defined. This isn't 100% clear from the rulebook, but
@@ -871,7 +882,16 @@ When Strip Ball and Sure Hands interact, the order is unclear. But it shouldn't
 matter, so to simplify the rules engine, Jervis is asking the pushed player to 
 use Sure Hands, before asking the attacker to use Strip Ball.
 
-### Page 137 - Take Root
+### Page 137 - Timmm-ber!
+It is unclear why Timmm-ber! wants to mention that it only works on MA 2 or 
+less, since that is a requirement for even rolling for Standing Up.
+
+For now, Jervis assumes that this sentence can be ignored and doesn't put extra
+constraints on the skill. I.e. any player that rolls for Standing Up can use
+Timmm-ber!.
+
+Technically, Timmm-ber! is an optional skill, but since there is no use-case nor
+downside to applying it automatically, Jervis will do that. 
 
 #### Take Root and Diving Tackle
 The interaction between Take Root and Diving Tackle is unclear as Take  Root 
@@ -897,7 +917,7 @@ replay files.
 #### Take Root and Declaring Actions
 Take Root only says you are not allowed to "Perform" Move Actions. This 
 means it is still allowed to "Declare" them, but the only thing you can do in
-that case is just ending the action straight away.
+that case is just end the action straight away.
 
 ### Page 137 - Tentacles
 This skill explicitly mentions Dodge, Jump and Leap, but not Pogo, so it is 

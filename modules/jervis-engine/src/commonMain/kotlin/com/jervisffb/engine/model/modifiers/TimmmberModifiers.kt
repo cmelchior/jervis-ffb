@@ -5,6 +5,8 @@ enum class TimmmberModifiers(override val modifier: Int, override val descriptio
     HELPING_HAND(1, "Helping Hand"),
 }
 
-data class HelpingHandsModifier(override val modifier: Int): DiceModifier {
+data class HelpingHandsModifier(private val openPlayers: Int): DiceModifier {
+    override val modifier: Int
+        get() = openPlayers * TimmmberModifiers.HELPING_HAND.modifier
     override val description: String = TimmmberModifiers.HELPING_HAND.description
 }

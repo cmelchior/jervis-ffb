@@ -516,7 +516,11 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] +1 when making a dodge
   - [x] Does not give -1 when dodging into a square marked by this player
 - [x] Throw Team-mate
-- [ ] Timmm-ber!
+- [x] Timmm-ber!
+  - [x] Apply to all Standing Up rolls
+  - [x] +1 for open players
+  - [x] Marked players do not count
+  - [x] Rolling 1 still fails.
 - [ ] Trickster
 - [ ] Unchannelled Fury*
   - [ ] Pro can be used as a reroll

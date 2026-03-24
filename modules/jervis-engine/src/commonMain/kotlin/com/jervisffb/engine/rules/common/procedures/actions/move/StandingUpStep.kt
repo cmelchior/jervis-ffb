@@ -22,19 +22,20 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.HelpingHandsModifier
 import com.jervisffb.engine.reports.ReportStandingUp
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 
 data class StandingUpRollContext(
     val player: Player,
-    val modifiers: List<DiceModifier> = emptyList(),
+    val modifiers: PersistentList<DiceModifier> = persistentListOf(),
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false
 ): ProcedureContext
@@ -87,23 +88,9 @@ object StandingUpStep : Procedure() {
 
     object RollForStandingUp : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            // The only modifier for Standing Up currently comes from Timm-ber!
-            // We will apply these automatically since doing it or not, has no
-            // side effects, and if you do not want the player to stand up,
-            // you will never attempt it in the first place.
             val player = state.getContext<MoveContext>().player
             val modifiers = mutableListOf<DiceModifier>()
-            if (player.isSkillAvailable(SkillType.TIMMMBER)) {
-                val helpers = (player.location as OnFieldLocation).getSurroundingCoordinates(rules, 1)
-                    .count { coordinate ->
-                        val neighborPlayer = state.field[coordinate].player
-                        val sameTeam = neighborPlayer?.team == player.team
-                        val isOpen = neighborPlayer?.let { rules.isOpen(it) } ?: false
-                        sameTeam && isOpen
-                    }
-                modifiers.add(HelpingHandsModifier(helpers))
-            }
-            return AddContext(StandingUpRollContext(player, modifiers))
+            return AddContext(StandingUpRollContext(player, modifiers.toPersistentList()))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandingUpRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
