@@ -20,9 +20,28 @@ concurrency:
 
 # For now, just run all rules tests. Mostly as a proof-of-concept.
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_count: ${{ steps.commit_count.outputs.count }}
+    steps:
+      - name: Get commit count
+        id: commit_count
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          COUNT=$(gh api "repos/${{ github.repository }}/commits?sha=${{ github.sha }}&per_page=1" \
+            --include 2>/dev/null \
+            | grep -oP 'page=\K[0-9]+(?=>; rel="last")' \
+            || echo "1")
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
   run-tests:
     runs-on: ubuntu-latest
+    needs: [ setup ]
     if: always() && !cancelled()
+    env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,8 +64,9 @@ jobs:
 
   build-windows-desktop:
     runs-on: windows-latest
-    needs: [ run-tests ]
+    needs: [ setup, run-tests ]
     env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
       JERVIS_WINDOWS_PACKAGE_GUID: ${{ secrets.JERVIS_WINDOWS_PACKAGE_GUID }}
     if: |
       always() && 
@@ -87,8 +107,9 @@ jobs:
   # See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html#macos-specific-configuration
   build-macos-desktop:
     runs-on: macos-latest
-    needs: [ run-tests ]
+    needs: [ setup, run-tests ]
     env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
       JERVIS_MACOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_BASE64 }}
       JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD }}
       JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD: ${{ secrets.JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD }}
@@ -151,12 +172,14 @@ jobs:
 
   build-linux-desktop:
     runs-on: ubuntu-latest
-    needs: [ run-tests ]
+    needs: [ setup, run-tests ]
     if: |
-      always() && 
-      !cancelled() && 
-      !contains(needs.*.result, 'failure') && 
+      always() &&
+      !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
+    env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
 
     steps:
       - name: Checkout code
@@ -189,12 +212,14 @@ jobs:
 
   build-wasm:
     runs-on: ubuntu-latest
-    needs: [ run-tests ]
+    needs: [ setup, run-tests ]
     if: |
-      always() && 
-      !cancelled() && 
-      !contains(needs.*.result, 'failure') && 
+      always() &&
+      !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
+    env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
 
     steps:
       - name: Checkout code
@@ -311,7 +336,7 @@ jobs:
   # Release JVM app via Conveyor, but only from main branch
   release-via-conveyor:
     runs-on: ubuntu-latest
-    needs: [ upload-dev-version ]
+    needs: [ setup, upload-dev-version ]
     if: |
       always() &&
       github.event_name == 'push' &&
@@ -322,6 +347,7 @@ jobs:
     permissions:
       contents: write  # Required to create GitHub Releases
     env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
       JERVIS_CONVEYOR_GITHUB_TOKEN: ${{ secrets.JERVIS_CONVEYOR_GITHUB_TOKEN }}
       JERVIS_MACOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_BASE64 }}
       JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD }}
