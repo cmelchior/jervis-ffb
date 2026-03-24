@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
@@ -820,6 +821,19 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Sprint?"
                 false -> "Waiting for opponent to use Sprint"
+            }
+        },
+
+        BB2025BothDown.DefenderChooseToUseWrestle to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Wrestle?"
+                false -> "Waiting for opponent to use Wrestle"
+            }
+        },
+        BB2025BothDown.AttackerChooseToUseWrestle to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Wrestle?"
+                false -> "Waiting for opponent to use Wrestle"
             }
         },
     )

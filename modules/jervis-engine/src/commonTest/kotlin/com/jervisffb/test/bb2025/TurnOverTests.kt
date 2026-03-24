@@ -27,6 +27,7 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
@@ -41,6 +42,7 @@ import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -494,5 +496,49 @@ class TurnOverTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertNull(state.activeTeam)
         assertEquals(1, state.homeScore)
+    }
+
+    @Test
+    fun placedProneWithBallInOwnTurn() {
+        val attacker = awayTeam["A1".playerId]
+        attacker.addSkill(SkillType.WRESTLE)
+        val defender = homeTeam["H1".playerId]
+
+        // Give ball to attacker
+        SetBallState.carried(state.singleBall(), attacker).execute(state)
+
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock(defender, 2.dblock),
+            Confirm, // Use Wrestle
+            5.d8 // Bounce
+        )
+        assertNull(state.activePlayer)
+        assertEquals(homeTeam, state.activeTeam)
+        state.singleBall().assertCoordinates(14, 5)
+        assertEquals(BallState.ON_GROUND, state.singleBall().state)
+        assertFalse(attacker.hasBall())
+    }
+
+    @Test
+    fun placedProneWithBallInOpponentsTurn() {
+        val attacker = awayTeam["A1".playerId]
+        attacker.addSkill(SkillType.WRESTLE)
+        val defender = homeTeam["H1".playerId]
+
+        // Give ball to defender
+        SetBallState.carried(state.singleBall(), defender).execute(state)
+
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            *standardBlock(defender, 2.dblock),
+            Confirm, // Use Wrestle
+            4.d8 // Bounce
+        )
+        assertNull(state.activePlayer)
+        assertEquals(awayTeam, state.activeTeam)
+        state.singleBall().assertCoordinates(11, 5)
+        assertEquals(BallState.ON_GROUND, state.singleBall().state)
+        assertFalse(defender.hasBall())
     }
 }

@@ -9,7 +9,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -22,16 +21,18 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.BothDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportBothDownResult
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
+import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025PlacedProne
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -95,8 +96,9 @@ object BB2025BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
+                if (useWrestle) ReportSkillUsed(context.defender, SkillType.WRESTLE) else null,
                 UpdateContext(context.copy(defenderUsesWrestle = useWrestle)),
-                GotoNode(AttackerChooseToUseWrestle)
+                if (useWrestle) GotoNode(ResolveBothDown) else GotoNode(AttackerChooseToUseWrestle)
             )
         }
     }
@@ -122,6 +124,7 @@ object BB2025BothDown: Procedure() {
             }
             val updatedContext = context.copy(attackerUsesWrestle = useWrestle)
             return compositeCommandOf(
+                if (useWrestle) ReportSkillUsed(context.attacker, SkillType.WRESTLE) else null,
                 UpdateContext(updatedContext),
                 if (updatedContext.attackerUsesWrestle || updatedContext.defenderUsesWrestle) {
                     GotoNode(ResolveBothDown)
@@ -189,14 +192,11 @@ object BB2025BothDown: Procedure() {
     object ResolveBothDown: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BothDownContext>()
+            val activeContext = state.getContext<ActivatePlayerContext>()
 
-            // If Wrestle was used, both players are just placed prone and nothing more happens.
+            // If Wrestle was used, both players are Place Prone. All side-effects are handled there.
             if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
-                return compositeCommandOf(
-                    SetPlayerState(context.attacker, PlayerState.PRONE, hasTackleZones = false),
-                    SetPlayerState(context.defender, PlayerState.PRONE, hasTackleZones = false),
-                    ExitProcedure()
-                )
+                return GotoNode(ResolveBothPlaceProne)
             }
 
             // If Block was used for both attacker and defender, nothing further happens
@@ -271,6 +271,57 @@ object BB2025BothDown: Procedure() {
             return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
+        }
+    }
+
+    // When using Wrestle, both players are Placed Prone.
+    // If that happens, we resolve them one after the other, starting with the defender.
+    object ResolveBothPlaceProne: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val activeContext = state.getContext<ActivatePlayerContext>()
+            return compositeCommandOf(
+                // TODO Figure out how Multiple Block work here later
+                UpdateContext(activeContext.copy(activationEndsImmediately = true)),
+                GotoNode(ResolveDefenderPlacedProne)
+            )
+        }
+    }
+
+    object ResolveDefenderPlacedProne: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val injuryContext = RiskingInjuryContext(
+                player = context.defender,
+                causedBy = null, // The opponent does not get to use their skills when players are placed prone
+                mode = RiskingInjuryMode.PLACED_PRONE
+            )
+            return AddContext(injuryContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025PlacedProne
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                GotoNode(ResolveAttackerPlacedProne)
+            )
+        }
+    }
+
+    object ResolveAttackerPlacedProne: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val injuryContext = RiskingInjuryContext(
+                player = context.attacker,
+                causedBy = null, // The opponent does not get to use their skills when players are placed prone
+                mode = RiskingInjuryMode.PLACED_PRONE
+            )
+            return AddContext(injuryContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025PlacedProne
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),

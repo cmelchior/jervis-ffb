@@ -238,7 +238,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Pushback
   - [x] Does not work on Both Down
   - [x] Does not work when Distracted
-- [ ] Wrestle
+- [x] Wrestle
+  - [x] Works on Block
+  - [x] Works on Blitz
+  - [x] No armour roll
+  - [x] Does not work when Distracted
+  - [x] Override player having Block
 
 ## Mutations
 

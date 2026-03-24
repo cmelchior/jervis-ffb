@@ -225,6 +225,8 @@ object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
         return when (val currentNode = state.stack.currentNode()) {
             BB2020BothDown.AttackerChooseToUseWrestle -> context.attacker.coordinates
             BB2020BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
+            BB2025BothDown.AttackerChooseToUseWrestle -> context.attacker.coordinates
+            BB2025BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
             else -> error("Unsupported node: $currentNode")
         }
     }

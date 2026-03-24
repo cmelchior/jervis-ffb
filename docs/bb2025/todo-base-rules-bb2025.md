@@ -22,8 +22,8 @@ book.
     - [x] Knocked Down during own team turn (active player)
     - [ ] Knocked Down during own team turn (inactive player)
     - [x] Knocked Down during other teams turn (no turnover)
-    - [ ] Placed Prone with the Ball in own team turn
-    - [ ] Placed Prone with the Ball in other teams turn (no turnover)
+    - [x] Placed Prone with the Ball in own team turn
+    - [x] Placed Prone with the Ball in other teams turn (no turnover)
     - [x] Player with ball goes into the crowd in own team turn
     - [x] Player with ball goes into the crowd in other team turn (no turnover)
     - [x] Pushing own player, not holding the ball, into the crowd (no turnover)
