@@ -3,8 +3,7 @@ atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu
 browser = "0.3" # https://github.com/Kotlin/kotlinx-browser
 buildconfig = "5.7.0" # https://github.com/gmazzo/gradle-buildconfig-plugin
 clikt = "5.0.3" # https://github.com/ajalt/clikt
-compose = "1.10.1" # https://github.com/JetBrains/compose-multiplatform
-composeHotReload = "1.0.0" # https://github.com/JetBrains/compose-hot-reload
+compose = "1.10.3" # https://github.com/JetBrains/compose-multiplatform
 conveyor = "2.0" # https://plugins.gradle.org/plugin/dev.hydraulic.conveyor
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines
 cryptography = "0.4.0" # https://github.com/whyoleg/cryptography-kotlin/releases/tag/0.4.0
@@ -80,7 +79,6 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 conveyor = { id = "dev.hydraulic.conveyor" , version.ref = "conveyor" }
