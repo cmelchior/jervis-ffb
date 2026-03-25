@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
+
 package com.jervisffb.utils
 
 import co.touchlab.kermit.LogWriter

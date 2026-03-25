@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalResourceApi::class)
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@file:OptIn(ExperimentalResourceApi::class, ExperimentalWasmJsInterop::class)
 
 package com.jervisffb.ui
 
@@ -12,7 +13,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 @JsFun("playSound")
 external fun playSound(filePath: String)
 
-@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object SoundManager {
 
     private val sounds: MutableMap<SoundEffect, String> = mutableMapOf()

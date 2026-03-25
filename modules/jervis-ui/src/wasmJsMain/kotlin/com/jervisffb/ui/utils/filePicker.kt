@@ -1,3 +1,6 @@
+@file:Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+@file:OptIn(ExperimentalWasmJsInterop::class)
+
 package com.jervisffb.ui.utils
 
 import com.jervisffb.utils.jervisLogger
@@ -12,7 +15,6 @@ import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileReader
 
 private fun saveWebFile(filename: String, content: String, mimeType: String = "application/json") {
-    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     val blobParts: JsArray<JsAny?> =   content.let { arrayOf(content.toJsString() as JsAny?).toJsArray() }
     val blob = Blob(blobParts, BlobPropertyBag(type = mimeType))
     val url = URL.createObjectURL(blob)

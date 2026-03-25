@@ -1,3 +1,4 @@
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -14,7 +15,7 @@ version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 buildConfig {
     packageName("com.jervisffb")
-    buildConfigField("releaseVersion", (rootProject.ext["publicVersion"] as Provider<String?>).get())
+    buildConfigField("releaseVersion", (rootProject.ext["publicVersion"] as Provider<String>).get())
     buildConfigField("gitHash", (rootProject.ext["gitHash"] as Provider<String>).get())
     buildConfigField("gitHashLong", (rootProject.ext["gitHashLong"] as Provider<String>).get())
     buildConfigField("gitHistory", (rootProject.ext["gitHistory"] as Provider<String>).get())

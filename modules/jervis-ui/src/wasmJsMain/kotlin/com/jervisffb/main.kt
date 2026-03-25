@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
+
 package com.jervisffb
 
 import androidx.compose.ui.ExperimentalComposeUiApi
