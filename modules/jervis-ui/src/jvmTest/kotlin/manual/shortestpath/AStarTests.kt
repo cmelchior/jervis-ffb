@@ -51,8 +51,8 @@ fun AStarContent() {
         is PathFinder.Failure -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
                 BoxGrid(
-                    rules.fieldHeight.toInt(),
-                    rules.fieldWidth.toInt(),
+                    rules.fieldHeight,
+                    rules.fieldWidth,
                     it.fieldView,
                     it.gScore,
                     result.path,
@@ -63,8 +63,8 @@ fun AStarContent() {
         is PathFinder.Success -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
                 BoxGrid(
-                    rules.fieldHeight.toInt(),
-                    rules.fieldWidth.toInt(),
+                    rules.fieldHeight,
+                    rules.fieldWidth,
                     it.fieldView,
                     it.gScore,
                     result.path,

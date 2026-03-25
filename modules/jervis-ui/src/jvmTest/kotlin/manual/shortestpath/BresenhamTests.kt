@@ -40,8 +40,8 @@ class BresenhamTests {
                     createStartingTestSetup(state)
                     val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
                     BresenhamGrid(
-                        rules.fieldHeight.toInt(),
-                        rules.fieldWidth.toInt(),
+                        rules.fieldHeight,
+                        rules.fieldWidth,
                         path.value,
                         { start: FieldCoordinate, end: FieldCoordinate ->
                             path.value = rules.pathFinder.getStraightLine(state, start, end)

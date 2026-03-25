@@ -48,10 +48,7 @@ object PasswordChallenge {
         var i = 0
         while (i < len) {
             data[i / 2] =
-                (
-                    (hexString[i].digitToIntOrNull(16) ?: -1 shl 4) + hexString[i + 1].digitToIntOrNull(16)!!
-                        ?: -1
-                ).toByte()
+                (((hexString[i].digitToIntOrNull(16) ?: (-1 shl 4)) + hexString[i + 1].digitToIntOrNull(16)!!)).toByte()
             i += 2
         }
         return data

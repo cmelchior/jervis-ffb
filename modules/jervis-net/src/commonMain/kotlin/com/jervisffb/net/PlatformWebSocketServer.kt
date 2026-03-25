@@ -64,7 +64,7 @@ class PlatformWebSocketServer(
                     if (!closeConnectionIfInvalidFormat(platformConnection, clientMessage)) {
                         val (gameId, username) = readGameAndUser(clientMessage)
                         connectionUsername = username
-                        val game = server.gameCache.getGame(gameId) ?: error("GameId not found: ${gameId?.value}")
+                        val game = server.gameCache.getGame(gameId) ?: error("GameId not found: ${gameId.value}")
                         val connection = JervisNetworkWebSocketConnection(username, platformConnection)
                         val clientConnection = game.addClient(connection, clientMessage as JoinGameMessage)
                         clientConnection.awaitDisconnect()
