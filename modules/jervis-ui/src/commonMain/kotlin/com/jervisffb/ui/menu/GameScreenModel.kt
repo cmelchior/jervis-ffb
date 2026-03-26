@@ -35,7 +35,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.UiPlayerCard
-import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.field.FieldSizeData
 import com.jervisffb.ui.game.view.field.PointerEventBus
@@ -73,7 +73,7 @@ data class LoadingTeamInfo(
 // The GameScreenModel must guarantee that one instance of this exists for the lifetime
 // of the Game Screen.
 @Stable
-class LocalFieldDataWrapper {
+class LocalFieldDataWrapper(uiState: UiGameController) {
     // Information about the size of the Field, especially the width and height in pixels
     var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
     // Used to share mouse events across all field layers
@@ -81,6 +81,8 @@ class LocalFieldDataWrapper {
     // Indicates whether any Action Wheel menu is visible.
     val isActionWheelVisible: State<Boolean>
         field = mutableStateOf(false)
+
+    val uiDecorations = uiState.uiDecorations
 
     val isPrimaryActionWheelVisible: State<Boolean>
         field = mutableStateOf(false)
@@ -107,7 +109,7 @@ class GameScreenModel(
     private val gameController: GameEngineController,
     val homeTeam: Team,
     var awayTeam: Team,
-    val actionProvider: UiActionProvider,
+    val actionProvider: UiActionProviderGroup,
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
     private val actions: List<GameAction> = emptyList(),
@@ -126,7 +128,7 @@ class GameScreenModel(
         )
     )
 
-    val sharedFieldData = LocalFieldDataWrapper()
+    val sharedFieldData: LocalFieldDataWrapper
 
     var fumbbl: FumbblReplayAdapter? = null
     val rules: Rules = gameController.rules
@@ -162,6 +164,10 @@ class GameScreenModel(
 
     val hoverPlayerFlow = MutableStateFlow<Player?>(null)
     val playerStatCardDismissed = MutableStateFlow(false)
+
+    init {
+        sharedFieldData = LocalFieldDataWrapper(uiState)
+    }
 
     // Calculate which player to show on either the away or home side
     private fun computePlayerStatCard(fixedPlayer: Player?, hoveredPlayer: Player?, forHomeSide: Boolean): Player? {

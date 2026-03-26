@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.bb2025.skills.EyeGouge
 import com.jervisffb.engine.rules.bb2025.skills.Fend
 import com.jervisffb.engine.rules.bb2025.skills.FoulAppearance
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
+import com.jervisffb.engine.rules.bb2025.skills.Fumblerooski
 import com.jervisffb.engine.rules.bb2025.skills.GiveAndGo
 import com.jervisffb.engine.rules.bb2025.skills.Grab
 import com.jervisffb.engine.rules.bb2025.skills.Guard
@@ -176,10 +177,10 @@ class BB2025SkillSettings: SkillSettings() {
                         EyeGouge(player, category, expiresAt)
                     }
                 }
-                SkillType.FUMBLEROOSKIE -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                SkillType.FUMBLEROOSKI -> {
+                    addNoValueEntry("Fumblerooski", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        Fumblerooski(player, category, expiresAt)
+                    }
                 }
                 SkillType.LETHAL_FLIGHT -> {
                     // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->

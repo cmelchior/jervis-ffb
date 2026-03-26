@@ -31,7 +31,9 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
@@ -42,6 +44,7 @@ import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
+import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
@@ -72,6 +75,7 @@ import kotlin.time.ExperimentalTime
  * - Dodge (skill usage)
  * - Eye Gouge (skill usage)
  * - Fend (skill usage)
+ * - Fumblerooski (skill usage)
  * - Grab (skill usage)
  * - Hit an Run (skill usage)
  * - Leap (skill usage)
@@ -338,6 +342,19 @@ object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
             else -> error("Unsupported node: ${state.stack.currentNode()}")
         }
         return player.coordinates
+    }
+}
+
+object UseFumblerooskiWheelController: UseSkillWheelController(SkillType.FUMBLEROOSKI) {
+    override val nodes: Set<Node> = setOf(
+        StandardMoveStep.ChooseToUseFumblerooski,
+        JumpStep.ChooseToUseFumblerooskiAfterJumpingToTargetSquare,
+        LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare,
+        PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<MoveContext>()
+        return context.player.coordinates
     }
 }
 

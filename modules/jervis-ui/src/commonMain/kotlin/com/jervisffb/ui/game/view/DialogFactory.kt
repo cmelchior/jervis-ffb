@@ -44,7 +44,6 @@ import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
-import io.ktor.client.request.request
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.

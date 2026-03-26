@@ -23,11 +23,42 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.jervisffb.ui.game.icons.ActionIcon
 
-data class ContextMenuOption(
-    val title: String,
-    val command: () -> Unit,
+/**
+ * Interface representing each entry in a context menu.
+ */
+sealed interface ContextMenuOption {
+    val title: String
+    val command: () -> Unit
     val icon: ActionIcon
-)
+}
+
+// Context menus that does not carry state, but just trigger a simple effect.
+data class SimpleContextMenuOption(
+    override val title: String,
+    override val command: () -> Unit,
+    override val icon: ActionIcon,
+) : ContextMenuOption
+
+// Context menus that have state between each Game Action, i.e., something that
+// can be enabled/disabled before the next game action.
+class ToggleContextMenuOption(
+    initial: ContextData,
+    private val calculateStateFunc: () -> ContextData,
+): ContextMenuOption {
+    data class ContextData(val title: String, val icon: ActionIcon, val command: () -> Unit)
+    private var data = initial
+
+    override val title: String
+        get() = data.title
+    override val command: () -> Unit
+        get() = data.command
+    override val icon: ActionIcon
+        get() = data.icon
+
+    fun recalculateState() {
+        data = calculateStateFunc()
+    }
+}
 
 @Composable
 fun ContextPopupMenu(
@@ -84,7 +115,7 @@ fun ContextPopupMenu(
             onDismissRequest = { hidePopup(true) },
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Max).background(MaterialTheme.colorScheme.background)) {
-                commands.forEach { (title, cmd) ->
+                commands.forEach { command ->
                     Box(
                         modifier =
                             Modifier
@@ -92,12 +123,12 @@ fun ContextPopupMenu(
                                 .background(MaterialTheme.colorScheme.background)
                                 .clickable {
                                     hidePopup(false)
-                                    cmd()
+                                    command.command()
                                 },
                     ) {
                         Text(
                             modifier = Modifier.padding(4.dp),
-                            text = title,
+                            text = command.title,
                         )
                     }
                 }

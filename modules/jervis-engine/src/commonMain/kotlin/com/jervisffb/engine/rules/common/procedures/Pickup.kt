@@ -67,7 +67,7 @@ import com.jervisffb.engine.rules.common.tables.Weather
  * 4. Roll for Pickup
  */
 object Pickup : Procedure() {
-    override val initialNode: Node = CheckForNoBallSkill
+    override val initialNode: Node = CheckForActivePlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         return if (state.getContextOrNull<PickupRollContext>() == null) {
             val ball = state.currentBall()
@@ -94,6 +94,18 @@ object Pickup : Procedure() {
         }
     }
 
+    // Page 57 (BB2025): Only the active player can attempt to pickup the ball.
+    object CheckForActivePlayer: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
+            val activePlayer = state.activePlayer
+            return when (context.player == activePlayer) {
+                true -> GotoNode(CheckForNoBallSkill)
+                false -> GotoNode(PickupFailed)
+            }
+        }
+    }
+
     object CheckForNoBallSkill: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PickupRollContext>()
@@ -101,7 +113,6 @@ object Pickup : Procedure() {
             val hasNoBall = player.isSkillAvailable(SkillType.NO_BALL)
             return if (hasNoBall) {
                 compositeCommandOf(
-                    SetBallState.bouncing(context.ball),
                     ReportNoBallAffectingAction(player, ReportNoBallAffectingAction.ActionType.PICKUP),
                     GotoNode(PickupFailed)
                 )
@@ -212,7 +223,6 @@ object Pickup : Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.bouncing(ball),
                     ReportPickup(result.player, result.target, result.modifiers, result.roll!!.result, false),
                     GotoNode(PickupFailed),
                 )
@@ -222,9 +232,17 @@ object Pickup : Procedure() {
 
     object PickupFailed : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val context = state.getContext<PickupRollContext>()
+            val isPickupActivePlayer = (context.player == state.activePlayer)
             // If it was the active player that failed the pickup, it is a turnover regardless
             // of where the ball ends up.
-            return state.activePlayer?.let { SetTurnOver(TurnOver.STANDARD) }
+            return compositeCommandOf(
+                SetBallState.bouncing(context.ball),
+                when (isPickupActivePlayer) {
+                    true -> SetTurnOver(TurnOver.STANDARD)
+                    false -> null
+                }
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()

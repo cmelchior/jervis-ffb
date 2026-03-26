@@ -184,6 +184,16 @@ fun jumpTo(x: Int, y: Int) = arrayOf(
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
 
+fun leapTo(x: Int, y: Int) = arrayOf(
+    MoveTypeSelected(MoveType.LEAP),
+    FieldSquareSelected(FieldCoordinate(x, y)),
+)
+
+fun pogoTo(x: Int, y: Int) = arrayOf(
+    MoveTypeSelected(MoveType.POGO),
+    FieldSquareSelected(FieldCoordinate(x, y)),
+)
+
 fun rushTo(x: Int, y: Int, rushRoll: D6Result = 6.d6) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),
@@ -309,6 +319,11 @@ fun landingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected())
 fun rushRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
+)
+
+fun pogoRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll
 )
 
 fun projectileVomitRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(

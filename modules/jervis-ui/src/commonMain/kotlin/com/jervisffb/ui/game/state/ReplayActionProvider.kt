@@ -18,16 +18,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration.Companion.milliseconds
 
 class ReplayActionProvider(
     private val menuViewModel: MenuViewModel,
     private val fumbbl: FumbblReplayAdapter?
-): UiActionProvider() {
+): UiActionProviderGroup() {
 
     companion object {
         val LOG = jervisLogger()
     }
 
+    override val currentProvider = this
     private var job: Job? = null
     private var paused = false
     private lateinit var controller: GameEngineController
@@ -102,7 +104,7 @@ class ReplayActionProvider(
                         }
                     }
                     index = j + 1
-                    delay(100)
+                    delay(100.milliseconds)
                 }
             }
         }

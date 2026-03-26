@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.builder.GameVersion
@@ -156,5 +157,12 @@ fun Player.assertCoordinates(x: Int, y: Int) {
  */
 fun Ball.assertCoordinates(x: Int, y: Int) {
     assertEquals(FieldCoordinate(x, y), coordinates)
+}
+
+/**
+ * Test helper, checking if a team is the current Active Team.
+ */
+fun Team.assertActive() {
+    assertEquals(this, game.activeTeam)
 }
 

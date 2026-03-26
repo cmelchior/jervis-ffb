@@ -10,10 +10,13 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -64,7 +67,8 @@ import kotlin.math.max
  * 1. Tentacles
  * 2. Rush(es)
  * 3. Jump Roll
- * 3. Diving Tackle
+ * 4. Fumblerooski
+ * 5. Diving Tackle
  *
  * Since the player does not need to Dodge to leave the square, any skills
  * that trigger on Dodge cannot trigger on Jumps.
@@ -131,11 +135,18 @@ object JumpStep : Procedure() {
                         val context = state.getContext<MoveContext>()
                         compositeCommandOf(
                             UpdateContext(context.copy(target = target.coordinate)),
-                            GotoNode(CheckIfRushingIsNeeded)
+                            GotoNode(ChooseToUseTentacles)
                         )
                     }
                 }
             }
+        }
+    }
+
+    // TODO Implement Tentacles
+    object ChooseToUseTentacles: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return GotoNode(CheckIfRushingIsNeeded)
         }
     }
 
@@ -279,41 +290,70 @@ object JumpStep : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val jumpContext = state.getContext<JumpRollContext>()
             val player = jumpContext.player
+
+            // If we roll a natural 1 on the Jump Roll, we fall over in the starting square,
+            // otherwise we reach the target square (where the player either can continue moving or falls over).
+            // We split it into these two categories, because Fumblerooskie might trigger when the player
+            // reaches the target square. So we need to handle this first, because handling the result in the
+            // target square.
             return if (jumpContext.isSuccess) {
                 compositeCommandOf(
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
-                    RemoveContext<JumpRollContext>(),
                     ReportJumpResult(jumpContext, moveContext.target!!),
-                    GotoNode(ResolveMove)
+                    GotoNode(ChooseToUseFumblerooskiAfterJumpingToTargetSquare)
                 )
             } else if (!jumpContext.isSuccess && jumpContext.roll!!.result.value == 1) {
                 // Rush failed catastrophically, player Falls Over in starting square
                 compositeCommandOf(
                     SetPlayerLocation(player, moveContext.startingSquare),
-                    RemoveContext<JumpRollContext>(),
                     ReportJumpResult(jumpContext, moveContext.startingSquare),
                     GotoNode(ResolvePlayerFallingOver)
                 )
             } else {
-                // Jump failed, Player Falls Overin target square
+                // Jump failed, Player Falls Over in target square
                 compositeCommandOf(
-                    RemoveContext<JumpRollContext>(),
                     ReportJumpResult(jumpContext, moveContext.target!!),
-                    GotoNode(ResolvePlayerFallingOver)
+                    GotoNode(ChooseToUseFumblerooskiAfterJumpingToTargetSquare)
                 )
             }
         }
     }
 
-    object CheckTentacles: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            TODO("Not yet implemented")
+    object ChooseToUseFumblerooskiAfterJumpingToTargetSquare: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team
         }
-
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val hasFumblerooski = context.player.isSkillAvailable(SkillType.FUMBLEROOSKI)
+            val hasBall = context.player.hasBall()
+            return when (hasFumblerooski && hasBall) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            val context = state.getContext<MoveContext>()
+            val jumpContext = state.getContext<JumpRollContext>()
+            val skillUsed = (action == Confirm)
+            return buildCompositeCommand {
+                add(RemoveContext(jumpContext))
+                if (skillUsed) {
+                    val player = context.player
+                    val ball = player.ball ?: INVALID_GAME_STATE("Player must have a ball to use Fumblerooski: $player")
+                    addAll(
+                        ReportSkillUsed(player, SkillType.FUMBLEROOSKI),
+                        SetBallState.onGround(ball),
+                        SetBallLocation(ball, context.startingSquare),
+                    )
+                }
+                val targetNode = when (jumpContext.isSuccess) {
+                    true -> ResolveMove
+                    false -> ResolvePlayerFallingOver
+                }
+                add(GotoNode(targetNode))
+            }
         }
     }
 
@@ -337,7 +377,7 @@ object JumpStep : Procedure() {
     }
 
     /**
-     * Resolve the final result of the move after rolling for potential rushes, dodge and other skills.
+     * Resolve the final result of jumping
      */
     object ResolveMove: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
@@ -351,4 +391,5 @@ object JumpStep : Procedure() {
             )
         }
     }
+
 }

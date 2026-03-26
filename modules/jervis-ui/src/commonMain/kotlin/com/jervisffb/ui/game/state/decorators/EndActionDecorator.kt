@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
-import com.jervisffb.ui.game.view.ContextMenuOption
+import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 object EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
     override fun decorate(
@@ -22,7 +22,7 @@ object EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
             acc.updateSquare(location as FieldCoordinate) {
                 // Add action at the front so the button is placed at the bottom.
                 it.copy(contextMenuOptions = it.contextMenuOptions.add(0,
-                    ContextMenuOption(
+                    SimpleContextMenuOption(
                         "End action",
                         { actionProvider.userActionSelected(EndAction) },
                         ActionIcon.END_TURN

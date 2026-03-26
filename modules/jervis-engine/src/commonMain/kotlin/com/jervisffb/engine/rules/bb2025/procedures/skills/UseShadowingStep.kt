@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.UseShadowingSkill
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -29,8 +30,10 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Class wrapping using the Shadowing skill in BB2025.
@@ -42,35 +45,31 @@ object UseShadowingStep: Procedure() {
 
     object CheckIfShadowingIsAvailable: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MoveContext>()
-            val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
-                .filter { coord ->
-                    state.field[coord].player
-                        ?.let { player -> player.team != context.player.team}
-                        ?: false
+            // This can happen if a Diving Tackle player went prone here. This will prevent Shadowing from being used.
+            val isStartingSquareEmpty = !state.field[context.startingSquare].isOccupied()
+            val eligiblePlayers = when (isStartingSquareEmpty) {
+                true -> {
+                    context.startingSquare.getSurroundingCoordinates(rules)
+                        .filter { coord ->
+                            state.field[coord].player
+                                ?.let { player -> player.team != context.player.team }
+                                ?: false
+                        }
+                        .mapNotNull { state.field[it].player }
+                        .filter { it.isSkillAvailable(SkillType.SHADOWING) }
+                        .filterNot { it.hasStatusEffect(PlayerStatusEffectType.ROOTED) }
                 }
-                .mapNotNull { state.field[it].player }
-                .filter { it.isSkillAvailable(SkillType.SHADOWING) }
-                .filterNot { it.hasStatusEffect(PlayerStatusEffectType.ROOTED) }
-                .let { playerList ->
-                    if (playerList.isNotEmpty()) {
-                        SelectPlayer.fromPlayers(playerList)
-                    } else {
-                        null
-                    }
-                }
-
-            return if (eligiblePlayers == null) {
+                false -> emptyList()
+            }
+            return if (eligiblePlayers.isEmpty()) {
                 listOf(ContinueWhenReady)
             } else {
-                listOf(eligiblePlayers, CancelWhenReady)
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers), CancelWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<MoveContext>()
             return when (action) {
                 is PlayerSelected -> {
                     val player = action.getPlayer(state)
@@ -97,10 +96,15 @@ object UseShadowingStep: Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<ShadowingRollContext>()
             return if (context.isSuccess) {
+                val isBallInLocation = state.field[moveContext.startingSquare].balls.isNotEmpty()
+                val nextNode = when (isBallInLocation) {
+                    true -> GotoNode(BounceBall)
+                    false -> ExitProcedure()
+                }
                 compositeCommandOf(
                     SetPlayerLocation(context.player, moveContext.startingSquare),
                     RemoveContext<ShadowingRollContext>(),
-                    ExitProcedure()
+                    nextNode
                 )
             } else {
                 compositeCommandOf(
@@ -108,6 +112,23 @@ object UseShadowingStep: Procedure() {
                     ExitProcedure()
                 )
             }
+        }
+    }
+
+    // A Shadowing Player cannot attempt to pickup the ball (as they are not on the active team),
+    // but that logic is inside `Pickup`, so just delegate to that.
+    object BounceBall: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val moveContext = state.getContext<MoveContext>()
+            val ball = state.field[moveContext.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${moveContext.startingSquare}")
+            return SetCurrentBall(ball)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                ExitProcedure(),
+            )
         }
     }
 }

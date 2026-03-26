@@ -146,6 +146,7 @@ book.
            - [ ] During Chain Push
            - [ ] Jump into square
            - [ ] ... (so many edge cases)
+           - [ ] Roll before using Fumblerooski
 
     - [ ] Friends with the Ref
     - [ ] Stiletto
@@ -380,6 +381,7 @@ book.
       - [ ] Still has the ball
     - [ ] Nega-trait players cannot Stall (as they all require rolls)
     - [ ] Do not check for stalling after turn-over
+    - [ ] NAF / FUMBBL interpretations
 - [ ] Conceding
     - [ ] Free if 3 or less players at beginning of turn
 

@@ -18,6 +18,8 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -52,9 +54,11 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import kotlinx.collections.immutable.toPersistentList
 
@@ -499,6 +503,9 @@ object DodgeRoll: Procedure() {
                     val skill = player.getSkill(SkillType.DIVING_TACKLE)
                     val updatedModifiers = context.rollModifiers.add(DodgeRollModifier.DIVING_TACKLE)
                     val success = isSuccess(context, overrideModifiers = updatedModifiers)
+                    // If a player use Fumblerooski, they might have left a ball in the square the Diving Tackle
+                    // player ends up prone in. In that case, the ball will always bounce.
+                    val ballInSquare = state.field[context.startingSquare].balls.isNotEmpty()
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
                         UpdateContext(context.copy(
@@ -507,13 +514,31 @@ object DodgeRoll: Procedure() {
                         )),
                         SetPlayerState(player, PlayerState.PRONE, hasTackleZones = false),
                         SetPlayerLocation(player, context.startingSquare),
-                        ExitProcedure()
+                        if (ballInSquare) GotoNode(BounceBallInStartingSquare) else ExitProcedure(),
                     )
                 }
                 Cancel,
                 Continue -> ExitProcedure()
                 else -> INVALID_ACTION(action)
             }
+        }
+    }
+
+    object BounceBallInStartingSquare: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<DodgeRollContext>()
+            val ball = state.field[context.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${context.startingSquare}")
+            return compositeCommandOf(
+                SetBallState.bouncing(ball),
+                SetCurrentBall(ball),
+            )
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                ExitProcedure()
+            )
         }
     }
 

@@ -70,6 +70,28 @@ subjected to any rules that take place at the start or during their activation".
 This means that if a player is Distracted and chooses to forgo their activation, 
 the Distracted status will _not_ be cleared.
 
+### Page 54 - Move Action
+There are a number of skills that can interact with a Move Action, but the order
+in which skills are checked and used is not defined in the rulebook. 
+
+For now, Jervis is using the following order as that seems the most 
+reasonable (for a suitable definition of "reasonable"):
+
+1. Declare intent to move player.
+2. Tentacles: If they succeed, the Move Action stops before the player is moved.
+3. Move the player into the target square.
+4. Fumblerooski
+5. Rush if needed
+   a. Sprint 
+   b. Sure Feet
+6. Dodge if needed
+   a. Stunty* / Titchy*
+   b. Two Heads
+   c. Break Tackle
+   d. Prehensile Tail
+   e. Diving Tackle
+7. Shadowing
+
 ### Page 54 - Standing Up
 The rules for standing up state that: "If a player with a Move Allowance 
 Characteristic of 2 or less (regardless of any modifiers) wishes to stand up..."
@@ -498,6 +520,42 @@ trigger on chain-pushes, but can only be used by the attacker when performing a
 Block.
 
 Jervis has adopted a similar interpretation.
+
+### 128 - Fumblerooski
+From the rules, it is unclear how Fumblerooski interact with other skills, as 
+Fumblerooski will trigger on "they may choose to place the ball on the 
+ground in any square they move out of during their Move Action".
+
+What does this e.g., mean when using Tentacles or Shadowing?
+
+For now, Jervis uses the following order:
+
+1. Check for Tentacles: If failed, the player isn't moved and Fumblerooski
+   cannot be used.
+2. Move Player. Fumblerooskie can now be used.
+3. Shadowing/Diving Tackles are used afterward. If an opponent ends up in the 
+   square that was just vacated, the ball will bounce as only the active player
+   can do a Pickup.
+
+Similar questions arise for Jump and Leap as the rulebook isn't clear on exactly
+where Fumblerooski can trigger. For critical failures and success, the answer
+is probably clear; Fumblerooski can be used.
+
+However, what happens on rolls where you fail the the Jump, but still end up
+in the target square? Is it possible to use Fumblerooski between moving and 
+Fall Over? 
+
+Since other skills like Steady Footing have a window there to trigger, we also
+assume that Fumblerooski can. This is similar to how FUMBBL interprets this.
+
+Finally, some have argued that Fumblerooskie can be interpreted as allowing you to
+place the ball in _any_ square that was vacated during the move, not just the
+last one. 
+
+Apart from being a very generous interpretation and mechanically clunky, NAF
+has also ruled that it only applies to the last square vacated.
+
+Jervis has adopted the same interpretation.
 
 ### Page 128 - Grab
 Grrab is split into two sections: 1) Moving the pushed player and 2) Disable

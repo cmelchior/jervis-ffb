@@ -4,12 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.view.ActionWheelDialog
+import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.NoActionWheel
+import com.jervisffb.ui.game.view.NoActionWheel.hideWhenClickOutside
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 
 /**
@@ -25,9 +31,13 @@ import com.jervisffb.ui.game.viewmodel.FieldViewModel
 fun ContextMenuLayer(vm: FieldViewModel) {
     val contextActionWheelPresent by vm.sharedFieldData.isContextActionWheelVisible
     val fieldData by vm.fieldViewData.collectAsState()
-    val currenState by vm.contextMenuViewModel
-    var hideWhenClickOutside by currenState.hideOnClickedOutside
-    val wheelState by currenState.data
+    var currentState by remember { mutableStateOf<ActionWheelUiState>(NoActionWheel) }
+
+    LaunchedEffect(vm) {
+        vm.contextActionWheelViewModel.observe().collect {
+            currentState = it
+        }
+    }
 
     // Context menu visibility is different than the Action Wheel. Can we be sure
     // that this always works? I suspect so, since we also check if the main action wheel is present
@@ -41,8 +51,8 @@ fun ContextMenuLayer(vm: FieldViewModel) {
             val interceptor = object : PointerEventInterceptor {
                 override fun onPress(square: FieldCoordinate, isPrimary: Boolean): Boolean {
                     if (!isPrimary) return false
-                    if (hideWhenClickOutside) {
-                        vm.contextMenuViewModel.value.hideWheel()
+                    if (currentState.hideWhenClickOutside) {
+                        vm.contextActionWheelViewModel.hideWheel()
                     }
                     return true
                 }
@@ -63,7 +73,7 @@ fun ContextMenuLayer(vm: FieldViewModel) {
         modifier = Modifier.fillMaxSize()
     ) {
         ActionWheelDialog(
-            uiState = wheelState,
+            uiState = currentState,
             vm,
             fieldData,
         )

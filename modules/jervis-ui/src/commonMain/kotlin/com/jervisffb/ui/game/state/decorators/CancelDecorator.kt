@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
-import com.jervisffb.ui.game.view.ContextMenuOption
+import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 /**
  * Some "cancel" actions we want to display in inside the timer button
@@ -103,7 +103,7 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
             acc.updateSquare(coordinates) {
                 it.copy(
                     contextMenuOptions = it.contextMenuOptions.add(
-                        ContextMenuOption(
+                        SimpleContextMenuOption(
                             title,
                             { actionProvider.userActionSelected(Cancel) },
                             ActionIcon.CANCEL

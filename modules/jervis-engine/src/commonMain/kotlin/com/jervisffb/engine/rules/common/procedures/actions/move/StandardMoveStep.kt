@@ -1,5 +1,9 @@
 package com.jervisffb.engine.rules.common.procedures.actions.move
 
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -7,9 +11,12 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -45,32 +52,34 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Handle a player moving a single step using a normal move.
+ * Handle a player moving a single step as part of performing a Move Action,
+ * either alone or part of another action (like Blitz).
  *
  * This sub procedure is purely used by [ResolveMoveTypeStep], which is also
  * responsible for controlling the lifecycle of [MoveContext].
  *
- * Upper layers do not have full information before getting here, this e.g.
- * means that we got here because the calling procedure assumed that Spring
+ * Upper layers do not have full information before getting here, this e.g.,
+ * means that we might be here because the calling procedure assumed that Sprint
  * will be used, but the actual usage was then rejected, preventing the player
  * from moving.
  *
  * Developer's Commentary
  * The order of checks during a Move is a bit unclear, so this list is a
- * best-effort implementation. It might change if new information comes to
- * light. For now, we check things in the following order:
+ * best-effort implementation.
  *
- * The order of checks is:
+ * For now, we check things in the following order:
+ *
  * 1. Tentacles.
- * 2. Rush
+ * 2. Fumblerooski
+ * 3. Rush
  *  a. Sprint
  *  b. Sure Feet
- * 3. Dodge
+ * 4. Dodge
  *   a. Two Heads / Stunty* / Titchy*
  *   b. Break Tackle
  *   c. Prehensile Tail
  *   d. Diving Tackle
- * 4. Shadowing
+ * 5. Shadowing
  */
 object StandardMoveStep: Procedure() {
     override val initialNode: Node = CheckForSprint
@@ -120,10 +129,23 @@ object StandardMoveStep: Procedure() {
                 else -> castAction<FieldSquareSelected>(action) {
                     compositeCommandOf(
                         UpdateContext(context.copy(target = it.coordinate, hasMoved = true)),
-                        GotoNode(MovePlayer),
+                        GotoNode(ChooseToUseTentacles),
                     )
                 }
             }
+        }
+    }
+
+    // TODO Implement tentacle movement logic
+    object ChooseToUseTentacles: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team.otherTeam()
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return listOf(ContinueWhenReady)
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return GotoNode(MovePlayer)
         }
     }
 
@@ -145,9 +167,40 @@ object StandardMoveStep: Procedure() {
                 RemoveContext<MovePlayerIntoSquareContext>(),
                 when (state.turnOver != null) {
                     true -> ExitProcedure() // Something went wrong when moving the player
-                    false -> GotoNode(CheckIfRushingIsNeeded)
+                    false -> GotoNode(ChooseToUseFumblerooski)
                 }
             )
+        }
+    }
+
+    object ChooseToUseFumblerooski: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val hasFumblerooski = context.player.isSkillAvailable(SkillType.FUMBLEROOSKI)
+            val hasBall = context.player.hasBall()
+            return when (hasFumblerooski && hasBall) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val skillUsed = (action == Confirm)
+            return buildCompositeCommand {
+                if (skillUsed) {
+                    val player = context.player
+                    val ball = player.ball ?: INVALID_GAME_STATE("Player must have a ball to use Fumblerooski: $player")
+                    addAll(
+                        ReportSkillUsed(player, SkillType.FUMBLEROOSKI),
+                        SetBallState.onGround(ball),
+                        SetBallLocation(ball, context.startingSquare),
+                    )
+                }
+                add(GotoNode(CheckIfRushingIsNeeded))
+            }
         }
     }
 

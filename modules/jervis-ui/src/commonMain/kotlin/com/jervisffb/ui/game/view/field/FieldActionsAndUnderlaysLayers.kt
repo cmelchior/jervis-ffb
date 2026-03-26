@@ -98,8 +98,8 @@ private fun SquareHighlightAndAction(
                     // In that case, it is the square that should handle opening it again, after which control transfers
                     // back to the ActionWheelLayer
                     if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isActionWheelVisible.value) {
-                        vm.contextMenuViewModel.value = square.createActionWheelContextMenu(vm.game, sharedFieldData)
-                        vm.contextMenuViewModel.value.showWheel()
+                        val menuOptions = square.createActionWheelContextMenu(vm, sharedFieldData)
+                        vm.contextActionWheelViewModel.showWheel(menuOptions)
                     }
 
                     // Toggling the Action Wheel should take precedence over triggering square/player actions.

@@ -101,7 +101,7 @@ private fun PlayerWithIndicators(
                 player,
                 playerTransientData,
                 true,
-                square.showContextMenu // && !square.useActionWheel
+                square.showContextMenu
             )
             if (it.dice != 0) {
                 BlockDiceIndicatorImage(it.dice)

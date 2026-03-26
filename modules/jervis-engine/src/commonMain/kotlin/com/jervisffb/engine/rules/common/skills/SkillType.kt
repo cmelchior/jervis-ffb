@@ -4,7 +4,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillValue
-import io.ktor.client.request.invoke
 import kotlinx.serialization.Serializable
 
 /**
@@ -46,7 +45,7 @@ enum class SkillType(val description: String) {
     // Devious
     DIRTY_PLAYER("Dirty Player"),
     EYE_GOUGE("Eye Gouge"),
-    FUMBLEROOSKIE("Fumblerooskie"),
+    FUMBLEROOSKI("Fumblerooski"),
     LETHAL_FLIGHT("Lethal Flight"),
     LONE_FOULER("Lone Fouler"),
     PILE_DRIVER("Pile Driver"),

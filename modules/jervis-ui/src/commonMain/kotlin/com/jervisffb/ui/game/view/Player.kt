@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +40,7 @@ import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.toSkiaColor
+import kotlinx.coroutines.flow.map
 import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
@@ -73,10 +75,12 @@ fun Player(
     parentHandleClick: Boolean,
     contextMenuShowing: Boolean,
 ) {
+    val isUsingFumblerooski by screenModel.uiState.uiDecorations.fumblerooskiEnabled
+        .map { it?.id == player.id }
+        .collectAsState(false)
     val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
-    val ballImage = IconFactory.getHeldBallOverlay()
+    val ballImage = IconFactory.getHeldBallOverlay(isUsingFumblerooski)
     var isTempSelected by player.isTemporarySelected
-
     var playerModifier: Modifier = modifier.aspectRatio(1f)
 
     if (player.isSelectable && !parentHandleClick) {

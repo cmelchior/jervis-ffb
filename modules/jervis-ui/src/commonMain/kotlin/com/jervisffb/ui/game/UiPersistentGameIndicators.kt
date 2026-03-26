@@ -1,10 +1,13 @@
 package com.jervisffb.ui.game
 
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.fumbbl.net.model.BloodSpot
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.jetbrains.compose.resources.DrawableResource
 
 data class MoveUsed(val coordinate: FieldCoordinate, val value: Int)
@@ -26,6 +29,10 @@ class UiPersistentGameIndicators {
     private var usedMoveToStandUp: Int? = null
     private var extraMoveOffset: Int = 0
     val movesUsed: MutableList<MoveUsed> = mutableListOf() // TODO Probably shouldn't be public
+
+    // If set, it means that this player intends to use the Fumblerooskie on the next move
+    val fumblerooskiEnabled: StateFlow<Player?>
+        field = MutableStateFlow(null)
 
     // Track when standing up, so we can adjust showing "Move Used" decorator
     fun addMoveUsedToStandUp(move: Int) {
@@ -67,6 +74,10 @@ class UiPersistentGameIndicators {
     }
     fun undo(deltaId: GameActionId? = null) {
         undostack[deltaId]?.invoke()
+    }
+
+    fun useFumblerooskiOnNextMove(player: Player?) {
+        fumblerooskiEnabled.value = player
     }
 }
 

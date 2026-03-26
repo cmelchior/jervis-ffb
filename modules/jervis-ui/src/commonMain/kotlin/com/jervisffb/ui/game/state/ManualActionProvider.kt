@@ -37,6 +37,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.getContext
@@ -53,6 +54,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripB
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -71,6 +73,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -132,6 +135,9 @@ open class ManualActionProvider(
     private val queuedActions = mutableListOf<GameAction>()
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
     private var sharedData: LocalFieldDataWrapper? = null
+
+    var nextFumblerooskiCommand: GameAction? = null
+        private set
 
     private val fieldActionDecorators = mapOf(
         // EndSetupWhenReady -> TODO()
@@ -201,7 +207,7 @@ open class ManualActionProvider(
         }
 
         // We only want to check for other automated settings if no queued up actions exist.
-        // This also means that anyone queuing up actions, most queue up all intermediate actions
+        // This also means that anyone queuing up actions, must queue up all intermediate actions
         // as well. Even the ones that are normally automatically created.
         if (queuedActions.isEmpty()) {
             automatedAction = calculateAutomaticResponse(controller, controller.getAvailableActions().actions)
@@ -237,13 +243,6 @@ open class ManualActionProvider(
             // the dialog has been resolved.
             if (acc.dialogInput == null && !actionWheelVisible) {
                 addNonDialogActionDecorators(acc, actions)
-            }
-
-            // Check for the context menu. The context menu is not considered a modal dialog, so is
-            // added during `addNonDialogActionDecorators()`. Thus we need to check for it here.
-            // TODO This is probably the wrong architecture as we can have multiple menus like during
-            acc.squares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
-                acc.contextMenuActionWheel = it.createActionWheelContextMenu(game.state, sharedData!!)
             }
         }
     }
@@ -438,6 +437,21 @@ open class ManualActionProvider(
             return createRandomAction(controller.state, actions)
         }
 
+        val currentNode = controller.currentProcedure()?.currentNode()
+
+        // The option for selecting Fumblerooskie is done a slightly different place in the UI, so we need to check
+        // if we should provide the response here.
+        if (currentNode == StandardMoveStep.ChooseToUseFumblerooski
+            || currentNode == JumpStep.ChooseToUseFumblerooskiAfterJumpingToTargetSquare
+            || currentNode == LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare
+            || currentNode == PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare
+        ) {
+            val nextAction = nextFumblerooskiCommand
+            nextFumblerooskiCommand = null
+            sharedData?.uiDecorations?.useFumblerooskiOnNextMove(null)
+            return nextAction ?: Cancel
+        }
+
         // Do not reroll successful rolls that are considered "successful"
         // If we are in the middle of a Dodge, Jump or Leap, we will assume that Diving Tackle
         // will be used right after, i.e. you might want to reroll something that rolls equal to
@@ -458,7 +472,6 @@ open class ManualActionProvider(
         }
 
         // Randomly select a kicking player
-        val currentNode = controller.currentProcedure()?.currentNode()
         if (currentNode == TheKickOff.NominateKickingPlayer && menuViewModel.isFeatureEnabled(
                 Feature.SELECT_KICKING_PLAYER
             )) {
@@ -736,7 +749,23 @@ open class ManualActionProvider(
     }
 
     override fun hasQueuedActions(): Boolean {
+        // This is currently only used to filter Game Status Messages, so we do not
+        // need to consider Fumblerooski (for now)
         return automatedAction != null || queuedActions.isNotEmpty()
+    }
+
+    // Fumblerooski is selected outside its normal place in the Rules Engine.
+    // Set the return value here.
+    // TODO This is effectively a "future" action, i.e. not just the next one.
+    //  Consider if we need a proper API for this kind of thing, but wait until
+    //  we have more cases than Fumblerooski
+    fun nextFumblerooskiCommand(player: Player, action: GameAction?) {
+        nextFumblerooskiCommand = action
+        if (action == Confirm) {
+            sharedData?.uiDecorations?.useFumblerooskiOnNextMove(player)
+        } else {
+            sharedData?.uiDecorations?.useFumblerooskiOnNextMove(null)
+        }
     }
 }
 

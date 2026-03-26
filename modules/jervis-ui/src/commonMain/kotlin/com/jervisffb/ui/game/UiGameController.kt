@@ -36,7 +36,7 @@ import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
-import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025PassWheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025ThrowTeamMateWheelController
@@ -78,6 +78,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseDivingCatchWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseDodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseEyeGougeWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseFendWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseFumblerooskiWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseGrabWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseHitAndRunWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseKickWheelController
@@ -110,8 +111,10 @@ import com.jervisffb.ui.game.state.indicators.TeamFeatureStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
 import com.jervisffb.ui.game.view.ActionWheelUiState
+import com.jervisffb.ui.game.view.ContextWheelUiState
 import com.jervisffb.ui.game.view.GameStatusMessageFactory
 import com.jervisffb.ui.game.view.HideActionWheel
+import com.jervisffb.ui.game.view.NoContextMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.FrameRateAverager
@@ -148,7 +151,7 @@ class UiGameController(
     // This mostly affects UNDO.
     val uiMode: TeamActionMode,
     val gameController: GameEngineController,
-    val actionProvider: UiActionProvider,
+    val actionProvider: UiActionProviderGroup,
     val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
@@ -218,6 +221,7 @@ class UiGameController(
         UseDodgeWheelController,
         UseEyeGougeWheelController,
         UseFendWheelController,
+        UseFumblerooskiWheelController,
         UseGrabWheelController,
         UseHitAndRunWheelController,
         UseKickWheelController,
@@ -269,8 +273,8 @@ class UiGameController(
     // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
     val uiActionWheelFlow: Flow<List<ActionWheelUiState>>
         field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
-    val uiContextWheelFlow: Flow<List<ActionWheelUiState>>
-        field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+    val uiContextWheelFlow: Flow<ContextWheelUiState>
+        field = MutableSharedFlow<ContextWheelUiState>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
     val gameStatusMessageFactory = GameStatusMessageFactory(menuViewModel, state)
 
     // `replay` is only used to allow the UI to register itself after the game controller has started
@@ -442,13 +446,15 @@ class UiGameController(
                     // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
                     // reset that state here when the action is Undo or Revert. It also means we do not have
                     // to deal with "back"-animations.
-                    val shouldHideActionWheel = checkHideActionWheelImmediately(gameController, actionWheelLocation)
-                    if (shouldHideActionWheel) {
+                    val shouldHidePrimaryActionWheel = checkHideActionWheelImmediately(gameController, actionWheelLocation)
+                    if (shouldHidePrimaryActionWheel) {
                         val isRevertingState = (userAction is Undo || userAction is Revert)
                         acc.addActionWheelEvent(HideActionWheel(hideImmediately = isRevertingState))
-                        acc.addContextWheelEvent(HideActionWheel(hideImmediately = isRevertingState))
-                        acc.emitActionWheelState()
                     }
+                    // Always hide any Context Menu still visible
+                    acc.addContextWheelEvent(NoContextMenu)
+                    acc.emitActionWheelState()
+
                 } catch (ex: InvalidActionException) {
                     reportInvalidAction(ex)
                 }
@@ -547,7 +553,6 @@ class UiGameController(
 
     /**
      * Method responsible for updating the UI state based on recent changes in the [Game] model.
-     * This includes
      */
     private fun addBaseGameStateChanges(state: Game, actions: ActionRequest, delta: GameDelta, acc: UiSnapshotAccumulator) {
 

@@ -271,7 +271,7 @@ class BB2020SkillSettings: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.FUMBLEROOSKIE -> {
+                SkillType.FUMBLEROOSKI -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
                     // TODO()
                     // }

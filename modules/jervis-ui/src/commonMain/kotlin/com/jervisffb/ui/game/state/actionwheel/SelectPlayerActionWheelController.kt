@@ -40,7 +40,6 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         return state.activePlayerOrThrow().coordinates
     }
 
-
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,

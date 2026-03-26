@@ -22,7 +22,6 @@ object TestDummy {
     val settings = GameSettings(StandardBB2020Rules())
     val homeActionProvider = ManualActionProvider(controller, menuViewModel,TeamActionMode.HOME_TEAM, settings)
     val awayActionProvider = ManualActionProvider(controller, menuViewModel,  TeamActionMode.AWAY_TEAM, settings)
-    val dummyFieldWrapper = LocalFieldDataWrapper()
     val actionProvider = LocalActionProvider(
         controller,
         settings,
@@ -40,6 +39,7 @@ object TestDummy {
         menuViewModel,
     )
     val uiController = UiGameController(TeamActionMode.ALL_TEAMS, controller, actionProvider, menuViewModel, emptyList())
+    val dummyFieldWrapper = LocalFieldDataWrapper(uiController)
     val fieldVieModel by lazy { FieldViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {
         SidebarViewModel(

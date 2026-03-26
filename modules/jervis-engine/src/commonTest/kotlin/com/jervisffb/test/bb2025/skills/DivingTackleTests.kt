@@ -137,4 +137,23 @@ class DivingTackleTests: JervisGameBB2025Test() {
         leapingPlayer.assertProne()
         leapingPlayer.assertCoordinates(11, 4)
     }
+
+    @Test
+    fun preventShadowing() {
+        val mover = awayTeam["A1".playerId]
+        val tackler = homeTeam["H1".playerId]
+        tackler.addSkill(SkillType.DIVING_TACKLE)
+        val shadower = homeTeam["H2".playerId]
+        shadower.addSkill(SkillType.SHADOWING)
+        assertEquals(3, mover.agility)
+        controller.rollForward(
+            *activatePlayer(mover, PlayerStandardActionType.MOVE),
+            *moveTo(14, 5),
+            *dodge(5.d6), // Dodge roll must be high enough to succeed even with -2 from Diving Tackle.
+            PlayerSelected(tackler), // Use Diving Tackle, prevent Shadowing from being used
+        )
+        assertEquals(mover,state.activePlayer)
+        assertEquals(FieldCoordinate(14, 5), mover.coordinates)
+        mover.assertStanding()
+    }
 }

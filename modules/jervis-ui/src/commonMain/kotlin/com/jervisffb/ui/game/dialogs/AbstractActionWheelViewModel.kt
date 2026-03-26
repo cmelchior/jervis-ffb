@@ -28,12 +28,13 @@ import kotlinx.coroutines.DelicateCoroutinesApi
  */
 @OptIn(DelicateCoroutinesApi::class)
 abstract class AbstractActionWheelViewModel(
-    team: Team,
+    team: Team?,
     // Used to connect the view model to the UI
     val sharedFieldData: LocalFieldDataWrapper,
 ): UserInputDialog {
 
-    // Whether the entire wheel is visible or not
+    // Whether clicking outside the wheel will hide it or not.
+    // Only "optional" wheels should have this enabled.
     var hideOnClickedOutside = mutableStateOf(false)
 
     // Which team is responsible for selecting the action? This can affect some coloring

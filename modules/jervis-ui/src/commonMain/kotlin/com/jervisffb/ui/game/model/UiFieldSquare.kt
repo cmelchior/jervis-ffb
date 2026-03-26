@@ -1,11 +1,11 @@
 package com.jervisffb.ui.game.model
 
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
 import com.jervisffb.ui.game.view.ContextMenuOption
+import com.jervisffb.ui.game.view.ContextWheelMenu
+import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -37,12 +37,10 @@ data class UiFieldSquare(
     fun isEmpty() = !isBallOnGround && player == null
     fun hasDirectionArrow() = directionSelected != null || selectableDirection != null
 
-    fun createActionWheelContextMenu(game: Game, sharedData: LocalFieldDataWrapper): SecondaryActionWheelViewModel {
-        return SecondaryActionWheelViewModel(
-            coordinates = coordinates,
-            options = contextMenuOptions,
-            team = game.activeTeam!!,
-            sharedFieldData = sharedData
+    fun createActionWheelContextMenu(viewModel: FieldViewModel, sharedData: LocalFieldDataWrapper): ContextWheelMenu {
+        return ContextWheelMenu(
+            coordinates,
+            contextMenuOptions
         )
     }
 }

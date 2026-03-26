@@ -21,19 +21,19 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
 }
 
 /**
+ * All games have a top-level [UiActionProviderGroup], that an action provider
+ * for each player.
+ */
+abstract class UiActionProviderGroup: UiActionProvider() {
+    abstract val currentProvider: UiActionProvider
+}
+
+/**
  * Action Providers are responsible for feeding game actions to the main game loop.
  * This can either be done automatically, through events sent from the server or through
  * the UI.
- *
  */
 abstract class UiActionProvider {
-    abstract fun startHandler()
-    abstract fun actionHandled(team: Team?, action: GameAction)
-
-    // Called after setting up the UI and before starting the game loop.
-    // This allows Compose and UI controller to share data that cross across a lot of responsibilities.
-    abstract fun updateSharedData(sharedData: LocalFieldDataWrapper)
-
     val errorHandler = CoroutineExceptionHandler { _, exception ->
         // TODO This doesn't seem to work?
         exception.printStackTrace()
@@ -51,6 +51,11 @@ abstract class UiActionProvider {
     protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 
+    abstract fun startHandler()
+    abstract fun actionHandled(team: Team?, action: GameAction)
+    // Called after setting up the UI and before starting the game loop.
+    // This allows Compose and UI controller to share data that cross across a lot of responsibilities.
+    abstract fun updateSharedData(sharedData: LocalFieldDataWrapper)
     // Init method called when the ActionProvider is attached to a UiGameController.
     // We have this to break the cyclic dependency between the ActionProvider and UiGameController, and it
     // allows the UiGameController to provide additional context or configuration for the ActionProvider.

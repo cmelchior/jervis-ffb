@@ -145,6 +145,9 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
         launch {
             fieldViewModel.actionWheelViewModel.start()
         }
+        launch {
+            fieldViewModel.contextActionWheelViewModel.start()
+        }
     }
 
     GameScreen(

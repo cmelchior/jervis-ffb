@@ -1,12 +1,13 @@
 package com.jervisffb.ui.game.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -14,6 +15,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.safeTryEmit
@@ -24,6 +26,7 @@ import com.jervisffb.ui.game.dialogs.PrimaryActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
+import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
@@ -81,20 +84,19 @@ class FieldViewModel(
     val height = rules.fieldHeight
     val sharedFieldData = screenModel.sharedFieldData
 
-    val fieldViewData = screenModel.fieldViewData
-    val fieldBackground = screenModel.fieldBackground
+    val fieldViewData: MutableStateFlow<FieldViewData> = screenModel.fieldViewData
+    val fieldBackground: Flow<FieldDetails> = screenModel.fieldBackground
 
     val actionWheelViewModel = PrimaryActionWheelViewModel(
         eventFlow = uiState.uiActionWheelFlow,
         team = uiState.state.homeTeam,
         sharedFieldData = sharedFieldData,
     )
-    var contextMenuViewModel = mutableStateOf(SecondaryActionWheelViewModel(
-        coordinates = null,
-        options = emptyList(),
-        team = uiState.state.homeTeam,
+    val contextActionWheelViewModel = SecondaryActionWheelViewModel(
+        fieldViewModel = this,
+        eventFlow = uiState.uiContextWheelFlow,
         sharedFieldData = sharedFieldData,
-    ))
+    )
 
     val highlights: StateFlow<FieldCoordinate?>
         field = MutableStateFlow<FieldCoordinate?>(null)
@@ -149,7 +151,7 @@ class FieldViewModel(
 
             // Use path finder
             val pathList = uiSnapshot.pathFinder?.let { pathFinder ->
-                if (showPathFinder(activePlayer, mouseEnter)) {
+                if (showPathFinder(activePlayer, mouseEnter, screenModel.actionProvider.currentProvider as? ManualActionProvider)) {
                     val standingUpPenalty = when {
                         requiresStandingUp && !standingUpIsFree -> rules.moveRequiredForStandingUp
                         else -> 0
@@ -164,9 +166,17 @@ class FieldViewModel(
                     val action = {
                         val actionProvider = (uiState.actionProvider)
                         fun getQueuedActionsForPath(): QueuedActionsResult {
+                            // If the player is using Fumblerooski we have disabled the Pathfinder
+                            // This means that if they _haven't_ used it, we need to _not_ use it
+                            // across all moves triggered by the PathFinder.
+                            val isFumblerooskiAvailable = activePlayer.isSkillAvailable(SkillType.FUMBLEROOSKI) && activePlayer.hasBall()
                             val selectedSquares = path.map {
                                 CompositeGameAction(
-                                    listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
+                                    listOfNotNull(
+                                        MoveTypeSelected(MoveType.STANDARD),
+                                        FieldSquareSelected(it),
+                                        if (isFumblerooskiAvailable) Cancel else null
+                                    )
                                 )
                             }
                             return if (selectedSquares.size == 1) {
@@ -231,14 +241,16 @@ class FieldViewModel(
     }
     private fun showPathFinder(
         activePlayer: Player?,
-        mouseEnter: FieldCoordinate?
-    ): Boolean = (
-        activePlayer != null &&
-            mouseEnter != null &&
-            activePlayer.coordinates != mouseEnter &&
-            activePlayer.movesLeft > 0 &&
-            rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
-    )
+        mouseEnter: FieldCoordinate?,
+        actionProvider: ManualActionProvider?,
+    ): Boolean {
+        return activePlayer != null
+            && mouseEnter != null
+            && activePlayer.coordinates != mouseEnter
+            && activePlayer.movesLeft > 0
+            && rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
+            && (actionProvider != null && actionProvider.nextFumblerooskiCommand != Confirm)
+    }
 
     fun notifyAnimationFinished() {
         uiState.notifyAnimationDone()

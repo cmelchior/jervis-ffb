@@ -49,6 +49,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Jump
   - [x] Works on Dodge
   - [x] Works on Leap
+  - [x] Diving Tackle can prevent other players from using Shadowing
 - [x] Dodge
   - [x] Is optional
   - [x] Can reroll successful dodge rolls
@@ -130,7 +131,23 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Apply on POW
   - [x] Apply on Stumble
   - [x] Does not work against Stand Firm
-- [ ] Fumblerooskie
+- [x] Fumblerooski 
+  - [ ] Does not work against Tentacles
+  - [x] Decide after leaving the last square, but before rolling any dice.
+  - [x] Use before Rush
+  - [x] Use Before Dodge
+  - [x] Shadowing into the square will bounce the ball
+  - [x] Diving Tackle into the square will bounce the ball
+  - [x] Jump: Use if successful roll
+  - [x] Jump: Use if failed roll, but falling over in target square
+  - [x] Jump: Does not work if falling over in starting square
+  - [x] Leap: Use if successful roll
+  - [x] Leap: Use if failed roll, but falling over in target square
+  - [x] Leap: Does not work if falling over in starting square
+  - [x] Pogo: Use if successful roll
+  - [x] Pogo: Use if failed roll, but falling over in target square
+  - [x] Pogo: Does not work if falling over in starting square
+  - [x] Only work for active player when performing a "Move Action"
 - [ ] Lethal Flight
 - [x] Lone Fouler
   - [x] "Failed" rolls also take into account other modifiers
@@ -281,6 +298,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Adds -1 negative modifier
   - [x] Only one player can use it
 - [ ] Tentacles
+  - [ ] Check before rushing to Jump
+  - [ ] Check before rushing to Leap
+  - [ ] Check before rushing to Pogo
 - [x] Two Heads
   - [x] Use skill on dodge
   - [x] Use skill multiple times pr. turn

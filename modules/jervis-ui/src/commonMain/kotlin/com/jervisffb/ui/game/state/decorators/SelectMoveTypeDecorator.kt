@@ -1,7 +1,9 @@
 package com.jervisffb.ui.game.state.decorators
 
 import com.jervis.generated.SettingsKeys
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -21,7 +23,8 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
-import com.jervisffb.ui.game.view.ContextMenuOption
+import com.jervisffb.ui.game.view.SimpleContextMenuOption
+import com.jervisffb.ui.game.view.ToggleContextMenuOption
 
 object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
 
@@ -66,7 +69,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
-                            ContextMenuOption(
+                            SimpleContextMenuOption(
                                 "Jump",
                                 { actionProvider.userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
                                 ActionIcon.JUMP
@@ -80,7 +83,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
-                            ContextMenuOption(
+                            SimpleContextMenuOption(
                                 "Leap",
                                 { actionProvider.userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
                                 ActionIcon.LEAP
@@ -94,7 +97,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
-                            ContextMenuOption(
+                            SimpleContextMenuOption(
                                 "Pogo",
                                 { actionProvider.userActionSelected(MoveTypeSelected(MoveType.POGO)) },
                                 ActionIcon.LEAP
@@ -130,7 +133,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                                         CompositeGameAction(
                                             listOf(
                                                 MoveTypeSelected(MoveType.STANDARD),
-                                                FieldSquareSelected(loc)
+                                                FieldSquareSelected(loc),
                                             )
                                         )
                                     )
@@ -139,6 +142,36 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                             )
                         }
                     }
+
+                if (player.isSkillAvailable(SkillType.FUMBLEROOSKI) && player.hasBall()) {
+                    // If player has Fumblerooski, they can enable it before-hand here
+                    acc.updateSquare(player.coordinates) {
+                        val useFumblerooski = ToggleContextMenuOption.ContextData("Use Fumblerooski when moving next", ActionIcon.FUMBLEROOSKI_USE) {
+                            val uiController = acc.uiController
+                            // We need to reset the UI decoration at the correct place when Undo'ing actions
+                            uiController.uiDecorations.registerUndo(uiController.gameController.currentActionIndex()) {
+                                actionProvider.nextFumblerooskiCommand(player, null)
+                            }
+                            actionProvider.nextFumblerooskiCommand(player, Confirm)
+                        }
+                        val cancelFumblerooski = ToggleContextMenuOption.ContextData("Cancel Fumblerooski on next move", ActionIcon.FUMBLEROOSKI_CANCEL) {
+                            actionProvider.nextFumblerooskiCommand(player, Cancel)
+                        }
+                        it.copy(
+                            contextMenuOptions = it.contextMenuOptions.add(
+                                ToggleContextMenuOption(
+                                    useFumblerooski
+                                )  {
+                                    val isFumblerooskiEnabled = (actionProvider.nextFumblerooskiCommand == Confirm)
+                                    when (isFumblerooskiEnabled) {
+                                        true -> cancelFumblerooski
+                                        false -> useFumblerooski
+                                    }
+                                }
+                            )
+                        )
+                    }
+                }
             }
 
             MoveType.STAND_UP -> {
@@ -146,7 +179,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
-                            ContextMenuOption(
+                            SimpleContextMenuOption(
                                 "Stand-Up",
                                 { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
                                 ActionIcon.STAND_UP

@@ -5,7 +5,6 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
-import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
@@ -13,6 +12,7 @@ import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
+import com.jervisffb.ui.game.view.ContextWheelUiState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class UiSnapshotAccumulator(
     private val uiStateFlow: MutableSharedFlow<UiGameSnapshot>,
     private val uiActionWheelFlow: MutableSharedFlow<List<ActionWheelUiState>>,
-    private val uiContextWheelFlow: MutableSharedFlow<List<ActionWheelUiState>>,
+    private val uiContextWheelFlow: MutableSharedFlow<ContextWheelUiState>,
     previousSnapshot: UiGameSnapshot,
     val uiController: UiGameController
 ) {
@@ -49,8 +49,7 @@ class UiSnapshotAccumulator(
     var awayDogoutOnClickAction: (() -> Unit)? = null
     var homeDogoutOnClickAction: (() -> Unit)? = null
     private val actionWheelEvents = mutableListOf<ActionWheelUiState>()
-    private val contextWheelEvents = mutableListOf<ActionWheelUiState>()
-    var contextMenuActionWheel: SecondaryActionWheelViewModel? = null
+    private val contextWheelEvents = mutableListOf<ContextWheelUiState>()
     var dialogInput: UserInputDialog? = null
     var homeTeamInfo = UiTeamInfoUpdate(game.homeTeam)
     var awayTeamInfo = UiTeamInfoUpdate(game.awayTeam)
@@ -69,7 +68,7 @@ class UiSnapshotAccumulator(
         }
     }
 
-    fun addContextWheelEvent(event: ActionWheelUiState) {
+    fun addContextWheelEvent(event: ContextWheelUiState) {
         contextWheelEvents.add(event)
     }
 
@@ -162,7 +161,7 @@ class UiSnapshotAccumulator(
     // is cleared after sending it.
     suspend fun emitActionWheelState() {
         if (contextWheelEvents.isNotEmpty()) {
-            uiContextWheelFlow.emit(contextWheelEvents.toList())
+            uiContextWheelFlow.emit(contextWheelEvents.single())
             contextWheelEvents.clear()
         }
         if (actionWheelEvents.isNotEmpty()) {

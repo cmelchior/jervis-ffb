@@ -47,6 +47,7 @@ import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block3dagai
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block_away
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block_home
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_holdball
+import com.jervisffb.jervis_ui.generated.resources.icons_decorations_holdball_fumblerooski
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_prone
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_stunned
 import com.jervisffb.jervis_ui.generated.resources.icons_game_pb_east
@@ -132,6 +133,10 @@ enum class ActionIcon(val path: String) {
     ROLL_DICE("jervis/actions/jervis_action_roll_dice.png"),
     TEAM_REROLL("jervis/actions/jervis_action_team_reroll.png"),
 
+    // Skills
+    FUMBLEROOSKI_CANCEL("jervis/actions/jervis_action_cancel.png"),
+    FUMBLEROOSKI_USE("jervis/actions/jervis_action_use_fumblerooski.png"),
+
     // Player Actions
     MOVE("jervis/actions/jervis_action_move.png"),
     BLOCK("jervis/actions/jervis_action_block.png"),
@@ -149,7 +154,6 @@ enum class ActionIcon(val path: String) {
     LEAP("jervis/actions/jervis_action_jump.png"),
     STAY("jervis/actions/jervis_action_cancel.png"),
     FOLLOW_UP("jervis/actions/jervis_action_move.png"),
-
 
     // Special Actions
     BALL_AND_CHAIN("jervis/actions/jervis_action_move.png"),
@@ -588,8 +592,11 @@ object IconFactory {
     }
 
     @Composable
-    fun getHeldBallOverlay(): ImageBitmap {
-        return imageResource(Res.drawable.icons_decorations_holdball)
+    fun getHeldBallOverlay(useFumblerooski: Boolean): ImageBitmap {
+        return when (useFumblerooski) {
+            true -> imageResource(Res.drawable.icons_decorations_holdball_fumblerooski)
+            false -> imageResource(Res.drawable.icons_decorations_holdball)
+        }
     }
 
     @Composable

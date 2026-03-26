@@ -15,9 +15,11 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
@@ -50,6 +52,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -834,6 +837,31 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             when (isActiveClient) {
                 true -> "Use Wrestle?"
                 false -> "Waiting for opponent to use Wrestle"
+            }
+        },
+
+        StandardMoveStep.ChooseToUseFumblerooski to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Fumblerooski?"
+                false -> "Waiting for opponent to use Fumblerooski"
+            }
+        },
+        JumpStep.ChooseToUseFumblerooskiAfterJumpingToTargetSquare to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Fumblerooski?"
+                false -> "Waiting for opponent to use Fumblerooski"
+            }
+        },
+        LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Fumblerooski?"
+                false -> "Waiting for opponent to use Fumblerooski"
+            }
+        },
+        PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Fumblerooski?"
+                false -> "Waiting for opponent to use Fumblerooski"
             }
         },
     )

@@ -22,9 +22,10 @@ class LocalActionProvider(
     private val settings: GameSettings,
     private val homeProvider: UiActionProvider,
     private val awayProvider: UiActionProvider,
-): UiActionProvider() {
+): UiActionProviderGroup() {
 
-    private var currentProvider = homeProvider
+    override var currentProvider: UiActionProvider = homeProvider
+        private set
 
     private var actionJob: Job? = null
 

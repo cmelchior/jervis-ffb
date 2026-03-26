@@ -41,7 +41,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *  - Jump
  *  - Leap
  *
- *  Turnovers are handled in the parent procedures that called this one.
+ *  Turnovers should be handled in the parent procedure that called this one.
  *
  *  --------------
  *  Developer's Notes:

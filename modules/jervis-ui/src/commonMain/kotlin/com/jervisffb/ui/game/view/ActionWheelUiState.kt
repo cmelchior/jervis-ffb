@@ -7,6 +7,22 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import kotlin.math.ceil
 
 /**
+ * Classes responsible for representing the Context Wheel.
+ * This is seperate from [ActionWheelUiState] as there are enough changes
+ * between Primary and Context Action Wheels, that using the same API is
+ * challenging.
+ *
+ * All of these APIs are still a bit of a mess, though, and probably need
+ * another pass.
+ */
+sealed interface ContextWheelUiState
+data class ContextWheelMenu(
+    val coordinates: FieldCoordinate,
+    val options: List<ContextMenuOption>,
+): ContextWheelUiState
+object NoContextMenu: ContextWheelUiState
+
+/**
  * Classes responsible for representing the stable state of an Action Wheel.
  * The UI method [ActionWheel], is responsible for rendering the actual changes
  * between them, but these states do provide hints to it on what kind of animation

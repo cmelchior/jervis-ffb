@@ -31,7 +31,7 @@ class P2PActionProvider(
     private val homeProvider: UiActionProvider,
     private val awayProvider: UiActionProvider,
     private val networkAdapter: P2PClientNetworkAdapter,
-): UiActionProvider() {
+): UiActionProviderGroup() {
 
     companion object {
         val LOG = jervisLogger()
@@ -49,7 +49,8 @@ class P2PActionProvider(
     private val queuedServerActions = mutableListOf<GameAction>()
     private var handlingServerRevert = false // Set during `prepareForNextAction`. If `true`, the action will not be sent to the server again
 
-    private var currentProvider = homeProvider
+    override var currentProvider: UiActionProvider = homeProvider
+        private set
 
     // Returns `true` if _this_ client is responsible for creating the current action.
     // `false` if the action is expected to come from the server.
