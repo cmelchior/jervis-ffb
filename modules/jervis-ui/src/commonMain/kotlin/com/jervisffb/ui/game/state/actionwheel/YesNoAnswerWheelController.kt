@@ -79,6 +79,7 @@ import kotlin.time.ExperimentalTime
  * - Grab (skill usage)
  * - Hit an Run (skill usage)
  * - Leap (skill usage)
+ * - Lethal Flight (skill usage)
  * - Lone Fouler (skill usage)
  * - Mighty Blow (skill usage)
  * - Safe Pair of Hands (skill usage)
@@ -468,6 +469,18 @@ object UseLeapWheelController: UseSkillWheelController(SkillType.LEAP) {
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<MoveContext>()
         val player = context.player
+        return player.coordinates
+    }
+}
+
+object UseLethalFlightWheelController: UseSkillWheelController(SkillType.LETHAL_FLIGHT) {
+    override val nodes: Set<Node> = setOf(
+        ArmourRoll.ChooseToUseLethalFlight,
+        InjuryRoll.ChooseToUseLethalFlight,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<RiskingInjuryContext>()
+        val player = context.causedBy ?: error("Missing causedBy: $state")
         return player.coordinates
     }
 }

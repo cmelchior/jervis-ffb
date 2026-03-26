@@ -11,6 +11,7 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.builder.GameVersion
@@ -142,6 +143,14 @@ fun Player.assertStunned() {
     assertEquals(PlayerState.STUNNED, state)
     assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
     assertTrue(location.isOnField(team.game.rules), "Stunned players should be on the field")
+}
+
+/**
+ * Test Helper, checking if a player is Knocked Out.
+ */
+fun Player.assertKnockedOut() {
+    assertEquals(PlayerState.KNOCKED_OUT, state)
+    assertEquals(DogOut, location)
 }
 
 /**

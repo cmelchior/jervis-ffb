@@ -37,8 +37,10 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.InjuryResult
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 
 /**
@@ -50,10 +52,28 @@ import com.jervisffb.engine.utils.sum
  * The result is stored in [RiskingInjuryContext] and it is up
  * to the caller to determine what to do with the result.
  *
+ * Developer's Commentary:
  * Mighty Blow specifically say "Whenever this player Knocks Down an opposition
  * player during a Block Action..." (page 131 in BB2025 rulebook), but when you
  * are pushed into the crowd, the player is never Knocked Down. So Mighty Blow
  * does not apply there
+ *
+ * There are a number of skills that affect Injury Rolls, especially as they
+ * can occur in different scenarios. This procedure is capturing all of them.
+ *
+ * For now, we just go through all relevant skills in an arbitrary order. Since
+ * all of the skills can be applied after rolling the dice, this is where
+ * we choose to apply them.
+ *
+ * Block:
+ * 1. Mighty Blow (Knocked Down)
+ * 2. TBD: Chainsaw, Arm Bar, Others?
+ *
+ * Foul:
+ * 1. Dirty Player (Knocked Down)
+ *
+ * Throw Team-mate:
+ * 1. Lethal Flight (Knocked Down)
  */
 object InjuryRoll: Procedure() {
     override val initialNode: Node = RollDice
@@ -198,6 +218,46 @@ object InjuryRoll: Procedure() {
                     add(UpdateContext(updatedContext))
                     add(SetSkillUsed(fouler, fouler.getSkill(SkillType.DIRTY_PLAYER), true))
                     add(ReportSkillUsed(fouler, SkillType.DIRTY_PLAYER))
+                }
+                add(GotoNode(ChooseToUseLethalFlight))
+            }
+        }
+    }
+
+    object ChooseToUseLethalFlight: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val context = state.getContext<RiskingInjuryContext>()
+            return context.causedBy?.team ?: context.player.team.otherTeam() // If we take the fallback, this node will be skipped.
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val thrownContext = state.getContextOrNull<ThrowTeamMateContext>()
+
+            val thrownPlayer = thrownContext?.thrownPlayer
+            val isKnockedDown = (context.mode == RiskingInjuryMode.KNOCKED_DOWN)
+            val isThrowTMScenario = (thrownPlayer != null && thrownPlayer == context.causedBy)
+            val hasLethalFlight = (context.causedBy?.isSkillAvailable(SkillType.LETHAL_FLIGHT) == true)
+
+            return if (isKnockedDown && isThrowTMScenario && hasLethalFlight) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val usedLethalFlight = (action is Confirm)
+            return buildCompositeCommand {
+                if (usedLethalFlight) {
+                    val thrownPlayer = context.causedBy ?: INVALID_GAME_STATE("Missing causedBy: $context")
+                    val updatedModifiers = context.injuryModifiers.add(InjuryModifier.LETHAL_FLIGHT)
+                    val updatedContext = context.copy(
+                        injuryModifiers = updatedModifiers,
+                        injuryResult = rules.injuryTable.roll(context.injuryRoll[0], context.injuryRoll[1], updatedModifiers.sum())
+                    )
+                    add(UpdateContext(updatedContext))
+                    add(SetSkillUsed(thrownPlayer, thrownPlayer.getSkill(SkillType.LETHAL_FLIGHT), true))
+                    add(ReportSkillUsed(thrownPlayer, SkillType.LETHAL_FLIGHT))
                 }
                 add(GotoNode(ChooseToUseThickSkull))
             }

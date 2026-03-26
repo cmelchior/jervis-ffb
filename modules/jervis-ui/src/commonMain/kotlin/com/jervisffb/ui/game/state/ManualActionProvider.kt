@@ -689,7 +689,7 @@ open class ManualActionProvider(
             }
         }
 
-        // Always use Dirty Player on Injury (if possible)
+        // Always use Mighty Blow on Injury (if possible)
         if (menuViewModel.isFeatureEnabled(Feature.USE_MIGHTY_BLOW_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseMightyBlow)) {
             return Confirm
         }
@@ -729,6 +729,21 @@ open class ManualActionProvider(
             && !doDivingTackleHaveAnAffect(controller.state)
         ) {
             return Cancel
+        }
+
+        // Use Lethal Flight if Armour isn't already broken
+        if (menuViewModel.isFeatureEnabled(Feature.USE_LETHAL_FLIGHT_ON_ARMOUR) && (currentNode == ArmourRoll.ChooseToUseLethalFlight)) {
+            val context = controller.state.getContextOrNull<RiskingInjuryContext>()
+            if (context?.armourBroken != true) {
+                return Confirm
+            } else {
+                return Cancel
+            }
+        }
+
+        // Always use Lethal Flight on Injury (if possible)
+        if (menuViewModel.isFeatureEnabled(Feature.USE_LETHAL_FLIGHT_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseLethalFlight)) {
+            return Confirm
         }
 
         return null

@@ -36,6 +36,7 @@ import com.jervisffb.engine.rules.bb2025.skills.JumpUp
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
+import com.jervisffb.engine.rules.bb2025.skills.LethalFlight
 import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
 import com.jervisffb.engine.rules.bb2025.skills.Loner
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
@@ -183,9 +184,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.LETHAL_FLIGHT -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Lethal Flight", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        LethalFlight(player, category, expiresAt)
+                    }
                 }
                 SkillType.LONE_FOULER -> {
                     addNoValueEntry("Lone Fouler", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->

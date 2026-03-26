@@ -3,6 +3,7 @@ package com.jervisffb.engine.model.modifiers
 enum class ArmourModifier(override val modifier: Int, override val description: String) : DiceModifier {
     DIRTY_PLAYER(1, "Dirty Player"),
     MARKED(1, "Marked"),
+    LETHAL_FLIGHT(1, "Lethal Flight"),
 }
 
 data class MightyBlowArmourModifier(override val modifier: Int = 1) : DiceModifier {

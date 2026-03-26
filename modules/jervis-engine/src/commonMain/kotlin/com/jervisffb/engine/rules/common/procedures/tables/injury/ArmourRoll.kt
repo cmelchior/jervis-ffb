@@ -30,6 +30,7 @@ import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.hasSkill
@@ -42,6 +43,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 
@@ -49,7 +51,7 @@ import com.jervisffb.engine.utils.sum
  * Implement the armour roll.
  *
  * See page 60 in the BB2020 rulebook.
- * See page XX in the BB2025 rulebook.
+ * See page 66 in the BB2025 rulebook.
  *
  * The result is stored in [RiskingInjuryContext] and it is up
  * to the caller to determine what to do with the result.
@@ -66,13 +68,16 @@ import com.jervisffb.engine.utils.sum
  * Mighty Blow (if they don't make a difference)
  *
  * Block:
- * 1. Claw (Knocked Down - Block)
- * 2. Mighty Blow (Knocked Down - Block)
+ * 1. Claw (Knocked Down)
+ * 2. Mighty Blow (Knocked Down)
  * 4. TBD: Chainsaw, Arm Bar, Others?
  *
  * Foul:
  * 1. Dirty Player (AV Roll - Modifier)
  * 2. Lone Fouler (AV Roll - Reroll)
+ *
+ * Throw Team-mate:
+ * 1. Lethal Flight (Knocked Down)
  */
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
@@ -146,7 +151,15 @@ object ArmourRoll: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             return when (context.mode) {
-                RiskingInjuryMode.KNOCKED_DOWN -> GotoNode(CheckIfMightyBlowIsApplicable)
+                RiskingInjuryMode.KNOCKED_DOWN -> {
+                    val throwPlayerContext = state.getContextOrNull<ThrowTeamMateContext>()
+                    val thrownPlayer = throwPlayerContext?.thrownPlayer
+                    if (thrownPlayer != null && thrownPlayer == context.causedBy && context.mode == RiskingInjuryMode.KNOCKED_DOWN) {
+                        GotoNode(CheckIfLethalFlightIsApplicable)
+                    } else {
+                        GotoNode(CheckIfMightyBlowIsApplicable)
+                    }
+                }
                 RiskingInjuryMode.FOUL -> GotoNode(ChooseToUseDirtyPlayer)
                 // None of these have skills that can affect the armour roll
                 RiskingInjuryMode.BAD_LANDING,
@@ -319,6 +332,74 @@ object ArmourRoll: Procedure() {
                     )
                 }
                 false -> ExitProcedure()
+            }
+        }
+    }
+
+    // Knocked Down by thrown player during Throw Team-mate Action.
+    // To clean up the action flow, we skip Lethal Flight if using it wouldn't matter.
+    object CheckIfLethalFlightIsApplicable: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            // Since the opponent using Mighty Blow, might already be prone, we cannot rely on
+            // normal checks.
+            val opponentCanUseSkills = context.canOpponentUseSkills
+            val opponentHasLethalFlight = (context.causedBy?.isSkillAvailable(SkillType.LETHAL_FLIGHT) == true)
+
+            // We only want to use Lethal Flight if it makes a difference, i.e. Armour Roll should be
+            // Target AV - 1.
+            val target = context.player.armorValue
+            val roll = context.armourRoll.sum() + context.armourModifiers.sum()
+            val avModifier: Int = when (opponentHasLethalFlight) {
+                true -> 1
+                false -> 0
+            }
+            val lethalFlightWillMatter = roll < target
+                && avModifier > 0
+                && (roll + avModifier) >= target
+
+            return if (opponentCanUseSkills && opponentHasLethalFlight && lethalFlightWillMatter) {
+                GotoNode(ChooseToUseLethalFlight)
+            } else {
+                ExitProcedure()
+            }
+        }
+    }
+
+    object ChooseToUseLethalFlight: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val injuryContext = state.getContext<RiskingInjuryContext>()
+            return injuryContext.causedBy?.team ?: error("Missing team: $injuryContext")
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<RiskingInjuryContext>()
+            val hasLethalFlight = (context.causedBy?.isSkillAvailable(SkillType.LETHAL_FLIGHT) == true)
+            return if (hasLethalFlight) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<RiskingInjuryContext>()
+            val thrownPlayer = context.causedBy!!
+            val useLethalFlight = (action is Confirm)
+            return if (useLethalFlight) {
+                val skill = thrownPlayer.getSkill(SkillType.LETHAL_FLIGHT)
+                compositeCommandOf(
+                    ReportSkillUsed(thrownPlayer, SkillType.LETHAL_FLIGHT),
+                    SetSkillUsed(thrownPlayer, skill, true),
+                    UpdateContext(
+                        context.copy(
+                            armourModifiers = context.armourModifiers + listOf(ArmourModifier.LETHAL_FLIGHT)
+                        )
+                    ),
+                    ExitProcedure()
+                )
+            } else {
+                ExitProcedure()
             }
         }
     }

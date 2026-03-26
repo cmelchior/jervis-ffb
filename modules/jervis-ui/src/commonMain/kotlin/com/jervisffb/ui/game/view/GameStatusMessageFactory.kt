@@ -864,6 +864,20 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 false -> "Waiting for opponent to use Fumblerooski"
             }
         },
+
+        ArmourRoll.ChooseToUseLethalFlight to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Lethal Flight to injure opponent?"
+                false -> "Waiting for opponent to use Lethal Flight"
+            }
+        },
+
+        InjuryRoll.ChooseToUseLethalFlight to { isActiveClient, _, _ ->
+            when (isActiveClient) {
+                true -> "Use Lethal Flight on Injury Roll?"
+                false -> "Waiting for opponent to use Lethal Flight"
+            }
+        },
     )
 
     private fun isActiveStep(actionProvider: UiActionProvider): Boolean {

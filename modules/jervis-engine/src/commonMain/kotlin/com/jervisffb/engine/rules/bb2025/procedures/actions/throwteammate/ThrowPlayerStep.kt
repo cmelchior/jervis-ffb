@@ -301,7 +301,11 @@ object ThrowPlayerStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val playerInSquare = state.field[throwContext.target!!].player ?: INVALID_GAME_STATE("No player found in square: ${throwContext.target}")
-            val injuryContext = RiskingInjuryContext(playerInSquare)
+            val injuryContext = RiskingInjuryContext(
+                player = playerInSquare,
+                causedBy = throwContext.thrownPlayer,
+                mode = RiskingInjuryMode.KNOCKED_DOWN
+            )
             return compositeCommandOf(
                 ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
                 AddContext(injuryContext),

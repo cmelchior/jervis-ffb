@@ -148,7 +148,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Pogo: Use if failed roll, but falling over in target square
   - [x] Pogo: Does not work if falling over in starting square
   - [x] Only work for active player when performing a "Move Action"
-- [ ] Lethal Flight
+- [x] Lethal Flight
+  - [x] Works on Armour
+  - [x] Works on Injury if not used on Armour
+  - [x] Is not used if no effect
+  - [x] Does not work if Distracted
+  - [x] Works when landing on multiple players
+  - [ ] Gain SPP for Casualties
 - [x] Lone Fouler
   - [x] "Failed" rolls also take into account other modifiers
   - [x] Only works if no offensive assists

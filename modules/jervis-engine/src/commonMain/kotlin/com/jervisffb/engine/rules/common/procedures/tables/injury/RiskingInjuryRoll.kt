@@ -3,8 +3,10 @@ package com.jervisffb.engine.rules.common.procedures.tables.injury
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -133,13 +135,22 @@ object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<RiskingInjuryContext>()
         // A player with Leader has left the field after an injury roll. If they had Leader
         // we need to check if the leader reroll is still available.
-        val player = state.getContext<RiskingInjuryContext>().player
+        val commands = mutableListOf<Command?>()
+
+        val player = context.player
         if (!player.location.isOnField(rules) && player.hasSkill(SkillType.LEADER)) {
-            return Leader.removeLeaderRerollIfNotAvailable(player.team)
+            commands.add(Leader.removeLeaderRerollIfNotAvailable(player.team))
         }
-        return null
+
+        // If Lethal Flight was used during this Injury, it will reset now
+        context.causedBy?.getSkillOrNull(SkillType.LETHAL_FLIGHT)?.let { skill ->
+            commands.add(SetSkillUsed(player, skill, false))
+        }
+
+        return CompositeCommand(commands.filterNotNull())
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RiskingInjuryContext>()
 
