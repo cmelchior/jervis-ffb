@@ -77,8 +77,12 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
             )
         }
 
-        val actionButtons = if (acc.gameController.currentNode() == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll) {
-            actions.filterIsInstance<SelectRerollOption>().firstOrNull()?.let { rerollOption ->
+        val currentNode = acc.gameController.currentNode()
+        val actionButtons = if (
+            currentNode == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
+            || currentNode == SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll
+        ) {
+            actions.getOrNull<SelectRerollOption>()?.let { rerollOption ->
                 rerollOption.options.map { option ->
                     val rerollSource = option.getRerollSource(acc.game)
                     ActionButtonData(
