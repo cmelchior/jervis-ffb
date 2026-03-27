@@ -48,4 +48,42 @@ class ApothecaryTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.RESERVE, state.getPlayerById("H1".playerId).state)
         assertEquals(DogOut, state.getPlayerById("H1".playerId).location)
     }
+
+    @Test
+    fun chooseOriginalResult() {
+        val defender = homeTeam["H1".playerId]
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock(defender, 6.dblock),
+            DirectionSelected(Direction.LEFT),
+            Cancel, // Do not follow up
+            DiceRollResults(6.d6, 6.d6), // Armor
+            DiceRollResults(4.d6, 6.d6), // Casualty
+            DiceRollResults(16.d16), // Dead
+            Confirm,  // Use Apothecary
+            DiceRollResults(1.d16), // Badly Hurt
+            Cancel,  // Use 1st roll
+        )
+        assertEquals(PlayerState.DEAD, defender.state)
+        assertEquals(DogOut, defender.location)
+    }
+
+    @Test
+    fun chooseNewResult() {
+        val defender = homeTeam["H1".playerId]
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock(defender, 6.dblock),
+            DirectionSelected(Direction.LEFT),
+            Cancel, // Do not follow up
+            DiceRollResults(6.d6, 6.d6), // Armor
+            DiceRollResults(4.d6, 6.d6), // Casualty
+            DiceRollResults(16.d16), // Dead
+            Confirm,  // Use Apothecary
+            DiceRollResults(1.d16), // Badly Hurt
+            Confirm,  // Use 2nd roll
+        )
+        assertEquals(PlayerState.RESERVE, defender.state)
+        assertEquals(DogOut, defender.location)
+    }
 }

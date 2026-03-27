@@ -344,8 +344,8 @@ book.
     - [ ] Use on BH
     - [ ] Use on Casualty
     - [ ] Use on injury when pushed into the crowd
-    - [ ] Select first roll
-    - [ ] Select 2nd roll
+    - [x] Select first roll
+    - [x] Select 2nd roll
 - [ ] Scoring
     - [x] Moving into the End Zone with the ball using a standard move
     - [x] Follow-up into the End Zone
