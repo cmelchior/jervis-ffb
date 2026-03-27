@@ -383,6 +383,9 @@ private fun DrawerMenuGroupHeader(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
+    val contentColor = remember(enabled) {
+        JervisTheme.rulebookRed.copy(alpha = if (enabled) 1f else 0.5f)
+    }
     Row(
         modifier = Modifier
             .applyIf(background != Color.Transparent) {
@@ -400,7 +403,7 @@ private fun DrawerMenuGroupHeader(
             text = title,
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
-            color = JervisTheme.rulebookRed
+            color = contentColor,
         )
         Spacer(modifier = Modifier.weight(1f))
         val img = when (isSelected) {
@@ -415,7 +418,7 @@ private fun DrawerMenuGroupHeader(
                 true -> "Close $title submenu"
             },
             contentScale = ContentScale.FillBounds,
-            colorFilter = ColorFilter.tint(JervisTheme.rulebookRed)
+            colorFilter = ColorFilter.tint(contentColor)
         )
     }
 }
