@@ -42,9 +42,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -66,14 +69,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
@@ -101,12 +103,12 @@ import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
-import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.game.view.utils.stoneBackground
 import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
-import com.jervisffb.ui.reversed
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.scalePixels
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -266,7 +268,16 @@ fun ActionWheel(
                 buttonsEnabled = !isPrimary
             }
         )
-        HoverText(hoverText, JervisTheme.homeTeamColor)
+
+        if (hoverText.isNullOrEmpty() && (uiState.bottomMessage?.isNotBlank() == true)) {
+            RingMessage(
+                message = uiState.bottomMessage ?: "",
+                angle = 90f,
+                radius = (ringSize - borderSize) / 2f,
+            )
+        } else {
+            TooltipText(hoverText)
+        }
     }
 }
 private suspend fun runWheelAnimations(
@@ -583,23 +594,17 @@ private fun RingMessage(
     message: String?,
     angle: Float,
     radius: Dp,
-    borderColor: Color = JervisTheme.rulebookRed,
 ) {
     val radiusPx = with(LocalDensity.current) { radius.toPx() }
     val offset = remember(angle, message) { getOffset(angle, radiusPx) }
     Box(modifier = Modifier.offset { offset.toIntOffset() }) {
         Box(
             modifier = Modifier
-                .dropShadow(shape = shape) {
-                    this.color = Color.Black.copy(1f)
-                    this.offset = Offset.Zero
-                    this.radius = 16.dp.toPx()
-                }
-                .paperBackground()
-                .border(width = 4.dp, borderColor)
-                .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp)
+                .stoneBackground(shape = RoundedCornerShape(8.dp))
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
         ) {
             Text(
+                color = JervisTheme.white,
                 modifier = Modifier,
                 text = message ?: "",
                 fontWeight = FontWeight.Bold,
@@ -746,88 +751,69 @@ private fun ActionWheelBackgroundRing(
 // Helper text that hovers just below the center player.
 // Generally, this should be a "hover" effect when mousing over buttons
 @Composable
-private fun HoverText(
+private fun TooltipText(
     message: String?,
-    borderColor: Color,
+    backgroundColor: Color = JervisTheme.black.copy(0.8f),
+    fontSize: TextUnit = 16.jsp,
+    fontWeight: FontWeight = FontWeight.Bold,
+    textColor: Color = Color.White,
 ) {
-    val fontSize = 14.sp
-    val fontWeight = FontWeight.Bold
-    val textColor = Color.White
-    val animationDuration = 100
-    var displayedMessage by remember { mutableStateOf<String?>(null) }
-    val bgAlpha = remember {
-        Animatable(0f)
-    }
-    LaunchedEffect(message) {
-        if (message == null) {
-            bgAlpha.animateTo(0f, tween(
-                durationMillis = (bgAlpha.value*animationDuration).roundToInt(),
-                easing = LinearOutSlowInEasing.reversed()
-            ))
-            delay((bgAlpha.value*animationDuration).roundToInt().toLong().milliseconds)
-            displayedMessage = null
-        } else {
-            displayedMessage = message
-            bgAlpha.animateTo(1f, tween(
-                durationMillis = ((1f-bgAlpha.value) * animationDuration).roundToInt(),
-                easing = LinearEasing
-            ))
-        }
-    }
+    // In a previous commit, the TooltipText had an animation duration. The
+    // rationale was to avoid "flicker" when moving quickly over many buttons.
+    // That also worked, but it was causing other issues as the background
+    // size was changing, which looked worse, so the animation was removed again
+    // If we introduce animations here, we should probably also animate between
+    // the different tooltip sizes, but this needs more investigation.
 
-    // There are issues with text Stroke and alpha. It doesn't seem to render correctly.
-    // This is probably a bug, but haven't found a workaround yet. So for now, just use
-    // a solid background color.
-
-    // Background border
-//        Text(
-//            modifier = Modifier.alpha(bgAlpha.value),
-//            text = displayedMessage ?: "",
-//            style = MaterialTheme.typography.body1.copy(
-//                color = borderColor,
-//                fontWeight = fontWeight,
-//                fontSize = fontSize,
-//                // Shadow doesn't work well with border. We probably need a custom canvas render
-//                // shadow = Shadow(
-//                //     color = Color.Black,
-//                //     offset = Offset(2f, 2f),
-//                //     blurRadius = 8f
-//                // ),
-//                drawStyle = Stroke(
-//                    miter = borderWidth,
-//                    width = borderWidth,
-//                    join = StrokeJoin.Round
-//                )
-//            ),
-//        )
-
-    val baselineShift = remember(displayedMessage) {
-        // Aligning the text in the center of a colored background is pretty tricky
-        // due to different fonts and how Compose treat ascent / descent. This is
-        // mostly a problem for the direction hover as it includes unicode arrows.
-        // So for now we just account that specific case. Until we can come up with
-        // a better way of doing it.
-        if (displayedMessage?.startsWith("Direction: ") == true) {
-            BaselineShift.None
-        } else {
-            BaselineShift(-0.05f)
-        }
-    }
+    // On CMP, getBoundingBox uses RectHeightStyle.MAX which returns
+    // line-height bounds (font metrics), not ink bounds. So we cannot use the
+    // bounding box top/bottom for vertical centering. Instead:
+    //   - Horizontal: getBoundingBox left/right (accurate)
+    //   - Vertical: anchored to firstBaseline; capHeight ≈ fontSize * 0.72
+    //     (cap height is stable at ~70-73% of em size across common UI fonts)
+    // See https://youtrack.jetbrains.com/issue/CMP-2477
+    val fontSizePx = with(LocalDensity.current) { fontSize.toPx() }
+    val capHeightPx = fontSizePx * 0.72f
+    // Reset all layout state when displayedMessage changes so we never show text
+    // before the background has measured its bounds (onTextLayout fires one frame late).
+    var layoutReady by remember(message) { mutableStateOf(false) }
+    var textLeft by remember(message) { mutableStateOf(0f) }
+    var textRight by remember(message) { mutableStateOf(0f) }
+    var firstBaseline by remember(message) { mutableStateOf(0f) }
     Text(
         modifier = Modifier
-            .offset(y = 60.jdp)
-            .clip(RoundedCornerShape(4.dp))
-            .alpha(bgAlpha.value)
-            .background(borderColor)
-            .padding(4.dp)
-        ,
-        text = displayedMessage ?: "",
+            .offset(y = 55.jdp)
+            .drawBehind {
+                if (textRight > textLeft && firstBaseline > 0f) {
+                    val padding = 8.dp.toPx()
+                    drawRoundRect(
+                        color = backgroundColor,
+                        topLeft = Offset(textLeft - padding, firstBaseline - capHeightPx - padding),
+                        size = Size(textRight - textLeft + padding * 2, capHeightPx + padding * 2),
+                        cornerRadius = CornerRadius(4.dp.toPx()),
+                    )
+                }
+            },
+        onTextLayout = { result ->
+            firstBaseline = result.firstBaseline
+            val text = result.layoutInput.text.toString()
+            val indices = text.indices.filter { !text[it].isWhitespace() }
+            if (indices.isNotEmpty()) {
+                val boxes = indices.map { result.getBoundingBox(it) }
+                textLeft = boxes.minOf { it.left }
+                textRight = boxes.maxOf { it.right }
+            } else {
+                textLeft = 0f
+                textRight = 0f
+            }
+            layoutReady = true
+        },
+        text = message ?: "",
         style = MaterialTheme.typography.bodySmall.copy(
             fontFamily = JervisTheme.defaultFontFamily(), // Needed to support direction arrows on Web
             fontSize = fontSize,
             color = textColor,
             fontWeight = fontWeight,
-            baselineShift = baselineShift
         ),
     )
 }

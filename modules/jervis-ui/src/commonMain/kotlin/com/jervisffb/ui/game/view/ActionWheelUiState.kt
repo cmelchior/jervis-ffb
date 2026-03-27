@@ -45,6 +45,7 @@ sealed class ActionWheelUiState {
     open val animationOnly: Boolean = false
     open val hideWhenClickOutside: Boolean = false
     open val enableAnimation: Boolean = true
+    open val bottomMessage: String? = null // Message being shown as long as no onHover message is shown
 
     open fun isLastActionUndo(): Boolean = false
 
@@ -85,6 +86,7 @@ data class ActionWheelUiStateData(
     override val animationOnly: Boolean = false,
     override val hideWhenClickOutside: Boolean = false,
     override val enableAnimation: Boolean = true,
+    override val bottomMessage: String? = null,
 ): ActionWheelUiState() {
 
     override fun isLastActionUndo(): Boolean {

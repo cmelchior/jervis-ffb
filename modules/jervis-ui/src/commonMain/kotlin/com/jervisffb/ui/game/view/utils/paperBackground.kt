@@ -16,7 +16,10 @@ import com.jervisffb.ui.utils.applyIf
 /**
  * Add noise to a background color so it mimics a paper-like texture.
  */
-fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper, shape: Shape? = RectangleShape): Modifier {
+fun Modifier.paperBackground(
+    color: Color = JervisTheme.rulebookPaper,
+    shape: Shape? = RectangleShape
+): Modifier {
     val paperShader = createGrayscaleNoiseShader()
     return this
         .applyIf(shape != null) { clip(shape!!) }
@@ -34,22 +37,25 @@ fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper, shape: Sh
         }
 }
 
-fun Modifier.stoneBackground(): Modifier {
-    val color = Color(0x000000)
+fun Modifier.stoneBackground(
+    shape: Shape? = RectangleShape
+): Modifier {
+    val color = Color(0x000000).copy(alpha = 0.8f)
     val paperShader = createGrayscaleNoiseShader()
-    return this.drawBehind {
-        // Add desired background color
-        drawRect(color = color, size = size)
-        // Add semi-transparent noise on top
-        drawRect(
-            size = size,
-            brush = ShaderBrush(paperShader),
-            alpha = 0.8f,
-        )
-        // Re-add background color to make the noise blend more into the background
-        drawRect(color = color.copy(alpha = 0.5f), size = size)
-        drawRect(color = color.copy(alpha = 0.2f), size = size)
-    }
+    return this
+        .applyIf(shape != null) { clip(shape!!) }
+        .drawBehind {
+            // Add desired background color
+            drawRect(color = color, size = size)
+            // Add semi-transparent noise on top
+            drawRect(
+                size = size,
+                brush = ShaderBrush(paperShader),
+                alpha = 0.5f,
+            )
+            // Re-add background color to make the noise blend more into the background
+            drawRect(color = color.copy(alpha = 0.5f), size = size)
+        }
 }
 
 /**

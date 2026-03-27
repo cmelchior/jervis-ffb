@@ -187,7 +187,8 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
         }
     }
 
-    // Animate rolling the die, but only for clients
+    // Animate rolling the die, but only for clients with server dice rolls enabled
+    // as they would already have chosen the result in `onDecorateActions`
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
@@ -227,7 +228,8 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
                 bottomItems = emptyList(),
                 bottomAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
                 onDismiss = null,
-                animationOnly = true
+                animationOnly = true,
+                bottomMessage = diceRollType.description
             )
             acc.addActionWheelEvent(wheelState)
             return true
