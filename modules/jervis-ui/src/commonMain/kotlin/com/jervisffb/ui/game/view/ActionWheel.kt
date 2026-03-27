@@ -894,7 +894,9 @@ fun ActionButton(
             }
     ) {
         Image(
-            filterQuality = FilterQuality.None,
+            modifier = Modifier.size(72.jdp), // 1.25x scaling = same as Dice Icon scaling
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.High,
             bitmap = icon,
             contentDescription = "",
             colorFilter = if (isHover) colorFilter else null

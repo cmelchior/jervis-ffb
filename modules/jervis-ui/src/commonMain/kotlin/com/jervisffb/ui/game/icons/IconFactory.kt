@@ -82,6 +82,7 @@ import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.utils.getSubImage
+import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.ui.utils.toImageBitmap
 import com.jervisffb.ui.utils.toSkiaColor
@@ -556,8 +557,8 @@ object IconFactory {
     fun getDiceSizeDp(die: DieResult): DpSize {
         val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find: $die")
         return DpSize(
-            (image.width / density.density).dp,
-            (image.height / density.density).dp
+            (image.width / density.density).jdp * 1.25f,
+            (image.height / density.density).jdp * 1.25f
         )
     }
 
