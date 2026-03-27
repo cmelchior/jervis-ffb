@@ -203,7 +203,7 @@ fun ActionWheel(
             topAnims = topAnimatable,
             bottomAnims = bottomAnimatable,
             animationDurationMs = animationDurationMs,
-            maxRingAlpha = maxRingAlpha,
+            maxRingAlpha = if (uiState.animationOnly) 0f else maxRingAlpha,
             ringAlpha = ringAlpha,
         )
 
@@ -244,7 +244,7 @@ fun ActionWheel(
         WheelButtons(
             animationsCache = topAnimatable,
             buttons = topRenderButtons,
-            wheelRadius = (ringSize - borderSize)/2f,
+            wheelRadius = (ringSize - borderSize) / 2f,
             buttonsClickable = buttonsEnabled,
             onHover = { text -> hoverText = text },
             primaryFocus = temporaryPrimaryFocus,
@@ -257,7 +257,7 @@ fun ActionWheel(
         WheelButtons(
             animationsCache = bottomAnimatable,
             buttons = bottomRenderButtons,
-            wheelRadius = (ringSize - borderSize)/2f,
+            wheelRadius = (ringSize - borderSize) / 2f,
             buttonsClickable = buttonsEnabled,
             onHover = { text -> hoverText = text },
             primaryFocus = temporaryPrimaryFocus,

@@ -283,8 +283,10 @@ fun ActionWheelDialog(
             ActionWheel(
                 uiState = uiState,
                 offsetDelegate = { state: ActionWheelUiState? ->
+                    // It is challenging for the hiding action to know where the last wheel
+                    // was shown, so in the case where we are hiding the wheel, we do not
+                    // update the offset (so the wheel doesn't move).
                     if (state?.ringAnimationMode.isHiding()) {
-                        // offset = null
                         return@ActionWheel
                     }
                     val center = uiState.center
