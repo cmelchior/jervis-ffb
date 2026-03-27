@@ -64,8 +64,14 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
+import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
+import com.jervisffb.ui.menu.dice.DiceColorSettingsPanel
 import com.jervisffb.ui.utils.applyIf
 import org.jetbrains.compose.resources.painterResource
+
+private sealed interface DrawerSecondLevelContent
+private data class GeneratedSection(val section: MenuSection) : DrawerSecondLevelContent
+private data object DiceColorSection : DrawerSecondLevelContent
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -76,7 +82,7 @@ fun GameMenuDrawer(
     showMenuDrawer: (Boolean) -> Unit,
 ) {
     val uiState: UiGameSnapshot? by menuViewModel.uiState.uiStateFlow.collectAsState(null)
-    var secondLevelItems: MenuSection? by remember { mutableStateOf(null) }
+    var secondLevelItems: DrawerSecondLevelContent? by remember { mutableStateOf(null) }
 
     // Close submenus when the drawer is closing
     LaunchedEffect(drawerState.isOpen) {
@@ -210,8 +216,11 @@ fun GameMenuDrawer(
                     innerPadding = 4.dp,
                     onSelected = { selected ->
                         menuViewModel.enableAutomatedActions = selected
-                        if (!selected && secondLevelItems?.id == SettingsKeys.JERVIS_AUTO_ACTION) {
-                            secondLevelItems = null
+                        if (!selected && secondLevelItems is GeneratedSection) {
+                            val generatedSection = (secondLevelItems as GeneratedSection).section
+                            if (generatedSection.id == SettingsKeys.JERVIS_AUTO_ACTION) {
+                                secondLevelItems = null
+                            }
                         }
                     }
                 )
@@ -222,25 +231,27 @@ fun GameMenuDrawer(
                     } else {
                         true
                     }
+                    val target = GeneratedSection(section)
                     DrawerMenuGroupHeader(
                         title = section.label,
-                        isSelected = (secondLevelItems == section),
+                        isSelected = (secondLevelItems == target),
                         if (index % 2 == 1) JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f) else Color.Transparent,
                         enabled = enabled,
                         onClick = {
-                            if (secondLevelItems == null) {
-                                // No menu open, open the new one
-                                secondLevelItems = section
-                            } else if (secondLevelItems == section) {
-                                // Menu already open, just close it
-                                secondLevelItems = null
-                            } else if (secondLevelItems != section) {
-                                // Another menu open, just replace it
-                                secondLevelItems = section
-                            }
+                            secondLevelItems = if (secondLevelItems == target) null else target
                         },
                     )
                 }
+                val diceColorIndex = generatedMenu.sections.size
+                DrawerMenuGroupHeader(
+                    title = "Dice Colors",
+                    isSelected = (secondLevelItems is DiceColorSection),
+                    if (diceColorIndex % 2 == 1) JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f) else Color.Transparent,
+                    enabled = true,
+                    onClick = {
+                        secondLevelItems = if (secondLevelItems is DiceColorSection) null else DiceColorSection
+                    },
+                )
             }
             Box(modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)) {
                 JervisButton(
@@ -292,30 +303,38 @@ fun GameMenuDrawer(
                     .padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                var itemIndex = 0
-                secondLevelItems?.let { menuGroup ->
-                    // If Section has no sub-sections
-                    if (!menuGroup.subsections) {
-                        DrawerSectionHeader(menuGroup.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
-                    }
-                    menuGroup.items.forEach { item ->
-                        when (item) {
-                            is ToggleItem -> {
-                                SettingsEntry(item, itemIndex)
-                                itemIndex++
-                            }
-                            is MenuSection -> {
-                                DrawerSectionHeader(item.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
-                                item.items.forEach { subItem ->
-                                    when (subItem) {
-                                        is ToggleItem -> SettingsEntry(subItem, itemIndex)
-                                        else -> { /* nested-nested items are not supported */ }
-                                    }
+                when (val content = secondLevelItems) {
+                    is GeneratedSection -> {
+                        val menuGroup = content.section
+                        var itemIndex = 0
+                        // If Section has no sub-sections
+                        if (!menuGroup.subsections) {
+                            DrawerSectionHeader(menuGroup.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
+                        }
+                        menuGroup.items.forEach { item ->
+                            when (item) {
+                                is ToggleItem -> {
+                                    SettingsEntry(item, itemIndex)
                                     itemIndex++
+                                }
+                                is MenuSection -> {
+                                    DrawerSectionHeader(item.label, topPadding = if (itemIndex == 0) 0.dp else 24.dp)
+                                    item.items.forEach { subItem ->
+                                        when (subItem) {
+                                            is ToggleItem -> SettingsEntry(subItem, itemIndex)
+                                            else -> { /* nested-nested items are not supported */ }
+                                        }
+                                        itemIndex++
+                                    }
                                 }
                             }
                         }
                     }
+                    is DiceColorSection -> {
+                        DrawerSectionHeader("Dice Colors", topPadding = 0.dp)
+                        DiceColorSettingsPanel(BB2025DiceColorConfig)
+                    }
+                    null -> { /* AnimatedVisibility handles visibility */ }
                 }
             }
         }

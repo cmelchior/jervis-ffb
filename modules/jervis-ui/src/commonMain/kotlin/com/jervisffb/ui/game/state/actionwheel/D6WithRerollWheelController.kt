@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRollContext
@@ -109,6 +110,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
     abstract val rollDiceNode: Node
     abstract val chooseRerollSourceNode: Node
     abstract val rerollDiceNode: Node
+    abstract val diceRollType: DiceRollType
     abstract fun getOriginalRoll(state: Game): D6Result
     override val nodes: Set<Node> by lazy {
         setOf(
@@ -132,6 +134,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
                     action = { provider.userActionSelected(d6Option) },
                     options = D6Result.allOptions(),
                     expandable = false,
+                    diceRollType = diceRollType,
                 )
             }
             val wheelState = ActionWheelUiStateData(
@@ -151,6 +154,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
             val rolledValue = DieButtonData(
                 id = ButtonId("$buttonIdPrefix-${roll.value}"),
                 label = { "Accept roll: ${roll.value}" },
+                diceRollType = diceRollType,
                 diceValue = roll,
                 action = { provider.userActionSelected(NoRerollSelected()) },
                 options = emptyList(),
@@ -204,6 +208,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
                 DieButtonData(
                     id = buttonId,
                     label = { "" },
+                    diceRollType = diceRollType,
                     diceValue = d6Roll,
                     action = { /* Do nothing */ },
                     options = emptyList(),
@@ -236,6 +241,7 @@ abstract class D6WithRerollWheelController() : ActionWheelDialogController() {
  */
 object AccuracyBB2020WheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
+    override val diceRollType: DiceRollType = DiceRollType.ACCURACY
     override val rollDiceNode: Node = AccuracyRoll.RollDie
     override val chooseRerollSourceNode: Node = AccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = AccuracyRoll.ReRollDie
@@ -255,6 +261,7 @@ object AccuracyBB2020WheelController : D6WithRerollWheelController() {
  */
 object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
+    override val diceRollType: DiceRollType = DiceRollType.ACCURACY
     override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie
     override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie
@@ -271,6 +278,7 @@ object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
 
 object AccuracyBB2025ThrowTeamMateWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "quality"
+    override val diceRollType: DiceRollType = DiceRollType.ACCURACY
     override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.RollDie
     override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ReRollDie
@@ -290,6 +298,7 @@ object AccuracyBB2025ThrowTeamMateWheelController : D6WithRerollWheelController(
  */
 object CatchWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "catch"
+    override val diceRollType: DiceRollType = DiceRollType.CATCH
     override val rollDiceNode: Node = CatchRoll.RollDie
     override val chooseRerollSourceNode: Node = CatchRoll.ChooseReRollSource
     override val rerollDiceNode: Node = CatchRoll.ReRollDie
@@ -310,6 +319,7 @@ object CatchWheelController : D6WithRerollWheelController() {
  */
 object DodgeWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "dodge"
+    override val diceRollType: DiceRollType = DiceRollType.DODGE
     override val rollDiceNode: Node = DodgeRoll.RollDie
     override val chooseRerollSourceNode: Node = DodgeRoll.ChooseReRollSource
     override val rerollDiceNode: Node = DodgeRoll.ReRollDie
@@ -326,6 +336,7 @@ object DodgeWheelController : D6WithRerollWheelController() {
 
 object DauntlessWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "dauntless"
+    override val diceRollType: DiceRollType = DiceRollType.DAUNTLESS
     override val rollDiceNode: Node = DauntlessRoll.RollDie
     override val chooseRerollSourceNode: Node = DauntlessRoll.ChooseReRollSource
     override val rerollDiceNode: Node = DauntlessRoll.ReRollDie
@@ -343,6 +354,7 @@ object DauntlessWheelController : D6WithRerollWheelController() {
 
 object FoulAppearanceWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "foul-appearance"
+    override val diceRollType: DiceRollType = DiceRollType.FOUL_APPEARANCE
     override val rollDiceNode: Node = FoulAppearanceRoll.RollDie
     override val chooseRerollSourceNode: Node = FoulAppearanceRoll.ChooseReRollSource
     override val rerollDiceNode: Node = FoulAppearanceRoll.ReRollDie
@@ -363,6 +375,7 @@ object FoulAppearanceWheelController : D6WithRerollWheelController() {
  */
 object InterceptionWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "interception"
+    override val diceRollType: DiceRollType = DiceRollType.INTERCEPTION
     override val rollDiceNode: Node = InterceptionRoll.RollDie
     override val chooseRerollSourceNode: Node = InterceptionRoll.ChooseReRollSource
     override val rerollDiceNode: Node = InterceptionRoll.ReRollDie
@@ -383,6 +396,7 @@ object InterceptionWheelController : D6WithRerollWheelController() {
  */
 object PickupWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "pickup"
+    override val diceRollType: DiceRollType = DiceRollType.PICKUP
     override val rollDiceNode: Node = PickupRoll.RollDie
     override val chooseRerollSourceNode: Node = PickupRoll.ChooseReRollSource
     override val rerollDiceNode: Node = PickupRoll.ReRollDie
@@ -402,6 +416,7 @@ object PickupWheelController : D6WithRerollWheelController() {
  */
 object RushWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "rush"
+    override val diceRollType: DiceRollType = DiceRollType.RUSH
     override val rollDiceNode: Node = RushRoll.RollDie
     override val chooseRerollSourceNode: Node = RushRoll.ChooseReRollSource
     override val rerollDiceNode: Node = RushRoll.ReRollDie
@@ -421,6 +436,7 @@ object RushWheelController : D6WithRerollWheelController() {
  */
 object SecureTheBallWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "secure"
+    override val diceRollType: DiceRollType = DiceRollType.SECURE_THE_BALL
     override val rollDiceNode: Node = SecureTheBallRoll.RollDie
     override val chooseRerollSourceNode: Node = SecureTheBallRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SecureTheBallRoll.ReRollDie
@@ -441,6 +457,7 @@ object SecureTheBallWheelController : D6WithRerollWheelController() {
  */
 object ShadowingWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "shadowing"
+    override val diceRollType: DiceRollType = DiceRollType.SHADOWING
     override val rollDiceNode: Node = ShadowingRoll.RollDie
     override val chooseRerollSourceNode: Node = ShadowingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ShadowingRoll.ReRollDie
@@ -457,6 +474,7 @@ object ShadowingWheelController : D6WithRerollWheelController() {
 
 object SteadyFootingWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "steady-footing"
+    override val diceRollType: DiceRollType = DiceRollType.STEADY_FOOTING
     override val rollDiceNode: Node = SteadyFootingRoll.RollDie
     override val chooseRerollSourceNode: Node = SteadyFootingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SteadyFootingRoll.ReRollDie
@@ -473,6 +491,7 @@ object SteadyFootingWheelController : D6WithRerollWheelController() {
 
 object TakeRootWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "take-root"
+    override val diceRollType: DiceRollType = DiceRollType.TAKE_ROOT
     override val rollDiceNode: Node = TakeRootRoll.RollDie
     override val chooseRerollSourceNode: Node = TakeRootRoll.ChooseReRollSource
     override val rerollDiceNode: Node = TakeRootRoll.ReRollDie
@@ -492,6 +511,7 @@ object TakeRootWheelController : D6WithRerollWheelController() {
  */
 object JumpWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "jump"
+    override val diceRollType: DiceRollType = DiceRollType.JUMP
     override val rollDiceNode: Node = JumpRoll.RollDie
     override val chooseRerollSourceNode: Node = JumpRoll.ChooseReRollSource
     override val rerollDiceNode: Node = JumpRoll.ReRollDie
@@ -506,6 +526,7 @@ object JumpWheelController : D6WithRerollWheelController() {
 
 object JumpUpWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "jump-up"
+    override val diceRollType: DiceRollType = DiceRollType.JUMP_UP
     override val rollDiceNode: Node = JumpUpRoll.RollDie
     override val chooseRerollSourceNode: Node = JumpUpRoll.ChooseReRollSource
     override val rerollDiceNode: Node = JumpUpRoll.ReRollDie
@@ -523,6 +544,7 @@ object JumpUpWheelController : D6WithRerollWheelController() {
  */
 object BoneHeadWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "bonehead"
+    override val diceRollType: DiceRollType = DiceRollType.BONE_HEAD
     override val rollDiceNode: Node = BoneHeadRoll.RollDie
     override val chooseRerollSourceNode: Node = BoneHeadRoll.ChooseReRollSource
     override val rerollDiceNode: Node = BoneHeadRoll.ReRollDie
@@ -540,6 +562,7 @@ object BoneHeadWheelController : D6WithRerollWheelController() {
  */
 object ReallyStupidWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "really-stupid"
+    override val diceRollType: DiceRollType = DiceRollType.REALLY_STUPID
     override val rollDiceNode: Node = ReallyStupidRoll.RollDie
     override val chooseRerollSourceNode: Node = ReallyStupidRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ReallyStupidRoll.ReRollDie
@@ -557,6 +580,7 @@ object ReallyStupidWheelController : D6WithRerollWheelController() {
  */
 object UnchannelledFuryWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "unchannelled-fury"
+    override val diceRollType: DiceRollType = DiceRollType.UNCHANNELLED_FURY
     override val rollDiceNode: Node = UnchannelledFuryRoll.RollDie
     override val chooseRerollSourceNode: Node = UnchannelledFuryRoll.ChooseReRollSource
     override val rerollDiceNode: Node = UnchannelledFuryRoll.ReRollDie
@@ -574,6 +598,7 @@ object UnchannelledFuryWheelController : D6WithRerollWheelController() {
  */
 object LeapWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "leap"
+    override val diceRollType: DiceRollType = DiceRollType.LEAP
     override val rollDiceNode: Node = LeapRoll.RollDie
     override val chooseRerollSourceNode: Node = LeapRoll.ChooseReRollSource
     override val rerollDiceNode: Node = LeapRoll.ReRollDie
@@ -591,6 +616,7 @@ object LeapWheelController : D6WithRerollWheelController() {
  */
 object PogoWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "pogo"
+    override val diceRollType: DiceRollType = DiceRollType.POGO
     override val rollDiceNode: Node = PogoRoll.RollDie
     override val chooseRerollSourceNode: Node = PogoRoll.ChooseReRollSource
     override val rerollDiceNode: Node = PogoRoll.ReRollDie
@@ -608,6 +634,7 @@ object PogoWheelController : D6WithRerollWheelController() {
  */
 object LandingWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "landing"
+    override val diceRollType: DiceRollType = DiceRollType.LANDING
     override val rollDiceNode: Node = LandingRoll.RollDie
     override val chooseRerollSourceNode: Node = LandingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = LandingRoll.ReRollDie
@@ -622,6 +649,7 @@ object LandingWheelController : D6WithRerollWheelController() {
 
 object ProjectileVomitWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "projectile-vomit"
+    override val diceRollType: DiceRollType = DiceRollType.PROJECTILE_VOMIT
     override val rollDiceNode: Node = ProjectileVomitRoll.RollDie
     override val chooseRerollSourceNode: Node = ProjectileVomitRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ProjectileVomitRoll.ReRollDie
@@ -636,6 +664,7 @@ object ProjectileVomitWheelController : D6WithRerollWheelController() {
 
 object BreatheFireWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "breathe-fire"
+    override val diceRollType: DiceRollType = DiceRollType.BREATHE_FIRE
     override val rollDiceNode: Node = BreatheFireRoll.RollDie
     override val chooseRerollSourceNode: Node = BreatheFireRoll.ChooseReRollSource
     override val rerollDiceNode: Node = BreatheFireRoll.ReRollDie

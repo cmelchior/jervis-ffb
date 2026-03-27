@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseReroll
@@ -57,6 +58,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
             DieButtonData(
                 id = ButtonId("block-$index"),
                 label = { null },
+                diceRollType = DiceRollType.BLOCK,
                 diceValue = die.result,
                 action = {
                     val action = if (actions.contains<SelectNoReroll>()) {
@@ -71,7 +73,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                 },
                 options = DBlockResult.allOptions(),
                 expandable = false,
-                preferLtr = (index == 0)
+                preferLtr = (index == 0),
             )
         }
 

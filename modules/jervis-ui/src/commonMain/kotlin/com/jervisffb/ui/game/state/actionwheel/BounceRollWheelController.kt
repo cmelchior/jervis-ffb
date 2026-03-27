@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
@@ -47,6 +48,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
             DieButtonData(
                 id = ButtonId("bounce-${d8Option.value}"),
                 label = { label },
+                diceRollType = DiceRollType.BOUNCE,
                 diceValue = d8Option,
                 action = { provider.userActionSelected(d8Option) },
                 options = D6Result.allOptions(),
@@ -78,6 +80,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
                 DieButtonData(
                     id = buttonId,
                     label = { "" },
+                    diceRollType = DiceRollType.BOUNCE,
                     diceValue = d8,
                     action = { /* Do nothing */ },
                     options = emptyList(),

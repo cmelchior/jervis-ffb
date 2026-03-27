@@ -11,6 +11,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
@@ -50,6 +51,7 @@ object ScatterRollWheelController : ActionWheelDialogController() {
             DieButtonData(
                 id = ButtonId("scatter-3-$it"),
                 label = { "Scatter" },
+                diceRollType = DiceRollType.SCATTER,
                 diceValue = D8Result.random(),
                 action = { /* Do nothing */ },
                 options = D8Result.allOptions(),
@@ -102,13 +104,14 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                 DieButtonData(
                     id = ButtonId("scatter-3-$it"),
                     label = { "Scatter" },
+                    diceRollType = DiceRollType.SCATTER,
                     diceValue = dice.rolls[it - 1],
                     action = { /* Do nothing */ },
                     options = D8Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(
                         endValue = dice.rolls[it - 1],
-                    )
+                    ),
                 )
             }
             val wheelState = ActionWheelUiStateData(

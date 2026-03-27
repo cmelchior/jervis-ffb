@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.dialogs.wheel
 
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
 import kotlin.jvm.JvmInline
@@ -45,13 +46,14 @@ data class ActionButtonData(
 data class DieButtonData<T: DieResult>(
     override val id: ButtonId,
     override val label: () -> String?,
+    val diceRollType: DiceRollType,
     var diceValue: T,
     override val action: () -> Unit,
     val options: List<T>,
     val expandable: Boolean,
     val enabled: Boolean = true,
     override val animateRoll: RollAnimationData<T>? = null,
-    val preferLtr: Boolean = true
+    val preferLtr: Boolean = true,
 ): ButtonData {
     override var targetAngle: Float = 0f
     override var defaultStartingAngle: Float = 0f

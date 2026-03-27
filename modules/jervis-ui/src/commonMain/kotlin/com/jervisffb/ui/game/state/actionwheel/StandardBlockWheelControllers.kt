@@ -13,6 +13,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
@@ -64,11 +65,12 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
             DieButtonData(
                 id = ButtonId("block-$index"),
                 label = { null },
+                diceRollType = DiceRollType.BLOCK,
                 diceValue = diceValue,
                 action = { /* Do nothing */ },
                 options = DBlockResult.allOptions(),
                 expandable = true,
-                preferLtr = (index == 0)
+                preferLtr = (index == 0),
             )
         }
 
@@ -112,13 +114,14 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                 DieButtonData(
                     id = ButtonId("block-$index"),
                     label = { null },
+                    diceRollType = DiceRollType.BLOCK,
                     diceValue = die,
                     action = { /* Do nothing */ },
                     options = DBlockResult.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(
                         endValue = die,
-                    )
+                    ),
                 )
             }
             val wheelState = ActionWheelUiStateData(

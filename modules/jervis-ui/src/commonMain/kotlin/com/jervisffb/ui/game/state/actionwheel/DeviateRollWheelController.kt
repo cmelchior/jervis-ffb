@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
@@ -51,6 +52,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
             DieButtonData(
                 id = ButtonId("deviate-d6"),
                 label = { "Distance" },
+                diceRollType = DiceRollType.DEVIATE,
                 diceValue = D6Result.random(),
                 action = { /* Do nothing */ },
                 options = D6Result.allOptions(),
@@ -59,6 +61,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
             DieButtonData(
                 id = ButtonId("deviate-d8"),
                 label = { "Direction" },
+                diceRollType = DiceRollType.DEVIATE,
                 diceValue = D8Result.random(),
                 action = { /* Do nothing */ },
                 options = D8Result.allOptions(),
@@ -115,17 +118,19 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                 DieButtonData(
                     id = ButtonId("deviate-d6"),
                     label = { null },
+                    diceRollType = DiceRollType.DEVIATE,
                     diceValue = dice.first,
                     action = { /* Do nothing */ },
                     options = D6Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(
                         endValue = dice.first,
-                    )
+                    ),
                 ),
                 DieButtonData(
                     id = ButtonId("deviate-d8"),
                     label = { null },
+                    diceRollType = DiceRollType.DEVIATE,
                     diceValue = dice.second,
                     action = { /* Do nothing */ },
                     options = D8Result.allOptions(),

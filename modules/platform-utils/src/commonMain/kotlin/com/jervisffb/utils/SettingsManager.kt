@@ -3,6 +3,7 @@ package com.jervisffb.utils
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.getBooleanFlow
+import com.russhwolf.settings.coroutines.getStringFlow
 import com.russhwolf.settings.minusAssign
 import com.russhwolf.settings.observable.makeObservable
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +66,10 @@ class SettingsManager() {
 
     fun observeBooleanKey(key: String, defaultValue: Boolean): Flow<Boolean> {
         return settings.getBooleanFlow(key, defaultValue)
+    }
+
+    fun observeStringKey(key: String, defaultValue: String): Flow<String> {
+        return settings.getStringFlow(key, defaultValue)
     }
 
     fun put(key: String, value: Any?) {

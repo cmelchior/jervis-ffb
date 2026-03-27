@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -85,8 +86,10 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -99,6 +102,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
 import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
 import com.jervisffb.ui.reversed
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
@@ -108,6 +112,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import kotlin.math.cos
@@ -1140,6 +1145,7 @@ fun ExpandableDiceSelector(
             alpha,
             value = if (isAnimating) displayFace!! else currentDiceValue,
             label = button.label,
+            diceRollType = button.diceRollType,
             clickEnabled = isOnClickEnabled,
             onHover = {
                 if (!isAnimating) {
@@ -1216,6 +1222,7 @@ fun ExpandableDiceSelector(
                                         alpha,
                                         value = dieValue,
                                         label = { null }, // Hide onHover values for the dice selector (for now)
+                                        diceRollType = button.diceRollType,
                                         clickEnabled = true,
                                         onHover = onHover,
                                         onClick = {
@@ -1347,6 +1354,7 @@ private fun SimpleDiceButton(
                 alpha,
                 value = if (isAnimating) displayFace!! else button.diceValue,
                 label = button.label,
+                diceRollType = button.diceRollType,
                 clickEnabled = (isAnimating || !isOnClickEnabled),
                 onHover = onHover,
                 onClick = onClick,
@@ -1363,6 +1371,7 @@ private fun DiceButton(
     alpha: Float,
     value: DieResult,
     label: () -> String?,
+    diceRollType: DiceRollType,
     clickEnabled: Boolean = true,
     onHover: (String?) -> Unit = {},
     onClick: () -> Unit = {},
@@ -1379,6 +1388,16 @@ private fun DiceButton(
             else -> RoundedCornerShape(4.dp)
         }
     }
+
+    val diceConfig = remember(diceRollType) { BB2025DiceColorConfig.configFor(diceRollType) }
+    val settingsFlow = remember(diceConfig) {
+        SETTINGS_MANAGER
+            .observeStringKey(diceConfig.settingsKey, diceConfig.defaultColor.name)
+            .map { colorDescription ->
+                DiceColor.entries.find { it.name == colorDescription } ?: DiceColor.DEFAULT
+            }
+    }
+    val diceColor by settingsFlow.collectAsState(diceConfig.defaultColor)
     val bitmap = if ((useSelectedColorAsHover && hover)) {
         val color = when (value) {
             is D3Result,
@@ -1387,12 +1406,7 @@ private fun DiceButton(
         }
         IconFactory.getDiceIcon(value, color)
     } else {
-        val color = when (value) {
-            is D3Result,
-            is D6Result -> DiceColor.BROWN
-            else -> DiceColor.DEFAULT
-        }
-        IconFactory.getDiceIcon(value, color)
+        IconFactory.getDiceIcon(value, diceColor)
     }
 
     fun showHoverEffect() {
