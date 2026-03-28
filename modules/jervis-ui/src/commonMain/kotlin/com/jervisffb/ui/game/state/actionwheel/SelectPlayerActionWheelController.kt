@@ -47,7 +47,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         sharedData: LocalFieldDataWrapper
     ) {
         val wheelOptions = actions.get<SelectPlayerAction>().actions.map {
-            val id = ButtonId("[$it.id.value] ${it.type}")
+            val id = ButtonId("player-action-${it.type}")
             createActionOption(id, acc.game, provider, it)
         }.toMutableList()
 

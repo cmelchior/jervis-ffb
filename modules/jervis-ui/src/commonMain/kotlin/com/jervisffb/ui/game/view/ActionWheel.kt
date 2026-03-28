@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -565,21 +566,19 @@ private fun WheelButtons(
     val radiusPx = with(LocalDensity.current) { wheelRadius.toPx() }
     Box(Modifier.size(wheelRadius), Alignment.Center) {
         buttons.reversed().forEachIndexed { _, item ->
-            val animationData = animationsCache[item.id]
-            if (animationData != null) {
-                val angle by animationData.angleDegree.asState()
-                val alpha by animationData.alpha.asState()
-                MenuItemButton(
-                    item,
-                    animationData,
-                    angle,
-                    alpha,
-                    radiusPx,
-                    isOnClickEnabled = buttonsClickable || (item.id == primaryFocus),
-                    isFullyVisible = (primaryFocus == null) || (item.id == primaryFocus),
-                    onHover,
-                    onPrimaryFocus,
-                )
+            key(item.id) {
+                val animationData = animationsCache[item.id]
+                if (animationData != null) {
+                    MenuItemButton(
+                        item,
+                        animationData,
+                        radiusPx,
+                        isOnClickEnabled = buttonsClickable || (item.id == primaryFocus),
+                        isFullyVisible = (primaryFocus == null) || (item.id == primaryFocus),
+                        onHover,
+                        onPrimaryFocus,
+                    )
+                }
             }
         }
     }
@@ -625,8 +624,6 @@ private fun shortestPathToTaget(current: Float, desired: Float): Float {
 private fun MenuItemButton(
     item: ButtonData,
     animationData: ItemAnimatable,
-    angle: Float,
-    alpha: Float,
     radiusPx: Float,
     isOnClickEnabled: Boolean,
     isFullyVisible: Boolean,
@@ -634,6 +631,8 @@ private fun MenuItemButton(
     onHover: (String?) -> Unit,
     onPrimaryFocus: (ButtonId, Boolean) -> Unit = { _, _ -> },
 ) {
+    val angle by animationData.angleDegree.asState()
+    val alpha by animationData.alpha.asState()
     if (alpha <= 0f) return
     val offset = getOffset(angle, radiusPx)
     Box(
@@ -830,7 +829,7 @@ fun ActionButton(
     onClick: () -> Unit = { },
 ) {
     val icon = remember(icon) { IconFactory.getActionIcon(icon) }
-    val colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+    val colorFilter = remember { ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken) }
     var isHover by remember(icon) { mutableStateOf(false) }
     // Modifier order is a mess to get shadows to animate correctly. The current setup works,
     // but I suspect its performance could be improved. But this requires further experimentation.
@@ -1041,16 +1040,18 @@ fun ExpandableDiceSelector(
     // Current state tracking
     var currentDiceValue by remember(button) { mutableStateOf(button.diceValue) }
     val density = LocalDensity.current
-    val diceList = button.options.toMutableList().apply {
-        remove(button.diceValue)
-        add(0, button.diceValue)
+    val diceList = remember(button) {
+        button.options.toMutableList().apply {
+            remove(button.diceValue)
+            add(0, button.diceValue)
+        }
     }
     val shadowColor = Color.Black
     var expanded by remember { mutableStateOf(false) }
 
     // Properties we animate when expanded and deflating the selector
     val expandDurationMs = 200
-    val animation = tween<Float>(expandDurationMs, easing = FastOutLinearInEasing)
+    val animation = remember { tween<Float>(expandDurationMs, easing = FastOutLinearInEasing) }
     val bgWidthDp = remember { Animatable(0f) }
     val bgAlpha = remember { Animatable(0f) }
 
@@ -1058,19 +1059,21 @@ fun ExpandableDiceSelector(
     val backgroundPadding = 8.dp
     val spacingBetweenItems = backgroundPadding / 2f
 
-    val rows = when (button.diceValue) {
-        is D12Result -> 3
-        is D16Result -> 4
-        is D20Result -> 4
-        is D2Result -> 1
-        is D3Result -> 1
-        is D4Result -> 2
-        is D6Result -> 2
-        is D8Result -> 2
-        is DBlockResult -> 2
+    val rows = remember(button.diceValue) {
+        when (button.diceValue) {
+            is D12Result -> 3
+            is D16Result -> 4
+            is D20Result -> 4
+            is D2Result -> 1
+            is D3Result -> 1
+            is D4Result -> 2
+            is D6Result -> 2
+            is D8Result -> 2
+            is DBlockResult -> 2
+        }
     }
     val itemsPrRow = diceList.size / rows
-    val buttonSize = IconFactory.getDiceSizeDp(currentDiceValue)
+    val buttonSize = remember(currentDiceValue) { IconFactory.getDiceSizeDp(currentDiceValue) }
     val (buttonWidth, buttonHeight) = buttonSize
     val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
     val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)
@@ -1404,7 +1407,7 @@ private fun DiceButton(
         }
     }
 
-    LaunchedEffect(clickEnabled) {
+    LaunchedEffect(clickEnabled, hover) {
         if (clickEnabled && hover) {
             showHoverEffect()
         }
