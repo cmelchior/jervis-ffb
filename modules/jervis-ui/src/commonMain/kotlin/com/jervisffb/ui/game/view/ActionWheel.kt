@@ -659,7 +659,7 @@ private fun MenuItemButton(
                 ExpandableDiceSelector(
                     item as DieButtonData<DieResult>,
                     animationData,
-                    isOnClickEnabled = isOnClickEnabled,
+                    isOnClickEnabled = isOnClickEnabled && item.enabled,
                     isFullyVisible = isFullyVisible,
                     onClick = item.action,
                     onHover = onHover,
@@ -1417,7 +1417,7 @@ private fun DiceButton(
         modifier = Modifier
             .size(buttonSize)
             .onPointerEvent(PointerEventType.Enter) {
-                if (!hover) {
+                if (!hover && clickEnabled) {
                     hover = true
                     showHoverEffect()
                 }

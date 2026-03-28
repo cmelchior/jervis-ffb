@@ -34,6 +34,7 @@ import kotlin.time.ExperimentalTime
 
 /**
  * Control first block roll.
+ * This is only used when dice rolls are done locally.
  */
 object StandardBlockRollWheelController : ActionWheelDialogController() {
 

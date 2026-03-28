@@ -15,6 +15,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseReroll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
@@ -426,6 +428,24 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Lethal Flight"
                 }
             },
+            SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll to { isActiveClient, _, state ->
+                val context = state.getContext<BlockContext>()
+                val selectResultTeam = context.getTeamSelectingResult()
+                val attackerChooseResult = (context.attacker.team == selectResultTeam)
+                when {
+                    (isActiveClient && attackerChooseResult) -> "Re-roll Block Dice or Select Block Result"
+                    (isActiveClient && !attackerChooseResult) -> "Re-roll Block Dice or Confirm to Allow Opponent to Select Block Result"
+                    (!isActiveClient && attackerChooseResult) -> "Waiting for Opponent to Re-roll or Select Block Result"
+                    (!isActiveClient && !attackerChooseResult) -> "Waiting for opponent to Re-roll or Accept Rolled Block Dice"
+                    else -> error("Unsupported scenario: $isActiveClient, $attackerChooseResult")
+                }
+            },
+            SingleStandardBlockChooseResult.SelectBlockResult to { isActiveClient, _, state ->
+                when {
+                    isActiveClient -> "Select Block Result"
+                    else -> "Waiting for opponent to Select Block Result"
+                }
+            }
         )
     }
 

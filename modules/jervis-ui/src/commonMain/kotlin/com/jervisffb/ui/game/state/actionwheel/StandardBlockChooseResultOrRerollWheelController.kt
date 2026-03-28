@@ -52,8 +52,20 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         actions: ActionRequest,
         sharedData: LocalFieldDataWrapper,
     ) {
+        val currentNode = acc.gameController.currentNode()
 
+        // If it is the blocking player that also chooses the final result, we shortcut
+        // the action sequence a bit, by folding "no-reroll" into pressing one of the
+        // dice.
+        // If not, we add a "Confirm" roll to the action buttons, which will transfer
+        // control to the other coach for selecting the final result.
         val context = acc.game.getContext<BlockContext>()
+        val selectResultTeam = context.getTeamSelectingResult()
+        val attackerChooseResult = (context.attacker.team == selectResultTeam)
+        val diceButtonEnabled = attackerChooseResult
+            || (currentNode == SingleStandardBlockChooseResult.SelectBlockResult)
+            || (currentNode == StandardBlockChooseResult.SelectBlockResult)
+
         val diceButtons = context.roll.mapIndexed { index, die ->
             DieButtonData(
                 id = ButtonId("block-$index"),
@@ -73,16 +85,17 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                 },
                 options = DBlockResult.allOptions(),
                 expandable = false,
+                enabled = diceButtonEnabled,
                 preferLtr = (index == 0),
             )
         }
 
-        val currentNode = acc.gameController.currentNode()
-        val actionButtons = if (
+        val actionButtons = mutableListOf<ActionButtonData>()
+        if (
             currentNode == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
             || currentNode == SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll
         ) {
-            actions.getOrNull<SelectRerollOption>()?.let { rerollOption ->
+            val rerollButtons = actions.getOrNull<SelectRerollOption>()?.let { rerollOption ->
                 rerollOption.options.map { option ->
                     val rerollSource = option.getRerollSource(acc.game)
                     ActionButtonData(
@@ -93,9 +106,20 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                         action = { provider.userActionSelected(RerollOptionSelected(option)) }
                     )
                 }
-            } ?: emptyList()
-        } else {
-            emptyList()
+            }
+            actionButtons.addAll(rerollButtons ?: emptyList())
+            if (!attackerChooseResult) {
+                actionButtons.add(
+                    ActionButtonData(
+                        id = ButtonId("confirm"),
+                        label = { "Confirm Roll" },
+                        icon = ActionIcon.CONFIRM,
+                        action = {
+                            provider.userActionSelected(NoRerollSelected())
+                        },
+                    )
+                )
+            }
         }
 
         val wheelState = ActionWheelUiStateData(

@@ -38,11 +38,7 @@ object SingleStandardBlockChooseResult: Procedure() {
     object SelectBlockResult : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team {
             val context = state.getContext<BlockContext>()
-            return if (context.calculateNoOfBlockDice() < 0) {
-                context.defender.team
-            } else {
-                context.attacker.team
-            }
+            return context.getTeamSelectingResult()
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(

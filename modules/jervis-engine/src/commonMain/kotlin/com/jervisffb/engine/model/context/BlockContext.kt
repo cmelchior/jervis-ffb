@@ -2,6 +2,7 @@ package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.calculateBlockDiceToRoll
 
@@ -36,5 +37,12 @@ data class BlockContext(
             defender.strength,
             defensiveAssists
         )
+    }
+
+    fun getTeamSelectingResult(): Team {
+        return when (calculateNoOfBlockDice() < 0) {
+            true -> defender.team
+            false -> attacker.team
+        }
     }
 }

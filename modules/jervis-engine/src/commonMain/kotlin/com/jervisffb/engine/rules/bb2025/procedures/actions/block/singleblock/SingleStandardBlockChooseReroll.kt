@@ -53,7 +53,6 @@ object SingleStandardBlockChooseReroll: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                // TODO What is the difference between Continue and NoRerollSelected
                 Continue,
                 is NoRerollSelected -> {
                     compositeCommandOf(
