@@ -49,6 +49,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Works on Jump
   - [x] Works on Dodge
   - [x] Works on Leap
+  - [x] Works on Pogo, but does not apply any modifiers
   - [x] Diving Tackle can prevent other players from using Shadowing
 - [x] Dodge
   - [x] Is optional

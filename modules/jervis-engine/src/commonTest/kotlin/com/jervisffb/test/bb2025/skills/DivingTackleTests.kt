@@ -20,6 +20,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
 import com.jervisffb.test.leap
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pogoRoll
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
@@ -99,6 +100,8 @@ class DivingTackleTests: JervisGameBB2025Test() {
         mover.assertProne()
     }
 
+    // Leap reduces negative modifiers before Diving Tackle is used, which means
+    // that the -2 from Diving is not reduced to -1.
     @Test
     fun leapDoesNotConsiderDivingTackleModifier() {
         val leapingPlayer = state.getPlayerById("A1".playerId)
@@ -136,6 +139,29 @@ class DivingTackleTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         leapingPlayer.assertProne()
         leapingPlayer.assertCoordinates(11, 4)
+    }
+
+    // While Diving Tackle can be used on Pogo, it doesn't apply any modifiers
+    @Test
+    fun workOnPogo() {
+        val pogoPlayer = awayTeam["A1".playerId]
+        pogoPlayer.addSkill(SkillType.POGO_STICK)
+        homeTeam["H1".playerId].putProne()
+        val tacklePlayer = homeTeam["H2".playerId]
+        tacklePlayer.addSkill(SkillType.DIVING_TACKLE)
+        assertEquals(3, pogoPlayer.agility)
+        controller.rollForward(
+            *activatePlayer(pogoPlayer, PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.POGO),
+            FieldSquareSelected(11, 4),
+            *pogoRoll(3.d6), // No negative modifiers when using Pogo
+            PlayerSelected(tacklePlayer), // Use Diving Tackle (modifier is ignore, but player is still prone)
+        )
+        assertEquals(pogoPlayer, state.activePlayer)
+        pogoPlayer.assertStanding()
+        pogoPlayer.assertCoordinates(11, 4)
+        tacklePlayer.assertProne()
+        tacklePlayer.assertCoordinates(13, 5)
     }
 
     @Test

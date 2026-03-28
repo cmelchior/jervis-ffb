@@ -260,6 +260,7 @@ object PogoStep : Procedure() {
                 AddContext(
                     PogoRollContext(
                         player = player,
+                        startingSquare = moveContext.startingSquare,
                         modifiers = modifiers,
                     )
                 ),

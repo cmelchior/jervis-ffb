@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
@@ -34,6 +35,7 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
         DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
         JumpRoll.ChooseToUseDivingTackleAfterReRoll,
         LeapRoll.ChooseToUseDivingTackleAfterReRoll,
+        PogoRoll.ChooseToUseDivingTackleAfterReRoll,
         HitAndRunStep.SelectTargetSquareOrCancel
     )
 
@@ -80,7 +82,8 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
                 DodgeRoll.ChooseToUsePrehensileTail -> "Do not use Prehensile Tail"
                 DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
                 JumpRoll.ChooseToUseDivingTackleAfterReRoll,
-                LeapRoll.ChooseToUseDivingTackleAfterReRoll -> "Do not use Diving Tackle"
+                LeapRoll.ChooseToUseDivingTackleAfterReRoll,
+                PogoRoll.ChooseToUseDivingTackleAfterReRoll -> "Do not use Diving Tackle"
                 HitAndRunStep.SelectTargetSquareOrCancel -> "Do not use Hit and Run"
                 else -> error("Unsupported node: ${state.stack.currentNode()}")
             }

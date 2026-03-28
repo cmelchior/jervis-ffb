@@ -416,6 +416,12 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Diving Tackle"
                 }
             },
+            PogoRoll.ChooseToUseDivingTackleAfterReRoll to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to use Diving Tackle."
+                    false -> "Waiting for opponent to use Diving Tackle"
+                }
+            },
             ArmourRoll.ChooseToUseLethalFlight to { isActiveClient, _, _ ->
                 when (isActiveClient) {
                     true -> "Use Lethal Flight to injure opponent?"

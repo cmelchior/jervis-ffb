@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2025.procedures.actions.move
 
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -7,11 +9,15 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -22,16 +28,21 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportRerollUsed
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
@@ -87,7 +98,7 @@ object PogoRoll : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
-                is NoRerollSelected -> ExitProcedure()
+                is NoRerollSelected -> GotoNode(ChooseToUseDivingTackleAfterReRoll)
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.POGO, action.getRerollSource(state))
                     compositeCommandOf(
@@ -131,8 +142,48 @@ object PogoRoll : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.POGO, d6),
                     UpdateContext(rerollResult),
-                    ExitProcedure(),
+                    GotoNode(ChooseToUseDivingTackleAfterReRoll)
                 )
+            }
+        }
+    }
+
+    // Diving Tackle can be used, but does not apply any modifiers to the roll
+    object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PogoRollContext>().player.team.otherTeam()
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<PogoRollContext>()
+            val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
+                .filter { coord ->
+                    state.field[coord].player?.let { player ->
+                        player.team != context.player.team
+                    } ?: false
+                }
+                .mapNotNull { state.field[it].player }
+                .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
+
+            return if (eligiblePlayers.isNotEmpty()) {
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers), CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PogoRollContext>()
+            return when (action) {
+                is PlayerSelected -> {
+                    val player = action.getPlayer(state)
+                    val skill = player.getSkill(SkillType.DIVING_TACKLE)
+                    compositeCommandOf(
+                        ReportSkillUsed(player, skill),
+                        SetPlayerState(player, PlayerState.PRONE, hasTackleZones = false),
+                        SetPlayerLocation(player, context.startingSquare),
+                        ExitProcedure()
+                    )
+                }
+                Cancel,
+                Continue -> ExitProcedure()
+                else -> INVALID_ACTION(action)
             }
         }
     }
