@@ -41,15 +41,19 @@ import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025PassWheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025ThrowTeamMateWheelController
 import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
+import com.jervisffb.ui.game.state.actionwheel.AwayTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.BreatheFireWheelController
 import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
+import com.jervisffb.ui.game.state.actionwheel.ChooseKickingTeamWheelController
+import com.jervisffb.ui.game.state.actionwheel.CoinTossWheelController
 import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.FoulAppearanceWheelController
+import com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
@@ -63,6 +67,7 @@ import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SecureTheBallWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectBlockTypeWheelController
+import com.jervisffb.ui.game.state.actionwheel.SelectCoinSideWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
@@ -101,6 +106,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseThickSkullWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
+import com.jervisffb.ui.game.state.actionwheel.WeatherRollWheelController
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
@@ -108,6 +114,7 @@ import com.jervisffb.ui.game.state.indicators.BlockStatusIndicator
 import com.jervisffb.ui.game.state.indicators.DirectionArrowStatusIndicator
 import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
 import com.jervisffb.ui.game.state.indicators.MoveUsedStatusIndicator
+import com.jervisffb.ui.game.state.indicators.PreGamePlayerAndRefereeStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamFeatureStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
@@ -178,7 +185,8 @@ class UiGameController(
         MoveUsedStatusIndicator,
         TeamFeatureStatusIndicator,
         TeamRerollStatusIndicator,
-        TeamSetupsAvailableStatusIndicator
+        TeamSetupsAvailableStatusIndicator,
+        PreGamePlayerAndRefereeStatusIndicator,
     )
     val actionWheelControllers = setOf(
         AccuracyBB2020WheelController,
@@ -247,7 +255,17 @@ class UiGameController(
         UseWrestleWheelController,
 
         UseApothecaryWheelController,
-        ArgueTheCallWheelController
+        ArgueTheCallWheelController,
+
+        // Rolls
+        HomeTeamFanFactorRoll,
+        AwayTeamFanFactorRoll,
+        WeatherRollWheelController,
+
+        // Coin
+        SelectCoinSideWheelController,
+        CoinTossWheelController,
+        ChooseKickingTeamWheelController
     )
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
@@ -273,8 +291,9 @@ class UiGameController(
         field = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
 
     // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
+    // `replay` is only used to allow the UI to register itself after the game controller has started
     val uiActionWheelFlow: Flow<List<ActionWheelUiState>>
-        field = MutableSharedFlow<List<ActionWheelUiState>>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+        field = MutableSharedFlow<List<ActionWheelUiState>>(replay = 1, extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
     val uiContextWheelFlow: Flow<ContextWheelUiState>
         field = MutableSharedFlow<ContextWheelUiState>(extraBufferCapacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
     val gameStatusMessageFactory = GameStatusMessageFactory(menuViewModel, state)
@@ -358,6 +377,8 @@ class UiGameController(
                 homeTeamInfo = UiTeamInfoUpdate.INITIAL,
                 awayTeamInfo = UiTeamInfoUpdate.INITIAL,
                 pathFinder = null,
+                showReferee = false,
+                refereeCoordinates = null,
             )
 
             while (!controller.stack.isEmpty()) {
@@ -472,8 +493,9 @@ class UiGameController(
         // If both current and previous node had a visible wheel in the same location, we can keep it around
         // Otherwise it should be hidden
         val currentNode = gameController.currentNode()
-        val nextActionWheelPosition = actionWheelControllers.firstOrNull { it.nodes.contains(currentNode) }?.getActionWheelCenter(gameController.state)
-        return lastWheelLocation != null && lastWheelLocation != nextActionWheelPosition
+        val nextController = actionWheelControllers.firstOrNull { it.nodes.contains(currentNode) }
+        val nextActionWheelPosition = nextController?.getActionWheelCenter(gameController.state)
+        return nextController == null || (lastWheelLocation != null && lastWheelLocation != nextActionWheelPosition)
     }
 
     private fun applyUiIndicators(actionRequest: ActionRequest, controller: GameEngineController, acc: UiSnapshotAccumulator) {
@@ -530,7 +552,7 @@ class UiGameController(
     private suspend fun runPostActionSelectedAnimations(
         engineController: GameEngineController,
         action: GameAction,
-        uiState: UiSnapshotAccumulator
+        acc: UiSnapshotAccumulator
     ) {
         if (action != Undo) {
             // Run any animations on Wheel Controllers first, before triggering more custom animations.
@@ -538,15 +560,16 @@ class UiGameController(
             val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
                 controller.nodes.contains(engineController.currentNode())
             }
-            if (currentWheelHandler?.onPostActionAnimation(
-                    uiState,
-                    action
-                ) == true) {
-                uiState.emitActionWheelState()
+            if (currentWheelHandler?.onPostActionAnimation(acc, action) == true) {
+                acc.emitActionWheelState()
                 animationDone.receive()
             }
             val animation = AnimationFactory.getPostActionAnimation(state, action)
             if (animation != null) {
+                // We do not want animations to run on top of action wheels, so hide them
+                // before running the animation.
+                acc.addActionWheelEvent(HideActionWheel(hideImmediately = true))
+                acc.emitActionWheelState()
                 animationFlow.emit(animation)
                 animationDone.receive()
             }

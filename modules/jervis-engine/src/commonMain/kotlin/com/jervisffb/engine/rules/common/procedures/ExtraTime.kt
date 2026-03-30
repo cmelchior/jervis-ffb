@@ -53,7 +53,7 @@ object ExtraTime : Procedure() {
 
     object DetermineKickingTeam : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+            com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(RunExtraHalf)
         }

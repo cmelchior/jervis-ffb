@@ -143,7 +143,9 @@ class Team(
     var pettyCash: Int = 0
 
     // Fans
-    var fanFactor: Int = 0
+    val fanFactor: Int
+        get() = fairWeatherFans + dedicatedFans
+    var fairWeatherFans: Int = 0
     var dedicatedFans: Int = 0
 
     // Team value (in total amount, e.g 100.000, not 100 K)

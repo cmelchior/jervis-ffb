@@ -13,7 +13,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.common.procedures.CoinTossContext
-import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
@@ -103,7 +103,7 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createCheeringFansRollDialog(controller.state.receivingTeam)
                 }
 
-                is DetermineKickingTeam.ChooseKickingTeam -> {
+                is DetermineKickingTeamStep.ChooseKickingTeam -> {
                     val choices =
                         listOf(
                             Confirm to "Kickoff",
@@ -113,13 +113,13 @@ object DialogFactory {
                     SingleChoiceInputDialog.createChooseToKickoffDialog(context.winner!!, choices)
                 }
 
-                is DetermineKickingTeam.CoinToss -> {
+                is DetermineKickingTeamStep.CoinToss -> {
                     SingleChoiceInputDialog.createTossDialog(
                         state = controller.state,
                         CoinTossResult.allOptions())
                 }
 
-                is DetermineKickingTeam.SelectCoinSide -> {
+                is DetermineKickingTeamStep.SelectCoinSide -> {
                     SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
                         controller.state.awayTeam,
                         CoinSideSelected.allOptions(),

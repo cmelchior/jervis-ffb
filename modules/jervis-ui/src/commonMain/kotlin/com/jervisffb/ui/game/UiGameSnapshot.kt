@@ -47,6 +47,9 @@ data class UiGameSnapshot(
     // If set, it means we are in the middle of a move action that allows the player
     // to move multiple squares.
     val pathFinder: PathFinder.AllPathsResult?,
+    val showReferee: Boolean,
+    val refereeCoordinates: FieldCoordinate?,
+
 ) {
     val stack = game.stack
 }

@@ -95,10 +95,6 @@ data class ActionWheelUiStateData(
 
     var lastActionWasUndo: Boolean = false
 
-    // Only used in `COMPACT` mode and defines the distance in degrees between
-    // each sub item.
-    private val stepAngle = 45.0f
-
     init {
         recalculateSubMenuAngles(topItems, topExpandMode, -90f)
         recalculateSubMenuAngles(bottomItems, bottomExpandMode, 90f)
@@ -115,18 +111,35 @@ data class ActionWheelUiStateData(
         }
         when (val mode = expandMode) {
             MenuExpandMode.None -> error("Not supported")
-            MenuExpandMode.TwoWay -> {
+            is MenuExpandMode.TwoWay -> {
                 buttons.forEachIndexed { index, item ->
-                    when (index) {
-                        0 -> {
-                            item.defaultStartingAngle = 0f
-                            item.targetAngle = -90f
+                    when (mode.direction) {
+                        MenuExpandMode.TwoDirection.HORIZONTAL -> {
+                            when (index) {
+                                0 -> {
+                                    item.defaultStartingAngle = 90f
+                                    item.targetAngle = 0f
+                                }
+                                1 -> {
+                                    item.defaultStartingAngle = -90f
+                                    item.targetAngle = 180f
+                                }
+                                else -> error("Too many item: ${buttons.size}")
+                            }
                         }
-                        1 -> {
-                            item.defaultStartingAngle = 180f
-                            item.targetAngle = 90f
+                        MenuExpandMode.TwoDirection.VERTICAL -> {
+                            when (index) {
+                                0 -> {
+                                    item.defaultStartingAngle = 0f
+                                    item.targetAngle = -90f
+                                }
+                                1 -> {
+                                    item.defaultStartingAngle = 180f
+                                    item.targetAngle = 90f
+                                }
+                                else -> error("Too many item: ${buttons.size}")
+                            }
                         }
-                        else -> error("Too many item: ${buttons.size}")
                     }
                 }
             }
@@ -142,7 +155,7 @@ data class ActionWheelUiStateData(
             is MenuExpandMode.Compact -> {
                 // Clump menu items together at `centerAngle`. For an even number of menu items
                 // This means none of them will be directly on `centerAngle`.
-                val offset = if (buttons.size % 2 == 0) stepAngle / 2f else 0f
+                val offset = if (buttons.size % 2 == 0) mode.angleBetweenItemsDegrees / 2f else 0f
                 // val parentModifier = if (parent == null) 0 else 1
                 val parentModifier = 0
                 buttons.forEachIndexed { index, item ->
@@ -150,7 +163,7 @@ data class ActionWheelUiStateData(
                     // so [cw(1), ccw(1), cw(2), ccw(2), ...]
                     val direction = if (index % 2 == 1) -1 else 1
                     val magnitude = ceil((index + parentModifier) / 2.0).toFloat()
-                    item.targetAngle = (startAngle + offset + direction * magnitude * stepAngle)
+                    item.targetAngle = (startAngle + offset + direction * magnitude * mode.angleBetweenItemsDegrees)
                 }
             }
         }

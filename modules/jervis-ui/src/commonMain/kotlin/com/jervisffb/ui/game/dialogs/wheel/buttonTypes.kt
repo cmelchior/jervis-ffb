@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.dialogs.wheel
 
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.ext.d2
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -19,7 +20,9 @@ data class RollAnimationData<T: DieResult>(
     val additionalDelayAfterRoll: Duration? = ActionWheelDialogController.DEFAULT_DELAY_AFTER_ROLL
 ) {
     val startingValue: T = endValue.allOptions(endValue).random() as T
-    val intermediateValue: T = endValue.allOptions(endValue, startingValue).random() as T
+    val intermediateValue: T = endValue.allOptions(endValue, startingValue)
+        .let { it.ifEmpty { listOf(1.d2) }}
+        .random() as T
 }
 
 sealed interface ButtonData {
@@ -60,9 +63,10 @@ data class DieButtonData<T: DieResult>(
 }
 
 // Just Dummy for now
-data class CoinMenuItem(
+data class CoinButtonData(
     override val id: ButtonId,
     val value: Coin,
+    val enabled: Boolean = true,
     override val label: () -> String?,
     override val action: () -> Unit,
     override val animateRoll: RollAnimationData<*>? = null

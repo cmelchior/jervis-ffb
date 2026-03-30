@@ -3,7 +3,7 @@ package com.jervisffb.fumbbl.net.adapter.impl.setup
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -35,6 +35,6 @@ object SelectToKickoffOrReceiveMapper: CommandActionMapper {
         // Handle selecting to receive or kick
         val report = command.reportList.firstOrNull() as ReceiveChoiceReport
         val receive = !report.receiveChoice
-        newActions.add(if (receive) Cancel else Confirm, DetermineKickingTeam.ChooseKickingTeam)
+        newActions.add(if (receive) Cancel else Confirm, DetermineKickingTeamStep.ChooseKickingTeam)
     }
 }

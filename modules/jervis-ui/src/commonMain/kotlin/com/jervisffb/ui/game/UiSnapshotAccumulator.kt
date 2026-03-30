@@ -58,6 +58,9 @@ class UiSnapshotAccumulator(
     // to move multiple squares.
     var pathFinder: PathFinder.AllPathsResult? = null
 
+    var showReferee = false
+    var refereeCoordinates: FieldCoordinate? = null
+
     fun addActionWheelEvent(event: ActionWheelUiState) {
         actionWheelEvents.add(event)
         when (event) {
@@ -130,6 +133,11 @@ class UiSnapshotAccumulator(
         this.gameStatusText = message
     }
 
+    fun showReferee(coordinates: FieldCoordinate?) {
+        this.showReferee = true
+        this.refereeCoordinates = coordinates
+    }
+
     fun build(): UiGameSnapshot {
         val freeBalls  = squares.filter { it.value.isBallOnGround }
         return UiGameSnapshot(
@@ -150,6 +158,8 @@ class UiSnapshotAccumulator(
             homeTeamInfo = homeTeamInfo,
             awayTeamInfo = awayTeamInfo,
             pathFinder = pathFinder,
+            showReferee = showReferee,
+            refereeCoordinates = refereeCoordinates,
         )
     }
 

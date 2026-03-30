@@ -121,7 +121,7 @@ data class D2Result(override val value: Int) : DieResult() {
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D2Result> {
-        return D2Result.Companion.allOptions().toMutableList().apply {
+        return Companion.allOptions().toMutableList().apply {
             removeAll(except.toList())
         }
     }
@@ -141,7 +141,7 @@ data class D3Result(override val value: Int) : DieResult() {
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D3Result> {
-        return D3Result.Companion.allOptions().toMutableList().apply {
+        return Companion.allOptions().toMutableList().apply {
             removeAll(except.toList())
         }
     }

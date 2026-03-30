@@ -14,7 +14,7 @@ sealed interface MenuExpandMode {
     data object None: MenuExpandMode
 
     // Only left/right. This assumes a maximum spread of 180 degrees.
-    data object TwoWay: MenuExpandMode
+    data class TwoWay(val direction: TwoDirection = TwoDirection.VERTICAL): MenuExpandMode
 
     // Distribute evenly all around the circle.
     data class FanOut(
@@ -32,6 +32,18 @@ sealed interface MenuExpandMode {
      * Cluster around the starting angle, using [ActionWheelMenuItem.stepAngle]
      * as the distance between items.
      */
-    data class Compact(val spread: Float = 360f): MenuExpandMode
+    data class Compact(
+        val spread: Float = 360f,
+        // The angle between items in degrees
+        val angleBetweenItemsDegrees: Float = 45f,
+    ): MenuExpandMode
+
+    /**
+     * Enum that describes if a TwoWay menu should end being either horizontal
+     * or vertical.
+     */
+    enum class TwoDirection {
+        HORIZONTAL, VERTICAL
+    }
 }
 

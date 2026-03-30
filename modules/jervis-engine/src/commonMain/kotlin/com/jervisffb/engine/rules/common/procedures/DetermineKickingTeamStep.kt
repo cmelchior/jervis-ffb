@@ -39,9 +39,10 @@ data class CoinTossContext(
 /**
  * Select the kicking team automatically by using a coin toss.
  *
- * See page 38 of the rulebook.
+ * See page 38 of the BB2020 rulebook.
+ * See page 46 of the BB2025 rulebook.
  */
-object DetermineKickingTeam : Procedure() {
+object DetermineKickingTeamStep : Procedure() {
     override val initialNode: Node = SelectCoinSide
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {

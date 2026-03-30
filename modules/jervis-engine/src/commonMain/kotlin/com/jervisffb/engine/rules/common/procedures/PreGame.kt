@@ -104,7 +104,7 @@ object PreGame : Procedure() {
 
     object DetermineKickingTeam : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) =
-            com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+            com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

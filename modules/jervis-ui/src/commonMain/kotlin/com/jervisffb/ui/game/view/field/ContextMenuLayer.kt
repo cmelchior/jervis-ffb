@@ -76,6 +76,7 @@ fun ContextMenuLayer(vm: FieldViewModel) {
             uiState = currentState,
             vm,
             fieldData,
+            isPrimary = false
         )
     }
 }

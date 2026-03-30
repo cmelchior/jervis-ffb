@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D20Result
@@ -204,6 +203,7 @@ object IconFactory {
     private lateinit var density: Density
 
     private val cachedPlayers: MutableMap<PlayerId, PlayerSprite> = mutableMapOf()
+    private var cachedReferee: ImageBitmap? = null
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
@@ -583,8 +583,8 @@ object IconFactory {
     fun getCoinSizeDp(coin: Coin): DpSize {
         val image = cachedCoin[coin] ?: error("Could not find coin: $coin")
         return DpSize(
-            (image.width / density.density).dp,
-            (image.height / density.density).dp
+            (image.width / density.density).jdp * 1.25f,
+            (image.height / density.density).jdp * 1.25f
         )
     }
 

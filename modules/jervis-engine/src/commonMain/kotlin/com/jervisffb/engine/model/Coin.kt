@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model
 
-enum class Coin {
-    HEAD,
-    TAIL,
+enum class Coin(val description: String) {
+    HEAD("Heads"),
+    TAIL("Tails"),
 }

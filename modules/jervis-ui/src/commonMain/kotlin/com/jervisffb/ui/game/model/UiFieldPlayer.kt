@@ -34,9 +34,13 @@ data class UiFieldPlayer(
     val dice: Int = 0, // Show block dice decorator
     val isBlocked: Boolean = false, // Show "blocked" indicator
 ) {
-    constructor(model: Player, selectAction: ((GameScreenModel, UiFieldPlayer) -> Unit)? = null) : this(
+    constructor(
+        model: Player,
+        overrideLocation: Location = model.location,
+        selectAction: ((GameScreenModel, UiFieldPlayer) -> Unit)? = null
+    ) : this(
         id = model.id,
-        location = model.location,
+        location = overrideLocation,
         number = model.number,
         team = model.team.id,
         size = model.position.size,

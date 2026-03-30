@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -39,11 +39,11 @@ object ThrowCoinMapper: CommandActionMapper {
         val choseHeads = report.coinChoiceHeads
         newActions.add(
             CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL),
-            DetermineKickingTeam.SelectCoinSide,
+            DetermineKickingTeamStep.SelectCoinSide,
         )
         newActions.add(
             CoinTossResult(if (throwHeads) Coin.HEAD else Coin.TAIL),
-            DetermineKickingTeam.CoinToss,
+            DetermineKickingTeamStep.CoinToss,
         )
         // jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.C)
     }

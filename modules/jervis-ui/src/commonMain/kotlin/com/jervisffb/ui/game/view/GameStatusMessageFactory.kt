@@ -35,8 +35,10 @@ import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.DeviateRoll
 import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
+import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
@@ -45,6 +47,7 @@ import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
@@ -177,6 +180,9 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             TakeRootRoll.ReRollDie to "Re-roll D6 for Take Root",
             JumpUpRoll.RollDie to "Roll D6 to Jump Up",
             JumpUpRoll.ReRollDie to "Re-roll D6 to Jump Up",
+            FanFactorRolls.SetFanFactorForHomeTeam to "Roll D3 for Fan Factor",
+            FanFactorRolls.SetFanFactorForAwayTeam to "Roll D3 for Fan Factor",
+            WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather"
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
@@ -451,7 +457,25 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     isActiveClient -> "Select Block Result"
                     else -> "Waiting for opponent to Select Block Result"
                 }
-            }
+            },
+            DetermineKickingTeamStep.SelectCoinSide to { isActiveClient, _, state ->
+                when {
+                    isActiveClient -> "Select Coin Side"
+                    else -> "Waiting for opponent to Select Coin Side"
+                }
+            },
+            DetermineKickingTeamStep.CoinToss to { isActiveClient, _, state ->
+                when {
+                    isActiveClient -> "Flip the Coin"
+                    else -> "Waiting for opponent to Flip the Coin"
+                }
+            },
+            DetermineKickingTeamStep.ChooseKickingTeam to { isActiveClient, _, state ->
+                when {
+                    isActiveClient -> "Choose How to Start the Game"
+                    else -> "Waiting for opponent to choose Kicking and Receiving Team"
+                }
+            },
         )
     }
 

@@ -23,11 +23,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DrawerDefaults.shape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -44,12 +44,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -59,6 +61,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -70,13 +73,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.Popup
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
@@ -89,6 +92,7 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
@@ -97,14 +101,13 @@ import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
-import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
+import com.jervisffb.ui.game.dialogs.wheel.CoinButtonData
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
-import com.jervisffb.ui.game.view.utils.stoneBackground
 import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
@@ -173,7 +176,15 @@ fun ActionWheel(
         bottomRenderButtons.clear()
         bottomRenderButtons.addAll(uiState.bottomItems)
         topRenderButtons.clear()
-        topRenderButtons.addAll(uiState.bottomItems)
+        topRenderButtons.addAll(uiState.topItems)
+    }
+
+    // Update the wheel position synchronously before the frame is drawn, so the wheel
+    // never renders at a stale position (e.g. when bottomMessage stays the same across
+    // two states that are at different field coordinates).
+    DisposableEffect(uiState) {
+        offsetDelegate(uiState)
+        onDispose { }
     }
 
     // Trigger animations on state changes.
@@ -183,6 +194,8 @@ fun ActionWheel(
         if (uiState.animationOnly) {
             topAnimatable.clear()
             bottomAnimatable.clear()
+            // With "animation only", we normally does not want to go back to the
+            // "previous state", so we always reset it here.
             previousState = NoActionWheel
         }
 
@@ -196,8 +209,6 @@ fun ActionWheel(
         val topUnion = (from.topItems + to.topItems).reversed().distinctBy { it.id }.reversed()
         topRenderButtons.clear()
         topRenderButtons.addAll(topUnion)
-
-        offsetDelegate(uiState)
 
         // 2) Run animations. This will animate disappearing items to alpha = 0
         runWheelAnimations(
@@ -220,9 +231,9 @@ fun ActionWheel(
         // state when showing the wheel the next time.
         if (to.isHiding()) {
             bottomRenderButtons.clear()
+            bottomAnimatable.clear()
             topRenderButtons.clear()
             topAnimatable.clear()
-            bottomAnimatable.clear()
         }
 
         previousState = uiState
@@ -327,7 +338,6 @@ private suspend fun animateRegion(
     animationMode: ButtonLayoutMode,
     animationDuration: Int,
 ) = coroutineScope {
-
     val shortAnimation = (animationDuration * 2/3f).roundToInt()
     val appearing = to.filter { new -> from.none { it.id == new.id } }
     val staying   = to.filter { new -> from.any { it.id == new.id } }
@@ -335,10 +345,11 @@ private suspend fun animateRegion(
     val animatingRoll = to.filter { it.animateRoll != null }
 
     // Debug information
-    //     println("AnimationMode [$animationDuration]: $animationMode")
-    //     println("Appearing: ${appearing.size}")
-    //     println("Staying: ${staying.size}")
-    //     println("Disappearing: ${disappearing.size}")
+    //    println("Items: ${from.size} vs. ${to.size}")
+    //    println("AnimationMode [$animationDuration]: $animationMode")
+    //    println("Appearing: ${appearing.size}")
+    //    println("Staying: ${staying.size}")
+    //    println("Disappearing: ${disappearing.size}")
 
     // Make sure that all buttons are in the animation cache
     appearing.forEach {
@@ -421,14 +432,14 @@ private suspend fun animateRegion(
         }
         ButtonLayoutMode.EXPEND_NEW_SUBMENU -> {
             disappearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(0f, tween(shortAnimation))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             appearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(1f, tween(animationDuration))
                     }
@@ -436,29 +447,29 @@ private suspend fun animateRegion(
                         val target = shortestPathToTaget(anim.angleDegree.value, it.targetAngle)
                         anim.angleDegree.animateTo(target, tween(animationDuration))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             staying.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.angleDegree.animateTo(it.targetAngle, tween(animationDuration))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
         }
         ButtonLayoutMode.CONTRACT_NEW_SUBMENU -> {
             appearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(1f, tween(animationDuration))
                     }
                     launch {
                         anim.angleDegree.snapTo(it.targetAngle)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             disappearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(0f, tween(shortAnimation))
                         // anim.alpha.animateTo(0f, tween((shortAnimation * 0.8).roundToInt()))
@@ -467,87 +478,87 @@ private suspend fun animateRegion(
                         val target = shortestPathToTaget(anim.angleDegree.value, it.defaultStartingAngle)
                         anim.angleDegree.animateTo(target, tween(shortAnimation))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             staying.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.angleDegree.animateTo(it.targetAngle, tween(animationDuration))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
         }
 
         ButtonLayoutMode.EXPAND_UNDO -> {
             appearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.angleDegree.snapTo(it.targetAngle)
                         anim.alpha.snapTo(1f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             staying.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.angleDegree.snapTo(it.targetAngle)
                         anim.alpha.snapTo(1f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             disappearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.angleDegree.snapTo(it.defaultStartingAngle)
                         anim.alpha.snapTo(0f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
         }
         ButtonLayoutMode.HIDE -> {
             appearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(0f, tween(shortAnimation))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             staying.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(0f, tween(shortAnimation))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             disappearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.animateTo(0f, tween(shortAnimation))
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
         }
         ButtonLayoutMode.CONTRACT_UNDO -> {
             appearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.snapTo(0f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             staying.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.snapTo(0f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
             disappearing.forEach {
-                animationsCache[it.id]!!.let { anim ->
+                animationsCache[it.id]?.let { anim ->
                     launch {
                         anim.alpha.snapTo(0f)
                     }
-                }
+                } ?: error("Missing animation for ${it.id}")
             }
         }
     }
@@ -590,28 +601,85 @@ private fun WheelButtons(
  */
 @Composable
 private fun RingMessage(
-    message: String?,
+    message: String,
     angle: Float,
     radius: Dp,
 ) {
     val radiusPx = with(LocalDensity.current) { radius.toPx() }
     val offset = remember(angle, message) { getOffset(angle, radiusPx) }
-    Box(modifier = Modifier.offset { offset.toIntOffset() }) {
+
+    // Message box with a "brush" background
+    // Attempt to align it so it looks on the line with the team features row
+    Box(
+        modifier = Modifier
+            .offset { offset.toIntOffset() }
+        ,
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
+        val imageBrush = remember(chalkTexture) {
+            ShaderBrush(
+                shader = ImageShader(
+                    image = chalkTexture,
+                    tileModeX = TileMode.Repeated,
+                    tileModeY = TileMode.Repeated,
+                ),
+            )
+        }
         Box(
             modifier = Modifier
-                .stoneBackground(shape = RoundedCornerShape(8.dp))
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+                .height(54.jdp)
+                .drawWithContent {
+                    // Create fade brush for left and right edges
+                    val fadeBrush = Brush.horizontalGradient(
+                        0f to Color.Transparent,
+                        0.25f to Color.Black,
+                        0.75f to Color.Black,
+                        1f to Color.Transparent,
+                        startX = 0f,
+                        endX = size.width
+                    )
+                    // Draw the background with the fade mask
+                    with(drawContext.canvas) {
+                        saveLayer(
+                            bounds = Rect(0f, 0f, size.width, size.height),
+                            paint = androidx.compose.ui.graphics.Paint()
+                        )
+                        drawRect(
+                            brush = imageBrush,
+                            size = size,
+                            alpha = 0.8f,
+                            colorFilter = ColorFilter.tint(JervisTheme.black)
+                        )
+                        drawRect(
+                            brush = SolidColor(JervisTheme.black.copy(0.2f)),
+                            size = size
+                        )
+                        drawRect(
+                            brush = fadeBrush,
+                            size = size,
+                            blendMode = BlendMode.DstIn
+                        )
+                        restore()
+                    }
+                    drawContent()
+                }
+            ,
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                color = JervisTheme.white,
-                modifier = Modifier,
                 text = message ?: "",
+                lineHeight = 1.em,
+                maxLines = 1,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                fontSize = 20.jsp,
+                color = JervisTheme.white,
+                modifier = Modifier.padding(horizontal = 100.jdp),
             )
         }
     }
 }
+
 
 // Calculate the shortest distance (in degrees) to a target when moving across a ring
 private fun shortestPathToTaget(current: Float, desired: Float): Float {
@@ -667,7 +735,15 @@ private fun MenuItemButton(
                     onExpandedChanged = onPrimaryFocus,
                 )
             }
-            is CoinMenuItem -> TODO("Add support for Coins")
+            is CoinButtonData -> {
+                CoinButton(
+                    coin = item,
+                    onHover = onHover,
+                    onClick = item.action,
+                    alpha = alpha,
+                    animationData = animationData
+                )
+            }
         }
     }
 }
@@ -892,49 +968,48 @@ fun ActionButton(
 @Composable
 fun CoinButton(
     modifier: Modifier = Modifier,
-    coin: CoinMenuItem,
-    disabled: Boolean = false,
-    onClick: (Coin) -> Unit = { },
-    onAnimationDone: () -> Unit = {},
-    dropShadow: Boolean = true
+    coin: CoinButtonData,
+    onHover: (String?) -> Unit = {},
+    onClick: () -> Unit = { },
+    alpha: Float = 1f,
+    dropShadow: Boolean = true,
+    animationData: ItemAnimatable,
 ) {
     val buttonSize = IconFactory.getCoinSizeDp(coin.value)
-    val (buttonWidth, buttonHeight) = buttonSize
+    val isAnimating by animationData.isAnimating
+    val yOffset by animationData.yOffset.asState()
+    val rotation by animationData.rotation.asState()
+    val displayFace: DieResult? by animationData.displayFace
+    val coinFace = when {
+        !isAnimating -> coin.value
+        (displayFace?.value == 1) -> Coin.HEAD
+        (displayFace?.value == 2) -> Coin.TAIL
+        else -> Coin.HEAD
+    }
 
+    // The visible button, both the normal and jumping one.
     Box(
-        modifier = modifier
-            .alpha(if (disabled) 0.3f else 1f)
+        modifier = Modifier
+            .alpha(alpha)
+            .applyIf(isAnimating) {
+                graphicsLayer {
+                    translationY = yOffset
+                    rotationZ = rotation
+                }
+            }
         ,
         contentAlignment = Alignment.CenterStart,
     ) {
-// TODO Add support for flipping a Coin
-//        if (!coin.animationDone) {
-//            CoinAnimation(
-//                coin.animatingFrom!!,
-//                coin.value,
-//                content = { value ->
-//                    CoinImage(
-//                        value,
-//                        buttonSize,
-//                        enabled = false,
-//                        onClick = { },
-//                        dropShadow = dropShadow,
-//                    )
-//                },
-//                onAnimationEnd = {
-//                    coin.animationDone = true
-//                    onAnimationDone()
-//                }
-//            )
-//        } else {
         CoinImage(
-            coin.value,
+            coin = coinFace,
             buttonSize,
-            enabled = true,
+            enabled = coin.enabled,
+            onHover = { hover ->
+                onHover(if (hover) coin.label() else null)
+            },
             onClick = onClick,
             dropShadow = dropShadow,
         )
-//        }
     }
 }
 
@@ -944,11 +1019,13 @@ fun CoinImage(
     coin: Coin,
     size: DpSize,
     enabled: Boolean,
-    onClick: (Coin) -> Unit = {},
+    onHover: (Boolean) -> Unit = {},
+    onClick: () -> Unit = {},
     dropShadow: Boolean,
 ) {
     Box(
         modifier = Modifier
+            .padding(6.jdp)
             .size(size)
         ,
         contentAlignment = Alignment.Center
@@ -961,17 +1038,10 @@ fun CoinImage(
             contentDescription = coin.name,
             modifier = Modifier.fillMaxSize()
                 .applyIf(dropShadow) {
-                    dropShadow(shape = CircleShape) {
-                        color = JervisTheme.black.copy(1f)
+                    dropShadow(CircleShape) {
+                        color = JervisTheme.black.copy(0.6f)
                         offset = Offset.Zero
-                        radius = 12.dp.toPx()
-                    }
-                }
-                .applyIf(!dropShadow) {
-                    dropShadow(shape = CircleShape) {
-                        color = JervisTheme.black.copy(0.3f)
-                        offset = Offset.Zero
-                        radius = 4.dp.toPx()
+                        radius = 6.jdp.toPx()
                     }
                 }
                 .applyIf(enabled) {
@@ -985,14 +1055,16 @@ fun CoinImage(
                                 when (e.type) {
                                     PointerEventType.Enter -> {
                                         colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+                                        onHover(true)
                                     }
                                     PointerEventType.Exit  -> {
                                         colorFilter = null
+                                        onHover(false)
                                     }
                                     PointerEventType.Press -> {
                                         // We are about to trigger onClick, so prevent
                                         // other layers from reacting too early
-                                        onClick(coin)
+                                        onClick()
                                     }
                                     PointerEventType.Release -> {
                                         // See above
@@ -1005,7 +1077,7 @@ fun CoinImage(
                 .clip(CircleShape)
             ,
             contentScale = ContentScale.Fit,
-            filterQuality = FilterQuality.None,
+            filterQuality = FilterQuality.Low,
             colorFilter = colorFilter,
         )
     }
@@ -1237,120 +1309,6 @@ fun ExpandableDiceSelector(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun CoinAnimation(
-    startingValue: Coin,
-    endValue: Coin,
-    content: @Composable (Coin) -> Unit = {  _ -> },
-    onAnimationEnd: () -> Unit = {},
-) {
-    val animationDurationMs = 300L
-    val yOffset = remember(startingValue, endValue) { Animatable(0f) }
-    val rotation = remember(startingValue, endValue) { Animatable(0f) }
-    var displayFace by remember(startingValue, endValue) { mutableStateOf(startingValue) }
-
-    // Total animation is 300 ms
-    LaunchedEffect(startingValue, endValue) {
-        val randJob = launch {
-            // For "complex" dice like Block dice, changing face too quick
-            // makes it look really messy. With this approach we change once
-            // near the top of the arc before switching to correct result.
-            // From manual testing, this seems to be a good trade-off between
-            // "hiding" the true result a bit and making it look more "random".
-            displayFace = startingValue
-            delay(animationDurationMs/2)
-            displayFace = endValue
-        }
-
-        // Parallel rotation while airborne
-        val rotJob = launch {
-            rotation.animateTo(
-                targetValue = 360f,
-                animationSpec = tween(300, easing = LinearEasing)
-            )
-        }
-
-        // Jump up
-        yOffset.animateTo(
-            targetValue = -75f,
-            animationSpec = tween(150, easing = LinearOutSlowInEasing)
-        )
-
-        // Start falling and stop rotation
-        yOffset.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(150, easing = FastOutLinearInEasing)
-        )
-        rotJob.cancel()
-        randJob.cancel()
-        rotation.snapTo(0f)
-        displayFace = endValue
-        onAnimationEnd()
-    }
-
-    Box(
-        modifier = Modifier
-            .graphicsLayer {
-                translationY = yOffset.value
-                rotationZ = rotation.value
-            }
-        ,
-        contentAlignment = Alignment.Center
-    ) {
-        content(displayFace)
-    }
-}
-
-@Composable
-private fun SimpleDiceButton(
-    button: DieButtonData<*>,
-    animationData: ItemAnimatable,
-    isOnClickEnabled: Boolean = true,
-    isFullyVisible: Boolean = true,
-    onClick: () -> Unit = { },
-    onHover: (String?) -> Unit = { },
-    alpha: Float = 1f,
-) {
-    val shadowColor = Color.Black
-    val buttonSize = IconFactory.getDiceSizeDp(button.diceValue)
-    val (buttonWidth, buttonHeight) = buttonSize
-
-    val isAnimating by animationData.isAnimating
-    val yOffset by animationData.yOffset.asState()
-    val rotation by animationData.rotation.asState()
-    val displayFace by animationData.displayFace
-
-    // The visible button, both the normal and jumping one.
-    Box(
-        modifier = Modifier.alpha(if (isFullyVisible) 1f else 0.3f),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        Box(
-            modifier = Modifier
-                .applyIf(isAnimating) {
-                    graphicsLayer {
-                        translationY = yOffset
-                        rotationZ = rotation
-                    }
-                }
-            ,
-            contentAlignment = Alignment.Center
-        ) {
-            DiceButton(
-                DpSize(buttonWidth,  buttonHeight),
-                alpha,
-                value = if (isAnimating) displayFace!! else button.diceValue,
-                label = button.label,
-                diceRollType = button.diceRollType,
-                clickEnabled = (isAnimating || !isOnClickEnabled),
-                onHover = onHover,
-                onClick = onClick,
-                dropShadowColor = shadowColor,
-            )
         }
     }
 }

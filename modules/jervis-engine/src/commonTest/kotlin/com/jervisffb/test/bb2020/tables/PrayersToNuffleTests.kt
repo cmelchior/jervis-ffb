@@ -23,7 +23,7 @@ import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.FullGame
 import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
@@ -85,7 +85,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultInducements()
         )
         // If prayers are skipped, we jump directly to the coin flip.
-        assertEquals(DetermineKickingTeam.SelectCoinSide, controller.currentProcedure()!!.currentNode())
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentProcedure()!!.currentNode())
     }
 
     @Test
@@ -108,7 +108,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 *defaultInducements()
             )
             when (rolls) {
-                0 -> assertEquals(DetermineKickingTeam.SelectCoinSide, controller.currentProcedure()!!.currentNode())
+                0 -> assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentProcedure()!!.currentNode())
                 1 -> {
                     val context = state.getContext<PrayersToNuffleRollContext>()
                     assertEquals(1, context.rollsRemaining)

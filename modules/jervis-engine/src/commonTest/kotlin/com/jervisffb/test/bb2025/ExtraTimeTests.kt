@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.BB2025Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
-import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
+import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultDetermineKickingTeam
 import com.jervisffb.test.defaultKickOffAwayTeam
@@ -59,7 +59,7 @@ class ExtraTimeTests: JervisGameBB2025Test() {
         )
         assertEquals(3, state.halfNo)
         assertEquals(0, state.driveNo)
-        assertEquals(DetermineKickingTeam.SelectCoinSide, controller.stack.currentNode()) // Game has ended
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.stack.currentNode()) // Game has ended
     }
 
     @Test

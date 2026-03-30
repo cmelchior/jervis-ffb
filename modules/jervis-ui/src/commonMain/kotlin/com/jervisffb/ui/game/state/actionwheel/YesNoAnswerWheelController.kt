@@ -125,7 +125,7 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
             center = getActionWheelCenter(acc.game),
             topAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
             bottomItems = buttons,
-            bottomExpandMode = MenuExpandMode.TwoWay,
+            bottomExpandMode = MenuExpandMode.TwoWay(),
             bottomAnimationType = ButtonLayoutMode.EXPEND_NEW_SUBMENU,
             onDismiss = null,
             animationOnly = false

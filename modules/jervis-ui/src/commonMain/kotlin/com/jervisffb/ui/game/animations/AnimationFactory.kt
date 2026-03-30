@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.animations
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
@@ -15,6 +16,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
+import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.ChangingWeather
@@ -165,6 +167,20 @@ object AnimationFactory {
                 Weather.BLIZZARD -> Res.drawable.icons_animation_kickoff_kick_off_blizzard
             }
             return KickOffEventAnimation(weatherImage)
+        }
+
+        if (currentNode == FanFactorRolls.SetFanFactorForAwayTeam) {
+            val awayFanFactor = when (action) {
+                is D3Result -> action.value
+                is DiceRollResults -> (action.rolls.first() as D3Result).value
+                else -> error("Unsupported action: $action")
+            }
+
+            return FanFactorResultAnimation(
+                homeFairWeatherRoll = state.homeTeam.fairWeatherFans,
+                awayFairWeatherRoll = awayFanFactor,
+                state.homeTeam,
+                state.awayTeam)
         }
 
         return null

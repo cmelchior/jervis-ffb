@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetFanFactor
+import com.jervisffb.engine.commands.SetFairWeatherFans
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -40,10 +40,9 @@ object FanFactorRolls : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val dedicatedFans = state.homeTeam.dedicatedFans
-                val total = d3.value + dedicatedFans
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.FAN_FACTOR, d3),
-                    SetFanFactor(state.homeTeam, total),
+                    SetFairWeatherFans(state.homeTeam, d3.value),
                     ReportFanFactor(state.homeTeam, d3.value, dedicatedFans),
                     GotoNode(SetFanFactorForAwayTeam),
                 )
@@ -58,12 +57,11 @@ object FanFactorRolls : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val dedicatedFans = state.awayTeam.dedicatedFans
-            return castDiceRoll<D3Result>(action) {
-                val total = it.value + dedicatedFans
+            return castDiceRoll<D3Result>(action) { d3 ->
                 compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.FAN_FACTOR, it),
-                    SetFanFactor(state.awayTeam, total),
-                    ReportFanFactor(state.awayTeam, it.value, dedicatedFans),
+                    ReportDiceRoll(DiceRollType.FAN_FACTOR, d3),
+                    SetFairWeatherFans(state.awayTeam, d3.value),
+                    ReportFanFactor(state.awayTeam, d3.value, dedicatedFans),
                     ExitProcedure(),
                 )
             }

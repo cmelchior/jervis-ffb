@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
 import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
@@ -24,6 +25,9 @@ fun AnimationLayer(
             }
             is PassAnimation -> {
                 PassResultAnimation(vm, animationData!!.second as PassAnimation)
+            }
+            is FanFactorResultAnimation -> {
+                FanFactorResultAnimation(vm, animationData!!.second as FanFactorResultAnimation)
             }
             else -> { /* Do nothing */ }
         }

@@ -68,9 +68,13 @@ class SidebarViewModel(
     // Expose Dogout information as a separate flow
     private val dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>> = uiState.uiStateFlow.map { snapshot: UiGameSnapshot ->
         val list = if (team.isHomeTeam()) {
-            snapshot.game.homeTeam.filter { player -> player.location == DogOut }
+            snapshot.game.homeTeam.filter { player ->
+                player.location == DogOut && snapshot.players[player.id]?.location == DogOut
+            }
         } else {
-            snapshot.game.awayTeam.filter { player -> player.location == DogOut }
+            snapshot.game.awayTeam.filter { player ->
+                player.location == DogOut && snapshot.players[player.id]?.location == DogOut
+            }
         }
         val newList = list.map { player ->
             snapshot.players[player.id]?.let {

@@ -32,8 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.jervisffb.engine.actions.CoinSideSelected
-import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
@@ -42,8 +40,6 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_dice_roll
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
-import com.jervisffb.ui.game.dialogs.wheel.ButtonId
-import com.jervisffb.ui.game.dialogs.wheel.CoinMenuItem
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.JervisButton
@@ -88,38 +84,38 @@ fun SingleSelectUserActionDialog(
                 ) {
                     dialog.actionDescriptions.forEach { (action, description) ->
                         when (action) {
-                            is CoinSideSelected -> {
-                                CoinButton(
-                                    modifier = Modifier.offset(y = 4.dp),
-                                    coin = CoinMenuItem(
-                                        id = ButtonId("CoinSide"),
-                                        value = action.component1(),
-                                        // parent = null,
-                                        label = { description },
-                                        // enabled = true,
-                                        action = { vm.userActionSelected(action) },
-                                        // startAnimationFrom = null
-                                    ),
-                                    onClick = { vm.userActionSelected(action) },
-                                    dropShadow = false
-                                )
-                            }
-                            is CoinTossResult -> {
-                                CoinButton(
-                                    modifier = Modifier.offset(y = 4.dp),
-                                    coin = CoinMenuItem(
-                                        id = ButtonId("CoinResult"),
-                                        value = action.result,
-                                        // parent = null,
-                                        label = { description },
-                                        // enabled = true,
-                                        action = { vm.userActionSelected(action) },
-                                        // startAnimationFrom = null
-                                    ),
-                                    onClick = { vm.userActionSelected(action) },
-                                    dropShadow = false
-                                )
-                            }
+//                            is CoinSideSelected -> {
+//                                CoinButton(
+//                                    modifier = Modifier.offset(y = 4.dp),
+//                                    coin = CoinButtonData(
+//                                        id = ButtonId("CoinSide"),
+//                                        value = action.component1(),
+//                                        // parent = null,
+//                                        label = { description },
+//                                        // enabled = true,
+//                                        action = { vm.userActionSelected(action) },
+//                                        // startAnimationFrom = null
+//                                    ),
+//                                    onClick = { vm.userActionSelected(action) },
+//                                    dropShadow = false,
+//                                )
+//                            }
+//                            is CoinTossResult -> {
+//                                CoinButton(
+//                                    modifier = Modifier.offset(y = 4.dp),
+//                                    coin = CoinButtonData(
+//                                        id = ButtonId("CoinResult"),
+//                                        value = action.result,
+//                                        // parent = null,
+//                                        label = { description },
+//                                        // enabled = true,
+//                                        action = { vm.userActionSelected(action) },
+//                                        // startAnimationFrom = null
+//                                    ),
+//                                    onClick = { vm.userActionSelected(action) },
+//                                    dropShadow = false,
+//                                )
+//                            }
                             is DBlockResult -> {
 
                             }
@@ -262,6 +258,10 @@ fun ActionWheelDialog(
     uiState: ActionWheelUiState,
     fieldVm: FieldViewModel,
     fieldData: FieldViewData,
+    // We need to know the "primary wheel" as only the primary wheel are allowed
+    // to send `notifyUiHandledActionWheelEvent` events back to the ViewModel.
+    // This boolean is an ugly way of doing it, but it works for now.
+    isPrimary: Boolean
 ) {
 
     val ringSize = 250.jdp
@@ -312,9 +312,11 @@ fun ActionWheelDialog(
                 showTip = showTip,
                 tipRotationDegree = tipRotationDegree,
                 onAnimationFinished = {
-                    fieldVm.actionWheelViewModel.notifyUiHandledActionWheelEvent()
-                    if (uiState.animationOnly) {
-                        fieldVm.screenModel.uiState.notifyAnimationDone()
+                    if (isPrimary) {
+                        fieldVm.actionWheelViewModel.notifyUiHandledActionWheelEvent()
+                        if (uiState.animationOnly) {
+                            fieldVm.screenModel.uiState.notifyAnimationDone()
+                        }
                     }
                 },
             )

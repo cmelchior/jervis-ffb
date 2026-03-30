@@ -106,7 +106,7 @@ fun Player(
                     }
                 }
                 .applyIf(player.location is DogOut) {
-                    pointerInput(Unit) {
+                    pointerInput(player.id, player.location) {
                         awaitPointerEventScope {
                             var down = false // Track press, so we can filter Release correctly
                             while (true) {
@@ -244,13 +244,14 @@ val playerInFocus = playerBorderShaderTemplate.replace(
 // Maybe we need to draw the image to a slightly larger canvas before applying the blur. This requires
 // more experimentation.
 @Composable
-private fun PlayerImage(
+fun PlayerImage(
     bitmap: ImageBitmap,
     isSelectable: Boolean,
     isTempSelected: Boolean,
     isActionWheelFocus: Boolean,
     isGoingDown: Boolean,
-    alpha: Float
+    alpha: Float,
+    filterQuality: FilterQuality = FilterQuality.Low,
 ) {
     // Use Decal to avoid artifacts at the edges. It would be nice if we could render the "glow" outside
     // the canvas. It seems possible when using renderEffects on the graphicsLayer. But will need
@@ -307,7 +308,7 @@ private fun PlayerImage(
             // Try to keep as much of the "pixel" feel, while still
             // allowing dynamic scaling. We probably need to play around with
             // this setting.
-            filterQuality = FilterQuality.Low,
+            filterQuality = filterQuality,
             modifier = Modifier.aspectRatio(1f).fillMaxSize().alpha(alpha)
         )
     }
