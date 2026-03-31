@@ -141,6 +141,23 @@ class ChargeTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun charge_doNotSelectAnyPlayers() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 4.d6), // Roll Charge
+                    1.d3, // How many players to activate.
+                    Cancel, // Do not select any players
+                ),
+            )
+        )
+        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(1, awayTeam.turnMarker)
+    }
+
+    @Test
     @Ignore
     fun charge_kickTeamMate() {
         // - [ ] 1 Kick Teammate

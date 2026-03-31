@@ -54,4 +54,16 @@ abstract class ActionWheelDialogController {
     ): Boolean {
         return false
     }
+
+    protected fun getHomeCenterCoordinates(state: Game): FieldCoordinate {
+        val y = (state.rules.fieldHeight / 2)
+        val x = (state.rules.fieldWidth / 4)
+        return FieldCoordinate(x, y)
+    }
+
+    protected fun getAwayCenterCoordinates(state: Game): FieldCoordinate {
+        val y = (state.rules.fieldHeight / 2)
+        val x = state.rules.fieldWidth - (state.rules.fieldWidth / 4) - 1
+        return FieldCoordinate(x, y)
+    }
 }

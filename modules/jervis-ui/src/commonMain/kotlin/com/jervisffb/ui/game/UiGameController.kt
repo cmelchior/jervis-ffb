@@ -45,23 +45,38 @@ import com.jervisffb.ui.game.state.actionwheel.AwayTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.BreatheFireWheelController
+import com.jervisffb.ui.game.state.actionwheel.BrilliantCoachingKickingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.BrilliantCoachingReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
+import com.jervisffb.ui.game.state.actionwheel.ChargePlayersRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.CheeringFansKickingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.CheeringFansReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.ChooseKickingTeamWheelController
 import com.jervisffb.ui.game.state.actionwheel.CoinTossWheelController
 import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnKickingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnReceivingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgySnackKickingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgySnackReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.FoulAppearanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.InterceptionWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
+import com.jervisffb.ui.game.state.actionwheel.KickoffEventWheelController
 import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
 import com.jervisffb.ui.game.state.actionwheel.LeapWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
+import com.jervisffb.ui.game.state.actionwheel.PitchInvasionKickingTeamPlayersAffectedRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.PitchInvasionKickingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.PitchInvasionReceivingTeamPlayersAffectedRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.PitchInvasionReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.PogoWheelController
 import com.jervisffb.ui.game.state.actionwheel.ProjectileVomitWheelController
+import com.jervisffb.ui.game.state.actionwheel.QuickSnapRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.ReallyStupidWheelController
 import com.jervisffb.ui.game.state.actionwheel.RushWheelController
 import com.jervisffb.ui.game.state.actionwheel.ScatterRollWheelController
@@ -70,6 +85,7 @@ import com.jervisffb.ui.game.state.actionwheel.SelectBlockTypeWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectCoinSideWheelController
 import com.jervisffb.ui.game.state.actionwheel.SelectPlayerActionWheelController
 import com.jervisffb.ui.game.state.actionwheel.ShadowingWheelController
+import com.jervisffb.ui.game.state.actionwheel.SolidDefenseWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SteadyFootingWheelController
@@ -257,10 +273,26 @@ class UiGameController(
         UseApothecaryWheelController,
         ArgueTheCallWheelController,
 
-        // Rolls
+        // Pre-game / Kick-off Rolls
         HomeTeamFanFactorRoll,
         AwayTeamFanFactorRoll,
         WeatherRollWheelController,
+        KickoffEventWheelController,
+        ChargePlayersRollWheelController,
+        QuickSnapRollWheelController,
+        SolidDefenseWheelController,
+        CheeringFansKickingTeamRollWheelController,
+        CheeringFansReceivingTeamRollWheelController,
+        BrilliantCoachingKickingTeamRollWheelController,
+        BrilliantCoachingReceivingTeamRollWheelController,
+        DodgySnackKickingTeamRollWheelController,
+        DodgySnackReceivingTeamRollWheelController,
+        DodgySnackEffectOnKickingTeamRollWheelController,
+        DodgySnackEffectOnReceivingTeamRollWheelController,
+        PitchInvasionKickingTeamRollWheelController,
+        PitchInvasionReceivingTeamRollWheelController,
+        PitchInvasionKickingTeamPlayersAffectedRollWheelController,
+        PitchInvasionReceivingTeamPlayersAffectedRollWheelController,
 
         // Coin
         SelectCoinSideWheelController,

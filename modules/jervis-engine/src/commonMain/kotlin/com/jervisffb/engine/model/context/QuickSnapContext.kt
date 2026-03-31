@@ -11,4 +11,6 @@ data class QuickSnapContext(
     // Current player being moved
     val currentPlayer: Player? = null,
     val target: FieldCoordinate? = null,
-): ProcedureContext
+): ProcedureContext {
+    val playersLeft = (roll.value + 3) - playersMoved.size
+}

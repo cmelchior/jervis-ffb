@@ -11,8 +11,12 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
@@ -136,6 +140,61 @@ object AwayTeamFanFactorRoll: D3RollWheelController() {
         val y = (state.rules.fieldHeight / 2) - 1
         val x = (state.rules.fieldWidth / 2) + 1
         return FieldCoordinate(x, y)
+    }
+}
+
+object ChargePlayersRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "charge-players"
+    override val rollDiceNode: Node = Charge.RollForPlayers
+    override val diceRollType: DiceRollType = DiceRollType.CHARGE
+
+    // There is no "real" center for this, so we place it in the center of the Field
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+}
+
+object QuickSnapRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "quick-snap"
+    override val rollDiceNode: Node = QuickSnap.RollDie
+    override val diceRollType: DiceRollType = DiceRollType.QUICK_SNAP
+
+    // There is no "real" center for this, so we place it in the center of the Field
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+}
+
+object SolidDefenseWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "solid-defense"
+    override val rollDiceNode: Node = SolidDefense.RollDie
+    override val diceRollType: DiceRollType = DiceRollType.SOLID_DEFENSE
+
+    // There is no "real" center for this, so we place it in the center of the Field
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+}
+
+object PitchInvasionKickingTeamPlayersAffectedRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "pitch-invasion-kicking-players-affected"
+    override val rollDiceNode: Node = PitchInvasion.RollForKickingTeamStuns
+    override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val isHomeTeam = state.kickingTeam.isHomeTeam()
+        return when (isHomeTeam) {
+            true -> getHomeCenterCoordinates(state)
+            false -> getAwayCenterCoordinates(state)
+        }
+    }
+}
+
+object PitchInvasionReceivingTeamPlayersAffectedRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "pitch-invasion-receiving-players-affected"
+    override val rollDiceNode: Node = PitchInvasion.RollForReceivingTeamStuns
+    override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED
+
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val isHomeTeam = state.receivingTeam.isHomeTeam()
+        return when (isHomeTeam) {
+            true -> getHomeCenterCoordinates(state)
+            false -> getAwayCenterCoordinates(state)
+        }
     }
 }
 

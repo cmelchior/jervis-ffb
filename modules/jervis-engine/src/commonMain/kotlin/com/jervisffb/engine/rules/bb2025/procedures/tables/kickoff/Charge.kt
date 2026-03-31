@@ -229,7 +229,7 @@ object Charge : Procedure() {
                 }
                 Continue,
                 Cancel -> {
-                    GotoNode(SelectPlayersToActivate)
+                    GotoNode(ResolveEndOfTurn)
                 }
                 else -> INVALID_ACTION(action)
             }

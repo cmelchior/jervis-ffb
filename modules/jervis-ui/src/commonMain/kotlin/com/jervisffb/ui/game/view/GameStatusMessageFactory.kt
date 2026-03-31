@@ -4,6 +4,8 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.ChargeContext
+import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
@@ -30,6 +32,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowT
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
+import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -47,6 +51,7 @@ import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
@@ -64,6 +69,11 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
@@ -182,7 +192,23 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             JumpUpRoll.ReRollDie to "Re-roll D6 to Jump Up",
             FanFactorRolls.SetFanFactorForHomeTeam to "Roll D3 for Fan Factor",
             FanFactorRolls.SetFanFactorForAwayTeam to "Roll D3 for Fan Factor",
-            WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather"
+            WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather",
+            TheKickOffEvent.RollForKickOffEvent to "Roll 2D6 for the Kick-off Event",
+            Charge.RollForPlayers to "Roll D3 + 3 for Number of Players to be used during Charge",
+            QuickSnap.RollDie to "Roll D3 + 3 for Number of Players to Move during Quick Snap",
+            SolidDefense.RollDie to "Roll D3 + 3 for Number of Players to Move during Solid Defense",
+            CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
+            CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
+            BrilliantCoaching.KickingTeamRollDie to "Roll D6 for Brilliant Coaching",
+            BrilliantCoaching.ReceivingTeamRollDie to "Roll D6 for Brilliant Coaching",
+            DodgySnack.KickingTeamRollDie to "Roll D6 for Dodgy Snack",
+            DodgySnack.ReceivingTeamRollDie to "Roll D6 for Dodgy Snack",
+            DodgySnack.RollForKickingTeamSelectedPlayer to "Roll D6 for Effect of Dodgy Snack",
+            DodgySnack.RollForReceivingTemSelectedPlayer to "Roll D6 for Effect of Dodgy Snack",
+            PitchInvasion.RollForKickingTeamFans to "Roll D6 for Pitch Invasion",
+            PitchInvasion.RollForReceivingTeamFans to "Roll D6 for Pitch Invasion",
+            PitchInvasion.RollForKickingTeamStuns to "Roll D3 for number of Players Affected by Pitch Invasion",
+            PitchInvasion.RollForReceivingTeamStuns to "Roll D3 for number of Players Affected by Pitch Invasion",
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
@@ -476,6 +502,20 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     else -> "Waiting for opponent to choose Kicking and Receiving Team"
                 }
             },
+            Charge.SelectPlayersToActivate to { isActiveClient, _, state ->
+                val context = state.getContext<ChargeContext>()
+                when {
+                    isActiveClient -> "Select Up to ${context.playersToSelect} Players to be used during Charge"
+                    else -> "Waiting for opponent to select Players for Charge"
+                }
+            },
+            QuickSnap.SelectPlayerOrEndSetup to { isActiveClient, _, state ->
+                val context = state.getContext<QuickSnapContext>()
+                when {
+                    isActiveClient -> "Select Player to Move - ${context.playersLeft} Left"
+                    else -> null
+                }
+            }
         )
     }
 

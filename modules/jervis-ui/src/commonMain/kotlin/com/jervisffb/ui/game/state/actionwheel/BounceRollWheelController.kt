@@ -99,7 +99,8 @@ object BounceRollWheelController : ActionWheelDialogController() {
                 bottomItems = emptyList(),
                 bottomAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
                 onDismiss = null,
-                animationOnly = true
+                animationOnly = true,
+                bottomMessage = "Bounce Roll"
             )
             acc.addActionWheelEvent(wheelState)
             return true
