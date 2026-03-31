@@ -163,6 +163,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Modifiers are also optional on the reroll
   - [x] Does not work if Put the Boot In is used
 - [ ] Pile Driver
+  - [ ] Does not work on Special Actions (like Stab)
+  - [ ] Does not work if no longer standing next to player
+  - [ ] Ends action immediately
+  - [ ] Team Foul Action can be performed
 - [x] Put the Boot In
   - [x] Doesn't work when prone
   - [x] Usage is optional (for now we always use it)
@@ -404,6 +408,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Wrestle works on both block
     - [ ] Most roll for Dauntless on both blocks
     - [ ] Hit and Run trigger after both blocks (re-check this)
+    - [ ] Pile Driver works on both blocks
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push
