@@ -468,7 +468,8 @@ class TurnOverTests: JervisGameBB2025Test() {
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
-            SmartMoveTo(0, 3) // Score
+            SmartMoveTo(0, 3), // Score
+            Confirm // Accept Touchdown
         )
         // We cannot check if TurnOver is set because there is no "stop" between reaching
         // the end zone the activation ending (Could we add a skill that triggers at end of Activation?)
@@ -489,7 +490,8 @@ class TurnOverTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.RIGHT), // Push into end zone
-            Cancel // Do not follow up
+            Cancel, // Do not follow up
+            Confirm // Accept Touchdown
         )
         // We cannot check if TurnOver is set because there is no "stop" between check for touchdown
         // during push and the activation ending

@@ -668,7 +668,7 @@ private fun RingMessage(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = message ?: "",
+                text = message,
                 lineHeight = 1.em,
                 maxLines = 1,
                 fontWeight = FontWeight.Bold,
@@ -1122,8 +1122,6 @@ fun ExpandableDiceSelector(
     var expanded by remember { mutableStateOf(false) }
 
     // Properties we animate when expanded and deflating the selector
-    val expandDurationMs = 200
-    val animation = remember { tween<Float>(expandDurationMs, easing = FastOutLinearInEasing) }
     val bgWidthDp = remember { Animatable(0f) }
     val bgAlpha = remember { Animatable(0f) }
 

@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
@@ -19,6 +21,7 @@ import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.ChangingWeather
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.rules.common.tables.Weather
@@ -111,6 +114,14 @@ object AnimationFactory {
                 to = state.singleBall().outOfBoundsAt!!
             }
             return PassAnimation(from, to, outOfBounds)
+        }
+
+        // Animate confetti cannon on touchdown
+        if (stack.singleCurrentNode(ScoringATouchdown.InformOfGoal)) {
+            val context = state.getContextOrNull<ScoringATouchDownContext>()
+            if (context?.isTouchdownScored == true) {
+                return ConfettiAnimation(rules = rules, homeTeamScored = context.player.isOnHomeTeam())
+            }
         }
 
         return null

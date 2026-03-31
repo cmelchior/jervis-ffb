@@ -2,6 +2,7 @@ package com.jervisffb.test.bb2020.actions
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
@@ -788,7 +789,8 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             FieldSquareSelected(0, 7),
             *qualityRoll(6.d6),
             DiceRollResults(3.d8, 7.d8, 4.d8), // Scatter back to the starting point.
-            *landingRoll(6.d6) // Land successfully on the end-zone.
+            *landingRoll(6.d6), // Land successfully on the end-zone.
+            Confirm // Accept Touchdown
         )
         assertEquals(1, state.awayScore)
     }

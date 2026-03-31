@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.common.procedures.CoinTossContext
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
@@ -23,6 +24,7 @@ import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
+import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
@@ -188,6 +190,10 @@ object DialogFactory {
 
                 is ScatterRoll.RollDice -> {
                     MultipleChoiceUserInputDialog.createScatterRollDialog(rules)
+                }
+
+                is ScoringATouchdown.InformOfGoal -> {
+                    SingleChoiceInputDialog.createGoalScoredDialog(controller.state.getContext<ScoringATouchDownContext>().player)
                 }
 
                 is SetupTeam.InformOfInvalidSetup -> {

@@ -623,6 +623,9 @@ class TouchdownTests: JervisGameBB2020Test() {
     }
 
     private fun assertTouchdown(homeTeam: Boolean = false) {
+        controller.rollForward(
+            Confirm // Confirm the "Touchdown Scored" message
+        )
         if (homeTeam) {
             assertEquals(0, state.awayScore)
             assertEquals(1, state.homeScore)

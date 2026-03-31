@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.common.procedures.actions.move
 
+import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -22,11 +23,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.reports.ReportGoal
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -126,7 +125,8 @@ object ScoringATouchdown : Procedure() {
             val context = state.getContext<ScoringATouchDownContext>()
             return when (action) {
                 Continue -> {
-                    if (context.player.hasSkill(SkillType.BLOOD_LUST)) GotoNode(CheckBloodLust) else ExitProcedure()
+                    GotoNode(InformOfGoal)
+                    // if (context.player.hasSkill(SkillType.BLOOD_LUST)) GotoNode(CheckBloodLust) else ExitProcedure()
                 }
                 else -> INVALID_ACTION(action)
             }
@@ -139,6 +139,17 @@ object ScoringATouchdown : Procedure() {
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
+        }
+    }
+
+    // Mostly relevant to give the UI a hook to show "goal" messages
+    object InformOfGoal : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ScoringATouchDownContext>().player.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return listOf(ConfirmWhenReady)
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

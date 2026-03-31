@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.jervisffb.ui.game.animations.ConfettiAnimation
 import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
 import com.jervisffb.ui.game.animations.PassAnimation
@@ -28,6 +29,9 @@ fun AnimationLayer(
             }
             is FanFactorResultAnimation -> {
                 FanFactorResultAnimation(vm, animationData!!.second as FanFactorResultAnimation)
+            }
+            is ConfettiAnimation -> {
+                TouchdownAnimation(vm, animationData!!.second as ConfettiAnimation)
             }
             else -> { /* Do nothing */ }
         }

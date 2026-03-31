@@ -26,7 +26,6 @@ data class FieldSizeData(
 
     /**
      * Returns the modifier needed to place a square of the given size at the given coordinate.
-     *
      */
     fun calculateOffset(coordinate: FieldCoordinate, size: PlayerSize): Offset {
         val modifier = when (size) {

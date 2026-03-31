@@ -73,6 +73,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
+import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
@@ -450,6 +451,12 @@ open class ManualActionProvider(
             nextFumblerooskiCommand = null
             sharedData?.uiDecorations?.useFumblerooskiOnNextMove(null)
             return nextAction ?: Cancel
+        }
+
+        // We only have "Confirm" actions on Touchdowns to trigger animations (for now)
+        // So we always provide it.
+        if (currentNode == ScoringATouchdown.InformOfGoal) {
+            return Confirm
         }
 
         // Do not reroll successful rolls that are considered "successful"

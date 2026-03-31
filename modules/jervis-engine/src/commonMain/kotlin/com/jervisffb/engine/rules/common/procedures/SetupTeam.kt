@@ -160,6 +160,7 @@ object SetupTeam : Procedure() {
         }
     }
 
+    // Mostly relevant to give the UI a hook to show "invalid setup" messages
     object InformOfInvalidSetup : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
