@@ -6,6 +6,7 @@ The TODO list is by no means exhaustive, it is just a place to dump things as
 they come up.
 
 ## Todo List
+- [ ] Team Feature Icon for "+1 Offensive Assist on next Block"
 - [ ] Custom Action Icons for selecting Kicking/Receiving Team.
 - [ ] Action Icon for deselecting Fumblerooski.
 - [ ] "Forward move indicator" is wrong after a Jump/Leap.

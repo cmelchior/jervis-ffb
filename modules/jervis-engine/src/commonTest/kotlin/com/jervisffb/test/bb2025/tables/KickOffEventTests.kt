@@ -1,31 +1,45 @@
 package com.jervisffb.test.bb2025.tables
 
+import com.jervisffb.engine.actions.BlockTypeSelected
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
+import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.KickoffStatModifier
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
+import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
-import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultAwaySetup
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
@@ -33,12 +47,14 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStunned
 import kotlin.collections.orEmpty
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -330,10 +346,10 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     2.d6, // Home team roll
                     1.d6, // Away team roll, should be the same value
                 ),
-                bounce = null
             ),
         )
-        assertEquals(Bounce.RollDirection, controller.currentProcedure()?.currentNode())
+        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -344,15 +360,182 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
-                    3.d6, // Home team roll
+                    4.d6, // Home team roll
                     2.d6, // Away team roll
-                    2.d16 // Prayers To Nuffle: Friends with the ref
                 ),
-                bounce = null
             ),
         )
-        assertTrue(homeTeam.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF))
-        assertFalse(awayTeam.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF))
+        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_awayWins() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    3.d6, // Home team roll
+                    6.d6, // Away team roll
+                ),
+            ),
+        )
+        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_benefitExpiresAfterFirstTurn() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    3.d6, // Home team roll
+                    6.d6, // Away team roll
+                ),
+            ),
+        )
+        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        controller.rollForward(
+            EndTurn
+        )
+        assertEquals(homeTeam, state.activeTeam)
+        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_benefitExpiresAfterFirstTeamTurn() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    6.d6, // Home team roll
+                    1.d6, // Away team roll
+                ),
+            ),
+        )
+        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertEquals(awayTeam, state.activeTeam)
+        controller.rollForward(
+            EndTurn
+        )
+        assertEquals(homeTeam, state.activeTeam)
+        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        controller.rollForward(
+            EndTurn
+        )
+        assertEquals(awayTeam, state.activeTeam)
+        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_usedOnFirstBlock() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    1.d6, // Home team roll
+                    6.d6, // Away team roll
+                ),
+            ),
+        )
+        val attacker = awayTeam["A1".playerId]
+        val defender = homeTeam["H1".playerId]
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
+            PlayerSelected(defender),
+        )
+        val diceAction = controller.getAvailableActions().get<RollDice>()
+        assertTrue(diceAction.dice.all { it == Dice.BLOCK })
+        assertEquals(2, diceAction.dice.size)
+        controller.rollForward(
+            DiceRollResults(3.dblock, 6.dblock),
+            NoRerollSelected(),
+            SelectSingleBlockDieResult(index = 1),
+            DirectionSelected(Direction.LEFT),
+            Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertNull(state.activePlayer)
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_usedOnFirstBlitz() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    1.d6, // Home team roll
+                    6.d6, // Away team roll
+                ),
+            ),
+        )
+        val attacker = awayTeam["A1".playerId]
+        val defender = homeTeam["H1".playerId]
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
+            PlayerSelected(defender),
+            PlayerSelected(defender),
+            BlockTypeSelected(BlockType.STANDARD),
+        )
+        val diceAction = controller.getAvailableActions().get<RollDice>()
+        assertTrue(diceAction.dice.all { it == Dice.BLOCK })
+        assertEquals(2, diceAction.dice.size)
+        controller.rollForward(
+            DiceRollResults(3.dblock, 6.dblock),
+            NoRerollSelected(),
+            SelectSingleBlockDieResult(index = 1),
+            DirectionSelected(Direction.LEFT),
+            Cancel, // Do not follow up
+            DiceRollResults(1.d6, 1.d6),
+            EndAction
+        )
+        assertNull(state.activePlayer)
+        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+    }
+
+    @Test
+    fun cheeringFans_notUsedOnSpecialActions() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
+                    1.d6, // Home team roll
+                    6.d6, // Away team roll
+                ),
+            ),
+        )
+        val attacker = awayTeam["A1".playerId]
+        attacker.addSkill(SkillType.STAB)
+        val defender = homeTeam["H1".playerId]
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerSpecialActionType.STAB),
+            PlayerSelected(defender),
+            DiceRollResults(3.d6, 2.d6),
+        )
+        assertNull(state.activePlayer)
+        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test

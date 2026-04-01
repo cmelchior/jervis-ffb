@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.engine.rules.common.procedures.actions.block.calculateBlockDiceToRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 
@@ -24,7 +25,14 @@ fun calculateAssumedNoOfBlockDice(state: Game, attacker: Player, defender: Playe
         attackerStrength += 1
     }
 
-    val offensiveAssists = rules.calculateOffensiveAssists(attacker, defender)
+    // In BB2025, Cheering Fans have a special offensive assist for the first Block.
+    val cheeringFansExtraAssist = when (attacker.team.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+        true -> 1
+        false -> 0
+    }
+
+    // Calculate assists
+    val offensiveAssists = rules.calculateOffensiveAssists(attacker, defender) + cheeringFansExtraAssist
     val defensiveAssists = rules.calculateDefensiveAssists(defender, attacker)
 
     return calculateBlockDiceToRoll(attackerStrength, offensiveAssists, defenderStrength, defensiveAssists)

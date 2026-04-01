@@ -150,7 +150,8 @@ object AnimationFactory {
                 KickOffEvent.BRILLIANT_COACHING -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
                 KickOffEvent.CHANGING_WEATHER -> null // Animation is handled by the Weather Roll
                 KickOffEvent.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEvent.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                KickOffEvent.BB2020_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                KickOffEvent.BB2025_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
                 KickOffEvent.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                 KickOffEvent.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
                 KickOffEvent.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick

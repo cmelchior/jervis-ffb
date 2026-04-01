@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,7 +50,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
@@ -103,7 +104,7 @@ import kotlin.math.tan
 
 // Game Status Layout that is compatible with a Game Screen layout for a Blood Bowl 3 inspired layout
 @Composable
-fun TopBarGameStatus(
+fun GameStatusTopBar(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
@@ -359,49 +360,39 @@ private fun TeamFeaturesRow(
                     }
                     UiTeamFeatureType.BLOODWEISER_KEG -> TODO()
                     UiTeamFeatureType.UNKNOWN -> TODO()
+                    UiTeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST -> {
+                        TeamFeature(
+                            value = feature.value,
+                            content = {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(4.jdp)
+                                        .aspectRatio(1f)
+                                        .fillMaxHeight()
+                                        .background(JervisTheme.rulebookPaperDark, shape = RoundedCornerShape(4.jdp))
+                                        .border(2.dp, JervisTheme.white.copy(alpha = 0.5f), RoundedCornerShape(4.jdp))
+                                    ,
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "CF",
+                                        lineHeight = 1.em,
+                                        color = JervisTheme.white,
+                                        fontSize = 16.jsp,
+                                        fontWeight = FontWeight.Bold,
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            shadow = Shadow(
+                                                color = Color.Black,
+                                                offset = Offset(2f, 2f),
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        )
+                    }
                 }
             }
-        }
-    }
-}
-
-/**
- * Render a team feature icon (normally inducements).
- */
-@Composable
-private fun TeamFeature(
-    value: Int?,
-    icon: ImageBitmap,
-    // If false, it means it has been used, but will return.
-    // Inducements used that are 1-time should just disappear.
-    available: Boolean = true,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
-            modifier = Modifier, //.dropShadow(blurRadius = 4.dp),
-            bitmap = icon,
-            contentDescription = "",
-            contentScale = ContentScale.Fit,
-            filterQuality = FilterQuality.None,
-        )
-        if (value != null && value > 1) {
-            Text(
-                modifier = Modifier.padding(start = 6.jdp).alpha(if (available) 1f else 0.3f),
-                fontSize = 22.jsp,
-                text = value.toString(),
-                color = Color.White,
-                lineHeight = 1.em,
-                fontWeight = FontWeight.Bold,
-                fontFamily = JervisTheme.fontFamily(),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    shadow = Shadow(
-                        color = Color.Black,
-                        offset = Offset(2f, 2f),
-                    )
-                )
-            )
         }
     }
 }
@@ -727,7 +718,11 @@ private fun TeamBadge(
             Row(
                 modifier = Modifier.height(inducementIconSize),
             ) {
-                TeamFeaturesRow(leftSide = leftSide, height = inducementIconSize, teamInfo.featureList)
+                TeamFeaturesRow(leftSide = leftSide, height = inducementIconSize,
+                    teamInfo.featureList.let {
+                        if (leftSide) it else it.asReversed()
+                    }
+                )
             }
         }
     }

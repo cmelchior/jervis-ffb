@@ -35,7 +35,6 @@ import com.jervisffb.ui.keybinds.ClientShortcut
 import com.jervisffb.ui.keybinds.KeyBindings
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.TopbarButton
-import com.jervisffb.ui.utils.createPlatformButtonLabel
 import com.jervisffb.ui.utils.jdp
 
 @Composable
@@ -59,7 +58,7 @@ fun GameScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        TopBarGameStatus(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
+        GameStatusTopBar(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(8.jdp))
         Row(
             modifier = Modifier

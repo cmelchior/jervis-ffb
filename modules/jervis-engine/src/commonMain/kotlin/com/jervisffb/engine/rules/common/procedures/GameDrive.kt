@@ -65,8 +65,8 @@ object GameDrive : Procedure() {
             return when {
                 inactiveTouchdownScored -> {
                     compositeCommandOf(
-                        // Keep the current turnover state as we use it as an indicator for what to do
-                        // on the next turn.
+                        // Keep the current turnover state as we use it as an indicator to terminate
+                        // next team turn immediately.
                         SetActiveTeam(state.inactiveTeamOrThrow()),
                         SetKickingTeam(state.receivingTeam),
                         GotoNode(Turn)

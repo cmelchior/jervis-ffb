@@ -34,8 +34,8 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.LastingInjuryR
 import com.jervisffb.engine.rules.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRefContext
 import com.jervisffb.engine.rules.common.procedures.tables.prayers.BadHabits
@@ -97,11 +97,11 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createCasualtyRollDialog(rules, player)
                 }
 
-                CheeringFans.KickingTeamRollDie -> {
+                BB2020CheeringFans.KickingTeamRollDie -> {
                     MultipleChoiceUserInputDialog.createCheeringFansRollDialog(controller.state.kickingTeam)
                 }
 
-                CheeringFans.ReceivingTeamRollDie -> {
+                BB2020CheeringFans.ReceivingTeamRollDie -> {
                     MultipleChoiceUserInputDialog.createCheeringFansRollDialog(controller.state.receivingTeam)
                 }
 

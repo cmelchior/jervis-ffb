@@ -37,9 +37,6 @@ object EndOfDriveSequence: Procedure() {
         }
     }
 
-
-
-
     object RecoverKnockedOutPlayers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
@@ -53,7 +50,7 @@ object EndOfDriveSequence: Procedure() {
             // Remove special rules or effects that lasted for the duration of the drive
             // Unclear where in this process Sweltering Heat is applied.
             // For now, it doesn't really matter, so just run it afterwards
-            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_DRIVE)
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_DRIVE)
 
             // TODO Check for multiple balls here and remove duplicates
             return compositeCommandOf(

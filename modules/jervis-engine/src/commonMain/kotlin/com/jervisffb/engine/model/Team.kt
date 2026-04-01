@@ -6,91 +6,17 @@ import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
+import com.jervisffb.engine.model.modifiers.TeamStatusEffect
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
-import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
-import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.serialize.RosterLogo
-
-class TeamHalfData(private val game: Game) {
-    var totalRerolls: Int = 0
-    var usedRerolls: Int = 0
-}
-
-class TeamDriveData(private val game: Game) {
-    // Team related data
-}
-
-class TeamTurnData(private val game: Game) {
-    var moveActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.MOVE]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.MOVE] = value
-        }
-    var passActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.PASS]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.PASS] = value
-        }
-    var handOffActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.HAND_OFF]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.HAND_OFF] = value
-        }
-    var blockActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.BLOCK]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.BLOCK] = value
-        }
-    var blitzActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.BLITZ]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.BLITZ] = value
-        }
-    var foulActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.FOUL]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.FOUL] = value
-        }
-    var throwTeamMateActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE] = value
-        }
-    var secureTheBallActions: Int
-        get() = availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL]!!
-        set(value) {
-            availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL] = value
-        }
-
-    val availableStandardActions =
-        mutableMapOf(
-            PlayerStandardActionType.MOVE to 0,
-            PlayerStandardActionType.PASS to 0,
-            PlayerStandardActionType.HAND_OFF to 0,
-            PlayerStandardActionType.BLOCK to 0,
-            PlayerStandardActionType.BLITZ to 0,
-            PlayerStandardActionType.FOUL to 0,
-            PlayerStandardActionType.THROW_TEAM_MATE to 0,
-            PlayerStandardActionType.SECURE_THE_BALL to 0,
-        )
-    val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
-    val usedStandardActions = mutableMapOf(
-        PlayerStandardActionType.MOVE to 0,
-        PlayerStandardActionType.PASS to 0,
-        PlayerStandardActionType.HAND_OFF to 0,
-        PlayerStandardActionType.BLOCK to 0,
-        PlayerStandardActionType.BLITZ to 0,
-        PlayerStandardActionType.FOUL to 0,
-        PlayerStandardActionType.THROW_TEAM_MATE to 0,
-        PlayerStandardActionType.SECURE_THE_BALL to 0,
-    )
-}
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Class modeling all state related to a Team.
@@ -175,6 +101,11 @@ class Team(
     val specialPlayCards = mutableListOf<SpecialPlayCard>()
     val infamousCoachingStaff = mutableListOf<InfamousCoachingStaff>()
 
+    // Some effects are hard to put into other buckets, like Cheering Fans Offensive Assists.
+    // In these cases, we might want to mark the team somehow. This is done through a
+    // TeamStatusEffect.
+    val statusEffects: MutableList<TeamStatusEffect> = mutableListOf()
+
     // Cyclic dependencies. Must be manually set when a Team is constructed
     // TODO Why do we have these and `isAwayTeam()`?
     lateinit var game: Game
@@ -185,8 +116,6 @@ class Team(
     // game state never needs to be deserialized directly, but is only
     // created by running forward or backwards through all game actions
     // This API probably needs to be redesigned
-    lateinit var halfData: TeamHalfData
-    lateinit var driveData: TeamDriveData
     lateinit var turnData: TeamTurnData
     var turnMarker: Int = 0
 
@@ -197,8 +126,6 @@ class Team(
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances
     fun setGameReference(game: Game) {
-        halfData = TeamHalfData(game)
-        driveData = TeamDriveData(game)
         turnData = TeamTurnData(game)
         this.game = game
         teamIsHomeTeam = (game.homeTeam == this)
@@ -239,6 +166,22 @@ class Team(
 
     fun hasPrayer(prayer: PrayerToNuffle): Boolean {
         return activePrayersToNuffle.contains(prayer)
+    }
+
+    fun addStatusEffect(effect: TeamStatusEffect) {
+        if (!statusEffects.add(effect)) {
+            INVALID_GAME_STATE("Could not add status effect: ${effect.type}")
+        }
+    }
+
+    fun removeStatusEffect(effect: TeamStatusEffect) {
+        if (!statusEffects.remove(effect)) {
+            INVALID_GAME_STATE("Could not remove status effect: ${effect.type}")
+        }
+    }
+
+    fun hasStatusEffect(effect: TeamStatusEffectType): Boolean {
+        return statusEffects.any { it.type == effect }
     }
 
     override fun toString(): String {

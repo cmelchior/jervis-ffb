@@ -112,7 +112,7 @@ class Game(
     // Global state properties
     // We should only have properties here that are relevant to more than
     // one procedure, otherwise it should be moved into a [ProcedureContext]
-    fun isTurnOver(): Boolean = turnOver != null
+    fun isTurnOver(): Boolean = (turnOver != null)
 
     // Checks if an action should end immediately.
     // It feels wrong to have this method here (since it contains some logic and
@@ -278,5 +278,4 @@ class Game(
     fun setCurrentNode(nextState: Node) {
         stack.peepOrNull()!!.setCurrentNode(nextState)
     }
-
 }

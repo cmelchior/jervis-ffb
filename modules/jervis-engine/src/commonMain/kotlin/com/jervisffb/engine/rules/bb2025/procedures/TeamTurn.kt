@@ -106,7 +106,7 @@ object TeamTurn : Procedure() {
     object SelectPlayerOrEndTurn : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // If this team scored in the opponent's turn, their next turn ends immediately.
+            // If this team scored in the opponent's turn, their turn ends immediately.
             return if (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN) {
                 listOf(ContinueWhenReady)
             } else {
@@ -231,12 +231,13 @@ object TeamTurn : Procedure() {
             // - Special Play Cards
             // - Temporary Skills/Characteristics are removed
             // - Stunned Players are now prone
-            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
-            val nextNodeCommand = if (state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(
-                    PrayerToNuffle.THROW_A_ROCK)) {
-                GotoNode(CheckForThrowARock)
-            } else {
-                ExitProcedure()
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
+            val activeTeamResetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_OWN_TEAM_TURN)
+
+            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)
+            val nextNodeCommand = when (throwRockActive) {
+                true -> GotoNode(CheckForThrowARock)
+                false -> ExitProcedure()
             }
 
             return compositeCommandOf(
@@ -244,6 +245,7 @@ object TeamTurn : Procedure() {
                 *turnOverStunnedPlayersCommands,
                 *resetPlayerAvailabilityCommands,
                 *resetCommands,
+                *activeTeamResetCommands,
                 nextNodeCommand
             )
         }

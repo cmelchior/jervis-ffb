@@ -57,6 +57,7 @@ import kotlin.test.fail
 /**
  * This class is testing all the results on the Prayer to Nuffle Table
  */
+@Ignore // We cannot test this until we have Inducement Support in BB2025
 class PrayersToNuffleTests: JervisGameBB2025Test() {
 
     @BeforeTest

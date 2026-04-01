@@ -3,10 +3,11 @@ package com.jervisffb.engine.rules.common.tables
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Blitz
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.GetTheRef
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.HighKick
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRef
@@ -29,7 +30,8 @@ enum class KickOffEvent(
     BRILLIANT_COACHING("Brilliant Coaching", BrilliantCoaching, Duration.IMMEDIATE),
     CHANGING_WEATHER("Changing Weather", ChangingWeather, Duration.IMMEDIATE),
     CHARGE("Charge!", Charge, Duration.IMMEDIATE),
-    CHEERING_FANS("Cheering Fans", CheeringFans, Duration.IMMEDIATE),
+    BB2020_CHEERING_FANS("Cheering Fans", BB2020CheeringFans, Duration.IMMEDIATE),
+    BB2025_CHEERING_FANS("Cheering Fans", BB2025CheeringFans, Duration.IMMEDIATE),
     DODGY_SNACK("Dodgy Snack", DodgySnack, Duration.IMMEDIATE),
     GET_THE_REF("Get the Ref", GetTheRef, Duration.IMMEDIATE),
     HIGH_KICK("High Kick", HighKick, Duration.IMMEDIATE),

@@ -23,6 +23,7 @@ enum class Duration {
     END_OF_ACTIVATION, // The effect expires at the end of the current players activation
     END_OF_ACTION, // The effect expires at the end of the action, this also includes subactions, like the Block part of a Blitz.
     END_OF_TURN, // The effect expires at the end of the current teams turn.
+    END_OF_OWN_TEAM_TURN, // The effect expires at the end of this teams turns, either the current (if in progress) or if opponent turn, end of next regular team turn.
     END_OF_DRIVE, // The effect expires at the end of the current drive
     END_OF_HALF, // The effect expires at the end of the current half
     END_OF_GAME, // The effect lasts for the entire game, but doesn't carry over to the next game

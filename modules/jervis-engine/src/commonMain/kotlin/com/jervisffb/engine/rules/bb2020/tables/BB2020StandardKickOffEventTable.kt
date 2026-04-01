@@ -18,7 +18,7 @@ object BB2020StandardKickOffEventTable: KickOffTable {
             3 to KickOffEvent.TIME_OUT,
             4 to KickOffEvent.SOLID_DEFENSE,
             5 to KickOffEvent.HIGH_KICK,
-            6 to KickOffEvent.CHEERING_FANS,
+            6 to KickOffEvent.BB2020_CHEERING_FANS,
             7 to KickOffEvent.BRILLIANT_COACHING,
             8 to KickOffEvent.CHANGING_WEATHER,
             9 to KickOffEvent.QUICK_SNAP,

@@ -10,6 +10,7 @@ import com.jervisffb.engine.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.RemovePrayersToNuffle
 import com.jervisffb.engine.commands.RemoveTeamReroll
+import com.jervisffb.engine.commands.RemoveTeamStatusEffect
 import com.jervisffb.engine.commands.ResetShadowingSkill
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
@@ -20,6 +21,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.InfamousCoachAbility
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
@@ -286,39 +288,39 @@ private fun gatherResetPlayerTemporaryModifiersCommands(
  */
 fun getResetTeamTemporaryModifiersCommands(
     state: Game,
-    rules: Rules,
     duration: Duration
 ): Array<Command> {
     if (duration in Duration.singlePlayerDurations) {
         error("Wrong use of API. Use `getResetPlayerTemporaryModifiersCommands` instead")
     }
     val builder = mutableListOf<Command>()
-    gatherResetTeamTemporaryModifiersCommands(state, rules, duration, builder)
+    val activeTeam = state.activeTeam ?: state.homeTeam
+    val inactiveTeam = activeTeam.otherTeam()
+    gatherResetTeamTemporaryModifiersCommands(activeTeam, duration, builder)
+    if (duration != Duration.END_OF_OWN_TEAM_TURN) {
+        gatherResetTeamTemporaryModifiersCommands(inactiveTeam, duration, builder)
+    }
     return builder.toTypedArray()
 }
 
+// Collect all reset commands for a single team
 private fun gatherResetTeamTemporaryModifiersCommands(
-    state: Game,
-    rules: Rules,
+    team: Team,
     duration: Duration,
     builder: MutableList<Command>
 ) {
-    val teams = listOf(state.homeTeam, state.awayTeam)
+    val state = team.game
 
     // Find and reset all temporary state associated with a single player.
-    teams.forEach { team ->
-        team.forEach { player ->
-            gatherResetPlayerTemporaryModifiersCommands(player, duration, builder)
-        }
+    team.forEach { player ->
+        gatherResetPlayerTemporaryModifiersCommands(player, duration, builder)
     }
 
     // Remove all temporary rerolls that might have expired.
     // Note, Leader has a SPECIAL duration and is handled by itself
-    val removableRerolls: List<RemoveTeamReroll> = teams.flatMap { team ->
-        team.rerolls
-            .filter { it.duration == duration }
-            .map { RemoveTeamReroll(team, it) }
-    }
+    val removableRerolls: List<RemoveTeamReroll> = team.rerolls
+        .filter { it.duration == duration }
+        .map { RemoveTeamReroll(team, it) }
     builder.addAll(removableRerolls)
 
     // Leader rerolls are only removed between normal halfs. They are kept
@@ -327,34 +329,34 @@ private fun gatherResetTeamTemporaryModifiersCommands(
     val removableLeaderRerolls = if (
         state.halfNo < state.rules.halfsPrGame && duration == Duration.END_OF_HALF
     ) {
-        teams.flatMap { team ->
-            team.rerolls
-                .filterIsInstance<LeaderTeamReroll>()
-                .map { reroll -> RemoveTeamReroll(team, reroll) }
-        }
+        team.rerolls
+            .filterIsInstance<LeaderTeamReroll>()
+            .map { reroll -> RemoveTeamReroll(team, reroll) }
     } else {
         emptyList()
     }
     builder.addAll(removableLeaderRerolls)
 
     // Find all active Prayers of Nuffle that expires at the given duration
-    val removablePrayers = teams.flatMap { team ->
-        team.activePrayersToNuffle
-            .filter { it.duration == duration }
-            .map {
-                RemovePrayersToNuffle(team, it)
-            }
-    }
+    val removablePrayers = team.activePrayersToNuffle
+        .filter { it.duration == duration }
+        .map {
+            RemovePrayersToNuffle(team, it)
+        }
     builder.addAll(removablePrayers)
 
     // All active special play cards that has ended their duration are marked
     // as played
-    val specialPlayCards: List<SetSpecialPlayCardActive> = teams.flatMap { team ->
-        team.specialPlayCards
-            .filter { it.isActive && duration == duration }
-            .map { SetSpecialPlayCardActive(it, false) }
-    }
+    val specialPlayCards: List<SetSpecialPlayCardActive> = team.specialPlayCards
+        .filter { it.isActive && duration == duration }
+        .map { SetSpecialPlayCardActive(it, false) }
     builder.addAll(specialPlayCards)
+
+    // Any Team Status Effects that might expire
+    val teamStatusEffects: List<RemoveTeamStatusEffect> = team.statusEffects
+        .filter { it.duration == duration }
+        .map { RemoveTeamStatusEffect(team, it) }
+    builder.addAll(teamStatusEffects)
 }
 
 /**

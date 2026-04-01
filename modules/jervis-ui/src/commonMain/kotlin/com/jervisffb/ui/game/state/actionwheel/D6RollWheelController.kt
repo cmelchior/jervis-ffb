@@ -15,8 +15,9 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -44,7 +45,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
         actions: ActionRequest,
         sharedData: LocalFieldDataWrapper,
     ) {
-        if (acc.stack.currentNode() == rollDiceNode) {
+        if (nodes.contains(acc.stack.currentNode())) {
             val buttons = D6Result.allOptions().map { d6Option ->
                 DieButtonData(
                     id = ButtonId("$buttonIdPrefix-${d6Option.value}"),
@@ -77,7 +78,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
     ): Boolean {
         val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
         val currentNode = acc.stack.currentNode()
-        if (!((currentNode == rollDiceNode) && serverRoll)) return false
+        if (!((nodes.contains(currentNode)) && serverRoll)) return false
 
         val button = selectedAction.safeCast<DiceRollResults>().let { roll ->
             val d6Roll = roll.rolls.first() as D6Result
@@ -114,8 +115,12 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
 
 object CheeringFansKickingTeamRollWheelController: D6RollWheelController() {
     override val buttonIdPrefix: String = "cheering-fans-kicking-team"
-    override val rollDiceNode: Node = CheeringFans.KickingTeamRollDie
+    override val rollDiceNode: Node = BB2020CheeringFans.KickingTeamRollDie
     override val diceRollType: DiceRollType = DiceRollType.CHEERING_FANS
+    override val nodes: Set<Node> = setOf(
+        BB2020CheeringFans.KickingTeamRollDie,
+        BB2025CheeringFans.KickingTeamRollDie
+    )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
@@ -129,8 +134,12 @@ object CheeringFansKickingTeamRollWheelController: D6RollWheelController() {
 
 object CheeringFansReceivingTeamRollWheelController: D6RollWheelController() {
     override val buttonIdPrefix: String = "cheering-fans-receiving-team"
-    override val rollDiceNode: Node = CheeringFans.ReceivingTeamRollDie
+    override val rollDiceNode: Node = BB2020CheeringFans.ReceivingTeamRollDie
     override val diceRollType: DiceRollType = DiceRollType.CHEERING_FANS
+    override val nodes: Set<Node> = setOf(
+        BB2020CheeringFans.ReceivingTeamRollDie,
+        BB2025CheeringFans.ReceivingTeamRollDie
+    )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
     override fun getActionWheelCenter(state: Game): FieldCoordinate {

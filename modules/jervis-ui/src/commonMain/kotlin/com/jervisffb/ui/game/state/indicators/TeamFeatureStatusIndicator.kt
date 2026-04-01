@@ -4,6 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
@@ -33,14 +34,35 @@ object TeamFeatureStatusIndicator: FieldStatusIndicator {
     }
 
     private fun configureTeamFeatures(team: Team, teamInfo: UiTeamInfoUpdate): UiTeamInfoUpdate {
+        val featureList = mutableListOf<UiTeamFeature>()
+
+        // Team Apothecary
         val availableTeamApothecaries = team.teamApothecaries.count { !it.used }
+        if (availableTeamApothecaries > 0) {
+            featureList.add(
+                UiTeamFeature(
+                    name = "Team Apothecary",
+                    value = availableTeamApothecaries,
+                    type = UiTeamFeatureType.APOTHECARY,
+                    used = false
+                )
+            )
+        }
+
+        // Cheering Fans Offensive Assist
+        if (team.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+            featureList.add(
+                UiTeamFeature(
+                    name = "+1 Offensive Assist on next Block",
+                    value = 1,
+                    type = UiTeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST,
+                    used = false
+                )
+            )
+        }
+
         return teamInfo.copy(
-            featureList = teamInfo.featureList.add(UiTeamFeature(
-                name = "Team Apothecary",
-                value = availableTeamApothecaries,
-                type = UiTeamFeatureType.APOTHECARY,
-                used = false
-            ))
+            featureList = teamInfo.featureList.addAll(featureList)
         )
     }
 }

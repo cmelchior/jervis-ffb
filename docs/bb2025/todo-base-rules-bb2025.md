@@ -191,7 +191,10 @@ book.
     - [x] High Kick
         - [x] Allow moving player to kicking side
         - [x] No available players
-    - [ ] Cheering Fans
+    - [x] Cheering Fans
+      - [x] Goes away after 1 turn if unused
+      - [x] Adds +1 to Offensive Assists only
+      - [x] Works on Perform Block, i.e., Blitz, but not Special actions
     - [x] Brilliant Coaching
     - [x] Changing Weather
     - [x] Quick Snap

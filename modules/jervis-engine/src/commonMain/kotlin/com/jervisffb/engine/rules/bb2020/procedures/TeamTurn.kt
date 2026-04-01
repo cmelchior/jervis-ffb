@@ -173,7 +173,9 @@ object TeamTurn : Procedure() {
             // - Special Play Cards
             // - Temporary Skills/Characteristics are removed
             // - Stunned Players are now prone
-            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
+            val activeTeam = state.activeTeamOrThrow()
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
+            val activeTeamResetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_OWN_TEAM_TURN)
             val nextNodeCommand = if (state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)
             } else {
@@ -185,6 +187,7 @@ object TeamTurn : Procedure() {
                 *turnOverStunnedPlayersCommands,
                 *resetPlayerAvailabilityCommands,
                 *resetCommands,
+                *activeTeamResetCommands,
                 nextNodeCommand
             )
         }

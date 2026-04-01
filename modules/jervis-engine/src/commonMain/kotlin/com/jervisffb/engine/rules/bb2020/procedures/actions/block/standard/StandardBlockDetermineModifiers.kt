@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.RemoveTeamStatusEffect
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -16,6 +17,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.SkillStatModifier
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
@@ -68,7 +70,15 @@ object StandardBlockDetermineModifiers: Procedure() {
             val context = state.getContext<BlockContext>()
             val offensiveAssists = rules.calculateOffensiveAssists(context.attacker, context.defender)
             val defensiveAssists = rules.calculateDefensiveAssists(context.defender, context.attacker)
+            val attackTeam = context.attacker.team
             return compositeCommandOf(
+                when (attackTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                    true -> {
+                        val statusEffect = attackTeam.statusEffects.first { it.type == TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST }
+                        RemoveTeamStatusEffect(attackTeam, statusEffect)
+                    }
+                    false -> null
+                },
                 UpdateContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 ExitProcedure()
             )

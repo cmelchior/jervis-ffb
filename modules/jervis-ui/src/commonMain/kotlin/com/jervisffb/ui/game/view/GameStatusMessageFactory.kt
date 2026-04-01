@@ -69,8 +69,8 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
@@ -197,8 +197,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             Charge.RollForPlayers to "Roll D3 + 3 for Number of Players to be used during Charge",
             QuickSnap.RollDie to "Roll D3 + 3 for Number of Players to Move during Quick Snap",
             SolidDefense.RollDie to "Roll D3 + 3 for Number of Players to Move during Solid Defense",
-            CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
-            CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
+            BB2020CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
+            BB2020CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
             BrilliantCoaching.KickingTeamRollDie to "Roll D6 for Brilliant Coaching",
             BrilliantCoaching.ReceivingTeamRollDie to "Roll D6 for Brilliant Coaching",
             DodgySnack.KickingTeamRollDie to "Roll D6 for Dodgy Snack",

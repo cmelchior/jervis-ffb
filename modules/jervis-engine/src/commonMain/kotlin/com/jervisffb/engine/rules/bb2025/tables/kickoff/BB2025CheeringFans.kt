@@ -5,7 +5,9 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.commands.AddTeamStatusEffect
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -15,31 +17,24 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.CheeringFansContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.TeamStatusEffect
+import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
 import com.jervisffb.engine.reports.ReportCheeringFansResult
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRoll
-import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
-
-data class CheeringFansContext(
-    val kickingTeamRoll: D6Result,
-    val receivingTeamRoll: D6Result? = null,
-    val winner: Team? = null,
-): ProcedureContext
 
 /**
  * Procedure for handling the Kick-Off Event: "Cheering Fans" as described on page 41
- * of the rulebook.
+ * of the BB2020 rulebook.
  */
-object CheeringFans : Procedure() {
+object BB2025CheeringFans : Procedure() {
     override val initialNode: Node = KickingTeamRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<CheeringFansContext>()
@@ -80,65 +75,35 @@ object CheeringFans : Procedure() {
     object ResolveCheeringFans : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
-            val kickingTeamResult = context.kickingTeamRoll.value + state.kickingTeam.cheerleaders
-            val receivingTeamResult = context.receivingTeamRoll!!.value + state.receivingTeam.cheerleaders
-            return when {
-                kickingTeamResult == receivingTeamResult -> {
-                    compositeCommandOf(
-                        ReportCheeringFansResult(
-                            state.kickingTeam,
-                            state.receivingTeam,
-                            context.kickingTeamRoll,
-                            state.kickingTeam.cheerleaders,
-                            context.receivingTeamRoll,
-                            state.receivingTeam.cheerleaders,
-                        ),
-                        ExitProcedure(),
-                    )
+            val kickingTeam = state.kickingTeam
+            val receivingTeam = state.receivingTeam
+            val kickingTeamResult = context.kickingTeamRoll.value + kickingTeam.cheerleaders
+            val receivingTeamResult = context.receivingTeamRoll!!.value + receivingTeam.cheerleaders
+            return buildCompositeCommand {
+                if (kickingTeamResult >= receivingTeamResult && !kickingTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                    add(AddTeamStatusEffect(kickingTeam, TeamStatusEffect.cheeringFans()))
                 }
-                kickingTeamResult > receivingTeamResult -> {
-                    compositeCommandOf(
-                        ReportCheeringFansResult(
-                            state.kickingTeam,
-                            state.receivingTeam,
-                            context.kickingTeamRoll,
-                            state.kickingTeam.cheerleaders,
-                            context.receivingTeamRoll,
-                            state.receivingTeam.cheerleaders,
-                        ),
-                        UpdateContext(state.getContext<CheeringFansContext>().copy(winner = state.kickingTeam)),
-                        GotoNode(WinnerRollsOnPrayersToNuffle),
-                    )
+                if (receivingTeamResult >= kickingTeamResult && !receivingTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                    add(AddTeamStatusEffect(receivingTeam, TeamStatusEffect.cheeringFans()))
                 }
-                else -> {
-                    compositeCommandOf(
-                        ReportCheeringFansResult(
-                            state.kickingTeam,
-                            state.receivingTeam,
-                            context.kickingTeamRoll,
-                            state.kickingTeam.cheerleaders,
-                            context.receivingTeamRoll,
-                            state.receivingTeam.cheerleaders,
-                        ),
-                        UpdateContext(state.getContext<CheeringFansContext>().copy(winner = state.receivingTeam)),
-                        GotoNode(WinnerRollsOnPrayersToNuffle),
+                add(
+                    ReportCheeringFansResult(
+                        kickingTeam,
+                        receivingTeam,
+                        context.kickingTeamRoll,
+                        kickingTeam.cheerleaders,
+                        context.receivingTeamRoll,
+                        receivingTeam.cheerleaders,
                     )
+                )
+                if (kickingTeamResult > receivingTeamResult) {
+                    UpdateContext(state.getContext<CheeringFansContext>().copy(winner = kickingTeam))
                 }
+                if (receivingTeamResult > kickingTeamResult) {
+                    UpdateContext(state.getContext<CheeringFansContext>().copy(winner = receivingTeam))
+                }
+                add(ExitProcedure())
             }
-        }
-    }
-
-    object WinnerRollsOnPrayersToNuffle : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<CheeringFansContext>()
-            return AddContext(PrayersToNuffleRollContext(context.winner!!, 1))
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PrayersToNuffleRoll
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                RemoveContext<PrayersToNuffleRollContext>(),
-                ExitProcedure()
-            )
         }
     }
 }

@@ -43,7 +43,6 @@ object GameHalf : Procedure() {
         // Remove modifiers that only last this half
         val resetCommands = getResetTeamTemporaryModifiersCommands(
             state,
-            rules,
             Duration.END_OF_HALF
         )
         return compositeCommandOf(

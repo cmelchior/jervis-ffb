@@ -319,7 +319,7 @@ object Charge : Procedure() {
 
             // Ending a Charge isn't considered a real "end-of-turn", so we only reset state we used for
             // book keeping, but not anything that would trigger at the end of a turn.
-            val resetCommands = getResetTeamTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
+            val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
             return compositeCommandOf(
                 *progressStunnedCommands,
                 *resetPlayerAvailabilityCommands,
