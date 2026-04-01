@@ -52,6 +52,7 @@ import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
+import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
@@ -168,6 +169,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             BoneHeadRoll.ReRollDie to "Re-roll D6 to avoid Bone Head",
             ReallyStupidRoll.RollDie to "Roll D6 for Really Stupid",
             ReallyStupidRoll.ReRollDie to "Re-roll D6 to avoid Really Stupid",
+            UnchannelledFuryRoll.RollDie to "Roll D6 for Unchannelled Fury",
+            UnchannelledFuryRoll.ReRollDie to "Re-roll D6 to avoid Unchannelle Fury",
             JumpRoll.RollDie to "Roll D6 to Jump",
             JumpRoll.ReRollDie to "Re-roll D6 to Jump",
             LeapRoll.RollDie to "Roll D6 to Leap",
@@ -220,8 +223,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             SecureTheBallRoll.ChooseReRollSource to "Accept Secure the Ball Result or Reroll D6?",
             ShadowingRoll.ChooseReRollSource to "Accept Shadowing Result or Reroll D6?",
             BoneHeadRoll.ChooseReRollSource to "Accept Bone Head Result or Reroll D6?",
-            ReallyStupidRoll.RollDie to "Roll D6 for Really Stupid",
             ReallyStupidRoll.ChooseReRollSource to "Accept Really Stupid Result or Reroll D6?",
+            UnchannelledFuryRoll.ChooseReRollSource to "Accept Unchannelled Fury Result or Reroll D6?",
             JumpRoll.ChooseReRollSource to "Accept Jump Result or Reroll D6?",
             LeapRoll.ChooseReRollSource to "Accept Leap Result or Reroll D6?",
             PogoRoll.ChooseReRollSource to "Accept Pogo-stick Result or Reroll D6?",
