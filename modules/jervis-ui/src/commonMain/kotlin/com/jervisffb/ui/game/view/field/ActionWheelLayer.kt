@@ -37,7 +37,7 @@ fun ActionWheelLayer(vm: FieldViewModel) {
     }
 
     // When the Action-Wheel is visible, intercept all clicks to prevent them from reaching other layers.
-    val localField = LocalFieldData.current ?: return
+    val localField = LocalFieldData.current
     DisposableEffect(currentState) {
         if (currentState != NoActionWheel && !currentState.isHiding()) {
             val interceptor = object : PointerEventInterceptor {
