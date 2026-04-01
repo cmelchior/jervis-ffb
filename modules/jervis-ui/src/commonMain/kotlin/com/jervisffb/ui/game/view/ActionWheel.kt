@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -73,6 +75,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
@@ -612,6 +615,8 @@ private fun RingMessage(
     // Attempt to align it so it looks on the line with the team features row
     Box(
         modifier = Modifier
+            // Let the text box expand to any length. Any text here should be "reasonable".
+            .wrapContentSize(unbounded = true)
             .offset { offset.toIntOffset() }
         ,
         contentAlignment = Alignment.BottomCenter
@@ -628,7 +633,7 @@ private fun RingMessage(
         }
         Box(
             modifier = Modifier
-                .height(54.jdp)
+                .defaultMinSize(minHeight = 54.jdp)
                 .drawWithContent {
                     // Create fade brush for left and right edges
                     val fadeBrush = Brush.horizontalGradient(
@@ -668,13 +673,14 @@ private fun RingMessage(
             contentAlignment = Alignment.Center
         ) {
             Text(
+                modifier = Modifier.padding(horizontal = 100.jdp, vertical = 16.jdp),
                 text = message,
+                textAlign = TextAlign.Center,
                 lineHeight = 1.em,
                 maxLines = 1,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.jsp,
                 color = JervisTheme.white,
-                modifier = Modifier.padding(horizontal = 100.jdp),
             )
         }
     }
