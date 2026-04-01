@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
+import com.jervisffb.engine.rules.common.procedures.PreGame
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
@@ -172,7 +173,9 @@ object AnimationFactory {
         }
 
         // Weather changes due to Changing Weather kickoff event is reported as the final weather result
-        if (currentNode == WeatherRoll.RollWeatherDice && state.stack.get(-1).currentNode() == ChangingWeather.ChangeWeather) {
+        val originalWeatherRoll = (currentNode == WeatherRoll.RollWeatherDice && state.stack.get(-1).currentNode() == PreGame.TheWeather)
+        val kickoffEventWeatherChange = (currentNode == WeatherRoll.RollWeatherDice && state.stack.get(-1).currentNode() == ChangingWeather.ChangeWeather)
+        if (originalWeatherRoll || kickoffEventWeatherChange) {
             val roll = (action as DiceRollResults).rolls.map { it as D6Result }
             val result: Weather = state.rules.weatherTable.roll(roll.first(), roll.last())
             val weatherImage = when (result) {
