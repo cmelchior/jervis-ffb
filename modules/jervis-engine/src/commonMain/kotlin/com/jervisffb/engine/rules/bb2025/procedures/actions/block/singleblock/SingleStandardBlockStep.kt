@@ -17,6 +17,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.PileDriverStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -60,9 +61,11 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * 12. Knock Down attacking player and resolve armour / injury.
  * 13. Bounce ball if the defender had it.
  * 14. Bounce ball if the attacker had it.
+ * 15. Use Pile Driver (if available)
  *
  * Implementations for each step are found in the
- * [com.jervisffb.engine.rules.bb2025.procedures.actions.block.shared] package.
+ * [com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock]
+ * package.
  */
 object SingleStandardBlockStep : Procedure() {
     override val initialNode: Node = CheckForFoulAppearance
@@ -151,18 +154,18 @@ object SingleStandardBlockStep : Procedure() {
     object ResolveBlockResult : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockApplyResult
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BlockContext>()
-            val player = context.attacker
-            return when (rules.isStanding(player) && player.isSkillAvailable(SkillType.HIT_AND_RUN)) {
-                true -> GotoNode(ResolveHitAndRun)
-                // Once the block die is resolved, the block step is over
-                // and all injuries have been resolved
-                false -> ExitProcedure()
-            }
+            return GotoNode(ChooseToUsePileDriver)
         }
     }
 
-    object ResolveHitAndRun: ParentNode() {
+    object ChooseToUsePileDriver: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PileDriverStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(ChooseToUseHitAndRun)
+        }
+    }
+
+    object ChooseToUseHitAndRun: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = HitAndRunStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()

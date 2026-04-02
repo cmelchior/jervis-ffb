@@ -11,7 +11,6 @@ are not implemented yet.
 
 * TODO: Review BB2020 version of this file and move over any relevant items.
 
-
 ## Rulebook
 
 ### Page 23 - The Blood Bowl Pitch
@@ -891,6 +890,23 @@ Multiple Block interacts with a number of other skills. These are listed here:
 ### Page 132 - No Ball
 Technically, you are allowed to user other skills like Extra Arms, but since 
 it would be pointless, Jervis just ignore these skills.
+
+### Page 133 - Pile Driver
+As Pile Driver says "perform a free Foul Action", it doesn't count against
+the limit of declarig one Foul Action per turn.
+
+Also, Pile Driver will activate after fully resolving the block, including
+bouncing any balls the opponent might have had.
+
+While technically Quick Foul can be used on a Pile Driver foul, it would not
+do anything useful, so this interaction is ignored in Jervis. The reasoning 
+being:
+
+1. Pile Driver puts a Player Prone and ends their Activation.
+2. Quick Foul removes the "End Activation" flag.
+3. Standing Up can only be used at the beginning of the action.
+4. The player is prone and still "active", but there is nothing
+   they can do at this point, except ending their Activation.
 
 ### Page 134 - Put the Boot In
 Technically, using the skill should be optional, but there doesn't seem to be 

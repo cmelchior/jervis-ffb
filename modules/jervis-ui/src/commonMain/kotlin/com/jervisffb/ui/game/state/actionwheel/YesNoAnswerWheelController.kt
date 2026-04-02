@@ -28,6 +28,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.PileDriverStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
@@ -81,6 +82,7 @@ import kotlin.time.ExperimentalTime
  * - Leap (skill usage)
  * - Lethal Flight (skill usage)
  * - Lone Fouler (skill usage)
+ * - Pile Driver (skill usage)
  * - Mighty Blow (skill usage)
  * - Safe Pair of Hands (skill usage)
  * - Safe Pass (skill usage)
@@ -492,6 +494,17 @@ object UseLoneFoulerWheelController: UseSkillWheelController(SkillType.LONE_FOUL
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
         val player = context.causedBy ?: error("Missing causedBy: $state")
+        return player.coordinates
+    }
+}
+
+object UsePileDriverWheelController: UseSkillWheelController(SkillType.PILE_DRIVER) {
+    override val nodes: Set<Node> = setOf(
+        PileDriverStep.ChooseToUsePileDriver
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<BlockContext>()
+        val player = context.attacker
         return player.coordinates
     }
 }

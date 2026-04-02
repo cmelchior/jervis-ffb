@@ -45,6 +45,7 @@ import com.jervisffb.engine.rules.bb2025.skills.MyBall
 import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
 import com.jervisffb.engine.rules.bb2025.skills.Pass
+import com.jervisffb.engine.rules.bb2025.skills.PileDriver
 import com.jervisffb.engine.rules.bb2025.skills.Pogo
 import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2025.skills.Pro
@@ -194,9 +195,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.PILE_DRIVER -> {
-                    // addEntry(type, SkillCategory.DEVIOUS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Pile Driver", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->
+                        PileDriver(player, category, expiresAt)
+                    }
                 }
                 SkillType.PUT_THE_BOOT_IN -> {
                     addNoValueEntry("Put the Boot In", type, SkillCategory.DEVIOUS) { player, category,expiresAt ->

@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
@@ -260,6 +261,16 @@ fun breatheFireRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelecte
     roll,
     reroll,
 )
+
+fun useApothecary(value: Boolean) = when (value) {
+    true -> Confirm
+    false -> Cancel
+}
+
+fun followUp(value: Boolean) = when (value) {
+    true -> Confirm
+    false -> Cancel
+}
 
 fun foulAppearanceRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,

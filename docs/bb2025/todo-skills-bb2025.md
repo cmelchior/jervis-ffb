@@ -162,11 +162,13 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Only works if no defensive assists
   - [x] Modifiers are also optional on the reroll
   - [x] Does not work if Put the Boot In is used
-- [ ] Pile Driver
-  - [ ] Does not work on Special Actions (like Stab)
-  - [ ] Does not work if no longer standing next to player
-  - [ ] Ends action immediately
-  - [ ] Team Foul Action can be performed
+- [x] Pile Driver
+  - [x] Does not work on Special Actions (like Stab)
+  - [x] Does not work if no longer standing next to player
+  - [x] Ends action immediately
+  - [x] Team Foul Action can be performed
+  - [x] Quick Foul is not applied on Pile Driver fouls
+  - [x] Lone Fouler, Put the Boot In, Sneaky Git and Dirty Player all work
 - [x] Put the Boot In
   - [x] Doesn't work when prone
   - [x] Usage is optional (for now we always use it)

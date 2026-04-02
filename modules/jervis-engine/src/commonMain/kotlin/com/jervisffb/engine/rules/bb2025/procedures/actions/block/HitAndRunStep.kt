@@ -31,8 +31,11 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for controlling the Hit and Run extra move for Block and Stab
+ * Procedure for controlling the Hit and Run extra move for Block and Stab.
  * action.
+ *
+ * If the active player doesn't have Hit and Run or it isn't applicable, this
+ * procedure will exit without doing anything.
  */
 object HitAndRunStep : Procedure() {
     override val initialNode: Node = ChooseToUseHitAndRun
@@ -98,6 +101,7 @@ object HitAndRunStep : Procedure() {
         val state = player.team.game
         val rules = state.rules
         val player = state.activePlayerOrThrow()
+        if (!rules.isStanding(player)) return emptyList()
         return player.coordinates.getSurroundingCoordinates(rules)
             .filter { !state.field[it].isOccupied() }
             .filter { target ->

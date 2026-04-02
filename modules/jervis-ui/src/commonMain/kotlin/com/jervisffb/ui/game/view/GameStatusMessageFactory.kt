@@ -14,6 +14,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.block.PileDriverStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
@@ -130,6 +131,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare to SkillType.FUMBLEROOSKI,
             PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare to SkillType.FUMBLEROOSKI,
             UseStripBallStep.ChooseToUseStripBall to SkillType.STRIP_BALL,
+            PileDriverStep.ChooseToUsePileDriver to SkillType.PILE_DRIVER,
         )
 
         return skills.toList().associate {
