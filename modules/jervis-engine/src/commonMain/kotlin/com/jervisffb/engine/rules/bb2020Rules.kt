@@ -163,6 +163,14 @@ class StandardBB2020Rules(
         )
     }
 
+    /**
+     * Returns an updated copy of the current ruleset.
+     * The original ruleset is not modified.
+     */
+    fun update(block: StandardBB2020RulesBuilder.() -> Unit): StandardBB2020Rules {
+        return toBuilder().apply(block).build()
+    }
+
     // Builder API infrastructure
     override fun toBuilder() = StandardBB2020RulesBuilder(standardBB2020RuleParameters)
     class StandardBB2020RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {

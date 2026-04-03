@@ -156,6 +156,14 @@ class StandardBB2025Rules(
         )
     }
 
+    /**
+     * Returns an updated copy of the current ruleset.
+     * The original ruleset is not modified.
+     */
+    fun update(block: StandardBB2025RulesBuilder.() -> Unit): StandardBB2025Rules {
+        return toBuilder().apply(block).build()
+    }
+
     // Builder API infrastructure
     override fun toBuilder() = StandardBB2025RulesBuilder(standardBB2025RuleParameters)
     class StandardBB2025RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {

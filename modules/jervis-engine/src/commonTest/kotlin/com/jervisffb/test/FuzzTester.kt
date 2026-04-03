@@ -25,6 +25,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.roster.Roster
@@ -58,19 +59,21 @@ import kotlin.test.fail
  * - Disabling checking the validity can also help. See [GameEngineController] constructor.
  * - The tests are highly parallizable, but memory can be an issue
  **/
-//@Ignore // Comment out to run
+@Ignore // Comment out to run
 class FuzzTester {
 
     @Test
     fun runRandomBB2020Games() {
         runFuzzTest(games = 100_000, batchSize = 5_000) { _: Int, seed: Long ->
             val random = Random(seed)
-            val state = createDefaultGameStateBB2020(StandardBB2020Rules())
+            val rules = StandardBB2020Rules().update {
+                undoActionBehavior = UndoActionBehavior.ALLOWED
+            }
+            val state = createDefaultGameStateBB2020(rules)
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
             while (controller.stack.isNotEmpty()) {
-                val availableActions = controller.getAvailableActions()
-                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)
                 controller.handleAction(userAction)
             }
         }
@@ -83,15 +86,16 @@ class FuzzTester {
         }
         runFuzzTest(games = 100_000, batchSize = 5_000) { _, seed->
             val random = Random(seed)
-            val rules = StandardBB2025Rules()
+            val rules = StandardBB2025Rules().update {
+                undoActionBehavior = UndoActionBehavior.ALLOWED
+            }
             val homeTeam = createRandomTeamBB2025(rules, random, "H")
             val awayTeam = createRandomTeamBB2025(rules, random, "A")
             val state = createDefaultGameStateBB2025(rules, homeTeam, awayTeam)
             val controller = GameEngineController(state, validateActions = false)
             controller.startManualMode(logAvailableActions = false)
             while (controller.stack.isNotEmpty()) {
-                val availableActions = controller.getAvailableActions()
-                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)
                 controller.handleAction(userAction)
             }
             // Check that all procedures cleaned up after themselves
@@ -106,14 +110,54 @@ class FuzzTester {
     fun runRandomBB7Games() {
         runFuzzTest(games = 1000, batchSize = 100) { gameNo, seed ->
             val random = Random(seed)
-            val state = createDefaultGameStateBB2020(BB72020Rules())
+            val rules = BB72020Rules().toBuilder().run {
+                undoActionBehavior = UndoActionBehavior.ALLOWED
+                build()
+            }
+            val state = createDefaultGameStateBB2020(rules)
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
             while (controller.stack.isNotEmpty()) {
-                val availableActions = controller.getAvailableActions()
-                val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)
                 controller.handleAction(userAction)
             }
+        }
+    }
+
+    private fun runFuzzTest(games: Int = 100_000, batchSize: Int = 5_000, testFunc: (gameNo: Int, randomSeed: Long) -> Unit) {
+        val dispatcher = multiThreadDispatcher("fuzztester", 8)
+        runBlocking {
+            (0 until games step batchSize).forEach { startIndex ->
+                launch(dispatcher) {
+                    val endIndex = (startIndex + batchSize).coerceAtMost(games)
+                    for (gameNo in startIndex until endIndex) {
+                        val seed = Random.nextLong()
+                        try {
+                            testFunc(gameNo, seed)
+                        } catch (e: Exception) {
+                            fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getSetupAction(controller: GameEngineController): GameAction?  {
+        val state = controller.state
+        val stack = controller.state.stack
+        return if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+            val context = state.getContext<SetupTeamContext>()
+            val compositeActions = mutableListOf<GameAction>()
+            if (context.team.isHomeTeam()) {
+                handleManualHomeKickingSetup(controller, compositeActions)
+            } else {
+                handleManualAwayKickingSetup(controller, compositeActions)
+            }
+            compositeActions.add(EndSetup)
+            CompositeGameAction(compositeActions)
+        } else {
+            null
         }
     }
 
@@ -166,43 +210,6 @@ class FuzzTester {
                 )
                 addPlayer(PlayerId("$prefix$playerNo"), "Player-$playerNo-$prefix", PlayerNo(playerNo), position)
             }
-        }
-    }
-
-    private fun runFuzzTest(games: Int = 100_000, batchSize: Int = 5_000, testFunc: (gameNo: Int, randomSeed: Long) -> Unit) {
-        val dispatcher = multiThreadDispatcher("fuzztester", 8)
-        runBlocking {
-            (0 until games step batchSize).forEach { startIndex ->
-                launch(dispatcher) {
-                    val endIndex = (startIndex + batchSize).coerceAtMost(games)
-                    for (gameNo in startIndex until endIndex) {
-                        val seed = Random.nextLong()
-                        try {
-                            testFunc(gameNo, seed)
-                        } catch (e: Exception) {
-                            fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getSetupAction(controller: GameEngineController): GameAction?  {
-        val state = controller.state
-        val stack = controller.state.stack
-        return if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
-            val context = state.getContext<SetupTeamContext>()
-            val compositeActions = mutableListOf<GameAction>()
-            if (context.team.isHomeTeam()) {
-                handleManualHomeKickingSetup(controller, compositeActions)
-            } else {
-                handleManualAwayKickingSetup(controller, compositeActions)
-            }
-            compositeActions.add(EndSetup)
-            return CompositeGameAction(compositeActions)
-        } else {
-            null
         }
     }
 

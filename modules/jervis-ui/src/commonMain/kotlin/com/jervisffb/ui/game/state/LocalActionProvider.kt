@@ -79,7 +79,7 @@ class LocalActionProvider(
             actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
                 // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
                 // delay(settings.timerSettings.turnFreeTime ?: settings.timerSettings.turnActionTime)
-                val action = createRandomAction(engine.state, engine.getAvailableActions())
+                val action = createRandomAction(engine)
                 provider.userActionSelected(action)
             }
         }

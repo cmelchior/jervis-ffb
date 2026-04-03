@@ -120,7 +120,7 @@ class RandomActionProvider(
 
                 if (teamActionHandledHere && (!actionHandledOnServer || isServer)) {
                     if (!useManualAutomatedActions(controller)) {
-                        val selectedAction = createRandomAction(controller.state, request.actions)
+                        val selectedAction = createRandomAction(controller)
                         delay(delay.inWholeMilliseconds)
                         actionSelectedChannel.send(selectedAction)
                     }

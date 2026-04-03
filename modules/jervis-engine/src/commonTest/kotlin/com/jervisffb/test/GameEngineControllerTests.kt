@@ -35,9 +35,8 @@ class GameEngineControllerTests {
 
     @Test
     fun undoIncrementActionId() {
-        val rules = StandardBB2020Rules().toBuilder().run {
+        val rules = StandardBB2020Rules().update {
             undoActionBehavior = UndoActionBehavior.ALLOWED
-            build()
         }
         val controller = createGameController(rules)
 
@@ -58,9 +57,8 @@ class GameEngineControllerTests {
 
     @Test
     fun cannotUndoDiceRollsIfNotInEnabled() {
-        val rules = StandardBB2020Rules().toBuilder().run {
+        val rules = StandardBB2020Rules().update {
             undoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS
-            build()
         }
         val controller = createGameController(rules)
 
@@ -77,9 +75,8 @@ class GameEngineControllerTests {
 
     @Test
     fun revertDecrementsActionId() {
-        val rules = StandardBB2020Rules().toBuilder().run {
+        val rules = StandardBB2020Rules().update {
             undoActionBehavior = UndoActionBehavior.NOT_ALLOWED // Revert is always allowed
-            build()
         }
         val controller = createGameController(rules)
 
@@ -97,9 +94,8 @@ class GameEngineControllerTests {
 
     @Test
     fun undoCompositeCommandsUndoAll() {
-        val rules = StandardBB2020Rules().toBuilder().run {
+        val rules = StandardBB2020Rules().update {
             undoActionBehavior = UndoActionBehavior.ALLOWED // Revert is always allowed
-            build()
         }
         val controller = createGameController(rules)
         assertEquals(FanFactorRolls.SetFanFactorForHomeTeam, controller.currentNode())

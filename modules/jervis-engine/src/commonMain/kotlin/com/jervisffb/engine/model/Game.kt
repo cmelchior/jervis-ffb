@@ -81,6 +81,13 @@ class Game(
             INVALID_GAME_STATE("Home and away teams cannot be the same: ${homeTeam.id}")
         }
 
+        // Check that all player ids are unique
+        val allIds = homeTeam.map { it.id }.toSet() + awayTeam.map { it.id }.toSet()
+        if (allIds.size != homeTeam.size + awayTeam.size) {
+            val duplicates = (homeTeam.map { it.id } + awayTeam.map { it.id }).groupingBy { it }.eachCount().filter { it.value > 1 }
+            INVALID_GAME_STATE("Duplicate player ids found: ${duplicates.keys}}")
+        }
+
         // Setup circular references, making it easier to navigate
         // the object graph.
         homeTeam.setGameReference(this)

@@ -3,7 +3,7 @@ package com.jervisffb.engine.commands.context
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ProcedureContext
-import com.jervisffb.engine.model.context.setContext
+import com.jervisffb.engine.model.context.addContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.reflect.KClass
 
@@ -38,7 +38,7 @@ class RemoveContextUsingType<T: ProcedureContext>(private val type: KClass<T>) :
 
     override fun undo(state: Game) {
         if (originalValue != null) {
-            state.setContext(originalValue!!)
+            state.addContext(originalValue!!)
         }
     }
 }
@@ -55,7 +55,7 @@ class RemoveContextUsingReference(private val context: ProcedureContext) : Comma
 
     override fun undo(state: Game) {
         if (originalValue != null) {
-            state.setContext(originalValue!!)
+            state.addContext(originalValue!!)
         }
     }
 }

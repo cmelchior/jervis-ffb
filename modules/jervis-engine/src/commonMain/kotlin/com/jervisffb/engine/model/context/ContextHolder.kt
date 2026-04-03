@@ -62,7 +62,8 @@ class ContextHolder {
                     error("Context stack is empty for context type: ${context::class.simpleName} (id: $id)")
                 }
                 remove(context::class, id)
-                setContext(context, id)            }
+                setContext(context, id)
+            }
         }
     }
 
@@ -107,7 +108,7 @@ class ContextHolder {
 /**
  * Stores a new context with a given id, overriding any if they exist already.
  */
-fun Game.setContext(context: ProcedureContext, id: Int = 0) {
+fun Game.addContext(context: ProcedureContext, id: Int = 0) {
     this.contexts.setContext(context, id)
 }
 

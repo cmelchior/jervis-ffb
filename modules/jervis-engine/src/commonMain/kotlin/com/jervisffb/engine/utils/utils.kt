@@ -1,6 +1,7 @@
 package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
@@ -202,10 +203,13 @@ val randomList = mutableListOf<GameAction>(
 //    DiceRollResults(5.d6, 5.d6), // Kickoff event
 )
 
+/**
+ * Create a random action for the next ActionNode.
+ */
 fun createRandomAction(
-    state: Game,
-    availableActions: List<GameActionDescriptor>,
-    random: Random = Random
+    controller: GameEngineController,
+    random: Random = Random,
+    canUndo: Boolean = false
 ): GameAction {
 
     // Hacky way to inject events. Should probably try to add some kind of Developer UI
@@ -214,9 +218,15 @@ fun createRandomAction(
         return randomList.removeAt(0)
     }
 
+    // 2% of the time, we will UNDO, rather than progress the game state.\
+    if (canUndo && controller.history.isNotEmpty() && random.nextInt(100) < 2) {
+        return Undo
+    }
+
     // Select a random action but disallow certain ones:
     // - EndAction: Do not call this to prevent a player stopping their turn too soon
-    var actionDesc: GameActionDescriptor? = null
+    val availableActions = controller.getAvailableActions().actions
+    var actionDesc: GameActionDescriptor?
     val filtered = availableActions.filter { it != EndActionWhenReady }
     if (filtered.isEmpty()) {
         actionDesc = availableActions.random(random)

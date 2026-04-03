@@ -19,9 +19,8 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameBB2020Test {
 
-    open val rules: BB2020Rules = StandardBB2020Rules().toBuilder().run {
+    open val rules: BB2020Rules = StandardBB2020Rules().update {
         undoActionBehavior = UndoActionBehavior.ALLOWED
-        build()
     }
     protected open lateinit var state: Game
     protected open lateinit var controller: GameEngineController

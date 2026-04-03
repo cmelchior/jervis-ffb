@@ -58,7 +58,7 @@ object BB2025Stumble: Procedure() {
         val stumbleContext = state.getContext<StumbleContext>()
         val pushContext = stumbleContext.pushContext ?: INVALID_GAME_STATE("StumbleContext should contain PushContext: $stumbleContext")
         return compositeCommandOf(
-            RemoveContext<StumbleContext>(),
+            RemoveContext(stumbleContext),
             ReportStumbleResult(pushContext.firstPusher, pushContext.firstPushee, stumbleContext.isDefenderDown())
         )
     }

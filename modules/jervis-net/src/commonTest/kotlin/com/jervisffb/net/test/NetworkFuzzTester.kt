@@ -232,7 +232,7 @@ class NetworkFuzzTester {
             val isRandom = availableActions.containsActionWithRandomBehavior()
             val hostAction = (availableActions.team == null) || (availableActions.team?.id == hostHomeTeam.id)
             if (hostAction && !isRandom) {
-                val userAction = getSetupAction(controller) ?: createRandomAction(game, availableActions.actions, random)
+                val userAction = getSetupAction(controller) ?: createRandomAction(controller, random)
                 controller.handleAction(userAction)
                 conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
             } else {
@@ -267,7 +267,7 @@ class NetworkFuzzTester {
             val isRandom = availableActions.containsActionWithRandomBehavior()
             val clientAction = (availableActions.team?.id == clientAwayTeam.id)
             if (clientAction && !isRandom) {
-                val userAction = getSetupAction(controller) ?: createRandomAction(game, availableActions.actions, random)
+                val userAction = getSetupAction(controller) ?: createRandomAction(controller, random)
                 controller.handleAction(userAction)
                 conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
             } else {

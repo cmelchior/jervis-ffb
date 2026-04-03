@@ -118,7 +118,7 @@ suspend fun handleAction(
     // in the network protocol first
     val serverDiceRolls = !session.gameSettings.clientSelectedDiceRolls
     while (serverDiceRolls && availableActions.containsActionWithRandomBehavior()) {
-        val action = createRandomAction(game.state, availableActions, session.random)
+        val action = createRandomAction(game, session.random)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
@@ -143,7 +143,7 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
         session.game?.state?.rules?.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER
         && availableActions.containsActionWithRandomBehavior()
     ) {
-        val action = createRandomAction(game.state, availableActions, session.random)
+        val action = createRandomAction(game, session.random)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()

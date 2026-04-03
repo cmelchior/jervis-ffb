@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetAbortIfBallOutOfBounds
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -45,8 +46,7 @@ object TheKickOffEvent : Procedure() {
     override val initialNode: Node = RollForKickOffEvent
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        state.abortIfBallOutOfBounds = false
-        return null
+        return SetAbortIfBallOutOfBounds(false)
     }
 
     object RollForKickOffEvent : ActionNode() {
@@ -128,16 +128,18 @@ object TheKickOffEvent : Procedure() {
             // goes beyond the kicking teams Line of Scrimmage. This rule also generalizes
             // to Standard board setups. In particular, the ball is allowed to land in any
             // configured No Man's Land.
-            state.abortIfBallOutOfBounds = true // TODO Is there a better way to handle this?
             val outOfBounds =
                 !ball.coordinates.isOnField(rules)
                     || (state.kickingTeam.isHomeTeam() && ballLocation.x <= rules.lineOfScrimmageHome)
                     || (state.kickingTeam.isAwayTeam() && ballLocation.x >= rules.lineOfScrimmageAway)
-            return if (outOfBounds) {
-                GotoNode(SelectTouchBack)
-            } else {
-                GotoNode(ResolveBallLanding)
-            }
+
+            return compositeCommandOf(
+                SetAbortIfBallOutOfBounds(true),
+                when (outOfBounds) {
+                    true -> GotoNode(SelectTouchBack)
+                    false -> GotoNode(ResolveBallLanding)
+                }
+            )
         }
     }
 

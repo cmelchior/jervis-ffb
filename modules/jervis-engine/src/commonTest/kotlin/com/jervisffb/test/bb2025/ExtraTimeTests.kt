@@ -21,10 +21,9 @@ import kotlin.test.assertTrue
  */
 class ExtraTimeTests: JervisGameBB2025Test() {
 
-    override val rules: BB2025Rules = StandardBB2025Rules().toBuilder().run {
+    override val rules: BB2025Rules = StandardBB2025Rules().update {
         hasExtraTime = true
         turnsInExtraTime = 8
-        build()
     }
 
     @BeforeTest
