@@ -412,6 +412,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Hit and Run trigger after both blocks (re-check this)
     - [ ] Pile Driver works on both blocks
     - [ ] Cheering Fans Assist only works on one the first block resolved
+    - [ ] Trickster work against both blocks, but treat both defender positions as taken.
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push
@@ -557,6 +558,19 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Marked players do not count
   - [x] Rolling 1 still fails.
 - [ ] Trickster
+  - [ ] Work against Block
+  - [ ] Work against Blitz
+  - [ ] Work against Stab
+  - [ ] Work Against Projectile Vomit
+  - [ ] work against Breathe Fire
+  - [ ] Work against Chain Saw
+  - [ ] Work against Hypnotic Gaze
+  - [ ] Does not work against Ball & Chain
+  - [ ] Does not work if no eligible squares
+  - [ ] Does not work if Distracted
+  - [ ] Keep the ball when moving
+  - [ ] Pickup Ball when moving, before being blocked
+  - [ ] Score only after block completes
 - [ ] Unchannelled Fury*
   - [ ] Pro can be used as a reroll
   - [x] Roll after selecting action

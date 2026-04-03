@@ -997,6 +997,20 @@ that case is just end the action straight away.
 This skill explicitly mentions Dodge, Jump and Leap, but not Pogo, so it is 
 assumed that this skill cannot affect a player using Pogo. 
 
+### Page 138 - Trickster
+The exact timing of Trickster is a bit unclear in the Block Sequence, especially
+in relation to Foul Apparenace. 
+
+Both use the wording "...an opposition player attempts to perform a Block Action
+against this player...", but Trickster also has an additional "...Before 
+determining how many dice are rolled...".
+
+While an argument could be made that Trickster triggers before Foul Appearance,
+it also feels "weird". So for this reason, Jervis will check for Foul Appearance
+and only if passed, can Trickster be used.
+
+FUMBBL has a similar interpretation.
+
 ### Page 138 - Very Long Legs
 While this skill is optional during Interceptions, Jervis always enables it as 
 the coach can just choose to not intercept instead. This lowers the complexity 

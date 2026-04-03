@@ -75,6 +75,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
+import com.jervisffb.engine.rules.bb2025.skills.Trickster
 import com.jervisffb.engine.rules.bb2025.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2025.skills.Unsteady
@@ -656,7 +657,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.TRICKSTER -> {
-
+                    //    addNoValueEntry("Trickster", type, SkillCategory.TRAITS) { player, category, expiresAt ->
+                    //        Trickster(player, category, expiresAt)
+                    //    }
                 }
                 SkillType.UNCHANNELLED_FURY -> {
                     addNoValueEntry("Unchannelled Fury", type, SkillCategory.TRAITS) { player, category,expiresAt ->
