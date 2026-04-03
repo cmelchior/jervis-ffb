@@ -51,7 +51,6 @@ object MoveAction : Procedure() {
 
     object SelectMoveType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val moveOptions = calculateMoveTypesAvailable(state, state.activePlayer!!)
             return buildList {
@@ -59,7 +58,6 @@ object MoveAction : Procedure() {
                 add(EndActionWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is EndAction -> {

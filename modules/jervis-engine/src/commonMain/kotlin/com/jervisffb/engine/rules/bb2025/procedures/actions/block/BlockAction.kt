@@ -92,10 +92,12 @@ object BlockAction : Procedure() {
             val activePlayerContext = state.getContext<ActivatePlayerContext>()
             return when (jumpUpContext.isSuccess) {
                 true -> compositeCommandOf(
+                    RemoveContext(jumpUpContext),
                     SetPlayerState(jumpUpContext.player, PlayerState.STANDING, hasTackleZones = true),
                     GotoNode(SelectDefenderOrEndAction),
                 )
                 false -> compositeCommandOf(
+                    RemoveContext(jumpUpContext),
                     UpdateContext(activePlayerContext.copy(
                         activationEndsImmediately = true,
                         markActionAsUsed = true

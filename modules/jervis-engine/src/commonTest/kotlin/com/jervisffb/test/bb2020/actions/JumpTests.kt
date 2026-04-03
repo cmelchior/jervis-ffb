@@ -16,8 +16,11 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.ext.undoActions
+import com.jervisffb.test.jump
+import com.jervisffb.test.jumpTo
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
@@ -50,7 +53,6 @@ class JumpTests: JervisGameBB2020Test() {
                 PlayerState.PRONE,
                 PlayerState.STUNNED,
                 PlayerState.STUNNED_OWN_TURN -> true
-
                 else -> false
             }
             if (!canJump) continue
@@ -58,13 +60,16 @@ class JumpTests: JervisGameBB2020Test() {
             state.getPlayerById("H1".playerId).state = playerState
             val jumpingPlayer = state.getPlayerById("A1".playerId)
             controller.rollForward(
-                PlayerSelected(jumpingPlayer.id),
-                PlayerActionSelected(PlayerStandardActionType.MOVE),
-                MoveTypeSelected(MoveType.JUMP),
-                FieldSquareSelected(11, 5),
-                4.d6,
-                NoRerollSelected()
+                *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             )
+            assertEquals(6, jumpingPlayer.movesLeft)
+            assertEquals(2, jumpingPlayer.rushesLeft)
+            controller.rollForward(
+                *jumpTo(11, 5),
+                *jump(4.d6),
+            )
+            assertEquals(4, jumpingPlayer.movesLeft)
+            assertEquals(2, jumpingPlayer.rushesLeft)
             jumpingPlayer.assertStanding()
             jumpingPlayer.assertCoordinates(11, 5)
             controller.undoActions(6)

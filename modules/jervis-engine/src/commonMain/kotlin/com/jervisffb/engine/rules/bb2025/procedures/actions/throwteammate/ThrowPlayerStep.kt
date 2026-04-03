@@ -434,6 +434,7 @@ object ThrowPlayerStep: Procedure() {
             // 3. They landed unsuccessfully on the square. They will Fall Over and the ball will bounce.
             //    If there are multiple balls in play, the ball held by the player is bounced first.
             return compositeCommandOf(
+                RemoveContext(rollContext),
                 ReportPlayerLandingInSquare(throwContext, rollContext),
                 if (successfulLanding) {
                     GotoNode(LandSuccessfullyInSquare)

@@ -36,6 +36,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.JumpModifier
@@ -88,7 +89,10 @@ object JumpStep : Procedure() {
 
     override val initialNode: Node = CheckForSprint
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        val jumpContext = state.getContextOrNull<JumpRollContext>()
+        return jumpContext?.let { RemoveContext(it) }
+    }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<MoveContext>()
 
     // If the moving player has no more moves or rushes left, they will
@@ -186,8 +190,8 @@ object JumpStep : Procedure() {
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     RemoveContext(rushContext),
                     GotoNode(RushOnce)
                 )
@@ -216,8 +220,8 @@ object JumpStep : Procedure() {
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerLocation(moveContext.player, moveContext.target!!),
                     RemoveContext(rushContext),
                     GotoNode(ChooseToUseVeryLongLegs)
@@ -298,8 +302,7 @@ object JumpStep : Procedure() {
             // target square.
             return if (jumpContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft - JUMP_DISTANCE),
                     ReportJumpResult(jumpContext, moveContext.target!!),
                     GotoNode(ChooseToUseFumblerooskiAfterJumpingToTargetSquare)
                 )
@@ -338,7 +341,6 @@ object JumpStep : Procedure() {
             val jumpContext = state.getContext<JumpRollContext>()
             val skillUsed = (action == Confirm)
             return buildCompositeCommand {
-                add(RemoveContext(jumpContext))
                 if (skillUsed) {
                     val player = context.player
                     val ball = player.ball ?: INVALID_GAME_STATE("Player must have a ball to use Fumblerooski: $player")
@@ -381,12 +383,8 @@ object JumpStep : Procedure() {
      */
     object ResolveMove: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<MoveContext>()
-            val movingPlayer = context.player
             return compositeCommandOf(
-                // Player was already moved before rolling any dice, so here we just
-                // adjust stats.
-                SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - JUMP_DISTANCE),
+                // Player was already moved before rolling any dice
                 ExitProcedure()
             )
         }

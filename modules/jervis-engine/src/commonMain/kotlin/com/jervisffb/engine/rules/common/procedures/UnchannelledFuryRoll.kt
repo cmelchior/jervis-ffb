@@ -167,7 +167,7 @@ object UnchannelledFuryRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    AddContext(rollContext),
+                    UpdateContext(rollContext),
                     ExitProcedure(),
                 )
             }

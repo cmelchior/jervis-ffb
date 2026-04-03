@@ -190,7 +190,7 @@ object JumpStep : Procedure() {
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
                     RemoveContext(rushContext),
-                    SetPlayerRushesLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     GotoNode(ChooseToUseVeryLongLegs)
                 )
@@ -266,8 +266,6 @@ object JumpStep : Procedure() {
             val player = jumpContext.player
             return if (jumpContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     RemoveContext(jumpContext),
                     GotoNode(ResolveMove)
                 )

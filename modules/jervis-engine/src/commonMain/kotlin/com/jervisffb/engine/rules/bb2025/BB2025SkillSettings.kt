@@ -40,7 +40,6 @@ import com.jervisffb.engine.rules.bb2025.skills.LethalFlight
 import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
 import com.jervisffb.engine.rules.bb2025.skills.Loner
 import com.jervisffb.engine.rules.bb2025.skills.MightyBlow
-import com.jervisffb.engine.rules.bb2025.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2025.skills.MyBall
 import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
@@ -466,9 +465,10 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.MULTIPLE_BLOCK -> {
-                    addNoValueEntry("Multiple Block", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
-                        MultipleBlock(player, category, expiresAt)
-                    }
+                    // To many things missing, so disable for now
+                    //    addNoValueEntry("Multiple Block", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                    //        MultipleBlock(player, category, expiresAt)
+                    //    }
                 }
                 SkillType.STAND_FIRM -> {
                     addNoValueEntry("Stand Firm", type, SkillCategory.STRENGTH) { player, category,expiresAt ->

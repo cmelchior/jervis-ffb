@@ -347,7 +347,7 @@ data class SelectPlayers(
             return results
         }
     override fun createRandom(random: Random): PlayersSelected {
-        val playersCount = random.nextInt(count + 1)
+        val playersCount = random.nextInt(count) + 1
         players.shuffled(random).subList(0, playersCount).let { selectedPlayers ->
             return PlayersSelected(selectedPlayers)
         }

@@ -30,6 +30,10 @@ class ContextHolder {
             0 -> {
                 val stack = contexts.getOrPut(context::class) { mutableListOf() }
                 val previous = stack.lastOrNull()
+                // Enable during debugging to catch duplicate contexts.
+                //    if (stack.any { it::class == context::class }) {
+                //        error("Context stack already contains context of type: ${context::class.simpleName}")
+                //    }
                 stack.add(context)
                 previous
             }

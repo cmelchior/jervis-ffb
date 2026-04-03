@@ -1,29 +1,43 @@
 package com.jervisffb.test
 
+import co.touchlab.kermit.Severity
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BB72020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
+import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.teamBuilder
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2025.createDefaultGameStateBB2025
+import com.jervisffb.utils.DEFAULT_LOG_LEVEL
+import com.jervisffb.utils.multiThreadDispatcher
 import com.jervisffb.utils.runBlocking
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.test.Ignore
@@ -44,7 +58,7 @@ import kotlin.test.fail
  * - Disabling checking the validity can also help. See [GameEngineController] constructor.
  * - The tests are highly parallizable, but memory can be an issue
  **/
-@Ignore // Comment out to run
+//@Ignore // Comment out to run
 class FuzzTester {
 
     @Test
@@ -64,9 +78,15 @@ class FuzzTester {
 
     @Test
     fun runRandomBB2025Games() {
+        if (DEFAULT_LOG_LEVEL != Severity.Assert) {
+            error("Disabling logs is recommended for performance reasons when running Fuzz Tests. Either disable this comment or change the log-level")
+        }
         runFuzzTest(games = 100_000, batchSize = 5_000) { _, seed->
             val random = Random(seed)
-            val state = createDefaultGameStateBB2025(StandardBB2025Rules())
+            val rules = StandardBB2025Rules()
+            val homeTeam = createRandomTeamBB2025(rules, random, "H")
+            val awayTeam = createRandomTeamBB2025(rules, random, "A")
+            val state = createDefaultGameStateBB2025(rules, homeTeam, awayTeam)
             val controller = GameEngineController(state, validateActions = false)
             controller.startManualMode(logAvailableActions = false)
             while (controller.stack.isNotEmpty()) {
@@ -97,10 +117,63 @@ class FuzzTester {
         }
     }
 
+    private fun createRandomTeamBB2025(rules: Rules, random: Random, prefix: String): Team {
+        val playerCount = random.nextInt(9, 17) // 9-16 inclusive
+        val allSkills = SkillType.entries.toList()
+        val roster = Roster(
+            id = RosterId("random-team-$prefix"),
+            name = "Random Team $prefix",
+            tier = 1,
+            numberOfRerolls = 8,
+            rerollCost = 50_000,
+            allowApothecary = true,
+            leagues = emptyList(),
+            specialRules = emptyList(),
+            positions = emptyList(),
+            logo = RosterLogo.NONE
+        )
+        return teamBuilder(rules, roster) {
+            coach = Coach(CoachId("$prefix-coach"), "${prefix}Coach")
+            name = "${prefix}Team"
+            repeat(playerCount) { index ->
+                val playerNo = index + 1
+                val mv = random.nextInt(1, 10)   // MA: 1-9
+                val st = random.nextInt(1, 9)    // ST: 1-8
+                val ag = random.nextInt(1, 7)    // AG: 1-6
+                val pa: Int? = if (random.nextBoolean()) random.nextInt(1, 7) else null  // PA: 1-6 or null
+                val av = random.nextInt(3, 12)   // AV: 3-11
+                val skillCount = random.nextInt(0, 7) // up to 6 skills
+                val skills = allSkills.shuffled(random).take(skillCount).map { it.id() }
+                val position = RosterPosition(
+                    id = PositionId("$prefix-player-$playerNo"),
+                    quantity = 1,
+                    title = "Player $playerNo",
+                    titleSingular = "Player $playerNo",
+                    shortHand = "P",
+                    cost = 0,
+                    move = mv,
+                    strength = st,
+                    agility = ag,
+                    passing = pa,
+                    armorValue = av,
+                    skills = skills,
+                    primary = emptyList(),
+                    secondary = emptyList(),
+                    keywords = emptyList(),
+                    size = PlayerSize.STANDARD,
+                    icon = null,
+                    portrait = null
+                )
+                addPlayer(PlayerId("$prefix$playerNo"), "Player-$playerNo-$prefix", PlayerNo(playerNo), position)
+            }
+        }
+    }
+
     private fun runFuzzTest(games: Int = 100_000, batchSize: Int = 5_000, testFunc: (gameNo: Int, randomSeed: Long) -> Unit) {
-        runBlocking(Dispatchers.Default) {
+        val dispatcher = multiThreadDispatcher("fuzztester", 8)
+        runBlocking {
             (0 until games step batchSize).forEach { startIndex ->
-                launch {
+                launch(dispatcher) {
                     val endIndex = (startIndex + batchSize).coerceAtMost(games)
                     for (gameNo in startIndex until endIndex) {
                         val seed = Random.nextLong()

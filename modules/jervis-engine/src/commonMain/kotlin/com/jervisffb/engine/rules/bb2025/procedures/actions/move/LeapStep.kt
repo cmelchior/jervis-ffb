@@ -214,7 +214,7 @@ object LeapStep : Procedure() {
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerLocation(moveContext.player, moveContext.target!!),
                     RemoveContext(rushContext),
@@ -305,8 +305,7 @@ object LeapStep : Procedure() {
             val player = leapContext.player
             return if (leapContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft - JUMP_DISTANCE),
                     ReportLeapResult(leapContext, moveContext.target!!),
                     GotoNode(ChooseToUseFumblerooskiAfterLeapingToTargetSquare)
                 )
@@ -393,7 +392,7 @@ object LeapStep : Procedure() {
             val context = state.getContext<MoveContext>()
             val movingPlayer = context.player
             return compositeCommandOf(
-                SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - JUMP_DISTANCE),
+                // Player was already moved just after rolling dice, so we just exit here.
                 ExitProcedure()
             )
         }

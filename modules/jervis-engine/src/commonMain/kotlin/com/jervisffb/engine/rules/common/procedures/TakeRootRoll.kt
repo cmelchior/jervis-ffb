@@ -61,7 +61,7 @@ object TakeRootRoll: Procedure() {
         val activateContext = state.getContext<ActivatePlayerContext>()
         val context = state.getContext<TakeRootRollContext>()
         return buildCompositeCommand {
-            add(RemoveContext<TakeRootRollContext>())
+            add(RemoveContext(context))
             if (!context.isSuccess) {
                 addAll(
                     AddPlayerStatusEffect(context.player, PlayerStatusEffect.rooted()),
@@ -69,6 +69,7 @@ object TakeRootRoll: Procedure() {
                     UpdateContext(
                         activateContext.copy(
                             rolledForNegaTrait = true,
+                            markActionAsUsed = true,
                         )
                     )
                 )
@@ -150,7 +151,6 @@ object TakeRootRoll: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val activateContext = state.getContext<ActivatePlayerContext>()
                 val rollResultContext = state.getContext<TakeRootRollContext>()
                 val isSuccess = calculateSuccess(d6)
                 val rollContext = rollResultContext.copy(
@@ -161,7 +161,7 @@ object TakeRootRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    AddContext(rollContext),
+                    UpdateContext(rollContext),
                     ExitProcedure(),
                 )
             }

@@ -82,7 +82,11 @@ class LeapTests: JervisGameBB2025Test() {
         val leapingPlayer = state.getPlayerById("A1".playerId)
         leapingPlayer.addSkill(SkillType.LEAP)
         controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.MOVE),
+            *activatePlayer("A1", PlayerStandardActionType.MOVE)
+        )
+        assertEquals(6, leapingPlayer.movesLeft)
+        assertEquals(2, leapingPlayer.rushesLeft)
+        controller.rollForward(
             MoveTypeSelected(MoveType.LEAP),
             FieldSquareSelected(11, 4),
             Cancel, // Do not use Leap modifier
@@ -93,6 +97,8 @@ class LeapTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             5.d6,
         )
+        assertEquals(4, leapingPlayer.movesLeft)
+        assertEquals(2, leapingPlayer.rushesLeft)
         leapingPlayer.assertStanding()
         leapingPlayer.assertCoordinates(11, 4)
     }
@@ -195,6 +201,8 @@ class LeapTests: JervisGameBB2025Test() {
             5.d6, // Leap
             NoRerollSelected(),
         )
+        assertEquals(0, leapingPlayer.movesLeft)
+        assertEquals(1, leapingPlayer.rushesLeft)
         leapingPlayer.assertStanding()
         leapingPlayer.assertCoordinates(11, 5)
 
@@ -220,6 +228,8 @@ class LeapTests: JervisGameBB2025Test() {
             5.d6, // Leap
             NoRerollSelected(),
         )
+        assertEquals(0, leapingPlayer.movesLeft)
+        assertEquals(0, leapingPlayer.rushesLeft)
         leapingPlayer.assertStanding()
         leapingPlayer.assertCoordinates(11, 5)
     }

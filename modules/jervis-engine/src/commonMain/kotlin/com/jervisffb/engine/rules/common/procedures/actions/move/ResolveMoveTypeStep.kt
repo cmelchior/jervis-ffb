@@ -72,7 +72,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object ResolveMoveTypeStep : Procedure() {
     override val initialNode: Node = ResolveMove
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        return null
+    }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<MoveContext>()
 
     object ResolveMove : ParentNode() {
@@ -136,7 +138,10 @@ object ResolveMoveTypeStep : Procedure() {
                 else -> {
                     compositeCommandOf(
                         if (moveContext.hasMoved) UpdateContext(activeContext.copyWithMarkedAction(true)) else null,
-                        if (player.hasBall()) GotoNode(CheckForScoring) else ExitProcedure()
+                        when (player.hasBall()) {
+                            true -> GotoNode(CheckForScoring)
+                            false -> ExitProcedure()
+                        }
                     )
                 }
             }

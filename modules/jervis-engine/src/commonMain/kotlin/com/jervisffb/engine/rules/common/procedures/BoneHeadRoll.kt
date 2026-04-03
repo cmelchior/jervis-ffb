@@ -153,7 +153,6 @@ object BoneHeadRoll: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
-                val activateContext = state.getContext<ActivatePlayerContext>()
                 val rollResultContext = state.getContext<BoneHeadRollContext>()
                 val isSuccess = calculateSuccess(d6)
                 val rollContext = rollResultContext.copy(
@@ -164,7 +163,7 @@ object BoneHeadRoll: Procedure() {
                     isSuccess = isSuccess
                 )
                 compositeCommandOf(
-                    AddContext(rollContext),
+                    UpdateContext(rollContext),
                     ExitProcedure(),
                 )
             }

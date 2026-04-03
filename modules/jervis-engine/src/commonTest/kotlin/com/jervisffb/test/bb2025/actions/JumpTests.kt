@@ -23,6 +23,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.ext.undoActions
 import com.jervisffb.test.jump
+import com.jervisffb.test.jumpTo
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.assertCoordinates
@@ -57,7 +58,6 @@ class JumpTests: JervisGameBB2025Test() {
                 PlayerState.PRONE,
                 PlayerState.STUNNED,
                 PlayerState.STUNNED_OWN_TURN -> true
-
                 else -> false
             }
             if (!canJump) continue
@@ -66,10 +66,15 @@ class JumpTests: JervisGameBB2025Test() {
             val jumpingPlayer = state.getPlayerById("A1".playerId)
             controller.rollForward(
                 *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
-                MoveTypeSelected(MoveType.JUMP),
-                FieldSquareSelected(11, 5),
+            )
+            assertEquals(6, jumpingPlayer.movesLeft)
+            assertEquals(2, jumpingPlayer.rushesLeft)
+            controller.rollForward(
+                *jumpTo(11, 5),
                 *jump(4.d6),
             )
+            assertEquals(4, jumpingPlayer.movesLeft)
+            assertEquals(2, jumpingPlayer.rushesLeft)
             jumpingPlayer.assertStanding()
             jumpingPlayer.assertCoordinates(11, 5)
             controller.undoActions(6)
@@ -230,6 +235,8 @@ class JumpTests: JervisGameBB2025Test() {
             4.d6, // Jump
             NoRerollSelected(),
         )
+        assertEquals(0, jumpingPlayer.movesLeft)
+        assertEquals(1, jumpingPlayer.rushesLeft)
         jumpingPlayer.assertStanding()
         jumpingPlayer.assertCoordinates(11, 5)
 
@@ -250,9 +257,10 @@ class JumpTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6),
-            4.d6, // Jump
-            NoRerollSelected(),
+            *jump(4.d6),
         )
+        assertEquals(0, jumpingPlayer.movesLeft)
+        assertEquals(0, jumpingPlayer.rushesLeft)
         jumpingPlayer.assertStanding()
         jumpingPlayer.assertCoordinates(11, 5)
     }

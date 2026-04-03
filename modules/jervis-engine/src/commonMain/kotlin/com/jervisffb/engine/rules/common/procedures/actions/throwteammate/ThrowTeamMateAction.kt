@@ -124,7 +124,7 @@ object ThrowTeamMateAction : Procedure() {
         val context = state.getContext<ThrowTeamMateContext>()
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
-            RemoveContext<ThrowTeamMateContext>(),
+            RemoveContext(context),
             UpdateContext(
                 activePlayerContext.copyWithMarkedAction(context.hasMoved || context.qualityRoll != null)
             ),

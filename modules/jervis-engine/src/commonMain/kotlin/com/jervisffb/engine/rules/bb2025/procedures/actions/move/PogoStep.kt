@@ -211,7 +211,7 @@ object PogoStep : Procedure() {
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     SetPlayerLocation(moveContext.player, moveContext.target!!),
                     RemoveContext(rushContext),
@@ -281,8 +281,7 @@ object PogoStep : Procedure() {
             val player = pogoContext.player
             return if (pogoContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
+                    SetPlayerMoveLeft(player, player.movesLeft - JUMP_DISTANCE),
                     ReportPogoResult(pogoContext, moveContext.target!!),
                     GotoNode(ChooseToUseFumblerooskiAfterPogoToTargetSquare)
                 )
@@ -366,11 +365,8 @@ object PogoStep : Procedure() {
     object ResolveMove: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            val movingPlayer = context.player
             return compositeCommandOf(
-                // Player was already moved before rolling any dice, so here we just
-                // adjust stats.
-                SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - JUMP_DISTANCE),
+                // Player was already moved just after rolling dice, so we just exit here.
                 ExitProcedure()
             )
         }

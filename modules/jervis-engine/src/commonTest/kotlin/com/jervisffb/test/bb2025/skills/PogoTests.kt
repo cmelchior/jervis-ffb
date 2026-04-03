@@ -78,7 +78,11 @@ class PogoTests: JervisGameBB2025Test() {
         val pogoingPlayer = state.getPlayerById("A1".playerId)
         pogoingPlayer.addSkill(SkillType.POGO_STICK)
         controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.MOVE),
+            *activatePlayer("A1", PlayerStandardActionType.MOVE)
+        )
+        assertEquals(6, pogoingPlayer.movesLeft)
+        assertEquals(2, pogoingPlayer.rushesLeft)
+        controller.rollForward(
             MoveTypeSelected(MoveType.POGO),
             FieldSquareSelected(11, 4),
             2.d6, // 2 Marks from leaving
@@ -89,6 +93,8 @@ class PogoTests: JervisGameBB2025Test() {
             SelectTeamReroll<RegularTeamReroll>(),
             3.d6,
         )
+        assertEquals(4, pogoingPlayer.movesLeft)
+        assertEquals(2, pogoingPlayer.rushesLeft)
         pogoingPlayer.assertStanding()
         pogoingPlayer.assertCoordinates(11, 4)
     }
@@ -166,6 +172,8 @@ class PogoTests: JervisGameBB2025Test() {
             3.d6, // Pogo
             NoRerollSelected(),
         )
+        assertEquals(0, pogoingPlayer.movesLeft)
+        assertEquals(1, pogoingPlayer.rushesLeft)
         pogoingPlayer.assertStanding()
         pogoingPlayer.assertCoordinates(11, 5)
 
@@ -190,6 +198,8 @@ class PogoTests: JervisGameBB2025Test() {
             3.d6, // Pogo
             NoRerollSelected(),
         )
+        assertEquals(0, pogoingPlayer.movesLeft)
+        assertEquals(0, pogoingPlayer.rushesLeft)
         pogoingPlayer.assertStanding()
         pogoingPlayer.assertCoordinates(11, 5)
     }

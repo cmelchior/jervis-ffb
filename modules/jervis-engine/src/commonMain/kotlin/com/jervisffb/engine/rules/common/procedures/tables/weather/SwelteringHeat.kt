@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.common.procedures.tables.weather
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -31,6 +33,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportPlayerInjury
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import kotlin.math.min
 
 /**
  * Procedure for handling "Sweltering Heat".
@@ -52,15 +55,31 @@ object SwelteringHeat : Procedure() {
     object RollForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            // Skip rolling if there are no available players on the field.
+            val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
+            return when (onFieldPlayers.isEmpty()) {
+                true -> listOf(ContinueWhenReady)
+                false -> listOf(RollDice(Dice.D3))
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D3Result>(action) { d3 ->
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
-                    UpdateContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
-                    GotoNode(SelectPlayersOnHomeTeam)
-                )
+            return when (action) {
+                Continue -> {
+                    compositeCommandOf(
+                        ReportNoSwelteringHeatRoll(state.homeTeam),
+                        GotoNode(RollForAwayTeam)
+                    )
+                }
+
+                else -> {
+                    castDiceRoll<D3Result>(action) { d3 ->
+                        compositeCommandOf(
+                            ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
+                            UpdateContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
+                            GotoNode(SelectPlayersOnHomeTeam)
+                        )
+                    }
+                }
             }
         }
     }
@@ -70,7 +89,7 @@ object SwelteringHeat : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().homeRoll!!.value
-            return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))
+            return listOf(SelectRandomPlayers(min(onFieldPlayers.size, affectedPlayers), onFieldPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -93,16 +112,31 @@ object SwelteringHeat : Procedure() {
     object RollForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            // Skip rolling if there are no available players on the field.
+            val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
+            return when (onFieldPlayers.isEmpty()) {
+                true -> listOf(ContinueWhenReady)
+                false -> listOf(RollDice(Dice.D3))
+            }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D3Result>(action) { d3 ->
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
-                    UpdateContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
-                    GotoNode(SelectPlayersOnAwayTeam)
-                )
+            return when (action) {
+                Continue -> {
+                    compositeCommandOf(
+                        ReportNoSwelteringHeatRoll(state.awayTeam),
+                        ExitProcedure()
+                    )
+                }
+                else -> {
+                    castDiceRoll<D3Result>(action) { d3 ->
+                        compositeCommandOf(
+                            ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
+                            UpdateContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
+                            GotoNode(SelectPlayersOnAwayTeam)
+                        )
+                    }
+                }
             }
         }
     }
@@ -112,7 +146,7 @@ object SwelteringHeat : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().awayRoll!!.value
-            return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))
+            return listOf(SelectRandomPlayers(min(onFieldPlayers.size, affectedPlayers), onFieldPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

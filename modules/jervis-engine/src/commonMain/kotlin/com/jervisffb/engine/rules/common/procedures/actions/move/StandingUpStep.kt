@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -97,19 +98,21 @@ object StandingUpStep : Procedure() {
             val activeContext = state.getContext<ActivatePlayerContext>()
             val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<StandingUpRollContext>()
-            return if (context.isSuccess) {
-                compositeCommandOf(
-                    RemoveContext<StandingUpRollContext>(),
-                    UpdateContext(moveContext.copy(hasMoved = true)),
-                    SetPlayerMoveLeft(context.player, 0),
-                    SetPlayerState(context.player, PlayerState.STANDING, hasTackleZones = true),
-                    ReportStandingUp(context),
-                    ExitProcedure()
-                )
-            } else {
-                compositeCommandOf(
-                    UpdateContext(moveContext.copy(hasMoved = true)),
-                    UpdateContext(activeContext.copy(activationEndsImmediately = true)),
+            return buildCompositeCommand {
+                add(RemoveContext(context))
+                if (context.isSuccess) {
+                    addAll(
+                        UpdateContext(moveContext.copy(hasMoved = true)),
+                        SetPlayerMoveLeft(context.player, 0),
+                        SetPlayerState(context.player, PlayerState.STANDING, hasTackleZones = true),
+                    )
+                } else {
+                    addAll(
+                        UpdateContext(moveContext.copy(hasMoved = true)),
+                        UpdateContext(activeContext.copy(activationEndsImmediately = true)),
+                    )
+                }
+                addAll(
                     ReportStandingUp(context),
                     ExitProcedure()
                 )

@@ -273,8 +273,14 @@ object Charge : Procedure() {
             val context = state.getContext<ActivatePlayerContext>()
             val chargeContext = state.getContext<ChargeContext>()
             return buildCompositeCommand {
-                if (context.markActionAsUsed) {
-                    add(UpdateContext(chargeContext.copy(activatedPlayers = chargeContext.activatedPlayers.add(context.player))))
+                if (context.player.available == Availability.HAS_ACTIVATED) {
+                    add(
+                        UpdateContext(
+                            chargeContext.copy(
+                                activatedPlayers = chargeContext.activatedPlayers.add(context.player)
+                            )
+                        )
+                    )
                 }
                 add(RemoveContext(context))
                 when (state.turnOver != null) {

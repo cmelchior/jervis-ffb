@@ -31,7 +31,8 @@ interface SpecialActionProvider {
         if (!player.location.isOnField(rules)) return false
         val isSkillAvailable = player.isSkillAvailable(skill)
         val isSkillActionUsed = isSpecialActionUsed
-        val isActionAvailable = (state.activeTeamOrThrow().turnData.availableSpecialActions[specialAction]!! > 0)
+        val actionsAvailable = state.activeTeamOrThrow().turnData.availableSpecialActions.getOrElse(specialAction) { 0 } // Should only be `null` during Charge as no special actions are available there
+        val isActionAvailable = (actionsAvailable > 0)
         val isAdjacentToOpponent = player.coordinates.getSurroundingCoordinates(rules, 1)
             .mapNotNull { state.field[it].player }
             .filter { otherPlayer -> otherPlayer.team != player.team }

@@ -91,6 +91,69 @@ class WeatherTests: JervisGameBB2020Test() {
     }
 
     @Test
+    fun swelteringHeat_noAvailablePlayersThanRolled() {
+        controller.rollForward(
+            *defaultPregame(
+                weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(),
+        )
+
+        // Move all players to KO
+        listOf(homeTeam, awayTeam).forEach { team ->
+            team.forEach { player ->
+                if (player.location.isOnField(rules)) {
+                    player.apply {
+                        state = PlayerState.KNOCKED_OUT
+                        location = DogOut
+                    }
+                }
+            }
+        }
+        controller.rollForward(
+            *skipTurns(16),
+            // Skip Sweltering Heat Rolls
+        )
+        assertEquals(Weather.SWELTERING_HEAT, state.weather)
+        assertEquals(2, state.halfNo) // We are at the start of 2nd drive.
+    }
+
+    @Test
+    fun swelteringHeat_lessAvailablePlayersThanRolled() {
+        controller.rollForward(
+            *defaultPregame(
+                weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(),
+        )
+
+        // Move almost all players to KO
+        listOf(homeTeam, awayTeam).forEach { team ->
+            team.forEach { player ->
+                if (player.location.isOnField(rules) && player.id != "H1".playerId && player.id != "A1".playerId) {
+                    player.apply {
+                        state = PlayerState.KNOCKED_OUT
+                        location = DogOut
+                    }
+                }
+            }
+        }
+        controller.rollForward(
+            *skipTurns(16),
+            3.d3, // Home Heat roll
+            RandomPlayersSelected(listOf("H1".playerId)),
+            2.d3, // Away Heat roll
+            RandomPlayersSelected(listOf("A1".playerId)),
+        )
+        assertEquals(1, homeTeam.filter { it.state == PlayerState.FAINTED }.size)
+        assertEquals(1, awayTeam.filter { it.state == PlayerState.FAINTED }.size)
+        assertEquals(Weather.SWELTERING_HEAT, state.weather)
+        assertEquals(2, state.halfNo) // We are at the start of 2nd drive.
+    }
+
+    @Test
     fun verySunny_throwBall() {
         controller.rollForward(
             *defaultPregame(
