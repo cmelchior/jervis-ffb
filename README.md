@@ -33,6 +33,8 @@ The project is written in Kotlin Multiplatform primarily focusing on Web (using 
 and Desktop (using a packaged JVM). The target is to have a faithful adaption of 
 the core Blood Bowl rules as well as any expansions.
 
+Public documentation can be found here: https://cmelchior.github.io/jervis-ffb/
+
 **The project is work-in-progress, so things might differ from what is described here.**
 
 

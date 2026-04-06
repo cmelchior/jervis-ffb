@@ -414,7 +414,11 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: "recursive"
 
       - uses: actions/setup-python@v5
         with:
@@ -422,6 +426,13 @@ jobs:
 
       - name: Install Zensical
         run: pip install zensical
+
+      - name: Substitute version in download links
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(gh release view --json tagName --jq '.tagName' | sed 's/^v//')
+          sed -i "s/0\.0\.0000/$VERSION/g" website/index.md
 
       - name: Build site
         run: zensical build --clean

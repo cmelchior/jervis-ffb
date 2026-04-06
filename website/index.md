@@ -33,13 +33,13 @@ management.
     
     If blocked, go to __System Settings > Privacy & Security__, scroll to __Security__, and click __Open Anyway__.
 
-    [Download .zip](https://github.com/cmelchior/jervis-ffb/releases/latest/download/jervis-fantasy-football-dev-1.0.977-mac-aarch64.zip){ .md-button .md-button--primary }
+    [Download .zip](https://github.com/cmelchior/jervis-ffb/releases/latest/download/jervis-fantasy-football-dev-0.0.0000-mac-aarch64.zip){ .md-button .md-button--primary }
 
 ===  ":fontawesome-brands-linux: Linux"
 
     The Linux client is distributed as a `.deb` package and should work on most Linux distributions without any issues.
 
-    [Download .deb](https://github.com/cmelchior/jervis-ffb/releases/latest/download/christian-melchior-jervis-fantasy-football-dev_1.0.977_amd64.deb){ .md-button .md-button--primary }
+    [Download .deb](https://github.com/cmelchior/jervis-ffb/releases/latest/download/christian-melchior-jervis-fantasy-football-dev_0.0.0000_amd64.deb){ .md-button .md-button--primary }
 
 ===  ":fontawesome-brands-chrome: Web"
 
