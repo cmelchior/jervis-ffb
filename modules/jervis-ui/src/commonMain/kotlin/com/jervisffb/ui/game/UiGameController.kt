@@ -33,7 +33,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.ui.game.animations.AnimationFactory
+import com.jervisffb.ui.game.animations.ConfettiAnimation
 import com.jervisffb.ui.game.animations.JervisAnimation
+import com.jervisffb.ui.game.animations.LogoAnimation
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.UiActionProviderGroup
@@ -140,6 +142,7 @@ import com.jervisffb.ui.game.view.ContextWheelUiState
 import com.jervisffb.ui.game.view.GameStatusMessageFactory
 import com.jervisffb.ui.game.view.HideActionWheel
 import com.jervisffb.ui.game.view.NoContextMenu
+import com.jervisffb.ui.game.view.animation.LogoAnimation
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.FrameRateAverager
@@ -579,6 +582,11 @@ class UiGameController(
                 acc.emitActionWheelState()
                 animationFlow.emit(animation)
                 animationDone.receive()
+                // Enable this to have a promotional logo show up on touchdowns
+                //    if (animation is ConfettiAnimation) {
+                //        animationFlow.emit(LogoAnimation())
+                //        animationDone.receive()
+                //    }
             }
         }
     }

@@ -96,6 +96,18 @@ The iPad version can be built and installed using Xcode. Use the project file
 found here [`modules/iosApp/iosApp.xcodeproj`](modules/iosApp/iosApp.xcodeproj). 
 You will need to supply your own signature under "Signing & Capabilities".
 
+The documentation website is built by installing Zensical:
+
+```shell
+pip install zensical
+```
+
+And then running the following command from the root of the repository:
+```shell
+# Website is visible on localhost:8080
+zensical serve
+```
+
 
 ## Repository Structure
 
@@ -158,6 +170,9 @@ of the following modules:
 
 - `replay-analyzer`: A helper for processing and converting the JSON content of 
    a FUMBBL replay file into something that Jervis can process.
+
+- `website`: Contains the source code for the public non-coder website. It is built
+   using [Zensical](https://zensical.org/).
 
 
 ### UI Resources

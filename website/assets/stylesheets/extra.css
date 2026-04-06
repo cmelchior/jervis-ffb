@@ -1,0 +1,59 @@
+/* Logos as masks */
+.admonition.naf .admonition-title::before {
+    -webkit-mask-image: url("/jervis-ffb/assets/naf.svg");
+    mask-image: url("/jervis-ffb/assets/naf.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: currentColor;
+}
+
+.admonition.fumbbl .admonition-title::before {
+    -webkit-mask-image: url("/jervis-ffb/assets/fumbbl.svg");
+    mask-image: url("/jervis-ffb/assets/fumbbl.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: currentColor;
+}
+
+.admonition.bloodbowl .admonition-title::before {
+    -webkit-mask-image: url("/jervis-ffb/assets/bloodbowl.svg");
+    mask-image: url("/jervis-ffb/assets/bloodbowl.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background-color: currentColor;
+}
+
+/* Logos as real images */
+/*.admonition.naf .admonition-title::before {*/
+/*    content: "";*/
+/*    display: inline-block;*/
+/*    -webkit-mask: none !important;*/
+/*    mask: none !important;*/
+/*    -webkit-mask-image: none !important;*/
+/*    mask-image: none !important;*/
+/*    background-color: transparent !important;*/
+/*    background-image: url("/jervis-ffb/assets/naf.svg");*/
+/*    background-size: contain;*/
+/*    background-repeat: no-repeat;*/
+/*    background-position: center;*/
+/*}*/
+
+/*.admonition.fumbbl .admonition-title::before {*/
+/*    content: "";*/
+/*    display: inline-block;*/
+/*    -webkit-mask: none !important;*/
+/*    mask: none !important;*/
+/*    -webkit-mask-image: none !important;*/
+/*    mask-image: none !important;*/
+/*    background-color: transparent !important;*/
+/*    background-image: url("/jervis-ffb/assets/fumbbl.svg");*/
+/*    background-size: contain;*/
+/*    background-repeat: no-repeat;*/
+/*    background-position: center;*/
+/*}*/

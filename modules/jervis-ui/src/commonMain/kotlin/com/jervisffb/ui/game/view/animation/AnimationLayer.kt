@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import com.jervisffb.ui.game.animations.ConfettiAnimation
 import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
+import com.jervisffb.ui.game.animations.LogoAnimation
 import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 
@@ -32,6 +33,9 @@ fun AnimationLayer(
             }
             is ConfettiAnimation -> {
                 TouchdownAnimation(vm, animationData!!.second as ConfettiAnimation)
+            }
+            is LogoAnimation -> {
+                LogoAnimation(vm, animationData!!.second as LogoAnimation)
             }
             else -> { /* Do nothing */ }
         }

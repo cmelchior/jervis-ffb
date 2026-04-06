@@ -403,3 +403,41 @@ jobs:
           done
         env:
           GH_TOKEN: ${{ secrets.JERVIS_CONVEYOR_GITHUB_TOKEN }}
+
+  deploy-docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: [ setup, release-via-conveyor ]
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Zensical
+        run: pip install zensical
+
+      - name: Build site
+        run: zensical build --clean
+
+      - name: Copy download.html from gh-pages
+        run: |
+          git fetch origin gh-pages
+          git checkout origin/gh-pages -- download.html
+          cp download.html site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

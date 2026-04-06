@@ -18,6 +18,9 @@ tools/fumbblcli.jar
 generated.conveyor.conf
 /output/
 
+# Zensical
+site/
+
 # Resources are too expensive to store in Git for now
 # They need to be extracted from the FUMBBL client.
 # /modules/game-ui/common/src/commonMain/resources/
