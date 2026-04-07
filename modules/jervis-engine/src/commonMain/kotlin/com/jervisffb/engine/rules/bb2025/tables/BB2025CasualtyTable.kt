@@ -1,9 +1,11 @@
 package com.jervisffb.engine.rules.bb2025.tables
 
 import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.Serializable
 
 /**
@@ -37,8 +39,9 @@ object BB2025CasualtyTable: CasualtyTable {
      */
     override fun roll(
         d16: D16Result,
+        modifiers: List<DiceModifier>,
     ): CasualtyResult {
-        val result = d16.value
+        val result = (d16.value + modifiers.sum()).coerceIn(d16.min.toInt(), d16.max.toInt())
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Casulty Table.")
     }
 }

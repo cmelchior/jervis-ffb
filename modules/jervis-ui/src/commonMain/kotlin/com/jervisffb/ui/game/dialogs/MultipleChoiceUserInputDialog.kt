@@ -19,10 +19,13 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.modifiers.CasualtyModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Class wrapping the intent to show a dialog for a dice roll involving 1 - many dice.
@@ -171,7 +174,14 @@ class MultipleChoiceUserInputDialog(
                         Pair(Dice.D16, D16Result.allOptions()),
                     ),
                 result = { rolls: DiceRollResults ->
-                    val result = rules.casualtyTable.roll(rolls.first() as D16Result)
+                    // Check for Decay (ideally we should get this information from the Model layer somehow)
+                    // but since this dialog will be gone soon, just hack it for now.
+                    val modifiers = if (player.hasSkill(SkillType.DECAY)) {
+                        listOf(CasualtyModifier.DECAY)
+                    } else {
+                        emptyList()
+                    }
+                    val result = rules.casualtyTable.roll(rolls.first() as D16Result, modifiers)
                     "${result.title} (${rolls.sum()})"
                 },
             )

@@ -78,6 +78,8 @@ data class RiskingInjuryContext(
 
     // Casualty roll
     val casualtyRoll: D16Result? = null,
+    // Modifiers are also applied to `apothecary*` rolls.
+    val casualtyModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val casualtyResult: CasualtyResult? = null,
     val lastingInjuryRoll: D6Result? = null,
     val lastingInjuryResult: LastingInjuryResult? = null,

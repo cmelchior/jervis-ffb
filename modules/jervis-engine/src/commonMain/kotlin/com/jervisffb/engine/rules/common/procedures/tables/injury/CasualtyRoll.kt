@@ -17,10 +17,13 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.CasualtyModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
+import kotlinx.collections.immutable.toPersistentList
 
 /**
  * Implement the Casualty Roll as described on page 61 in the rulebook.
@@ -41,15 +44,20 @@ object CasualtyRoll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D16Result>(action) { d16 ->
                 val context = state.getContext<RiskingInjuryContext>()
+                val player = context.player
 
                 // Determine the result of casualty roll
-                val result = rules.casualtyTable.roll(d16)
-                val modifiers = emptyList<Skill<*>>() // Just having skills here is not enough, we need more generic Modifier
+                val modifiers = buildList {
+                    if (player.isSkillAvailable(SkillType.DECAY)) {
+                        add(CasualtyModifier.DECAY)
+                    }
+                }
+                val result = rules.casualtyTable.roll(d16, modifiers)
 
                 val updatedContext = context.copy(
                     casualtyRoll = d16,
+                    casualtyModifiers = modifiers.toPersistentList(),
                     casualtyResult = result,
-//                    casualtyModifiers = modifiers,
                 )
 
                 compositeCommandOf(

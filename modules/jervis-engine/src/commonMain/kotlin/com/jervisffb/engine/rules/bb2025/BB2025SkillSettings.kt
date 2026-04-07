@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
 import com.jervisffb.engine.rules.bb2025.skills.Dauntless
+import com.jervisffb.engine.rules.bb2025.skills.Decay
 import com.jervisffb.engine.rules.bb2025.skills.Defensive
 import com.jervisffb.engine.rules.bb2025.skills.DirtyPlayer
 import com.jervisffb.engine.rules.bb2025.skills.DivingCatch
@@ -536,9 +537,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.DECAY -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Decay", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        Decay(player, category, expiresAt)
+                    }
                 }
                 SkillType.DRUNKARD -> {
                     // TODO()

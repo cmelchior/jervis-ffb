@@ -464,7 +464,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Is not available when starting from Prone
     - [x] Is not available if not starting next to an opponent
 - [ ] Chainsaw*
-- [ ] Decay*
+- [x] Decay*
+  - [x] +1 to Casualty Roll
+  - [x] +1 to re-rolled casualty roll (apothecary)
 - [ ] Hypnotic Gaze
 - [x] Insignificant*
 - [ ] Kick Team-mate

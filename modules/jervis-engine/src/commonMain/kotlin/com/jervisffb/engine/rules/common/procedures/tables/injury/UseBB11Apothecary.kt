@@ -110,7 +110,7 @@ object UseBB11Apothecary: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D16Result>(action) { d16 ->
                 val context = state.getContext<RiskingInjuryContext>()
-                val result = rules.casualtyTable.roll(d16)
+                val result = rules.casualtyTable.roll(d16, context.casualtyModifiers)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CASUALTY, d16),
                     UpdateContext(context.copy(
