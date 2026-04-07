@@ -8,6 +8,7 @@ import com.jervisffb.engine.rules.bb2025.skills.BloodLust
 import com.jervisffb.engine.rules.bb2025.skills.BoneHead
 import com.jervisffb.engine.rules.bb2025.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
+import com.jervisffb.engine.rules.bb2025.skills.Bullseye
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
@@ -75,7 +76,6 @@ import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
-import com.jervisffb.engine.rules.bb2025.skills.Trickster
 import com.jervisffb.engine.rules.bb2025.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2025.skills.Unsteady
@@ -441,9 +441,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.BULLSEYE -> {
-                    // addEntry(type, SkillCategory.STRENGTH) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Bullseye", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                        Bullseye(player, category, expiresAt)
+                    }
                 }
                 SkillType.GRAB -> {
                     addNoValueEntry("Grab", type, SkillCategory.STRENGTH) { player, category,expiresAt ->

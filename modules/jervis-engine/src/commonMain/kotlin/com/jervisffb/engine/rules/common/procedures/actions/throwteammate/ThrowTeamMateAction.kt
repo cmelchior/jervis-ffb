@@ -76,8 +76,11 @@ data class ThrowTeamMateContext(
     val qualityRoll: D6DieRoll? = null,
     val qualityRollModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val qualityRollResult: ThrowPlayerResult? = null,
-    // If a player without TZ or prone/stunned are thrown they will bounce one
+    // BB2020: If a player without TZ or prone/stunned are thrown they will bounce one
     // extra time before landing.
+    // BB2025: If a player without TZ or prone/stunned is thrown, they will just automatically
+    // fail the landing roll. `crashLanding` only used in BB2025 as a side-remark for landing
+    // on another player, but here we use it to mean the same as in BB2020.
     val willCrashLand: Boolean = false,
     // If a player bounces on another player, the result when they land differs between rulesets.
     // - in BB2020, the rulebook says they will Fall Down, but it was errata'ed to a Knock Down

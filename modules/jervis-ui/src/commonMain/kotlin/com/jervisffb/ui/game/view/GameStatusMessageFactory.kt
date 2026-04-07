@@ -132,6 +132,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare to SkillType.FUMBLEROOSKI,
             UseStripBallStep.ChooseToUseStripBall to SkillType.STRIP_BALL,
             PileDriverStep.ChooseToUsePileDriver to SkillType.PILE_DRIVER,
+            ThrowPlayerStep.ChooseToUseBullseye to SkillType.BULLSEYE,
         )
 
         return skills.toList().associate {

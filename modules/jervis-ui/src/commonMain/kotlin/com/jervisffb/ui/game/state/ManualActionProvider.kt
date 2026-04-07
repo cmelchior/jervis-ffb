@@ -58,6 +58,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
@@ -76,11 +77,13 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.engine.utils.doDivingTackleHaveAnAffect
@@ -751,6 +754,22 @@ open class ManualActionProvider(
         // Always use Lethal Flight on Injury (if possible)
         if (menuViewModel.isFeatureEnabled(Feature.USE_LETHAL_FLIGHT_ON_INJURY) && (currentNode == InjuryRoll.ChooseToUseLethalFlight)) {
             return Confirm
+        }
+
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_BULLSEYE) && (currentNode == ThrowPlayerStep.ChooseToUseBullseye)) {
+            // If the throw is at the limit of the thrown range, the Coach should choose (as they might want to scatter beyond it)
+            // Otherwise we can automatically apply Bullseye.
+            val context = controller.state.getContext<ThrowTeamMateContext>()
+            val target = context.target ?: FieldCoordinate.UNKNOWN
+            val rules = controller.rules
+            val range = rules.rangeRuler.measure(context.thrower, target)
+            if (range == Range.OUT_OF_RANGE) return Confirm
+            val atEdgeOfAllowedRange = target.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
+                .any { neighbor ->
+                    val neighborRange = rules.rangeRuler.measure(context.thrower, neighbor)
+                    neighborRange == Range.LONG_PASS
+                }
+            if (!atEdgeOfAllowedRange) return Confirm
         }
 
         return null

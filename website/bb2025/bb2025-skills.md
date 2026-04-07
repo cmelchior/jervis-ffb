@@ -38,6 +38,18 @@ of Big Hand on Secure the Ball actions
     modifiers that apply to pickup rolls apply to the secure the ball roll as 
     well."
 
+## Page 126 - Bullseye
+Bullseye is an optional skill, but in most scenarios a Coach would always choose
+to use it.
+
+The only exception seems to be when you want to try to throw a player further
+than is allowed, which can only be achieved by having the player scatter.
+
+For this reason, Jervis automatically uses Bullseye, unless that target square
+is at max range.
+
+This behavior can be disabled in the Auto Actions menu.
+
 ## Page 127 - Cloud Burster
 Technically, this skill is optional, but you would only want to disable it if 
 you wanted the opponent to "accidentally" catch the ball, but in that case

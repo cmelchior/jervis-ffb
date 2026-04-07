@@ -36,6 +36,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
@@ -72,6 +73,7 @@ import kotlin.time.ExperimentalTime
  *
  * During Block action:
  * - Block (skill usage)
+ * - Bullseye (skill usage)
  * - Diving Catch (ball on target)
  * - Dodge (skill usage)
  * - Eye Gouge (skill usage)
@@ -187,6 +189,16 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
             BB2025BothDown.DefenderChooseToUseBlock -> context.attacker.coordinates
             else -> error("Unsupported node: $currentNode")
         }
+    }
+}
+
+object UseBullseyeWheelController: UseSkillWheelController(SkillType.BULLSEYE) {
+    override val nodes: Set<Node> = setOf(
+        ThrowPlayerStep.ChooseToUseBullseye,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val player = state.getContext<ThrowTeamMateContext>().thrower
+        return player.coordinates
     }
 }
 

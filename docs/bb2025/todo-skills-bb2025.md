@@ -383,7 +383,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] +1 if ST3 or less
   - [x] +2 if ST4
   - [x] +3 if ST5 or more
-- [ ] Bulls Eye
+- [x] Bullseye
+  - [x] Work on superb throws
+  - [x] Does not work on Subpar throws 
 - [x] Grab
   - [x] Grab is optional
   - [x] Blocking player select any adjacent square to blocked player

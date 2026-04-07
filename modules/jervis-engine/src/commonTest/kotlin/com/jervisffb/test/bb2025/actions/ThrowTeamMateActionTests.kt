@@ -523,10 +523,11 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
 
     @Test
     fun bounceIntoTheCrowd() {
-        awayTeam["A13".playerId].state = PlayerState.PRONE
+        val thrownPlayer = awayTeam["A13".playerId]
+        thrownPlayer.putProne()
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
+            PlayerSelected(thrownPlayer),
             FieldSquareSelected(11, 0),
             *qualityRoll(6.d6),
             DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same field

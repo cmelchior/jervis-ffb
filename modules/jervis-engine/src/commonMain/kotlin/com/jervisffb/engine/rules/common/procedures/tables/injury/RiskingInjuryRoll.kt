@@ -61,6 +61,10 @@ data class RiskingInjuryContext(
     val isPartOfMultipleBlock: Boolean = false,
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN,
 
+    // For mode = KNOCKED_DOWN, there is a chance that the player avoids being knocked down.
+    // This boolean allow callers to respond to that.
+    val isKnockedDown: Boolean = false,
+
     // Armour roll
     val armourRoll: List<D6DieRoll> = listOf(),
     val armourModifiers: List<DiceModifier> = listOf(),

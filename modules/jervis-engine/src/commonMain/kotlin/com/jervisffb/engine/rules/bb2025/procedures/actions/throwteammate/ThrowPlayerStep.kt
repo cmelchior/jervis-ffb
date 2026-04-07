@@ -2,6 +2,9 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -38,6 +41,7 @@ import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LandingModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -45,6 +49,7 @@ import com.jervisffb.engine.reports.ReportPlayerBounce
 import com.jervisffb.engine.reports.ReportPlayerLandingInSquare
 import com.jervisffb.engine.reports.ReportPlayerLandingOnAnotherPlayer
 import com.jervisffb.engine.reports.ReportQualityOfThrow
+import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingThrowTeamMate
 import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
@@ -66,6 +71,7 @@ import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowT
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -174,8 +180,46 @@ object ThrowPlayerStep: Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
                 SetPlayerLocation(context.thrownPlayer!!, context.target!!, isThrown = true),
-                GotoNode(ScatterPlayer)
+                when (context.qualityRollResult == ThrowPlayerResult.SUPERB) {
+                    true -> GotoNode(ChooseToUseBullseye)
+                    false -> GotoNode(ScatterPlayer)
+                }
             )
+        }
+    }
+
+    object ChooseToUseBullseye: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<ThrowTeamMateContext>().thrower.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<ThrowTeamMateContext>()
+            val thrower = context.thrower
+            val hasSkill = thrower.isSkillAvailable(SkillType.BULLSEYE)
+            val isSuperbThrow = (context.qualityRollResult == ThrowPlayerResult.SUPERB)
+            return when (hasSkill && isSuperbThrow) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                else -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<ThrowTeamMateContext>()
+            val useSkill = (action is Confirm)
+            return when (useSkill) {
+                true -> {
+                    val landsAt = context.target ?: INVALID_GAME_STATE("No target at: $context")
+                    val nextNode = when {
+                        state.field[landsAt].isOccupied() -> GotoNode(ResolveLandingInOccupiedSquare)
+                        else -> GotoNode(ResolveLandingInEmptySquare)
+                    }
+                    compositeCommandOf(
+                        ReportSkillUsed(context.thrower, SkillType.BULLSEYE),
+                        UpdateContext(context.copy(landsAt = landsAt)),
+                        nextNode
+                    )
+                }
+                false -> GotoNode(ScatterPlayer)
+            }
         }
     }
 
@@ -221,12 +265,10 @@ object ThrowPlayerStep: Procedure() {
                     ),
                     UpdateContext(throwContext.copy(target = landsAt)),
                     RemoveContext<ScatterRollContext>(),
-                    if (state.field[landsAt].isOccupied()) {
-                        GotoNode(ResolveLandingInOccupiedSquare)
-                    } else if (throwContext.willCrashLand) {
-                        GotoNode(BouncePlayer)
-                    } else {
-                        GotoNode(ResolveLanding)
+                    when {
+                        state.field[landsAt].isOccupied() -> GotoNode(ResolveLandingInOccupiedSquare)
+                        throwContext.willCrashLand -> GotoNode(BouncePlayer)
+                        else -> GotoNode(ResolveLandingInEmptySquare)
                     }
                 )
             }
@@ -265,7 +307,7 @@ object ThrowPlayerStep: Procedure() {
                 val target = thrownPlayer.coordinates.move(direction, steps = 1)
                 val landingNode = when {
                     target.isOutOfBounds(rules) -> ResolveLandingInTheCrowd
-                    target.isOnField(rules) && !state.field[target].isOccupied() -> ResolveLanding
+                    target.isOnField(rules) && !state.field[target].isOccupied() -> ResolveLandingInEmptySquare
                     target.isOnField(rules) && state.field[target].isOccupied() -> ResolveLandingInOccupiedSquare
                     else -> error("Could not determine landing type at: $target")
                 }
@@ -316,10 +358,13 @@ object ThrowPlayerStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            // According to FAQ May 2025, landing on a player from your own team is always a turnover.
-            // TODO Is this also the case if they have Steady Footing?
+            // If the player lands on one of their own team members and knocks them down, it's a turnover per the list
+            // of turnovers on page 35 in the BB2025 rulebook. This is a bit tricky to check since a thrown player
+            // can knock an already prone player down again.
+            val isKnockedDown = injuryContext.isKnockedDown
+            val isSameTeam = (injuryContext.player.team == throwContext.thrownPlayer!!.team)
             return compositeCommandOf(
-                if (injuryContext.player.team == throwContext.thrownPlayer!!.team) SetTurnOver(TurnOver.STANDARD) else null,
+                if (isKnockedDown && isSameTeam) SetTurnOver(TurnOver.STANDARD) else null,
                 RemoveContext(injuryContext),
                 GotoNode(BouncePlayer)
             )
@@ -384,7 +429,7 @@ object ThrowPlayerStep: Procedure() {
 
     // Player is attempting to land in an empty square on the field.
     // A player that is crash landing has already bounced when reaching this node.
-    object ResolveLanding: ParentNode() {
+    object ResolveLandingInEmptySquare: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<ThrowTeamMateContext>()
             return if (context.fallOverWhenLanding) {

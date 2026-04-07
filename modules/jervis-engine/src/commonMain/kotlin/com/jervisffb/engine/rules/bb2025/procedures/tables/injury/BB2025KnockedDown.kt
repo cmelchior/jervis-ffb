@@ -17,6 +17,7 @@ import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -130,6 +131,7 @@ object BB2025KnockedDown: Procedure() {
             val player = context.player
             val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
             return buildCompositeCommand {
+                add(UpdateContext(context.copy(isKnockedDown = true)))
                 add(SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
                 if (rootedStatus != null) {
                     add(RemovePlayerStatusEffect(player, rootedStatus))
