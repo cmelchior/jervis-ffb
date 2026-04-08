@@ -23,7 +23,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertStanding
@@ -55,7 +55,7 @@ class TackleTests: JervisGameBB2025Test() {
         )
         assertTrue(controller.getAvailableActions().get<SelectRerollOption>().options.none { it.getRerollSource(state) is Dodge })
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             6.d6,
             EndAction,
         )
@@ -73,7 +73,7 @@ class TackleTests: JervisGameBB2025Test() {
         // Dodge reroll is not available
         assertFalse(controller.getAvailableActions().get<SelectRerollOption>().options.any { it.getRerollSource(state) is Dodge })
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             6.d6,
             EndAction,
         )

@@ -22,7 +22,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
@@ -91,7 +91,7 @@ class PogoTests: JervisGameBB2025Test() {
         assertTrue(state.getContext<PogoRollContext>().modifiers.none { it.modifier < 0 })
         assertFalse(state.getContext<PogoRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6,
         )
         assertEquals(4, pogoingPlayer.movesLeft)
@@ -116,7 +116,7 @@ class PogoTests: JervisGameBB2025Test() {
         assertTrue(state.getContext<PogoRollContext>().modifiers.none { it.modifier < 0 })
         assertFalse(state.getContext<PogoRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6,
         )
         pogoingPlayer.assertStanding()

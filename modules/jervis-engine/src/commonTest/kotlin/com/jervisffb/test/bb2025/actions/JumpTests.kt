@@ -25,7 +25,7 @@ import com.jervisffb.test.ext.undoActions
 import com.jervisffb.test.jump
 import com.jervisffb.test.jumpTo
 import com.jervisffb.test.rushRoll
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
@@ -142,7 +142,7 @@ class JumpTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<JumpRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             5.d6,
         )
         jumpingPlayer.assertStanding()
@@ -184,7 +184,7 @@ class JumpTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<JumpRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             5.d6,
         )
         jumpingPlayer.assertStanding()

@@ -13,7 +13,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.unchannelledFury
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -69,7 +69,7 @@ class UnchannelledFuryTests: JervisGameBB2025Test() {
         )
         assertTrue(state.getContext<UnchannelledFuryRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         val player = awayTeam["A1".playerId]

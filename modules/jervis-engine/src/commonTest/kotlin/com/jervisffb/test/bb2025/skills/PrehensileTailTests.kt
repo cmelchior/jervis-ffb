@@ -18,7 +18,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
@@ -52,7 +52,7 @@ class PrehensileTailTests: JervisGameBB2025Test() {
         )
         assertTrue(state.getContext<DodgeRollContext>().rollModifiers.any { it == DodgeRollModifier.PREHENSILE_TAIL })
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6,
             DiceRollResults(1.d6, 1.d6),
         )

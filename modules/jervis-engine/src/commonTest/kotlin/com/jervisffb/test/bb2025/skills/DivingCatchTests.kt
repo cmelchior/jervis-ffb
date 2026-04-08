@@ -31,7 +31,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -179,7 +179,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             5.d8, // Bounce back
             Confirm, // Use Diving Catch
             4.d6,
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             5.d6  // 3 - 2 (marks) - 1 (bouncing) + 1 (diving catch)
         )
         assertNull(state.activePlayer)
@@ -198,7 +198,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *throwBall(6.d6),
             Confirm, // Use Diving Catch
             3.d6, // 3 - 2 + 1
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         assertNull(state.activePlayer)

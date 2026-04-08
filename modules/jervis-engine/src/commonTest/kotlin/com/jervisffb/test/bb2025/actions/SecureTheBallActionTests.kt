@@ -21,7 +21,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
@@ -134,7 +134,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
             *activatePlayer("A8", PlayerStandardActionType.SECURE_THE_BALL),
             SmartMoveTo(17, 7),
             2.d6,
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6
         )
         assertTrue(player.hasBall())

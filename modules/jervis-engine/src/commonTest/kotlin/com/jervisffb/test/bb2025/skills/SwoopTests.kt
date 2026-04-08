@@ -26,7 +26,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.swoopDirectionRoll
 import com.jervisffb.test.swoopDistanceRoll
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertReserves
@@ -115,7 +115,7 @@ class SwoopTests: JervisGameBB2025Test() {
             Confirm, // Use Swoop
             DirectionSelected(Direction.LEFT),
             3.d3,
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             1.d3,
             *swoopDistanceRoll(2.d6),
             *landingRoll(6.d6)
@@ -141,7 +141,7 @@ class SwoopTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             *swoopDirectionRoll(2.d3),
             1.d6,
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6,
             *landingRoll(6.d6)
         )

@@ -16,7 +16,7 @@ import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.reallyStupid
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -123,7 +123,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<ReallyStupidRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         assertEquals(player, state.activePlayer)
@@ -139,7 +139,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<ReallyStupidRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         val player = awayTeam["A1".playerId]
@@ -156,7 +156,7 @@ class ReallyStupidTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<ReallyStupidRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         val player = awayTeam["A1".playerId]

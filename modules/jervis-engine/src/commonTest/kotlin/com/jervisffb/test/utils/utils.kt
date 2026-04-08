@@ -64,7 +64,7 @@ fun SelectSkillReroll(type: SkillType): GameAction {
  * If the reroll type isn't available, an error is thrown.
  */
 @Suppress("TestFunctionName")
-inline fun <reified T : TeamReroll> SelectTeamReroll(): GameAction {
+inline fun <reified T : TeamReroll> TeamRerollSelected(): GameAction {
     return CalculatedAction { state, rules ->
         val selectRerolls = getAvailableActions().singleInstanceOf<SelectRerollOption>()
         val teamReroll = selectRerolls.options.first {

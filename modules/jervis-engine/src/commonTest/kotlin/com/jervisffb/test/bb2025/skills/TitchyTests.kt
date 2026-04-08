@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.hasSkill
@@ -62,7 +62,7 @@ class TitchyTests: JervisGameBB2025Test() {
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(12, 4)),
             DiceRollResults(2.d6), // Not good enough, even with Titchy
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             DiceRollResults(3.d6), // Good enough, but only with Titchy
             EndAction
         )

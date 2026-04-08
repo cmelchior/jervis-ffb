@@ -32,7 +32,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.takeRoot
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
@@ -111,7 +111,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.MOVE),
             1.d6,
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             2.d6
         )
         assertEquals(player,state.activePlayer)

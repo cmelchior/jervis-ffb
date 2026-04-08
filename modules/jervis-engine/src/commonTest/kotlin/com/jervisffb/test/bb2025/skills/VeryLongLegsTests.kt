@@ -33,7 +33,7 @@ import com.jervisffb.test.jumpTo
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
@@ -95,7 +95,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<JumpRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         val player = awayTeam["A1".playerId]
@@ -143,7 +143,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         assertTrue(state.getContext<LeapRollContext>().modifiers.contains(LeapModifier.VERY_LONG_LEGS))
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6
         )
         val player = awayTeam["A1".playerId]
@@ -167,7 +167,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         assertFalse(state.getContext<PogoRollContext>().isSuccess)
         assertFalse(state.getContext<PogoRollContext>().modifiers.any { it.description == "Leap" })
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             3.d6
         )
         val player = awayTeam["A1".playerId]

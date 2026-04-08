@@ -24,7 +24,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
@@ -95,7 +95,7 @@ class LeapTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             5.d6,
         )
         assertEquals(4, leapingPlayer.movesLeft)
@@ -119,7 +119,7 @@ class LeapTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6,
         )
         leapingPlayer.assertStanding()
@@ -142,7 +142,7 @@ class LeapTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             6.d6,
         )
         leapingPlayer.assertStanding()
@@ -309,7 +309,7 @@ class LeapTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6,
         )
         leapingPlayer.assertStanding()
@@ -330,7 +330,7 @@ class LeapTests: JervisGameBB2025Test() {
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6,
         )
         leapingPlayer.assertStanding()

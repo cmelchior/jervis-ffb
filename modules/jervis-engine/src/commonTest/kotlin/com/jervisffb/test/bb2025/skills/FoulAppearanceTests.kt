@@ -23,7 +23,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.foulAppearanceRoll
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
@@ -89,7 +89,7 @@ class FoulAppearanceTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             PlayerSelected(defender),
             1.d6, // Fail Foul Appearance
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             2.d6, // Succeed Foul Appearance
             4.dblock,
             NoRerollSelected(),

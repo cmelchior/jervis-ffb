@@ -12,7 +12,7 @@ import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
@@ -123,7 +123,7 @@ class DodgeTests: JervisGameBB2020Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(12, 4),
             1.d6, // Fail dodge
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             4.d6 // Succeed
         )
         val player = awayTeam["A1".playerId]

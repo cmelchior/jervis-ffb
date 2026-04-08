@@ -19,7 +19,7 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.pickup
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -54,7 +54,7 @@ class BigHandTests: JervisGameBB2025Test() {
             *activatePlayer(player, PlayerStandardActionType.MOVE),
             SmartMoveTo(17, 7),
             Cancel, // Do not use Big Hand
-            *pickup(3.d6, SelectTeamReroll<RegularTeamReroll>()),
+            *pickup(3.d6, TeamRerollSelected<RegularTeamReroll>()),
             4.d6
         )
         assertTrue(player.hasBall())

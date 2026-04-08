@@ -22,7 +22,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSkillReroll
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -84,7 +84,7 @@ class SureHandsTests: JervisGameBB2025Test() {
         )
         assertFalse(controller.getAvailableActions().get<SelectRerollOption>().options.any { it.getRerollSource(state) is SureHands })
         controller.rollForward(
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             6.d6,
         )
         assertTrue(awayTeam["A10".playerId].hasBall())

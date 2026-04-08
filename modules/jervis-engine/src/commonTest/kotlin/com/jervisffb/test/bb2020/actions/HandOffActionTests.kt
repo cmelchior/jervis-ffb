@@ -19,7 +19,7 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -170,7 +170,7 @@ class HandOffActionTests: JervisGameBB2020Test() {
             SmartMoveTo(14, 7),
             PlayerSelected("A3".playerId), // Target of hand-off
             5.d6, // Fail catch (3 marks)
-            SelectTeamReroll<RegularTeamReroll>(),
+            TeamRerollSelected<RegularTeamReroll>(),
             6.d6 // Catch it
         )
         assertTrue(awayTeam["A3".playerId].hasBall())

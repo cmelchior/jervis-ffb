@@ -45,7 +45,7 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.teamSetup
-import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertKnockedDown
@@ -264,7 +264,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             PlayerSelected("A13".playerId),
             FieldSquareSelected(11, 4), // Quick Pass - No modifiers
             4.d6,
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             5.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
@@ -283,7 +283,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             PlayerSelected("A13".playerId),
             FieldSquareSelected(8, 4), // -1 Short Pass
             2.d6,
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             3.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
@@ -332,7 +332,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             2.d6, // No modifiers on landing
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             3.d6
         )
         awayTeam["A13".playerId].assertStanding()
@@ -350,7 +350,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             *qualityRoll(5.d6), // Fail pass check
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             3.d6,
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             4.d6
         )
         awayTeam["A13".playerId].assertStanding()
@@ -367,7 +367,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             DiceRollResults(5.d8, 6.d6), // Deviate
             DiceRollResults(2.d8, 2.d8, 2.d8), // Always scatter
             4.d6,
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             5.d6
         )
         awayTeam["A13".playerId].assertStanding()
@@ -383,7 +383,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             *qualityRoll(1.d6), // A natural 1 is a fumble.
             3.d8, // Bounce
             3.d6,
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             4.d6
         )
         awayTeam["A13".playerId].assertStanding()
@@ -401,7 +401,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             3.d6, // 1 marks on landing
-            SelectTeamReroll<TeamReroll>(),
+            TeamRerollSelected<TeamReroll>(),
             4.d6
         )
         awayTeam["A13".playerId].assertStanding()
