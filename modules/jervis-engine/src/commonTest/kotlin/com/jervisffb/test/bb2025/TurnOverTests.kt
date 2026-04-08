@@ -39,6 +39,8 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
+import com.jervisffb.test.utils.assertKnockedDown
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -63,15 +65,16 @@ class TurnOverTests: JervisGameBB2025Test() {
 
     @Test
     fun fallingOverInOwnActivation() {
+        val player = awayTeam["A8".playerId]
         controller.rollForward(
-            PlayerSelected("A8".playerId),
+            PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             SmartMoveTo(22, 13),
             *moveTo(23, 13), // Rush
             1.d6, // Fail Rush
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, state.getPlayerById("A8".playerId).state)
+        player.assertFallenOver()
         assertEquals(TurnOver.STANDARD, state.turnOver)
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -88,7 +91,7 @@ class TurnOverTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 1.dblock),
         )
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
+        attacker.assertKnockedDown()
         assertEquals(TurnOver.STANDARD, state.turnOver)
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -107,7 +110,7 @@ class TurnOverTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT), // Push back
             Cancel, // Do not follow up
         )
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
         assertNull(state.turnOver)
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll

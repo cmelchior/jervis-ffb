@@ -22,6 +22,7 @@ import com.jervisffb.test.ext.undoActions
 import com.jervisffb.test.jump
 import com.jervisffb.test.jumpTo
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -206,7 +207,7 @@ class JumpTests: JervisGameBB2020Test() {
             3.d6, // 1 Marked Modifiers from leaving/entering
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(11, 5)
     }
 
@@ -222,7 +223,7 @@ class JumpTests: JervisGameBB2020Test() {
             1.d6,
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(13, 5)
     }
 
@@ -295,7 +296,7 @@ class JumpTests: JervisGameBB2020Test() {
             1.d6, // Rush
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(13, 5)
     }
 
@@ -318,7 +319,7 @@ class JumpTests: JervisGameBB2020Test() {
             1.d6, // Rush
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(11, 5)
     }
 

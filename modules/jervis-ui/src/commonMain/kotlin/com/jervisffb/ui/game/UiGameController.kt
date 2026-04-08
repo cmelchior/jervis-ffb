@@ -89,6 +89,8 @@ import com.jervisffb.ui.game.state.actionwheel.SolidDefenseWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockChooseResultOrRerollWheelController
 import com.jervisffb.ui.game.state.actionwheel.StandardBlockRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.SteadyFootingWheelController
+import com.jervisffb.ui.game.state.actionwheel.SwoopDirectionWheelController
+import com.jervisffb.ui.game.state.actionwheel.SwoopDistanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.TakeRootWheelController
 import com.jervisffb.ui.game.state.actionwheel.UnchannelledFuryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
@@ -119,6 +121,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseSteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStripBallWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseStrongArmWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseSureHandsWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseSwoopWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseThickSkullWheelController
@@ -129,10 +132,11 @@ import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BlockStatusIndicator
-import com.jervisffb.ui.game.state.indicators.DirectionArrowStatusIndicator
 import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
 import com.jervisffb.ui.game.state.indicators.MoveUsedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.PreGamePlayerAndRefereeStatusIndicator
+import com.jervisffb.ui.game.state.indicators.PushDirectionArrowStatusIndicator
+import com.jervisffb.ui.game.state.indicators.SwoopDirectionArrowIndicator
 import com.jervisffb.ui.game.state.indicators.TeamFeatureStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
@@ -199,7 +203,8 @@ class UiGameController(
         BallExitStatusIndicator,
         BallOnGroundStatusIndicator,
         BlockStatusIndicator,
-        DirectionArrowStatusIndicator,
+        PushDirectionArrowStatusIndicator,
+        SwoopDirectionArrowIndicator,
         MoveUsedStatusIndicator,
         TeamFeatureStatusIndicator,
         TeamRerollStatusIndicator,
@@ -236,6 +241,8 @@ class UiGameController(
         SelectPlayerActionWheelController,
         SelectBlockTypeWheelController,
         ScatterRollWheelController,
+        SwoopDirectionWheelController,
+        SwoopDistanceWheelController,
 
         StandardBlockRollWheelController,
         StandardBlockChooseResultOrRerollWheelController,
@@ -268,6 +275,7 @@ class UiGameController(
         UseStripBallWheelController,
         UseStrongArmWheelController,
         UseSureHandsWheelController,
+        UseSwoopWheelController,
         UseTackleWheelController,
         UseTauntWheelController,
         UseThickSkullWheelController,

@@ -47,6 +47,7 @@ book.
     - [x] Sent-off for commiting a Foul
     - [x] Touchdown scored (own team)
     - [x] Touchdown scored (other team)
+    - [ ] Check problematic cases where a turnover reasons might override each other (e.g. touchdown -> normal turnover)
     - [ ] Touchdowns are not checked until everything is "at rest".
     - [ ] In case of checking for touchdowns. The order is Active Team (active coach chooses order), then Inactive Team (inactive coach chooses order).
     - [ ] Turnover state is reset when turn ends
@@ -506,7 +507,6 @@ book.
     - [x] Action used when moving without throwing
     - [x] Action used when throwing without moving
     - [x] Cannot move after the throw
-    - [x] Can throw prone player
     - [x] Superb Throw
     - [x] Subpar Throw
     - [x] Fumbled Throw
@@ -520,13 +520,13 @@ book.
     - [x] Not turnover if landing on player from an opponent team
     - [x] No Turnover if a thrown player is knocked down and not holding the ball
     - [x] Turnover if the thrown player is knocked down and is holding the ball
-    - [x] Successful landing on the ball trigger Bounce
+    - [x] Successful landing on the ball trigger ball Bounce
     - [x] Land in the occupied square with prone player. Roll injury again
     - [x] Land in the end-zone with ball trigger touchdown.
     - [x] Land on a player with the ball. Ball gets knocked loose. It bounces immediately
     - [x] Player with a ball lands badly on another ball. Player ball is bounced first, then ball on ground
     - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
-    - [x] Crash Landing (not called that in BB2025)
+    - [x] Crash Landing (throw Prone / Distracted / Stunned player)
     - [x] Landing in the crowd
 - [x] Secure the Ball
   - [x] Not allowed if Big Guy.

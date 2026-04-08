@@ -27,6 +27,7 @@ import com.jervisffb.test.jumpTo
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -200,7 +201,7 @@ class JumpTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 5),
             *jump(3.d6), // 1 Marked Modifiers from leaving/entering
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(11, 5)
     }
 
@@ -214,7 +215,7 @@ class JumpTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 5),
             *jump(1.d6),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(13, 5)
     }
 
@@ -283,7 +284,7 @@ class JumpTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 5),
             *rushRoll(1.d6),
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(13, 5)
     }
 
@@ -303,7 +304,7 @@ class JumpTests: JervisGameBB2025Test() {
             *rushRoll(2.d6),
             *rushRoll(1.d6)
         )
-        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        jumpingPlayer.assertFallenOver()
         jumpingPlayer.assertCoordinates(13, 5)
     }
 

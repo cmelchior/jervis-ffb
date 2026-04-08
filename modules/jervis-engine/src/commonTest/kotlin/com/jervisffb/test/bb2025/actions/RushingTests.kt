@@ -13,7 +13,6 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
@@ -22,6 +21,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -73,8 +73,9 @@ class RushingTests: JervisGameBB2025Test() {
 
     @Test
     fun failedRush() {
+        val player = awayTeam["A8".playerId]
         controller.rollForward(
-            PlayerSelected("A8".playerId),
+            PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(16, 13),
             *moveTo(17, 13),
@@ -86,7 +87,7 @@ class RushingTests: JervisGameBB2025Test() {
             *moveTo(23, 13), // Rush
             *rushRoll(1.d6), // Fail Rush
         )
-        assertEquals(PlayerState.FALLEN_OVER, state.getPlayerById("A8".playerId).state)
+        player.assertFallenOver()
         assertEquals(TurnOver.STANDARD, state.turnOver)
     }
 

@@ -86,6 +86,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.skills.DiceRerollOption
@@ -284,7 +285,7 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
     }
 }
 
-fun List<Skill<*>>.getRerollOptions(state: Game, type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
+fun List<Skill<*>>.getRerollOptions(state: Game, type: DiceRollType, roll: DieRoll<*>, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
     return this.asSequence().filter { it is RerollSource }
         .map { it as RerollSource }
         .filter { !it.rerollUsed }
@@ -303,7 +304,7 @@ fun calculateAvailableRerollsFor(
     rules: Rules, // Ruleset used
     player: Player, // Player rolling the dice
     type: DiceRollType, // Which type of dice roll
-    roll: D6DieRoll, // The result of the first dice
+    roll: DieRoll<*>, // The result of the first dice
     firstRollWasSuccess: Boolean? // Whether the first roll was a success.
 ): SelectRerollOption? {
     if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use XX instead")

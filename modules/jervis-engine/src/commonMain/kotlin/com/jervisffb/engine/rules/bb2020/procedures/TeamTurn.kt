@@ -16,7 +16,7 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnMarker
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.UpdateTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -120,7 +120,7 @@ object TeamTurn : Procedure() {
                 // We actually scored in the previous turn, but for some odd reason, the rulebook defines it
                 // as happening in the next turn (where the team is active).
                 Continue -> compositeCommandOf(
-                    SetTurnOver(TurnOver.ACTIVE_TEAM_TOUCHDOWN),
+                    UpdateTurnOver(TurnOver.ACTIVE_TEAM_TOUCHDOWN),
                     GotoNode(ResolveEndOfTurn),
                 )
                 EndTurn -> GotoNode(ResolveEndOfTurn)

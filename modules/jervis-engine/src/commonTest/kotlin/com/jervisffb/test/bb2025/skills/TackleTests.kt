@@ -12,7 +12,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -26,10 +25,10 @@ import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -97,7 +96,7 @@ class TackleTests: JervisGameBB2025Test() {
         attacker.assertCoordinates(13, 5)
         attacker.assertStanding()
         defender.assertCoordinates(11, 4)
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
     }
 
     @Test
@@ -118,6 +117,6 @@ class TackleTests: JervisGameBB2025Test() {
         attacker.assertCoordinates(13, 5)
         attacker.assertStanding()
         defender.assertCoordinates(11, 4)
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
     }
 }

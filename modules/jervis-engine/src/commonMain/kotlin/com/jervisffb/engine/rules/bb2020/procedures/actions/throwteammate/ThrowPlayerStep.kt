@@ -14,8 +14,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -33,7 +33,7 @@ import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.LandingRollContext
@@ -559,7 +559,7 @@ object ThrowPlayerStep: Procedure() {
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.coordinates == throwContext.target }?.let {
                     SetBallState.Companion.bouncing(it)
                 },
-                SetPlayerState(thrownPlayer, PlayerState.FALLEN_OVER),
+                SetPlayerIntermediateState(thrownPlayer, PlayerIntermediateState.FALLEN_OVER),
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }

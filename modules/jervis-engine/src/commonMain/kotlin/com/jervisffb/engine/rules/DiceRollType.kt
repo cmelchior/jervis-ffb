@@ -60,6 +60,8 @@ enum class DiceRollType(val description: String) {
     STANDING_UP("Standing Up"),
     STEADY_FOOTING("Steady Footing"),
     SWELTERING_HEAT("Sweltering Heat"),
+    SWOOP_DIRECTION("Swoop Direction"),
+    SWOOP_DISTANCE("Swoop Distance"),
     TAKE_ROOT("Take Root"),
     THROW_A_ROCK("Throw A Rock"),
     THROWIN_DIRECTION("Throw-in Direction"),

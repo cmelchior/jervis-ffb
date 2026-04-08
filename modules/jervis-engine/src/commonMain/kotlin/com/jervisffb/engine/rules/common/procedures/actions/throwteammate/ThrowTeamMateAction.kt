@@ -76,18 +76,21 @@ data class ThrowTeamMateContext(
     val qualityRoll: D6DieRoll? = null,
     val qualityRollModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val qualityRollResult: ThrowPlayerResult? = null,
+
     // BB2020: If a player without TZ or prone/stunned are thrown they will bounce one
-    // extra time before landing.
+    // extra time before landing. They will automatically fail the landing roll. This is called
+    // Crash Landing.
     // BB2025: If a player without TZ or prone/stunned is thrown, they will just automatically
-    // fail the landing roll. `crashLanding` only used in BB2025 as a side-remark for landing
-    // on another player, but here we use it to mean the same as in BB2020.
+    // fail the landing roll. This is not a named concept, instea "Crash Landing" is only used
+    // as a side-remark for landing on another player.
+    // In Jervis, we use "Crash Landing" to mean being thrown while being Distracted, Prone or
+    // Stunned across all rulesets.
     val willCrashLand: Boolean = false,
     // If a player bounces on another player, the result when they land differs between rulesets.
     // - in BB2020, the rulebook says they will Fall Down, but it was errata'ed to a Knock Down
     // - in BB2025, the rulebook says they will Fall Over, and no errata currently exist.
     val fallOverWhenLanding: Boolean = false,
     val knockedDownWhenLanding: Boolean = false,
-    val landsAt: FieldCoordinate? = null,
     // If the player scattered, deviated or bounced into the crowd while holding the ball.
     // The ball should be thrown in from this field.
     val outOfBoundsAt: FieldCoordinate? = null

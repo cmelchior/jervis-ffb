@@ -34,6 +34,8 @@ import com.jervisffb.test.rushRoll
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.steadyFootingRoll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
+import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.assertStunned
@@ -81,7 +83,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *standardBlock("H1", 2.dblock),
         )
         defender.assertCoordinates(12, 5)
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
         attacker.assertCoordinates(13, 5)
         attacker.assertStanding()
         controller.rollForward(
@@ -297,7 +299,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Stunned
             2.d8, // Bounce to empty square
         )
-        assertEquals(PlayerState.FALLEN_OVER, thrownPlayer.state)
+        thrownPlayer.assertFallenOver()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )

@@ -8,8 +8,8 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -24,7 +24,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
@@ -169,7 +169,7 @@ object MovePlayerIntoSquare : Procedure() {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             return compositeCommandOf(
                 SetPlayerLocation(context.player, DogOut),
-                SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
+                SetPlayerIntermediateState(context.player, PlayerIntermediateState.KNOCKED_DOWN),
                 AddContext(
                     RiskingInjuryContext(
                         player = context.player,

@@ -10,10 +10,10 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -28,7 +28,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.JumpRollContext
@@ -166,7 +166,7 @@ object JumpStep : Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
+                    SetPlayerIntermediateState(player, PlayerIntermediateState.FALLEN_OVER),
                     SetTurnOver(TurnOver.STANDARD),
                     RemoveContext(rushContext),
                     GotoNode(ResolvePlayerFallingOver)
@@ -198,7 +198,7 @@ object JumpStep : Procedure() {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
                     RemoveContext(rushContext),
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
+                    SetPlayerIntermediateState(player, PlayerIntermediateState.FALLEN_OVER),
                     SetTurnOver(TurnOver.STANDARD),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -273,7 +273,7 @@ object JumpStep : Procedure() {
                 // Rush failed catastrophically, player Falls Over in starting square
                 compositeCommandOf(
                     SetPlayerLocation(player, moveContext.startingSquare),
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
+                    SetPlayerIntermediateState(player, PlayerIntermediateState.FALLEN_OVER),
                     SetTurnOver(TurnOver.STANDARD),
                     RemoveContext(jumpContext),
                     GotoNode(ResolvePlayerFallingOver)
@@ -281,7 +281,7 @@ object JumpStep : Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLEN_OVER),
+                    SetPlayerIntermediateState(player, PlayerIntermediateState.FALLEN_OVER),
                     SetTurnOver(TurnOver.STANDARD),
                     RemoveContext(jumpContext),
                     GotoNode(ResolvePlayerFallingOver)

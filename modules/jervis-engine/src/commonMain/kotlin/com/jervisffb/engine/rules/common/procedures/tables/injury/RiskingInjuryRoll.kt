@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.CompositeCommand
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -179,13 +180,18 @@ object RiskingInjuryRoll: Procedure() {
             return if (context.armourBroken) {
                 GotoNode(RollForInjury)
             } else {
-                // If armour is not broken, player is just placed prone.
-                // Unless it is a Stab or Projectile Vomit, which has special rules.
+                // If Amour isn't broken, we have to consider a few special cases:
+                // - If Stab or Projectile Vomit caused the Amour Roll, nothing happens if it fails.
+                // - If an Armour Roll was made against an already Stunned player (e.g. during Throw Team-mate), not
+                //   breaking armour will keep them Stunned.
+                val player = context.player
                 val standOnFailure = (context.mode in listOf(RiskingInjuryMode.STAB, RiskingInjuryMode.PROJECTILE_VOMIT))
+                val isStunned = (player.state == PlayerState.STUNNED)
                 compositeCommandOf(
-                    when (standOnFailure) {
-                        false -> SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false)
-                        true -> null
+                    when {
+                        isStunned -> SetPlayerIntermediateState(player, state = null) // Player remains Stunned
+                        standOnFailure -> null // Player remains Standing
+                        else -> SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false)
                     },
                     ExitProcedure()
                 )

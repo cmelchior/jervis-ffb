@@ -70,6 +70,7 @@ import com.jervisffb.engine.rules.bb2025.skills.StrongArm
 import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
+import com.jervisffb.engine.rules.bb2025.skills.Swoop
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
 import com.jervisffb.engine.rules.bb2025.skills.TakeRoot
 import com.jervisffb.engine.rules.bb2025.skills.Taunt
@@ -633,9 +634,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.SWOOP -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Swoop", type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                        Swoop(player, category, expiresAt)
+                    }
                 }
                 SkillType.TAKE_ROOT -> {
                     addNoValueEntry("Take Root", type, SkillCategory.TRAITS) { player, category,expiresAt ->

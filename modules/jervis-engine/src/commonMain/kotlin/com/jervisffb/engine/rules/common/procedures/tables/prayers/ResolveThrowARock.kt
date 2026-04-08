@@ -12,7 +12,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -26,7 +26,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
@@ -113,7 +113,7 @@ object ResolveThrowARock : Procedure() {
                 return if (d6.value >= 5) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
-                        SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
+                        SetPlayerIntermediateState(player, PlayerIntermediateState.KNOCKED_DOWN),
                         ReportGameProgress("${state.activeTeamOrThrow()} hit ${player.name} with a rock"),
                         GotoNode(ResolveInjuryByRock),
                     )

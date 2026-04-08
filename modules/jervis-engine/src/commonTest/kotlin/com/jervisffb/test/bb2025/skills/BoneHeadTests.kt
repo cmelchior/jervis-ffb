@@ -46,13 +46,13 @@ class BoneHeadTests: JervisGameBB2025Test() {
 
     @Test
     fun rollAfterSelectingAction() {
+        val player = awayTeam["A1".playerId]
         controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.MOVE),
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
             *boneHead(2.d6),
             *moveTo(14, 5),
-            *dodge(1.d6)
+            *dodge(6.d6)
         )
-        val player = awayTeam["A1".playerId]
         assertEquals(player, state.activePlayer)
         assertFalse(rules.isDistracted(player))
     }

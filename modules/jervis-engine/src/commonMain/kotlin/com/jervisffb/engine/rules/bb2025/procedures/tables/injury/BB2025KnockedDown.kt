@@ -11,7 +11,7 @@ import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -27,10 +27,9 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
@@ -60,8 +59,8 @@ object BB2025KnockedDown: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<RiskingInjuryContext>()
-        if (context.player.state == PlayerState.KNOCKED_DOWN) {
-            INVALID_GAME_STATE("Player is already knocked down: ${context.player.state}")
+        if (context.player.intermediateState == PlayerIntermediateState.KNOCKED_DOWN) {
+            INVALID_GAME_STATE("Player is already knocked down: ${context.player.intermediateState}")
         }
         if (context.mode != RiskingInjuryMode.KNOCKED_DOWN && context.mode != RiskingInjuryMode.BAD_LANDING) {
             INVALID_GAME_STATE("Player needs to have a bad landing or be knocked down to use this procedure: ${context.mode}")
@@ -132,7 +131,7 @@ object BB2025KnockedDown: Procedure() {
             val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
             return buildCompositeCommand {
                 add(UpdateContext(context.copy(isKnockedDown = true)))
-                add(SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
+                add(SetPlayerIntermediateState(player, PlayerIntermediateState.KNOCKED_DOWN))
                 if (rootedStatus != null) {
                     add(RemovePlayerStatusEffect(player, rootedStatus))
                 }
@@ -166,7 +165,6 @@ object BB2025KnockedDown: Procedure() {
             val isBouncing = state.currentBallOrNull()?.state == BallState.BOUNCING
             return when {
                 isBouncing && context.isPartOfMultipleBlock -> {
-                    val mbContext = state.getContext<BB2025MultipleBlockContext>()
                     compositeCommandOf(
                         SetCurrentBall(null),
                         ExitProcedure()

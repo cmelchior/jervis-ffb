@@ -216,25 +216,30 @@ abstract class Rules(
 
     /**
      * Returns the result of rolling a direction using the Throw-in
-     * template (or Random Direction template in case of corners)
+     * template when attempting to throw a ball in after it went out-of-bounds
+     * (or Random Direction template in case of corners).
      */
     fun throwIn(from: FieldCoordinate, d3: D3Result): Direction {
         val corner = from.getCornerLocation(this)
         return if (corner != null) {
             randomDirectionTemplate.roll(corner, d3)
         } else {
-            if (from.x == 0) {
-                ThrowInTemplate.roll(ThrowInPosition.LEFT, d3)
-            } else if (from.x == fieldWidth - 1) {
-                ThrowInTemplate.roll(ThrowInPosition.RIGHT, d3)
-            } else if (from.y == 0) {
-                ThrowInTemplate.roll(ThrowInPosition.TOP, d3)
-            } else if (from.y == fieldHeight - 1) {
-                ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
-            } else {
-                throw IllegalArgumentException("Cannot determine position of: $from")
+            when {
+                (from.x == 0) -> ThrowInTemplate.roll(ThrowInPosition.LEFT, d3)
+                (from.x == fieldWidth - 1) -> ThrowInTemplate.roll(ThrowInPosition.RIGHT, d3)
+                (from.y == 0) -> ThrowInTemplate.roll(ThrowInPosition.TOP, d3)
+                (from.y == fieldHeight - 1) -> ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
+                else -> throw IllegalArgumentException("Cannot determine position of: $from")
             }
         }
+    }
+
+    /**
+     * Returns the result of rolling on the throw-in template when it is put down
+     * anywhere on the field and pointed in a specific direction.
+     */
+    fun throwIn(direction: Direction, d3: D3Result): Direction {
+        return ThrowInTemplate.roll(direction, d3)
     }
 
     /**
@@ -301,8 +306,6 @@ abstract class Rules(
             PlayerState.BANNED,
             PlayerState.DODGY_SNACK,
             PlayerState.FAINTED,
-            PlayerState.FALLEN_OVER,
-            PlayerState.KNOCKED_DOWN,
             PlayerState.PRONE,
             PlayerState.RESERVE,
             PlayerState.STANDING,

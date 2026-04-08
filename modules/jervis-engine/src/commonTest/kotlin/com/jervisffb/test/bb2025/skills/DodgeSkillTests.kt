@@ -8,7 +8,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
@@ -22,6 +21,7 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
@@ -125,6 +125,6 @@ class DodgeSkillTests: JervisGameBB2025Test() {
         attacker.assertCoordinates(13, 5)
         attacker.assertStanding()
         defender.assertCoordinates(11, 4)
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
     }
 }

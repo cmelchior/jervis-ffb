@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.common.tables
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.model.Direction
 import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -30,6 +31,20 @@ object ThrowInTemplate {
         d3: D3Result,
     ): Direction {
         return rotateVector(results[d3.value]!!, position.rotateDegrees)
+    }
+
+    /**
+     * When the template is placed anywhere on the field and pointed in a specific direction,
+     * compute the rotation angle from that direction and apply the throw-in template.
+     *
+     * @param direction The direction determining the "center" of the throw-in template.
+     * @return the result of rolling on the template, the result will either be [direction] or one of the squares next to it
+     */
+    fun roll(direction: Direction, d3: D3Result): Direction {
+        // The base template (0°) points UP (0,-1); the angle is computed relative to that.
+        val angleRadians = atan2(direction.yModifier.toDouble(), direction.xModifier.toDouble()) + PI / 2
+        val angleDegrees = (angleRadians * 180.0 / PI).roundToInt()
+        return rotateVector(results[d3.value]!!, angleDegrees)
     }
 
     private fun rotateVector(

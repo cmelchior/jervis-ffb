@@ -4,7 +4,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -15,7 +15,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.assertContext
@@ -43,7 +43,7 @@ object BB2020KnockedDown: Procedure() {
         val playerThrown = (context.mode == RiskingInjuryMode.BAD_LANDING)
 
         return buildCompositeCommand {
-            add(SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
+            add(SetPlayerIntermediateState(context.player, PlayerIntermediateState.KNOCKED_DOWN))
             if ((isOnActiveTeam && !playerThrown) || (isOnActiveTeam && playerThrown && hasBall)) {
                 add(SetTurnOver(TurnOver.STANDARD))
             }

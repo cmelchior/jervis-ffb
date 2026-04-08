@@ -13,8 +13,8 @@ import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -33,7 +33,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PushContext
@@ -449,7 +449,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                             add(SetBallState.bouncing(it))
                         }
                         if (context.isDefenderKnockedDown && push.pushee == context.firstPushee) {
-                            add(SetPlayerState(push.pushee, PlayerState.KNOCKED_DOWN))
+                            add(SetPlayerIntermediateState(push.pushee, PlayerIntermediateState.KNOCKED_DOWN))
                         }
                     }
                 }

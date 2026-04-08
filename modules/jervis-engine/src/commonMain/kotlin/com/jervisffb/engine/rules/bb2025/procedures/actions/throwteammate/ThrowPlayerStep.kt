@@ -42,6 +42,7 @@ import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LandingModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -57,7 +58,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
 import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
@@ -80,6 +80,15 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * This procedure assumes that the player being thrown has already been selected.
  *
  * See page 76 in the BB2025 rulebook.
+ *
+ * Developer's Commentary:
+ * BB2025 changed pickup rules, so now only the active player can pick up the
+ * ball. This means that if a thrown player lands on the ball, in BB2025
+ * it will bounce, where in BB2020 they could attempt to pick it up.
+ *
+ * In BB2020, there was the concept of Crash Landing, which caused an extra
+ * bounce when landing. This concept was reduced in BB2025 to only apply when
+ * landing on another player.
  */
 object ThrowPlayerStep: Procedure() {
     override val initialNode: Node = DeclareTargetSquare
@@ -182,7 +191,7 @@ object ThrowPlayerStep: Procedure() {
                 SetPlayerLocation(context.thrownPlayer!!, context.target!!, isThrown = true),
                 when (context.qualityRollResult == ThrowPlayerResult.SUPERB) {
                     true -> GotoNode(ChooseToUseBullseye)
-                    false -> GotoNode(ScatterPlayer)
+                    false -> GotoNode(CheckForSwoop)
                 }
             )
         }
@@ -208,18 +217,53 @@ object ThrowPlayerStep: Procedure() {
             return when (useSkill) {
                 true -> {
                     val landsAt = context.target ?: INVALID_GAME_STATE("No target at: $context")
-                    val nextNode = when {
-                        state.field[landsAt].isOccupied() -> GotoNode(ResolveLandingInOccupiedSquare)
-                        else -> GotoNode(ResolveLandingInEmptySquare)
-                    }
+                    val nextNode = getNextNodeWhenLanding(state, landsAt)
                     compositeCommandOf(
                         ReportSkillUsed(context.thrower, SkillType.BULLSEYE),
-                        UpdateContext(context.copy(landsAt = landsAt)),
-                        nextNode
+                        UpdateContext(context.copy(target = landsAt)),
+                        GotoNode(nextNode)
                     )
                 }
-                false -> GotoNode(ScatterPlayer)
+                false -> GotoNode(CheckForSwoop)
             }
+        }
+    }
+
+    object CheckForSwoop: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<ThrowTeamMateContext>()
+            val player = context.thrownPlayer ?: INVALID_GAME_STATE("No thrown player in: $context")
+            return when (player.isSkillAvailable(SkillType.SWOOP)) {
+                true -> null
+                false -> ScatterPlayer
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val throwContext = state.getContext<ThrowTeamMateContext>()
+            val player = throwContext.thrownPlayer ?: INVALID_GAME_STATE("Missing thrown player: $throwContext")
+            val context = SwoopContext(player)
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = SwoopStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val swoopContext = state.getContext<SwoopContext>()
+            val swoopUsed = (swoopContext.selectedDirection != null)
+            if (!swoopUsed) return compositeCommandOf(
+                RemoveContext(swoopContext),
+                GotoNode(ScatterPlayer)
+            )
+            val throwContext = state.getContext<ThrowTeamMateContext>()
+            val landsAt = swoopContext.landsAt ?: INVALID_GAME_STATE("No landsAt in: $throwContext")
+            val nextNode = getNextNodeWhenLanding(state, landsAt)
+            return compositeCommandOf(
+                RemoveContext(swoopContext),
+                UpdateContext(throwContext.copy(
+                    target = landsAt,
+                    outOfBoundsAt = swoopContext.outOfBoundsAt
+                )),
+                SetPlayerLocation(throwContext.thrownPlayer!!, landsAt, isThrown = true),
+                GotoNode(nextNode),
+            )
         }
     }
 
@@ -267,7 +311,6 @@ object ThrowPlayerStep: Procedure() {
                     RemoveContext<ScatterRollContext>(),
                     when {
                         state.field[landsAt].isOccupied() -> GotoNode(ResolveLandingInOccupiedSquare)
-                        throwContext.willCrashLand -> GotoNode(BouncePlayer)
                         else -> GotoNode(ResolveLandingInEmptySquare)
                     }
                 )
@@ -305,12 +348,7 @@ object ThrowPlayerStep: Procedure() {
                 val direction = rules.direction(bounceRoll)
                 val thrownPlayer = throwContext.thrownPlayer!!
                 val target = thrownPlayer.coordinates.move(direction, steps = 1)
-                val landingNode = when {
-                    target.isOutOfBounds(rules) -> ResolveLandingInTheCrowd
-                    target.isOnField(rules) && !state.field[target].isOccupied() -> ResolveLandingInEmptySquare
-                    target.isOnField(rules) && state.field[target].isOccupied() -> ResolveLandingInOccupiedSquare
-                    else -> error("Could not determine landing type at: $target")
-                }
+                val landingNode = getNextNodeWhenLanding(state, target)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BOUNCE, bounceRoll),
                     SetPlayerLocation(
@@ -380,6 +418,12 @@ object ThrowPlayerStep: Procedure() {
             val thrownPlayer = context.thrownPlayer!!
             val injuryContext = RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.PUSHED_INTO_CROWD)
             return buildCompositeCommand {
+                // According to the list of Turnovers on page 35 in the BB2025 rulebook, it is a turnover
+                // if a player on the active team is forced to move off the pitch for any reason.
+                addAll(
+                    SetTurnOver(TurnOver.STANDARD),
+                    SetPlayerLocation(thrownPlayer, thrownPlayer.coordinates, isThrown = false)
+                )
                 if (thrownPlayer.hasBall()) {
                     // Lose the ball before rolling for injury, so the ball doesn't end up in the Dogout.
                     addAll(
@@ -432,14 +476,11 @@ object ThrowPlayerStep: Procedure() {
     object ResolveLandingInEmptySquare: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (context.fallOverWhenLanding) {
-                ResolveLandingPlayerFallingOver
-            } else if (context.willCrashLand) {
-                ResolveLandingPlayerFallingOver
-            } else if (context.knockedDownWhenLanding) {
-                INVALID_GAME_STATE("A thrown player landing should not be Knocked Down")
-            } else {
-                null
+            return when {
+                context.fallOverWhenLanding -> ResolveLandingPlayerFallingOver
+                context.willCrashLand -> ResolveLandingPlayerFallingOver
+                context.knockedDownWhenLanding -> INVALID_GAME_STATE("A thrown player landing should not be Knocked Down")
+                else -> null
             }
         }
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -466,7 +507,10 @@ object ThrowPlayerStep: Procedure() {
                 modifiers,
                 LandingModifier.MARKED
             )
-            return AddContext(LandingRollContext(thrownPlayer, diceRollTarget, modifiers))
+            return compositeCommandOf(
+                SetPlayerLocation(thrownPlayer, thrownPlayer.coordinates, isThrown = false),
+                AddContext(LandingRollContext(thrownPlayer, diceRollTarget, modifiers))
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = LandingRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -529,26 +573,6 @@ object ThrowPlayerStep: Procedure() {
         }
     }
 
-    // It is currently a bit unclear if it is allowed to pick up the ball when landing on it. RAW it seems "no", but it is
-    // a change from BB2020 and the rulebook doesn't explicitly say so.
-    object PickupBallAfterLanding: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val throwContext = state.getContext<ThrowTeamMateContext>()
-            val ball = state.field[throwContext.thrownPlayer!!.coordinates].balls.single()
-            return compositeCommandOf(
-                SetCurrentBall(ball),
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            // All possible results are calculated inside Pickup, so just end here
-            return compositeCommandOf(
-                SetCurrentBall(null),
-                ExitProcedure()
-            )
-        }
-    }
-
     object BounceBallOnLandingSquare: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.balls.first { it.state == BallState.BOUNCING }
@@ -569,11 +593,6 @@ object ThrowPlayerStep: Procedure() {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val thrownPlayer = throwContext.thrownPlayer ?: INVALID_GAME_STATE("Could not find thrown player: $throwContext")
             return compositeCommandOf(
-                SetPlayerLocation(
-                    thrownPlayer,
-                    throwContext.target!!,
-                    isThrown = false,
-                ),
                 state.balls.firstOrNull { it.state == BallState.ON_GROUND && it.coordinates == throwContext.target }?.let {
                     SetBallState.bouncing(it)
                 },
@@ -615,6 +634,17 @@ object ThrowPlayerStep: Procedure() {
             } else {
                 add(ExitProcedure())
             }
+        }
+    }
+
+    // -- HELPER METHODS --
+    fun getNextNodeWhenLanding(state: Game, landsAt: FieldCoordinate): Node {
+        val rules = state.rules
+        return when {
+            landsAt.isOutOfBounds(rules) -> ResolveLandingInTheCrowd
+            landsAt.isOnField(rules) && !state.field[landsAt].isOccupied() -> ResolveLandingInEmptySquare
+            landsAt.isOnField(rules) && state.field[landsAt].isOccupied() -> ResolveLandingInOccupiedSquare
+            else -> error("Could not determine landing type at: $landsAt")
         }
     }
 }

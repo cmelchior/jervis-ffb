@@ -5,7 +5,6 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
@@ -14,6 +13,7 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -81,7 +81,7 @@ class DodgeTests: JervisGameBB2020Test() {
             4.d6, // Need 5+ to dodge
             NoRerollSelected()
         )
-        assertEquals(PlayerState.FALLEN_OVER, player.state)
+        player.assertFallenOver()
     }
 
     @Test
@@ -112,7 +112,7 @@ class DodgeTests: JervisGameBB2020Test() {
             NoRerollSelected()
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(PlayerState.FALLEN_OVER, player.state)
+        player.assertFallenOver()
         assertEquals(FieldCoordinate(12, 4), player.coordinates)
     }
 

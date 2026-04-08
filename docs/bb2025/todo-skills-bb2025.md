@@ -527,7 +527,15 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] No marked negative modifiers when Dodging
   - [x] -1 to intercept
   - [x] Roll on Stunty Injury Table
-- [ ] Swoop
+- [x] Swoop
+  - [x] Does not work if Distracted
+  - [x] Does not work if Prone
+  - [x] Works on subpar throw
+  - [x] Choose throw-in direction
+  - [x] Roll direction
+  - [x] Roll distance
+  - [x] Can reroll direction
+  - [x] Can reroll distance
 - [ ] Take Root*
   - [x] Roll on activation if standing
   - [x] Roll for other negatraits if Take Root failed

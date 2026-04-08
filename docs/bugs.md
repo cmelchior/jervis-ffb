@@ -3,6 +3,7 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- "Stand Up & End Action" should not be shown for players with negatraits. It crashes the rules engine.
 - Animated Dice performance on Web is really bad for some reason.
 - Using the Player Editor in-game does not correctly modify MovesLeft, since that value is set at the beginning of the turn.
 - Team Badge Outline does not rescale when the game window size changes.

@@ -28,6 +28,9 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDirectionRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDistanceRoll
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
@@ -133,6 +136,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             UseStripBallStep.ChooseToUseStripBall to SkillType.STRIP_BALL,
             PileDriverStep.ChooseToUsePileDriver to SkillType.PILE_DRIVER,
             ThrowPlayerStep.ChooseToUseBullseye to SkillType.BULLSEYE,
+            SwoopStep.ChooseToUseSwoop to SkillType.SWOOP,
         )
 
         return skills.toList().associate {
@@ -215,6 +219,10 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             PitchInvasion.RollForReceivingTeamFans to "Roll D6 for Pitch Invasion",
             PitchInvasion.RollForKickingTeamStuns to "Roll D3 for number of Players Affected by Pitch Invasion",
             PitchInvasion.RollForReceivingTeamStuns to "Roll D3 for number of Players Affected by Pitch Invasion",
+            SwoopDirectionRoll.RollDie to "Roll D3 to determine direction of Swoop",
+            SwoopDirectionRoll.ReRollDie to "Re-roll D3 to determine direction of Swoop",
+            SwoopDistanceRoll.RollDie to "Roll D6 to determine distance of Swoop",
+            SwoopDistanceRoll.ReRollDie to "Re-roll D6 to determine distance of Swoop",
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
@@ -240,6 +248,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             FoulAppearanceRoll.ChooseReRollSource to "Accept Foul Appearance Result or Reroll D6?",
             TakeRootRoll.ChooseReRollSource to "Accept Take Root Result or Reroll D6?",
             JumpUpRoll.ChooseReRollSource to "Accept Jump Up Result or Reroll D6?",
+            SwoopDirectionRoll.ChooseReRollSource to "Accept Swoop Direction Result or Re-roll D3?",
+            SwoopDistanceRoll.ChooseReRollSource to "Accept Swoop Distance Result or Re-roll D6?",
         )
 
         val rollMessages: Map<Node, (Boolean, Boolean, Game) -> String?> = rollDiceScenarios.associate { data ->

@@ -6,7 +6,6 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -16,11 +15,11 @@ import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
@@ -44,13 +43,13 @@ class BlockTests: JervisGameBB2020Test() {
         )
         defender.assertCoordinates(12, 5)
         attacker.assertCoordinates(13, 5)
-        assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+        defender.assertKnockedDown()
         attacker.assertStanding()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
         defender.assertProne()
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
+        attacker.assertKnockedDown()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
@@ -90,7 +89,7 @@ class BlockTests: JervisGameBB2020Test() {
         )
         assertTrue(state.isTurnOver())
         attacker.assertCoordinates(13, 5)
-        assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
+        attacker.assertKnockedDown()
         defender.assertCoordinates(12, 5)
         defender.assertStanding()
     }

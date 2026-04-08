@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.DogOut
@@ -23,6 +24,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalContracts::class)
@@ -106,6 +108,14 @@ fun Player.putProne() {
 }
 
 /**
+ * Modify the Player state, so they will be considered Stunned.
+ */
+fun Player.putStunned() {
+    state = PlayerState.STUNNED
+    hasTackleZones = false
+}
+
+/**
  * Modify the Player state, so they will be considered Distracted.
  * Note, Distracted doesn't exist in BB2020, but here we interpret it as being
  * Standing without TackleZones
@@ -123,6 +133,7 @@ fun Player.makeDistracted() {
  */
 fun Player.assertStanding() {
     assertEquals(PlayerState.STANDING, state)
+    assertNull(intermediateState)
     assertTrue(hasTackleZones)
     assertTrue(location.isOnField(team.game.rules))
 }
@@ -132,6 +143,7 @@ fun Player.assertStanding() {
  */
 fun Player.assertProne() {
     assertEquals(PlayerState.PRONE, state)
+    assertNull(intermediateState)
     assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
     assertTrue(location.isOnField(team.game.rules), "Prone players should be on the field")
 }
@@ -141,6 +153,7 @@ fun Player.assertProne() {
  */
 fun Player.assertStunned() {
     assertEquals(PlayerState.STUNNED, state)
+    assertNull(intermediateState)
     assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
     assertTrue(location.isOnField(team.game.rules), "Stunned players should be on the field")
 }
@@ -150,6 +163,30 @@ fun Player.assertStunned() {
  */
 fun Player.assertKnockedOut() {
     assertEquals(PlayerState.KNOCKED_OUT, state)
+    assertNull(intermediateState)
+    assertEquals(DogOut, location)
+}
+
+/**
+ * Test Helper, checking if a player is Fallen Over.
+ */
+fun Player.assertFallenOver() {
+    assertEquals(PlayerIntermediateState.FALLEN_OVER, intermediateState)
+}
+
+/**
+ * Test Helper, checking if a player is Fallen Over.
+ */
+fun Player.assertKnockedDown() {
+    assertEquals(PlayerIntermediateState.KNOCKED_DOWN, intermediateState)
+}
+
+/**
+ * Test Helper, checking if a player is in the Reserves box.
+ */
+fun Player.assertReserves() {
+    assertEquals(PlayerState.RESERVE, state)
+    assertNull(intermediateState)
     assertEquals(DogOut, location)
 }
 

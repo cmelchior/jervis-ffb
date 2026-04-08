@@ -614,6 +614,30 @@ use Sure Hands, before asking the attacker to use Strip Ball.
 
     Strip Ball requires the Push Back and will therefore not trigger
 
+## Page 136 - Swoop
+It looks like it is a prerequisite for Swoop that the thrown player would 
+Scatter. This e.g., means that Swoop cannot be used on a fumbled throw or when 
+the thrower is using Bullseye (nor would it make sense).
+
+Also, the Swoop roll is not a single "dice pool", but consists of two separate 
+rolls. This means that rerolls can be used on both rolls, but you need to choose
+to reroll the direction before you roll for distance.
+
+It is also slightly unclear what happens if a player is near the sidelines.
+Are you allowed to point the throw-in template out of the field?
+
+The rules say "...so it faces one of the two End Zones or either Sideline",
+since you are not facing the sideline when putting the template on the other
+side, Jervis assumes this is not allowed. This also simplifies the game logic
+and UX.
+
+Note, it is still possible to Swoop out of the sidelines if you point towards
+an end zone and roll a distance that takes the player out-of-bounds.
+
+!!! naf "NAF"
+    
+    Team rerolls may be used to reroll direction or distance.
+
 ## Page 137 - Take Root
 
 ### Take Root and Diving Tackle

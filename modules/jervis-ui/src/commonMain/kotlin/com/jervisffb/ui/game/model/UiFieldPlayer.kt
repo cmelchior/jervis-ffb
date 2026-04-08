@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerState
@@ -51,8 +52,8 @@ data class UiFieldPlayer(
         position = model.position,
         isActive = (model.available == Availability.IS_ACTIVE),
         isGoingDown = (
-            model.state == PlayerState.KNOCKED_DOWN
-                || model.state == PlayerState.FALLEN_OVER
+            model.intermediateState == PlayerIntermediateState.KNOCKED_DOWN
+                || model.intermediateState == PlayerIntermediateState.FALLEN_OVER
                 || model.team.game.rules.isInjuried(model)
         ),
         hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnField(model.team.game.rules)

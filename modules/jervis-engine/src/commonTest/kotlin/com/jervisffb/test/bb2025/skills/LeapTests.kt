@@ -26,6 +26,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.rushRoll
 import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
@@ -161,7 +162,7 @@ class LeapTests: JervisGameBB2025Test() {
             3.d6, // -2 Marked Modifiers from leaving/entering
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
+        leapingPlayer.assertFallenOver()
         leapingPlayer.assertCoordinates(11, 5)
     }
 
@@ -178,7 +179,7 @@ class LeapTests: JervisGameBB2025Test() {
             1.d6,
             NoRerollSelected(),
         )
-        assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
+        leapingPlayer.assertFallenOver()
         leapingPlayer.assertCoordinates(13, 5)
     }
 
@@ -250,7 +251,7 @@ class LeapTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 5),
             *rushRoll(1.d6),
         )
-        assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
+        leapingPlayer.assertFallenOver()
         leapingPlayer.assertCoordinates(13, 5)
     }
 
@@ -274,7 +275,7 @@ class LeapTests: JervisGameBB2025Test() {
             *rushRoll(2.d6),
             *rushRoll(1.d6),
         )
-        assertEquals(PlayerState.FALLEN_OVER, leapingPlayer.state)
+        leapingPlayer.assertFallenOver()
         leapingPlayer.assertCoordinates(13, 5)
     }
 

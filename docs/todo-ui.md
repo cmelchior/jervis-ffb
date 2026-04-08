@@ -6,6 +6,9 @@ The TODO list is by no means exhaustive, it is just a place to dump things as
 they come up.
 
 ## Todo List
+- [ ] Show better indicators for "Dev Mode" during Swoop, i.e. show what the values actually represent on the field, and not just the dice
+- [ ] A thrown player is rendered below a loose ball, which looks weird. We probably need to add a new "Air"-layer
+- [ ] Animations when a player is being thrown (including swoop)
 - [ ] Team Feature Icon for "+1 Offensive Assist on next Block"
 - [ ] Custom Action Icons for selecting Kicking/Receiving Team.
 - [ ] Action Icon for deselecting Fumblerooski.

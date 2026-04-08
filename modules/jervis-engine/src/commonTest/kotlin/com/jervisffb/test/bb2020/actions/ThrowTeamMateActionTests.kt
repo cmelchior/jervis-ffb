@@ -46,10 +46,14 @@ import com.jervisffb.test.qualityRoll
 import com.jervisffb.test.rushTo
 import com.jervisffb.test.teamSetup
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertFallenOver
+import com.jervisffb.test.utils.assertKnockedDown
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.hasSkill
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -406,17 +410,18 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
 
     @Test
     fun fallOverOnFailedLanding() {
+        val thrownPlayer = awayTeam["A13".playerId]
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             *moveTo(14, 4),
             *dodge(),
-            PlayerSelected("A13".playerId),
+            PlayerSelected(thrownPlayer),
             FieldSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             *landingRoll(1.d6),
         )
-        assertEquals(PlayerState.FALLEN_OVER, awayTeam["A13".playerId].state)
+        thrownPlayer.assertFallenOver()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6),
         )
@@ -427,9 +432,10 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
     // until finding an empty square.
     @Test
     fun landInOccupiedSquare() {
+        val thrownPlayer = awayTeam["A13".playerId]
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
+            PlayerSelected(thrownPlayer),
             FieldSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
@@ -440,7 +446,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             4.d8, // Bounce to empty square
         )
         // Thrown player is knocked down on landing after hitting another player
-        assertEquals(PlayerState.KNOCKED_DOWN, awayTeam["A13".playerId].state)
+        thrownPlayer.assertKnockedDown()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll for thrown player
         )
@@ -449,55 +455,57 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
         assertNull(state.activePlayer)
         homeTeam["H1".playerId].assertStunned()
         homeTeam["H2".playerId].assertProne()
-        awayTeam["A13".playerId].assertProne()
+        thrownPlayer.assertProne()
     }
 
     @Test
     fun fallOverOnCrashLanding() {
-        awayTeam["A13".playerId].apply {
+        val thrownPlayer = awayTeam["A13".playerId].apply {
             state = PlayerState.PRONE
             hasTackleZones = true
         }
         controller.rollForward(
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
+            PlayerSelected(thrownPlayer),
             FieldSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
             4.d8, // Player bounce after landing
         )
-        assertEquals(PlayerState.FALLEN_OVER, awayTeam["A13".playerId].state)
+        thrownPlayer.assertFallenOver()
         controller.rollForward(
             DiceRollResults(1.d6, 1.d6), // Armour roll on thrown player
         )
         assertEquals(awayTeam, state.activeTeam)
-        awayTeam["A13".playerId].assertProne()
-        assertEquals(FieldCoordinate(9, 5), awayTeam["A13".playerId].coordinates)
+        thrownPlayer.assertProne()
+        thrownPlayer.assertCoordinates(9, 5)
     }
 
     // Landing in an Occupied Square takes precedence over Crash Landing
     @Test
     fun crashLandOnAnotherPlayer() {
-        awayTeam["A13".playerId].state = PlayerState.PRONE
+        val thrownPlayer = awayTeam["A13".playerId].apply {
+            putProne()
+        }
         controller.rollForward(
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
-            PlayerSelected("A13".playerId),
+            PlayerSelected(thrownPlayer),
             FieldSquareSelected(11, 5), // Land on Hafling
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
             DiceRollResults(1.d6, 1.d6),
             4.d8, // Player bounce after landing
         )
-        assertEquals(PlayerState.KNOCKED_DOWN, awayTeam["A13".playerId].state)
+        thrownPlayer.assertKnockedDown()
         controller.rollForward(
             DiceRollResults(6.d6, 2.d6), // Armour roll on thrown player
             DiceRollResults(1.d6, 1.d6), // Injury Roll on thrown player
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(PlayerState.STUNNED_OWN_TURN, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(10, 5), awayTeam["A13".playerId].coordinates)
+        assertEquals(PlayerState.STUNNED_OWN_TURN, thrownPlayer.state)
+        thrownPlayer.assertCoordinates(10, 5)
     }
 
     @Test

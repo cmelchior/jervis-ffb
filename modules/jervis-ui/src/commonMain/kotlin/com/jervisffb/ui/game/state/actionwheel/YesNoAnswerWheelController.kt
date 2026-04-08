@@ -36,6 +36,8 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopContext
+import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
@@ -95,6 +97,7 @@ import kotlin.time.ExperimentalTime
  * - Steady Footing (skill usage)
  * - Strip Ball (skill usage)
  * - Strong Arm (skill usage)
+ * - Swoop (skill usage)
  * - Tackle (skill usage)
  * - Taunt (skill usage)
  * - Follow Up
@@ -533,6 +536,16 @@ object UseMightyBlowController: UseSkillWheelController(SkillType.MIGHTY_BLOW) {
     }
 }
 
+object UseSwoopWheelController: UseSkillWheelController(SkillType.SWOOP) {
+    override val nodes: Set<Node> = setOf(
+        SwoopStep.ChooseToUseSwoop,
+    )
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        val context = state.getContext<SwoopContext>()
+        return context.player.coordinates
+    }
+}
+
 object UseApothecaryWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
         UseBB11Apothecary.ChooseToUseApothecary,
@@ -541,14 +554,18 @@ object UseApothecaryWheelController: YesNoAnswerWheelController() {
     override val yesLabel: String = "Use Apothecary"
     override val noLabel: String = "Do not use Apothecary"
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
-        val attacker = state.getContext<RiskingInjuryContext>().player
-        return when (attacker.location) {
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+        val player = state.getContext<RiskingInjuryContext>().player
+        return when (player.location) {
             DogOut -> {
                 state.getContext<PushContext>().pushChain.last().from
             }
             is FieldCoordinate -> {
-                attacker.coordinates
+                // TODO Figure out a better player to show the Action Wheel for players out-of-bounds
+                when (player.coordinates.isOutOfBounds(state.rules)) {
+                    true -> null
+                    false -> player.coordinates
+                }
             }
             is GiantLocation -> TODO("Not supported")
         }

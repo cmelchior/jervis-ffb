@@ -2,7 +2,9 @@ package com.jervisffb.engine.model
 
 // TODO Should we split this into DogoutState and FieldState?
 /**
- * This enum describes the high-level state of players.
+ * This enum describes the high-level state of players. This enum should only
+ * contain "stable" states. [PlayerIntermediateState] contains states that
+ * are temporary and are used when transitioning between [PlayerState]s.
  *
  * **Developer's Commentary**
  * There is some overlap between state and status effect, and it isn't clear
@@ -21,11 +23,6 @@ enum class PlayerState {
     FAINTED, // From Sweltering Heat
     BANNED, // From being sent off by the Ref
     DODGY_SNACK, // Miss the drive from Dodgy Snack
-
-    // Intermediate states. These states should only be used while the effect of
-    // them is being resolved. I.e., rolling armor and injury dice.
-    FALLEN_OVER,
-    KNOCKED_DOWN,
 
     // Field states
     STANDING,
@@ -48,4 +45,15 @@ enum class PlayerState {
 //    HIT_BY_LIGHTNING,
 //    HIT_BY_BOMB,
 //    SETUP_PREVENTED
+}
+
+/**
+ * Intermediate Player states. These states indicate that [Player.state]
+ * is currently changing to a new value, but we do not yet know what that
+ * value is, e.g., a player being Knocked Down will transition from STANDING to
+ * PRONE. While this is happening, the intermediate state is set to KNOCKED_DOWN.
+ */
+enum class PlayerIntermediateState {
+    KNOCKED_DOWN,
+    FALLEN_OVER,
 }

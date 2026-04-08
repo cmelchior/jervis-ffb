@@ -119,6 +119,8 @@ object BB2025DiceColorConfig : DiceColorConfig() {
             DiceRollType.STEADY_FOOTING -> DiceRollTypeConfig(rollType, "Steady Footing", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.SUDDEN_DEATH -> DiceRollTypeConfig(rollType, "Sudden Death", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.SWELTERING_HEAT -> DiceRollTypeConfig(rollType, "Sweltering Heat", d3, d6Colors, DiceColor.WHITE)
+            DiceRollType.SWOOP_DIRECTION -> DiceRollTypeConfig(rollType, "Swoop Direction", d3, d6Colors, DiceColor.DEFAULT)
+            DiceRollType.SWOOP_DISTANCE -> DiceRollTypeConfig(rollType, "Swoop Distance", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.TAKE_ROOT -> DiceRollTypeConfig(rollType, "Take Root", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.THROWIN_DIRECTION -> DiceRollTypeConfig(rollType, "Throw-In Direction", d8, singleColor, DiceColor.DEFAULT)
             DiceRollType.THROWIN_DISTANCE -> DiceRollTypeConfig(rollType, "Throw-In Distance", d16, singleColor, DiceColor.DEFAULT)

@@ -17,7 +17,7 @@ import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
  *
  * The current push is handled by [SelectDirectionDecorator].
  */
-object DirectionArrowStatusIndicator: FieldStatusIndicator {
+object PushDirectionArrowStatusIndicator: FieldStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,

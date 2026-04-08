@@ -2,12 +2,17 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerState
 
 /**
  * Sets the player [PlayerState] in [Player.state].
+ *
  * Since this commonly also affects the tackle zones of the player in [Player.hasTackleZones].
  * It is also possible to define that change here.
+ *
+ * Note, setting a [Player.state] will always reset [Player.intermediateState] back to `null`.
+ * It is not necessary to do this manually.
  */
 class SetPlayerState(
     private val player: Player,
@@ -17,6 +22,7 @@ class SetPlayerState(
     private val hasTackleZones: Boolean? = null
 ) : Command {
     private lateinit var originalState: PlayerState
+    private var originalIntermediateState: PlayerIntermediateState? = null
     private var originalHasTackleZones: Boolean = false
 
     override fun execute(state: Game) {
@@ -24,6 +30,7 @@ class SetPlayerState(
         this.originalHasTackleZones = player.hasTackleZones
         player.apply {
             this.state = this@SetPlayerState.state
+            this.intermediateState = null
             if (this@SetPlayerState.hasTackleZones != null) {
                 this.hasTackleZones = this@SetPlayerState.hasTackleZones
             }
@@ -36,6 +43,7 @@ class SetPlayerState(
                 this.hasTackleZones = originalHasTackleZones
             }
             this.state = originalState
+            this.intermediateState = originalIntermediateState
         }
     }
 }

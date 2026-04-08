@@ -119,6 +119,7 @@ class Player(
     var isBeingThrown: Boolean = false
     var facing: PlayerFacing = PlayerFacing.UNKNOWN
     var state: PlayerState = PlayerState.RESERVE
+    var intermediateState: PlayerIntermediateState? = null
     val isActive: Boolean get() = (team.game.activePlayer == this)
     var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null

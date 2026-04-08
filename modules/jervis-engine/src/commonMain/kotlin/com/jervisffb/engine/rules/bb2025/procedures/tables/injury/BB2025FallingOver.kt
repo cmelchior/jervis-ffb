@@ -10,7 +10,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -25,7 +25,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
@@ -59,7 +59,7 @@ object BB2025FallingOver: Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<RiskingInjuryContext>()
-        if (context.player.state == PlayerState.FALLEN_OVER) {
+        if (context.player.intermediateState == PlayerIntermediateState.FALLEN_OVER) {
             INVALID_GAME_STATE("Player is already falling over: ${context.player}")
         }
         if (context.mode != RiskingInjuryMode.FALLING_OVER && context.mode != RiskingInjuryMode.BAD_LANDING) {
@@ -130,7 +130,7 @@ object BB2025FallingOver: Procedure() {
             val context = state.getContext<RiskingInjuryContext>()
             val player = context.player
             return buildCompositeCommand {
-                add(SetPlayerState(player, PlayerState.FALLEN_OVER, hasTackleZones = false))
+                add(SetPlayerIntermediateState(player, PlayerIntermediateState.FALLEN_OVER))
                 /**
                  * If the player falling over, carried a ball, they will drop the ball, and it
                  * will bounce from this square.
@@ -165,7 +165,6 @@ object BB2025FallingOver: Procedure() {
     object RollForInjury: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<RiskingInjuryContext>()
             val ball = state.currentBallOrNull()
             return if (ball?.state == BallState.BOUNCING) {
                 GotoNode(BounceBall)

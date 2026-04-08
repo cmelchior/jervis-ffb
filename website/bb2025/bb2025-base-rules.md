@@ -494,7 +494,9 @@ Since BB2025 lacks any guidance on this, Jervis uses the BB2020 rule.
     natural 1, the test is 'Fumbled'."
 
 ## Page 78 - Landing
-In BB2020, a player landing successfully on the ball were allowed to pick it up.
+
+### Picking up the Ball
+In BB2020, a player landing successfully on the ball was allowed to pick it up.
 
 This wording has been removed from the rulebook in BB2025, and Pickup (page 57)
 specifies that a player moving outside their activation cannot pick up the ball.
@@ -512,3 +514,24 @@ specifies that a player moving outside their activation cannot pick up the ball.
     Page 57 says "If a player is ever involuntarily moved into a square 
     containing the ball, ..., they may not attempt to pick up the ball and it 
     will bounce."
+
+### Throwing a Stunned Player
+Stunned players can be thrown but will automatically fail their Agility Test
+and Fall Over.
+
+However, it is unclear what happens if the Armour Roll doesn't break Armour. Does
+the player stay Stunned or reverts to a Prone state?
+
+Falls Over (page 40) says: "...When a player Falls Over, place a Prone Token 
+next them and then make an Armour Roll..."". A RAW interpretation could indicate
+that the player then becomes Prone.
+
+Stunned (page 39) says: "At the end of of each team's turn, any players on 
+their team that started that turn Stunned will automatically roll over...". This
+could indicate that it isn't possible to remove a Stunned effect during the
+turn, although it isn't spelled out.
+
+As it is both unintuitive, unclear and mechanically clunky to allow a Stunned
+player to become Prone this way, Jervis has adopted the interpretation that if a 
+Stunned Player is either Knocked Down or Falls Over during a turn, and Armour
+isn't broken, they remain Stunned rather than reverting to Prone.

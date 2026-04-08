@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
@@ -348,6 +349,16 @@ fun standingUpRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected
 )
 
 fun steadyFootingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
+fun swoopDirectionRoll(roll: D3Result, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
+fun swoopDistanceRoll(roll: D6Result, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
 )
