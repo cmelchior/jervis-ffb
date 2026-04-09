@@ -12,15 +12,18 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.PileDriverStep
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Procedure for handling a single standard block once attacker and defender
@@ -69,8 +72,17 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  */
 object SingleStandardBlockStep : Procedure() {
     override val initialNode: Node = CheckForFoulAppearance
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val context = UseRerollContext(type = DiceRollType.BLOCK)
+        return AddContext(context)
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.rerollContext
+        if (context?.type != DiceRollType.BLOCK) {
+            INVALID_GAME_STATE("Invalid reroll type for SingleStandardBlockStep: ${context?.type}")
+        }
+        return RemoveContext(context)
+    }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     object CheckForFoulAppearance: ParentNode() {
@@ -121,11 +133,9 @@ object SingleStandardBlockStep : Procedure() {
     object SelectRerollType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockChooseReroll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.rerollContext != null) {
-                GotoNode(RerollDice)
-            } else {
-                // We can select multiple rerolls
-                GotoNode(SelectBlockResult)
+            return when (state.rerollContext?.source != null) {
+                true -> GotoNode(RerollDice)
+                false -> GotoNode(SelectBlockResult)
             }
         }
     }

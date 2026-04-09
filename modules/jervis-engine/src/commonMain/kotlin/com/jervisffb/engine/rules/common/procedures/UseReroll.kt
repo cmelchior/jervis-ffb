@@ -11,6 +11,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * This class contains the rules for using various forms of rerolls.
@@ -54,7 +55,7 @@ object UseTeamReroll : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             return compositeCommandOf(
-                SetTeamRerollUsed(state.activeTeamOrThrow(), context.source),
+                SetTeamRerollUsed(state.activeTeamOrThrow(), context.source!!),
                 ExitProcedure(),
             )
         }
@@ -71,12 +72,11 @@ object UseStandardSkillReroll : Procedure() {
 
     object UseReroll : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
+            val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
             return compositeCommandOf(
-                if (context.source.rerollResetAt != Duration.PERMANENT) {
-                    SetSkillRerollUsed(context.source, used = true)
-                } else {
-                    null
+                when (context.source != null && context.source.rerollResetAt != Duration.PERMANENT) {
+                    true -> SetSkillRerollUsed(context.source, used = true)
+                    false -> null
                 },
                 ExitProcedure(),
             )

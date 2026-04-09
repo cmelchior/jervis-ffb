@@ -44,8 +44,8 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 object PogoRoll : D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.POGO
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PogoRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<PogoRollContext>().player.team
 
@@ -60,8 +60,8 @@ object PogoRoll : D6WithRerollProcedure() {
     }
 
     override val ChooseReRollSource = object : AbstractChooseRerollSource(
-        rerollNotAvailableCommand = ExitProcedure(),
-        noRerollSelectedCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        rerollNotAvailableCommand = { ExitProcedure() },
+        noRerollSelectedCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     ) {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<PogoRollContext>()
@@ -80,7 +80,7 @@ object PogoRoll : D6WithRerollProcedure() {
                 isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
             )
         }
-        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        override fun nextNodeCommand(): Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
     // Diving Tackle can be used, but does not apply any modifiers to the roll

@@ -46,11 +46,11 @@ import kotlinx.collections.immutable.toPersistentList
 object ThrowTeammateAccuracyRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ACCURACY
     override val initialNode: Node = ChooseToUseStrongArm
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ThrowTeamMateContext>()
         return UpdateContext(addInitialModifiersToContext(context, state, rules))
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowTeamMateContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<ThrowTeamMateContext>().thrower.team
 

@@ -72,7 +72,7 @@ import com.jervisffb.engine.utils.sum
 object RushRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.RUSH
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? {
         // Check for Rush modifiers
         val modifiers = mutableListOf<DiceModifier>()
 
@@ -95,7 +95,7 @@ object RushRoll: D6WithRerollProcedure() {
             null
         }
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RushRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<RushRollContext>().player.team
 

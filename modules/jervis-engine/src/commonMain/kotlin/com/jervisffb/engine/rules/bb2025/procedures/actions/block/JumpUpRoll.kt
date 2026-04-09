@@ -33,8 +33,8 @@ data class JumpUpRollContext(
 object JumpUpRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.JUMP_UP
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<JumpUpRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<JumpUpRollContext>().player.team
 

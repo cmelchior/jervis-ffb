@@ -101,8 +101,8 @@ import kotlinx.collections.immutable.toPersistentList
 object DodgeRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.DODGE
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<DodgeRollContext>()
         return ReportDodgeResult(context)
     }
@@ -378,7 +378,7 @@ object DodgeRoll: D6WithRerollProcedure() {
      * or other sources.
      */
     override val ChooseReRollSource = object : AbstractChooseRerollSource(
-        exitWithoutRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        exitWithoutRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     ) {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<DodgeRollContext>()
@@ -398,18 +398,17 @@ object DodgeRoll: D6WithRerollProcedure() {
                 isSuccess = isSuccess(dodgeContext, overrideD6 = d6)
             )
         }
-        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        override fun nextNodeCommand(): Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
     // Needs to be below ReRollDie due to initialization order issues.
     override val UseRerollSource = CommonUseRerollSource(
         rerollDiceNode = ReRollDie,
-        noRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        noRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)

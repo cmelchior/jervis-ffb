@@ -13,8 +13,9 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -27,11 +28,13 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
 /**
@@ -39,6 +42,10 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
  * re-roll options.
  *
  * TODO Consolidate this with [D3WithRerollProcedure]
+ *
+ * WARNING: Be careful with storing commands in abstract nodes. If these
+ * commands have mutable state (like logs), they risk being inconsistent and
+ * will crash the game engine.
  */
 abstract class D6WithRerollProcedure: Procedure() {
     // Roll initial dice
@@ -53,7 +60,33 @@ abstract class D6WithRerollProcedure: Procedure() {
     abstract val ReRollDie: ActionNode
 
     abstract val rollType: DiceRollType
+    // Returns Action Owner for all "roll" nodes (it should be the same team)
     abstract fun getActionOwner(state: Game): Team
+    // Roll specific "Enter" method
+    abstract fun onEnterRollProcedure(state: Game, rules: Rules): Command?
+    // Roll specific "Exit" method
+    abstract fun onExitRollProcedure(state: Game, rules: Rules): Command?
+
+    final override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val rollContextCommands = onEnterRollProcedure(state, rules)
+        val rerollContextCommand = AddContext(UseRerollContext(type = rollType))
+        return compositeCommandOf(
+            rollContextCommands,
+            rerollContextCommand
+        )
+    }
+
+    final override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val rollContextCommands = onExitRollProcedure(state, rules)
+        val rerollContext = state.getContext<UseRerollContext>()
+        if (rerollContext.type != rollType) {
+            INVALID_GAME_STATE("UseRerollContext's are in an inconsistent state. Received: $rerollContext")
+        }
+        return compositeCommandOf(
+            RemoveContext(rerollContext),
+            rollContextCommands
+        )
+    }
 
     // Shared logic for rolling the initial D6
     abstract inner class AbstractRollDie: ActionNode() {
@@ -82,12 +115,12 @@ abstract class D6WithRerollProcedure: Procedure() {
     // Shared logic for choosing the reroll source
     abstract inner class AbstractChooseRerollSource(
         // Where to go,if no rerolls are available
-        val rerollNotAvailableCommand: Command,
+        val rerollNotAvailableCommand: () -> Command,
         // Where to go, if Coach accepts first roll
-        val noRerollSelectedCommand: Command
+        val noRerollSelectedCommand: () -> Command
     ): ActionNode() {
         // Shortcut when exit nodes are the same for both cases
-        constructor(exitWithoutRerollCommand: Command = ExitProcedure()) : this(
+        constructor(exitWithoutRerollCommand: () -> Command = { ExitProcedure() }) : this(
             rerollNotAvailableCommand = exitWithoutRerollCommand,
             noRerollSelectedCommand = exitWithoutRerollCommand,
         )
@@ -111,16 +144,19 @@ abstract class D6WithRerollProcedure: Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                Continue -> rerollNotAvailableCommand
-                is NoRerollSelected -> noRerollSelectedCommand
+                Continue -> rerollNotAvailableCommand()
+                is NoRerollSelected -> noRerollSelectedCommand()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(
-                        roll = rollType,
+                    val rerollContext = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+                    if (rerollContext.type != rollType) {
+                        INVALID_GAME_STATE("Reroll type mismatch: expected $rollType, got $rerollContext")
+                    }
+                    val updatedContext = rerollContext.copy(
                         source = action.getRerollSource(state),
                         selectedRerollOption = action.option
                     )
                     compositeCommandOf(
-                        SetRerollContext(rerollContext),
+                        UpdateContext(updatedContext),
                         ReportRerollUsed(action.getRerollSource(state)),
                         GotoNode(UseRerollSource),
                     )
@@ -139,7 +175,7 @@ abstract class D6WithRerollProcedure: Procedure() {
         // Update specific Roll Context with the roll data
         abstract fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext
         // Which node to go to after re-rolling the dice
-        open val nextNodeCommand: Command = ExitProcedure()
+        open fun nextNodeCommand(): Command = ExitProcedure()
 
         override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
@@ -151,7 +187,7 @@ abstract class D6WithRerollProcedure: Procedure() {
                 return compositeCommandOf(
                     UpdateContext(updatedContext),
                     ReportDiceRoll(rollType, d6),
-                    nextNodeCommand
+                    nextNodeCommand()
                 )
             }
         }
@@ -159,16 +195,16 @@ abstract class D6WithRerollProcedure: Procedure() {
 
     class CommonUseRerollSource(
         private val rerollDiceNode: ActionNode,
-        private val noRerollCommand: Command = ExitProcedure()
+        private val noRerollCommand: () -> Command = { ExitProcedure() }
     ): ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
+            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
+            val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
             return when (context.rerollAllowed) {
                 true -> GotoNode(rerollDiceNode)
-                false -> noRerollCommand
+                false -> noRerollCommand()
             }
         }
     }

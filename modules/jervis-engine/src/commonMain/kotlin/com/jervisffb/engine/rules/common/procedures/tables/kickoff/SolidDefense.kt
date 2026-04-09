@@ -110,7 +110,10 @@ object SolidDefense : Procedure() {
                     .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() + context.playersMoved.toSet()
-                listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
+                when (eligiblePlayers.isEmpty()) {
+                    true -> listOf(EndSetupWhenReady)
+                    false -> listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
+                }
             }
         }
 

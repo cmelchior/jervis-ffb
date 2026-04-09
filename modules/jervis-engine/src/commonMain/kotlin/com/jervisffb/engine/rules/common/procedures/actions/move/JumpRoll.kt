@@ -47,8 +47,8 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 object JumpRoll : D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.JUMP
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<JumpRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<JumpRollContext>().player.team
 
@@ -63,7 +63,7 @@ object JumpRoll : D6WithRerollProcedure() {
     }
 
     override val ChooseReRollSource = object : AbstractChooseRerollSource(
-        exitWithoutRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        exitWithoutRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     ) {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<JumpRollContext>()
@@ -82,13 +82,13 @@ object JumpRoll : D6WithRerollProcedure() {
                 isSuccess = isSuccess(rollContext, overrideD6 = d6)
             )
         }
-        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        override fun nextNodeCommand(): Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
     // Needs to be below ReRollDie due to initialization order issues.
     override val UseRerollSource = CommonUseRerollSource(
         rerollDiceNode = ReRollDie,
-        noRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        noRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {

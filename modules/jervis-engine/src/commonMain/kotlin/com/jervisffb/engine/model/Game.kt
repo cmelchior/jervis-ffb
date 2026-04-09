@@ -194,9 +194,12 @@ class Game(
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
     val contexts: ContextHolder = ContextHolder()
-    // Rerolls are so widely used across multiple procedures that we want to track
-    // them independently.
-    var rerollContext: UseRerollContext? = null
+    // Rerolls are so widely used across multiple procedures that we want to
+    // make it really easy get access them.
+    val rerollContext: UseRerollContext?
+        get() {
+            return getContextOrNull<UseRerollContext>()
+        }
 
     val balls: MutableList<Ball> = mutableListOf(Ball())
     // Easy reference to the ball that is currently being "handled" somehow. This makes

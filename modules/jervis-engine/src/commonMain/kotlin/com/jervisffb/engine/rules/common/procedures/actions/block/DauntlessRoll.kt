@@ -39,11 +39,11 @@ data class DauntlessRollContext(
 object DauntlessRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.DAUNTLESS
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<DauntlessRollContext>()
         return ReportSkillUsed(context.attacker, SkillType.DAUNTLESS)
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<DauntlessRollContext>()
         return ReportDauntlessResult(context)
     }

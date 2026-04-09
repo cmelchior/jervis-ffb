@@ -18,8 +18,6 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
-import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -49,8 +47,8 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 object LeapRoll : D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.LEAP
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<LeapRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<LeapRollContext>().player.team
 
@@ -65,26 +63,11 @@ object LeapRoll : D6WithRerollProcedure() {
     }
 
     override val ChooseReRollSource = object : AbstractChooseRerollSource(
-        exitWithoutRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        exitWithoutRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     ) {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<LeapRollContext>()
             return RerollData(context.player, context.roll!!, context.isSuccess)
-        }
-    }
-
-    override val UseRerollSource = object : ParentNode() {
-        override fun name(): String = "UseRerollSource"
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
-        }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
-            return if (context.rerollAllowed) {
-                GotoNode(ReRollDie)
-            } else {
-                GotoNode(ChooseToUseDivingTackleAfterReRoll)
-            }
         }
     }
 
@@ -99,8 +82,13 @@ object LeapRoll : D6WithRerollProcedure() {
                 isSuccess = isSuccess(rollContext, overrideD6 = d6)
             )
         }
-        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+        override fun nextNodeCommand(): Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
+
+    override val UseRerollSource = CommonUseRerollSource(
+        rerollDiceNode = ReRollDie,
+        noRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
+    )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()

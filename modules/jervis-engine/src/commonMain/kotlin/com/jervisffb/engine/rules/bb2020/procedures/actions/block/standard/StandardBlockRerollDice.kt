@@ -46,7 +46,9 @@ object StandardBlockRerollDice: Procedure() {
     }
 
     object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules,): Procedure = state.rerollContext!!.source.rerollProcedure
+        override fun getChildProcedure(state: Game, rules: Rules,): Procedure {
+            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             // useRerollResult must be set by the procedure running which determines if a reroll is allowed
             return if (state.rerollContext!!.rerollAllowed) {

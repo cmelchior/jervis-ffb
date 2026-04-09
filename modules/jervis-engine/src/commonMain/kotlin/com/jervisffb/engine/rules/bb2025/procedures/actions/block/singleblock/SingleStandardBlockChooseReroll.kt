@@ -9,8 +9,8 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -21,7 +21,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
@@ -31,6 +30,7 @@ import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * TODO FUCK. This does not keep rerolls in lock-step. We need a custom node that can
@@ -55,20 +55,15 @@ object SingleStandardBlockChooseReroll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue,
-                is NoRerollSelected -> {
-                    compositeCommandOf(
-                        SetRerollContext(null),
-                        ExitProcedure()
-                    )
-                }
+                is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(
-                        roll = DiceRollType.BLOCK,
+                    val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+                    val rerollContext = context.copy(
                         source = action.getRerollSource(state),
                         selectedRerollOption = action.option
                     )
                     compositeCommandOf(
-                        SetRerollContext(rerollContext),
+                        UpdateContext(rerollContext),
                         GotoNode(UseReroll)
                     )
                 }
@@ -79,7 +74,7 @@ object SingleStandardBlockChooseReroll: Procedure() {
 
     object UseReroll: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
+            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()

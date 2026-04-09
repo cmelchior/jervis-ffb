@@ -26,8 +26,8 @@ object SwoopDistanceRoll : D6WithRerollProcedure() {
     }
     override val rollType: DiceRollType = DiceRollType.SWOOP_DISTANCE
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun getActionOwner(state: Game): Team = state.getContext<SwoopContext>().player.team
 
     override val RollDie = object : AbstractRollDie() {

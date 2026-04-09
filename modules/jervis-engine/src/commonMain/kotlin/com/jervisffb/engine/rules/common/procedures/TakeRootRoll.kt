@@ -38,11 +38,11 @@ data class TakeRootRollContext(
 object TakeRootRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.TAKE_ROOT
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer!!
         return AddContext(TakeRootRollContext(player = player))
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command {
         val activateContext = state.getContext<ActivatePlayerContext>()
         val context = state.getContext<TakeRootRollContext>()
         return buildCompositeCommand {

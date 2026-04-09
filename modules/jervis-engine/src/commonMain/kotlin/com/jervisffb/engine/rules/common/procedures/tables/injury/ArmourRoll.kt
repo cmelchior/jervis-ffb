@@ -10,11 +10,12 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -45,6 +46,7 @@ import com.jervisffb.engine.rules.bb2025.skills.LoneFouler
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 
 /**
@@ -81,8 +83,17 @@ import com.jervisffb.engine.utils.sum
  */
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val rerollContext = UseRerollContext(DiceRollType.ARMOUR)
+        return AddContext(rerollContext)
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val rerollContext = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+        if (rerollContext.type != DiceRollType.ARMOUR) {
+            INVALID_GAME_STATE("Invalid reroll context type: $rerollContext")
+        }
+        return RemoveContext(rerollContext)
+    }
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()
     }
@@ -322,11 +333,20 @@ object ArmourRoll: Procedure() {
             val fouler = context.causedBy ?: error("Missing fouler: $context")
             return when (useLoneFouler) {
                 true -> {
-                    val rerollContext = UseRerollContext(DiceRollType.ARMOUR, fouler.getSkill<LoneFouler>())
+                    val rerollSource = fouler.getSkill<LoneFouler>()
+                    val rerollOption = rerollSource.calculateRerollOptions(
+                        DiceRollType.ARMOUR,
+                        context.armourRoll,
+                        wasSuccess = false // Lone Fouler can only be used on sucesses
+                    ).singleOrNull() ?: error("Lone Fouler returned more than one re-roll option")
+                    val rerollContext = state.rerollContext!!.copy(
+                        source = rerollSource,
+                        selectedRerollOption = rerollOption
+                    )
                     compositeCommandOf(
                         ReportSkillUsed(fouler, SkillType.LONE_FOULER),
                         SetSkillRerollUsed(fouler.getSkill<LoneFouler>(), true),
-                        SetRerollContext(rerollContext),
+                        UpdateContext(rerollContext),
                         UpdateContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER })),
                         GotoNode(ReRollDice)
                     )

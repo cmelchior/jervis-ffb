@@ -66,11 +66,11 @@ import kotlinx.collections.immutable.toPersistentList
 object PassAccuracyRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ACCURACY
     override val initialNode: Node get() = ChooseToUseNervesOfSteel
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command {
         val updatedContext = setInitialModifiers(state, rules)
         return UpdateContext(updatedContext)
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
         val updatedContext = updatePassContextWithResult(context)
         return UpdateContext(updatedContext)

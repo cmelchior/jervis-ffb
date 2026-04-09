@@ -24,11 +24,12 @@ class SetPlayerIntermediateState(
     // If this ever changes, the default value must not change without first updating all callsites.
     private val hasTackleZones: Boolean = false
 ) : Command {
-    private lateinit var originalState: PlayerIntermediateState
+    private var originalIntermediateState: PlayerIntermediateState? = null
     private var originalHasTackleZones: Boolean = false
 
     override fun execute(state: Game) {
         this.originalHasTackleZones = player.hasTackleZones
+        this.originalIntermediateState = player.intermediateState
         player.apply {
             this.intermediateState = this@SetPlayerIntermediateState.state
             this.hasTackleZones = this@SetPlayerIntermediateState.hasTackleZones
@@ -38,7 +39,7 @@ class SetPlayerIntermediateState(
     override fun undo(state: Game) {
         player.apply {
             this.hasTackleZones = originalHasTackleZones
-            this.intermediateState = originalState
+            this.intermediateState = originalIntermediateState
         }
     }
 }

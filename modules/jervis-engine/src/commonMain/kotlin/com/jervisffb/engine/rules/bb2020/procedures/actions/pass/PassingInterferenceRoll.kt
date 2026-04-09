@@ -27,8 +27,8 @@ import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 object PassingInterferenceRoll : D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.PASSING_INTERFERENCE
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PassingInterferenceRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<PassingInterferenceRollContext>().player.team
 

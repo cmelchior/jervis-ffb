@@ -23,8 +23,8 @@ import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 object SwoopDirectionRoll : D3WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.SWOOP_DIRECTION
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<SwoopContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<SwoopContext>().player.team
 

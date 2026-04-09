@@ -33,8 +33,8 @@ import com.jervisffb.engine.utils.sum
 object StandingUpRoll : D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.STANDING_UP
     override val initialNode: Node = UseTimmber
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<StandingUpRollContext>()
     override fun getActionOwner(state: Game): Team = state.getContext<StandingUpRollContext>().player.team
 

@@ -39,11 +39,11 @@ data class BoneHeadRollContext(
 object BoneHeadRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.BONE_HEAD
     override val initialNode: Node get() = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer ?: INVALID_GAME_STATE("Missing active player")
         return AddContext(BoneHeadRollContext(player = player))
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command {
         val activateContext = state.getContext<ActivatePlayerContext>()
         val context = state.getContext<BoneHeadRollContext>()
         return buildCompositeCommand {

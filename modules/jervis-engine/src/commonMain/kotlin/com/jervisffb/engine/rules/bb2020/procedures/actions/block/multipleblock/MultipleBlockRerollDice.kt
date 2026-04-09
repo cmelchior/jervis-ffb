@@ -7,7 +7,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -68,7 +67,7 @@ object MultipleBlockRerollDice: Procedure() {
                     val rerollContext = updatedMbContext.createRerollContext(state, action)
                     compositeCommandOf(
                         AddContext(updatedMbContext),
-                        SetRerollContext(rerollContext),
+                        AddContext(rerollContext),
                         GotoNode(ReRollDie),
                     )
                 }
