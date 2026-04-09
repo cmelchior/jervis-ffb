@@ -357,7 +357,7 @@ object TakeRootWheelController : D6WithRerollWheelController() {
 
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<TakeRootRollContext>()
-        return context.roll.originalRoll
+        return context.roll?.originalRoll ?: error("No roll found in context")
     }
 }
 
@@ -408,7 +408,7 @@ object BoneHeadWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<BoneHeadRollContext>()
-        return context.roll.originalRoll
+        return context.roll?.originalRoll ?: error("No roll found in context")
     }
 }
 
@@ -426,7 +426,7 @@ object ReallyStupidWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<ReallyStupidRollContext>()
-        return context.roll.originalRoll
+        return context.roll?.originalRoll ?: error("No roll found in context")
     }
 }
 
@@ -444,7 +444,7 @@ object UnchannelledFuryWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<UnchannelledFuryRollContext>()
-        return context.roll.originalRoll
+        return context.roll?.originalRoll ?: error("No roll found in context")
     }
 }
 

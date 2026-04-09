@@ -482,7 +482,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Lethal Flight"
                 }
             },
-            SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll to { isActiveClient, _, state ->
+            SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll to { isActiveClient, _, state ->
                 val context = state.getContext<BlockContext>()
                 val selectResultTeam = context.getTeamSelectingResult()
                 val attackerChooseResult = (context.attacker.team == selectResultTeam)

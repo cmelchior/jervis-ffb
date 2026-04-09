@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -326,7 +326,7 @@ object ArmourRoll: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(fouler, SkillType.LONE_FOULER),
                         SetSkillRerollUsed(fouler.getSkill<LoneFouler>(), true),
-                        SetOldContext(Game::rerollContext, rerollContext),
+                        SetRerollContext(rerollContext),
                         UpdateContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER })),
                         GotoNode(ReRollDice)
                     )

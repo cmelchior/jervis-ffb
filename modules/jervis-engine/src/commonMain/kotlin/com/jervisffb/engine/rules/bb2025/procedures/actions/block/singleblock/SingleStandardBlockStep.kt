@@ -134,12 +134,11 @@ object SingleStandardBlockStep : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockRerollDice
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
-            // If all dice have been rerolled, we know for sure the final result. Otherwise, some skill might
-            // allow further rerolls, so
-            return if (rules.isRerollAllowed(context.roll)) {
-                GotoNode(SelectBlockResult)
-            } else {
-                GotoNode(SelectRerollType)
+            // If all dice have been rerolled, we know for sure the final result.
+            // Otherwise, it might be allowed to reroll more dice.
+            return when (rules.isRerollAllowed(context.roll)) {
+                true -> GotoNode(SelectRerollType)
+                false -> GotoNode(SelectBlockResult)
             }
         }
     }

@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.SetRerollContext
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
@@ -57,14 +57,18 @@ object StandardBlockChooseReroll: Procedure() {
                 Continue,
                 is NoRerollSelected -> {
                     compositeCommandOf(
-                        SetOldContext(Game::rerollContext, null),
+                        SetRerollContext(null),
                         ExitProcedure()
                     )
                 }
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.BLOCK, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(
+                        roll = DiceRollType.BLOCK,
+                        source = action.getRerollSource(state),
+                        selectedRerollOption = action.option
+                    )
                     compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
+                        SetRerollContext(rerollContext),
                         ExitProcedure()
                     )
                 }

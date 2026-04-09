@@ -8,7 +8,13 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
-    val id: RerollSourceId // Unique identifier for this reroll. Should be unique across both teams.
+    /**
+     * Unique identifier for this reroll type.
+     * If a reroll type provides more than one re-roll option, like allowing
+     * to re-rolling different individual dice. The [DiceRerollOption] should
+     * have the this (same) ID across all options.
+     */
+    val id: RerollSourceId
     val rerollResetAt: Duration // Not currently used (except for documentation purposes). Can it be removed?
     val rerollDescription: String
     var rerollUsed: Boolean
@@ -22,6 +28,7 @@ interface RerollSource {
         wasSuccess: Boolean? = null
     ): Boolean
 
+    // This method should only be called if `canReroll` returns true.
     fun calculateRerollOptions(
         // What kind of dice roll
         type: DiceRollType,

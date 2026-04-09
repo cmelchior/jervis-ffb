@@ -1,7 +1,6 @@
 package com.jervisffb.engine.rules.common.procedures
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetTeamRerollUsed
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -10,7 +9,6 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 
@@ -55,9 +53,7 @@ object UseTeamReroll : Procedure() {
     object UseReroll : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
-            val result = UseRerollContext(context.roll, context.source, true)
             return compositeCommandOf(
-                SetOldContext(Game::rerollContext, result),
                 SetTeamRerollUsed(state.activeTeamOrThrow(), context.source),
                 ExitProcedure(),
             )
@@ -76,9 +72,7 @@ object UseStandardSkillReroll : Procedure() {
     object UseReroll : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
-            val result = UseRerollContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(
-                SetOldContext(Game::rerollContext, result),
                 if (context.source.rerollResetAt != Duration.PERMANENT) {
                     SetSkillRerollUsed(context.source, used = true)
                 } else {

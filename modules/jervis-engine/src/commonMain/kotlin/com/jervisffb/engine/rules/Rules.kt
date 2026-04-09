@@ -530,7 +530,7 @@ abstract class Rules(
     fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
         // It is only allowed to reroll a die a single time. So if a rerollSource
         // exists, it cannot be rerolled again
-        return dicePool.any { it.rerollSource != null }
+        return dicePool.none { it.rerollSource != null }
     }
 
     /**

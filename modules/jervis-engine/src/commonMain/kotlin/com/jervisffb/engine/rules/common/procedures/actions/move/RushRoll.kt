@@ -1,44 +1,24 @@
 package com.jervisffb.engine.rules.common.procedures.actions.move
 
-import com.jervisffb.engine.actions.Continue
-import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectNoReroll
-import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
-import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
-import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
-import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.RushModifier
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.common.tables.Weather
-import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 
 /**
@@ -89,8 +69,9 @@ import com.jervisffb.engine.utils.sum
  *
  * @see [StandardMoveStep.ResolveRush]
  */
-object RushRoll: Procedure() {
-    override val initialNode: Node = RollDie
+object RushRoll: D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.RUSH
+    override val initialNode: Node get() = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         // Check for Rush modifiers
         val modifiers = mutableListOf<DiceModifier>()
@@ -116,106 +97,36 @@ object RushRoll: Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RushRollContext>()
+    override fun getActionOwner(state: Game): Team = state.getContext<RushRollContext>().player.team
 
-    object RollDie: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
-        }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val context = state.getContext<RushRollContext>()
-                val success = isRushSuccess(d6, context.modifiers)
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.RUSH, d6),
-                    UpdateContext(context.copy(
-                        roll = D6DieRoll.create(state, d6),
-                        isSuccess = success,
-                    )),
-                    GotoNode(ChooseReRollSource)
-                )
-            }
-        }
-    }
-
-    /**
-     * Choose where a reroll should come from. This can be skills, team rerolls, special cards
-     * or other sources.
-     */
-    object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+    override val RollDie = object: AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<RushRollContext>()
-            val rushingPlayer = context.player
-            val availableReRolls: SelectRerollOption? = calculateAvailableRerollsFor(
-                rules,
-                rushingPlayer,
-                DiceRollType.RUSH,
-                context.roll!!,
-                context.isSuccess
+            val success = isRushSuccess(d6, context.modifiers)
+            return context.copy(
+                roll = D6DieRoll.create(state, d6),
+                isSuccess = success,
             )
-            return if (availableReRolls == null) {
-                listOf(ContinueWhenReady)
-            } else {
-                listOf(SelectNoReroll(context.isSuccess)) + availableReRolls
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Continue -> ExitProcedure()
-                is NoRerollSelected -> ExitProcedure()
-                is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.RUSH, action.getRerollSource(state))
-                    compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
-                        ReportRerollUsed(action.getRerollSource(state)),
-                        GotoNode(UseRerollSource),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
         }
     }
 
-    /**
-     * Use the selected reroll source.
-     */
-    object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
-        }
-
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
-            return if (context.rerollAllowed) {
-                GotoNode(ReRollDie)
-            } else {
-                ExitProcedure()
-            }
+    override val ChooseReRollSource = object : AbstractChooseRerollSource() {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
+            val context = state.getContext<RushRollContext>()
+            return RerollData(context.player, context.roll!!, context.isSuccess)
         }
     }
 
-    object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val rushContext = state.getContext<RushRollContext>()
-                val rerollContext = state.rerollContext!!
-                val rerollResult = rushContext.copy(
-                    roll = rushContext.roll!!.copyReroll(
-                        rerollSource = rerollContext.source,
-                        rerolledResult = d6,
-                    ),
-                    isSuccess = isRushSuccess(d6, rushContext.modifiers),
-                )
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.RUSH, d6),
-                    UpdateContext(rerollResult),
-                    ExitProcedure(),
-                )
-            }
+    override val ReRollDie = object : AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val rushContext = state.getContext<RushRollContext>()
+            return rushContext.copy(
+                roll = rushContext.roll!!.copyReroll(
+                    rerollSource = state.rerollContext!!.source,
+                    rerolledResult = d6,
+                ),
+                isSuccess = isRushSuccess(d6, rushContext.modifiers),
+            )
         }
     }
 

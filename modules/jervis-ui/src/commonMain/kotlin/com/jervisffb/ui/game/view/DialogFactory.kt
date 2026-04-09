@@ -25,8 +25,6 @@ import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
-import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -200,11 +198,11 @@ object DialogFactory {
                     SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.getContext<SetupTeamContext>().team)
                 }
 
-                is StandingUpRoll.RollDie,
-                is StandingUpRoll.ReRollDie -> {
-                    val player = controller.state.getContext<StandingUpRollContext>().player
-                    MultipleChoiceUserInputDialog.createStandingUpRollDialog(player)
-                }
+                //    (currentNode == StandingUpRoll.RollDie),
+                //    (currentNode == StandingUpRoll.ReRollDie) -> {
+                //        val player = controller.state.getContext<StandingUpRollContext>().player
+                //        MultipleChoiceUserInputDialog.createStandingUpRollDialog(player)
+                //    }
 
                 is SwelteringHeat.RollForAwayTeam,
                 is SwelteringHeat.RollForHomeTeam -> {

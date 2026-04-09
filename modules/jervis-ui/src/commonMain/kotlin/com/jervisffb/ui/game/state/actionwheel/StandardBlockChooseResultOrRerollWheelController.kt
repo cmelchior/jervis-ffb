@@ -39,7 +39,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         StandardBlockChooseResult.SelectBlockResult,
         StandardBlockChooseReroll.ReRollSourceOrAcceptRoll,
         SingleStandardBlockChooseResult.SelectBlockResult,
-        SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll,
+        SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll,
     )
 
     override fun getActionWheelCenter(state: Game): FieldCoordinate {
@@ -93,7 +93,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         val actionButtons = mutableListOf<ActionButtonData>()
         if (
             currentNode == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
-            || currentNode == SingleStandardBlockChooseReroll.ReRollSourceOrAcceptRoll
+            || currentNode == SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll
         ) {
             val rerollButtons = actions.getOrNull<SelectRerollOption>()?.let { rerollOption ->
                 rerollOption.options.map { option ->

@@ -5,17 +5,11 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -26,27 +20,25 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.LeapRollContext
-import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LeapModifier
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
 /**
  * Procedure for handling a Leap Roll as described on page 130 in the BB2025
@@ -54,67 +46,35 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
  * result is stored in [LeapRollContext] and it is up to the caller of the
  * procedure to choose the appropriate action depending on the outcome.
  */
-object LeapRoll : Procedure() {
-    override val initialNode: Node = RollDie
+object LeapRoll : D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.LEAP
+    override val initialNode: Node get() = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<LeapRollContext>()
+    override fun getActionOwner(state: Game): Team = state.getContext<LeapRollContext>().player.team
 
-    object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<LeapRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<LeapRollContext>()
-                val resultContext = rollContext.copy(
-                    roll = D6DieRoll.create(state, d6),
-                    isSuccess = isSuccess(rollContext, overrideD6 = d6)
-                )
-                return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.LEAP, d6),
-                    UpdateContext(resultContext),
-                    GotoNode(ChooseReRollSource),
-                )
-            }
-        }
-    }
-
-    object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<LeapRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<LeapRollContext>()
-            val availableRerolls = calculateAvailableRerollsFor(
-                rules,
-                context.player,
-                DiceRollType.LEAP,
-                context.roll!!,
-                context.isSuccess
+    override val RollDie = object: AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val rollContext = state.getContext<LeapRollContext>()
+            return rollContext.copy(
+                roll = D6DieRoll.create(state, d6),
+                isSuccess = isSuccess(rollContext, overrideD6 = d6)
             )
-            return if (availableRerolls == null) {
-                listOf(ContinueWhenReady)
-            } else {
-                listOf(SelectNoReroll(context.isSuccess)) + availableRerolls
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Continue,
-                is NoRerollSelected -> GotoNode(ChooseToUseDivingTackleAfterReRoll)
-                is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.LEAP, action.getRerollSource(state))
-                    compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
-                        ReportRerollUsed(action.getRerollSource(state)),
-                        GotoNode(UseRerollSource),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
         }
     }
 
-    object UseRerollSource : ParentNode() {
+    override val ChooseReRollSource = object : AbstractChooseRerollSource(
+        exitWithoutRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+    ) {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
+            val context = state.getContext<LeapRollContext>()
+            return RerollData(context.player, context.roll!!, context.isSuccess)
+        }
+    }
+
+    override val UseRerollSource = object : ParentNode() {
+        override fun name(): String = "UseRerollSource"
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return state.rerollContext!!.source.rerollProcedure
         }
@@ -128,30 +88,22 @@ object LeapRoll : Procedure() {
         }
     }
 
-    object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<LeapRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<LeapRollContext>()
-                val rerollResult = rollContext.copy(
-                    roll = rollContext.roll!!.copyReroll(
-                        rerollSource = state.rerollContext!!.source,
-                        rerolledResult = d6,
-                    ),
-                    isSuccess = isSuccess(rollContext, overrideD6 = d6)
-                )
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.LEAP, d6),
-                    UpdateContext(rerollResult),
-                    GotoNode(ChooseToUseDivingTackleAfterReRoll),
-                )
-            }
+    override val ReRollDie = object: AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val rollContext = state.getContext<LeapRollContext>()
+            return rollContext.copy(
+                roll = rollContext.roll!!.copyReroll(
+                    rerollSource = state.rerollContext!!.source,
+                    rerolledResult = d6,
+                ),
+                isSuccess = isSuccess(rollContext, overrideD6 = d6)
+            )
         }
+        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<LeapRollContext>().player.team.otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<LeapRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)

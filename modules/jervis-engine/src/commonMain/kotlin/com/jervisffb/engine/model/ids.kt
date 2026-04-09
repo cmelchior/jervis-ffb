@@ -1,5 +1,7 @@
 package com.jervisffb.engine.model
 
+import com.jervisffb.engine.rules.common.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -43,8 +45,9 @@ value class PlayerId(val value: String)
 value class PositionId(val value: String)
 
 /**
- * Unique identifier for a [RerollSource]. This must be unique across
- * the entire game.
+ * Unique identifier for a [RerollSource]. This must be unique across the entire
+ * game. A [single RerollSource] can offer multiple [DiceRerollOption]. They
+ * should each have the same [RerollSourceId].
  */
 @Serializable
 @JvmInline

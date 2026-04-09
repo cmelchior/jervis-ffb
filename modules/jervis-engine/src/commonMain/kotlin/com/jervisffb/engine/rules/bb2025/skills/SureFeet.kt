@@ -26,7 +26,6 @@ class SureFeet(
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
-    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false
@@ -34,6 +33,7 @@ class SureFeet(
     override val workWhenProne: Boolean = false
     override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 
+    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")
     override val rerollResetAt: Duration = Duration.END_OF_TURN
     override val rerollDescription: String = "Sure Feet Reroll"
     override var rerollUsed: Boolean = false

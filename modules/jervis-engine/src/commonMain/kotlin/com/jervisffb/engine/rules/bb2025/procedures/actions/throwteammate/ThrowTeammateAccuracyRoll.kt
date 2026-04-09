@@ -3,49 +3,36 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
-import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SelectNoReroll
-import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
-import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
-import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.QualityModifier
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
-import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 import kotlinx.collections.immutable.toPersistentList
 
@@ -56,7 +43,8 @@ import kotlinx.collections.immutable.toPersistentList
  * The result is stored in [ThrowTeamMateContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object ThrowTeammateAccuracyRoll: Procedure() {
+object ThrowTeammateAccuracyRoll: D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.ACCURACY
     override val initialNode: Node = ChooseToUseStrongArm
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ThrowTeamMateContext>()
@@ -64,9 +52,10 @@ object ThrowTeammateAccuracyRoll: Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowTeamMateContext>()
+    override fun getActionOwner(state: Game): Team = state.getContext<ThrowTeamMateContext>().thrower.team
 
     object ChooseToUseStrongArm: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowTeamMateContext>()
             val isStrongArmAvailable = context.thrower.isSkillAvailable(SkillType.STRONG_ARM)
@@ -93,88 +82,22 @@ object ThrowTeammateAccuracyRoll: Procedure() {
         }
     }
 
-    object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(com.jervisffb.engine.actions.RollDice(Dice.D6))
-        }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val updatedContext = updateThrowTeamMateContext(state, d6, reroll = false)
-                return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    UpdateContext(updatedContext),
-                    GotoNode(ChooseReRollSource),
-                )
-            }
+    override val RollDie = object : AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            return updateThrowTeamMateContext(state, d6, reroll = false)
         }
     }
 
-    object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+    override val ChooseReRollSource = object : AbstractChooseRerollSource() {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<ThrowTeamMateContext>()
-            val availableRerolls: SelectRerollOption? = calculateAvailableRerollsFor(
-                rules = rules,
-                player = context.thrower,
-                type = DiceRollType.ACCURACY,
-                roll = context.qualityRoll!!,
-                firstRollWasSuccess = context.isQualityRollSuccess
-            )
-            return if (availableRerolls == null) {
-                listOf(ContinueWhenReady)
-            } else {
-                listOf(SelectNoReroll(null)) + availableRerolls
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Continue -> ExitProcedure()
-                is NoRerollSelected -> ExitProcedure()
-                is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.ACCURACY, action.getRerollSource(state))
-                    compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
-                        ReportRerollUsed(action.getRerollSource(state)),
-                        GotoNode(UseRerollSource),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
+            return RerollData(context.thrower, context.qualityRoll!!, null)
         }
     }
 
-    object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
-        }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
-            return if (context.rerollAllowed) {
-                GotoNode(ReRollDie)
-            } else {
-                ExitProcedure()
-            }
-        }
-    }
-
-    object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(
-            com.jervisffb.engine.actions.RollDice(
-                Dice.D6
-            )
-        )
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val updatedContext = updateThrowTeamMateContext(state, d6, reroll = true)
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.ACCURACY, d6),
-                    UpdateContext(updatedContext),
-                    ExitProcedure(),
-                )
-            }
+    override val ReRollDie = object : AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            return updateThrowTeamMateContext(state, d6, reroll = true)
         }
     }
 

@@ -7,20 +7,13 @@ import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -33,12 +26,11 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
-import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
@@ -47,7 +39,6 @@ import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
-import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
@@ -56,10 +47,11 @@ import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import kotlinx.collections.immutable.toPersistentList
 
 /**
@@ -106,31 +98,23 @@ import kotlinx.collections.immutable.toPersistentList
  * Break Tackle and Prehensile Tail. In this case, it doesn't matter since they
  * are both "free", but in other cases it might.
  */
-object DodgeRoll: Procedure() {
-    override val initialNode: Node = RollDie
+object DodgeRoll: D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.DODGE
+    override val initialNode: Node get() = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return ReportDodgeResult(state.getContext<DodgeRollContext>())
+        val context = state.getContext<DodgeRollContext>()
+        return ReportDodgeResult(context)
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<DodgeRollContext>()
+    override fun getActionOwner(state: Game): Team = state.getContext<DodgeRollContext>().player.team
 
-    object RollDie: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
-
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+    override val RollDie = object : AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val context = state.getContext<DodgeRollContext>()
+            return context.copy(roll = D6DieRoll.create(state, d6))
         }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val context = state.getContext<DodgeRollContext>()
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.DODGE, d6),
-                    UpdateContext(context.copy(roll = D6DieRoll.create(state, d6))),
-                    GotoNode(CalculateMandatoryModifiers)
-                )
-            }
-        }
+        override val nextNode: Node = CalculateMandatoryModifiers
     }
 
     /**
@@ -175,7 +159,7 @@ object DodgeRoll: Procedure() {
      * Choose whether the dodging player should use Two Heads (if applicable).
      */
     object ChooseToUseTwoHeads: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -207,7 +191,7 @@ object DodgeRoll: Procedure() {
      * Choose whether dodging player should use Break Tackle (if applicable).
      */
     object ChooseToUseBreakTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -243,7 +227,7 @@ object DodgeRoll: Procedure() {
      * If multiple players have it, only 1 can use it.
      */
     object ChooseToUsePrehensileTail: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -295,7 +279,7 @@ object DodgeRoll: Procedure() {
      * this choice is after.
      */
     object ChooseToUseDivingTackleBeforeRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -340,9 +324,7 @@ object DodgeRoll: Procedure() {
     }
 
     object ChooseToUseTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team {
-            return state.getContext<DodgeRollContext>().player.team.otherTeam()
-        }
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
@@ -395,87 +377,38 @@ object DodgeRoll: Procedure() {
      * Choose where a reroll should come from (if any). This can be skills, team rerolls, special cards
      * or other sources.
      */
-    object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+    override val ChooseReRollSource = object : AbstractChooseRerollSource(
+        exitWithoutRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+    ) {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<DodgeRollContext>()
-            val dodgingPlayer = context.player
-            val availableReRolls: SelectRerollOption? = calculateAvailableRerollsFor(
-                rules,
-                dodgingPlayer,
-                DiceRollType.DODGE,
-                context.roll!!,
-                context.isSuccess
+            return RerollData(context.player, context.roll!!, context.isSuccess)
+        }
+    }
+
+    override val ReRollDie = object : AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val dodgeContext = state.getContext<DodgeRollContext>()
+            val rerollContext = state.rerollContext!!
+            return dodgeContext.copy(
+                roll = dodgeContext.roll!!.copyReroll(
+                    rerollSource = rerollContext.source,
+                    rerolledResult = d6,
+                ),
+                isSuccess = isSuccess(dodgeContext, overrideD6 = d6)
             )
-            return if (availableReRolls == null) {
-                listOf(ContinueWhenReady)
-            } else {
-                listOf(SelectNoReroll(context.isSuccess)) + availableReRolls
-            }
         }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Continue,
-                is NoRerollSelected -> GotoNode(ChooseToUseDivingTackleAfterReRoll)
-                is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.DODGE, action.getRerollSource(state))
-                    compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
-                        GotoNode(UseRerollSource),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
-        }
+        override val nextNodeCommand: Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
-    /**
-     * Use the selected reroll source.
-     */
-    object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = state.rerollContext!!.source.rerollProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
-            return if (context.rerollAllowed) {
-                GotoNode(ReRollDie)
-            } else {
-                GotoNode(ChooseToUseDivingTackleAfterReRoll)
-            }
-        }
-    }
-
-    object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val dodgeContext = state.getContext<DodgeRollContext>()
-                val rerollContext = state.rerollContext!!
-                val rerolledDodgeRoll = dodgeContext.copy(
-                    roll = dodgeContext.roll!!.copyReroll(
-                        rerollSource = rerollContext.source,
-                        rerolledResult = d6,
-                    ),
-                    isSuccess = isSuccess(dodgeContext, overrideD6 = d6)
-                )
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.DODGE, d6),
-                    UpdateContext(rerolledDodgeRoll),
-                    GotoNode(ChooseToUseDivingTackleAfterReRoll),
-                )
-            }
-        }
-    }
+    // Needs to be below ReRollDie due to initialization order issues.
+    override val UseRerollSource = CommonUseRerollSource(
+        rerollDiceNode = ReRollDie,
+        noRerollCommand = GotoNode(ChooseToUseDivingTackleAfterReRoll)
+    )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()

@@ -48,8 +48,9 @@ object SingleStandardBlockRerollDice: Procedure() {
     object UseRerollSource : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules,): Procedure = state.rerollContext!!.source.rerollProcedure
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<BlockContext>()
             // useRerollResult must be set by the procedure running which determines if a reroll is allowed
-            return if (state.rerollContext!!.rerollAllowed) {
+            return if (rules.isRerollAllowed(context.roll)) {
                 GotoNode(ReRollDie)
             } else {
                 ExitProcedure()

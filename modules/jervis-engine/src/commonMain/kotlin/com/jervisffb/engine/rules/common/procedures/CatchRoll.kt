@@ -1,38 +1,19 @@
 package com.jervisffb.engine.rules.common.procedures
 
-import com.jervisffb.engine.actions.Continue
-import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetOldContext
-import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.UpdateContext
-import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
-import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.CatchContext
-import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
-import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
 
 /**
  * Procedure for handling a Catch Roll as described on page 51 in the rulebook.
@@ -40,99 +21,41 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
  * in [CatchContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
-object CatchRoll : Procedure() {
-    override val initialNode: Node = RollDie
+object CatchRoll : D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.CATCH
+    override val initialNode: Node get() = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchContext>()
+    override fun getActionOwner(state: Game): Team = state.getContext<CatchContext>().catchingPlayer.team
 
-    object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<CatchContext>()
-                val resultContext = rollContext.copy(
-                    roll = D6DieRoll.create(state, d6),
-                    isSuccess = testAgainstAgility(rollContext.catchingPlayer, d6, rollContext.modifiers)
-                )
-                return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.CATCH, d6),
-                    UpdateContext(resultContext),
-                    GotoNode(ChooseReRollSource),
-                )
-            }
-        }
-    }
-
-    // Team Reroll, Pro, Catch (only if failed), other skills
-    object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<CatchContext>()
-            val availableRerolls = calculateAvailableRerollsFor(
-                rules,
-                context.catchingPlayer,
-                DiceRollType.CATCH,
-                context.roll!!,
-                context.isSuccess
+    override val RollDie = object : AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val rollContext = state.getContext<CatchContext>()
+            return rollContext.copy(
+                roll = D6DieRoll.create(state, d6),
+                isSuccess = testAgainstAgility(rollContext.catchingPlayer, d6, rollContext.modifiers)
             )
-            return if (availableRerolls == null) {
-                listOf(ContinueWhenReady)
-            } else {
-                listOf(SelectNoReroll(context.isSuccess)) + availableRerolls
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                Continue -> ExitProcedure()
-                is NoRerollSelected -> ExitProcedure()
-                is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.getRerollSource(state))
-                    compositeCommandOf(
-                        SetOldContext(Game::rerollContext, rerollContext),
-                        ReportRerollUsed(action.getRerollSource(state)),
-                        GotoNode(UseRerollSource),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
         }
     }
 
-    object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext!!.source.rerollProcedure
-        }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
-            return if (context.rerollAllowed) {
-                GotoNode(ReRollDie)
-            } else {
-                ExitProcedure()
-            }
+    override val ChooseReRollSource = object : AbstractChooseRerollSource() {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
+            val context = state.getContext<CatchContext>()
+            return RerollData(context.catchingPlayer, context.roll!!, context.isSuccess)
         }
     }
 
-    object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchContext>().catchingPlayer.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D6Result>(action) { d6 ->
-                val catchRollContext = state.getContext<CatchContext>()
-                val rerollResult = catchRollContext.copy(
-                    roll = catchRollContext.roll!!.copyReroll(
-                        rerollSource = state.rerollContext!!.source,
-                        rerolledResult = d6,
-                    ),
-                    isSuccess = testAgainstAgility(catchRollContext.catchingPlayer, d6, catchRollContext.modifiers)
-                )
-                compositeCommandOf(
-                    UpdateContext(rerollResult),
-                    ExitProcedure(),
-                )
-            }
+    override val ReRollDie = object : AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val catchRollContext = state.getContext<CatchContext>()
+            return catchRollContext.copy(
+                roll = catchRollContext.roll!!.copyReroll(
+                    rerollSource = state.rerollContext!!.source,
+                    rerolledResult = d6,
+                ),
+                isSuccess = testAgainstAgility(catchRollContext.catchingPlayer, d6, catchRollContext.modifiers)
+            )
         }
     }
 }
