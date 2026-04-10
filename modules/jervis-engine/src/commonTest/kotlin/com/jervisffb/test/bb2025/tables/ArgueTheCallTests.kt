@@ -9,7 +9,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.BrilliantCoachingReroll
+import com.jervisffb.engine.rules.common.rerolls.BrilliantCoachingReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer

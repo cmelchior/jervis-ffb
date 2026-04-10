@@ -1,7 +1,6 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -13,7 +12,7 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
-import com.jervisffb.engine.rules.common.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable

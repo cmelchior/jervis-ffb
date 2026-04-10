@@ -17,7 +17,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.ext.rollForward

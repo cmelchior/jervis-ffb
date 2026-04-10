@@ -7,8 +7,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
-import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 

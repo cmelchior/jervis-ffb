@@ -16,9 +16,9 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.engine.utils.singleInstanceOf
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

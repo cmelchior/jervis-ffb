@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {

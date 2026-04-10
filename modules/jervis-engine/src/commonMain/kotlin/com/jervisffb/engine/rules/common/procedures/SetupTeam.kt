@@ -38,7 +38,7 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 

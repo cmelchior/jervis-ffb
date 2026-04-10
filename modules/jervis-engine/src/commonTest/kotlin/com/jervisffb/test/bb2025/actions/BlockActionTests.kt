@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.TeamReroll
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2020.skills.BlockTests

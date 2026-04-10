@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.FullGame
-import com.jervisffb.engine.rules.common.skills.TeamReroll
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2020.advancedHumanTeamAway

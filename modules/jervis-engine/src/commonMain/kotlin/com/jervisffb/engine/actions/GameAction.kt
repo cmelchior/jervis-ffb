@@ -20,7 +20,7 @@ import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil

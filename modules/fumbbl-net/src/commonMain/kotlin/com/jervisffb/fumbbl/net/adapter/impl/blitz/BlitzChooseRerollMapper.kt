@@ -8,8 +8,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.common.skills.DiceRerollOption
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

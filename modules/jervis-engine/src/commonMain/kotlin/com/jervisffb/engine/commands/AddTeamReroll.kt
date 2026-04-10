@@ -2,7 +2,7 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.common.skills.TeamReroll
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 
 /**
  * Add a new reroll to the team.

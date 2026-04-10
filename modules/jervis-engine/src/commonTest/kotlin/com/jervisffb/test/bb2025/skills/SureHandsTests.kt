@@ -14,7 +14,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo

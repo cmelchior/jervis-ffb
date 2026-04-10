@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.common.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 
 /**

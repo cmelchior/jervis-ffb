@@ -12,7 +12,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test

@@ -17,7 +17,7 @@ import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward

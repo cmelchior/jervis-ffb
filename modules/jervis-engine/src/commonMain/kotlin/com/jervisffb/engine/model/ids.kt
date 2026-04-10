@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model
 
-import com.jervisffb.engine.rules.common.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.serialization.Serializable

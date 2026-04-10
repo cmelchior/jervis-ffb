@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.skills
+package com.jervisffb.engine.rules.common.rerolls
 
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
@@ -6,10 +6,13 @@ import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.common.procedures.UseTeamReroll
-import kotlinx.serialization.Serializable
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.RerollSource
 
+/**
+ * Interface describing all types of a Team Reroll.
+ */
 sealed interface TeamReroll : RerollSource {
     val teamId: TeamId
     val carryOverIntoOvertime: Boolean
@@ -39,6 +42,9 @@ sealed interface TeamReroll : RerollSource {
     }
 }
 
+/**
+ * Class representing a regular team reroll that are part of the roster.
+ */
 class RegularTeamReroll(override val teamId: TeamId, val index: Int) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
@@ -48,6 +54,13 @@ class RegularTeamReroll(override val teamId: TeamId, val index: Int) : TeamRerol
     override var rerollUsed: Boolean = false
 }
 
+/**
+ * Class representing the reroll gained by having a player with Leader on the
+ * team.
+ *
+ * Note, the availability of this reroll is determined by more complex rules.
+ * These rules are handled in the relevant procedures.
+ */
 class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
@@ -57,6 +70,10 @@ class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
+/**
+ * Class representing the reroll gained by rolling Brilliant Coaching on the
+ * Kick-off Event Table.
+ */
 class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
@@ -66,30 +83,16 @@ class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-interface D6StandardSkillReroll : RerollSource {
+/**
+ * Class representing the reroll provided by the Team Mascot inducement
+ */
+class TeamMascotReroll(override val teamId: TeamId) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("${teamId.value}-mascot")
+    override val carryOverIntoOvertime: Boolean = true
+    override val duration = Duration.END_OF_GAME
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
+    override val rerollDescription: String = "Team Reroll (Mascot)"
+    override var rerollUsed: Boolean = false
     override val rerollProcedure: Procedure
-        get() = UseStandardSkillReroll
-
-    override fun calculateRerollOptions(
-        type: DiceRollType,
-        value: List<DieRoll<*>>,
-        wasSuccess: Boolean?,
-    ): List<DiceRerollOption> {
-        // For standard skills
-        if (value.size != 1) error("Unsupported number of dice: ${value.joinToString()}")
-        return listOf(DiceRerollOption(this.id, value))
-    }
-}
-
-@Serializable
-data class DiceRerollOption(
-    val rerollId: RerollSourceId,
-    val dice: List<DieRoll<*>>,
-) {
-    constructor(rerollId: RerollSourceId, dieRoll: DieRoll<*>): this(rerollId, listOf(dieRoll))
-    constructor(source: RerollSource, dieRoll: DieRoll<*>): this(source.id, listOf(dieRoll))
-
-    fun getRerollSource(game: Game): RerollSource {
-        return game.getRerollSourceById(rerollId)
-    }
+        get() = super.rerollProcedure
 }

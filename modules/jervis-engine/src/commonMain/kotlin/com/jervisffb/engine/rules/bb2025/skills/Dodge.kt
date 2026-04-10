@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.skills.D6StandardSkillReroll
+import com.jervisffb.engine.rules.common.rerolls.D6StandardSkillReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType

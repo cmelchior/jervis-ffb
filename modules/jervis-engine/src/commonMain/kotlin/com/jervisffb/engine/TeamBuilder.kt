@@ -15,11 +15,11 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite

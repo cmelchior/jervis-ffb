@@ -62,6 +62,19 @@ object UseTeamReroll : Procedure() {
     }
 }
 
+object UseMascotReroll: Procedure() {
+    override val initialNode: Node
+        get() = TODO("Not yet implemented")
+
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        TODO("Not yet implemented")
+    }
+
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        TODO("Not yet implemented")
+    }
+}
+
 /**
  * Define the rules for using a normal skill reroll.
  */

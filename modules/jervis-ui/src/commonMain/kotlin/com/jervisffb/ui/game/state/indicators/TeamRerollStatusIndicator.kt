@@ -4,9 +4,9 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.common.skills.BrilliantCoachingReroll
-import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
-import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.BrilliantCoachingReroll
+import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.ui.game.UiReroll
 import com.jervisffb.ui.game.UiRerollType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
