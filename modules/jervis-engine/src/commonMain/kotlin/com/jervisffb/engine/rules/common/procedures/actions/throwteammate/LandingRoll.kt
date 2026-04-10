@@ -52,7 +52,7 @@ object LandingRoll : D6WithRerollProcedure() {
             val landingRollContext = state.getContext<LandingRollContext>()
             return landingRollContext.copy(
                 roll = landingRollContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = testAgainstAgility(landingRollContext.landingPlayer, d6, landingRollContext.modifiers)

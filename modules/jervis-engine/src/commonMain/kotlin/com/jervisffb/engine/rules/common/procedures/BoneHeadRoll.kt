@@ -88,7 +88,7 @@ object BoneHeadRoll: D6WithRerollProcedure() {
             val rollResultContext = state.getContext<BoneHeadRollContext>()
             return rollResultContext.copy(
                 roll = rollResultContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = calculateSuccess(d6)

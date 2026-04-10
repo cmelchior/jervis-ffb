@@ -52,7 +52,7 @@ object SwoopDirectionRoll : D3WithRerollProcedure() {
             val selectedDirection = context.selectedDirection ?: error("No direction selected: $context")
             return context.copy(
                 directionRoll = context.directionRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d3,
                 ),
                 rolledDirection = rules.throwIn(selectedDirection, d3)

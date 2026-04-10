@@ -50,7 +50,7 @@ object BreatheFireRoll: D6WithRerollProcedure() {
             val context = state.getContext<BreatheFireContext>()
             return context.copy(
                 breatheRoll = context.breatheRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
             )

@@ -58,7 +58,7 @@ object ShadowingRoll : D6WithRerollProcedure() {
             val context = state.getContext<ShadowingRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isShadowingSuccessful(d6, context.modifiers)

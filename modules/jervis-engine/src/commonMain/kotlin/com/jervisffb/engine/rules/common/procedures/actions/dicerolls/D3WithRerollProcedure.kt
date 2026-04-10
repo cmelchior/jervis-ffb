@@ -191,10 +191,11 @@ abstract class D3WithRerollProcedure: Procedure() {
 
     class CommonUseRerollSource(private val rerollDiceNode: ActionNode): ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext?.source?.rerollProcedure ?: error("Missing reroll procedure for D3WithReroll: ${state.rerollContext}")
+            val context = state.getRerollContextOrNull()
+            return context?.source?.rerollProcedure ?: error("Missing reroll procedure for D3WithReroll: $context")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext!!
+            val context = state.getRerollContext()
             return when (context.rerollAllowed) {
                 true -> GotoNode(rerollDiceNode)
                 false -> ExitProcedure()

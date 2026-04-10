@@ -54,7 +54,7 @@ object PassingInterferenceRoll : D6WithRerollProcedure() {
             val context = state.getContext<PassingInterferenceRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = testAgainstAgility(context.player, d6, context.modifiers)

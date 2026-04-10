@@ -85,7 +85,7 @@ object UseStandardSkillReroll : Procedure() {
 
     object UseReroll : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+            val context = state.getRerollContext()
             return compositeCommandOf(
                 when (context.source != null && context.source.rerollResetAt != Duration.PERMANENT) {
                     true -> SetSkillRerollUsed(context.source, used = true)

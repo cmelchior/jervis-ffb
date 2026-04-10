@@ -73,11 +73,12 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object SingleStandardBlockStep : Procedure() {
     override val initialNode: Node = CheckForFoulAppearance
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val context = UseRerollContext(type = DiceRollType.BLOCK)
+        val blockContext = state.getContext<BlockContext>()
+        val context = UseRerollContext(type = DiceRollType.BLOCK, blockContext.attacker)
         return AddContext(context)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.rerollContext
+        val context = state.getRerollContextOrNull()
         if (context?.type != DiceRollType.BLOCK) {
             INVALID_GAME_STATE("Invalid reroll type for SingleStandardBlockStep: ${context?.type}")
         }
@@ -133,7 +134,7 @@ object SingleStandardBlockStep : Procedure() {
     object SelectRerollType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockChooseReroll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return when (state.rerollContext?.source != null) {
+            return when (state.getRerollContextOrNull()?.source != null) {
                 true -> GotoNode(RerollDice)
                 false -> GotoNode(SelectBlockResult)
             }

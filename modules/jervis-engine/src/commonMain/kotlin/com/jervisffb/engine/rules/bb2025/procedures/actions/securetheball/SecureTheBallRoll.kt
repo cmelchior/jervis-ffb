@@ -54,7 +54,7 @@ object SecureTheBallRoll : D6WithRerollProcedure() {
             val context = state.getContext<SecureTheBallRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isSecuringSuccessful(d6, context.modifiers)

@@ -147,7 +147,7 @@ abstract class D6WithRerollProcedure: Procedure() {
                 Continue -> rerollNotAvailableCommand()
                 is NoRerollSelected -> noRerollSelectedCommand()
                 is RerollOptionSelected -> {
-                    val rerollContext = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+                    val rerollContext = state.getRerollContext()
                     if (rerollContext.type != rollType) {
                         INVALID_GAME_STATE("Reroll type mismatch: expected $rollType, got $rerollContext")
                     }
@@ -198,10 +198,11 @@ abstract class D6WithRerollProcedure: Procedure() {
         private val noRerollCommand: () -> Command = { ExitProcedure() }
     ): ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
+            val context = state.getRerollContextOrNull()
+            return context?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: $context")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+            val context = state.getRerollContext()
             return when (context.rerollAllowed) {
                 true -> GotoNode(rerollDiceNode)
                 false -> noRerollCommand()

@@ -52,7 +52,7 @@ object PickupRoll : D6WithRerollProcedure() {
             val context = state.getContext<PickupRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isPickupSuccess(d6, context.player.agility, context.modifiers)

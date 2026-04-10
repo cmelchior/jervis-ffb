@@ -196,10 +196,12 @@ class Game(
     val contexts: ContextHolder = ContextHolder()
     // Rerolls are so widely used across multiple procedures that we want to
     // make it really easy get access them.
-    val rerollContext: UseRerollContext?
-        get() {
-            return getContextOrNull<UseRerollContext>()
-        }
+    fun getRerollContext(): UseRerollContext {
+        return getContextOrNull<UseRerollContext>() ?: INVALID_GAME_STATE("No reroll context found")
+    }
+    fun getRerollContextOrNull(): UseRerollContext? {
+        return getContextOrNull<UseRerollContext>()
+    }
 
     val balls: MutableList<Ball> = mutableListOf(Ball())
     // Easy reference to the ball that is currently being "handled" somehow. This makes

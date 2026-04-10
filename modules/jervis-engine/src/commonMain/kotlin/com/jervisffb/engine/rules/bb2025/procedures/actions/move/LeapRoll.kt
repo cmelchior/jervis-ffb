@@ -76,7 +76,7 @@ object LeapRoll : D6WithRerollProcedure() {
             val rollContext = state.getContext<LeapRollContext>()
             return rollContext.copy(
                 roll = rollContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isSuccess(rollContext, overrideD6 = d6)

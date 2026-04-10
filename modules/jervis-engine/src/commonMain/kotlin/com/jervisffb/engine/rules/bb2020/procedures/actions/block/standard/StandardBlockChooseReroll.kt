@@ -55,7 +55,7 @@ object StandardBlockChooseReroll: Procedure() {
                 Continue,
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+                    val context = state.getRerollContext()
                     val updatedContext = context.copy(
                         source = action.getRerollSource(state),
                         selectedRerollOption = action.option

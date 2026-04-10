@@ -122,7 +122,7 @@ object RushRoll: D6WithRerollProcedure() {
             val rushContext = state.getContext<RushRollContext>()
             return rushContext.copy(
                 roll = rushContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isRushSuccess(d6, rushContext.modifiers),

@@ -389,7 +389,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     override val ReRollDie = object : AbstractReRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val dodgeContext = state.getContext<DodgeRollContext>()
-            val rerollContext = state.rerollContext!!
+            val rerollContext = state.getRerollContext()
             return dodgeContext.copy(
                 roll = dodgeContext.roll!!.copyReroll(
                     rerollSource = rerollContext.source,

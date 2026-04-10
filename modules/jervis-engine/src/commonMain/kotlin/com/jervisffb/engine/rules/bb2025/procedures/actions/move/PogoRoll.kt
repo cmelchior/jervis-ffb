@@ -74,7 +74,7 @@ object PogoRoll : D6WithRerollProcedure() {
             val rollContext = state.getContext<PogoRollContext>()
             return rollContext.copy(
                 roll = rollContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)

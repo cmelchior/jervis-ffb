@@ -57,7 +57,7 @@ object SingleStandardBlockChooseReroll: Procedure() {
                 Continue,
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val context = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+                    val context = state.getRerollContext()
                     val rerollContext = context.copy(
                         source = action.getRerollSource(state),
                         selectedRerollOption = action.option
@@ -74,7 +74,7 @@ object SingleStandardBlockChooseReroll: Procedure() {
 
     object UseReroll: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
+            return state.getRerollContextOrNull()?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.getRerollContextOrNull()}")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()

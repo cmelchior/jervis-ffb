@@ -158,7 +158,7 @@ object ThrowTeammateAccuracyRoll: D6WithRerollProcedure() {
         return if (reroll) {
             context.copy(
                 qualityRoll = context.qualityRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6
                 ),
                 qualityRollResult = result

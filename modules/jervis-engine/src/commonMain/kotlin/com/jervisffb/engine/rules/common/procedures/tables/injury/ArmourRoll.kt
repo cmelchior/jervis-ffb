@@ -88,7 +88,7 @@ object ArmourRoll: Procedure() {
         return AddContext(rerollContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val rerollContext = state.rerollContext ?: INVALID_GAME_STATE("Missing reroll context")
+        val rerollContext = state.getRerollContext()
         if (rerollContext.type != DiceRollType.ARMOUR) {
             INVALID_GAME_STATE("Invalid reroll context type: $rerollContext")
         }
@@ -135,7 +135,7 @@ object ArmourRoll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
                 val context = state.getContext<RiskingInjuryContext>()
-                val reroll = state.rerollContext ?: error("Missing rerollContext")
+                val reroll = state.getRerollContext()
                 val originalRoll = context.armourRoll
                 val updatedD1 = originalRoll.first().copyReroll(
                     reroll.source,
@@ -339,7 +339,7 @@ object ArmourRoll: Procedure() {
                         context.armourRoll,
                         wasSuccess = false // Lone Fouler can only be used on sucesses
                     ).singleOrNull() ?: error("Lone Fouler returned more than one re-roll option")
-                    val rerollContext = state.rerollContext!!.copy(
+                    val rerollContext = state.getRerollContext().copy(
                         source = rerollSource,
                         selectedRerollOption = rerollOption
                     )

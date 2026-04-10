@@ -51,7 +51,7 @@ object ProjectileVomitRoll: D6WithRerollProcedure() {
             val context = state.getContext<ProjectileVomitContext>()
             return context.copy(
                 vomitRoll = context.vomitRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isSuccess(d6),

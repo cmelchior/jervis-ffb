@@ -51,7 +51,7 @@ object SteadyFootingRoll : D6WithRerollProcedure() {
             val context = state.getContext<SteadyFootingRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = steadyFootingTest(d6)

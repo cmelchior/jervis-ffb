@@ -73,7 +73,7 @@ object FoulAppearanceRoll: D6WithRerollProcedure() {
             val context = state.getContext<FoulAppearanceContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isSuccessful(d6)

@@ -93,7 +93,7 @@ object StandingUpRoll : D6WithRerollProcedure() {
             val rollContext = state.getContext<StandingUpRollContext>()
             return rollContext.copy(
                 roll = rollContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext.modifiers)

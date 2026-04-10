@@ -205,7 +205,7 @@ object PassAccuracyRoll: D6WithRerollProcedure() {
             val context = state.getContext<PassContext>()
             return context.copy(
                 passingRoll = context.passingRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6
                 )
             )

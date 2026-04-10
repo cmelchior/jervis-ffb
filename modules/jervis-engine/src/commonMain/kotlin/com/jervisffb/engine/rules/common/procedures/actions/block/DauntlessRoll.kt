@@ -72,7 +72,7 @@ object DauntlessRoll: D6WithRerollProcedure() {
             val context = state.getContext<DauntlessRollContext>()
             return context.copy(
                 roll = context.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 modifier = calculateModifier(context.attacker, context.defender, d6),

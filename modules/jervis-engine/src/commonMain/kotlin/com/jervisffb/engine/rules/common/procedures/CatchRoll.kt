@@ -51,7 +51,7 @@ object CatchRoll : D6WithRerollProcedure() {
             val catchRollContext = state.getContext<CatchContext>()
             return catchRollContext.copy(
                 roll = catchRollContext.roll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
                 isSuccess = testAgainstAgility(catchRollContext.catchingPlayer, d6, catchRollContext.modifiers)

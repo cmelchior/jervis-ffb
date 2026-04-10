@@ -31,6 +31,7 @@ import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.assert
 import kotlin.math.absoluteValue
 
 /**
@@ -41,13 +42,13 @@ object SingleStandardBlockRerollDice: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
-        if (state.rerollContext == null) INVALID_GAME_STATE("Missing reroll context.")
+        assert(state.getRerollContextOrNull() != null)
         state.assertContext<BlockContext>()
     }
 
     object UseRerollSource : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules,): Procedure {
-            return state.rerollContext?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.rerollContext}")
+            return state.getRerollContextOrNull()?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.getRerollContextOrNull()}")
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
@@ -70,7 +71,7 @@ object SingleStandardBlockRerollDice: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRollList<DBlockResult>(action) { rerolls: List<DBlockResult> ->
-                val rerollContext = state.rerollContext!!
+                val rerollContext = state.getRerollContext()
                 val blockContext = state.getContext<BlockContext>()
                 val updatedRoll = blockContext.roll.mapIndexed { i, blockRoll: BlockDieRoll ->
                     blockRoll.copyReroll(

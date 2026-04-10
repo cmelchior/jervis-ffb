@@ -51,7 +51,7 @@ object SwoopDistanceRoll : D6WithRerollProcedure() {
             val context = state.getContext<SwoopContext>()
             return context.copy(
                 distanceRoll = context.distanceRoll!!.copyReroll(
-                    rerollSource = state.rerollContext!!.source,
+                    rerollSource = state.getRerollContext().source,
                     rerolledResult = d6,
                 ),
             )
