@@ -9,8 +9,8 @@ import com.jervisffb.engine.commands.RemovePlayerSkill
 import com.jervisffb.engine.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.RemovePrayersToNuffle
+import com.jervisffb.engine.commands.RemoveTeamFeature
 import com.jervisffb.engine.commands.RemoveTeamReroll
-import com.jervisffb.engine.commands.RemoveTeamStatusEffect
 import com.jervisffb.engine.commands.ResetShadowingSkill
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
@@ -353,10 +353,10 @@ private fun gatherResetTeamTemporaryModifiersCommands(
     builder.addAll(specialPlayCards)
 
     // Any Team Status Effects that might expire
-    val teamStatusEffects: List<RemoveTeamStatusEffect> = team.statusEffects
+    val teamFeatures: List<RemoveTeamFeature> = team.features
         .filter { it.duration == duration }
-        .map { RemoveTeamStatusEffect(team, it) }
-    builder.addAll(teamStatusEffects)
+        .map { RemoveTeamFeature(team, it) }
+    builder.addAll(teamFeatures)
 }
 
 /**

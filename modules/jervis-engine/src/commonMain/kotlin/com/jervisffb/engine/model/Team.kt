@@ -4,16 +4,17 @@ import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.inducements.Bribe
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
+import com.jervisffb.engine.model.inducements.TeamMascot
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
-import com.jervisffb.engine.model.modifiers.TeamStatusEffect
-import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamFeature
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
-import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -100,11 +101,13 @@ class Team(
     val wizards = mutableListOf<Wizard>()
     val specialPlayCards = mutableListOf<SpecialPlayCard>()
     val infamousCoachingStaff = mutableListOf<InfamousCoachingStaff>()
+    val mascots = mutableListOf<TeamMascot>()
 
-    // Some effects are hard to put into other buckets, like Cheering Fans Offensive Assists.
-    // In these cases, we might want to mark the team somehow. This is done through a
-    // TeamStatusEffect.
-    val statusEffects: MutableList<TeamStatusEffect> = mutableListOf()
+    // Some effects are hard to put into other buckets, like Cheering Fans
+    // Offensive Assists. In these cases, we might want to mark the team
+    // somehow. This is done through a TeamFeature, which act as a catch-all
+    // for rules that don't fit elsewhere.
+    val features: MutableList<TeamFeature> = mutableListOf()
 
     // Cyclic dependencies. Must be manually set when a Team is constructed
     // TODO Why do we have these and `isAwayTeam()`?
@@ -168,20 +171,20 @@ class Team(
         return activePrayersToNuffle.contains(prayer)
     }
 
-    fun addStatusEffect(effect: TeamStatusEffect) {
-        if (!statusEffects.add(effect)) {
-            INVALID_GAME_STATE("Could not add status effect: ${effect.type}")
+    fun addFeature(feature: TeamFeature) {
+        if (!features.add(feature)) {
+            INVALID_GAME_STATE("Could not add feature: ${feature.type}")
         }
     }
 
-    fun removeStatusEffect(effect: TeamStatusEffect) {
-        if (!statusEffects.remove(effect)) {
-            INVALID_GAME_STATE("Could not remove status effect: ${effect.type}")
+    fun removeFeature(feature: TeamFeature) {
+        if (!features.remove(feature)) {
+            INVALID_GAME_STATE("Could not remove feature: ${feature.type}")
         }
     }
 
-    fun hasStatusEffect(effect: TeamStatusEffectType): Boolean {
-        return statusEffects.any { it.type == effect }
+    fun hasFeature(feature: TeamFeatureType): Boolean {
+        return features.any { it.type == feature }
     }
 
     override fun toString(): String {

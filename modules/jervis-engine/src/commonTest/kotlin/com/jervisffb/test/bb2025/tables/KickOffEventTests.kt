@@ -28,7 +28,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.KickoffStatModifier
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
@@ -348,8 +348,8 @@ class KickOffEventTests: JervisGameBB2025Test() {
                 ),
             ),
         )
-        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -365,8 +365,8 @@ class KickOffEventTests: JervisGameBB2025Test() {
                 ),
             ),
         )
-        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -382,8 +382,8 @@ class KickOffEventTests: JervisGameBB2025Test() {
                 ),
             ),
         )
-        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -399,14 +399,14 @@ class KickOffEventTests: JervisGameBB2025Test() {
                 ),
             ),
         )
-        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         controller.rollForward(
             EndTurn
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -422,21 +422,21 @@ class KickOffEventTests: JervisGameBB2025Test() {
                 ),
             ),
         )
-        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
             EndTurn
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertTrue(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         controller.rollForward(
             EndTurn
         )
         assertEquals(awayTeam, state.activeTeam)
-        assertFalse(homeTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(homeTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -454,7 +454,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         val attacker = awayTeam["A1".playerId]
         val defender = homeTeam["H1".playerId]
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             PlayerSelected(defender),
@@ -471,7 +471,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         assertNull(state.activePlayer)
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -489,7 +489,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         val attacker = awayTeam["A1".playerId]
         val defender = homeTeam["H1".playerId]
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLITZ),
             PlayerSelected(defender),
@@ -509,7 +509,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             EndAction
         )
         assertNull(state.activePlayer)
-        assertFalse(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test
@@ -528,14 +528,14 @@ class KickOffEventTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A1".playerId]
         attacker.addSkill(SkillType.STAB)
         val defender = homeTeam["H1".playerId]
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
         controller.rollForward(
             *activatePlayer(attacker, PlayerSpecialActionType.STAB),
             PlayerSelected(defender),
             DiceRollResults(3.d6, 2.d6),
         )
         assertNull(state.activePlayer)
-        assertTrue(awayTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST))
+        assertTrue(awayTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST))
     }
 
     @Test

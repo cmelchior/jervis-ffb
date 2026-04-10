@@ -4,7 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
@@ -50,7 +50,7 @@ object TeamFeatureStatusIndicator: FieldStatusIndicator {
         }
 
         // Cheering Fans Offensive Assist
-        if (team.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+        if (team.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
             featureList.add(
                 UiTeamFeature(
                     name = "+1 Offensive Assist on next Block",

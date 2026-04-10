@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.commands.AddTeamStatusEffect
+import com.jervisffb.engine.commands.AddTeamFeature
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -23,8 +23,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.CheeringFansContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.TeamStatusEffect
-import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamFeature
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.reports.ReportCheeringFansResult
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
@@ -80,11 +80,11 @@ object BB2025CheeringFans : Procedure() {
             val kickingTeamResult = context.kickingTeamRoll.value + kickingTeam.cheerleaders
             val receivingTeamResult = context.receivingTeamRoll!!.value + receivingTeam.cheerleaders
             return buildCompositeCommand {
-                if (kickingTeamResult >= receivingTeamResult && !kickingTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
-                    add(AddTeamStatusEffect(kickingTeam, TeamStatusEffect.cheeringFans()))
+                if (kickingTeamResult >= receivingTeamResult && !kickingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                    add(AddTeamFeature(kickingTeam, TeamFeature.cheeringFans()))
                 }
-                if (receivingTeamResult >= kickingTeamResult && !receivingTeam.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
-                    add(AddTeamStatusEffect(receivingTeam, TeamStatusEffect.cheeringFans()))
+                if (receivingTeamResult >= kickingTeamResult && !receivingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                    add(AddTeamFeature(receivingTeam, TeamFeature.cheeringFans()))
                 }
                 add(
                     ReportCheeringFansResult(

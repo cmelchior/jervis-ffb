@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock
 
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveTeamStatusEffect
+import com.jervisffb.engine.commands.RemoveTeamFeature
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.SkillStatModifier
-import com.jervisffb.engine.model.modifiers.TeamStatusEffectType
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.MultipleBlockAction
@@ -116,7 +116,7 @@ object SingleStandardBlockDetermineModifiers: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockContext>()
             val offensiveAssists = rules.calculateOffensiveAssists(context.attacker, context.defender)
-            val cheeringFansExtraAssist = when (context.attacker.team.hasStatusEffect(TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+            val cheeringFansExtraAssist = when (context.attacker.team.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
                 true -> 1
                 false -> 0
             }
@@ -124,8 +124,8 @@ object SingleStandardBlockDetermineModifiers: Procedure() {
             return compositeCommandOf(
                 when (cheeringFansExtraAssist > 0) {
                     true -> {
-                        val cheeringFansEffect = context.attacker.team.statusEffects.first { it.type == TeamStatusEffectType.CHEERING_FANS_OFFENSIVE_ASSIST }
-                        RemoveTeamStatusEffect(context.attacker.team, cheeringFansEffect)
+                        val cheeringFansEffect = context.attacker.team.features.first { it.type == TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST }
+                        RemoveTeamFeature(context.attacker.team, cheeringFansEffect)
                     }
                     false -> null
                 },
