@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.utils.LiveMergeList
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -114,6 +115,7 @@ class Player(
                 is GiantLocation -> INVALID_GAME_STATE("Cannot ask for coordinates for a giant player")
             }
         }
+
     // True from the player is selected as the thrown player until they finalize their landing
     // in an empty square or out of bounds.
     var isBeingThrown: Boolean = false
@@ -129,9 +131,9 @@ class Player(
     var number: PlayerNo = PlayerNo(0)
     // When updating `baseMove` and `moveModifiers`, `move` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.
-    var baseMove: Int = 0
+    var baseMove: Int = position.move
     val moveModifiers = mutableListOf<StatModifier>()
-    var move: Int = 0
+    var move: Int = position.move
     // How many moves the player has left, before rushes are needed.
     // Rolling for a Rush will modify this number.
     var movesLeft: Int = 0
@@ -139,24 +141,24 @@ class Player(
     var rushesLeft: Int = 0
     // When updating `baseStrength` and `strengthModifiers`, `strength` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.
-    var baseStrength: Int = 0
+    var baseStrength: Int = position.strength
     val strengthModifiers = mutableListOf<StatModifier>()
-    var strength: Int = 0
+    var strength: Int = position.strength
     // When updating `baseAgility` and `agilityModifiers`, `agility` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.
-    var baseAgility: Int = 0
+    var baseAgility: Int = position.agility
     val agilityModifiers = mutableListOf<StatModifier>()
-    var agility: Int = 0
+    var agility: Int = position.agility
     // When updating `basePassing` and `passingModifiers`, `passing` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.
-    var basePassing: Int? = null
+    var basePassing: Int? = position.passing
     val passingModifiers = mutableListOf<StatModifier>()
-    var passing: Int? = null
+    var passing: Int? = position.passing
     // When updating `baseArmorValue` and `armourModifiers`, `armorValue` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.
-    var baseArmorValue: Int = 0
+    var baseArmorValue: Int = position.armorValue
     val armourModifiers = mutableListOf<StatModifier>()
-    var armorValue: Int = 0
+    var armorValue: Int = position.armorValue
 
     val statModifiers: List<StatModifier>
         get() {
@@ -167,8 +169,10 @@ class Player(
     // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
     // to mark the player somehow. This is done through a PlayerStatusEffect.
     val statusEffects: MutableList<PlayerStatusEffect> = mutableListOf()
+
+    // Skills tracking
     val extraSkills = mutableListOf<Skill<*>>()
-    var positionSkills = position.skills.mapNotNull {
+    val positionSkills = position.skills.mapNotNull {
         // TODO For now, just ignore skills that are not supported
         if (rules.skillSettings.isSkillSupported(it.type)) {
             rules.createSkill(this, it)
@@ -176,8 +180,7 @@ class Player(
             null
         }
     }.toMutableList()
-    val skills: List<Skill<*>>
-        get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
+    val skills: List<Skill<*>> = LiveMergeList(extraSkills, positionSkills)
     // Unclear if keywords are all backed in from the start or they can change. For now, assume just keep them locked to the position
     val keywords: MutableList<PlayerKeyword> = position.keywords.toMutableList()
     var nigglingInjuries: Int = 0

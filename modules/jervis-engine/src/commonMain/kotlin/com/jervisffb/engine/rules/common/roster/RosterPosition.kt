@@ -58,24 +58,6 @@ data class RosterPosition(
             this.team = team
             this.name = name
             this.number = number
-            baseMove = position.move
-            move = position.move
-            baseStrength = position.strength
-            strength = position.strength
-            baseAgility = position.agility
-            agility = position.agility
-            basePassing = this@RosterPosition.passing
-            passing = this@RosterPosition.passing
-            baseArmorValue = position.armorValue
-            armorValue = position.armorValue
-            positionSkills = position.skills.mapNotNull { skill ->
-                // TODO For now we just ignore skills not supported
-                if (rules.skillSettings.isSkillSupported(skill.type)) {
-                    rules.createSkill(this, skill)
-                } else {
-                    null
-                }
-            }.toMutableList()
         }
     }
 
