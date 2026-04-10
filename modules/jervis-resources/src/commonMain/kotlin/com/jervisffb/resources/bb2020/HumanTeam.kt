@@ -46,6 +46,7 @@ val HUMAN_LINEMAN =
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_lineman.png",8),
         SingleSprite.ini("${portraitRootPath}/human_lineman.png")
@@ -67,6 +68,7 @@ val HUMAN_THROWER =
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_thrower.png",2),
         SingleSprite.ini("${portraitRootPath}/human_thrower.png")
@@ -87,6 +89,7 @@ val HUMAN_CATCHER =
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_catcher.png", 4),
         SingleSprite.ini("${portraitRootPath}/human_catcher.png")
@@ -103,6 +106,7 @@ val HUMAN_BLITZER =
         listOf(BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_blitzer.png", 4),
@@ -124,6 +128,7 @@ val HALFLING_HOPEFUL =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_halflinghopeful.png", 8),
@@ -147,6 +152,7 @@ val OGRE =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/human_ogre.png", 8),

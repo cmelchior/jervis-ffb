@@ -36,6 +36,7 @@ val SKAVEN_LINEMAN =
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_lineman.png", 9),
         SingleSprite.ini("${portraitRootPath}/skaven_lineman.png")
@@ -54,6 +55,7 @@ val SKAVEN_THROWER =
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_thrower.png", 2),
         SingleSprite.ini("${portraitRootPath}/skaven_thrower.png")
@@ -71,6 +73,7 @@ val GUTTER_RUNNER =
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_gutterrunner.png", 4),
         SingleSprite.ini("${portraitRootPath}/skaven_gutterrunner.png")
@@ -87,6 +90,7 @@ val SKAVEN_BLITZER =
         listOf(BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_blitzer.png", 2),
@@ -110,6 +114,7 @@ val RAT_OGRE =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/skaven_ratogre.png", 1),

@@ -23,6 +23,7 @@ val SKINK_RUNNER_LINEMEN =
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -40,6 +41,7 @@ val CHAMELEON_SKINKS =
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -56,6 +58,7 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         null,
@@ -79,6 +82,7 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         null,

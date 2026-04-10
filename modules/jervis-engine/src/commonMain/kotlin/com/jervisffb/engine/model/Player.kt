@@ -8,6 +8,7 @@ import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -181,8 +182,15 @@ class Player(
         }
     }.toMutableList()
     val skills: List<Skill<*>> = LiveMergeList(extraSkills, positionSkills)
+
+    // Special Rules tracking
+    val extraSpecialRules = mutableListOf<PlayerSpecialRule>()
+    val specialRules: List<PlayerSpecialRule> = LiveMergeList(extraSpecialRules, position.specialRules)
+
+    // Keywords tracking
     // Unclear if keywords are all backed in from the start or they can change. For now, assume just keep them locked to the position
     val keywords: MutableList<PlayerKeyword> = position.keywords.toMutableList()
+
     var nigglingInjuries: Int = 0
     var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0

@@ -35,6 +35,7 @@ val SKINK_RUNNER_LINEMEN =
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_skinkrunner.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_skinkrunner.png")
@@ -52,6 +53,7 @@ val CHAMELEON_SKINKS =
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_chameleonskink.png",2),
         SingleSprite.ini("$portraitRootPath/lizardmen_chameleonskink.png")
@@ -68,6 +70,7 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_saurusblocker.png",6),
@@ -91,6 +94,7 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/lizardmen_kroxigor.png",1),

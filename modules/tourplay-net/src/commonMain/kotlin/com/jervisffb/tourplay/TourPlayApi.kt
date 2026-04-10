@@ -94,6 +94,7 @@ class TourPlayApi() {
                 },
                 primary = mapToSkillCategory(position.skillNormal),
                 secondary = mapToSkillCategory(position.skillDouble),
+                emptyList(),
                 keywords = emptyList(),
                 size = when {
                     position.isBigGuy == true -> PlayerSize.BIG_GUY

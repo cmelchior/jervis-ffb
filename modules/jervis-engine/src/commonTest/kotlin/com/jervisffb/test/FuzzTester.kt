@@ -203,6 +203,7 @@ class FuzzTester {
                     skills = skills,
                     primary = emptyList(),
                     secondary = emptyList(),
+                    specialRules = emptyList(),
                     keywords = emptyList(),
                     size = PlayerSize.STANDARD,
                     icon = null,

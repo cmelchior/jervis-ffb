@@ -30,6 +30,7 @@ val ELVEN_LINEMAN =
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/elvenunion_lineman.png",8),
         SingleSprite.ini("${portraitRootPath}/elvenunion_lineman.png")
@@ -46,6 +47,7 @@ val ELVEN_THROWER =
         listOf(PASS.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.GENERAL),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/elvenunion_thrower.png",2),
@@ -64,6 +66,7 @@ val ELVEN_CATCHER =
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/elvenunion_catcher.png", 4),
         SingleSprite.ini("${portraitRootPath}/elvenunion_catcher.png")
@@ -80,6 +83,7 @@ val ELVEN_BLITZER =
         listOf(BLOCK.id(), SkillType.SIDESTEP.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/elvenunion_blitzer.png", 2),

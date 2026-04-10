@@ -49,6 +49,7 @@ val ORC_LINEMEN =
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_lineman.png",6),
         SingleSprite.ini("${portraitRootPath}/orc_lineman.png")
@@ -71,6 +72,7 @@ val ORC_THROWER =
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_thrower.png",2),
         SingleSprite.ini("${portraitRootPath}/orc_thrower.png")
@@ -91,6 +93,7 @@ val ORC_BLITZER =
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_blitzer.png", 4),
         SingleSprite.ini("${portraitRootPath}/orc_blitzer.png")
@@ -109,6 +112,7 @@ val BIG_UN_BLOCKERS =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_bigunblocker.png", 4),
@@ -130,6 +134,7 @@ val GOBLIN =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_goblin.png", 4),
@@ -155,6 +160,7 @@ val UNTRAINED_TROLL =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL, PASSING),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/orc_troll.png", 1),

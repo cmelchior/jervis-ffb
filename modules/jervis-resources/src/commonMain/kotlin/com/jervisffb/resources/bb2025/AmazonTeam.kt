@@ -41,6 +41,7 @@ val AMAZON_LINEMAN =
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_triballinewoman.png",9),
         SingleSprite.ini("${portraitRootPath}/amazon_triballinewoman.png")
@@ -64,6 +65,7 @@ val AMAZON_THROWER =
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_eaglewarriorthrower.png",2),
         SingleSprite.ini("${portraitRootPath}/amazon_eaglewarriorthrower.png")
@@ -85,6 +87,7 @@ val AMAZON_BLITZER =
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_piranhawarriorblitzer.png", 2),
         SingleSprite.ini("${portraitRootPath}/amazon_piranhawarriorblitzer.png")
@@ -104,6 +107,7 @@ val AMAZON_BLOCKER =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_jaguarwarriorblocker.png", 2),

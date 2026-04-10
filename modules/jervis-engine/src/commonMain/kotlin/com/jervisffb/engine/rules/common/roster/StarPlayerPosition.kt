@@ -33,6 +33,7 @@ class StarPlayerPosition(
     override val passing: Int?,
     override var armorValue: Int,
     override val skills: List<SkillId>,
+    override val specialRules: List<PlayerSpecialRule>,
     override val keywords: List<PlayerKeyword>,
     override val playsFor: List<RegionalSpecialRule>,
     override val size: PlayerSize,

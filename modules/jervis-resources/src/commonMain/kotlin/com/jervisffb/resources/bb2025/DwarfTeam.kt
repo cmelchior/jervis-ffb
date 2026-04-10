@@ -14,9 +14,6 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
-import com.jervisffb.engine.rules.common.skills.SkillType.LONER
-import com.jervisffb.engine.rules.common.skills.SkillType.MIGHTY_BLOW
-import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -38,6 +35,7 @@ val DWARF_LINEMAN =
         4, 3, 4, 5, 10,
         listOf(BLOCK.id(), SkillType.THICK_SKULL.id()),
         listOf(DEVIOUS, GENERAL),
+        emptyList(),
         emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
@@ -61,6 +59,7 @@ val DWARF_RUNNER =
         ),
         listOf(GENERAL, PASSING),
         listOf(STRENGTH),
+        emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.RUNNER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/dwarf_runner.png",3),
@@ -84,6 +83,7 @@ val DWARF_BLITZER =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(PASSING),
+        emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/dwarf_blitzer.png",2),
@@ -108,6 +108,7 @@ val TROLL_SLAYER =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(DEVIOUS),
+        emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.SPECIAL),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/dwarf_trollslayer.png",1),
@@ -135,6 +136,7 @@ val DEATHROLLER =
         ),
         listOf(DEVIOUS, STRENGTH),
         listOf(GENERAL),
+        emptyList(),
         listOf(PlayerKeyword.BIG_GUY, PlayerKeyword.DWARF, PlayerKeyword.SPECIAL),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/dwarf_deathroller.png",1),

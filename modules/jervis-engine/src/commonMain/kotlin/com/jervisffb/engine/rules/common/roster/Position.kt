@@ -41,6 +41,7 @@ interface Position {
     val primary: List<SkillCategory>
     val secondary: List<SkillCategory>
     val skills: List<SkillId>
+    val specialRules: List<PlayerSpecialRule>
     val keywords: List<PlayerKeyword>
     // If set, this position can only play for teams with the given regional special rule
     val playsFor: List<RegionalSpecialRule>

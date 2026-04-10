@@ -47,6 +47,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
 import kotlinx.serialization.json.Json
+import kotlin.collections.emptyList
 
 /**
  * Wrapper around https://fumbbl.com/apidoc/
@@ -219,6 +220,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 },
                 primary = mapToSkillCategory(position.normalSkills),
                 secondary = mapToSkillCategory(position.doubleSkills),
+                specialRules = emptyList(),
                 keywords = emptyList(),
                 icon = iconRef,
                 size = when {

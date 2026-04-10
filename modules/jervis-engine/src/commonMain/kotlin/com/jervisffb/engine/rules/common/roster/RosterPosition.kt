@@ -32,6 +32,7 @@ data class RosterPosition(
     override val skills: List<SkillId>,
     override val primary: List<SkillCategory>,
     override val secondary: List<SkillCategory>,
+    override val specialRules: List<PlayerSpecialRule>,
     override val keywords: List<PlayerKeyword>,
     override val size: PlayerSize,
     override val icon: SpriteSource?,

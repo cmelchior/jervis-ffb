@@ -33,6 +33,7 @@ val HOBGOBLIN_LINEMEN =
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/chaosdwarf_hobgoblinlineman.png", 10),
         SingleSprite.ini("${portraitRootPath}/chaosdwarf_hobgoblinlineman.png")
@@ -49,6 +50,7 @@ val CHAOS_DWARF_BLOCKERS =
         listOf(BLOCK.id(), TACKLE.id(), THICK_SKULL.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/chaosdwarf_chaosdwarfblocker.png", 6),
@@ -71,6 +73,7 @@ val BULL_CENTAUR_BLITZERS =
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/chaosdwarf_bullcentaurblitzer.png", 2),
         SingleSprite.ini("${portraitRootPath}/chaosdwarf_bullcentaurblitzer.png")
@@ -87,6 +90,7 @@ val ENSLAVED_MINOTAUR =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/chaosdwarf_enslavedminotaur.png",1),

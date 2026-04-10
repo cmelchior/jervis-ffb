@@ -31,6 +31,7 @@ val THE_BLACK_GOBBO_BB2020 =  StarPlayerPosition(
         STUNTY.id()
     ),
     emptyList(),
+    emptyList(),
     listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
     PlayerSize.STANDARD,
     SpriteSheet.ini("${iconRootPath}/TheBlackGobbo.png",1),

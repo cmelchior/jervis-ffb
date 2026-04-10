@@ -32,6 +32,7 @@ val BLOODBORN_MARAUDER_LINEMEN =
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/khorne_bloodbornmarauderlineman.png",7),
         SingleSprite.ini("${portraitRootPath}/khorne_bloodbornmarauderlineman.png")
@@ -49,6 +50,7 @@ val KHORNGORS =
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
         emptyList(),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/khorne_khorngor.png",4),
         SingleSprite.ini("${portraitRootPath}/khorne_khorngor.png")
@@ -65,6 +67,7 @@ val BLOODSEEKERS =
         listOf(FRENZY.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        emptyList(),
         emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/khorne_bloodseeker.png", 4),
@@ -88,6 +91,7 @@ val BLOODSPAWN =
         ),
         listOf(SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        emptyList(),
         emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/khorne_bloodspawn.png", 1),
