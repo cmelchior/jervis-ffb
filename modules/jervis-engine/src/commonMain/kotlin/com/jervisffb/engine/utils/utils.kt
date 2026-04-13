@@ -323,7 +323,7 @@ fun calculateAvailableRerollsForTeam(
 
     // Calculate the full list of re-roll options
     return when (canRerollType && hasTeamRerolls && allowedToUseTeamReroll) {
-        true -> listOf(DiceRerollOption(rules.getAvailableTeamReroll(team).id, roll))
+        true -> rules.getAvailableTeamRerolls(team).map { DiceRerollOption(it.id, roll) }
         false -> emptyList()
     }
 }

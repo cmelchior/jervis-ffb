@@ -119,15 +119,14 @@ object StandardBlockRerollDice: Procedure() {
         return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
             emptyList()
         } else {
-            val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                listOf(
-                    DiceRerollOption(
-                        rules.getAvailableTeamReroll(team).id,
-                        diceRoll
-                    ),
-                )
-            } else {
-                emptyList()
+            val teamRerolls = when (hasTeamRerolls && allowedToUseTeamReroll) {
+                true -> {
+                    rules.getAvailableTeamRerolls(team).map {
+                        DiceRerollOption(it.id, diceRoll)
+                    }
+                }
+
+                false -> emptyList()
             }
             listOf(SelectNoReroll(null, dicePoolId), SelectRerollOption(availableSkills + teamRerolls))
         }

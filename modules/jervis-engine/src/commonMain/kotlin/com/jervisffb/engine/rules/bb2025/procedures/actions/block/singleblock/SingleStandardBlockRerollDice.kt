@@ -22,7 +22,6 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportStartingExtraTime.id
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
@@ -109,15 +108,13 @@ object SingleStandardBlockRerollDice: Procedure() {
         return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
             emptyList()
         } else {
-            val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                listOf(
-                    DiceRerollOption(
-                        rules.getAvailableTeamReroll(team).id,
-                        diceRoll
-                    ),
-                )
-            } else {
-                emptyList()
+            val teamRerolls = when (hasTeamRerolls && allowedToUseTeamReroll) {
+                true -> {
+                    rules.getAvailableTeamRerolls(team).map {
+                        DiceRerollOption(it.id, diceRoll)
+                    }
+                }
+                false -> emptyList()
             }
             listOf(SelectNoReroll(null, dicePoolId), SelectRerollOption(availableSkills + teamRerolls))
         }

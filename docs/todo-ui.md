@@ -6,6 +6,9 @@ The TODO list is by no means exhaustive, it is just a place to dump things as
 they come up.
 
 ## Todo List
+- [ ] Add Action Wheel Icon for Mascot Team Reroll
+- [ ] Add Action Wheel Icon for Leader Team Reroll
+- [ ] Add Action Wheel Icon for Brilliant Coaching Team Reroll
 - [ ] Add Team Captain Team Feature icon
 - [ ] Show better indicators for "Dev Mode" during Swoop, i.e. show what the values actually represent on the field, and not just the dice
 - [ ] A thrown player is rendered below a loose ball, which looks weird. We probably need to add a new "Air"-layer

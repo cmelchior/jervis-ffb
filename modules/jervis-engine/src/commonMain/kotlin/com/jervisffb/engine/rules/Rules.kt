@@ -566,13 +566,18 @@ abstract class Rules(
     }
 
     /**
-     * Returns the best team reroll available.
-     * This means using temporary rerolls before using permanent ones
-     * TODO Should we instead return a list here, so players can manually select
-     *  between all the temporary rerolls?
+     * Return all available rerolls available for a Team.
+     *
+     * If multiple versions of the same reroll are available, only one of them
+     * is returned.
+     *
+     * E.g., if a Team has 3 regular, 1 Brilliant Coaching and 1 Mascot reroll,
+     * 3 rerolls will be returned: (1xregular, 1xbrilliant, 1xmascot)
      */
-    fun getAvailableTeamReroll(team: Team): RerollSource {
-        return team.availableRerolls.last()
+    fun getAvailableTeamRerolls(team: Team): List<RerollSource> {
+        return team.availableRerolls.distinctBy {
+            it::class
+        }
     }
 
     /**
