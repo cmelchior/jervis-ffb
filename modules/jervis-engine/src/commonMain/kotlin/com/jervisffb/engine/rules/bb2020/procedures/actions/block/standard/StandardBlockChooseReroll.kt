@@ -28,7 +28,6 @@ import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * TODO FUCK. This does not keep rerolls in lock-step. We need a custom node that can

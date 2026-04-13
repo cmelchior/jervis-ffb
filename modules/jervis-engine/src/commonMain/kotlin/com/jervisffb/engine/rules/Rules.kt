@@ -64,7 +64,7 @@ abstract class Rules(
      * Checks if a given setup is valid. If not valid, a list of broken rules
      * will be returned. If the setup is valid, an empty list is returned.
      */
-    fun isSetupValid(state: Game, team: Team): List<SetupRule> {
+    open fun isSetupValid(state: Game, team: Team): List<SetupRule> {
         val isHomeTeam = team.isHomeTeam()
         val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnField(this) }
         val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnField(this) }
@@ -513,24 +513,14 @@ abstract class Rules(
         }
     }
 
-    fun canUseTeamReroll(game: Game, player: Player): Boolean {
+    fun canUseTeamReroll(game: Game, player: Player?): Boolean {
         if (!game.canUseTeamRerolls) return false
-        if (game.activeTeam != player.team) return false
-        return when (player.team.usedRerollThisTurn) {
+        if (player != null && game.activeTeam != player.team) return false
+        return when (game.activeTeam?.usedRerollThisTurn) {
             true -> allowMultipleTeamRerollsPrTurn
             false -> true
+            null -> false // If there is no active team, rerolls are not allowed
         }
-    }
-
-    /**
-     * Returns `true` if rerolls of some dice in the dice pool are still allowed.
-     * Note, this doesn't mean that a reroll is available, just that it is allowed
-     * if possible.
-     */
-    fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
-        // It is only allowed to reroll a die a single time. So if a rerollSource
-        // exists, it cannot be rerolled again
-        return dicePool.none { it.rerollSource != null }
     }
 
     /**
@@ -635,6 +625,111 @@ abstract class Rules(
     fun createSkill(player: Player, skill: SkillId, expiresAt: Duration = Duration.PERMANENT): Skill<*> {
         return skillSettings.createSkill(player, skill, expiresAt)
     }
+
+    /**
+     * Returns `true` if rerolls of some dice in the dice pool are still allowed.
+     * Note; this doesn't mean that a reroll is available, just that it is allowed
+     * if possible.
+     */
+    fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
+        // It is only allowed to reroll a die a single time. So if a rerollSource
+        // exists, it cannot be rerolled again
+        return dicePool.none { it.rerollSource != null }
+    }
+
+    /**
+     * Return `true` if a Team Reroll is allowed to re-roll this type of roll.
+     *
+     * We keep this method here as some skills offer a re-roll that is
+     * functionaly the same as a Team Reroll. They should all go through this
+     * method.
+     */
+    fun canBeRerolledByTeamReroll(type: DiceRollType): Boolean {
+        return when (type) {
+            // Explicitly mentioned in the rulebook (page 33 BB2025)
+            DiceRollType.ARGUE_THE_CALL,
+            DiceRollType.ARMOUR,
+            DiceRollType.BOUNCE, // Is a Scatter(1)
+            DiceRollType.BRIBE,
+            DiceRollType.CASUALTY,
+            DiceRollType.CROWD_TAKES_ACTION,
+            DiceRollType.INJURY,
+            DiceRollType.LASTING_INJURY, // Assume it is covered by CASUALTY
+            DiceRollType.SCATTER,
+            DiceRollType.THROWIN_DIRECTION,
+            DiceRollType.THROWIN_DISTANCE,
+
+            // No team is active: Pre-game / Kick-off events / Post-game
+            DiceRollType.BAD_HABITS,
+            DiceRollType.BLITZ, // Kick-off Event
+            DiceRollType.BRILLIANT_COACHING,
+            DiceRollType.CHARGE,
+            DiceRollType.DEVIATE,
+            DiceRollType.DODGY_SNACK_EFFECT,
+            DiceRollType.DODGY_SNACK_ROLL_OFF,
+            DiceRollType.FAN_FACTOR,
+            DiceRollType.KICK_OFF_TABLE,
+            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+            DiceRollType.OFFICIOUS_REF_REFEREE,
+            DiceRollType.PITCH_INVASION_FAN_FACTOR,
+            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
+            DiceRollType.PRAYERS_TO_NUFFLE, // Only in BB2020
+            DiceRollType.QUICK_SNAP,
+            DiceRollType.SOLID_DEFENSE,
+            DiceRollType.SUDDEN_DEATH,
+            DiceRollType.SWELTERING_HEAT,
+            DiceRollType.THROW_A_ROCK,
+
+            // Covered by "can not be used if team is not active"
+            DiceRollType.INTERCEPTION,
+            DiceRollType.PASSING_INTERFERENCE,
+            DiceRollType.WEATHER,
+
+            // Probably cannot be used, find reference
+            DiceRollType.BB7_APOTHECARY -> false
+
+            // All of these should be allowed
+            DiceRollType.ACCURACY,
+            DiceRollType.BLOCK,
+            DiceRollType.BLOODLUST,
+            DiceRollType.BONE_HEAD,
+            DiceRollType.BREATHE_FIRE,
+            DiceRollType.CATCH,
+            DiceRollType.CHAINSAW,
+            DiceRollType.CHEERING_FANS,
+            DiceRollType.DAUNTLESS,
+            DiceRollType.DODGE,
+            DiceRollType.FOUL_APPEARANCE,
+            DiceRollType.HYPNOTIC_GAZE,
+            DiceRollType.JUMP,
+            DiceRollType.JUMP_UP,
+            DiceRollType.LANDING,
+            DiceRollType.LEAP,
+            DiceRollType.LONER,
+            DiceRollType.PASS,
+            DiceRollType.PICKUP,
+            DiceRollType.POGO,
+            DiceRollType.PRO,
+            DiceRollType.PROJECTILE_VOMIT,
+            DiceRollType.QUALITY,
+            DiceRollType.REALLY_STUPID,
+            DiceRollType.REGENERATION,
+            DiceRollType.RUSH,
+            DiceRollType.SECURE_THE_BALL,
+            DiceRollType.SHADOWING,
+            DiceRollType.STANDING_UP,
+            DiceRollType.STEADY_FOOTING,
+            DiceRollType.SWOOP_DIRECTION,
+            DiceRollType.SWOOP_DISTANCE,
+            DiceRollType.TAKE_ROOT,
+            DiceRollType.TEAM_CAPTAIN,
+            DiceRollType.TEAM_MASCOT,
+            DiceRollType.TREACHEROUS_TRAPDOOR,
+            DiceRollType.UNCHANNELLED_FURY -> true
+        }
+    }
+
+
 
     abstract fun toBuilder(): RulesParameterBuilder
 

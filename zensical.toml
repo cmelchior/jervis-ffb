@@ -16,6 +16,7 @@ nav = [
     { "2025 Rules" = "bb2025/index.md" },
     { "Base Rules" = "bb2025/bb2025-base-rules.md" },
     { "Skills" = "bb2025/bb2025-skills.md" },
+    { "Star Players" = "bb2025/bb2025-starplayers.md" },
   ]},
 ]
 

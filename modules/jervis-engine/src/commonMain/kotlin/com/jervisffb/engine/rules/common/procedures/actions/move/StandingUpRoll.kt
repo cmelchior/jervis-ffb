@@ -8,7 +8,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -36,7 +36,7 @@ object StandingUpRoll : D6WithRerollProcedure() {
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<StandingUpRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<StandingUpRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<StandingUpRollContext>().player
 
     // The only modifier for Standing Up currently comes from Timm-ber!
     // We will apply these automatically since doing it or not, has no

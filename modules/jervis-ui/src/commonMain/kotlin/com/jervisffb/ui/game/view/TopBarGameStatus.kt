@@ -71,10 +71,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_brilliant_coaching_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_mascot_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiReroll
@@ -287,7 +289,8 @@ private fun TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
             UiRerollType.TEAM -> Res.drawable.jervis_icon_team_reroll
             UiRerollType.LEADER -> Res.drawable.jervis_icon_leader_reroll
             UiRerollType.BRILLIANT_COACHING -> Res.drawable.jervis_icon_brilliant_coaching_reroll
-            UiRerollType.UNKNOWN -> TODO()
+            UiRerollType.MASCOT -> Res.drawable.jervis_icon_mascot_reroll
+            UiRerollType.UNKNOWN -> Res.drawable.jervis_icon_team_reroll
         }
         JervisTooltipArea(
             tooltip = {
@@ -360,40 +363,48 @@ private fun TeamFeaturesRow(
                     }
                     UiTeamFeatureType.BLOODWEISER_KEG -> TODO()
                     UiTeamFeatureType.UNKNOWN -> TODO()
+                    UiTeamFeatureType.TEAM_CAPTAIN -> {
+                        TeamFeature(
+                            value = feature.value,
+                            content = defaultTeamFeatureStatus("TC")
+                        )
+                    }
                     UiTeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST -> {
                         TeamFeature(
                             value = feature.value,
-                            content = {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(4.jdp)
-                                        .aspectRatio(1f)
-                                        .fillMaxHeight()
-                                        .background(JervisTheme.rulebookPaperDark, shape = RoundedCornerShape(4.jdp))
-                                        .border(2.dp, JervisTheme.white.copy(alpha = 0.5f), RoundedCornerShape(4.jdp))
-                                    ,
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "CF",
-                                        lineHeight = 1.em,
-                                        color = JervisTheme.white,
-                                        fontSize = 16.jsp,
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            shadow = Shadow(
-                                                color = Color.Black,
-                                                offset = Offset(2f, 2f),
-                                            )
-                                        )
-                                    )
-                                }
-                            }
+                            content = defaultTeamFeatureStatus("CF")
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun defaultTeamFeatureStatus(title: String): @Composable () -> Unit = {
+    Box(
+        modifier = Modifier
+            .padding(4.jdp)
+            .aspectRatio(1f)
+            .fillMaxHeight()
+            .background(JervisTheme.rulebookPaperDark, shape = RoundedCornerShape(4.jdp))
+            .border(2.dp, JervisTheme.white.copy(alpha = 0.5f), RoundedCornerShape(4.jdp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = title,
+            lineHeight = 1.em,
+            color = JervisTheme.white,
+            fontSize = 16.jsp,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodySmall.copy(
+                shadow = Shadow(
+                    color = Color.Black,
+                    offset = Offset(2f, 2f),
+                )
+            )
+        )
     }
 }
 

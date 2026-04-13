@@ -19,6 +19,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.LeapRollContext
@@ -50,7 +51,7 @@ object LeapRoll : D6WithRerollProcedure() {
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<LeapRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<LeapRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<LeapRollContext>().player
 
     override val RollDie = object: AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
@@ -91,7 +92,7 @@ object LeapRoll : D6WithRerollProcedure() {
     )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<LeapRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)

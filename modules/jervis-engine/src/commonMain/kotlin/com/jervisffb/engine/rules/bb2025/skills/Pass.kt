@@ -43,9 +43,10 @@ class Pass(
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?
     ): Boolean {
+        if (rerollUsed) return false
         val isPass = (state.stack.currentProcedure()?.procedure == PassAccuracyRoll)
         return isPass && (type == DiceRollType.ACCURACY)
     }

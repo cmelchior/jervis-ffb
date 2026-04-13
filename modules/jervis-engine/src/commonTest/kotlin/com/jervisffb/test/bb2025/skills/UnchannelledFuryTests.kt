@@ -11,11 +11,14 @@ import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.moveTo
+import com.jervisffb.test.proRoll
 import com.jervisffb.test.unchannelledFury
+import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.TeamRerollSelected
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -55,10 +58,20 @@ class UnchannelledFuryTests: JervisGameBB2025Test() {
         assertEquals(0, state.awayTeam.turnData.blitzActions)
     }
 
-    @Ignore
     @Test
-    fun canUseProToRerollBoneHeadRoll() {
-        // TODO
+    fun canUseProToRerollUnchannelledFury() {
+        val player = awayTeam["A1".playerId]
+        player.addSkill(SkillType.PRO)
+        controller.rollForward(
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+            *unchannelledFury(1.d6, SelectSkillReroll(SkillType.PRO)),
+            *proRoll(4.d6),
+            4.d6, // Succeed Unchannelled roll
+            *moveTo(14, 5),
+            *dodge(6.d6)
+        )
+        assertEquals(player, state.activePlayer)
+        assertFalse(rules.isDistracted(player))
     }
 
     @Test

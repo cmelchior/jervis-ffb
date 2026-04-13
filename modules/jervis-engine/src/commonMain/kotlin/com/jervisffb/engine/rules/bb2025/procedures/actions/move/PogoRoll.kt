@@ -18,6 +18,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.PogoRollContext
@@ -47,7 +48,7 @@ object PogoRoll : D6WithRerollProcedure() {
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PogoRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<PogoRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<PogoRollContext>().player
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {

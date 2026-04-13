@@ -30,7 +30,6 @@ import com.jervisffb.test.utils.assertFallenOver
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -335,11 +334,5 @@ class LeapTests: JervisGameBB2025Test() {
         )
         leapingPlayer.assertStanding()
         leapingPlayer.assertCoordinates(11, 4)
-    }
-
-    @Ignore
-    @Test
-    fun leapModifierGetsRecalculatedWithDivingTackle() {
-        // TODO Unclear if this is the right semantics
     }
 }

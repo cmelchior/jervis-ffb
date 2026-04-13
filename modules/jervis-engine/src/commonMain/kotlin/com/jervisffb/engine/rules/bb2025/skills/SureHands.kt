@@ -42,9 +42,10 @@ class SureHands(
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
+        if (rerollUsed) return false
         return type == DiceRollType.PICKUP
     }
 }

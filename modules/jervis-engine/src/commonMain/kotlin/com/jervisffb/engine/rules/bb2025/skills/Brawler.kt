@@ -49,22 +49,23 @@ class Brawler(
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?
     ): Boolean {
         if (type != DiceRollType.BLOCK) return false
+        if (rerollUsed) return false
 
         @Suppress("UNCHECKED_CAST")
-        val diceRolls = value as List<DieRoll<DBlockResult>>
+        val diceRolls = dicePool as List<DieRoll<DBlockResult>>
 
         // Only works if other have been re-rolled and a both-down result exists
         val isBlockingPlayer = (state.getContextOrNull<BlockContext>()?.attacker == player)
-        val rerollAllowed = state.rules.isRerollAllowed(diceRolls)
+
         val hasRerollableResult = diceRolls.any  {
             it.rerollSource == null && it.result.blockResult == BlockDice.BOTH_DOWN
         }
 
-        return isBlockingPlayer && rerollAllowed && hasRerollableResult
+        return isBlockingPlayer && hasRerollableResult
     }
 
     override fun calculateRerollOptions(

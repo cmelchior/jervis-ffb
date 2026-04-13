@@ -40,9 +40,11 @@ class CatchSkill(
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
+        if (rerollUsed) return false
+
         // Catch only allows rerolling failed rolls
         return type == DiceRollType.CATCH && wasSuccess == false && player.hasTackleZones
     }

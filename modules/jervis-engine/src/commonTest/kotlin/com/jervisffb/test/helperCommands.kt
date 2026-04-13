@@ -313,9 +313,18 @@ fun leap(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arra
     reroll,
 )
 
+fun loner(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll, reroll
+)
+
 fun dauntlessRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
+)
+
+fun proRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll
 )
 
 fun qualityRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
@@ -366,6 +375,14 @@ fun swoopDistanceRoll(roll: D6Result, reroll: GameAction? = NoRerollSelected()) 
 fun takeRoot(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
+)
+
+fun teamCaptainRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll, reroll
+)
+
+fun teamMascotRoll(roll: D6Result = 6.d6) = arrayOf(
+    roll
 )
 
 fun throwBall(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(

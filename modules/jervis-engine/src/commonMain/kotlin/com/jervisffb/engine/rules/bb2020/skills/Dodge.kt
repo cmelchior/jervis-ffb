@@ -35,7 +35,8 @@ class Dodge(
     override val rerollResetAt: Duration = Duration.END_OF_TURN
     override var rerollUsed: Boolean = false
 
-    override fun canReroll(state: Game, type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
+    override fun canReroll(state: Game, type: DiceRollType, dicePool: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
+        if (rerollUsed) return false
         return type == DiceRollType.DODGE
     }
 }

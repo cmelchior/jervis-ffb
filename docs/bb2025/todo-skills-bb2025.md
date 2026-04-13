@@ -235,7 +235,15 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [x] Kick
   - [x] Usage is optional
   - [x] Reduces distance from D6 to D3
-- [ ] Pro
+- [x] Pro
+  - [x] Works on 3+
+  - [x] Fails on 1-2
+  - [x] Only reroll single die in dice pool
+  - [x] Only works when player is Active
+  - [x] Does not work on: Armour, Injury, Casualty
+  - [x] Does not work outside activation
+  - [x] Does not work on "not made on players behalf": Argue the Call, Crowd, Team Captain, Team Mascot
+  - [x] Failed Pro still counts as "having re-rolled", preventing other rerolls of the same dice_
 - [x] Steady Footing
   - [x] If success, prevents turn over
   - [x] Prevent Fall Over (during own turn)
@@ -444,12 +452,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Cannoneer skill works
   - [ ] Safe Pass skills works
   - [ ] Hail Mary Pass works
-- [ ] Bone Head*
+- [x] Bone Head*
   - [x] Clear after activating
   - [x] Roll after selecting action
   - [x] Does not clear if you forgo activation
   - [x] Use action if failing roll
-  - [ ] Can use skills to reroll Bone Head (Pro)
+  - [x] Can use skills to reroll Bone Head (Pro)
 - [ ] Blood Lust (X+)*
 - [x] Breathe Fire
     - [x] Replace Block
@@ -470,7 +478,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Hypnotic Gaze
 - [x] Insignificant*
 - [ ] Kick Team-mate
-- [ ] Loner (X+)*
+- [x] Loner (X+)*
+  - [x] Requires X to use the reroll. Reroll is used
+  - [x] Failing Roll keeps original roll. Reroll is used.
+  - [x] Multiple versions of the skill is allowed. Lowest one is used.
+  - [x] Can reroll failed loner roll using Team Rerolls
+  - [x] Can reroll failed loner roll using Pro Rerolls
 - [ ] My Ball* 
   - [x] Cannot Pass
   - [x] Cannot Hand-off
@@ -501,8 +514,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Hit player
     - [x] Is not available when starting from Prone
     - [x] Is not available if not starting next to an opponent
-- [ ] Really Stupid*
-  - [ ] Pro can be used as a reroll
+- [x] Really Stupid*
+  - [x] Pro can be used as a reroll
   - [x] Clear after activating
   - [x] Roll after selecting action
   - [x] Does not clear if you forgo activation
@@ -583,8 +596,8 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [ ] Keep the ball when moving
   - [ ] Pickup Ball when moving, before being blocked
   - [ ] Score only after block completes
-- [ ] Unchannelled Fury*
-  - [ ] Pro can be used as a reroll
+- [x] Unchannelled Fury*
+  - [x] Pro can be used as a reroll
   - [x] Roll after selecting action
   - [x] Use action if failing roll
   - [x] Block improves chance

@@ -23,21 +23,53 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.CheeringFansContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.CheeringFansModifiers
+import com.jervisffb.engine.model.modifiers.CheerleadersModifiers
+import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.reports.ReportCheeringFansResult
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.sum
 
 /**
- * Procedure for handling the Kick-Off Event: "Cheering Fans" as described on page 41
- * of the BB2020 rulebook.
+ * Procedure for handling the Kick-Off Event: "Cheering Fans" as described on
+ * page 48 of the BB2025 rulebook.
  */
 object BB2025CheeringFans : Procedure() {
-    override val initialNode: Node = KickingTeamRollDie
+    override val initialNode: Node = DetermineModifiers
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<CheeringFansContext>()
+
+    object DetermineModifiers: ComputationNode() {
+
+        private fun addModifiers(list: MutableList<DiceModifier>, team: Team): List<DiceModifier> {
+            val cheerleaders = team.cheerleaders
+            if (cheerleaders > 0) {
+                list.add(CheerleadersModifiers(cheerleaders))
+            }
+            val hasMascot = team.mascots.isNotEmpty()
+            if (hasMascot) {
+                list.add(CheeringFansModifiers.TEAM_MASCOT)
+            }
+            return list
+        }
+
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = CheeringFansContext(
+                kickingTeamModifiers = addModifiers(mutableListOf(), state.kickingTeam),
+                receivingTeamModifiers = addModifiers(mutableListOf(), state.receivingTeam)
+            )
+            return compositeCommandOf(
+                AddContext(context),
+                GotoNode(KickingTeamRollDie)
+            )
+        }
+    }
+
 
     object KickingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
@@ -46,10 +78,11 @@ object BB2025CheeringFans : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<CheeringFansContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
-                    AddContext(CheeringFansContext(d6)),
+                    UpdateContext(context.copy(kickingTeamRoll = d6)),
                     GotoNode(ReceivingTeamRollDie),
                 )
             }
@@ -75,34 +108,47 @@ object BB2025CheeringFans : Procedure() {
     object ResolveCheeringFans : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
+            val winner = calculateWinner(state, context)
             val kickingTeam = state.kickingTeam
             val receivingTeam = state.receivingTeam
-            val kickingTeamResult = context.kickingTeamRoll.value + kickingTeam.cheerleaders
-            val receivingTeamResult = context.receivingTeamRoll!!.value + receivingTeam.cheerleaders
             return buildCompositeCommand {
-                if (kickingTeamResult >= receivingTeamResult && !kickingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                if ((winner == null || winner == kickingTeam) && !kickingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
                     add(AddTeamFeature(kickingTeam, TeamFeature.cheeringFans()))
                 }
-                if (receivingTeamResult >= kickingTeamResult && !receivingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
+                if ((winner == null || winner == receivingTeam) && !receivingTeam.hasFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST)) {
                     add(AddTeamFeature(receivingTeam, TeamFeature.cheeringFans()))
                 }
                 add(
                     ReportCheeringFansResult(
                         kickingTeam,
                         receivingTeam,
-                        context.kickingTeamRoll,
-                        kickingTeam.cheerleaders,
-                        context.receivingTeamRoll,
-                        receivingTeam.cheerleaders,
+                        context
                     )
                 )
-                if (kickingTeamResult > receivingTeamResult) {
+                if (winner == kickingTeam) {
                     UpdateContext(state.getContext<CheeringFansContext>().copy(winner = kickingTeam))
                 }
-                if (receivingTeamResult > kickingTeamResult) {
+                if (winner == receivingTeam) {
                     UpdateContext(state.getContext<CheeringFansContext>().copy(winner = receivingTeam))
                 }
                 add(ExitProcedure())
+            }
+        }
+    }
+
+    // -- HELPER METHODS --
+
+    private fun calculateWinner(state: Game, context: CheeringFansContext): Team? {
+        return with(context) {
+            val kickingDieRoll = kickingTeamRoll?.value ?: 0
+            val receivingDieRoll = receivingTeamRoll?.value ?: 0
+            val kickingResult = kickingDieRoll + kickingTeamModifiers.sum()
+            val receivingResult = receivingDieRoll + receivingTeamModifiers.sum()
+            when {
+                kickingResult > receivingResult -> state.kickingTeam
+                receivingResult > kickingResult -> state.receivingTeam
+                kickingResult == receivingResult -> null
+                else -> INVALID_GAME_STATE("Unknown state")
             }
         }
     }

@@ -21,15 +21,25 @@ interface RerollSource {
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
 
-    // Returns `true` if `calculateRerollOptions` will return a non-empty list
+    /**
+     * Returns `true` if this source is allowed to reroll a given roll.
+     * This method should only consider the state of itself, and not if
+     * another rule prevents the reroll.
+     *
+     * See [com.jervisffb.engine.rules.Rules.isRerollAllowed]
+     */
     fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean? = null
     ): Boolean
 
-    // This method should only be called if `canReroll` returns true.
+    /**
+     * This method should only be called if [canReroll] returns true.
+     * If this source can reroll one or more dice in the dice pool. All reroll
+     * options should be returned.
+     */
     fun calculateRerollOptions(
         // What kind of dice roll
         type: DiceRollType,
@@ -41,10 +51,10 @@ interface RerollSource {
     ): List<DiceRerollOption>
 
     // Helper method, for just rolling a single dice. Which is by far, the most common scenario.
-    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*>, wasSuccess: Boolean?): List<DiceRerollOption> =
+    fun calculateRerollOptions(type: DiceRollType, die: DieRoll<*>, wasSuccess: Boolean?): List<DiceRerollOption> =
         calculateRerollOptions(
             type,
-            listOf(value),
+            listOf(die),
             wasSuccess,
         )
 }

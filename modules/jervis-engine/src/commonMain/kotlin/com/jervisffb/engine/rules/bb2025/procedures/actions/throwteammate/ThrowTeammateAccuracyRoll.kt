@@ -14,6 +14,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
@@ -52,10 +53,10 @@ object ThrowTeammateAccuracyRoll: D6WithRerollProcedure() {
     }
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowTeamMateContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<ThrowTeamMateContext>().thrower.team
+    override fun getActionOwner(state: Game): Player = state.getContext<ThrowTeamMateContext>().thrower
 
     object ChooseToUseStrongArm: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowTeamMateContext>()
             val isStrongArmAvailable = context.thrower.isSkillAvailable(SkillType.STRONG_ARM)

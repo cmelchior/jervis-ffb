@@ -5,6 +5,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
@@ -59,6 +61,22 @@ object TeamFeatureStatusIndicator: FieldStatusIndicator {
                     used = false
                 )
             )
+        }
+
+        // Team Captain can roll to keep rerolls
+        if (team.specialRules.contains(TeamSpecialRule.TEAM_CAPTAIN)) {
+            val rules = team.game.rules
+            val teamCaptainOnField = team.any { it.location.isOnField(rules) && it.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN)}
+            if (teamCaptainOnField) {
+                featureList.add(
+                    UiTeamFeature(
+                        name = "Team Captain on the Field",
+                        value = 1,
+                        type = UiTeamFeatureType.TEAM_CAPTAIN,
+                        used = false
+                    )
+                )
+            }
         }
 
         return teamInfo.copy(

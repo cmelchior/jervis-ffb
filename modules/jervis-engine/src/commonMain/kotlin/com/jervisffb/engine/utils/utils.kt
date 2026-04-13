@@ -73,6 +73,7 @@ import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.LeapRollContext
@@ -83,8 +84,8 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
@@ -95,6 +96,7 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.collections.plus
 import kotlin.jvm.JvmName
 import kotlin.random.Random
 
@@ -286,6 +288,7 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
 }
 
 fun List<Skill<*>>.getRerollOptions(state: Game, type: DiceRollType, roll: DieRoll<*>, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
+    if (!state.rules.isRerollAllowed(listOf(roll))) return emptyList()
     return this.asSequence().filter { it is RerollSource }
         .map { it as RerollSource }
         .filter { !it.rerollUsed }
@@ -295,53 +298,89 @@ fun List<Skill<*>>.getRerollOptions(state: Game, type: DiceRollType, roll: DieRo
 }
 
 /**
+ * Calculate all available re-rolls options for a Team rolling a roll type.
+ * Note, if Player is the one doing the rolls, use
+ * [calculateAvailableRerollsForPlayer] instead.
+ *
+ * If no re-rolls are available, an empty list is returned.
+ *
+ * This method doesn't work for BLOCK rolls.
+ */
+fun calculateAvailableRerollsForTeam(
+    team: Team, // Team rolling the dice
+    type: DiceRollType, // Which type of dice roll
+    roll: List<DieRoll<*>>, // The result of the first dice
+    firstRollWasSuccess: Boolean? // Whether the first roll was a success.
+): List<DiceRerollOption> {
+    // Team rerolls are only available to the active team
+    if (team.game.activeTeam != team) return emptyList()
+
+    val state = team.game
+    val rules = team.game.rules
+    val hasTeamRerolls = team.availableRerollCount > 0
+    val allowedToUseTeamReroll = rules.canUseTeamReroll(state, player = null)
+    val canRerollType = rules.canBeRerolledByTeamReroll(type)
+
+    // Calculate the full list of re-roll options
+    return when (canRerollType && hasTeamRerolls && allowedToUseTeamReroll) {
+        true -> listOf(DiceRerollOption(rules.getAvailableTeamReroll(team).id, roll))
+        false -> emptyList()
+    }
+}
+
+/**
  * Calculate all available re-rolls options for a given roll type.
  * If no re-rolls are available, an empty list is returned.
  *
  * This method doesn't work for BLOCK rolls.
  */
-fun calculateAvailableRerollsFor(
-    rules: Rules, // Ruleset used
+fun calculateAvailableRerollsForPlayer(
     player: Player, // Player rolling the dice
     type: DiceRollType, // Which type of dice roll
     roll: DieRoll<*>, // The result of the first dice
     firstRollWasSuccess: Boolean? // Whether the first roll was a success.
-): SelectRerollOption? {
-    if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use XX instead")
-
-    // Check any skills available to the player
+): List<DiceRerollOption> {
+    if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use `calculateAvailableRerollsForBlock` instead")
     val skillRerolls: List<DiceRerollOption> = player.skills.getRerollOptions(
         player.team.game,
         type,
         roll,
         firstRollWasSuccess
     )
-
-    // Check if there is any team re-rolls available
-    val team = player.team
-    val hasTeamRerolls = team.availableRerollCount > 0
-    val allowedToUseTeamReroll = rules.canUseTeamReroll(player.team.game, player)
-
-    // Calculate the full list of re-roll options
-    val allOptions = if (skillRerolls.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
-        emptyList()
-    } else {
-        val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-            listOf(
-                DiceRerollOption(rules.getAvailableTeamReroll(team).id, listOf(roll))
-            )
-        } else {
-            emptyList()
-        }
-        skillRerolls + teamReroll
-    }
-
-    return if (allOptions.isEmpty()) {
-        null
-    } else {
-        SelectRerollOption(allOptions)
-    }
+    val teamRerolls = calculateAvailableRerollsForTeam(
+        team = player.team,
+        type = type,
+        roll = listOf(roll),
+        firstRollWasSuccess = firstRollWasSuccess
+    )
+    return skillRerolls + teamRerolls
 }
+
+fun calculateAvailableRerollsForBlock(
+    attackingPlayer: Player,
+    diceRoll: List<BlockDieRoll>
+): List<DiceRerollOption> {
+    // Re-rolling block dice can be pretty complex,
+    // Brawler: Can reroll a single "Both Down"
+    // Pro: Can reroll any single die
+    // Team reroll: Can reroll all of them
+    val skillRerolls = attackingPlayer.skills
+        .filter { skill: Skill<*> -> skill is RerollSource }
+        .map { it as RerollSource }
+        .filter { it.canReroll(attackingPlayer.team.game, DiceRollType.BLOCK, diceRoll) }
+        .flatMap { it.calculateRerollOptions(DiceRollType.BLOCK, diceRoll) }
+
+    val teamRerolls = calculateAvailableRerollsForTeam(
+        attackingPlayer.team,
+        type = DiceRollType.BLOCK,
+        diceRoll,
+        null
+    )
+    return skillRerolls + teamRerolls
+}
+
+
+
 
 /**
  * Returns all possible combinations from a given list, excluding the empty set.
@@ -369,8 +408,7 @@ fun <T> List<T>.combinations(size: Int): List<Set<T>> {
         .flatMap { (index: Int, element: T) ->
             this.drop(index + 1)
                 .combinations(size - 1)
-                .map { setOf(element) + it
-                }
+                .map { setOf(element) + it }
         }
 }
 

@@ -5,7 +5,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.assertContext
@@ -97,7 +97,7 @@ object RushRoll: D6WithRerollProcedure() {
     }
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RushRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<RushRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<RushRollContext>().player
 
     override val RollDie = object: AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {

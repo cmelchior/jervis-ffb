@@ -535,3 +535,98 @@ As it is both unintuitive, unclear and mechanically clunky to allow a Stunned
 player to become Prone this way, Jervis has adopted the interpretation that if a 
 Stunned Player is either Knocked Down or Falls Over during a turn, and Armour
 isn't broken, they remain Stunned rather than reverting to Prone.
+
+## Page 97 - New Skills
+When gaining new skills through advancements, it is illegal to get the same
+skill twice.
+
+However, it isn't specified if this can happen in other cases.
+
+In BB2020, there were a few cases where this could happen using Special
+Play Cards, but the interaction wasn't specified and mostly involved skills with
+modifiers like "Loner (4+)" or "Mighty Blow(+2)". In those cases, it was assumed
+that for negative effects, the lower number was chosen (e.g., Loner (3+) over 
+Loner (4+)) and for positive effects, the higher number was chosen (e.g., 
+Mighty Blow(+2) over Mighty Blow(+1)). However, you were not allowed to use the 
+skill twice.
+
+Right now, this is a hypothetical scenario in BB2025, as Special Play Cards are
+not available, and Prayers to Nuffle has wording that prevents this scenario.
+
+So for now, Jervis will throw an error if Players end up having the same skill
+twice.
+
+## Page 144 - Team Mascot
+
+### Loner
+Loner uses the wording "Whenever this player wishes to use a Team Re-roll...".
+Mascot uses the wording "...whenever the team wishes to use this Team
+re-roll ".
+
+Which makes it unclear which order you check, and how they impact each other.
+
+For now, Jervis uses the (somewhat arbitrary) order:
+
+1. First we check for Loner. If failed, the Mascot re-roll is marked as used,
+   without rolling for it as we treat the roll as par of the reroll.
+2. If Loner is passed, we then roll for Mascot.
+
+### Reroll Mascot Roll
+Technically, it would be allowed to use a Team Reroll to re-roll the Mascot Roll,
+but since the rules specify that failing the mascot role will allow you to do
+that anyway. There doesn't seem to be any use case for this, except complicating
+the re-roll logic.
+
+For this reason, Jervis does not allow using team rerolls on the Mascot Roll,
+but any applicable skill (not Pro) can be used.
+
+### Team Captain
+It is slightly unclear how the Team Mascot reroll should be treated in 
+combination with Team Captain.
+
+Jervis treats the "4+ to work" as part of the re-roll, so if Team Captain
+keeps the Mascot reroll. The Coach must still roll the next time it is used.
+
+This is consistent with the NAF interpretation.
+
+!!! naf "NAF"
+
+    If a Mascot reroll is free (independent of success) due to Team Captain, 
+    the 4+ roll has to be repeated next time the Mascot reroll is used.
+
+## Page 155 - Team Captain
+
+A few edge cases are unclear about how to handle Team Captain.
+
+### Loner
+Loner describes "...the Team Re-roll is lost just as if have been used". Jervis
+interprets this as meaning that Team Captain can roll to prevent rerolls lost
+this way.
+
+### Pro
+The Pro skill only works on rolls that are taken on behalf of the Player. Team 
+Captain rolling is not considered such a roll, as it is taken for the reroll 
+itself. 
+
+For this reason, Pro cannot be used to reroll Team Captain rolls. 
+
+!!! naf "NAF"
+
+    The Team Captain cannot use Pro to reroll the Team Captain roll.
+
+### Promotion
+It is unclear what happens if a player with Pro already gets promoted to
+Team Captain.
+
+1. Do they gain Pro twice?
+2. If Pro was gained through an advancement roll, is the price reduced?
+3. Do they just get the "Team Captain", designation, but otherwise keep
+   their normal Pro?
+
+Of these, the only thing Jervis prevents is someone having Pro twice. Otherwise,
+none of the questions are answered in the rulebook, but since all of them
+are related to "team building", and cannot happen in-game, Jervis does not have
+an opinion. This means that Jervis will leave it up to the Team Roster provider
+to handle this.
+
+This also means that Jervis supports a Team Captain not having Pro at all.

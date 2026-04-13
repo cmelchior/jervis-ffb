@@ -1,22 +1,24 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.CheeringFansContext
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.utils.sum
 
 class ReportCheeringFansResult(
     kickingTeam: Team,
     receivingTeam: Team,
-    dieKickingTeam: DieResult,
-    cheerLeadersKickingTeam: Int,
-    dieReceivingTeam: DieResult,
-    cheerLeadersReceivingTeam: Int,
+    context: CheeringFansContext,
 ) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
-        val kickingResult = dieKickingTeam.value + cheerLeadersKickingTeam
-        val receivingResult = dieReceivingTeam.value + cheerLeadersReceivingTeam
-        appendLine("Cheering Fans: ${kickingTeam.name} [${dieKickingTeam.value} + $cheerLeadersKickingTeam = $kickingResult] vs. ${receivingTeam.name} [${dieReceivingTeam.value} + $cheerLeadersReceivingTeam = $receivingResult]")
+        val kickingDieRoll = context.kickingTeamRoll?.value ?: 0
+        val kickingModifiers = context.kickingTeamModifiers.sum()
+        val receivingDieRoll = context.receivingTeamRoll?.value ?: 0
+        val receivingModifiers = context.kickingTeamModifiers.sum()
+        val kickingResult = kickingDieRoll + context.kickingTeamModifiers.sum()
+        val receivingResult = receivingDieRoll + context.receivingTeamModifiers.sum()
+        appendLine("Cheering Fans: ${kickingTeam.name} [$kickingDieRoll + $kickingModifiers = $kickingResult] vs. ${receivingTeam.name} [$receivingDieRoll + $receivingModifiers = $receivingResult]")
         when (kickingTeam.game.rules.baseVersion) {
             GameVersion.BB2020 -> {
                 when {

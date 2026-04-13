@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnFieldLocation
@@ -21,7 +22,10 @@ import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.SetupRule
+import com.jervisffb.engine.rules.common.TeamCaptainNotOnField
 import com.jervisffb.engine.rules.common.actions.PlayerAction
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -34,6 +38,31 @@ import kotlinx.serialization.Serializable
 abstract class BB2025Rules(
     private val bb2025RuleParameters: RulesParametersHolder
 ) : Rules(bb2025RuleParameters) {
+
+    override fun isSetupValid(state: Game, team: Team): List<SetupRule> {
+        val setupErrors = super.isSetupValid(state, team).toMutableList()
+        val rules = state.rules
+        // If a Team has a Team Captain, he must be placed on the field
+        // if possible
+        val (inReserve, onField, notAvailable) = team
+            .filter { it.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN) }
+            .fold(
+                initial = Triple(mutableListOf<Player>(), mutableListOf<Player>(), mutableListOf<Player>())
+            ) { data, player ->
+                when {
+                    player.location.isOnField(rules) -> data.second.add(player)
+                    !player.location.isOnField(rules) && player.state == PlayerState.RESERVE -> data.first.add(player)
+                    else -> data.third.add(player)
+                }
+                data
+            }
+
+        if (onField.isEmpty() && inReserve.isNotEmpty()) {
+            setupErrors.add(TeamCaptainNotOnField(inReserve.map { it.id }))
+        }
+
+        return setupErrors
+    }
 
     override fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")

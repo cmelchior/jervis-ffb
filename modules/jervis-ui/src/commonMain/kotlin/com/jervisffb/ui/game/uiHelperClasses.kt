@@ -12,6 +12,7 @@ enum class UiTeamFeatureType {
     APOTHECARY,
     BLOODWEISER_KEG,
     CHEERING_FANS_OFFENSIVE_ASSIST,
+    TEAM_CAPTAIN,
     UNKNOWN,
 }
 
@@ -19,6 +20,7 @@ enum class UiRerollType {
     TEAM,
     LEADER,
     BRILLIANT_COACHING,
+    MASCOT,
     UNKNOWN
 }
 

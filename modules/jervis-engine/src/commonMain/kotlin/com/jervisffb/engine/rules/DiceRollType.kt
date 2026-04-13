@@ -5,6 +5,7 @@ package com.jervisffb.engine.rules
  */
 enum class DiceRollType(val description: String) {
     ACCURACY("Accuracy"), // For passing and Throw Teammate (in BB2025)
+    ARGUE_THE_CALL("Argue the Call"),
     ARMOUR("Armour"),
     BAD_HABITS("Bad Habits"),
     BB7_APOTHECARY("Apothecary"),
@@ -13,6 +14,7 @@ enum class DiceRollType(val description: String) {
     BLOODLUST("Bloodlust"),
     BONE_HEAD("Bone Head"),
     BOUNCE("Bounce"),
+    BRIBE("Bribe"),
     BREATHE_FIRE("Breathe Fire"),
     BRILLIANT_COACHING("Brilliant Coaching"),
     CASUALTY("Casualty"),
@@ -20,6 +22,7 @@ enum class DiceRollType(val description: String) {
     CHAINSAW("Chainsaw"),
     CHARGE("Charge"),
     CHEERING_FANS("Cheering Fans"),
+    CROWD_TAKES_ACTION("Crowd Takes Action"), // Stalling
     FAN_FACTOR("Fan Factor"),
     FOUL_APPEARANCE("Foul Appearance"),
     DAUNTLESS("Dauntless"),
@@ -63,6 +66,8 @@ enum class DiceRollType(val description: String) {
     SWOOP_DIRECTION("Swoop Direction"),
     SWOOP_DISTANCE("Swoop Distance"),
     TAKE_ROOT("Take Root"),
+    TEAM_CAPTAIN("Team Captain"),
+    TEAM_MASCOT("Team Mascot"),
     THROW_A_ROCK("Throw A Rock"),
     THROWIN_DIRECTION("Throw-in Direction"),
     THROWIN_DISTANCE("Throw-in Distance"),

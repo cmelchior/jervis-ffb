@@ -10,7 +10,6 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
@@ -61,7 +60,7 @@ object TakeRootRoll: D6WithRerollProcedure() {
             }
         }
     }
-    override fun getActionOwner(state: Game): Team = state.getContext<ActivatePlayerContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<ActivatePlayerContext>().player
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {

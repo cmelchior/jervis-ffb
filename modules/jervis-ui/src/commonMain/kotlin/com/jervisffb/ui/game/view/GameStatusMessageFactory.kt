@@ -69,6 +69,11 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotStep
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
@@ -223,6 +228,14 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             SwoopDirectionRoll.ReRollDie to "Re-roll D3 to determine direction of Swoop",
             SwoopDistanceRoll.RollDie to "Roll D6 to determine distance of Swoop",
             SwoopDistanceRoll.ReRollDie to "Re-roll D6 to determine distance of Swoop",
+            LonerRoll.RollDie to "Roll D6 for Loner",
+            LonerRoll.ReRollDie to "Re-roll D6 for Loner",
+            TeamCaptainRoll.RollDie to "Roll D6 for Team Captain",
+            TeamCaptainRoll.ReRollDie to "Re-roll D6 for Team Captain",
+            TeamMascotRoll.RollDie to "Roll D6 for Team Mascot",
+            TeamMascotRoll.ReRollDie to "Re-roll D6 for Team Mascot",
+            ProRoll.RollDie to "Roll D6 for Pro",
+            ProRoll.ReRollDie to "Re-roll D6 for Pro",
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
@@ -250,6 +263,11 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             JumpUpRoll.ChooseReRollSource to "Accept Jump Up Result or Reroll D6?",
             SwoopDirectionRoll.ChooseReRollSource to "Accept Swoop Direction Result or Re-roll D3?",
             SwoopDistanceRoll.ChooseReRollSource to "Accept Swoop Distance Result or Re-roll D6?",
+            LonerRoll.ChooseReRollSource to "Accept Loner Result or Re-roll D6?",
+            TeamMascotRoll.ChooseReRollSource to "Accept Mascot Result or Re-roll D6?",
+            TeamMascotStep.ChooseAnotherReroll to "Team Mascot Failed, Choose Another Team Re-roll?",
+            TeamCaptainRoll.ChooseReRollSource to "Accept Team Captain Result or Re-roll D6?",
+            ProRoll.ChooseReRollSource to "Accept Pro Result or Re-roll D6?",
         )
 
         val rollMessages: Map<Node, (Boolean, Boolean, Game) -> String?> = rollDiceScenarios.associate { data ->

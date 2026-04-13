@@ -41,6 +41,9 @@ abstract class ParentNode : Node {
      * node completely. If a [Node] is returned, this parent node is skipped in
      * favor of the returned one. If `null` is returned, the node is executed
      * as normal, and [onEnterNode] is called next.
+     *
+     * This is an optimization to avoid litting with procedures with
+     * [ComputationNode] instances, which achieve the same thing.
      */
     open fun skipNodeFor(state: Game, rules: Rules): Node? = null
 

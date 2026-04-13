@@ -51,6 +51,7 @@ import com.jervisffb.ui.game.state.actionwheel.CatchWheelController
 import com.jervisffb.ui.game.state.actionwheel.ChargePlayersRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.CheeringFansKickingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.CheeringFansReceivingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.ChooseAlternativeToMascotWheelController
 import com.jervisffb.ui.game.state.actionwheel.ChooseKickingTeamWheelController
 import com.jervisffb.ui.game.state.actionwheel.CoinTossWheelController
 import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
@@ -69,12 +70,14 @@ import com.jervisffb.ui.game.state.actionwheel.JumpWheelController
 import com.jervisffb.ui.game.state.actionwheel.KickoffEventWheelController
 import com.jervisffb.ui.game.state.actionwheel.LandingWheelController
 import com.jervisffb.ui.game.state.actionwheel.LeapWheelController
+import com.jervisffb.ui.game.state.actionwheel.LonerWheelController
 import com.jervisffb.ui.game.state.actionwheel.PickupWheelController
 import com.jervisffb.ui.game.state.actionwheel.PitchInvasionKickingTeamPlayersAffectedRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.PitchInvasionKickingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.PitchInvasionReceivingTeamPlayersAffectedRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.PitchInvasionReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.PogoWheelController
+import com.jervisffb.ui.game.state.actionwheel.ProWheelController
 import com.jervisffb.ui.game.state.actionwheel.ProjectileVomitWheelController
 import com.jervisffb.ui.game.state.actionwheel.QuickSnapRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.ReallyStupidWheelController
@@ -92,6 +95,8 @@ import com.jervisffb.ui.game.state.actionwheel.SteadyFootingWheelController
 import com.jervisffb.ui.game.state.actionwheel.SwoopDirectionWheelController
 import com.jervisffb.ui.game.state.actionwheel.SwoopDistanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.TakeRootWheelController
+import com.jervisffb.ui.game.state.actionwheel.TeamCaptainWheelController
+import com.jervisffb.ui.game.state.actionwheel.TeamMascotWheelController
 import com.jervisffb.ui.game.state.actionwheel.UnchannelledFuryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseBigHandWheelController
@@ -228,8 +233,10 @@ class UiGameController(
         JumpUpWheelController,
         LandingWheelController,
         LeapWheelController,
+        LonerWheelController,
         PickupWheelController,
         PogoWheelController,
+        ProWheelController,
         ProjectileVomitWheelController,
         ReallyStupidWheelController,
         UnchannelledFuryWheelController,
@@ -243,6 +250,8 @@ class UiGameController(
         ScatterRollWheelController,
         SwoopDirectionWheelController,
         SwoopDistanceWheelController,
+        TeamCaptainWheelController,
+        TeamMascotWheelController,
 
         StandardBlockRollWheelController,
         StandardBlockChooseResultOrRerollWheelController,
@@ -284,6 +293,7 @@ class UiGameController(
 
         UseApothecaryWheelController,
         ArgueTheCallWheelController,
+        ChooseAlternativeToMascotWheelController,
 
         // Pre-game / Kick-off Rolls
         HomeTeamFanFactorRoll,

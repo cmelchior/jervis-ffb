@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.UseProReroll
+import com.jervisffb.engine.rules.common.procedures.rerolls.UseProReroll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -25,6 +25,7 @@ class Pro(
     override val category: SkillCategory = SkillCategory.GENERAL,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill, RerollSource {
+    val successTarget = 3 // What to roll to succeed
     override val type: SkillType = SkillType.PRO
     override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
@@ -42,13 +43,23 @@ class Pro(
     override var rerollUsed: Boolean = false
     override val rerollProcedure: Procedure = UseProReroll
 
-    override fun canReroll(state: Game, type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
-        return false
-        // TODO("Not yet implemented")
+    override fun canReroll(state: Game, type: DiceRollType, dicePool: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
+        if (rerollUsed) return false
+        if (state.activePlayer != player) return false
+        // It is a bit unclear if Pro can re-roll a different set of dice than a Team re-roll.
+        // For now, we assume the answer is mostly no. The activePlayer check will filter out
+        // most candidates anyway (like Landing). Team Captain/Mascot is the exception so far.
+        if (type == DiceRollType.TEAM_CAPTAIN) return false
+        if (type == DiceRollType.TEAM_MASCOT) return false
+        if (!state.rules.canBeRerolledByTeamReroll(type)) return false
+        return true
     }
 
     override fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): List<DiceRerollOption> {
-        return emptyList()
-        // TODO("Not yet implemented")
+        return value
+            .filter { it.rerollSource == null }
+            .map { die ->
+                DiceRerollOption(id, die)
+            }
     }
 }

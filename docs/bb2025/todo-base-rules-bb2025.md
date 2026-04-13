@@ -113,6 +113,15 @@ book.
     - [x] Blizzard
 - [ ] Take on Journeymen
 - [ ] Inducements (Select and Buy)
+    - [x] Team Mascot
+      - [x] +1 When rolling for Cheering Fans
+      - [x] +1 When rolling for Cheering Fans if re-roll is used
+      - [x] If re-roll is used, it comes back next half
+      - [x] re-roll does not come back for overtime
+      - [x] Pro cannot re-roll Mascot roll
+      - [x] If saved by Team Captain roll, must rol 4+ next time.
+      - [x] Team re-roll cannot be used to re-roll mascot roll
+      - [x] Skill rerolls can be used (e.g. Hafling Luck)
     - [ ] Temp Agency Cheerleaders
     - [ ] Part-time Assistant Coaches
     - [ ] Weather Mage
@@ -535,6 +544,17 @@ book.
   - [x] Action ends after pickup.
   - [x] Turnover if player does not have the ball when action ends.
   - [ ] Marked modifiers when using Shadowing
+
+## Special Rules
+
+- [x] Team Captain
+  - [x] Must be set up if possible
+  - [x] Gains Pro skill
+  - [x] 6+ to save reroll if on pitch
+  - [x] 6+ to save mascot if on pitch.
+  - [x] Works on all team rerolls
+  - [x] Works on Loner rerolls
+  - [x] Works for Pro (fail) -> Mascot (fail / fail Team Captain)  -> Team Reroll (allow Pro to reroll / succced Team Captain) 
 
 ## Statistics
 

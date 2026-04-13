@@ -5,7 +5,6 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -48,7 +47,7 @@ object DauntlessRoll: D6WithRerollProcedure() {
         return ReportDauntlessResult(context)
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<DauntlessRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<DauntlessRollContext>().attacker.team
+    override fun getActionOwner(state: Game): Player = state.getContext<DauntlessRollContext>().attacker
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {

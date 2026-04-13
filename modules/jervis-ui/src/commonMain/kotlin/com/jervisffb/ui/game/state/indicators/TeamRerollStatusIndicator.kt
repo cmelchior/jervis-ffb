@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.common.rerolls.BrilliantCoachingReroll
 import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
+import com.jervisffb.engine.rules.common.rerolls.TeamMascotReroll
 import com.jervisffb.ui.game.UiReroll
 import com.jervisffb.ui.game.UiRerollType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -58,6 +59,10 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
 
                 is RegularTeamReroll -> {
                     UiReroll("Team Reroll", UiRerollType.TEAM, it.rerollUsed)
+                }
+
+                is TeamMascotReroll -> {
+                    UiReroll("Mascot Reroll", UiRerollType.MASCOT, it.rerollUsed)
                 }
             }
         }

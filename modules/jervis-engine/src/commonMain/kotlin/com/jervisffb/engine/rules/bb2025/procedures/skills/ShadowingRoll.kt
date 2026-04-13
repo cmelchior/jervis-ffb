@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.assertContext
@@ -29,7 +29,7 @@ object ShadowingRoll : D6WithRerollProcedure() {
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<ShadowingRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<ShadowingRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<ShadowingRollContext>().player
 
     override val RollDie = object: AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
@@ -44,9 +44,9 @@ object ShadowingRoll : D6WithRerollProcedure() {
     override val ChooseReRollSource = object : AbstractChooseRerollSource() {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<ShadowingRollContext>()
-            val pickupPlayer = context.player
+            val shadowingPlayer = context.player
             return RerollData(
-                player = pickupPlayer,
+                player = shadowingPlayer,
                 roll = context.roll!!,
                 isSuccess = context.isSuccess
             )

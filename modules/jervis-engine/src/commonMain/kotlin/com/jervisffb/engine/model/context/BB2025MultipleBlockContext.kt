@@ -96,13 +96,14 @@ data class BB2025MultipleBlockContext(
      * Creates a [UseRerollContext] for currently active Multiple Block Action its reroll type
      */
     fun createRerollContext(state: Game, action: RerollOptionSelected): UseRerollContext {
+        val player = state.getContext<BlockContext>().attacker
         return when (getActiveRerollType()) {
             BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
             STAB -> TODO()
-            STANDARD -> UseRerollContext(DiceRollType.BLOCK, action.getRerollSource(state))
+            STANDARD -> UseRerollContext(DiceRollType.BLOCK, player.team, player, action.getRerollSource(state))
         }
     }
 

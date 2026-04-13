@@ -13,8 +13,9 @@ import com.jervisffb.test.boneHead
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.proRoll
+import com.jervisffb.test.utils.SelectSkillReroll
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -102,9 +103,19 @@ class BoneHeadTests: JervisGameBB2025Test() {
         assertFalse(rules.isDistracted(player))
     }
 
-    @Ignore
     @Test
     fun canUseProToRerollBoneHeadRoll() {
-        // TODO
+        val player = awayTeam["A1".playerId]
+        player.addSkill(SkillType.PRO)
+        controller.rollForward(
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+            *boneHead(1.d6, SelectSkillReroll(SkillType.PRO)),
+            *proRoll(4.d6),
+            2.d6, // Succeed Bone Head roll
+            *moveTo(14, 5),
+            *dodge(6.d6)
+        )
+        assertEquals(player, state.activePlayer)
+        assertFalse(rules.isDistracted(player))
     }
 }

@@ -21,8 +21,11 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.inducements.TeamMascot
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType.FRENZY
 import com.jervisffb.engine.rules.common.skills.SkillType.LEADER
 import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP
@@ -167,12 +170,12 @@ fun createDefaultBB2020HomeTeam(rules: Rules): Team {
 }
 
 fun createDefaultBB2025HomeTeam(rules: Rules): Team {
-    return teamBuilder(rules, HUMAN_TEAM_BB2025) {
+    val team = teamBuilder(rules, HUMAN_TEAM_BB2025) {
         coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
         addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), com.jervisffb.resources.bb2025.OGRE)
         addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), com.jervisffb.resources.bb2025.HALFLING_HOPEFUL)
-        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), com.jervisffb.resources.bb2025.HUMAN_LINEMAN)
+        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), com.jervisffb.resources.bb2025.HUMAN_LINEMAN, specialRules = listOf(PlayerSpecialRule.TEAM_CAPTAIN))
         addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), com.jervisffb.resources.bb2025.HUMAN_LINEMAN)
         addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), com.jervisffb.resources.bb2025.HUMAN_THROWER, listOf(LEADER.id()))
         addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), com.jervisffb.resources.bb2025.HUMAN_CATCHER, listOf(SIDESTEP.id()))
@@ -186,7 +189,15 @@ fun createDefaultBB2025HomeTeam(rules: Rules): Team {
         apothecaries = 1
         dedicatedFans = 1
         teamValue = 1_000_000
+        specialRules.add(TeamSpecialRule.TEAM_CAPTAIN)
     }
+
+    // Until we get proper inducement support, manually add a Mascot
+    val mascot = TeamMascot(team.id)
+    team.mascots.add(mascot)
+    team.rerolls.add(mascot.reroll)
+
+    return team
 }
 
 fun createDefaultBB2020AwayTeam(rules: Rules): Team {

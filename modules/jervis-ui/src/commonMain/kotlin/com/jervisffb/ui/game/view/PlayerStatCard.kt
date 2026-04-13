@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.utils.paperBackground
@@ -364,6 +365,12 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
                                     StatusText("Stunned", JervisTheme.statusStunned)
                                 }
                                 else -> { /* Do nothing */ }
+                            }
+                            player.model.specialRules.forEach { rule ->
+                                when (rule) {
+                                    PlayerSpecialRule.TEAM_CAPTAIN -> StatusText("Team Captain", JervisTheme.ruleTeamCaptain)
+                                    else -> StatusText("Unknown", JervisTheme.white)
+                                }
                             }
                             player.model.statusEffects.forEach { statusEffect ->
                                 when (statusEffect.type) {

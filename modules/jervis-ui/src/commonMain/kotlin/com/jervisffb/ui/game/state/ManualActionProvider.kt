@@ -78,9 +78,13 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdo
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
@@ -770,6 +774,30 @@ open class ManualActionProvider(
                     neighborRange == Range.LONG_PASS
                 }
             if (!atEdgeOfAllowedRange) return Confirm
+        }
+
+        fun isOnlyTeamRerolls(availableActions: ActionRequest): Boolean {
+            return availableActions.getOrNull<SelectRerollOption>()?.let {
+                it.options.all { option -> option.getRerollSource(controller.state) is TeamReroll }
+            } ?: false
+        }
+
+        if (!menuViewModel.isFeatureEnabled(Feature.ACCEPT_PRO_ROLL) && currentNode == ProRoll.ChooseReRollSource) {
+            if (isOnlyTeamRerolls(availableActions)) {
+                return NoRerollSelected()
+            }
+        }
+
+        if (!menuViewModel.isFeatureEnabled(Feature.ACCEPT_LONER_ROLL) && currentNode == LonerRoll.ChooseReRollSource) {
+            if (isOnlyTeamRerolls(availableActions)) {
+                return NoRerollSelected()
+            }
+        }
+
+        if (!menuViewModel.isFeatureEnabled(Feature.ACCEPT_TEAM_CAPTAIN_ROLL) && currentNode == TeamCaptainRoll.ChooseReRollSource) {
+            if (isOnlyTeamRerolls(availableActions)) {
+                return NoRerollSelected()
+            }
         }
 
         return null

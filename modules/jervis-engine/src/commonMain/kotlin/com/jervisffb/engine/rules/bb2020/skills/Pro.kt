@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.UseProReroll
+import com.jervisffb.engine.rules.common.procedures.rerolls.UseProReroll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -35,7 +35,7 @@ class Pro(
     override var rerollUsed: Boolean = false
     override val rerollProcedure: Procedure = UseProReroll
 
-    override fun canReroll(state: Game, type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
+    override fun canReroll(state: Game, type: DiceRollType, dicePool: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         return false
         // TODO("Not yet implemented")
     }

@@ -305,6 +305,16 @@ want to use Lone Fouler instead.
     
     Offensive and Defensive Assists are not optional.
 
+## Page 131 - Loner
+In BB2020, it was not allowed to re-roll a failed Loner roll using a Team 
+Reroll. This sentence is not found in BB2025, so while probably a mistake, until
+there is an errata, this is allowed in Jervis.
+
+!!! bloodbowl "2020 Rules"
+
+    Q: Can a player use a team re-roll to re-roll a failed Loner (X+) roll? (p.85)
+    A: No.
+
 ## Page 131 - Mighty Blow
 Mighty Blow specifically says "Whenever this player Knocks Down an opposition
 player during a Block Action...", but when you are pushed into the crowd, the

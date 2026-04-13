@@ -6,6 +6,7 @@ The TODO list is by no means exhaustive, it is just a place to dump things as
 they come up.
 
 ## Todo List
+- [ ] Add Team Captain Team Feature icon
 - [ ] Show better indicators for "Dev Mode" during Swoop, i.e. show what the values actually represent on the field, and not just the dice
 - [ ] A thrown player is rendered below a loose ball, which looks weird. We probably need to add a new "Air"-layer
 - [ ] Animations when a player is being thrown (including swoop)

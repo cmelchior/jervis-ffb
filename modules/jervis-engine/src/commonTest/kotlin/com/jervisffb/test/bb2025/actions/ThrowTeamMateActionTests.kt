@@ -32,6 +32,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.landingRoll
+import com.jervisffb.test.loner
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.qualityRoll
@@ -202,6 +203,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             FieldSquareSelected(11, 4), // Quick Pass - No modifiers
             4.d6,
             TeamRerollSelected<TeamReroll>(),
+            *loner(4.d6),
             5.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)
@@ -221,6 +223,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             FieldSquareSelected(8, 4), // -1 Short Pass
             2.d6,
             TeamRerollSelected<TeamReroll>(),
+            *loner(4.d6),
             3.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6)

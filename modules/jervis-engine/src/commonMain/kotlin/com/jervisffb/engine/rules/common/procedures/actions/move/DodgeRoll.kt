@@ -27,6 +27,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
@@ -107,7 +108,7 @@ object DodgeRoll: D6WithRerollProcedure() {
         return ReportDodgeResult(context)
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<DodgeRollContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<DodgeRollContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<DodgeRollContext>().player
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
@@ -159,7 +160,7 @@ object DodgeRoll: D6WithRerollProcedure() {
      * Choose whether the dodging player should use Two Heads (if applicable).
      */
     object ChooseToUseTwoHeads: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -191,7 +192,7 @@ object DodgeRoll: D6WithRerollProcedure() {
      * Choose whether dodging player should use Break Tackle (if applicable).
      */
     object ChooseToUseBreakTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -227,7 +228,7 @@ object DodgeRoll: D6WithRerollProcedure() {
      * If multiple players have it, only 1 can use it.
      */
     object ChooseToUsePrehensileTail: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team.otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -279,7 +280,7 @@ object DodgeRoll: D6WithRerollProcedure() {
      * this choice is after.
      */
     object ChooseToUseDivingTackleBeforeRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team.otherTeam()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
@@ -324,7 +325,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     }
 
     object ChooseToUseTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
@@ -408,7 +409,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     )
 
     object ChooseToUseDivingTackleAfterReRoll: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)

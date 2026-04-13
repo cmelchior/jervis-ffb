@@ -84,7 +84,14 @@ import com.jervisffb.engine.utils.sum
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val rerollContext = UseRerollContext(DiceRollType.ARMOUR)
+        val context = state.getContext<RiskingInjuryContext>()
+        // According to the rules on page 37 (BB2025), it is always the opposing
+        // team that makes the Armour roll, regardless of how the injury
+        // happened, so any team-specific rerolls (none currently exists) must
+        // be on that team.
+        val team = context.player.team.otherTeam()
+        val player = context.causedBy
+        val rerollContext = UseRerollContext(DiceRollType.ARMOUR, team = team, player = player)
         return AddContext(rerollContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {

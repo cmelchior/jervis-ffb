@@ -134,7 +134,7 @@ object SingleStandardBlockStep : Procedure() {
     object SelectRerollType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = SingleStandardBlockChooseReroll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return when (state.getRerollContextOrNull()?.source != null) {
+            return when (state.getRerollContextOrNull()?.rerollAllowed == true) {
                 true -> GotoNode(RerollDice)
                 false -> GotoNode(SelectBlockResult)
             }

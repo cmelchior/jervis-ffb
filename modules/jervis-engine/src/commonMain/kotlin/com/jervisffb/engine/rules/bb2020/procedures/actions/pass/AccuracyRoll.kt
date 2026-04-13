@@ -16,6 +16,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
@@ -65,7 +66,7 @@ object AccuracyRoll: D6WithRerollProcedure() {
         return UpdateContext(updatedContext)
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PassContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<PassContext>().thrower.team
+    override fun getActionOwner(state: Game): Player = state.getContext<PassContext>().thrower
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
@@ -76,7 +77,7 @@ object AccuracyRoll: D6WithRerollProcedure() {
     }
 
     object ChooseToUseAccurate: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
             val isApplicable = when (context.range) {
@@ -111,7 +112,7 @@ object AccuracyRoll: D6WithRerollProcedure() {
     }
 
     object ChooseToUseCannoneer: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state)
+        override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
             val isApplicable = when (context.range) {

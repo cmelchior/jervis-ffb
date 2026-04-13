@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
@@ -33,6 +34,7 @@ private data class PlayerData(
     val type: Position,
     val extraSkills: List<SkillId> = emptyList(),
     val statModifiers: List<StatModifier>,
+    val extraSpecialRules: List<PlayerSpecialRule> = emptyList(),
     val icon: PlayerUiData? = null,
 )
 
@@ -79,6 +81,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
         type: Position,
         skills: List<SkillId> = emptyList(),
         statModifiers: List<StatModifier> = emptyList(),
+        specialRules: List<PlayerSpecialRule> = emptyList()
     ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -88,7 +91,16 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
         val playerIcon = createDefaultUiData(type)
-        players[number] = PlayerData(id, name, number, type, skills, statModifiers, playerIcon)
+        players[number] = PlayerData(
+            id = id,
+            name = name,
+            number = number,
+            type = type,
+            extraSkills = skills,
+            statModifiers = statModifiers,
+            extraSpecialRules = specialRules,
+            icon = playerIcon
+        )
     }
 
     private fun createDefaultUiData(type: Position): PlayerUiData {
@@ -127,6 +139,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                     data.icon,
                 ).also { player ->
                     player.extraSkills.addAll(data.extraSkills.map { rules.createSkill(player, it, Duration.PERMANENT) })
+                    player.extraSpecialRules.addAll(data.extraSpecialRules)
                     data.statModifiers.forEach {
                         when (it.type) {
                             StatModifier.Type.AV -> player.armourModifiers.add(it)
@@ -146,6 +159,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
             this.teamCheerleaders = this@TeamBuilder.cheerleaders
             this.teamAssistantCoaches = this@TeamBuilder.assistentCoaches
             this.dedicatedFans = this@TeamBuilder.dedicatedFans
+            this.specialRules.addAll(this@TeamBuilder.specialRules)
             this.teamValue = this@TeamBuilder.teamValue
             this.currentTeamValue = this@TeamBuilder.currentTeamValue
             this.teamLogo = this@TeamBuilder.teamLogo

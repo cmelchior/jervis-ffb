@@ -28,15 +28,16 @@ object ExtraTime : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Swap kicking team before entering Extra Time back to the Home team
         // so it emulates starting the game, where it is always the Home Team
-        // that is throwing the coin and the Away Team that chooses the result
-        var kickingTeam = state.homeTeam
+        // that is throwing the coin and the Away Team that chooses the result.
+        //
+        // We do explicitely not call `ResetAvailableTeamRerolls` as they
+        // do not reset for Extra Time, but just carry over.
+        val kickingTeam = state.homeTeam
         return compositeCommandOf(
             SetHalf(state.halfNo + 1),
             SetDrive(0),
             SetKickingTeamAtHalfTime(kickingTeam),
             SetActiveTeam(kickingTeam.otherTeam()),
-//            ResetAvailableTeamRerolls(state.homeTeam),
-//            ResetAvailableTeamRerolls(state.awayTeam),
             SetTurnMarker(state.homeTeam, 0),
             SetTurnMarker(state.awayTeam, 0),
             ReportStartingExtraTime,

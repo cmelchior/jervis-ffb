@@ -91,6 +91,8 @@ object JervisTheme {
     val statusDodgySnack = Color(0xFFa9c364)
     val statusChomped = Color(0xFFf5f4f3)
 
+    val ruleTeamCaptain = JervisTheme.rulebookOrange
+
     val white = Color(0xFFFFFFFF)
     val black = Color(0xFF000000)
 

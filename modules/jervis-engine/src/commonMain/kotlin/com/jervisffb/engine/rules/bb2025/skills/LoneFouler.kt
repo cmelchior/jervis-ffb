@@ -11,7 +11,7 @@ import com.jervisffb.engine.model.modifiers.DefensiveAssistsArmourModifier
 import com.jervisffb.engine.model.modifiers.OffensiveAssistArmourModifier
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.UseLonerReroll
+import com.jervisffb.engine.rules.common.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -44,12 +44,12 @@ class LoneFouler(
     override val rerollResetAt: Duration = Duration.END_OF_ACTION
     override val rerollDescription: String = "Lone Fouler Reroll"
     override var rerollUsed: Boolean = false
-    override val rerollProcedure: Procedure = UseLonerReroll
+    override val rerollProcedure: Procedure = UseStandardSkillReroll
 
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?
     ): Boolean {
         if (type != DiceRollType.ARMOUR) return false

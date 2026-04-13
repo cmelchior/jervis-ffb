@@ -11,10 +11,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Game
@@ -24,6 +22,7 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportStartingExtraTime.id
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
@@ -32,13 +31,13 @@ import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.assert
-import kotlin.math.absoluteValue
+import kotlin.collections.forEachIndexed
 
 /**
  * Use a reroll and then reroll the block dice (if allowed).
  */
 object SingleStandardBlockRerollDice: Procedure() {
-    override val initialNode: Node = UseRerollSource
+    override val initialNode: Node = ReRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
@@ -46,37 +45,28 @@ object SingleStandardBlockRerollDice: Procedure() {
         state.assertContext<BlockContext>()
     }
 
-    object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules,): Procedure {
-            return state.getRerollContextOrNull()?.source?.rerollProcedure ?: INVALID_GAME_STATE("Missing reroll source: ${state.getRerollContextOrNull()}")
-        }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BlockContext>()
-            // useRerollResult must be set by the procedure running which determines if a reroll is allowed
-            return if (rules.isRerollAllowed(context.roll)) {
-                GotoNode(ReRollDie)
-            } else {
-                ExitProcedure()
-            }
-        }
-    }
-
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // TODO Some skills allow only rerolling some dice. We need to capture this somehow
-            val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
+            val rerollContext = state.getRerollContext()
+            val noOfDice = rerollContext.selectedRerollOption?.dice?.size ?: INVALID_GAME_STATE("Cannot determine number of dice: $rerollContext")
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            // TODO The dice must be rolled in the order they appear in the Reroll option.
+            //  Is this an acceptable restriction? As a minimum it should be documented somewhere.
             return castDiceRollList<DBlockResult>(action) { rerolls: List<DBlockResult> ->
                 val rerollContext = state.getRerollContext()
                 val blockContext = state.getContext<BlockContext>()
-                val updatedRoll = blockContext.roll.mapIndexed { i, blockRoll: BlockDieRoll ->
-                    blockRoll.copyReroll(
+                val rerollOptionDice = rerollContext.selectedRerollOption!!.dice
+                val updatedRoll = blockContext.roll.toMutableList()
+                rerolls.forEachIndexed { i, blockRoll ->
+                    val idToUpdate = rerollOptionDice[i].id
+                    val indexToUpdate = updatedRoll.indexOfFirst { it.id == idToUpdate }
+                    updatedRoll[indexToUpdate] = updatedRoll[indexToUpdate].copyReroll(
                         rerollSource = rerollContext.source,
-                        rerolledResult = rerolls[i] // TODO This requires that the rerolls are in the same order. Is that acceptable?
+                        rerolledResult = blockRoll
                     )
                 }
                 compositeCommandOf(

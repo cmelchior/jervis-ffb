@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.common
 
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 
 /**
  * Enum describing restrictions on setting up Players. These are reported by
@@ -33,4 +34,8 @@ data class WrongAmountOfPlayersOnField(
     val availablePlayers: Int,
     /** How many players are actually on the field */
     val playersOnField: Int
+): SetupRule
+data class TeamCaptainNotOnField(
+    // Which players with Team Captain status are available
+    val availablePlayers: List<PlayerId>
 ): SetupRule

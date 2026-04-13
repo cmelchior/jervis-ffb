@@ -58,6 +58,14 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRollContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.MascotRollContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.ProRollContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRollContext
+import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotRoll
 import kotlin.time.ExperimentalTime
 
 
@@ -76,6 +84,7 @@ import kotlin.time.ExperimentalTime
  * - Jump Up
  * - Landing
  * - Leap
+ * - Loner
  * - Pickup
  * - Pogo
  * - Projectile Vomit
@@ -85,6 +94,8 @@ import kotlin.time.ExperimentalTime
  * - Steady Footing
  * - Swoop (Distance)
  * - Take Root
+ * - Team Captain
+ * - Team Mascot
  * - Unchannelled Fury
  */
 abstract class D6WithRerollWheelController : SingleDieWithRerollWheelController<D6Result>() {
@@ -466,6 +477,21 @@ object LeapWheelController : D6WithRerollWheelController() {
     }
 }
 
+object LonerWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "loner"
+    override val diceRollType: DiceRollType = DiceRollType.LONER
+    override val rollDiceNode: Node = LonerRoll.RollDie
+    override val chooseRerollSourceNode: Node = LonerRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = LonerRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<LonerRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<LonerRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
 /**
  * Define the Action-Wheel layout when rolling for Pogo.
  */
@@ -498,6 +524,21 @@ object LandingWheelController : D6WithRerollWheelController() {
     }
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<LandingRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
+object ProWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "pro"
+    override val diceRollType: DiceRollType = DiceRollType.PRO
+    override val rollDiceNode: Node = ProRoll.RollDie
+    override val chooseRerollSourceNode: Node = ProRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ProRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<ProRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<ProRollContext>()
         return context.roll?.originalRoll!!
     }
 }
@@ -546,6 +587,47 @@ object SwoopDistanceWheelController : D6WithRerollWheelController() {
         return context.distanceRoll?.originalRoll!!
     }
 }
+
+object TeamCaptainWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "team-captain"
+    override val diceRollType: DiceRollType = DiceRollType.TEAM_CAPTAIN
+    override val rollDiceNode: Node = TeamCaptainRoll.RollDie
+    override val chooseRerollSourceNode: Node = TeamCaptainRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = TeamCaptainRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+        return state.getContext<TeamCaptainRollContext>().player.coordinates
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<TeamCaptainRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
+object TeamMascotWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "team-mascot"
+    override val diceRollType: DiceRollType = DiceRollType.TEAM_MASCOT
+    override val rollDiceNode: Node = TeamMascotRoll.RollDie
+    override val chooseRerollSourceNode: Node = TeamMascotRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = TeamMascotRoll.ReRollDie
+    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+        val context = state.getRerollContextOrNull()
+        val team = context?.team
+        val player = context?.player
+        return when {
+            (player != null && player.location.isOnField(state.rules)) -> player.coordinates
+            (team != null) -> when (team.isHomeTeam()) {
+                true -> getHomeCenterCoordinates(state)
+                false -> getAwayCenterCoordinates(state)
+            }
+            else -> null
+        }
+    }
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<MascotRollContext>()
+        return context.roll?.originalRoll!!
+    }
+}
+
 
 
 

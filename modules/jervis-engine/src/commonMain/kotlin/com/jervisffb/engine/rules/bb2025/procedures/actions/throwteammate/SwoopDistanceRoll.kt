@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -28,7 +28,7 @@ object SwoopDistanceRoll : D6WithRerollProcedure() {
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
-    override fun getActionOwner(state: Game): Team = state.getContext<SwoopContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<SwoopContext>().player
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {

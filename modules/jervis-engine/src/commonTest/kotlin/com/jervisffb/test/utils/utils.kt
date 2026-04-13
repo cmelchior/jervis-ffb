@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerState
@@ -129,6 +130,13 @@ fun Player.makeDistracted() {
 }
 
 /**
+ * Test Helper, checking that this player is the "Active Player".
+ */
+fun Player.assertActive() {
+    assertEquals(this, team.game.activePlayer)
+}
+
+/**
  * Test Helper, checking if a player is Standing
  */
 fun Player.assertStanding() {
@@ -212,3 +220,16 @@ fun Team.assertActive() {
     assertEquals(this, game.activeTeam)
 }
 
+/**
+ * Test helper, checking if a team is the current Active Team.
+ */
+fun Game.assertActiveTeam(team: Team) {
+    assertEquals(team, activeTeam)
+}
+
+/**
+ * Test helper, checking if there is no active player.
+ */
+fun Game.assertNoActivePlayer() {
+    assertNull(activePlayer)
+}

@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -26,7 +26,7 @@ object SwoopDirectionRoll : D3WithRerollProcedure() {
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<SwoopContext>()
-    override fun getActionOwner(state: Game): Team = state.getContext<SwoopContext>().player.team
+    override fun getActionOwner(state: Game): Player = state.getContext<SwoopContext>().player
 
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d3: D3Result): ProcedureContext {

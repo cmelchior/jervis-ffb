@@ -15,11 +15,12 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.proRoll
 import com.jervisffb.test.reallyStupid
+import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.makeDistracted
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -107,10 +108,20 @@ class ReallyStupidTests: JervisGameBB2025Test() {
         assertFalse(rules.isDistracted(player))
     }
 
-    @Ignore
     @Test
-    fun canUseProToRerollBoneHeadRoll() {
-        // TODO
+    fun canUseProToRerollReallyStupidRoll() {
+        val player = awayTeam["A1".playerId]
+        player.addSkill(SkillType.PRO)
+        controller.rollForward(
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+            *reallyStupid(1.d6, SelectSkillReroll(SkillType.PRO)),
+            *proRoll(4.d6),
+            2.d6, // Succeed Really Stupid roll
+            *moveTo(14, 5),
+            *dodge(6.d6)
+        )
+        assertEquals(player, state.activePlayer)
+        assertFalse(rules.isDistracted(player))
     }
 
     @Test

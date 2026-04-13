@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.UseTeamReroll
+import com.jervisffb.engine.rules.common.procedures.rerolls.UseTeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 
@@ -15,6 +15,7 @@ import com.jervisffb.engine.rules.common.skills.RerollSource
  */
 sealed interface TeamReroll : RerollSource {
     val teamId: TeamId
+    // Whether this reroll can be carried over into overtime if it isn't used in the half
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
     val duration: Duration
@@ -24,13 +25,14 @@ sealed interface TeamReroll : RerollSource {
     override fun canReroll(
         state: Game,
         type: DiceRollType,
-        value: List<DieRoll<*>>,
+        dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        // TODO Some types cannot be rerolled
+        if (rerollUsed) return false
         if (state.activeTeam?.id != teamId) return false
         if (state.activeTeam?.usedRerollThisTurn == true && !state.rules.allowMultipleTeamRerollsPrTurn) return false
-        return value.all { it.rerollSource == null }
+        if (state.rules.canBeRerolledByTeamReroll(type)) return false
+        return dicePool.all { it.rerollSource == null }
     }
 
     override fun calculateRerollOptions(
@@ -76,7 +78,7 @@ class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll {
  */
 class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
-    override val carryOverIntoOvertime: Boolean = false
+    override val carryOverIntoOvertime: Boolean = false // Because it only last for the current Drive
     override val duration = Duration.END_OF_DRIVE
     override val rerollResetAt: Duration = Duration.END_OF_DRIVE
     override val rerollDescription: String = "Team Reroll (Brilliant Coaching)"
@@ -93,6 +95,8 @@ class TeamMascotReroll(override val teamId: TeamId) : TeamReroll {
     override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team Reroll (Mascot)"
     override var rerollUsed: Boolean = false
-    override val rerollProcedure: Procedure
-        get() = super.rerollProcedure
+
+    companion object {
+        val TARGET: Int = 4
+    }
 }

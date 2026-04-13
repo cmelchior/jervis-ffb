@@ -40,8 +40,10 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlin.math.min
 
 /**
- * Procedure for handling the Prayer to Nuffle "Bad Habits" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Bad Habits".
+ *
+ * See page 39 in the BB2020 rulebook.
+ * See page 143 in the BB2025 rulebook.
  */
 object BadHabits : Procedure() {
     override val initialNode: Node = RollDie
