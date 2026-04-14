@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.AddGoal
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.NoOpCommand
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -63,27 +64,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object ScoringATouchdown : Procedure() {
     override val initialNode: Node = CheckForTouchdown
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        val context = state.getContext<ScoringATouchDownContext>()
-        return if (context.isTouchdownScored) {
-            val turnover = if (context.player.team == state.activeTeamOrThrow()) {
-                TurnOver.ACTIVE_TEAM_TOUCHDOWN
-            } else {
-                TurnOver.INACTIVE_TEAM_TOUCHDOWN
-            }
-            compositeCommandOf(
-                // Technically, if you score during the opponent's turn, the score isn't
-                // increased until your next real turn, but this has some problematic
-                // side effects for the end of the half. So we do it immediately instead.
-                // See rules-faq.md (page 64) for a discussion on this.
-                AddGoal(context.player.team, 1),
-                ReportGoal(state, context),
-                SetTurnOver(turnover),
-            )
-        } else {
-            null
-        }
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         val player = state.getContext<ScoringATouchDownContext>().player
         if (!player.hasBall() || player.state != PlayerState.STANDING) {
@@ -125,7 +106,7 @@ object ScoringATouchdown : Procedure() {
             val context = state.getContext<ScoringATouchDownContext>()
             return when (action) {
                 Continue -> {
-                    GotoNode(InformOfGoal)
+                    GotoNode(UpdateScore)
                     // if (context.player.hasSkill(SkillType.BLOOD_LUST)) GotoNode(CheckBloodLust) else ExitProcedure()
                 }
                 else -> INVALID_ACTION(action)
@@ -140,6 +121,33 @@ object ScoringATouchdown : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
         }
+    }
+
+    // We update the score before triggering the "Confirm" action. This is
+    // mostly to improve the UI experience, so the Touchdown Counter increases
+    // at the top of the screen increases as soon as the touchdown is scored
+    // and is visible while any touchdown animations are running.
+    object UpdateScore: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<ScoringATouchDownContext>()
+            if (!context.isTouchdownScored) INVALID_GAME_STATE("Touchdown was not scored: $context")
+            val turnover = if (context.player.team == state.activeTeamOrThrow()) {
+                TurnOver.ACTIVE_TEAM_TOUCHDOWN
+            } else {
+                TurnOver.INACTIVE_TEAM_TOUCHDOWN
+            }
+            return compositeCommandOf(
+                // Technically, if you score during the opponent's turn, the score isn't
+                // increased until your next real turn, but this has some problematic
+                // side effects for the end of the half. So we do it immediately instead.
+                // See rules-faq.md (page 64) for a discussion on this.
+                AddGoal(context.player.team, 1),
+                ReportGoal(state, context),
+                SetTurnOver(turnover),
+                GotoNode(InformOfGoal)
+            )
+        }
+
     }
 
     // Mostly relevant to give the UI a hook to show "goal" messages
