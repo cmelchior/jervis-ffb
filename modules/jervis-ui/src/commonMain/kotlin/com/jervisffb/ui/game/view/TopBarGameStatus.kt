@@ -312,18 +312,14 @@ private fun TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
                 modifier = Modifier
                     .width(30.jdp)
                     .height(40.jdp)
-                    .alpha(if (reroll.used) unavailableAlpha else availableAlpha)
+                    .alpha(if (!reroll.isAvailable()) unavailableAlpha else availableAlpha)
                 ,
                 painter = painterResource(image),
                 contentDescription = reroll.name,
                 contentScale = ContentScale.Fit,
             )
-
         }
-
-
     }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -292,6 +292,28 @@ rule engine and should be re-evaluated if new information becomes available.
 
     Diving Tackle is used after the Dodge re-roll decision and all modifiers.
 
+## Page 130 - Leader
+The rules say that "A team that has one or more players with this Skill on
+the pitch at the start of a half...", but since a player isn't on the pitch
+until after Setup, which is during the Start of Drive sequence, Jervis assumes 
+that this is the intended meaning.
+
+Also, since Extra Time is not a Half, this means that if a Leader reroll was 
+added at the beginning of the last half, it will carry over into Extra Time, but
+if the Leader is not placed on the Pitch, the re-roll is disabled, but can be
+enabled later in Extra Time if the Leader comes back to the Pitch.
+
+Leader also specifies that "...if all players with this Skill are removed from 
+play, either as a Casualty or by being Sent-off...". However, "Removed from 
+Play" is not a term defined in the rules, and both "Casualty" and "Argue the 
+Call" use the term "Removed from the Pitch".
+
+Jervis therefore interprets "Removed from Play" as meaning any effect that 
+removes a player from the pitch AND prevents them from being used for the 
+reminder of the game. This e.g., means that if a Player is Knocked Out, the
+re-roll is not lost, only disabled, and it can be enabled again if the Leader
+returns to the pitch during the Half.
+
 ## Page 130 - Lone Fouler
 Lone Fouler only works if there are no Offensive or Defensive assists. In 
 many cases it would be mathematically better to have a reroll than having +1.

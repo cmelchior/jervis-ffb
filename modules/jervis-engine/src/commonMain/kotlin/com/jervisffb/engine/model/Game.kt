@@ -113,8 +113,8 @@ class Game(
 
     // Game progress
     var abortIfBallOutOfBounds: Boolean = false
-    var halfNo: Int = 0
-    var driveNo: Int = 0
+    var halfNo: Int = 0 // [1-x], 0 = Pre-game
+    var driveNo: Int = 0 // [1-x], 0 = Pre-game
 
     // Global state properties
     // We should only have properties here that are relevant to more than

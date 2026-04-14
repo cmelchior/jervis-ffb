@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -100,6 +102,15 @@ inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
 }
 
+
+/**
+ * Modify the Player state, so they will put in the Reserves.
+ */
+fun Player.putInReserves() {
+    state = PlayerState.RESERVE
+    location = DogOut
+}
+
 /**
  * Modify the Player state, so they will be considered Prone.
  */
@@ -114,6 +125,15 @@ fun Player.putProne() {
 fun Player.putStunned() {
     state = PlayerState.STUNNED
     hasTackleZones = false
+}
+
+/**
+ * Modify the Player state, so they will be considered Knocked Out.
+ */
+fun Player.putInKnockedOut() {
+    val state = this.team.game
+    SetPlayerLocation(this, DogOut).execute(state)
+    SetPlayerState(this, PlayerState.KNOCKED_OUT).execute(state)
 }
 
 /**

@@ -201,6 +201,7 @@ class Player(
     val ball: Ball?
         get() = team.game.balls.firstOrNull { it.carriedBy == this }
 
+    // Shortcut to avoid avoiding creating a SkillId.
     // Warning: This method should only be used for skills that do not have values
     fun addSkill(skill: SkillType) {
         val skill = team.game.rules.createSkill(this, skill.id(null))

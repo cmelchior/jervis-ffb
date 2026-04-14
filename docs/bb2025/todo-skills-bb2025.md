@@ -358,15 +358,23 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Cannot intercept with Hail Mary Pass
   - [x] Always Long Bomb distance
   - [x] Always count Accurate as Inaccurate
-- [ ] Leader
-    - [ ] Available after setup
-    - [ ] Does not reset for overtime
-    - [ ] Carry over into overtime
-    - [ ] After Knocked Down
-    - [ ] After Falling over
-    - [ ] Removed immediately if pushed into the crowd
-    - [ ] Not removed if other players with Leader on the field
-    - [ ] Only one, regardless of number of players
+- [x] Leader
+    - [x] State is visible during Setup 
+    - [x] Does not reset for overtime
+    - [x] Carry over into overtime
+    - [x] Disable after Knocked Down
+    - [x] Remove after Knocked Down
+    - [x] Disable after Falling over
+    - [x] Remove after Falling over
+    - [ ] Diable after falling through a Trapdoor
+    - [ ] Remove fter falling through a Trapdoor
+    - [x] Disable immediately if pushed into the crowd
+    - [x] Remove immediately if pushed into the crowd
+    - [x] Disable after own player is chain-pushed into crowd
+    - [x] Removed after own player is chain-pushed into crowd
+    - [x] Not Disabled if other players with Leader on the field
+    - [x] Enabled if Leader returns to the pitch
+    - [x] Only one, regardless of number of players
 - [x] Nerves of Steel
   - [x] Ignore Marked modifiers on Catch
   - [x] Ignore Marked modifiers on Pass
@@ -423,6 +431,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [ ] Pile Driver works on both blocks
     - [ ] Cheering Fans Assist only works on one the first block resolved
     - [ ] Trickster work against both blocks, but treat both defender positions as taken.
+    - [ ] Exactly where in the sequence is the Leader reroll removed?
 - [x] Stand Firm
   - [x] Prevent being pushed back in the first block
   - [x] Prevent being pushed back in a chain push

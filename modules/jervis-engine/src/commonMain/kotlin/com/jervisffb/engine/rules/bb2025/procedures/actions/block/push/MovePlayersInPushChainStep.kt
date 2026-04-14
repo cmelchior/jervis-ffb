@@ -5,6 +5,7 @@ import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ComputationNode
@@ -14,14 +15,12 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.MultipleBlockAction
-import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.bb2025.skills.Leader
 
 /**
  * Procedure for moving all players' part of a Push Chain created by.
@@ -35,7 +34,16 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 object MovePlayersInPushChainStep: Procedure() {
     override val initialNode: Node = MovePushedPlayers
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        // After moving all players, a leader (on both teams) might have been
+        // pushed off the board. In that case we need to remove the Leader reroll.
+        val homeLeaderCommands = Leader.calculateLeaderRerollStatusChange(state.homeTeam)
+        val awayLeaderCommands = Leader.calculateLeaderRerollStatusChange(state.awayTeam)
+        return when (homeLeaderCommands != null || awayLeaderCommands != null) {
+            true -> compositeCommandOf(homeLeaderCommands, awayLeaderCommands)
+            false -> null
+        }
+    }
 
     /**
      * Resolve the push-chain by moving all players part of it. For now, we only
@@ -70,15 +78,6 @@ object MovePlayersInPushChainStep: Procedure() {
                             SetPlayerLocation(push.pushee, DogOut),
                             ReportPushedIntoCrowd(push.pushee, push.from)
                         )
-
-                        // Check if Leader rerolls are still available after a player with Leader
-                        // left the field.
-                        if (push.pushee.hasSkill(SkillType.LEADER)) {
-                            Leader.removeLeaderRerollIfNotAvailable(push.pushee.team)?.let { removeRerollCommand ->
-                                add(removeRerollCommand)
-                            }
-                        }
-
                         pushedIntoCrowd = true
                     } else {
                         // At this stage, there should only be one ball on the square,

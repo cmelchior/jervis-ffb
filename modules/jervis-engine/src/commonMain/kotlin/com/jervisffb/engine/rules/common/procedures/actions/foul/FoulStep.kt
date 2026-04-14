@@ -45,7 +45,7 @@ import com.jervisffb.engine.model.modifiers.DefensiveAssistsArmourModifier
 import com.jervisffb.engine.model.modifiers.OffensiveAssistArmourModifier
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Leader
+import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -66,7 +66,17 @@ object FoulStep: Procedure() {
     override val initialNode: Node = CalculateAssists
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return SetCurrentBall(null)
+        val context = state.getContext<FoulContext>()
+        // If the player that was banned had the Leader skill, we need to check
+        // if anyone else has Leader, otherwise the reroll is removed.
+        val leaderCommand = when (context.fouler.hasSkill(SkillType.LEADER)) {
+            true -> Leader.calculateLeaderRerollStatusChange(context.fouler.team)
+            false -> null
+        }
+        return compositeCommandOf(
+            leaderCommand,
+            SetCurrentBall(null)
+        )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<FoulContext>()
 
@@ -309,14 +319,6 @@ object FoulStep: Procedure() {
                 SetPlayerState(player, PlayerState.BANNED),
                 SetPlayerLocation(player, DogOut),
             )
-
-            // If the player had the Leader skill, we need to check if anyone else on the field
-            // has Leader, otherwise the reroll is removed.
-            if (player.hasSkill(SkillType.LEADER)) {
-                Leader.removeLeaderRerollIfNotAvailable(player.team)?.let { removeRerollCommand ->
-                    add(removeRerollCommand)
-                }
-            }
         }
     }
 }

@@ -27,8 +27,11 @@ enum class UiRerollType {
 class UiReroll(
     val name: String,
     val type: UiRerollType,
-    val used: Boolean = false
-)
+    val used: Boolean = false,
+    val enabled: Boolean = true,
+) {
+    fun isAvailable(): Boolean = enabled && !used
+}
 
 class UiTeamFeature(
     val name: String,

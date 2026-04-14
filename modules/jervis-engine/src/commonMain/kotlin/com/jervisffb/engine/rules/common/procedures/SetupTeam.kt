@@ -15,9 +15,10 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.AddTeamReroll
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.SetTeamRerollEnabled
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -35,12 +36,14 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class SetupTeamContext(
     val team: Team,
@@ -49,7 +52,18 @@ data class SetupTeamContext(
 
 object SetupTeam : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        // If the team has a Leader re-roll, it start out as disabled, and is
+        // only enabled if a Leader is move into the pitch
+        val context = state.getContext<SetupTeamContext>()
+        val team = context.team
+        val leaderReroll = team.rerolls.singleOrNull { it is LeaderTeamReroll }
+        val startOfHalf = (state.halfNo <= rules.halfsPrGame && team.turnMarker == 0)
+        return when (!startOfHalf && leaderReroll != null) {
+            true -> SetTeamRerollEnabled(team, leaderReroll, enabled = false)
+            false -> null
+        }
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<SetupTeamContext>()
 
@@ -114,6 +128,7 @@ object SetupTeam : Procedure() {
             return when (action) {
                 DogoutSelected -> {
                     compositeCommandOf(
+                        getRemoveLeaderRerollCommand(player),
                         SetPlayerLocation(player, DogOut),
                         SetPlayerState(player, PlayerState.RESERVE),
                         UpdateContext(context.copy(currentPlayer = null)),
@@ -126,6 +141,7 @@ object SetupTeam : Procedure() {
                         false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
                     }
                     compositeCommandOf(
+                        getAddLeaderRerollCommand(player),
                         SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
                         SetPlayerState(player, PlayerState.STANDING),
                         UpdateContext(context.copy(currentPlayer = null)),
@@ -141,21 +157,9 @@ object SetupTeam : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<SetupTeamContext>()
             val team = context.team
-            return if (rules.isSetupValid(state, team).isEmpty()) {
-                // If any player with Leader in on the field, the team receives another reroll
-                buildCompositeCommand {
-                    if (rules.isStartOfHalf(state)) {
-                        val hasLeader = team.any {
-                            it.hasSkill(SkillType.LEADER) && it.location.isOnField(rules)
-                        }
-                        if (hasLeader) {
-                            add(AddTeamReroll(team, LeaderTeamReroll(team.id)))
-                        }
-                    }
-                    add(ExitProcedure())
-                }
-            } else {
-                GotoNode(InformOfInvalidSetup)
+            return when (rules.isSetupValid(state, team).isEmpty()) {
+                true -> ExitProcedure()
+                false -> GotoNode(InformOfInvalidSetup)
             }
         }
     }
@@ -170,6 +174,49 @@ object SetupTeam : Procedure() {
             return castAction<Confirm>(action) {
                 GotoNode(SelectPlayerOrEndSetup)
             }
+        }
+    }
+
+    // -- HELPER METHODS --
+    // If a new Leader is added to the field, also add a Leader reroll
+    // Only 1 leader reroll is allowed.
+    fun getAddLeaderRerollCommand(playerAdded: Player): Command? {
+        if (!playerAdded.isSkillAvailable(SkillType.LEADER)) return null
+        val team = playerAdded.team
+        val rules = team.game.rules
+        val reroll = team.rerolls.firstOrNull { it is LeaderTeamReroll }
+        val startOfHalf = (team.turnMarker == 0 && team.game.halfNo <= rules.halfsPrGame)
+        val otherLeaderOnPitch = team
+            .filterNot { it == playerAdded }
+            .any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
+
+        return when {
+            startOfHalf && !otherLeaderOnPitch -> AddTeamReroll(team,LeaderTeamReroll(team.id))
+            startOfHalf && otherLeaderOnPitch -> null
+            !startOfHalf && !otherLeaderOnPitch -> SetTeamRerollEnabled(team, reroll!!, enabled = true)
+            !startOfHalf && otherLeaderOnPitch -> null
+            else -> INVALID_GAME_STATE("Unsupported state: (startOfHalf=$startOfHalf, otherLeader=$otherLeaderOnPitch, reroll=$reroll)")
+        }
+    }
+
+    // During Setup, if a Leader is removed from the Pitch, either completely
+    // remove reroll (if start of half and no other leader) or disable it.
+    fun getRemoveLeaderRerollCommand(playerRemoved: Player): Command? {
+        if (!playerRemoved.isSkillAvailable(SkillType.LEADER)) return null
+        val team = playerRemoved.team
+        val rules = team.game.rules
+        val reroll = team.rerolls.firstOrNull { it is LeaderTeamReroll }
+        val startOfHalf = (team.turnMarker == 0 && team.game.halfNo <= rules.halfsPrGame)
+        val otherLeaderOnPitch = team
+            .filterNot { it == playerRemoved }
+            .any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
+
+        return when {
+            startOfHalf && !otherLeaderOnPitch -> RemoveTeamReroll(team, reroll!!)
+            startOfHalf && otherLeaderOnPitch -> null
+            !startOfHalf && !otherLeaderOnPitch -> SetTeamRerollEnabled(team, reroll!!, enabled = false)
+            !startOfHalf && otherLeaderOnPitch -> null
+            else -> INVALID_GAME_STATE("Unsupported state: (startOfHalf=$startOfHalf, otherLeader=$otherLeaderOnPitch, reroll=$reroll)")
         }
     }
 }

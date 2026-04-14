@@ -49,25 +49,25 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
         val rerolls = team.rerolls.mapNotNull {
             when (it) {
                 is BrilliantCoachingReroll -> {
-                    UiReroll("Brilliant Coaching Reroll", UiRerollType.BRILLIANT_COACHING, it.rerollUsed)
+                    UiReroll("Brilliant Coaching Reroll", UiRerollType.BRILLIANT_COACHING, it.rerollUsed, it.enabled)
                 }
 
                 is LeaderTeamReroll -> {
                     // We assume the rules will remove it if the player leaves the field
-                    UiReroll("Leader Reroll", UiRerollType.LEADER, it.rerollUsed)
+                    UiReroll("Leader Reroll", UiRerollType.LEADER, it.rerollUsed, it.enabled)
                 }
 
                 is RegularTeamReroll -> {
-                    UiReroll("Team Reroll", UiRerollType.TEAM, it.rerollUsed)
+                    UiReroll("Team Reroll", UiRerollType.TEAM, it.rerollUsed, it.enabled)
                 }
 
                 is TeamMascotReroll -> {
-                    UiReroll("Mascot Reroll", UiRerollType.MASCOT, it.rerollUsed)
+                    UiReroll("Mascot Reroll", UiRerollType.MASCOT, it.rerollUsed, it.enabled)
                 }
             }
         }
         val reorderedRerolls = rerolls.sortedWith(
-            compareBy<UiReroll> { rank[it.type] }.thenBy { !it.used }
+            compareBy<UiReroll> { rank[it.type] }.thenBy { !it.isAvailable() }
         )
 
         return teamInfo.copy(

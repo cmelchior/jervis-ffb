@@ -22,12 +22,10 @@ import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
@@ -143,13 +141,15 @@ object RiskingInjuryRoll: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
-        // A player with Leader has left the field after an injury roll. If they had Leader
-        // we need to check if the leader reroll is still available.
         val commands = mutableListOf<Command?>()
 
+        // A player with Leader has left the field after an injury roll. If they
+        // had Leader, we need to check if another leader is on the field. If
+        // not, the Leader reroll should be removed
         val player = context.player
-        if (!player.location.isOnField(rules) && player.hasSkill(SkillType.LEADER)) {
-            commands.add(Leader.removeLeaderRerollIfNotAvailable(player.team))
+        val removeLeaderCommand = com.jervisffb.engine.rules.bb2025.skills.Leader.calculateLeaderRerollStatusChange(player.team)
+        if (removeLeaderCommand != null) {
+            commands.add(removeLeaderCommand)
         }
 
         // If Lethal Flight was used during this Injury, it will reset now

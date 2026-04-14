@@ -19,6 +19,10 @@ sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
     val duration: Duration
+    // Separate from "used". If a Team re-roll is disabled, it means it cannot be used
+    // "right now", but might become available later.
+    var enabled: Boolean
+
     override val rerollProcedure: Procedure
         get() = UseTeamReroll
 
@@ -28,7 +32,7 @@ sealed interface TeamReroll : RerollSource {
         dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        if (rerollUsed) return false
+        if (rerollUsed || !enabled) return false
         if (state.activeTeam?.id != teamId) return false
         if (state.activeTeam?.usedRerollThisTurn == true && !state.rules.allowMultipleTeamRerollsPrTurn) return false
         if (state.rules.canBeRerolledByTeamReroll(type)) return false
@@ -54,6 +58,7 @@ class RegularTeamReroll(override val teamId: TeamId, val index: Int) : TeamRerol
     override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll"
     override var rerollUsed: Boolean = false
+    override var enabled: Boolean = true
 }
 
 /**
@@ -70,6 +75,7 @@ class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll {
     override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll (Leader)"
     override var rerollUsed: Boolean = false
+    override var enabled: Boolean = true
 }
 
 /**
@@ -83,6 +89,7 @@ class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll {
     override val rerollResetAt: Duration = Duration.END_OF_DRIVE
     override val rerollDescription: String = "Team Reroll (Brilliant Coaching)"
     override var rerollUsed: Boolean = false
+    override var enabled: Boolean = true
 }
 
 /**
@@ -95,6 +102,7 @@ class TeamMascotReroll(override val teamId: TeamId) : TeamReroll {
     override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team Reroll (Mascot)"
     override var rerollUsed: Boolean = false
+    override var enabled: Boolean = true
 
     companion object {
         val TARGET: Int = 4

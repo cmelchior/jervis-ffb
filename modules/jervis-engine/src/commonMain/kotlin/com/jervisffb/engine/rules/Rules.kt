@@ -575,9 +575,9 @@ abstract class Rules(
      * 3 rerolls will be returned: (1xregular, 1xbrilliant, 1xmascot)
      */
     fun getAvailableTeamRerolls(team: Team): List<RerollSource> {
-        return team.availableRerolls.distinctBy {
-            it::class
-        }
+        return team.availableRerolls
+            .filter { it.enabled }
+            .distinctBy { it::class }
     }
 
     /**
