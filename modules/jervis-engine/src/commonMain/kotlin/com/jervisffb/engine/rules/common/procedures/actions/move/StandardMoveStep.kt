@@ -6,10 +6,10 @@ import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -36,7 +36,6 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
@@ -126,7 +125,7 @@ object StandardMoveStep: Procedure() {
             return when (action) {
                 // If the player has not moved, this will not use their action
                 EndAction -> ExitProcedure()
-                else -> castAction<FieldSquareSelected>(action) {
+                else -> castAction<PitchSquareSelected>(action) {
                     compositeCommandOf(
                         UpdateContext(context.copy(target = it.coordinate, hasMoved = true)),
                         GotoNode(ChooseToUseTentacles),

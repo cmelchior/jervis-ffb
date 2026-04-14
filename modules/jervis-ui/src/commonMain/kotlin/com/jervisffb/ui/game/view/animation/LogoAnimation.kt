@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.animations.LogoAnimation
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.utils.jsp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun LogoAnimation(vm: FieldViewModel, animation: LogoAnimation) {
+fun LogoAnimation(vm: PitchViewModel, animation: LogoAnimation) {
     var scale by remember { mutableStateOf(0f) }
     var alpha by remember { mutableStateOf(1f) }
     var translationY by remember { mutableStateOf(0f) }

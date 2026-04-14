@@ -1,9 +1,9 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
@@ -106,13 +106,13 @@ class Player(
     lateinit var team: Team
     var location: Location = DogOut
 
-    // Shortcut for getting a players coordinates. Only works for players currently on the field
+    // Shortcut for getting a players coordinates. Only works for players currently on the pitch
     // taking up a single square.
-    val coordinates: FieldCoordinate
+    val coordinates: PitchCoordinate
         get() {
             return when (val playerLocation = location) {
                 DogOut -> INVALID_GAME_STATE("Cannot ask for coordinates when player is in the DogOut")
-                is FieldCoordinate -> playerLocation
+                is PitchCoordinate -> playerLocation
                 is GiantLocation -> INVALID_GAME_STATE("Cannot ask for coordinates for a giant player")
             }
         }
@@ -287,7 +287,7 @@ class Player(
 
 fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == type }
 
-// This method assumes the player is on the field
+// This method assumes the player is on the pitch
 fun Player.isSkillAvailable(type: SkillType): Boolean {
     return getSkillOrNull(type)?.let { skill ->
 

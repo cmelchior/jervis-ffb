@@ -19,7 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import com.jervisffb.ui.game.animations.ConfettiAnimation
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -43,10 +43,10 @@ private data class CannonShot(
 )
 
 @Composable
-fun TouchdownAnimation(vm: FieldViewModel, animation: ConfettiAnimation) {
+fun TouchdownAnimation(vm: PitchViewModel, animation: ConfettiAnimation) {
 
     val squareSize = remember(animation) {
-        vm.sharedFieldData.size.squareSize.width
+        vm.sharedPitchData.size.squareSize.width
     }
 
     val shots = remember(animation) {

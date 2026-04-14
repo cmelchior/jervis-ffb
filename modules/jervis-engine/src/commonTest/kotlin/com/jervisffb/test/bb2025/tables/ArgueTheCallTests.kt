@@ -90,7 +90,7 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
             6.d6 // Roll "Well, When You Put It Like That..."
         )
 
-        // Check that the player was allowed to remain on the field, but a turnover
+        // Check that the player was allowed to remain on the pitch, but a turnover
         // was still triggered
         assertEquals(homeTeam, state.activeTeam)
         awayTeam["A6".playerId].assertStanding()

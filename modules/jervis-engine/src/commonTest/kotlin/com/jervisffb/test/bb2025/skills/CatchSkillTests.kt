@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -48,7 +48,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(16, 1),
+                placeKick = PitchSquareSelected(16, 1),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player with Catch
                 bounce = null
             ),
@@ -65,7 +65,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 1),
+                placeKick = PitchSquareSelected(13, 1),
                 deviate = DiceRollResults(5.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -73,7 +73,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1), // Select player with Catch next to thrower
+            PitchSquareSelected(15, 1), // Select player with Catch next to thrower
             *throwBall(6.d6),
         )
         assertEquals(BallState.ACCURATE_THROW, state.currentBall().state)
@@ -91,7 +91,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 1),
+                placeKick = PitchSquareSelected(13, 1),
                 deviate = DiceRollResults(5.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -113,7 +113,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 3),
+                placeKick = PitchSquareSelected(13, 3),
                 deviate = DiceRollResults(7.d8, 1.d6), // Deviate so lands on an empty square
                 bounce = 7.d8, // Bounce to player with catch on [13,5]
             ),
@@ -133,7 +133,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 3.d6),
             *defaultKickOffEvent(),
             1.d6, // Fail Catch Landing
@@ -149,7 +149,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 1),
+                placeKick = PitchSquareSelected(13, 1),
                 deviate = DiceRollResults(5.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -157,7 +157,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1), // Throw Quick Pass to player with Catch
+            PitchSquareSelected(15, 1), // Throw Quick Pass to player with Catch
             *throwBall(3.d6), // Inaccurate Pass
         )
         assertEquals(BallState.SCATTERED, state.currentBall().state)
@@ -180,7 +180,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
         catcher.makeDistracted()
         controller.rollForward(
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(16, 1),
+                placeKick = PitchSquareSelected(16, 1),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player with Catch
                 bounce = null
             ),
@@ -200,7 +200,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(16, 1),
+                placeKick = PitchSquareSelected(16, 1),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player with Catch
                 bounce = null
             ),
@@ -227,7 +227,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             *catch(1.d6, reroll = SelectSkillReroll(SkillType.CATCH)), // Fail first catch roll
             1.d6, // Fail rerolled first catch

@@ -4,9 +4,9 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -14,8 +14,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.SETTINGS_MANAGER
@@ -26,7 +26,7 @@ import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 import com.jervisffb.ui.game.view.ToggleContextMenuOption
 
-object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
+object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
 
     // Actions we allow to skip manually selecting Stand Up
     val eligibleActions = setOf(
@@ -59,11 +59,11 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
 
     private fun handleType(actionProvider: ManualActionProvider, state: Game, acc: UiSnapshotAccumulator, type: MoveType) {
         val player = state.activePlayer ?: error("No active player")
-        val activeLocation = player.location as FieldCoordinate
+        val activeLocation = player.location as PitchCoordinate
 
-        // For move selection, some types of moves we want to display on the field
+        // For move selection, some types of moves we want to display on the pitch
         // others should be a specific action that must be selected.
-        // On-field moves are shortcutting the Rules engine, so we need to account for that as well
+        // On-pitch moves are shortcutting the Rules engine, so we need to account for that as well
         when (type) {
             MoveType.JUMP -> {
                 acc.updateSquare(activeLocation) {
@@ -122,9 +122,9 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 )
                 acc.pathFinder = allPaths
 
-                // Also mark all fields around the player as immediately selectable
+                // Also mark all squares around the player as immediately selectable
                 activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-                    .filter { state.field[it].isUnoccupied() }
+                    .filter { state.pitch[it].isUnoccupied() }
                     .forEach { loc ->
                         acc.updateSquare(loc) {
                             it.copy(
@@ -133,7 +133,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                                         CompositeGameAction(
                                             listOf(
                                                 MoveTypeSelected(MoveType.STANDARD),
-                                                FieldSquareSelected(loc),
+                                                PitchSquareSelected(loc),
                                             )
                                         )
                                     )
@@ -198,7 +198,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
         actionProvider: ManualActionProvider,
         state: Game,
         player: Player,
-        activeLocation: OnFieldLocation,
+        activeLocation: OnPitchLocation,
         acc: UiSnapshotAccumulator
     ) {
         // For Standing Up, we make it easier for the player depending
@@ -224,7 +224,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
             }
             val allPaths = state.rules.pathFinder.calculateAllPaths(
                 state,
-                activeLocation as FieldCoordinate,
+                activeLocation as PitchCoordinate,
                 maxMove.coerceAtLeast(0),
             )
             acc.pathFinder = allPaths
@@ -232,13 +232,13 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
     }
 
     private fun addSelectableRushSquares(
-        activeLocation: OnFieldLocation,
+        activeLocation: OnPitchLocation,
         state: Game,
         acc: UiSnapshotAccumulator,
         actionProvider: ManualActionProvider
     ) {
         activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-            .filter { state.field[it].isUnoccupied() }
+            .filter { state.pitch[it].isUnoccupied() }
             .forEach { loc ->
                 acc.updateSquare(loc) {
                     it.copy(
@@ -249,7 +249,7 @@ object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                                 if (canMove) {
                                     val action = CompositeGameAction(
                                         MoveTypeSelected(MoveType.STANDARD),
-                                        FieldSquareSelected(loc)
+                                        PitchSquareSelected(loc)
                                     )
                                     QueuedActionsResult(action)
                                 } else {

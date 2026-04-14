@@ -7,13 +7,13 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
@@ -95,7 +95,7 @@ class MoveActionTests: JervisGameBB2025Test() {
         )
 
         val availableTargets = controller.getAvailableActions().actions
-            .filterIsInstance<SelectFieldLocation>()
+            .filterIsInstance<SelectPitchLocation>()
             .first().squares
             .filter { it.type == TargetSquare.Type.MOVE }
             .map { it.coordinate }
@@ -103,13 +103,13 @@ class MoveActionTests: JervisGameBB2025Test() {
 
         // Player starts at (15, 13). (14, 13) contains another player
         val expectedTargets = setOf(
-            FieldCoordinate(14, 12),
-            FieldCoordinate(14, 14),
-            FieldCoordinate(15, 12),
-            FieldCoordinate(15, 14),
-            FieldCoordinate(16, 12),
-            FieldCoordinate(16, 13),
-            FieldCoordinate(16, 14),
+            PitchCoordinate(14, 12),
+            PitchCoordinate(14, 14),
+            PitchCoordinate(15, 12),
+            PitchCoordinate(15, 14),
+            PitchCoordinate(16, 12),
+            PitchCoordinate(16, 13),
+            PitchCoordinate(16, 14),
         )
 
         assertTrue(availableTargets.containsAll(expectedTargets))

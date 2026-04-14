@@ -1,9 +1,9 @@
 package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.model.context.LeapRollContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
-class ReportLeapResult(roll: LeapRollContext, landIn: FieldCoordinate) : LogEntry() {
+class ReportLeapResult(roll: LeapRollContext, landIn: PitchCoordinate) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
         val name = roll.player.name

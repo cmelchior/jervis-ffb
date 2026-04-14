@@ -19,7 +19,7 @@ import com.jervisffb.ui.game.UiTeamInfoUpdate
  * shown as "used", while rerolls that are one-time use will be removed once
  * used.
  */
-object TeamRerollStatusIndicator: FieldStatusIndicator {
+object TeamRerollStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,
@@ -53,7 +53,7 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
                 }
 
                 is LeaderTeamReroll -> {
-                    // We assume the rules will remove it if the player leaves the field
+                    // We assume the rules will remove it if the player leaves the pitch
                     UiReroll("Leader Reroll", UiRerollType.LEADER, it.rerollUsed, it.enabled)
                 }
 

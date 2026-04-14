@@ -29,13 +29,13 @@ data class TooManyPlayersInWideZone(
     /** How many players are allowed in the Wide Zone */
     val maxPlayers: Int
 ): SetupRule
-data class WrongAmountOfPlayersOnField(
+data class WrongAmountOfPlayersOnPitch(
     /** How many available players are available. */
     val availablePlayers: Int,
-    /** How many players are actually on the field */
-    val playersOnField: Int
+    /** How many players are actually on the pitch */
+    val playersOnPitch: Int
 ): SetupRule
-data class TeamCaptainNotOnField(
+data class TeamCaptainNotOnPitch(
     // Which players with Team Captain status are available
     val availablePlayers: List<PlayerId>
 ): SetupRule

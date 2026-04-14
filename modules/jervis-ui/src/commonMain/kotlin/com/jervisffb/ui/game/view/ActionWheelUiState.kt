@@ -1,6 +1,6 @@
 package com.jervisffb.ui.game.view
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.dialogs.wheel.ButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
@@ -17,7 +17,7 @@ import kotlin.math.ceil
  */
 sealed interface ContextWheelUiState
 data class ContextWheelMenu(
-    val coordinates: FieldCoordinate,
+    val coordinates: PitchCoordinate,
     val options: List<ContextMenuOption>,
 ): ContextWheelUiState
 object NoContextMenu: ContextWheelUiState
@@ -33,7 +33,7 @@ sealed class ActionWheelUiState {
     // Otherwise, we will do a best-effort attempt at placing the circle directly over the `center` coordinate,
     // but in case there is no room, like if the square is too close to the edge. It will be placed to the side
     // with an arrow pointing it. How this happens is up to the UI.
-    open val center: FieldCoordinate? = null
+    open val center: PitchCoordinate? = null
     open val ringAnimationMode: ButtonLayoutMode = ButtonLayoutMode.STABLE
     open val topItems: List<ButtonData> = emptyList()
     open val topExpandMode: MenuExpandMode = MenuExpandMode.Compact()
@@ -74,7 +74,7 @@ class HideActionWheel(hideImmediately: Boolean): ActionWheelUiState() {
 }
 
 data class ActionWheelUiStateData(
-    override val center: FieldCoordinate?,
+    override val center: PitchCoordinate?,
     override val ringAnimationMode: ButtonLayoutMode = ButtonLayoutMode.STABLE,
     override val topItems: List<ButtonData> = emptyList(),
     override val topExpandMode: MenuExpandMode = MenuExpandMode.Compact(),

@@ -41,7 +41,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
@@ -264,7 +264,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
             val hasSidestep = context.pushee.hasSkill(SkillType.SIDESTEP)
             val validSideStepTargets = context.pushee.coordinates
                 .getSurroundingCoordinates(rules)
-                .count { state.field[it].isUnoccupied() } > 0
+                .count { state.pitch[it].isUnoccupied() } > 0
             val canUseSidestep = !(context.usedGrab || context.usedStandFirm)
             return when (hasSidestep && canUseSidestep) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
@@ -313,12 +313,12 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
             // Calculate all push options taking into account a chain push in progress.
             // In chain pushes, only the square of Player B could be empty, but it might
             // not be in case of a circular chain.
-            val emptyFields = getEmptySquaresForPushing(pushContext, pushOptions, state)
+            val emptySquares = getEmptySquaresForPushing(pushContext, pushOptions, state)
             return listOf(
-                if (emptyFields.isNotEmpty()) {
+                if (emptySquares.isNotEmpty()) {
                     SelectDirection(
                         origin = lastPushInChain.pushee.coordinates,
-                        directions = emptyFields.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
+                        directions = emptySquares.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
                     )
                 } else {
                     SelectDirection(
@@ -344,8 +344,8 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                 val pushData = context.pushChain.last()
                 val updateActions = listOfNotNull(
                     SetContextProperty(PushContext.PushData::to, pushData, target),
-                    if (target.isOnField(rules)) {
-                        AddContextListItem(context.looseBalls, state.field[target].balls)
+                    if (target.isOnPitch(rules)) {
+                        AddContextListItem(context.looseBalls, state.pitch[target].balls)
                     } else {
                         null
                     }
@@ -358,11 +358,11 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                         GotoNode(MovePushedPlayers)
                     )
                 } else {
-                    // Target field is occupied, resulting in a chain push, add the
+                    // Target square is occupied, resulting in a chain push, add the
                     // new chain push to the context and restart the process
                     val newPush = PushContext.PushData(
                         pusher = context.pushChain.last().pushee,
-                        pushee = state.field[target].player!!, // TODO This doesn't take into account chain pushes
+                        pushee = state.pitch[target].player!!, // TODO This doesn't take into account chain pushes
                         from = target,
                         isChainPush = true,
                     )
@@ -379,34 +379,34 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
         // Return squares considered "empty" when doing a Push. This takes into account any ongoing chain pushes.
         private fun getEmptySquaresForPushing(
             pushContext: PushContext,
-            pushOptions: Set<FieldCoordinate>,
+            pushOptions: Set<PitchCoordinate>,
             state: Game,
-        ): List<FieldCoordinate> {
+        ): List<PitchCoordinate> {
             val options = pushOptions.toMutableSet()
 
             // Find all occupied squares
             val firstPushedFromLocation = pushContext.pushChain.first().from
             val isFirstPushLocationAvailable = pushContext.pushChain.none { it.to == firstPushedFromLocation }
-            val onFieldSquares = options.filter { it.isOnField(state.rules) }
-            val occupiedSquares = onFieldSquares.filter {
+            val onPitchSquares = options.filter { it.isOnPitch(state.rules) }
+            val occupiedSquares = onPitchSquares.filter {
                 // This also takes into account chain-pushes. E.g. the first square in the chain
                 // might be available, but only if something else wasn't chain pushed into it.
-                state.field[it].isOccupied()
+                state.pitch[it].isOccupied()
                     || (it == firstPushedFromLocation && !isFirstPushLocationAvailable)
             }
 
-            // All squares on the field are taken. It is only in this case anyone can be pushed out of bounds.
-            return if (onFieldSquares.size == occupiedSquares.size) {
+            // All squares on the pitch are taken. It is only in this case anyone can be pushed out of bounds.
+            return if (onPitchSquares.size == occupiedSquares.size) {
                 options.filter { it.isOutOfBounds(state.rules) }
             } else {
-                (onFieldSquares.toSet() - occupiedSquares.toSet()).toList()
+                (onPitchSquares.toSet() - occupiedSquares.toSet()).toList()
             }
         }
     }
 
     /**
      * Resolve the push-chain by moving all players part of it. For now, we only
-     * update their field location. Crowd injuries and balls bouncing happens
+     * update their pitch location. Crowd injuries and balls bouncing happen
      * later.
      */
     object MovePushedPlayers: ComputationNode() {
@@ -433,7 +433,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                         )
 
                         // Check if Leader rerolls are still available after a player with Leader
-                        // left the field.
+                        // left the pitch.
                         if (push.pushee.hasSkill(SkillType.LEADER)) {
                             Leader.removeLeaderRerollIfNotAvailable(push.pushee.team)?.let { removeRerollCommand ->
                                 add(removeRerollCommand)
@@ -445,7 +445,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                         // At this stage, there should only be one ball on the square,
                         // Even if the player is holding another ball, it isn't knocked loose yet.
                         add(SetPlayerLocation(push.pushee, to))
-                        state.field[to].balls.singleOrNull()?.let {
+                        state.pitch[to].balls.singleOrNull()?.let {
                             add(SetBallState.bouncing(it))
                         }
                         if (context.isDefenderKnockedDown && push.pushee == context.firstPushee) {
@@ -465,7 +465,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
     object ResolvePushedIntoTheCrowd: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<PushContext>()
-            return if (!context.pushChain.last().pushee.location.isOnField(rules)) {
+            return if (!context.pushChain.last().pushee.location.isOnPitch(rules)) {
                 null
             } else {
                 DecideToFollowUp

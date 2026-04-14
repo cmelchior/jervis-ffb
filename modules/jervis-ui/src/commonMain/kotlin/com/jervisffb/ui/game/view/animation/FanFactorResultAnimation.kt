@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import kotlinx.coroutines.coroutineScope
@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun FanFactorResultAnimation(
-    vm: FieldViewModel,
+    vm: PitchViewModel,
     animation: FanFactorResultAnimation,
 ) {
     var nameAlpha by remember { mutableStateOf(0f) }

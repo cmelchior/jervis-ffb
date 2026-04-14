@@ -2,8 +2,8 @@ package com.jervisffb.fumbbl.net.utils
 
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.SkillId
@@ -38,8 +38,8 @@ typealias FumbblCoordinate = com.jervisffb.fumbbl.net.model.FieldCoordinate
 fun Game.Companion.fromFumbblState(rules: Rules, game: FumbblGame): Game {
     val homeTeam = extractTeam(rules, game.teamHome)
     val awayTeam = extractTeam(rules, game.teamAway)
-    val field: Field = extractField(game.fieldModel)
-    return Game(rules, homeTeam, awayTeam, field)
+    val pitch: Pitch = extractField(game.fieldModel)
+    return Game(rules, homeTeam, awayTeam, pitch)
 }
 
 private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
@@ -118,9 +118,9 @@ private fun extractRoster(roster: FumbblRoster): Roster {
     }
 }
 
-private fun extractField(field: FumbblField): Field {
+private fun extractField(field: FumbblField): Pitch {
     // TODO Extract more information when we know what to fetch
-    return Field(width = 26, height = 15)
+    return Pitch(width = 26, height = 15)
 }
 
 /**

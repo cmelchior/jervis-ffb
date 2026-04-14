@@ -9,7 +9,7 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 /**
  * Set a square indicator for a ball being in square but not carried by a player.
  */
-object BallOnGroundStatusIndicator: FieldStatusIndicator {
+object BallOnGroundStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,

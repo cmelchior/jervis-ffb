@@ -3,13 +3,13 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -56,7 +56,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(14, 5), mover.coordinates)
+        assertEquals(PitchCoordinate(14, 5), mover.coordinates)
         mover.assertProne()
     }
 
@@ -75,7 +75,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(14, 5), mover.coordinates)
+        assertEquals(PitchCoordinate(14, 5), mover.coordinates)
         mover.assertStanding()
     }
 
@@ -96,7 +96,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(14, 5), mover.coordinates)
+        assertEquals(PitchCoordinate(14, 5), mover.coordinates)
         mover.assertProne()
     }
 
@@ -112,7 +112,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *leap(4.d6), // -1 Modifiers from leaving, no to enter, so should succeed (Leap modifier cannot be used)
             PlayerSelected("H2".playerId), // Use Diving Tackle (causing leap to fail)
             DiceRollResults(1.d6, 1.d6),
@@ -131,7 +131,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *jump(4.d6), // -1 Modifiers from leaving, no to enter, so should succeed
             PlayerSelected("H2".playerId), // Use Diving Tackle (causing Jump to fail)
             DiceRollResults(1.d6, 1.d6),
@@ -153,7 +153,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(pogoPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *pogoRoll(3.d6), // No negative modifiers when using Pogo
             PlayerSelected(tacklePlayer), // Use Diving Tackle (modifier is ignore, but player is still prone)
         )
@@ -179,7 +179,7 @@ class DivingTackleTests: JervisGameBB2025Test() {
             PlayerSelected(tackler), // Use Diving Tackle, prevent Shadowing from being used
         )
         assertEquals(mover,state.activePlayer)
-        assertEquals(FieldCoordinate(14, 5), mover.coordinates)
+        assertEquals(PitchCoordinate(14, 5), mover.coordinates)
         mover.assertStanding()
     }
 }

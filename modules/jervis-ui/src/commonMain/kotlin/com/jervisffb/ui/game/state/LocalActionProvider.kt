@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +29,7 @@ class LocalActionProvider(
 
     private var actionJob: Job? = null
 
-    private var sharedData: LocalFieldDataWrapper? = null
+    private var sharedData: LocalPitchDataWrapper? = null
 
     override fun init(controller: UiGameController) {
         homeProvider.init(controller)
@@ -46,7 +46,7 @@ class LocalActionProvider(
         awayProvider.actionHandled(team, action)
     }
 
-    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+    override fun updateSharedData(sharedData: LocalPitchDataWrapper) {
         this.sharedData = sharedData
         homeProvider.updateSharedData(sharedData)
         awayProvider.updateSharedData(sharedData)

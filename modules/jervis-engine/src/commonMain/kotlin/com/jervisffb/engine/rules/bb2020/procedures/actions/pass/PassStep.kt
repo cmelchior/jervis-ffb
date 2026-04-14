@@ -2,10 +2,10 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -79,7 +79,7 @@ object PassStep: Procedure() {
                     }
                 }
                 .map { TargetSquare.Companion.throwTarget(it) }
-                .let { SelectFieldLocation(it) }
+                .let { SelectPitchLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
 
@@ -87,7 +87,7 @@ object PassStep: Procedure() {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    castAction<FieldSquareSelected>(action) {
+                    castAction<PitchSquareSelected>(action) {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower, it.coordinate)
                         val ball = context.thrower.ball!!
@@ -281,7 +281,7 @@ object PassStep: Procedure() {
     }
 
     /**
-     * Attempt to interfere with a pass that landed on the field without the ball going out of bounds first.
+     * Attempt to interfere with a pass that landed on the pitch without the ball going out of bounds first.
      */
     object AttemptPassingInterference: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -347,7 +347,7 @@ object PassStep: Procedure() {
     object ResolveBounceOrCatch: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val playerInSquare = state.field[ball.coordinates].player
+            val playerInSquare = state.pitch[ball.coordinates].player
             val canCatch = playerInSquare?.let { rules.canCatch(it) } ?: false
             return when (!canCatch) {
                 true -> SetBallState.bouncing(ball)

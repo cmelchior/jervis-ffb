@@ -4,9 +4,9 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallState
@@ -22,7 +22,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
@@ -119,15 +119,15 @@ class TurnOverTests: JervisGameBB2020Test() {
 
     @Test
     fun ownPlayerWithBallPushedIntoCrowd() {
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(23, 0)).execute(state)
-        SetPlayerLocation(awayTeam[2.playerNo], FieldCoordinate(23, 1)).execute(state)
-        SetPlayerLocation(awayTeam[3.playerNo], FieldCoordinate(23, 2)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(24, 0)).execute(state)
-        SetPlayerLocation(homeTeam[2.playerNo], FieldCoordinate(24, 1)).execute(state)
-        SetPlayerLocation(homeTeam[3.playerNo], FieldCoordinate(24, 2)).execute(state)
-        SetPlayerLocation(awayTeam[4.playerNo], FieldCoordinate(25, 0)).execute(state)
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(25, 1)).execute(state)
-        SetPlayerLocation(awayTeam[7.playerNo], FieldCoordinate(25, 2)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(23, 0)).execute(state)
+        SetPlayerLocation(awayTeam[2.playerNo], PitchCoordinate(23, 1)).execute(state)
+        SetPlayerLocation(awayTeam[3.playerNo], PitchCoordinate(23, 2)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(24, 0)).execute(state)
+        SetPlayerLocation(homeTeam[2.playerNo], PitchCoordinate(24, 1)).execute(state)
+        SetPlayerLocation(homeTeam[3.playerNo], PitchCoordinate(24, 2)).execute(state)
+        SetPlayerLocation(awayTeam[4.playerNo], PitchCoordinate(25, 0)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(25, 1)).execute(state)
+        SetPlayerLocation(awayTeam[7.playerNo], PitchCoordinate(25, 2)).execute(state)
         SetBallState.carried(state.singleBall(), awayTeam[5.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
@@ -149,15 +149,15 @@ class TurnOverTests: JervisGameBB2020Test() {
 
     @Test
     fun playerPushedIntoCrowd_noBall_noTurnOver() {
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(23, 0)).execute(state)
-        SetPlayerLocation(awayTeam[2.playerNo], FieldCoordinate(23, 1)).execute(state)
-        SetPlayerLocation(awayTeam[3.playerNo], FieldCoordinate(23, 2)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(24, 0)).execute(state)
-        SetPlayerLocation(homeTeam[2.playerNo], FieldCoordinate(24, 1)).execute(state)
-        SetPlayerLocation(homeTeam[3.playerNo], FieldCoordinate(24, 2)).execute(state)
-        SetPlayerLocation(awayTeam[4.playerNo], FieldCoordinate(25, 0)).execute(state)
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(25, 1)).execute(state)
-        SetPlayerLocation(awayTeam[7.playerNo], FieldCoordinate(25, 2)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(23, 0)).execute(state)
+        SetPlayerLocation(awayTeam[2.playerNo], PitchCoordinate(23, 1)).execute(state)
+        SetPlayerLocation(awayTeam[3.playerNo], PitchCoordinate(23, 2)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(24, 0)).execute(state)
+        SetPlayerLocation(homeTeam[2.playerNo], PitchCoordinate(24, 1)).execute(state)
+        SetPlayerLocation(homeTeam[3.playerNo], PitchCoordinate(24, 2)).execute(state)
+        SetPlayerLocation(awayTeam[4.playerNo], PitchCoordinate(25, 0)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(25, 1)).execute(state)
+        SetPlayerLocation(awayTeam[7.playerNo], PitchCoordinate(25, 2)).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
             *standardBlock("H2", 4.dblock),
@@ -176,8 +176,8 @@ class TurnOverTests: JervisGameBB2020Test() {
 
     @Test
     fun playerWithBallPushedIntoCrowd_opponentTurn_noTurnOver() {
-        SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(1, 14)).execute(state)
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(1, 13)).execute(state)
+        SetPlayerLocation(homeTeam[8.playerNo], PitchCoordinate(1, 14)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(1, 13)).execute(state)
         SetBallState.carried(state.singleBall(), homeTeam[8.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
@@ -233,8 +233,8 @@ class TurnOverTests: JervisGameBB2020Test() {
 
     @Test
     fun failToPickupBall_caughtByOpponentTeam() {
-        SetPlayerLocation(awayTeam[10.playerNo], FieldCoordinate(15, 7)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(16, 7)).execute(state)
+        SetPlayerLocation(awayTeam[10.playerNo], PitchCoordinate(15, 7)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(16, 7)).execute(state)
         controller.rollForward(
             *activatePlayer("A11", PlayerStandardActionType.MOVE),
             SmartMoveTo(17, 7),
@@ -259,7 +259,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 5),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
@@ -274,14 +274,14 @@ class TurnOverTests: JervisGameBB2020Test() {
 
     @Test
     fun fumblesPass_caughtByOpponentTeam() {
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(16, 7)).execute(state)
-        SetPlayerLocation(awayTeam[10.playerNo], FieldCoordinate(23, 7)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(16, 7)).execute(state)
+        SetPlayerLocation(awayTeam[10.playerNo], PitchCoordinate(23, 7)).execute(state)
         controller.rollForward(
             *activatePlayer("A11", PlayerStandardActionType.PASS),
             SmartMoveTo(17, 7),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(23, 7),
+            PitchSquareSelected(23, 7),
             *throwBall(1.d6), // Fumbled Pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
@@ -303,7 +303,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 5),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
@@ -324,7 +324,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(1.d6), // Fail catch
             2.d8, // Bounce
@@ -343,11 +343,11 @@ class TurnOverTests: JervisGameBB2020Test() {
         )
         assertEquals(
             Range.QUICK_PASS,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(15, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(4.d6),
             *catch(1.d6),
             4.d8, // Bounce
@@ -365,7 +365,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             *catch(1.d6),
             4.d8, // Bounce
@@ -389,7 +389,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             3.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(14, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(14, 4), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -438,7 +438,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             NoRerollSelected(),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -448,7 +448,7 @@ class TurnOverTests: JervisGameBB2020Test() {
         )
         // Results in a turnover
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(16, 6), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(16, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -460,7 +460,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -484,7 +484,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -506,7 +506,7 @@ class TurnOverTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -558,10 +558,10 @@ class TurnOverTests: JervisGameBB2020Test() {
     fun touchdownInOpponentsTurn() {
         // Give ball to opponent player an set them up to be pushed into the away team end zone
         val defender = homeTeam[1.playerNo]
-        SetPlayerLocation(defender, FieldCoordinate(24, 1)).execute(state)
+        SetPlayerLocation(defender, PitchCoordinate(24, 1)).execute(state)
         SetBallState.carried(state.singleBall(), defender).execute(state)
         val attacker = awayTeam[1.playerNo]
-        SetPlayerLocation(attacker, FieldCoordinate(23, 1)).execute(state)
+        SetPlayerLocation(attacker, PitchCoordinate(23, 1)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),

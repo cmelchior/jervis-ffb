@@ -1,12 +1,12 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.FieldSquare
+import com.jervisffb.engine.model.PitchSquare
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2025.skills.NervesOfSteel
 import com.jervisffb.engine.rules.common.actions.PassType
@@ -45,7 +45,7 @@ class NervesOfSteelTests: JervisGameBB2025Test() {
             SmartMoveTo(17, 7),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             Confirm, // Use Nerves of Steel
             *catch(3.d6) // Only works if Nerves of Steel cancels all tackle zones (2).
@@ -56,7 +56,7 @@ class NervesOfSteelTests: JervisGameBB2025Test() {
 
     @Test
     fun worksOnPass() {
-        SetBallLocation(state.singleBall(), FieldSquare(13, 4)).execute(state) // one TZ
+        SetBallLocation(state.singleBall(), PitchSquare(13, 4)).execute(state) // one TZ
         awayTeam["A1".playerId].addSkill(SkillType.NERVES_OF_STEEL)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.PASS),
@@ -64,7 +64,7 @@ class NervesOfSteelTests: JervisGameBB2025Test() {
             *dodge(6.d6),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             Confirm, // Use Nerves of Steel
         )
         assertTrue(state.getContext<PassContext>().passingModifiers.none { it.description == "Marked" })

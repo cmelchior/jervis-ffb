@@ -5,9 +5,9 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
@@ -23,7 +23,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
@@ -128,7 +128,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8),
             *landingRoll(6.d6)
@@ -154,7 +154,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8),
             *landingRoll(6.d6),
@@ -184,7 +184,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *dodge(),
             *rushTo(15, 4),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8),
             *landingRoll(6.d6)
@@ -200,7 +200,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4), // Quick Pass - No modifiers
+            PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             4.d6,
             TeamRerollSelected<TeamReroll>(),
             *loner(4.d6),
@@ -209,7 +209,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *landingRoll(6.d6)
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -220,7 +220,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(8, 4), // -1 Short Pass
+            PitchSquareSelected(8, 4), // -1 Short Pass
             2.d6,
             TeamRerollSelected<TeamReroll>(),
             *loner(4.d6),
@@ -229,7 +229,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *landingRoll(6.d6)
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(5, 4), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -237,13 +237,13 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(8, 4),
+            PitchSquareSelected(8, 4),
             *qualityRoll(1.d6), // A natural 1 is a fumble.
             3.d8, // Bounce
             *landingRoll(6.d6)
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(14, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(14, 4), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -253,7 +253,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             2.d6, // No modifiers on landing
@@ -261,19 +261,19 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             3.d6
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
     // In BB2025, it is not allowed to pick up the ball when successfully landing on it. This is a rule change from BB2020.
     @Test
     fun superbLanding_onBall() {
-        SetBallLocation(state.singleBall(), FieldCoordinate(8, 4)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(8, 4)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(6.d6),
@@ -285,13 +285,13 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
 
     @Test
     fun failLanding_bounceIfLandingOnBall() {
-        SetBallLocation(state.singleBall(), FieldCoordinate(8, 4)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(8, 4)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             *qualityRoll(6.d6),
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             *landingRoll(1.d6),
@@ -310,7 +310,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(8, 4), // -1 Short Pass
+            PitchSquareSelected(8, 4), // -1 Short Pass
             *qualityRoll(5.d6), // Fail pass check
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
             3.d6,
@@ -327,7 +327,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(8, 4),
+            PitchSquareSelected(8, 4),
             *qualityRoll(1.d6), // A natural 1 is a fumble.
             3.d8, // Bounce
             3.d6,
@@ -346,7 +346,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             3.d6, // 1 marks on landing
@@ -365,7 +365,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             *landingRoll(1.d6),
@@ -385,7 +385,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(6.d6, 6.d6), // Armour roll
@@ -416,7 +416,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws prone Hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
         )
@@ -439,7 +439,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws prone hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(11, 5), // Land on Hafling
+            PitchSquareSelected(11, 5), // Land on Hafling
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
             DiceRollResults(1.d6, 1.d6),
@@ -460,7 +460,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(5.d8, 5.d8, 4.d8), // Hit thrower
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -485,7 +485,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws hafling on top of another player
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Land on top of Home hafling
             DiceRollResults(1.d6, 1.d6), // Armour roll for player in landing square
@@ -497,7 +497,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         homeTeam["H13".playerId].assertProne()
         awayTeam["A13".playerId].assertProne()
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(10, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(10, 4), state.singleBall().coordinates)
     }
 
     @Test
@@ -507,7 +507,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws hafling on top of the prone player
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Land on top of Home hafling
             DiceRollResults(6.d6, 6.d6), // Armour roll
@@ -518,7 +518,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         homeTeam["H13".playerId].assertStunned()
         awayTeam["A13".playerId].assertProne()
-        assertEquals(FieldCoordinate(10, 5), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(10, 5), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -526,9 +526,9 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 0),
+            PitchSquareSelected(11, 0),
             *qualityRoll(6.d6),
-            DiceRollResults(1.d8, 5.d8, 7.d8), // Scatter out of the field
+            DiceRollResults(1.d8, 5.d8, 7.d8), // Scatter out of the pitch
             DiceRollResults(1.d6, 1.d6), // Injury roll
         )
         assertEquals(homeTeam, state.activeTeam)
@@ -538,13 +538,13 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     @Test
     fun bounceIntoTheCrowd() {
         val thrownPlayer = awayTeam["A13".playerId]
-        SetPlayerLocation(homeTeam["H10".playerId], FieldCoordinate(11, 0)).execute(state)
+        SetPlayerLocation(homeTeam["H10".playerId], PitchCoordinate(11, 0)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(11, 0),
+            PitchSquareSelected(11, 0),
             *qualityRoll(6.d6),
-            DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same field
+            DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same square
             DiceRollResults(1.d6, 1.d6), // Hit H10 and roll for AV
             3.d8, // Bounce out-of-bounds
             DiceRollResults(1.d6, 1.d6), // Injury roll
@@ -562,10 +562,10 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             *pickup(),
             *moveTo(14, 5),
             EndAction,
-            // Ogre throws hafling out of the field
+            // Ogre throws hafling out of the pitch
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 0),
+            PitchSquareSelected(11, 0),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 2.d8, 2.d8),
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -573,10 +573,10 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             DiceRollResults(3.d6, 1.d6), // Throw-in distance
             2.d8 // Bounce ball
         )
-        // Turn-over if player with ball is thrown out of the field
+        // Turn-over if player with ball is thrown out of the pitch
         assertEquals(homeTeam, state.activeTeam)
         assertEquals(PlayerState.RESERVE, awayTeam["A13".playerId].state)
-        assertEquals(FieldCoordinate(11, 2), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(11, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -585,9 +585,9 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(14, 0),
+            PitchSquareSelected(14, 0),
             *qualityRoll(6.d6),
-            DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same field
+            DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same square
             *landingRoll(6.d6)
         )
         assertEquals(Availability.AVAILABLE, thrownPlayer.available)
@@ -607,7 +607,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(14, 0),
+            PitchSquareSelected(14, 0),
             *qualityRoll(6.d6),
             DiceRollResults(7.d8, 5.d8, 1.d8), // Scatter to the same square
             DiceRollResults(1.d6, 1.d6), // AV roll
@@ -631,7 +631,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws prone Hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
         )
@@ -652,7 +652,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws prone Hafling
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Initial scatter ends up on an empty space
         )
@@ -677,7 +677,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws Home hafling on top of Away hafling with the ball
             *activatePlayer("H1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("H13".playerId),
-            FieldSquareSelected(15, 5),
+            PitchSquareSelected(15, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 5.d8, 6.d8), // Land on top of Away hafling
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -689,17 +689,17 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         assertEquals(homeTeam, state.activeTeam)
         homeTeam["H13".playerId].assertProne()
         awayTeam["A13".playerId].assertProne()
-        assertEquals(FieldCoordinate(17, 5), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(17, 5), state.singleBall().coordinates)
     }
 
     @Test
     fun playerWithBallLandsOnGroundWithBall() {
         // Add a 2nd ball
         val newBall = Ball().apply {
-            coordinates = FieldCoordinate(16, 5)
+            coordinates = PitchCoordinate(16, 5)
         }
         state.balls.add(newBall)
-        state.field[16, 5].balls.add(newBall)
+        state.pitch[16, 5].balls.add(newBall)
         // Throw a player with a ball on top of the other ball
         controller.rollForward(
             // Hafling picks up ball
@@ -711,7 +711,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws hafling on top of another player
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(16, 5),
+            PitchSquareSelected(16, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 5.d8, 6.d8), // Scatter back to starting point
             *landingRoll(6.d6),
@@ -724,7 +724,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         state.balls.last().let { ball ->
             assertEquals(newBall, ball)
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(17, 5), ball.coordinates)
+            assertEquals(PitchCoordinate(17, 5), ball.coordinates)
         }
     }
 
@@ -732,10 +732,10 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
     fun playerWithBallLandsBadlyOnAnotherBall() {
         // Add a 2nd ball
         val newBall = Ball().apply {
-            coordinates = FieldCoordinate(16, 5)
+            coordinates = PitchCoordinate(16, 5)
         }
         state.balls.add(newBall)
-        state.field[16, 5].balls.add(newBall)
+        state.pitch[16, 5].balls.add(newBall)
         // Throw a player with a ball on top of the other ball
         controller.rollForward(
             // Hafling picks up first ball
@@ -747,34 +747,34 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             // Ogre throws hafling on top of another player
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(16, 5),
+            PitchSquareSelected(16, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 5.d8, 6.d8), // Scatter back to the starting point
             *landingRoll(1.d6), // Fail landing on ball
             DiceRollResults(6.d6, 6.d6),
             DiceRollResults(6.d6, 6.d6),
             16.d16, // Thrown player is killed
-            Cancel, // Do not use apothecary, thrown player leaves the field
+            Cancel, // Do not use apothecary, thrown player leaves the square
             4.d8, // Bounce ball carried by player
             5.d8, // Bounce ball already in square
         )
         state.balls.first().let { ball ->
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(15, 5), ball.coordinates)
+            assertEquals(PitchCoordinate(15, 5), ball.coordinates)
         }
         state.balls.last().let { ball ->
             assertEquals(newBall, ball)
             assertEquals(BallState.ON_GROUND, ball.state)
-            assertEquals(FieldCoordinate(17, 5), ball.coordinates)
+            assertEquals(PitchCoordinate(17, 5), ball.coordinates)
         }
     }
 
     @Test
     fun landInEndZoneTriggersTouchdown() {
-        // Prepare the field by moving players and ball closer to the end-zone
-        SetPlayerLocation(awayTeam["A13".playerId], FieldCoordinate(5, 7)).execute(state)
-        SetPlayerLocation(awayTeam["A1".playerId], FieldCoordinate(4, 7)).execute(state)
-        SetBallLocation(state.singleBall(), FieldCoordinate(6, 7)).execute(state)
+        // Prepare the pitch by moving players and ball closer to the end-zone
+        SetPlayerLocation(awayTeam["A13".playerId], PitchCoordinate(5, 7)).execute(state)
+        SetPlayerLocation(awayTeam["A1".playerId], PitchCoordinate(4, 7)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(6, 7)).execute(state)
 
         controller.rollForward(
             *activatePlayer("A13", PlayerStandardActionType.MOVE),
@@ -784,7 +784,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             EndAction,
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(0, 7),
+            PitchSquareSelected(0, 7),
             *qualityRoll(6.d6),
             DiceRollResults(3.d8, 7.d8, 4.d8), // Scatter back to the starting point.
             *landingRoll(6.d6), // Land successfully on the end-zone.
@@ -795,10 +795,10 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
 
     @Test
     fun failLandingInEndZoneWithBallDoesNotTriggersTouchdown() {
-        // Prepare the field by moving players and ball closer to the end-zone
-        SetPlayerLocation(awayTeam["A13".playerId], FieldCoordinate(5, 7)).execute(state)
-        SetPlayerLocation(awayTeam["A1".playerId], FieldCoordinate(4, 7)).execute(state)
-        SetBallLocation(state.singleBall(), FieldCoordinate(6, 7)).execute(state)
+        // Prepare the pitch by moving players and ball closer to the end-zone
+        SetPlayerLocation(awayTeam["A13".playerId], PitchCoordinate(5, 7)).execute(state)
+        SetPlayerLocation(awayTeam["A1".playerId], PitchCoordinate(4, 7)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(6, 7)).execute(state)
 
         controller.rollForward(
             *activatePlayer("A13", PlayerStandardActionType.MOVE),
@@ -808,7 +808,7 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
             EndAction,
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(0, 7),
+            PitchSquareSelected(0, 7),
             *qualityRoll(6.d6),
             DiceRollResults(3.d8, 7.d8, 4.d8), // Scatter back to the starting point.
             *landingRoll(1.d6), // Land successfully on the end-zone.
@@ -817,6 +817,6 @@ class ThrowTeamMateActionTests: JervisGameBB2025Test() {
         )
         assertEquals(0, state.awayScore)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(1, 7), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(1, 7), state.singleBall().coordinates)
     }
 }

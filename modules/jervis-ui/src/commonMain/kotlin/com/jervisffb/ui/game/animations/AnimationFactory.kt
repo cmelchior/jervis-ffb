@@ -10,8 +10,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BB2020TheKickOffEvent
 import com.jervisffb.engine.rules.bb2025.procedures.BB2025TheKickOffEvent
@@ -96,16 +96,16 @@ object AnimationFactory {
             // For these (for now), we just decide to animate the ball from the center of the end-zone, but maybe
             // some other solution would be funnier/better?
             val from = when (val kickerLocation = state.kickingPlayer?.location) {
-                is OnFieldLocation -> kickerLocation
+                is OnPitchLocation -> kickerLocation
                 else -> {
                     if (state.kickingPlayer!!.isOnHomeTeam()) {
                         val x = 0
-                        val y = state.rules.fieldHeight / 2
-                        FieldCoordinate(x, y)
+                        val y = state.rules.pitchHeight / 2
+                        PitchCoordinate(x, y)
                     } else {
-                        val x = state.rules.fieldWidth - 1
-                        val y = state.rules.fieldHeight / 2
-                        FieldCoordinate(x, y)
+                        val x = state.rules.pitchWidth - 1
+                        val y = state.rules.pitchHeight / 2
+                        PitchCoordinate(x, y)
                     }
                 }
             }

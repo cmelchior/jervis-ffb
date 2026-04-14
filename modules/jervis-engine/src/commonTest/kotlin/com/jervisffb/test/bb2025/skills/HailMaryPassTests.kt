@@ -1,14 +1,14 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.rules.bb2025.skills.HailMaryPass
 import com.jervisffb.engine.rules.common.actions.PassType
@@ -57,9 +57,9 @@ class HailMaryPassTests: JervisGameBB2025Test() {
         )
         assertEquals(
             Range.OUT_OF_RANGE,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(0, 0))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(0, 0))
         )
-        assertTrue(controller.getAvailableActions().get<SelectFieldLocation>().squares.any { it.x == 0 && it.y == 0 })
+        assertTrue(controller.getAvailableActions().get<SelectPitchLocation>().squares.any { it.x == 0 && it.y == 0 })
     }
 
     @Test
@@ -69,12 +69,12 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(0, 7), // Will pass over LoS with players from Home Team
+            PitchSquareSelected(0, 7), // Will pass over LoS with players from Home Team
             *throwBall(6.d6),
             DiceRollResults(2.d8, 5.d8, 7.d8),
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(0, 7), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(0, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -85,9 +85,9 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(18, 7),
+            PitchSquareSelected(18, 7),
         )
-        assertEquals(Range.QUICK_PASS, rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(18, 7)))
+        assertEquals(Range.QUICK_PASS, rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(18, 7)))
         state.getContext<PassContext>().let { context ->
             assertEquals(Range.LONG_BOMB, context.range)
             assertContains(context.passingModifiers, AccuracyModifier.LONG_BOMB)
@@ -97,7 +97,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             DiceRollResults(3.d8, 3.d8, 3.d8),
             3.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(22, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(22, 3), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -108,9 +108,9 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(0, 0),
+            PitchSquareSelected(0, 0),
         )
-        assertEquals(Range.OUT_OF_RANGE, rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(0, 0)))
+        assertEquals(Range.OUT_OF_RANGE, rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(0, 0)))
         state.getContext<PassContext>().let { context ->
             assertEquals(Range.LONG_BOMB, context.range)
             assertContains(context.passingModifiers, AccuracyModifier.LONG_BOMB)
@@ -120,7 +120,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             DiceRollResults(7.d8, 7.d8, 7.d8),
             7.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(0, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(0, 4), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -131,7 +131,7 @@ class HailMaryPassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(18, 7),
+            PitchSquareSelected(18, 7),
             *throwBall(6.d6),
         )
         val context = state.getContext<PassContext>()

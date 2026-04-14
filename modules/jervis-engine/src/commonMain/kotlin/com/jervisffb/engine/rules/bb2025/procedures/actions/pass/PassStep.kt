@@ -5,10 +5,10 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -37,7 +37,7 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
@@ -83,7 +83,7 @@ object PassStep: Procedure() {
                     }
                 }
                 .map { TargetSquare.Companion.throwTarget(it) }
-                .let { SelectFieldLocation(it) }
+                .let { SelectPitchLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
 
@@ -91,7 +91,7 @@ object PassStep: Procedure() {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    castAction<FieldSquareSelected>(action) {
+                    castAction<PitchSquareSelected>(action) {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower, it.coordinate)
                         val ball = context.thrower.ball!!
@@ -280,7 +280,7 @@ object PassStep: Procedure() {
     }
 
     /**
-     * Attempt to interfere with a pass that landed on the field without the ball going out of bounds first.
+     * Attempt to interfere with a pass that landed on the pitch without the ball going out of bounds first.
      */
     object AttemptInterception: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -335,7 +335,7 @@ object PassStep: Procedure() {
      * to be caught.
      */
     object ResolveBounceOrCatch: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnPitch
         // TODO How to check for Star Player Points
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()

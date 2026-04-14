@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -15,7 +15,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.StripBall
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -61,7 +61,7 @@ class StripBallTests: JervisGameBB2025Test() {
         )
 
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 5), ball.coordinates)
+        assertEquals(PitchCoordinate(12, 5), ball.coordinates)
         assertEquals(BallState.ON_GROUND, ball.state)
     }
 
@@ -70,9 +70,9 @@ class StripBallTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A1".playerId]
         attacker.addSkill(SkillType.STRIP_BALL)
         val ballPlayer = homeTeam["H10".playerId]
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(ballPlayer, FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(ballPlayer, PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         val ball = state.singleBall()
         SetBallState.carried(ball, ballPlayer).execute(state)
         controller.rollForward(
@@ -82,7 +82,7 @@ class StripBallTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT), // 2nd push
             Confirm // Follow up
         )
-        assertEquals(FieldCoordinate(10, 5), ballPlayer.coordinates)
+        assertEquals(PitchCoordinate(10, 5), ballPlayer.coordinates)
         assertTrue(ballPlayer.hasBall())
         assertEquals(BallState.CARRIED, ball.state)
     }
@@ -112,7 +112,7 @@ class StripBallTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -125,8 +125,8 @@ class StripBallTests: JervisGameBB2025Test() {
         val attacker = awayTeam["A6".playerId]
         attacker.addSkill(SkillType.STRIP_BALL)
         val defender = homeTeam["H1".playerId]
-        SetPlayerLocation(attacker, FieldCoordinate(23, 3)).execute(state)
-        SetPlayerLocation(defender, FieldCoordinate(24, 3)).execute(state)
+        SetPlayerLocation(attacker, PitchCoordinate(23, 3)).execute(state)
+        SetPlayerLocation(defender, PitchCoordinate(24, 3)).execute(state)
         SetBallState.carried(state.singleBall(), defender).execute(state)
 
         assertEquals(0, state.awayScore)
@@ -140,7 +140,7 @@ class StripBallTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(24, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(24, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(0, state.awayScore)
         assertEquals(0, state.homeScore)

@@ -128,7 +128,7 @@ object OfficiousRef : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                // Special situation where no players from the receiving team are on the field
+                // Special situation where no players from the receiving team are on the pitch
                 Continue -> GotoNode(SelectPlayerFromKickingTeam)
                 else -> {
                     val context = state.getContext<OfficiousRefContext>()
@@ -178,11 +178,11 @@ object OfficiousRef : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                // Special situation where no players from the kicking team are on the field
+                // Special situation where no players from the kicking team are on the pitch
                 // Since all rolls have been made at this point, just exit
                 Continue -> {
                     compositeCommandOf(
-                        ReportGameProgress("No players from ${state.kickingTeam.name} are on the field"),
+                        ReportGameProgress("No players from ${state.kickingTeam.name} are on the pitch"),
                         ExitProcedure()
                     )
                 }
@@ -223,7 +223,7 @@ object OfficiousRef : Procedure() {
 
     private fun selectFromTeam(team: Team, rules: Rules): List<GameActionDescriptor> {
         return team
-            .filter { it.location.isOnField(rules) }
+            .filter { it.location.isOnPitch(rules) }
             .let { players ->
                 if (players.isNotEmpty()) {
                     listOf(

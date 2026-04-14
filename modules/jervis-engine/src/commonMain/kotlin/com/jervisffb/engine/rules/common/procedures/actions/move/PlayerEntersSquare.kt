@@ -101,7 +101,7 @@ object MovePlayerIntoSquare : Procedure() {
             val playerIsHoldingBall = (context.player.ball?.carriedBy == context.player)
             val ballOnTheGround = (
                 state.balls.size > 1 &&
-                    state.field[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
+                    state.pitch[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
             )
             return if (playerIsHoldingBall && ballOnTheGround) {
                 GotoNode(ResolveBouncingBall)
@@ -115,7 +115,7 @@ object MovePlayerIntoSquare : Procedure() {
     object ResolveBouncingBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
-            val ball = state.field[context.target].balls.first { it.state == BallState.ON_GROUND }
+            val ball = state.pitch[context.target].balls.first { it.state == BallState.ON_GROUND }
             return compositeCommandOf(
                 SetBallState.bouncing(ball),
                 SetCurrentBall(ball)
@@ -133,7 +133,7 @@ object MovePlayerIntoSquare : Procedure() {
     object CheckForTrapdoor: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
-            val hasTrapdoor = state.field[context.target].hasTrapdoor
+            val hasTrapdoor = state.pitch[context.target].hasTrapdoor
             val isTreacherous = (
                 state.homeTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR) ||
                     state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)

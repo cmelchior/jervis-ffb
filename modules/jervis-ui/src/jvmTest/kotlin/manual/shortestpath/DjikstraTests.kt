@@ -22,7 +22,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createStartingTestSetup
@@ -50,16 +50,16 @@ fun DjiekstraContent() {
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateAllPaths(state, FieldCoordinate(12, 6), 6)
-    val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
+    val result = rules.pathFinder.calculateAllPaths(state, PitchCoordinate(12, 6), 6)
+    val path = remember { mutableStateOf(listOf<PitchCoordinate>()) }
     DjiekstraBoxGrid(
         state,
-        rules.fieldHeight,
-        rules.fieldWidth,
+        rules.pitchHeight,
+        rules.pitchWidth,
         result.distances,
         path.value,
-        update = { end: FieldCoordinate ->
-            val newPath = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), end, 4, false)
+        update = { end: PitchCoordinate ->
+            val newPath = rules.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), end, 4, false)
             path.value = result.getClosestPathTo(end) // newPath.path
         },
     )
@@ -71,18 +71,18 @@ fun DjiekstraBoxGrid(
     state: Game,
     rows: Int,
     cols: Int,
-    distances: Map<FieldCoordinate, Int>,
-    path: List<FieldCoordinate>,
-    update: (end: FieldCoordinate) -> Unit,
+    distances: Map<PitchCoordinate, Int>,
+    path: List<PitchCoordinate>,
+    update: (end: PitchCoordinate) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
-                    val squareValue: Int? = distances[FieldCoordinate(x, y)]
-                    val onPath = path.contains(FieldCoordinate(x, y))
-                    val isStart = distances[FieldCoordinate(x, y)] == 0
-                    val isOccupied = state.field[x, y].isOccupied()
+                    val squareValue: Int? = distances[PitchCoordinate(x, y)]
+                    val onPath = path.contains(PitchCoordinate(x, y))
+                    val isStart = distances[PitchCoordinate(x, y)] == 0
+                    val isOccupied = state.pitch[x, y].isOccupied()
                     val (text: String, bgColor: Color) =
                         when {
                             isStart -> "" to Color.Red
@@ -94,7 +94,7 @@ fun DjiekstraBoxGrid(
                         modifier =
                             Modifier
                                 .onPointerEvent(PointerEventType.Enter) {
-                                    update(FieldCoordinate(x, y))
+                                    update(PitchCoordinate(x, y))
                                 }
                                 .size(30.dp)
                                 .padding(1.dp)

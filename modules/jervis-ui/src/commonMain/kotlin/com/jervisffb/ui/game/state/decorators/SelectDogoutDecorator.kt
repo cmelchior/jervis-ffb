@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
-object SelectDogoutDecorator: FieldActionDecorator<SelectDogout> {
+object SelectDogoutDecorator: PitchActionDecorator<SelectDogout> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,

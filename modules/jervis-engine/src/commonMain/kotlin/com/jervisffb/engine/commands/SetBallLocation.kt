@@ -2,11 +2,11 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 
-class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Command {
-    private lateinit var originalLocation: FieldCoordinate
+class SetBallLocation(val ball: Ball, val newLocation: PitchCoordinate) : Command {
+    private lateinit var originalLocation: PitchCoordinate
 
     override fun execute(state: Game) {
         // This is only disabled because we need to call it from SetBallState (when a ball is being carried)
@@ -16,13 +16,13 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
         val rules: Rules = state.rules
         this.originalLocation = ball.coordinates
         ball.coordinates = newLocation
-        if (originalLocation.isOnField(rules)) {
-            state.field[originalLocation].apply {
+        if (originalLocation.isOnPitch(rules)) {
+            state.pitch[originalLocation].apply {
                 balls.remove(ball)
             }
         }
-        if (newLocation.isOnField(rules)) {
-            state.field[newLocation].apply {
+        if (newLocation.isOnPitch(rules)) {
+            state.pitch[newLocation].apply {
                 balls.add(ball)
             }
         }
@@ -30,13 +30,13 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
 
     override fun undo(state: Game) {
         val rules = state.rules
-        if (newLocation.isOnField(rules)) {
-            state.field[newLocation].apply {
+        if (newLocation.isOnPitch(rules)) {
+            state.pitch[newLocation].apply {
                 balls.remove(this@SetBallLocation.ball)
             }
         }
-        if (originalLocation.isOnField(rules)) {
-            state.field[originalLocation].apply {
+        if (originalLocation.isOnPitch(rules)) {
+            state.pitch[originalLocation].apply {
                 balls.add(this@SetBallLocation.ball)
             }
         }

@@ -110,7 +110,7 @@ object FoulStep: Procedure() {
             // They are technically optional skills, but there should be no reason (not
             // even a bad one) to not apply them.
             val bootAssists = context.victim!!.coordinates.getSurroundingCoordinates(rules)
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it != context.fouler }
                 .filter { player ->
                     val hasPutTheBootIn = player.isSkillAvailable(SkillType.PUT_THE_BOOT_IN)

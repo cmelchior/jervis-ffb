@@ -143,8 +143,8 @@ object RiskingInjuryRoll: Procedure() {
         val context = state.getContext<RiskingInjuryContext>()
         val commands = mutableListOf<Command?>()
 
-        // A player with Leader has left the field after an injury roll. If they
-        // had Leader, we need to check if another leader is on the field. If
+        // A player with Leader has left the pitch after an injury roll. If they
+        // had Leader, we need to check if another leader is on the pitch. If
         // not, the Leader reroll should be removed
         val player = context.player
         val removeLeaderCommand = com.jervisffb.engine.rules.bb2025.skills.Leader.calculateLeaderRerollStatusChange(player.team)

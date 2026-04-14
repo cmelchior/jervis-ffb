@@ -5,11 +5,11 @@ import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.model.UiFieldPlayer
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.menu.GameScreenModel
 
-object SelectRandomPlayersDecorator : FieldActionDecorator<SelectRandomPlayers> {
+object SelectRandomPlayersDecorator : PitchActionDecorator<SelectRandomPlayers> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -18,7 +18,7 @@ object SelectRandomPlayersDecorator : FieldActionDecorator<SelectRandomPlayers> 
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
-            val selectedAction = onClickHandler@{ screenModel: GameScreenModel, player: UiFieldPlayer ->
+            val selectedAction = onClickHandler@{ screenModel: GameScreenModel, player: UiPitchPlayer ->
                 val enablePlayer = !player.isTemporarySelected.value
                 if (enablePlayer && screenModel.selectedPlayersInUi.size == descriptor.count) return@onClickHandler
                 player.isTemporarySelected.value = enablePlayer

@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -58,7 +58,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(6.d6), // Superb throw
         )
         assertEquals(ThrowPlayerResult.SUPERB, state.getContext<ThrowTeamMateContext>().qualityRollResult)
@@ -84,7 +84,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(4.d6), // Subpar throw
         )
         assertEquals(ThrowPlayerResult.SUBPAR, state.getContext<ThrowTeamMateContext>().qualityRollResult)
@@ -110,7 +110,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(6.d6), // Superb throw
             Confirm, // Use Swoop
             DirectionSelected(Direction.LEFT),
@@ -135,7 +135,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(6.d6), // Superb throw
             Confirm, // Use Swoop
             DirectionSelected(Direction.LEFT),
@@ -161,7 +161,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(16, 2),
+            PitchSquareSelected(16, 2),
             *qualityRoll(6.d6), // Superb throw
             Confirm, // Use Swoop
             DirectionSelected(Direction.UP),
@@ -175,7 +175,7 @@ class SwoopTests: JervisGameBB2025Test() {
     }
 
     // Player near the sideline place the template towards the end-zone,
-    // but 1-2 lies on outside of the field, i.e. any distance roll will
+    // but 1-2 lies on the outside of the pitch, i.e., any distance roll will
     // take the player out-of-bounds.
     @Test
     fun driftOutOfBounds() {
@@ -187,7 +187,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(16, 0),
+            PitchSquareSelected(16, 0),
             *qualityRoll(6.d6), // Superb throw
             Confirm, // Use Swoop
             DirectionSelected(Direction.RIGHT),
@@ -212,7 +212,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 4.d8, 8.d8),
             DiceRollResults(1.d6, 1.d6) // Auto fail landing, player Falls Over
@@ -235,7 +235,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 4.d8, 8.d8),
             DiceRollResults(1.d6, 1.d6) // Auto fail landing, player Falls Over
@@ -255,7 +255,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(9, 4),
+            PitchSquareSelected(9, 4),
             *qualityRoll(1.d6),
             7.d8, // Bounce Player
             *landingRoll(6.d6),
@@ -277,7 +277,7 @@ class SwoopTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(11, 4), // Quick Pass - No modifiers
+            PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             *qualityRoll(5.d6),
             Confirm, // Use Bullseye
             *landingRoll(6.d6)

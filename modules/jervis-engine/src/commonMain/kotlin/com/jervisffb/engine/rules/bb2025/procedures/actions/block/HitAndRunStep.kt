@@ -6,10 +6,10 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -23,7 +23,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -76,7 +76,7 @@ object HitAndRunStep : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val eligibleTargetSquares = getEligibleTargetSquares(state.activePlayerOrThrow())
             return listOf(
-                SelectFieldLocation(eligibleTargetSquares.map { TargetSquare.hitAndRun(it) }),
+                SelectPitchLocation(eligibleTargetSquares.map { TargetSquare.hitAndRun(it) }),
                 CancelWhenReady, // Also allow canceling if no good move options are found
             )
         }
@@ -84,7 +84,7 @@ object HitAndRunStep : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Cancel -> return ExitProcedure()
-                is FieldSquareSelected -> {
+                is PitchSquareSelected -> {
                     val player = state.activePlayerOrThrow()
                     compositeCommandOf(
                         SetPlayerLocation(player, action.coordinate),
@@ -97,13 +97,13 @@ object HitAndRunStep : Procedure() {
     }
 
     // -- HELPER METHODS --
-    fun getEligibleTargetSquares(player: Player): List<FieldCoordinate> {
+    fun getEligibleTargetSquares(player: Player): List<PitchCoordinate> {
         val state = player.team.game
         val rules = state.rules
         val player = state.activePlayerOrThrow()
         if (!rules.isStanding(player)) return emptyList()
         return player.coordinates.getSurroundingCoordinates(rules)
-            .filter { !state.field[it].isOccupied() }
+            .filter { !state.pitch[it].isOccupied() }
             .filter { target ->
                 // Player with Hit and Run will be marked in the target square
                 val isMarked = rules.isMarked(player, target)
@@ -114,7 +114,7 @@ object HitAndRunStep : Procedure() {
                 // automatically mark any opponent player adjacent to the target square.
                 target.getSurroundingCoordinates(rules)
                     .none {
-                        state.field[it].player?.let { p ->
+                        state.pitch[it].player?.let { p ->
                             player.team != p.team
                         } ?: false
                     }

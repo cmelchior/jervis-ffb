@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -43,7 +43,7 @@ class SafePassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(18, 7),
+            PitchSquareSelected(18, 7),
             *throwBall(1.d6),
             Confirm // Use Safe Pass
         )
@@ -60,7 +60,7 @@ class SafePassTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(25, 7),
+            PitchSquareSelected(25, 7),
             *throwBall(2.d6),
             2.d8 // Bounce from fumble
         )
@@ -77,7 +77,7 @@ class SafePassTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(0, 7),
+            PitchSquareSelected(0, 7),
             *throwBall(1.d6),
             Confirm // Use Safe Pass
         )

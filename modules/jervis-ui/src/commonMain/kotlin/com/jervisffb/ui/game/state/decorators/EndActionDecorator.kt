@@ -4,13 +4,13 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
-object EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
+object EndActionDecorator: PitchActionDecorator<EndActionWhenReady> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -19,7 +19,7 @@ object EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
         acc: UiSnapshotAccumulator
     ) {
         state.activePlayer?.location?.let { location ->
-            acc.updateSquare(location as FieldCoordinate) {
+            acc.updateSquare(location as PitchCoordinate) {
                 // Add action at the front so the button is placed at the bottom.
                 it.copy(contextMenuOptions = it.contextMenuOptions.add(0,
                     SimpleContextMenuOption(

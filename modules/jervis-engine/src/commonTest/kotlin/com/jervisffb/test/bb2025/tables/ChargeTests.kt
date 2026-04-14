@@ -6,8 +6,8 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.ForegoActivationSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
@@ -19,7 +19,7 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -127,7 +127,7 @@ class ChargeTests: JervisGameBB2025Test() {
                     *activatePlayer("H9", PlayerStandardActionType.THROW_TEAM_MATE),
                     SmartMoveTo(10, 7),
                     PlayerSelected("H10".playerId),
-                    FieldSquareSelected(11, 7),
+                    PitchSquareSelected(11, 7),
                     6.d6, // Throw
                     DiceRollResults(2.d8, 2.d8, 2.d8),  // Scatter
                     6.d6 // Landing
@@ -135,7 +135,7 @@ class ChargeTests: JervisGameBB2025Test() {
                 bounce = null
             )
         )
-        assertEquals(FieldCoordinate(11, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 4), homeTeam["H10".playerId].coordinates)
         homeTeam["H10".playerId].assertStanding()
         assertEquals(homeTeam, state.activeTeam)
     }
@@ -264,7 +264,7 @@ class ChargeTests: JervisGameBB2025Test() {
                 ),
             )
         )
-        assertEquals(FieldCoordinate(13, 10), homeTeam["H9".playerId].coordinates)
+        assertEquals(PitchCoordinate(13, 10), homeTeam["H9".playerId].coordinates)
         homeTeam["H9".playerId].assertStanding()
         assertEquals(1, state.awayTeam.turnMarker)
         assertEquals(awayTeam, state.activeTeam)
@@ -401,7 +401,7 @@ class ChargeTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(14, 11),
+                placeKick = PitchSquareSelected(14, 11),
                 deviate = DiceRollResults(4.d8, 1.d6),
                 kickoffEvent = arrayOf(
                     DiceRollResults(6.d6, 4.d6), // Roll Charge
@@ -416,7 +416,7 @@ class ChargeTests: JervisGameBB2025Test() {
                 bounce = null
             )
         )
-        assertEquals(FieldCoordinate(13, 11), homeTeam["H9".playerId].coordinates)
+        assertEquals(PitchCoordinate(13, 11), homeTeam["H9".playerId].coordinates)
         assertTrue(homeTeam["H9".playerId].hasBall())
         assertEquals(1, state.awayTeam.turnMarker)
         assertEquals(awayTeam, state.activeTeam)

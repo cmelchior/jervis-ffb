@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -14,7 +14,7 @@ import com.jervisffb.ui.game.dialogs.wheel.CoinButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 object SelectCoinSideWheelController : ActionWheelDialogController() {
 
@@ -22,7 +22,7 @@ object SelectCoinSideWheelController : ActionWheelDialogController() {
         DetermineKickingTeamStep.SelectCoinSide
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         return when (state.receivingTeam == state.awayTeam) {
             true -> AwayTeamFanFactorRoll.getActionWheelCenter(state)
             false -> HomeTeamFanFactorRoll.getActionWheelCenter(state)
@@ -33,7 +33,7 @@ object SelectCoinSideWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val buttons = listOf(
             CoinButtonData(

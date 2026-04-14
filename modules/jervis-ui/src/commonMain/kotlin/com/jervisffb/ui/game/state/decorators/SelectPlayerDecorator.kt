@@ -5,17 +5,15 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.model.UiFieldPlayer
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 import com.jervisffb.ui.menu.GameScreenModel
 
-object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
+object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -24,7 +22,7 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
-            val selectedAction = { screenModel: GameScreenModel, player: UiFieldPlayer ->
+            val selectedAction = { screenModel: GameScreenModel, player: UiPitchPlayer ->
                 actionProvider.userActionSelected(PlayerSelected(playerId))
             }
 
@@ -59,7 +57,7 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                         )
                     }
                 }
-                is FieldCoordinate -> {
+                is PitchCoordinate -> {
                     acc.updateSquare(playerLocation) {
                         it.copy(
                             selectedAction = null,

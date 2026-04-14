@@ -1,0 +1,429 @@
+package com.jervisffb.ui.game.view.pitch
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.ui.game.view.animation.AnimationLayer
+import com.jervisffb.ui.game.viewmodel.PitchDetails
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
+import com.jervisffb.ui.utils.pixelSize
+
+val LocalPitchData = staticCompositionLocalOf<LocalPitchDataWrapper> {
+    error("CompositionLocal LocalPitchData not present")
+}
+
+/**
+ * Rendering the pitch is pretty complex due to how many things that can potentially happen
+ * at the same time.
+ *
+ * Drawing the pitch involves rendering the following different "layers". From the bottom up:
+ *
+ * ** Environment background **
+ * 1. Background image: E.g., pitch or room type.
+ * 2. Square separators + lines + area overlay. E.g. dots between squares, chalk lines or
+ *    end-zone markings. In some cases this is merged with the background image.
+ * 3. Weather effects. E.g., snow, rain, wind, fog, etc. In some cases this is merged with the
+ *    background image.
+ *
+ * ** UI Feedback **
+ * 4. Pitch Actions and Underlay: This layer is responsible for attaching action handlers and highlights
+*     for static effects like squares available for actions, tackle zones or yellow colors for squares
+ *    that require a dodge.
+ * 5. Hover Underlay: Highlights for dynamic effects like when a mouse hovers over the square
+ *
+ * ** Environment features **
+ * 6. Room features: For Dungeon Bowl / Gutter Bowl. This includes statues or pits.
+ * 7. Trapdoors: In some cases Trapdoors could be placed on top of room features like bridges.
+ *
+ * ** Players **
+ * Since players come in different sizes, we need to use absolute positioning. This is done
+ * based on the offset of pitch squares as well as the calculated size for them. When using
+ * `dp` there is a small chance of rounding errors. Something to watch out for.
+ *
+ * 8. [PlayerLayer]: Render player including anything markers, like ball carried, bomb carried etc.
+ * 9. Ball: If a ball or bomb is loose, it is rendered on top of the player
+ *
+ * ** Action dialogs **
+ * 10. [DirectionArrowsLayer]: These are rendered on top of everything
+ * 11. [AnimationLayer]: This is where animations run (is this true)
+ * 12a. [ContextMenuLayer]: This is where the action wheel for the "context menu" is rendered
+ * 12b. [ActionWheelLayer]: This is where the action wheel for primary actions is rendered
+ * 13. DialogLayer: These are controlled outside the scope of this pitch.
+ *
+ * Developer's Commentary:
+ * I am still thinking about these layers. Maybe some of the lower layers needs to change order?
+ * Especially when it comes to weather effects, then it isn't clear exactly how these should be
+ * rendered. Adding them on top of another pitch image, is more flexible, but it is unclear if
+ * it will look good? Also, corner cases might surface while implementing features that require
+ * us to rework them.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun Pitch(
+    modifier: Modifier,
+    vm: PitchViewModel,
+    borderBrushSize: Dp = 3.dp,
+) {
+    val pitch: PitchDetails by vm.pitchBackground.collectAsState(PitchDetails.NICE)
+    val borderBrushSizePx = with(LocalDensity.current) { borderBrushSize.toPx() }
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            // In case of rounding errors. The underlying game background will be showing
+            .background(color = Color.Transparent)
+        ,
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        val localDensity = LocalDensity.current
+        val pitchDataSize = remember(maxWidth, maxHeight) {
+            // Calculate maximum square size based on maximum width
+            // If we need to render pitch markers, we add padding for it, so we can
+            // draw the borders without them interacting with pitch squares or the end zone.
+            val borderBrushPx = if (pitch.drawPitchMarkers) with(localDensity) { borderBrushSize.toPx().toInt() } else 0
+            val maxWidthPx = with(localDensity) { maxWidth.toPx() }
+            val squareSize = ((maxWidthPx - borderBrushPx*2) / vm.rules.pitchWidth).toInt() // Must be smaller than maxWidth
+            PitchSizeData(
+                borderBrushSizePx = borderBrushPx,
+                squareSize = IntSize(squareSize, squareSize),
+                squaresPrRow = vm.rules.pitchWidth,
+                squaresPrColumn = vm.rules.pitchHeight,
+            )
+        }
+        LaunchedEffect(pitchDataSize) {
+            vm.sharedPitchData.size = pitchDataSize
+        }
+        CompositionLocalProvider(LocalPitchData provides vm.sharedPitchData) {
+            val localPitch = LocalPitchData.current
+            if (localPitch.size.squareSize == IntSize.Zero) return@CompositionLocalProvider
+            ExactPixelBox(
+                modifier = Modifier
+                    .pointerInput(localPitch.size) {
+                        val pointerBus = localPitch.pointerBus
+                        val pitchSizeData = localPitch.size
+                        awaitPointerEventScope {
+                            while (true) {
+                                val e = awaitPointerEvent()
+                                val eventSquare = e.changes.first().position.toPitchSquare(pitchSizeData)
+                                val consumed = e.changes.any { it.isConsumed }
+                                if (consumed) continue
+                                when (e.type) {
+                                    PointerEventType.Move -> {
+                                        // `eventSquare` might be `null` when the mouse enters the "border" around the pitch.
+                                        // We want to filter that out
+                                        if (eventSquare != null) pointerBus.notifyMove(eventSquare)
+                                    }
+                                    PointerEventType.Enter -> if (eventSquare != null) pointerBus.notifyEnterField(eventSquare)
+                                    PointerEventType.Exit -> {
+                                        pointerBus.notifyExitPitch()
+                                        vm.triggerHoverExit()
+                                    }
+                                    PointerEventType.Press -> if (!consumed && eventSquare != null) pointerBus.notifyPressSquare(eventSquare, !e.buttons.isSecondaryPressed)
+                                    PointerEventType.Release -> if (!consumed) pointerBus.notifyReleaseSquare(eventSquare)
+                                }
+                            }
+                        }
+                    }
+                ,
+                widthPx = localPitch.size.totalPitchWidthPx,
+                heightPx = localPitch.size.totalPitchHeightPx
+            ) {
+                // Wrap content in a box to make it easier to lay them out normally.
+                Box(modifier = Modifier.fillMaxSize()) {
+                    BackgroundImageLayer(pitch)
+                    // Pitch markers have to account for padding itself since the border is part of it.
+                    if (pitch.drawPitchMarkers) {
+                        PitchMarkerLayer(
+                            rules = vm.rules,
+                            pitchDataSize = pitchDataSize,
+                            brushWidth = borderBrushSize,
+                            chalkAlpha = 0.6f
+                        )
+                    }
+
+                    // All other content is assumed to be "inside" the border.
+                    // TODO This might not be true, players and ball can leave this area
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(borderBrushSize)
+                        .onGloballyPositioned { coordinates ->
+                            vm.updatePitchOffSet(coordinates, borderBrushSizePx)
+                        }
+                    ) {
+                        PitchActionsAndUnderlaysLayers(vm)
+                        PitchHoverUnderlayLayer(vm)
+                        WeatherEffectsLayer(vm)
+                        RoomFeaturesLayer(vm)
+                        TrapdoorsLayer(vm)
+                        PlayerLayer(vm)
+                        BallLayer(vm)
+                        DirectionArrowsLayer(vm)
+                        AnimationLayer(vm)
+                        ContextMenuLayer(vm)
+                        ActionWheelLayer(vm)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Composable that draws a pixel-perfect box with the given width and height.
+ * This is used to draw the pitch, so we avoid sub-pixel rendering artifacts
+ * due to rounding in the individual squares.
+ */
+@Composable
+private fun ExactPixelBox(modifier: Modifier, widthPx: Int, heightPx: Int, content: @Composable () -> Unit) {
+    Layout(
+        content = content,
+        modifier = modifier,
+    ) { measurables, constraints  ->
+        val placeables = measurables.map {
+            it.measure(Constraints.fixed(widthPx, heightPx))
+        }
+        layout(widthPx, heightPx) {
+            placeables.forEach {
+                it.place(0, 0)
+            }
+        }
+    }
+}
+
+
+/**
+ * Modifier that sets the size and position of the Composable so it matches a square on the pitch.
+ */
+fun Modifier.Companion.jervisSquare(pitchSizeData: PitchSizeData, square: PitchCoordinate): Modifier {
+    return this
+        .pixelSize(pitchSizeData.squareSize)
+        .offset {
+            IntOffset(
+                x = square.x * pitchSizeData.squareSize.width,
+                y = square.y * pitchSizeData.squareSize.height
+            )
+        }
+}
+
+/**
+ * Composable that handle drawing the individual squares on the pitch and callback
+ * to the parent to fill them out.
+ */
+@Composable
+fun PitchSquares(
+    vm: PitchViewModel,
+    content: @Composable (modifier: Modifier, x: Int, y: Int) -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+    ) {
+        repeat(vm.height) { height: Int ->
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+            ) {
+                repeat(vm.width) { width ->
+                    val boxModifier = Modifier
+                        .fillMaxSize()
+                        // Do not set `aspectRatio` as it will resolve in small rounding errors
+                        // that make squares not line up perfectly. Instead, rely on the container
+                        // having the correct aspect ratio. This should cause all squares to be
+                        // as close to uniform as possible.
+                        .weight(1f)
+                        .onGloballyPositioned { coordinates ->
+                            vm.updateOffset(PitchCoordinate(width, height), coordinates)
+                        }
+                    content(boxModifier, width, height)
+                }
+            }
+        }
+    }
+}
+
+//@Composable
+//fun FieldSquaresLayer(
+//    vm: FieldViewModel,
+//    fieldData: Map<FieldCoordinate, Pair<UiFieldSquare, UiPlayer?>>,
+//    fieldSizeData: FieldSizeData,
+//) {
+//    // Players/Ball
+//    FieldSquares(vm) { modifier, x, y ->
+//        val squareData: UiFieldSquare? = fieldData[FieldCoordinate(x, y)]?.first
+//        val playerData: UiPlayer? = fieldData[FieldCoordinate(x, y)]?.second
+//        FieldSquare(
+//            modifier,
+//            x,
+//            y,
+//            vm,
+//            squareData ?: UiFieldSquare(FieldSquare(-1, -1)),
+//            playerData,
+//            null,  // TODO We need to also pass that in here
+//        )
+//    }
+//}
+
+
+
+
+//@OptIn(ExperimentalComposeUiApi::class)
+//@Composable
+//private fun FieldSquare(
+//    boxModifier: Modifier,
+//    width: Int,
+//    height: Int,
+//    vm: FieldViewModel,
+//    square: UiFieldSquare,
+//    player: UiPlayer? = null,
+//    playerTransientData: UiPlayerTransientData? = null,
+//) {
+//    val bgColor = when {
+//        square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
+//        square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
+//        player?.isSelectable == true -> Color.Transparent
+//        square.onSelected != null -> JervisTheme.availableActionBackground // Fallback for active squares
+//        else -> Color.Transparent
+//    }
+//
+//    val modifier = boxModifier
+//        .fillMaxSize()
+//        .background(color = bgColor)
+//        .onPointerEvent(PointerEventType.Enter) {
+//            vm.triggerHoverEnter(FieldCoordinate(width, height))
+//// Prototype: Dashed box around "active" square.
+////        }.applyIf(square.showContextMenu.value) {
+////            this.drawBehind {
+////                val strokeWidth = 2.dp.toPx()
+////                val cornerRadius = 8.dp.toPx()
+////                val dashLength = 4.dp.toPx()
+////                val gapLength  = 2.dp.toPx()
+////                val effect = PathEffect.dashPathEffect(floatArrayOf(dashLength, gapLength), 0f)
+////                val inset = strokeWidth / 2f
+////                val topLeft = Offset(inset, inset)
+////                val size = Size(size.width - strokeWidth, size.height - strokeWidth)
+////
+////                drawRoundRect(
+////                    color = Color.White.copy(alpha = 0.8f),
+////                    topLeft = topLeft,
+////                    size = size,
+////                    cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+////                    style = Stroke(width = strokeWidth, pathEffect = effect)
+////                )
+////            }
+//        }
+//
+//    val boxWrapperModifier =
+//        if (square.contextMenuOptions.isNotEmpty() || square.onSelected != null || vm.uiEphemeralData.squares[square.model.coordinates]?.hoverAction != null) {
+//            modifier.clickable {
+//                square.showContextMenu = !square.showContextMenu
+//                vm.uiEphemeralData.squares[square.model.coordinates]?.let {
+//                    it.hoverAction?.invoke()
+//                } ?: square.onSelected?.invoke()
+//                ?: error("Missing onSelected action: ${square.model.coordinates}")
+//            }
+//        } else {
+//            modifier
+//        }
+//
+//    Box(modifier = boxWrapperModifier) {
+//        if (square.showContextMenu && !square.useActionWheel) {
+//            ContextPopupMenu(
+//                hidePopup = { dismissed ->
+//                    square.showContextMenu = false
+//                    if (dismissed) {
+//                        square.onMenuHidden?.invoke()
+//                    }
+//                },
+//                commands = square.contextMenuOptions,
+//            )
+//        }
+//        if (square.isBallOnGround || square.isBallExiting) {
+//            "".any { it.isLetterOrDigit()}
+//            Image(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(4.dp)
+//                    .background(color = if (square.isBallExiting) Color.Red else Color.Transparent),
+//                alignment = Alignment.Center,
+//                contentScale = ContentScale.FillBounds,
+//                bitmap = IconFactory.getBall(),
+//                contentDescription = "",
+//            )
+//        } else if (vm.uiEphemeralData.squares[square.model.coordinates]?.futureMoveValue != null && square.isEmpty()) {
+//            val moveValue = vm.uiEphemeralData.squares[square.model.coordinates]?.futureMoveValue?.toString() ?: ""
+//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                Text(
+//                    text = moveValue,
+//                    style = JervisTheme.fieldSquareTextStyle.copy(
+//                        color = Color.White.copy(0.75f)
+//                    ),
+//                )
+//            }
+//        } else if (square.moveUsed != null) {
+//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                Text(
+//                    text = square.moveUsed.toString(),
+//                    style = JervisTheme.fieldSquareTextStyle.copy(
+//                        color = Color.Cyan.copy(0.75f)
+//                    )
+//                )
+//            }
+//        }
+//
+//        player?.let {
+//            Player(
+//                boxModifier,
+//                player,
+//                playerTransientData,
+//                true,
+//                square.showContextMenu // && !square.useActionWheel
+//            )
+//        }
+//        square.directionSelected?.let {
+//            DictionImage(it, interactive = false)
+//        }
+//        square.selectableDirection?.let {
+//            DictionImage(it, interactive = true)
+//        }
+//        if (square.dice != 0) {
+//            BlockDiceIndicatorImage(square.dice)
+//        }
+//        if (square.isBlocked) {
+//            PlayerBlockedIndicator()
+//        }
+//    }
+//}
+
+

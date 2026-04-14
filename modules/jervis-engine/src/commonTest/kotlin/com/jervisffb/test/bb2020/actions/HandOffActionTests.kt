@@ -10,7 +10,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.utils.singleInstanceOf
@@ -193,7 +193,7 @@ class HandOffActionTests: JervisGameBB2020Test() {
         )
         assertFalse(awayTeam["A7".playerId].hasBall())
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15, 0), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(15, 0), state.singleBall().coordinates)
     }
 
     @Test

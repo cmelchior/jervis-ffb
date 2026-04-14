@@ -1,6 +1,6 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -8,10 +8,10 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
-import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
+import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnPitch
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.defaultPregame
@@ -256,7 +256,7 @@ class SetupTests: JervisGameBB2020Test() {
 
     @Test
     fun invalid_missingPlayers() {
-        // Only 10 players on the field with 12 being available
+        // Only 10 players on the pitch with 12 being available
         state.homeTeam.apply {
             moveTo(this[1.playerNo], 12, 4)
             moveTo(this[2.playerNo], 12, 5)
@@ -271,12 +271,12 @@ class SetupTests: JervisGameBB2020Test() {
         }
         val brokenRules = rules.isSetupValid(state, state.homeTeam)
         assertEquals(1, brokenRules.size)
-        assertIs<WrongAmountOfPlayersOnField>(brokenRules.single())
+        assertIs<WrongAmountOfPlayersOnPitch>(brokenRules.single())
     }
 
     @Test
-    fun invalid_tooManyPlayersOnField() {
-        // 12 players on field, only 11 allowed
+    fun invalid_tooManyPlayersOnPitch() {
+        // 12 players on pitch, only 11 allowed
         state.homeTeam.apply {
             moveTo(this[1.playerNo], 12, 4)
             moveTo(this[2.playerNo], 12, 5)
@@ -293,7 +293,7 @@ class SetupTests: JervisGameBB2020Test() {
         }
         val brokenRules = rules.isSetupValid(state, state.homeTeam)
         assertEquals(1, brokenRules.size)
-        assertIs<WrongAmountOfPlayersOnField>(brokenRules.single())
+        assertIs<WrongAmountOfPlayersOnPitch>(brokenRules.single())
     }
 
     // Test for bug:
@@ -303,18 +303,18 @@ class SetupTests: JervisGameBB2020Test() {
     // assume the actions are valid.
     @Test
     fun placePlayerOnTopOfOtherPlayer() {
-        val targetSquare = FieldCoordinate(12, 4)
+        val targetSquare = PitchCoordinate(12, 4)
         controller.rollForward(
             *setupPlayer("H1".playerId, targetSquare),
             PlayerSelected("H2".playerId)
         )
         assertFailsWith<InvalidActionException> {
-            controller.handleAction(FieldSquareSelected(targetSquare))
+            controller.handleAction(PitchSquareSelected(targetSquare))
         }
     }
 
     private fun moveTo(player: Player, x: Int, y: Int) {
         SetPlayerState(player, PlayerState.STANDING).execute(state)
-        SetPlayerLocation(player, FieldCoordinate(x, y)).execute(state)
+        SetPlayerLocation(player, PitchCoordinate(x, y)).execute(state)
     }
 }

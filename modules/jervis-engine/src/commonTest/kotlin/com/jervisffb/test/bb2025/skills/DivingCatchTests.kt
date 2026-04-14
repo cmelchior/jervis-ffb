@@ -3,8 +3,8 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayersSelected
@@ -14,7 +14,7 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.DivingCatch
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -57,7 +57,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             *catch(6.d6),
         )
@@ -73,13 +73,13 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             *catch(1.d6),
             1.d8 // Bounce
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(12, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -87,7 +87,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
     fun catchThrowInInAdjacentSquare() {
         val catcher = awayTeam["A7".playerId]
         catcher.addSkill(SkillType.DIVING_CATCH)
-        leaveFieldAt(25, 1)
+        leavePitchAt(25, 1)
         controller.rollForward(
             2.d3, // Direction
             DiceRollResults(4.d6, 6.d6), // Distance
@@ -110,7 +110,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 0),
+            PitchSquareSelected(15, 0),
             *throwBall(6.d6),
             PlayersSelected(listOf(catcher.id)),
             PlayerSelected(catcher),
@@ -130,7 +130,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(3.d6), // Throw Quick pass, needs 4+
             DiceRollResults(2.d8, 8.d8, 1.d8), // Scatter to empty square
             PlayersSelected(listOf(catcher.id)),
@@ -150,7 +150,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(3, 7), // H11 stands here
+            PitchSquareSelected(3, 7), // H11 stands here
             *throwBall(6.d6),
             DiceRollResults(2.d8, 5.d8, 7.d8), // Lands at [4,7]
             PlayersSelected(listOf("H11".playerId)),
@@ -170,7 +170,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             Confirm, // Use Diving Catch
             *catch(1.d6),
@@ -194,7 +194,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             *throwBall(6.d6),
             Confirm, // Use Diving Catch
             3.d6, // 3 - 2 + 1
@@ -214,7 +214,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 4),
+            PitchSquareSelected(13, 4),
             *throwBall(6.d6),
             PlayersSelected(listOf("H1".playerId)),
             PlayersSelected(listOf("A1".playerId)),
@@ -237,7 +237,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 4),
+            PitchSquareSelected(13, 4),
             *throwBall(6.d6),
         )
         controller.rollForward(
@@ -257,7 +257,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(13, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -272,7 +272,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 4),
+            PitchSquareSelected(13, 4),
             *throwBall(6.d6),
         )
         assertEquals(homeTeam, controller.getAvailableActions().team)
@@ -293,7 +293,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(FieldCoordinate(13, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(13, 3), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
@@ -327,7 +327,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(14, 4),
+                placeKick = PitchSquareSelected(14, 4),
                 deviate = DiceRollResults(4.d8, 1.d6),
                 bounce = null
             ),
@@ -339,27 +339,27 @@ class DivingCatchTests: JervisGameBB2025Test() {
         assertTrue(catcher.hasBall())
     }
 
-    // Manipulate game flow so the ball leaves the field after bouncing from a throw.
-    // This method assumes the exit field is empty.
-    private fun leaveFieldAt(x: Int, y: Int) {
+    // Manipulate game flow so the ball leaves the pitch after bouncing from a throw.
+    // This method assumes the exit square is empty.
+    private fun leavePitchAt(x: Int, y: Int) {
         val bounceDirection = when {
             y == 0 -> 2.d8
-            y == rules.fieldHeight - 1 -> 7.d8
+            y == rules.pitchHeight - 1 -> 7.d8
             x == 0 -> 4.d8
-            x == rules.fieldWidth - 1 -> 5.d8
+            x == rules.pitchWidth - 1 -> 5.d8
             else -> error("Unsupported coordinate: ($x, $y)")
         }
 
         // For this we need to use the home team since they can reach the ball
         if (x == 0) {
-            SetBallLocation(state.singleBall(), FieldCoordinate(x, y)).execute(state)
+            SetBallLocation(state.singleBall(), PitchCoordinate(x, y)).execute(state)
             controller.rollForward(
                 EndTurn,
                 PlayerSelected("H11".playerId),
                 PlayerActionSelected(PlayerStandardActionType.MOVE),
                 SmartMoveTo(x, y),
                 *pickup(1.d6), // Fail pickup
-                1.d8, // Bounce out of field
+                1.d8, // Bounce out of pitch
             )
         } else {
             controller.rollForward(
@@ -368,7 +368,7 @@ class DivingCatchTests: JervisGameBB2025Test() {
                 *moveTo(17, 7),
                 *pickup(6.d6),
                 PassTypeSelected(PassType.STANDARD),
-                FieldSquareSelected(x, y), // Throw into the corner
+                PitchSquareSelected(x, y), // Throw into the corner
                 *throwBall(6.d6),
                 bounceDirection,
             )

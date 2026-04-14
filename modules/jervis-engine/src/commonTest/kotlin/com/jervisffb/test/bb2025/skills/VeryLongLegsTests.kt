@@ -3,11 +3,11 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d6
@@ -68,7 +68,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             4.d6, // Intercept (with "-6 + 2" modifier) - Will fail
@@ -115,7 +115,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
         )
@@ -136,7 +136,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             Confirm, // Use Very Long Legs
             3.d6, // -2 Marked, +1 Leap
         )
@@ -160,7 +160,7 @@ class VeryLongLegsTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             Confirm, // Use Very Long Legs
             2.d6, // -2 Marked (ignored)
         )

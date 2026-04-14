@@ -40,7 +40,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
- * Resolve a Pickup, i.e., when a player moves into a field where the ball is
+ * Resolve a Pickup, i.e., when a player moves into a square where the ball is
  * placed. This procedure requires that the caller has set a current ball.
  *
  * See page 46 in the BB2020 rulebook.
@@ -71,7 +71,7 @@ object Pickup : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         return if (state.getContextOrNull<PickupRollContext>() == null) {
             val ball = state.currentBall()
-            val pickupPlayer = state.field[ball.coordinates].player!!
+            val pickupPlayer = state.pitch[ball.coordinates].player!!
             val rollContext = PickupRollContext(pickupPlayer, ball)
             AddContext(rollContext)
         } else {
@@ -83,7 +83,7 @@ object Pickup : Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val ball = state.currentBall()
-        val playerOnBall = state.field[ball.coordinates].player
+        val playerOnBall = state.pitch[ball.coordinates].player
         if (ball.state != BallState.ON_GROUND) {
             throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
         }

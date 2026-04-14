@@ -314,7 +314,7 @@ object Catch : Procedure() {
                 if (it.isOutOfBounds(rules)) {
                     false
                 } else {
-                    state.field[it].player?.let { player -> rules.canCatch(player) }
+                    state.pitch[it].player?.let { player -> rules.canCatch(player) }
                 }
             } ?: false
             return when {
@@ -360,7 +360,7 @@ object Catch : Procedure() {
                 SetBallState.scattered(ball),
                 SetBallLocation(ball, landsAt),
                 AddContext(CatchContext(
-                    state.field[landsAt].player!!,
+                    state.pitch[landsAt].player!!,
                     ball
                 ))
             )

@@ -130,7 +130,7 @@ object BadHabits : Procedure() {
 
     private fun getEligiblePlayers(context: PrayersToNuffleRollContext, rules: Rules): List<Player> {
         return context.team.otherTeam().filter {
-            (it.state == PlayerState.RESERVE || it.location.isOnField(rules)) && !it.hasSkill(SkillType.LONER)
+            (it.state == PlayerState.RESERVE || it.location.isOnPitch(rules)) && !it.hasSkill(SkillType.LONER)
         }
     }
 

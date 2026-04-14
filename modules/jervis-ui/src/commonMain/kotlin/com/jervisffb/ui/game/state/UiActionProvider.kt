@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -55,7 +55,7 @@ abstract class UiActionProvider {
     abstract fun actionHandled(team: Team?, action: GameAction)
     // Called after setting up the UI and before starting the game loop.
     // This allows Compose and UI controller to share data that cross across a lot of responsibilities.
-    abstract fun updateSharedData(sharedData: LocalFieldDataWrapper)
+    abstract fun updateSharedData(sharedData: LocalPitchDataWrapper)
     // Init method called when the ActionProvider is attached to a UiGameController.
     // We have this to break the cyclic dependency between the ActionProvider and UiGameController, and it
     // allows the UiGameController to provide additional context or configuration for the ActionProvider.
@@ -64,7 +64,7 @@ abstract class UiActionProvider {
     // E.g. automated or queued actions.
     abstract suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest)
     // Hook for the UI to set up the UI so the next action can be selected.
-    // E.g. enable onClick listeners on Players, highlight certain aspects of the field or show Dialogs.
+    // E.g. enable onClick listeners on Players, highlight certain aspects of the pitch or show Dialogs.
     abstract fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator)
     // Hook to manipulate the UI after an action has been selected
     abstract fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator)

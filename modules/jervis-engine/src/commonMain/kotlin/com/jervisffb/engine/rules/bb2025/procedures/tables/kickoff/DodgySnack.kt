@@ -107,11 +107,11 @@ object DodgySnack : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 // The receiving team did not need to select a player, or no players from the
-                // receiving team are on the field (very unlikely).
+                // receiving team are on the pitch (very unlikely).
                 Continue -> {
-                    val availablePlayers = state.receivingTeam.any { it.location.isOnField(rules) }
+                    val availablePlayers = state.receivingTeam.any { it.location.isOnPitch(rules) }
                     compositeCommandOf(
-                        if (!availablePlayers) ReportGameProgress("No players from ${state.receivingTeam.name} are on the field") else null,
+                        if (!availablePlayers) ReportGameProgress("No players from ${state.receivingTeam.name} are on the Pitch") else null,
                         GotoNode(SelectPlayerFromKickingTeam)
                     )
                 }
@@ -164,12 +164,12 @@ object DodgySnack : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 // Kicking team did not need to select a player, or we have a special situation
-                // where there was no players on the field.
+                // where there was no players on the pitch.
                 // Since all rolls have been made at this point, just exit
                 Continue -> {
-                    val availablePlayers = state.kickingTeam.any { it.location.isOnField(rules) }
+                    val availablePlayers = state.kickingTeam.any { it.location.isOnPitch(rules) }
                     compositeCommandOf(
-                        if (!availablePlayers) ReportGameProgress("No players from ${state.kickingTeam.name} are on the field") else null,
+                        if (!availablePlayers) ReportGameProgress("No players from ${state.kickingTeam.name} are on the Pitch") else null,
                         ExitProcedure()
                     )
                 }
@@ -210,7 +210,7 @@ object DodgySnack : Procedure() {
 
     private fun selectFromTeam(team: Team, rules: Rules): List<GameActionDescriptor> {
         return team
-            .filter { it.location.isOnField(rules) }
+            .filter { it.location.isOnPitch(rules) }
             .let { players ->
                 if (players.isNotEmpty()) {
                     listOf(

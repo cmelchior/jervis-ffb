@@ -5,12 +5,12 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
@@ -140,19 +140,19 @@ object SolidDefense : Procedure() {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val freeFields: List<TargetSquare> =
-                state.field
+                state.pitch
                     .filter {rules.isInSetupArea(state.kickingTeam, it) }
                     .filter { it.isUnoccupied() }
                     .map { TargetSquare.setup(it.coordinates) }
 
             val playerCoordinates = context.currentPlayer!!.coordinates
             return listOf(
-                SelectFieldLocation(freeFields + TargetSquare.setup(playerCoordinates))
+                SelectPitchLocation(freeFields + TargetSquare.setup(playerCoordinates))
             )
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castAction<FieldSquareSelected>(action) { squareSelected ->
+            return castAction<PitchSquareSelected>(action) { squareSelected ->
                 when (state.kickingTeam.isHomeTeam()) {
                     true -> if (squareSelected.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
                     false -> if (squareSelected.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)

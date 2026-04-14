@@ -15,7 +15,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.SafePairOfHands
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -61,7 +61,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(12, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(12, 4), state.singleBall().coordinates)
     }
 
     @Test
@@ -87,7 +87,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23, 12), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(23, 12), state.singleBall().coordinates)
     }
 
     @Test
@@ -106,7 +106,7 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(11, 5), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(11, 5), state.singleBall().coordinates)
     }
 
     @Test
@@ -126,16 +126,16 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
             5.d8, // Bounce. No chance to use Safe Pair of Hands.
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(12, 5), ball.coordinates)
+        assertEquals(PitchCoordinate(12, 5), ball.coordinates)
         assertEquals(BallState.ON_GROUND, ball.state)
     }
 
     @Test
     fun doesNotWorkIfNoFreeTargetSquares() {
         awayTeam["A2".playerId].addSkill(SkillType.BLOCK)
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         SetBallState.carried(state.singleBall(), homeTeam["H2".playerId]).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
@@ -148,6 +148,6 @@ class SafePairOfHandsTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(10, 6), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(10, 6), state.singleBall().coordinates)
     }
 }

@@ -8,8 +8,8 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.SetBallState
@@ -21,7 +21,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.BB2025Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.bb2025.skills.Leader
@@ -90,7 +90,7 @@ class LeaderTests: JervisGameBB2025Test() {
         assertFalse(awayTeam.rerolls.any { it is LeaderTeamReroll })
         controller.rollForward(
             PlayerSelected(leader),
-            FieldSquareSelected(23, 7)
+            PitchSquareSelected(23, 7)
         )
         assertEquals(1, awayTeam.rerolls.count { it is LeaderTeamReroll })
         controller.rollForward(
@@ -341,11 +341,11 @@ class LeaderTests: JervisGameBB2025Test() {
         player1.extraSkills.clear()
 
         // Manipulate board-state, so a chain push is easily available
-        SetPlayerLocation(homeTeam["H6".playerId], FieldCoordinate(20, 0)).execute(state)
-        SetPlayerLocation(homeTeam["H7".playerId], FieldCoordinate(22, 0)).execute(state)
-        SetPlayerLocation(player2, FieldCoordinate(21, 0)).execute(state)
-        SetPlayerLocation(homeTeam["H8".playerId], FieldCoordinate(21, 1)).execute(state)
-        SetPlayerLocation(player1, FieldCoordinate(21, 2)).execute(state)
+        SetPlayerLocation(homeTeam["H6".playerId], PitchCoordinate(20, 0)).execute(state)
+        SetPlayerLocation(homeTeam["H7".playerId], PitchCoordinate(22, 0)).execute(state)
+        SetPlayerLocation(player2, PitchCoordinate(21, 0)).execute(state)
+        SetPlayerLocation(homeTeam["H8".playerId], PitchCoordinate(21, 1)).execute(state)
+        SetPlayerLocation(player1, PitchCoordinate(21, 2)).execute(state)
 
         assertTrue(awayTeam.rerolls.any { it is LeaderTeamReroll })
         controller.rollForward(
@@ -451,7 +451,7 @@ class LeaderTests: JervisGameBB2025Test() {
         )
         assertEquals(3, state.halfNo)
         assertEquals(1, state.awayTeam.turnMarker)
-        assertTrue(awayTeam.any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) })
+        assertTrue(awayTeam.any { it.location.isOnPitch(rules) && it.hasSkill(SkillType.LEADER) })
         assertFalse(awayTeam.rerolls.single { it is LeaderTeamReroll}.rerollUsed)
         assertTrue(awayTeam.rerolls.single { it is LeaderTeamReroll}.enabled)
     }
@@ -461,7 +461,7 @@ class LeaderTests: JervisGameBB2025Test() {
         assertFalse(awayTeam.rerolls.single { it is LeaderTeamReroll }.rerollUsed)
         assertTrue(awayTeam.rerolls.single { it is LeaderTeamReroll }.enabled)
 
-        // First we remove the leaders from the field an disable the Leader re-roll
+        // First we remove the leaders from the pitch and disable the Leader re-roll
         // Other tests verify this is ok
         awayTeam["A1".playerId].putInKnockedOut()
         awayTeam["A10".playerId].putInKnockedOut()
@@ -470,7 +470,7 @@ class LeaderTests: JervisGameBB2025Test() {
         // Then we make the Team score, triggering a new drive
         val scoringPlayer = awayTeam["A2".playerId]
         SetBallState.carried(state.singleBall(), scoringPlayer).execute(state)
-        SetPlayerLocation(scoringPlayer, FieldCoordinate(1, 1)).execute(state)
+        SetPlayerLocation(scoringPlayer, PitchCoordinate(1, 1)).execute(state)
 
         controller.rollForward(
             *activatePlayer(scoringPlayer, PlayerStandardActionType.MOVE),
@@ -507,16 +507,16 @@ class LeaderTests: JervisGameBB2025Test() {
         controller.rollForward(
             *teamSetup(
                 listOf(
-                    "A2".playerId to FieldCoordinate(13, 6),
-                    "A3".playerId to FieldCoordinate(13, 7),
-                    "A4".playerId to FieldCoordinate(13, 8),
-                    "A5".playerId to FieldCoordinate(13, 9),
-                    "A6".playerId to FieldCoordinate(14, 1),
-                    "A7".playerId to FieldCoordinate(15, 1),
-                    "A8".playerId to FieldCoordinate(15, 13),
-                    "A9".playerId to FieldCoordinate(14, 13),
-                    "A12".playerId to FieldCoordinate(16, 7),
-                    "A11".playerId to FieldCoordinate(22, 7),
+                    "A2".playerId to PitchCoordinate(13, 6),
+                    "A3".playerId to PitchCoordinate(13, 7),
+                    "A4".playerId to PitchCoordinate(13, 8),
+                    "A5".playerId to PitchCoordinate(13, 9),
+                    "A6".playerId to PitchCoordinate(14, 1),
+                    "A7".playerId to PitchCoordinate(15, 1),
+                    "A8".playerId to PitchCoordinate(15, 13),
+                    "A9".playerId to PitchCoordinate(14, 13),
+                    "A12".playerId to PitchCoordinate(16, 7),
+                    "A11".playerId to PitchCoordinate(22, 7),
                 )
             ),
             *defaultKickOffHomeTeam(),
@@ -541,16 +541,16 @@ class LeaderTests: JervisGameBB2025Test() {
         controller.rollForward(
             *teamSetup(
                 listOf(
-                    "A2".playerId to FieldCoordinate(13, 6),
-                    "A3".playerId to FieldCoordinate(13, 7),
-                    "A4".playerId to FieldCoordinate(13, 8),
-                    "A5".playerId to FieldCoordinate(13, 9),
-                    "A6".playerId to FieldCoordinate(14, 1),
-                    "A7".playerId to FieldCoordinate(15, 1),
-                    "A8".playerId to FieldCoordinate(15, 13),
-                    "A9".playerId to FieldCoordinate(14, 13),
-                    "A12".playerId to FieldCoordinate(16, 7),
-                    "A11".playerId to FieldCoordinate(22, 7),
+                    "A2".playerId to PitchCoordinate(13, 6),
+                    "A3".playerId to PitchCoordinate(13, 7),
+                    "A4".playerId to PitchCoordinate(13, 8),
+                    "A5".playerId to PitchCoordinate(13, 9),
+                    "A6".playerId to PitchCoordinate(14, 1),
+                    "A7".playerId to PitchCoordinate(15, 1),
+                    "A8".playerId to PitchCoordinate(15, 13),
+                    "A9".playerId to PitchCoordinate(14, 13),
+                    "A12".playerId to PitchCoordinate(16, 7),
+                    "A11".playerId to PitchCoordinate(22, 7),
                 )
             ),
             *defaultKickOffHomeTeam(),
@@ -559,7 +559,7 @@ class LeaderTests: JervisGameBB2025Test() {
         // Manipulate state, to make it east to score
         val scoringPlayer = awayTeam["A2".playerId]
         SetBallState.carried(state.singleBall(), scoringPlayer).execute(state)
-        SetPlayerLocation(scoringPlayer, FieldCoordinate(1, 1)).execute(state)
+        SetPlayerLocation(scoringPlayer, PitchCoordinate(1, 1)).execute(state)
         controller.rollForward(
             *activatePlayer(scoringPlayer, PlayerStandardActionType.MOVE),
             *moveTo(0, 0),

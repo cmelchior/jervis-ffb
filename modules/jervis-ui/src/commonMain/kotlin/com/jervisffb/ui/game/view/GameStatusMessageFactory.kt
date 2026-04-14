@@ -50,7 +50,7 @@ import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
-import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
@@ -446,19 +446,19 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Strong Arm"
                 }
             },
-            ResolveBallLandingOnField.InactiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
+            ResolveBallLandingOnPitch.InactiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
                 when {
                     (isActiveClient) -> "Select Players wanting to use Diving Catch"
                     else -> "Waiting for opponent to choose players to use Diving Catch"
                 }
             },
-            ResolveBallLandingOnField.ActiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
+            ResolveBallLandingOnPitch.ActiveTeamChoosesDivingCatchPlayers to { isActiveClient, _, state ->
                 when {
                     (isActiveClient) -> "Select Players wanting to use Diving Catch"
                     else -> "Waiting for opponent to choose players to use Diving Catch"
                 }
             },
-            ResolveBallLandingOnField.ChooseDivingCatchPlayer to { isActiveClient, _, state ->
+            ResolveBallLandingOnPitch.ChooseDivingCatchPlayer to { isActiveClient, _, state ->
                 when {
                     (isActiveClient) -> "Select player that should attempt to catch the ball using Diving Catch"
                     else -> "Waiting for opponent to choose player to perform a Diving Catch"

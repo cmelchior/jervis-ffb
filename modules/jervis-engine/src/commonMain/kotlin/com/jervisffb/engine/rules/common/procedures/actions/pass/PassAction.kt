@@ -34,7 +34,7 @@ import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
@@ -69,7 +69,7 @@ data class PassContext(
     val hasMoved: Boolean = false,
     // Target of the Pass in the current step. This means it will be updated when the ball scatters or deviates, but
     // not bounces after it lands.
-    val target: FieldCoordinate? = null,
+    val target: PitchCoordinate? = null,
     val range: Range? = null,
     val useNervesOfSteel: Boolean = false,
     val passingRoll: D6DieRoll? = null,
@@ -177,7 +177,7 @@ object PassAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their pass action.
             val moveContext = state.getContext<MoveContext>()
             val passContext = state.getContext<PassContext>()

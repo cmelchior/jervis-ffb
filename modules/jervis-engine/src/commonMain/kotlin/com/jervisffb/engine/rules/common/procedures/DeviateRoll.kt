@@ -20,16 +20,16 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
 data class DeviateRollContext(
-    val from: FieldCoordinate,
+    val from: PitchCoordinate,
     val deviateRoll: List<DieResult> = emptyList(),
-    val landsAt: FieldCoordinate? = null,
-    val outOfBoundsAt: FieldCoordinate? = null, // Will contain the last field before the ball went out of bounds.
+    val landsAt: PitchCoordinate? = null,
+    val outOfBoundsAt: PitchCoordinate? = null, // Will contain the last square before the ball went out of bounds.
 ): ProcedureContext
 
 /**
@@ -62,7 +62,7 @@ object DeviateRoll : Procedure() {
 
                 // Move the ball one at a time and check for out of bounds at every move
                 var currentLocation = context.from
-                var outOfBoundsAt: FieldCoordinate? = null
+                var outOfBoundsAt: PitchCoordinate? = null
                 for (i in 1..distance) {
                     val start = currentLocation
                     currentLocation = currentLocation.move(direction, 1)

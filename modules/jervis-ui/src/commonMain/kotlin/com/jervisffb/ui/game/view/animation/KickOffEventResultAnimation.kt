@@ -21,14 +21,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 
 @Composable
-fun KickOffEventResultAnimation(vm: FieldViewModel, animation: KickOffEventAnimation) {
+fun KickOffEventResultAnimation(vm: PitchViewModel, animation: KickOffEventAnimation) {
     var scale by remember { mutableStateOf(0f) }
     var alpha by remember { mutableStateOf(1f) }
     var translationY by remember { mutableStateOf(0f) }

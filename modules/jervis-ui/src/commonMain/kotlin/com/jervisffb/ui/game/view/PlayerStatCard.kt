@@ -73,7 +73,7 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Player Stat Card used on the Game Screen. They will be visible to the
- * left and right of the field.
+ * left and right of the pitch.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

@@ -2,7 +2,7 @@ package com.jervisffb.ui.game.dialogs
 
 import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Team
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 /**
@@ -30,7 +30,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 abstract class AbstractActionWheelViewModel(
     team: Team?,
     // Used to connect the view model to the UI
-    val sharedFieldData: LocalFieldDataWrapper,
+    val sharedPitchData: LocalPitchDataWrapper,
 ): UserInputDialog {
 
     // Whether clicking outside the wheel will hide it or not.

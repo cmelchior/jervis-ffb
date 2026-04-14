@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDirectionRoll
@@ -26,7 +26,7 @@ object SwoopDirectionWheelController : D3WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = SwoopDirectionRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SwoopDirectionRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<SwoopContext>().player.coordinates
     }
 

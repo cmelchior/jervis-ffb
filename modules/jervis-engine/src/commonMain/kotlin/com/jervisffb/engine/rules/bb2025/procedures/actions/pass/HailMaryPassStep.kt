@@ -5,10 +5,10 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -36,7 +36,7 @@ import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
 import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
@@ -68,23 +68,23 @@ object HailMaryPassStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
             val targetSquares = buildList {
-                for (x in 0 until state.rules.fieldWidth) {
-                    for (y in 0 until state.rules.fieldHeight) {
-                        val square = state.field[x, y]
+                for (x in 0 until state.rules.pitchWidth) {
+                    for (y in 0 until state.rules.pitchHeight) {
+                        val square = state.pitch[x, y]
                         if (square.player != context.thrower) {
                             add(TargetSquare.throwTarget(square.coordinates))
                         }
                     }
                 }
             }
-            return listOf(SelectFieldLocation(targetSquares), CancelWhenReady)
+            return listOf(SelectPitchLocation(targetSquares), CancelWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    castAction<FieldSquareSelected>(action) {
+                    castAction<PitchSquareSelected>(action) {
                         val context = state.getContext<PassContext>()
                         val distance = Range.LONG_BOMB
                         val ball = context.thrower.ball!!
@@ -250,7 +250,7 @@ object HailMaryPassStep: Procedure() {
      * to be caught.
      */
     object ResolveBounceOrCatch: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnPitch
 
         // TODO How to check for Star Player Points
         override fun onExitNode(state: Game, rules: Rules): Command {

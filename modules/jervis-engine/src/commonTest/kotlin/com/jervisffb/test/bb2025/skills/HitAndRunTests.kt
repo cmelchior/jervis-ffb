@@ -5,16 +5,16 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -54,7 +54,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Cancel, // Do not follow up
             Confirm, // Use Hit and Run
-            FieldSquareSelected(14, 6)
+            PitchSquareSelected(14, 6)
         )
         assertNull(state.activePlayer)
         attacker.assertCoordinates(14, 6)
@@ -73,7 +73,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Cancel, // Do not follow up
             Confirm, // Use Hit and Run
-            FieldSquareSelected(14, 6)
+            PitchSquareSelected(14, 6)
         )
         assertEquals(attacker, state.activePlayer)
         attacker.assertCoordinates(14, 6)
@@ -92,7 +92,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             PlayerSelected(homeTeam["H1".playerId]),
             DiceRollResults(1.d6, 2.d6),
             Confirm, // Use Hit and Run
-            FieldSquareSelected(14, 5)
+            PitchSquareSelected(14, 5)
         )
         assertNull(state.activePlayer)
         attacker.assertCoordinates(14, 5)
@@ -114,7 +114,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             BlockTypeSelected(BlockType.STAB),
             DiceRollResults(1.d6, 2.d6),
             Confirm, // Use Hit and Run
-            FieldSquareSelected(14, 4)
+            PitchSquareSelected(14, 4)
         )
         assertNull(state.activePlayer)
         attacker.assertCoordinates(14, 4)
@@ -125,7 +125,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.addSkill(SkillType.HIT_AND_RUN)
         val defender = homeTeam["H1".playerId]
-        SetPlayerLocation(defender, FieldCoordinate(12, 4)).execute(state)
+        SetPlayerLocation(defender, PitchCoordinate(12, 4)).execute(state)
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock(defender, 6.dblock),
@@ -136,7 +136,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
             1.d16, // Badly Hurt
             Cancel, // Do not use Apothecary
             Confirm, // Use Hit and Run
-            FieldSquareSelected(12, 4)
+            PitchSquareSelected(12, 4)
         )
         assertNull(state.activePlayer)
         attacker.assertCoordinates(12, 4)
@@ -154,12 +154,12 @@ class HitAndRunTests: JervisGameBB2025Test() {
             Cancel, // Do not follow up
             Confirm, // Use Hit and Run
         )
-        val targetSquares = controller.getAvailableActions().get<SelectFieldLocation>().squares.map { it.coordinate }.toSet()
+        val targetSquares = controller.getAvailableActions().get<SelectPitchLocation>().squares.map { it.coordinate }.toSet()
         val expectedSquares = setOf(
-            FieldCoordinate(13, 4),
-            FieldCoordinate(14, 4),
-            FieldCoordinate(14, 5),
-            FieldCoordinate(14, 6),
+            PitchCoordinate(13, 4),
+            PitchCoordinate(14, 4),
+            PitchCoordinate(14, 5),
+            PitchCoordinate(14, 6),
         )
         assertEquals(targetSquares.size, expectedSquares.size)
         targetSquares.forEach {
@@ -179,12 +179,12 @@ class HitAndRunTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Make Player Prone
             Confirm, // Use Hit and Run
         )
-        val targetSquares = controller.getAvailableActions().get<SelectFieldLocation>().squares.map { it.coordinate }.toSet()
+        val targetSquares = controller.getAvailableActions().get<SelectPitchLocation>().squares.map { it.coordinate }.toSet()
         val expectedSquares = setOf(
-            FieldCoordinate(13, 4),
-            FieldCoordinate(14, 4),
-            FieldCoordinate(14, 5),
-            FieldCoordinate(14, 6),
+            PitchCoordinate(13, 4),
+            PitchCoordinate(14, 4),
+            PitchCoordinate(14, 5),
+            PitchCoordinate(14, 6),
         )
         assertEquals(targetSquares.size, expectedSquares.size)
         targetSquares.forEach {
@@ -211,7 +211,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
         attacker.addSkill(SkillType.HIT_AND_RUN)
         val defender = homeTeam["H2".playerId]
         val blockingPlayer = homeTeam["H10".playerId]
-        SetPlayerLocation(blockingPlayer, FieldCoordinate(14, 6)).execute(state)
+        SetPlayerLocation(blockingPlayer, PitchCoordinate(14, 6)).execute(state)
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock(defender, 3.dblock),
@@ -229,7 +229,7 @@ class HitAndRunTests: JervisGameBB2025Test() {
         attacker.addSkill(SkillType.HIT_AND_RUN)
         val alonePlayer = awayTeam["A10".playerId]
         alonePlayer.makeDistracted()
-        SetPlayerLocation(alonePlayer, FieldCoordinate(12, 4)).execute(state)
+        SetPlayerLocation(alonePlayer, PitchCoordinate(12, 4)).execute(state)
         controller.rollForward(
             *activatePlayer(attacker, PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -237,10 +237,10 @@ class HitAndRunTests: JervisGameBB2025Test() {
             Confirm, // Follow up
             Confirm, // Use Hit and Run
         )
-        val targetSquares = controller.getAvailableActions().get<SelectFieldLocation>().squares.map { it.coordinate }.toSet()
+        val targetSquares = controller.getAvailableActions().get<SelectPitchLocation>().squares.map { it.coordinate }.toSet()
         val expectedSquares = setOf(
-            FieldCoordinate(11, 4),
-            FieldCoordinate(13, 4),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(13, 4),
         )
         assertEquals(targetSquares.size, expectedSquares.size)
         targetSquares.forEach {

@@ -14,11 +14,11 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d3
@@ -28,7 +28,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
@@ -88,46 +88,46 @@ fun defaultSetup(homeFirst: Boolean = true): Array<GameAction> {
 
 fun defaultHomeSetup(endSetup: Boolean = true): Array<GameAction> {
     val setup = buildList {
-        add("H1".playerId to FieldCoordinate(12, 5))
-        add("H2".playerId to FieldCoordinate(12, 6))
-        add("H3".playerId to FieldCoordinate(12, 7))
-        add("H4".playerId to FieldCoordinate(12, 8))
-        add("H5".playerId to FieldCoordinate(12, 9))
-        add("H6".playerId to FieldCoordinate(11, 1))
-        add("H7".playerId to FieldCoordinate(10, 1))
-        add("H8".playerId to FieldCoordinate(10, 13))
-        add("H9".playerId to FieldCoordinate(11, 13))
-        add("H10".playerId to  FieldCoordinate(9, 7))
-        add("H11".playerId to  FieldCoordinate(3, 7))
+        add("H1".playerId to PitchCoordinate(12, 5))
+        add("H2".playerId to PitchCoordinate(12, 6))
+        add("H3".playerId to PitchCoordinate(12, 7))
+        add("H4".playerId to PitchCoordinate(12, 8))
+        add("H5".playerId to PitchCoordinate(12, 9))
+        add("H6".playerId to PitchCoordinate(11, 1))
+        add("H7".playerId to PitchCoordinate(10, 1))
+        add("H8".playerId to PitchCoordinate(10, 13))
+        add("H9".playerId to PitchCoordinate(11, 13))
+        add("H10".playerId to  PitchCoordinate(9, 7))
+        add("H11".playerId to  PitchCoordinate(3, 7))
     }
     return teamSetup(setup, endSetup)
 }
 
 fun defaultAwaySetup(endSetup: Boolean = true): Array<GameAction> {
     val setup= listOf(
-        "A1".playerId to FieldCoordinate(13, 5),
-        "A2".playerId to FieldCoordinate(13, 6),
-        "A3".playerId to FieldCoordinate(13, 7),
-        "A4".playerId to FieldCoordinate(13, 8),
-        "A5".playerId to FieldCoordinate(13, 9),
-        "A6".playerId to FieldCoordinate(14, 1),
-        "A7".playerId to FieldCoordinate(15, 1),
-        "A8".playerId to FieldCoordinate(15, 13),
-        "A9".playerId to FieldCoordinate(14, 13),
-        "A10".playerId to FieldCoordinate(16, 7),
-        "A11".playerId to FieldCoordinate(22, 7),
+        "A1".playerId to PitchCoordinate(13, 5),
+        "A2".playerId to PitchCoordinate(13, 6),
+        "A3".playerId to PitchCoordinate(13, 7),
+        "A4".playerId to PitchCoordinate(13, 8),
+        "A5".playerId to PitchCoordinate(13, 9),
+        "A6".playerId to PitchCoordinate(14, 1),
+        "A7".playerId to PitchCoordinate(15, 1),
+        "A8".playerId to PitchCoordinate(15, 13),
+        "A9".playerId to PitchCoordinate(14, 13),
+        "A10".playerId to PitchCoordinate(16, 7),
+        "A11".playerId to PitchCoordinate(22, 7),
     )
     return teamSetup(setup, endSetup)
 }
 
-fun teamSetup(vararg setup: Pair<PlayerId, FieldCoordinate>): Array<GameAction> {
+fun teamSetup(vararg setup: Pair<PlayerId, PitchCoordinate>): Array<GameAction> {
     return teamSetup(setup.toList())
 }
 
-fun teamSetup(setup: List<Pair<PlayerId, FieldCoordinate>>, endSetup: Boolean = true): Array<GameAction> {
+fun teamSetup(setup: List<Pair<PlayerId, PitchCoordinate>>, endSetup: Boolean = true): Array<GameAction> {
     return setup.flatMap {
         val playerId = it.first
-        listOf(PlayerSelected(playerId), FieldSquareSelected(it.second))
+        listOf(PlayerSelected(playerId), PitchSquareSelected(it.second))
     }.let { list ->
         (list + if (endSetup) EndSetup else null).filterNotNull().toTypedArray()
     }
@@ -141,7 +141,7 @@ fun defaultKickOffEvent(): Array<GameAction?> = arrayOf(
 
 fun defaultKickOffHomeTeam(
     selectKicker: PlayerSelected? = PlayerSelected(PlayerId("H10")), // Select Kicker
-    placeKick: FieldSquareSelected = FieldSquareSelected(19, 7), // Center of Away Half,
+    placeKick: PitchSquareSelected = PitchSquareSelected(19, 7), // Center of Away Half,
     deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [18,7]
     kickoffEvent: Array<GameAction?> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
@@ -154,7 +154,7 @@ fun defaultKickOffHomeTeam(
 )
 
 fun defaultKickOffAwayTeam(
-    placeKick: FieldSquareSelected = FieldSquareSelected(6, 7), // Center of Away Half,
+    placeKick: PitchSquareSelected = PitchSquareSelected(6, 7), // Center of Away Half,
     deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [5,7]
     kickoffEvent: Array<GameAction?> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [4,7]
@@ -178,27 +178,27 @@ fun activatePlayer(player: Player, type: ActionType) = arrayOf(
 
 fun moveTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
-    FieldSquareSelected(FieldCoordinate(x, y)),
+    PitchSquareSelected(PitchCoordinate(x, y)),
 )
 
 fun jumpTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.JUMP),
-    FieldSquareSelected(FieldCoordinate(x, y)),
+    PitchSquareSelected(PitchCoordinate(x, y)),
 )
 
 fun leapTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.LEAP),
-    FieldSquareSelected(FieldCoordinate(x, y)),
+    PitchSquareSelected(PitchCoordinate(x, y)),
 )
 
 fun pogoTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.POGO),
-    FieldSquareSelected(FieldCoordinate(x, y)),
+    PitchSquareSelected(PitchCoordinate(x, y)),
 )
 
 fun rushTo(x: Int, y: Int, rushRoll: D6Result = 6.d6) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
-    FieldSquareSelected(FieldCoordinate(x, y)),
+    PitchSquareSelected(PitchCoordinate(x, y)),
     rushRoll,
     NoRerollSelected()
 )
@@ -213,10 +213,10 @@ fun SmartMoveTo(x: Int, y: Int): GameAction {
         val activePlayer = state.activePlayer
         val pathfinder = rules.pathFinder
         val start = activePlayer!!.coordinates
-        val end = FieldCoordinate(x, y)
+        val end = PitchCoordinate(x, y)
         val path = pathfinder.calculateShortestPath(state, start, end, activePlayer.movesLeft)
         val lastSquare = path.path.last()
-        if (lastSquare != FieldCoordinate(x, y)) {
+        if (lastSquare != PitchCoordinate(x, y)) {
             throw IllegalArgumentException(
                 "Cannot reach destination (${x}, ${y}). Last step was ($lastSquare.x}, ${lastSquare.y})."
             )
@@ -228,9 +228,9 @@ fun SmartMoveTo(x: Int, y: Int): GameAction {
     }
 }
 
-fun setupPlayer(id: PlayerId, field: FieldCoordinate) = arrayOf(
+fun setupPlayer(id: PlayerId, square: PitchCoordinate) = arrayOf(
     PlayerSelected(id),
-    FieldSquareSelected(field),
+    PitchSquareSelected(square),
 )
 
 fun skipTurns(count: Int) = Array(count) { EndTurn }

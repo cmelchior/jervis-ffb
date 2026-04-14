@@ -8,7 +8,7 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 /**
  * Set a square indicator for the square where a ball went out of bounds.
  */
-object BallExitStatusIndicator: FieldStatusIndicator {
+object BallExitStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,

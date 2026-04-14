@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.formatDiceRoll
@@ -9,7 +9,7 @@ import com.jervisffb.engine.utils.sum
 
 data class PogoRollContext(
     val player: Player,
-    val startingSquare: FieldCoordinate,
+    val startingSquare: PitchCoordinate,
     val modifiers: List<DiceModifier> = emptyList(),
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false

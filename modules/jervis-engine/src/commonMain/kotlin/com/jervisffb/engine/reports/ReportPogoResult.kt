@@ -1,9 +1,9 @@
 package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.model.context.PogoRollContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
-class ReportPogoResult(roll: PogoRollContext, landIn: FieldCoordinate) : LogEntry() {
+class ReportPogoResult(roll: PogoRollContext, landIn: PitchCoordinate) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
         val name = roll.player.name

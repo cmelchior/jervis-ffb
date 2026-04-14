@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2020.tables
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.SelectPlayer
@@ -16,7 +16,7 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
@@ -126,9 +126,9 @@ class KickOffEventTests: JervisGameBB2020Test() {
                     DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
-                    FieldSquareSelected(0, 5),
+                    PitchSquareSelected(0, 5),
                     PlayerSelected("H7".playerId),
-                    FieldSquareSelected(0, 6),
+                    PitchSquareSelected(0, 6),
                     EndSetup, // Will be valid
                 ),
             )
@@ -148,13 +148,13 @@ class KickOffEventTests: JervisGameBB2020Test() {
                     DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
-                    FieldSquareSelected(0, 0),
+                    PitchSquareSelected(0, 0),
                     PlayerSelected("H7".playerId),
-                    FieldSquareSelected(0, 1),
+                    PitchSquareSelected(0, 1),
                     PlayerSelected("H8".playerId),
-                    FieldSquareSelected(0, 2),
+                    PitchSquareSelected(0, 2),
                     PlayerSelected("H9".playerId),
-                    FieldSquareSelected(0, 3),
+                    PitchSquareSelected(0, 3),
                     EndSetup, // Will be invalid
                 ),
                 bounce = null
@@ -215,7 +215,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 6),
+                placeKick = PitchSquareSelected(13, 6),
                 deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [13,5] which is occupied
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick
@@ -238,7 +238,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 2.d6), // Move ball to [11,7], behind opponent LoS
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick
@@ -263,7 +263,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [11,7], behind opponent LoS
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick, cannot be used
@@ -414,7 +414,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(18, 3), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(18, 3), state.getBall().coordinates)
     }
 
     @Test
@@ -423,7 +423,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers sid
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -445,7 +445,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers side
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -457,7 +457,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(14, 5), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(14, 5), state.getBall().coordinates)
     }
 
     @Test
@@ -466,7 +466,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Deviate out of bounds with exit at [13, 0]
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -504,13 +504,13 @@ class KickOffEventTests: JervisGameBB2020Test() {
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))
-        assertEquals(8, controller.getAvailableActions().actionsCount) // Can move into all nearby fields
+        assertEquals(8, controller.getAvailableActions().actionsCount) // Can move into all nearby squares
         controller.rollForward(
-            FieldSquareSelected(14,0),
+            PitchSquareSelected(14,0),
             PlayerSelected("A7".playerId),
-            FieldSquareSelected(14,1),
+            PitchSquareSelected(14,1),
             PlayerSelected("A9".playerId),
-            FieldSquareSelected(14,14),
+            PitchSquareSelected(14,14),
             EndSetup
         )
         assertEquals(Bounce.RollDirection, controller.currentNode())
@@ -550,13 +550,13 @@ class KickOffEventTests: JervisGameBB2020Test() {
                     DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,0),
+                    PitchSquareSelected(14,0),
                     PlayerSelected("A7".playerId),
-                    FieldSquareSelected(14,1),
+                    PitchSquareSelected(14,1),
                     PlayerSelected("A9".playerId),
-                    FieldSquareSelected(14,14),
+                    PitchSquareSelected(14,14),
                     PlayerSelected("A8".playerId),
-                    FieldSquareSelected(14,13),
+                    PitchSquareSelected(14,13),
                 ),
             )
         )
@@ -564,7 +564,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun quickSnap_sameFieldDoesNotCountAsMoved() {
+    fun quickSnap_sameSquareDoesNotCountAsMoved() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -573,9 +573,9 @@ class KickOffEventTests: JervisGameBB2020Test() {
                     DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,1), // Same location
+                    PitchSquareSelected(14,1), // Same location
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,1), // Same location
+                    PitchSquareSelected(14,1), // Same location
                     EndSetup
                 )
             )
@@ -633,7 +633,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun officiousRef_noPlayersOnField() {
+    fun officiousRef_noPlayersOnPitch() {
         controller.rollForward(
             *defaultPregame(),
             *defaultHomeSetup(),
@@ -710,7 +710,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun pitchInvasion_noPlayersOnField() {
+    fun pitchInvasion_noPlayersOnPitch() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()

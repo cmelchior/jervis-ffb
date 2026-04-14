@@ -12,8 +12,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.game.view.Sidebar
-import com.jervisffb.ui.game.view.field.Field
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.view.pitch.Pitch
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import manual.dummies.TestDummy
 import org.junit.Test
@@ -25,13 +25,13 @@ class PlayerStatsCardTests {
     fun run() {
         val left = TestDummy.leftSidebar
         val right = TestDummy.rightSidebar
-        val field = TestDummy.fieldVieModel
+        val pitch = TestDummy.pitchViewModel
 
         application {
             val windowState = rememberWindowState()
             Window(onCloseRequest = ::exitApplication, state = windowState) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    PlayerStatsContent(left, right, field)
+                    PlayerStatsContent(left, right, pitch)
                 }
             }
         }
@@ -42,7 +42,7 @@ class PlayerStatsCardTests {
 private fun PlayerStatsContent(
     leftDugout: SidebarViewModel,
     rightDugout: SidebarViewModel,
-    field: FieldViewModel,
+    pitch: PitchViewModel,
 ) {
     Row(
         modifier =
@@ -52,7 +52,7 @@ private fun PlayerStatsContent(
         verticalAlignment = Alignment.Top,
     ) {
         Sidebar(leftDugout, Modifier.weight(152.42f))
-        Field(Modifier, field)
+        Pitch(Modifier, pitch)
         Sidebar(rightDugout, Modifier.weight(152.42f))
     }
 }

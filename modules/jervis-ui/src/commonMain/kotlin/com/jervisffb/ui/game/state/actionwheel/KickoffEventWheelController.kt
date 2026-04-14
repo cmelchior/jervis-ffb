@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 /**
@@ -34,13 +34,13 @@ object KickoffEventWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(TheKickOffEvent.RollForKickOffEvent)
 
     // There is no "real" center for this, so we place it, so just place it in the middle
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val diceButtons = listOf(
             // We want D6 on the "right" side, so it has to go first in the list

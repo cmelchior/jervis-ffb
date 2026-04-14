@@ -43,7 +43,7 @@ object IronMan : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val requestedAction = context.team
-                .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
+                .filter { it.state == PlayerState.RESERVE || it.location.isOnPitch(rules) }
                 .filter { !it.hasSkill(SkillType.LONER) }
                 .let {
                     when (it.isNotEmpty()) {

@@ -6,7 +6,7 @@ import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
  * Contains all the information needed to display a player in the dogout.
  */
 data class UiSidebarPlayer(
-    val player: UiFieldPlayer,
+    val player: UiPitchPlayer,
     val transientData: UiPlayerTransientData?,
 ) {
     val state get() = player.state

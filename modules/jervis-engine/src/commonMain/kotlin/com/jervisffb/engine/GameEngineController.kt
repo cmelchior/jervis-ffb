@@ -90,7 +90,7 @@ class GameEngineController(
 
     // If `true`, a log entry will be created in `state.logs` for the next legally available actions.
     // This is nice for debugging, but it is a relatively costly operation, especially when selecting
-    // field squares. So when running many games quickly, like during fuzz testing or AI training,
+    // pitch squares. So when running many games quickly, like during fuzz testing or AI training,
     // setting this to false can improve memory pressure and overall performance.
     var logAvailableActions: Boolean = true
     val logsEvents: Flow<ListEvent> = state.logChanges

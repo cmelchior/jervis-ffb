@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.QuickFoul
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -66,7 +66,7 @@ class QuickFoulTests: JervisGameBB2025Test() {
             *dodge(6.d6),
             *moveTo(13, 5)
         )
-        assertTrue(homeTeam["H1".playerId].location.isAdjacent(rules, FieldCoordinate(13, 5)))
+        assertTrue(homeTeam["H1".playerId].location.isAdjacent(rules, PitchCoordinate(13, 5)))
         assertFalse(controller.getAvailableActions().contains<SelectPlayer>())
     }
 

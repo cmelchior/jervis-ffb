@@ -2,8 +2,8 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
@@ -47,7 +47,7 @@ class ExtraArmsTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             Cancel, // Do not use Extra Arms
             2.d6, // Catch fails
@@ -65,7 +65,7 @@ class ExtraArmsTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             Confirm, // Do use Extra Arms
             1.d6, // Catch fails
@@ -110,7 +110,7 @@ class ExtraArmsTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)

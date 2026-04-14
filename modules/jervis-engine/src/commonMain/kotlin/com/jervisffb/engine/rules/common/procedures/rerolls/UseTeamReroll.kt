@@ -176,7 +176,7 @@ object UseTeamReroll : Procedure() {
     private fun getTeamCaptain(context: UseRerollContext): Player? {
         val rules = context.team.game.rules
         return context.team.firstOrNull { player ->
-            player.location.isOnField(rules) && player.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN)
+            player.location.isOnPitch(rules) && player.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN)
         }
     }
 }

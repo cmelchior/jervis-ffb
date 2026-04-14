@@ -2,7 +2,7 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -49,7 +49,7 @@ class BullseyeTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(11, 4), // Quick Pass - No modifiers
+            PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             *qualityRoll(5.d6),
             Confirm, // Use Bullseye
             *landingRoll(6.d6)
@@ -68,7 +68,7 @@ class BullseyeTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(8, 4), // Short Pass
+            PitchSquareSelected(8, 4), // Short Pass
             *qualityRoll(4.d6)
         )
         assertEquals(ThrowPlayerResult.SUBPAR, state.getContext<ThrowTeamMateContext>().qualityRollResult)
@@ -91,7 +91,7 @@ class BullseyeTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(15, 5),
+            PitchSquareSelected(15, 5),
             *qualityRoll(6.d6),
             Confirm, // Use Bullseye
             *landingRoll(6.d6),
@@ -114,7 +114,7 @@ class BullseyeTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             Confirm, // Use Bullseye
             DiceRollResults(1.d6, 1.d6), // AV Roll for player
@@ -139,7 +139,7 @@ class BullseyeTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(13, 6),
+            PitchSquareSelected(13, 6),
             *qualityRoll(6.d6),
             Confirm, // Use Bullseye
             DiceRollResults(1.d6, 1.d6), // AV Roll for player

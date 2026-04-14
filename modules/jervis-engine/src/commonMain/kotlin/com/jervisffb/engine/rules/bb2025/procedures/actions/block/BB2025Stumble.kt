@@ -124,7 +124,7 @@ object BB2025Stumble: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushedBack
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<StumbleContext>()
-            return if (context.defender.location.isOnField(rules) && context.isDefenderDown()) {
+            return if (context.defender.location.isOnPitch(rules) && context.isDefenderDown()) {
                 GotoNode(ResolvePlayerDown)
             } else {
                 ExitProcedure()
@@ -132,7 +132,7 @@ object BB2025Stumble: Procedure() {
         }
     }
 
-    // If the player is still on the field, resolve them going down.
+    // If the player is still on the pitch, resolve them going down.
     // Otherwise, it was resolved as part of the Chain Push
     object ResolvePlayerDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {

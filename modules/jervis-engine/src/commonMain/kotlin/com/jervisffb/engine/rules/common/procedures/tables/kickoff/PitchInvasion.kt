@@ -191,11 +191,11 @@ object PitchInvasion : Procedure() {
 
     private fun selectFromTeam(affectedPlayers: Int, team: Team, rules: Rules): List<GameActionDescriptor> {
         return team
-            .filter { it.location.isOnField(rules) }
+            .filter { it.location.isOnPitch(rules) }
             .let { players ->
                 if (players.isNotEmpty()) {
-                    // If we have fewer players on the field than we need to select, we reduce the requested size
-                    // to be equal to all players on the field.
+                    // If we have fewer players on the pitch than we need to select, we reduce the requested size
+                    // to be equal to all players on the pitch.
                     listOf(
                         SelectRandomPlayers(min(affectedPlayers, players.size), players.map { it.id })
                     )

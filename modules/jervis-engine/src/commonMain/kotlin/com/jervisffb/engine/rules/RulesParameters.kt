@@ -65,15 +65,15 @@ sealed interface RulesParameters {
     val turnsInExtraTime: Int
     val hasShootoutInExtraTime: Boolean
 
-    // Field (Defined as being horizontal with a home team on the right, away team on the left)
+    // Pitch (Defined as being horizontal with a home team on the right, away team on the left)
 
-    // Total width of the field
-    val fieldWidth: Int
-    // Total height of the field
-    val fieldHeight: Int
-    // Height of the Wide Zone at the top and bottom of the field
+    // Total width of the pitch
+    val pitchWidth: Int
+    // Total height of the pitch
+    val pitchHeight: Int
+    // Height of the Wide Zone at the top and bottom of the pitch
     val wideZone: Int
-    // Width of the End Zone at each end of the field where the ball is scored.
+    // Width of the End Zone at each end of the pitch where the ball is scored.
     val endZone: Int
     // X-coordinates for the line of scrimmage for the home team. It is zero-indexed.
     val lineOfScrimmageHome: Int
@@ -84,8 +84,8 @@ sealed interface RulesParameters {
     val playersRequiredOnLineOfScrimmage: Int
     // How many players are allowed in each wide zone during setup
     val maxPlayersInWideZone: Int
-    // Default max number of players on the field. Skills and effects might change this
-    val maxPlayersOnField: Int
+    // Default max number of players on the pitch. Skills and effects might change this
+    val maxPlayersOnPitch: Int
 
     // Stadium / Pitch / Ball rules / Match Events
     val stadium: StadiumRule
@@ -123,7 +123,7 @@ sealed interface RulesParameters {
     val moveRequiredForStandingUp: Int
     val secureTheBallTarget: Int
 
-    // Defines how the paths between locations on the field are calculated. This can be rules-specific,
+    // Defines how the paths between locations on the pitch are calculated. This can be rules-specific,
     // since it might involve the use of skills.
     val pathFinder: PathFinder
     // Behavior customization, .e.g. allow the rules to specify which Procedure should

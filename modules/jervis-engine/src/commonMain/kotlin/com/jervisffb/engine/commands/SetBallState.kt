@@ -4,18 +4,18 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
 class SetBallState private constructor(
     private val ball: Ball,
     private val ballState: BallState,
     private val carriedBy: Player? = null,
-    private val exitLocation: FieldCoordinate? = null,
+    private val exitLocation: PitchCoordinate? = null,
 ) : Command {
     private lateinit var originalState: BallState
     private var originalCarriedBy: Player? = null
-    private var originalExit: FieldCoordinate? = null
-    private var originalLocation: FieldCoordinate? = null
+    private var originalExit: PitchCoordinate? = null
+    private var originalLocation: PitchCoordinate? = null
     // We need to store a reference to this on `execute`, so we use the same
     // instance on `undo`.
     private var originalSetLocationCommand: SetBallLocation? = null
@@ -72,7 +72,7 @@ class SetBallState private constructor(
         )
 
         // Calling this will also update the ball location to OUT_OF_BOUNDS
-        fun outOfBounds(ball: Ball, exit: FieldCoordinate): Command = SetBallState(
+        fun outOfBounds(ball: Ball, exit: PitchCoordinate): Command = SetBallState(
             ball = ball,
             ballState = BallState.OUT_OF_BOUNDS,
             carriedBy = null,
@@ -107,7 +107,7 @@ class SetBallState private constructor(
             it.state = ballState
             it.carriedBy = carriedBy
             if (carriedBy != null) {
-                originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.UNKNOWN)
+                originalSetLocationCommand = SetBallLocation(it, PitchCoordinate.UNKNOWN)
                 originalSetLocationCommand?.execute(state)
             }
             it.outOfBoundsAt = exitLocation

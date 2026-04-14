@@ -7,11 +7,11 @@ import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.GameScreenModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 
@@ -39,14 +39,14 @@ object TestDummy {
         menuViewModel,
     )
     val uiController = UiGameController(TeamActionMode.ALL_TEAMS, controller, actionProvider, menuViewModel, emptyList())
-    val dummyFieldWrapper = LocalFieldDataWrapper(uiController)
-    val fieldVieModel by lazy { FieldViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
+    val dummyPitchWrapper = LocalPitchDataWrapper(uiController)
+    val pitchViewModel by lazy { PitchViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {
         SidebarViewModel(
             gameModel,
             menuViewModel,
             uiController,
-            dummyFieldWrapper,
+            dummyPitchWrapper,
             state.homeTeam,
             gameModel.hoverPlayerFlow,
         )
@@ -56,7 +56,7 @@ object TestDummy {
             gameModel,
             menuViewModel,
             uiController,
-            dummyFieldWrapper,
+            dummyPitchWrapper,
             state.awayTeam,
             gameModel.hoverPlayerFlow,
         )

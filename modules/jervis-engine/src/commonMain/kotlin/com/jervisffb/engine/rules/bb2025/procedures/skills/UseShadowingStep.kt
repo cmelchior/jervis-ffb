@@ -48,16 +48,16 @@ object UseShadowingStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MoveContext>()
             // This can happen if a Diving Tackle player went prone here. This will prevent Shadowing from being used.
-            val isStartingSquareEmpty = !state.field[context.startingSquare].isOccupied()
+            val isStartingSquareEmpty = !state.pitch[context.startingSquare].isOccupied()
             val eligiblePlayers = when (isStartingSquareEmpty) {
                 true -> {
                     context.startingSquare.getSurroundingCoordinates(rules)
                         .filter { coord ->
-                            state.field[coord].player
+                            state.pitch[coord].player
                                 ?.let { player -> player.team != context.player.team }
                                 ?: false
                         }
-                        .mapNotNull { state.field[it].player }
+                        .mapNotNull { state.pitch[it].player }
                         .filter { it.isSkillAvailable(SkillType.SHADOWING) }
                         .filterNot { it.hasStatusEffect(PlayerStatusEffectType.ROOTED) }
                 }
@@ -96,7 +96,7 @@ object UseShadowingStep: Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<ShadowingRollContext>()
             return if (context.isSuccess) {
-                val isBallInLocation = state.field[moveContext.startingSquare].balls.isNotEmpty()
+                val isBallInLocation = state.pitch[moveContext.startingSquare].balls.isNotEmpty()
                 val nextNode = when (isBallInLocation) {
                     true -> GotoNode(BounceBall)
                     false -> ExitProcedure()
@@ -120,7 +120,7 @@ object UseShadowingStep: Procedure() {
     object BounceBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val moveContext = state.getContext<MoveContext>()
-            val ball = state.field[moveContext.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${moveContext.startingSquare}")
+            val ball = state.pitch[moveContext.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${moveContext.startingSquare}")
             return SetCurrentBall(ball)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup

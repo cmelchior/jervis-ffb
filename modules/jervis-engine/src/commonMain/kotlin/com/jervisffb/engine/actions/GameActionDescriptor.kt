@@ -7,8 +7,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
@@ -204,7 +204,7 @@ data class SelectMoveType(
 }
 
 data class SelectDirection(
-    val origin: OnFieldLocation,
+    val origin: OnPitchLocation,
     val directions: List<Direction>
 ): GameActionDescriptor {
     override val size: Int = directions.size
@@ -221,7 +221,7 @@ data class TargetSquare(
     // Catch-all for Jump, Leap and Pogo
     val requiresJump: Boolean = false
 ) {
-    constructor(coordinate: FieldCoordinate, type: Type, requiresRush: Boolean = false, requiresDodge: Boolean = false, requiresJump: Boolean = false) : this(
+    constructor(coordinate: PitchCoordinate, type: Type, requiresRush: Boolean = false, requiresDodge: Boolean = false, requiresJump: Boolean = false) : this(
         coordinate.x,
         coordinate.y,
         type,
@@ -230,7 +230,7 @@ data class TargetSquare(
         requiresJump
     )
 
-    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
+    val coordinate: PitchCoordinate = PitchCoordinate(x, y)
 
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
@@ -248,35 +248,35 @@ data class TargetSquare(
     }
 
     companion object {
-        fun setup(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.SETUP)
-        fun direction(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.DIRECTION)
-        fun standUp(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.STAND_UP)
-        fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = TargetSquare(coordinate, Type.MOVE, needRush, needDodge)
-        fun rush(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.RUSH)
-        fun jump(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.JUMP, needRush, requiresDodge = false, requiresJump = true)
-        fun leap(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.LEAP, needRush, requiresDodge = false, requiresJump = true)
-        fun pogo(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.POGO, needRush, requiresDodge = false, requiresJump = true)
-        fun kick(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.KICK)
-        fun throwTarget(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.THROW_TARGET)
-        fun hitAndRun(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.HIT_AND_RUN)
+        fun setup(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.SETUP)
+        fun direction(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.DIRECTION)
+        fun standUp(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.STAND_UP)
+        fun move(coordinate: PitchCoordinate, needRush: Boolean, needDodge: Boolean) = TargetSquare(coordinate, Type.MOVE, needRush, needDodge)
+        fun rush(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.RUSH)
+        fun jump(coordinate: PitchCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.JUMP, needRush, requiresDodge = false, requiresJump = true)
+        fun leap(coordinate: PitchCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.LEAP, needRush, requiresDodge = false, requiresJump = true)
+        fun pogo(coordinate: PitchCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.POGO, needRush, requiresDodge = false, requiresJump = true)
+        fun kick(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.KICK)
+        fun throwTarget(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.THROW_TARGET)
+        fun hitAndRun(coordinate: PitchCoordinate) = TargetSquare(coordinate, Type.HIT_AND_RUN)
     }
 }
 
-data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDescriptor {
+data class SelectPitchLocation(val squares: List<TargetSquare>) : GameActionDescriptor {
     override val size: Int = squares.size
     init {
         if (squares.isEmpty()) {
-            throw IllegalArgumentException("SelectFieldLocation must contain at least one target")
+            throw IllegalArgumentException("SelectPitchLocation must contain at least one target")
         }
     }
-    override fun createRandom(random: Random): FieldSquareSelected {
+    override fun createRandom(random: Random): PitchSquareSelected {
         val target = squares.random(random).coordinate
-        return FieldSquareSelected(target)
+        return PitchSquareSelected(target)
     }
 
-    override fun createAll(): List<FieldSquareSelected> {
+    override fun createAll(): List<PitchSquareSelected> {
         return squares.map {
-            FieldSquareSelected(it.coordinate)
+            PitchSquareSelected(it.coordinate)
         }
     }
 }

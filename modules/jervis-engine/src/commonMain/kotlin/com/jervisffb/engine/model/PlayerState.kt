@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model
 
-// TODO Should we split this into DogoutState and FieldState?
+// TODO Should we split this into DogoutState and PitchState?
 /**
  * This enum describes the high-level state of players. This enum should only
  * contain "stable" states. [PlayerIntermediateState] contains states that

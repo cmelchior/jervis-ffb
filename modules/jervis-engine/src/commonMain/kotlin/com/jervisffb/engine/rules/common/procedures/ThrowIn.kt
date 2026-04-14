@@ -28,7 +28,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -38,7 +38,7 @@ import com.jervisffb.engine.utils.sum
 
 data class ThrowInContext(
     val ball: Ball,
-    val outOfBoundsAt: FieldCoordinate,
+    val outOfBoundsAt: PitchCoordinate,
     val directionRoll: D3Result? = null,
     val direction: Direction? = null,
     val distance: List<D6Result> = emptyList(),
@@ -106,7 +106,7 @@ object ThrowIn : Procedure() {
                 val direction = context.direction!!
                 val ball = context.ball
                 var ballPosition = context.outOfBoundsAt
-                var outOfBoundsAt: FieldCoordinate? = null
+                var outOfBoundsAt: PitchCoordinate? = null
 
 
                 // In BB2024, the first square is counted as 0, while in BB2025, it is counted as 1
@@ -137,7 +137,7 @@ object ThrowIn : Procedure() {
                         ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
                         UpdateContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
-                        GotoNode(ResolveLandOnField)
+                        GotoNode(ResolveLandOnPitch)
                     )
                 }
             }
@@ -160,8 +160,8 @@ object ThrowIn : Procedure() {
         }
     }
 
-    object ResolveLandOnField : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
+    object ResolveLandOnPitch : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnPitch
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

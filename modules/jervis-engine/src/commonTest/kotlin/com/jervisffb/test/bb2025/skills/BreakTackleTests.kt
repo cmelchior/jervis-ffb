@@ -2,10 +2,10 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -13,7 +13,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.bb2025.skills.BreakTackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -56,7 +56,7 @@ class BreakTackleTests: JervisGameBB2025Test() {
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(FieldCoordinate(14, 5)),
+            PitchSquareSelected(PitchCoordinate(14, 5)),
             DiceRollResults(3.d6), // Dodge roll, is not enough
             Confirm // Use Break Tackle
         )
@@ -81,7 +81,7 @@ class BreakTackleTests: JervisGameBB2025Test() {
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(FieldCoordinate(14, 5)),
+            PitchSquareSelected(PitchCoordinate(14, 5)),
             DiceRollResults(2.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
             TeamRerollSelected<RegularTeamReroll>(),

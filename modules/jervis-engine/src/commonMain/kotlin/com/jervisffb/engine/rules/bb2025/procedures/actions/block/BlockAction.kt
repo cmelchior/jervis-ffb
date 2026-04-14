@@ -116,7 +116,7 @@ object BlockAction : Procedure() {
             val attacker = state.activePlayer!!
             val eligibleDefenders: List<GameActionDescriptor> =
                 attacker.coordinates.getSurroundingCoordinates(rules)
-                    .mapNotNull { state.field[it].player }
+                    .mapNotNull { state.pitch[it].player }
                     .filter { it.state == PlayerState.STANDING }
                     .filter { it.team != attacker.team }
                     .let { listOf(SelectPlayer.fromPlayers(it)) }
@@ -223,7 +223,7 @@ object BlockAction : Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their blitz
             // TODO This approach to turn overs might not be correct, i.e. a touchdown
             // could have been scored after a Blitz

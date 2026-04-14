@@ -3,11 +3,11 @@ package com.jervisffb.test.bb2020.actions
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.actions.Undo
@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
@@ -85,7 +85,7 @@ class PassActionTests: JervisGameBB2020Test() {
             4.d6, // Pickup
             NoRerollSelected(),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(5.d6),
         )
@@ -100,7 +100,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(5.d6),
         )
@@ -118,7 +118,7 @@ class PassActionTests: JervisGameBB2020Test() {
             PassTypeSelected(PassType.STANDARD),
             Cancel, // Cancel pass action
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(5.d6),
         )
@@ -137,7 +137,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *rushTo(24, 7),
             *rushTo(25, 7),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(5.d6),
         )
@@ -153,7 +153,7 @@ class PassActionTests: JervisGameBB2020Test() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(5.d6),
         )
@@ -167,7 +167,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(1.d6),
             7.d8
@@ -185,11 +185,11 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         assertEquals(
             Range.QUICK_PASS,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(15, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(4.d6),
             *catch(6.d6),
         )
@@ -206,11 +206,11 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         assertEquals(
             Range.SHORT_PASS,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(15, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(5.d6),
             *catch(6.d6),
         )
@@ -227,11 +227,11 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         assertEquals(
             Range.LONG_PASS,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(15, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(6.d6),
         )
@@ -248,11 +248,11 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         assertEquals(
             Range.LONG_BOMB,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(15, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(15, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             *catch(6.d6),
         )
@@ -267,7 +267,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
         )
-        val targets = controller.getAvailableActions().singleInstanceOf<SelectFieldLocation>()
+        val targets = controller.getAvailableActions().singleInstanceOf<SelectPitchLocation>()
         assertTrue(targets.squares.all { it.type == TargetSquare.Type.THROW_TARGET })
         assertEquals(309, targets.squares.map { it.coordinate }.toSet().size)
     }
@@ -283,11 +283,11 @@ class PassActionTests: JervisGameBB2020Test() {
         assertTrue(rules.isMarked(awayTeam["A10".playerId]))
         assertEquals(
             Range.QUICK_PASS,
-            rules.rangeRuler.measure(awayTeam["A10".playerId], FieldCoordinate(14, 1))
+            rules.rangeRuler.measure(awayTeam["A10".playerId], PitchCoordinate(14, 1))
         )
         controller.rollForward(
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *pickup(4.d6), // Throw Quick pass (-1 marked modifier), needs 5+
         )
         assertEquals(BallState.SCATTERED, state.singleBall().state)
@@ -301,7 +301,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(4.d6), // Throw Quick pass, needs 4+
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
@@ -319,7 +319,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(3.d6), // Throw Quick pass, needs 4+
         )
         assertEquals(PassingType.INACCURATE, state.getContext<PassContext>().passingResult)
@@ -338,7 +338,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 5),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(2.d6), // Throw Short pass, needs 5+ (-1 modifier)
         )
         assertEquals(PassingType.WILDLY_INACCURATE, state.getContext<PassContext>().passingResult)
@@ -358,7 +358,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 5),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             *throwBall(1.d6), // Fumbbl pass
         )
         assertEquals(PassingType.FUMBLED, state.getContext<PassContext>().passingResult)
@@ -377,7 +377,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
         )
         val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
@@ -398,7 +398,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
         )
         val interceptors = controller.getAvailableActions().singleInstanceOf<SelectPlayer>().players
@@ -421,7 +421,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             2.d6, // Fail to deflect
@@ -438,7 +438,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             Cancel, // Do not deflect
             *catch(6.d6),
@@ -454,7 +454,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)
@@ -483,7 +483,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 10),
+            PitchSquareSelected(13, 10),
             *throwBall(4.d6), // Pass - Inaccurate
             DiceRollResults(4.d8, 2.d8, 5.d8) // Scatter back to the original target
         )
@@ -513,7 +513,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 10),
+            PitchSquareSelected(13, 10),
             *throwBall(2.d6), // Pass - Wildly inaccurate
             DiceRollResults(7.d8, 6.d6) // Deviate to [12, 9]
         )
@@ -545,7 +545,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 10),
+            PitchSquareSelected(13, 10),
             *throwBall(2.d6), // Pass - Wildly inaccurate
             DiceRollResults(7.d8, 6.d6) // Deviate to [12, 9]
         )
@@ -573,7 +573,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6)
         )
         controller.rollForward(
@@ -584,7 +584,7 @@ class PassActionTests: JervisGameBB2020Test() {
             2.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(9, 2), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(9, 2), state.singleBall().coordinates)
     }
 
     @Test
@@ -595,7 +595,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -615,7 +615,7 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             PlayerSelected("H2".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -637,12 +637,12 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(10, 0), // Empty square
+            PitchSquareSelected(10, 0), // Empty square
             *throwBall(3.d6), // Inaccurate pass
             DiceRollResults(2.d8, 2.d8, 2.d8),
         )
-        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(10, -1), state.getContext<PassContext>().target)
+        assertEquals(PitchCoordinate(10, -1), state.singleBall().coordinates)
         assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
 
         controller.rollForward(
@@ -656,7 +656,7 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         // Turnover
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(6, 1), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(6, 1), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -668,13 +668,13 @@ class PassActionTests: JervisGameBB2020Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(10, 0), // Empty square
+            PitchSquareSelected(10, 0), // Empty square
             *throwBall(3.d6), // Inaccurate pass
             DiceRollResults(2.d8, 2.d8, 2.d8),
         )
 
-        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate(10, -1), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(10, -1), state.getContext<PassContext>().target)
+        assertEquals(PitchCoordinate(10, -1), state.singleBall().coordinates)
         assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
 
         controller.rollForward(
@@ -690,7 +690,7 @@ class PassActionTests: JervisGameBB2020Test() {
         )
         // Turnover
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(8, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(8, 3), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }

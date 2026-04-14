@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -34,7 +34,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
 
     override val nodes: Set<Node> = setOf(Bounce.RollDirection)
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.currentBall().coordinates
     }
 
@@ -42,7 +42,7 @@ object BounceRollWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val buttons = RandomDirectionTemplate.getTemplateValues().map { (d8Option, label) ->
             DieButtonData(

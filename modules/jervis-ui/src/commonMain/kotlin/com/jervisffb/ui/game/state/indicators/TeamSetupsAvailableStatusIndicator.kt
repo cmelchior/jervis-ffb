@@ -19,7 +19,7 @@ import com.jervisffb.ui.menu.TeamActionMode
  *  sure this is the best place to add support for them yet. But having them deep
  *  inside the ViewModels was definitely annoying.
  */
-object TeamSetupsAvailableStatusIndicator: FieldStatusIndicator {
+object TeamSetupsAvailableStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,

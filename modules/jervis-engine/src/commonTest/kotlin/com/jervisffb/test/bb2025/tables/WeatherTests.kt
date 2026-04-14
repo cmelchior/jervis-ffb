@@ -1,12 +1,12 @@
 package com.jervisffb.test.bb2025.tables
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -18,7 +18,7 @@ import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
@@ -102,7 +102,7 @@ class WeatherTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(18, 7), // 1 Field away = Quick Pass
+            PitchSquareSelected(18, 7), // 1 square away = Quick Pass
             *throwBall(4.d6), // Roll for Accuracy roll (should be 5+ to be accurate)
         )
         val context = state.getContext<PassContext>()
@@ -192,8 +192,8 @@ class WeatherTests: JervisGameBB2025Test() {
         )
 
         // Check that no squares outside the valid range can be selected.
-        controller.getAvailableActions().actions.filterIsInstance<SelectFieldLocation>().first().squares.forEach {
-            val range = rules.rangeRuler.measure(FieldCoordinate(17, 7), it.coordinate)
+        controller.getAvailableActions().actions.filterIsInstance<SelectPitchLocation>().first().squares.forEach {
+            val range = rules.rangeRuler.measure(PitchCoordinate(17, 7), it.coordinate)
             if (range != Range.QUICK_PASS && range != Range.SHORT_PASS) {
                 fail("Invalid range: $range for ${it.coordinate}")
             }

@@ -18,7 +18,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.bb2025.skills.EyeGouge
@@ -68,8 +68,8 @@ class EyeGougeTests: JervisGameBB2025Test() {
 
     @Test
     fun applyOnPushbackIntoCrowd() {
-        SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(1, 14)).execute(state)
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(1, 13)).execute(state)
+        SetPlayerLocation(homeTeam[8.playerNo], PitchCoordinate(1, 14)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(1, 13)).execute(state)
         awayTeam["A1".playerId].apply {
             addSkill(SkillType.EYE_GOUGE)
         }
@@ -174,9 +174,9 @@ class EyeGougeTests: JervisGameBB2025Test() {
 
     @Test
     fun doesNotWorkOnChainPushes() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         homeTeam["H1".playerId].addStatusEffect(PlayerStatusEffect.eyeGouge())
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
@@ -185,9 +185,9 @@ class EyeGougeTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT), // 2nd push
             Confirm // Follow up
         )
-        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
-        assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PitchCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
     }
 
     @Test

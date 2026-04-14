@@ -37,7 +37,7 @@ import com.jervisffb.engine.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.multipleblock.MultipleBlockRerollDice
@@ -252,13 +252,13 @@ object MultipleBlockAction: Procedure() {
 
             val eligibleDefenders: List<GameActionDescriptor> =
                 attacker.coordinates.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isOccupied() }
-                    .filter { state.field[it].player!!.let { player ->
+                    .filter { state.pitch[it].isOccupied() }
+                    .filter { state.pitch[it].player!!.let { player ->
                         player.team != attacker.team &&
                             player != defender1 &&
                             player != defender2
                     }}
-                    .map { SelectPlayer(state.field[it].player!!) }
+                    .map { SelectPlayer(state.pitch[it].player!!) }
 
 
             val deselectCommands = listOf(
@@ -755,8 +755,8 @@ object MultipleBlockAction: Procedure() {
      * Returns `null` if no ball is found, if a ball is found, the [Command] to transition to the next
      * node is returned.
      */
-    private fun checkBouncingBallInSquare(state: Game, coordinates: FieldCoordinate): Command? {
-        val square = state.field[coordinates]
+    private fun checkBouncingBallInSquare(state: Game, coordinates: PitchCoordinate): Command? {
+        val square = state.pitch[coordinates]
         return if (square.balls.isNotEmpty()) {
             val ball = square.balls.single()
             if (ball.state == BallState.BOUNCING) {
@@ -775,11 +775,11 @@ object MultipleBlockAction: Procedure() {
     private fun resolveNextBallEventsInPushChain(context: PushContext): Command? {
         val state = context.firstPusher.team.game
 
-        // First run through squares we know are on the field
+        // First run through squares we know are on the pitch
         var selectedBall: Ball? = null
         for (step in 0..< context.pushChain.size) {
             val square = context.pushChain[step].to!!
-            val ball = state.field[square].balls.singleOrNull()
+            val ball = state.pitch[square].balls.singleOrNull()
             if (ball != null && ball.state == BallState.BOUNCING) {
                 selectedBall = ball
                 break
@@ -793,7 +793,7 @@ object MultipleBlockAction: Procedure() {
 
         // Finally check the attackers location (if the choose to follow up, otherwise they coul not have lost the ball)
         if (selectedBall == null && context.followsUp) {
-            val ball = state.field[context.pushChain.first().from].balls.singleOrNull()
+            val ball = state.pitch[context.pushChain.first().from].balls.singleOrNull()
             if (ball != null) {
                 if (ball.state != BallState.BOUNCING) INVALID_GAME_STATE("Unexpected ball state: ${ball.state}")
                 selectedBall = ball

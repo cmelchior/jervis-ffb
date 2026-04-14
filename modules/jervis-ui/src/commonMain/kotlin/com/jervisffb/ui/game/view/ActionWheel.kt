@@ -184,7 +184,7 @@ fun ActionWheel(
 
     // Update the wheel position synchronously before the frame is drawn, so the wheel
     // never renders at a stale position (e.g. when bottomMessage stays the same across
-    // two states that are at different field coordinates).
+    // two states that are at different pitch coordinates).
     DisposableEffect(uiState) {
         offsetDelegate(uiState)
         onDispose { }
@@ -934,7 +934,7 @@ fun ActionButton(
                     awaitPointerEventScope {
                         while (true) {
                             val e = awaitPointerEvent()
-                            // Action Buttons take precedence over anything the other Field Layers might do,
+                            // Action Buttons take precedence over anything the other Pitch Layers might do,
                             // so consume all events here.
                             e.changes.forEach { it.consume() }
                             when (e.type) {
@@ -1055,7 +1055,7 @@ fun CoinImage(
                         awaitPointerEventScope {
                             while (true) {
                                 val e = awaitPointerEvent()
-                                // Action Buttons take precedence over anything the other Field Layers might do,
+                                // Action Buttons take precedence over anything the other Pitch Layers might do,
                                 // so consume all events here.
                                 e.changes.forEach { it.consume() }
                                 when (e.type) {

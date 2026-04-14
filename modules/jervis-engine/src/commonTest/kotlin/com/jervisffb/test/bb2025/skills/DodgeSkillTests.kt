@@ -9,7 +9,7 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.getSkill
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -52,7 +52,7 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             SelectSkillReroll(SkillType.DODGE),
             3.d6
         )
-        assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
+        assertEquals(PitchCoordinate(14, 5), movingPlayer.coordinates)
         movingPlayer.assertStanding()
     }
 
@@ -67,7 +67,7 @@ class DodgeSkillTests: JervisGameBB2025Test() {
             SelectSkillReroll(SkillType.DODGE),
             6.d6
         )
-        assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
+        assertEquals(PitchCoordinate(14, 5), movingPlayer.coordinates)
         movingPlayer.assertStanding()
     }
 

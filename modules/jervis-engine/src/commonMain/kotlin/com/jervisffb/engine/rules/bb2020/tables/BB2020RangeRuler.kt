@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.RangeRuler
 import kotlinx.serialization.Serializable
@@ -62,9 +62,9 @@ object BB2020RangeRuler: RangeRuler {
         }
     }
 
-    override fun measure(thrower: Player, target: FieldCoordinate): Range = measure(thrower.coordinates, target)
+    override fun measure(thrower: Player, target: PitchCoordinate): Range = measure(thrower.coordinates, target)
 
-    override fun measure(origin: FieldCoordinate, target: FieldCoordinate): Range {
+    override fun measure(origin: PitchCoordinate, target: PitchCoordinate): Range {
         val deltaX: Int = abs(target.x - origin.x)
         val deltaY: Int = abs(target.y - origin.y)
         return if ((deltaX < ranges.size) && (deltaY < ranges[deltaX].size)) {
@@ -74,11 +74,11 @@ object BB2020RangeRuler: RangeRuler {
         }
     }
 
-    override fun opponentPlayersUnderRuler(thrower: Player, target: FieldCoordinate): List<Player> {
+    override fun opponentPlayersUnderRuler(thrower: Player, target: PitchCoordinate): List<Player> {
         val rules = thrower.team.game.rules
         val opponentPlayers = mutableListOf<Player>()
 
-        // It is quicker to search through players on the field, rather than trying to calculate
+        // It is quicker to search through players on the pitch, rather than trying to calculate
         // the squares under the ruler, so lets do that.
         thrower.team.otherTeam().forEach { player ->
             // Ignore any player at the the target location
@@ -92,7 +92,7 @@ object BB2020RangeRuler: RangeRuler {
     }
 
     // Credit for this idea: https://github.com/christerk/ffb/blob/3c084704c1a72ce1c64b3245429717b83f164af0/ffb-common/src/main/java/com/fumbbl/ffb/util/UtilPassing.java#L43
-    private fun isUnderRuler(player: Player, start: FieldCoordinate, target: FieldCoordinate): Boolean {
+    private fun isUnderRuler(player: Player, start: PitchCoordinate, target: PitchCoordinate): Boolean {
         val receiverX: Int = target.x - start.x
         val receiverY: Int = target.y - start.y
         val interceptorX: Int = player.coordinates.x - start.x

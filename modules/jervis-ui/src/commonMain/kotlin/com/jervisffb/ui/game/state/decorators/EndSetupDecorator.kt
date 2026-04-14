@@ -9,7 +9,7 @@ import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
-object EndSetupDecorator : FieldActionDecorator<EndSetupWhenReady> {
+object EndSetupDecorator : PitchActionDecorator<EndSetupWhenReady> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,

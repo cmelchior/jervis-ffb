@@ -11,8 +11,8 @@ import com.jervisffb.ui.game.view.ContextWheelMenu
 import com.jervisffb.ui.game.view.ContextWheelUiState
 import com.jervisffb.ui.game.view.NoContextMenu
 import com.jervisffb.ui.game.view.ToggleContextMenuOption
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -23,10 +23,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  * without generating a [com.jervisffb.engine.actions.GameAction].
  */
 class SecondaryActionWheelViewModel(
-    private val fieldViewModel: FieldViewModel,
+    private val pitchViewModel: PitchViewModel,
     private val eventFlow: Flow<ContextWheelUiState>,
-    sharedFieldData: LocalFieldDataWrapper,
-): AbstractActionWheelViewModel(null, sharedFieldData) {
+    sharedPitchData: LocalPitchDataWrapper,
+): AbstractActionWheelViewModel(null, sharedPitchData) {
 
     private val hideAction = com.jervisffb.ui.game.view.HideActionWheel(hideImmediately = true)
     private var currentWheelData: ContextWheelMenu? = null
@@ -48,12 +48,12 @@ class SecondaryActionWheelViewModel(
                     val wheelEvent = recalculateContextMenu(event)
                     currentWheel = wheelEvent
                     _eventFlow.emit(wheelEvent)
-                    sharedFieldData.setContextActionWheelVisibility(true)
+                    sharedPitchData.setContextActionWheelVisibility(true)
                 }
                 NoContextMenu -> {
                     currentWheelData = null
                     currentWheel = null
-                    sharedFieldData.setContextActionWheelVisibility(false)
+                    sharedPitchData.setContextActionWheelVisibility(false)
                     _eventFlow.emit(hideAction)
                 }
             }
@@ -74,7 +74,7 @@ class SecondaryActionWheelViewModel(
                     icon = contextOption.icon,
                     action = {
                         hideWheel()
-                        fieldViewModel.triggerHoverExit()
+                        pitchViewModel.triggerHoverExit()
                         contextOption.command()
                         if (contextOption is ToggleContextMenuOption) {
                             contextOption.recalculateState()
@@ -98,16 +98,16 @@ class SecondaryActionWheelViewModel(
         val event = recalculateContextMenu(menuOptions)
         currentWheel = event
         _eventFlow.safeTryEmit(event)
-        sharedFieldData.setContextActionWheelVisibility(true)
+        sharedPitchData.setContextActionWheelVisibility(true)
     }
 
     override fun showWheel() {
-        sharedFieldData.setContextActionWheelVisibility(true)
+        sharedPitchData.setContextActionWheelVisibility(true)
         _eventFlow.safeTryEmit(currentWheel!!)
     }
 
     override fun hideWheel(onDismiss: (() -> Unit)?) {
-        sharedFieldData.let {
+        sharedPitchData.let {
             it.setContextActionWheelVisibility(false)
             _eventFlow.safeTryEmit(hideAction)
             // Do not use onDismiss here as the Context Menu doesn't generate GameActions

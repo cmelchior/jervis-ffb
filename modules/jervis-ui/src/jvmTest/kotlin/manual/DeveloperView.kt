@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.SingleSprite
@@ -50,7 +50,6 @@ import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.TeamTable
 import com.jervisffb.utils.runBlocking
 import kotlin.math.PI
 import kotlin.math.cos
@@ -78,7 +77,7 @@ fun mainTeamTable() {
         rules,
         createDefaultBB2020HomeTeam(rules),
         createDefaultBB2020AwayTeam(rules),
-        Field.createForRuleset(rules),
+        Pitch.createForRuleset(rules),
     )
 
     application {

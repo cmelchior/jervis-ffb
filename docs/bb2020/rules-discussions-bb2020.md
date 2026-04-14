@@ -17,7 +17,7 @@ are prone. Also, BB2025 specifies that they must be Standing as well.
 
 Open Players also do not specify that they have to be on the pitch, which
 means that a High Kick would allow you to move a player from the Dogout into
-the field.
+the pitch.
 
 ## Chainsaw vs. Mighty Blow
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049
@@ -26,7 +26,7 @@ You cannot use MB _against_ the player that has Chainsaw
 ## Both Down during Block
 When resolving Both Dow during a Block. Who is resolved first: Attacker or 
 Defender?
-    a. Does it matter? Yes, because if a knocked down player leaves the field, 
+    a. Does it matter? Yes, because if a knocked down player leaves the pitch, 
        it can affect how a dropped ball bounces.
 
 ## Selecting Skill Usage
@@ -82,7 +82,7 @@ I am using the following interpretation:
     d. Roll Rush(es)
     e. Roll Dodge
     e. Roll for Jump. On (1) move player back to starting square
-    c. Roll for Trapdoor. If you leave the field, ball stays there.
+    c. Roll for Trapdoor. If you leave the pitch, ball stays there.
     f. If standing and moving voluntarily: Pickup Ball
     g. If Falling Over/Knocked Down/Moved involuntarily: Bounce ball (We assume 
        this has the same timing as picking up)
@@ -158,7 +158,7 @@ Unclear why.
 When rolling on the Prayers To Nuffle table during the Kick-off Event, we treat 
 "available to play during this drive" as players on both the pitch and in the 
 Reserves box. It is unclear if players in the Dogout are covered by that phrase 
-after you placed players on the field.
+after you placed players on the pitch.
 
 ## Can you reroll a roll with a team reroll if the pro roll failed? 
 FUMBBL just fixed this so you can, but unclear where that interpretation came 

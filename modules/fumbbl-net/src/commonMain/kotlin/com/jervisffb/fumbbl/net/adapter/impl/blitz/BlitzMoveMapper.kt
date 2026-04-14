@@ -1,10 +1,10 @@
 package com.jervisffb.fumbbl.net.adapter.impl.blitz
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
@@ -38,9 +38,9 @@ object BlitzMoveMapper: CommandActionMapper {
         val moves: List<FieldModelSetPlayerCoordinate> = command.modelChangeList.filterIsInstance<FieldModelSetPlayerCoordinate>()
         val hasBlocked = fumbblGame.actingPlayer.hasBlocked
         moves.forEach {
-            val coord = FieldCoordinate(it.value!!.x, it.value.y)
+            val coord = PitchCoordinate(it.value!!.x, it.value.y)
             newActions.add(MoveTypeSelected(MoveType.STANDARD), if (hasBlocked) BlitzAction.RemainingMovesOrEndAction else BlitzAction.MoveOrBlockOrEndAction)
-            newActions.add(FieldSquareSelected(coord), StandardMoveStep.SelectTargetSquareOrEndAction)
+            newActions.add(PitchSquareSelected(coord), StandardMoveStep.SelectTargetSquareOrEndAction)
         }
     }
 }

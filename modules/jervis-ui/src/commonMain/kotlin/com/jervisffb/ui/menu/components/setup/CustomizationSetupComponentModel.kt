@@ -44,13 +44,13 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     val intMatcher = Regex("^\\d*$")
 
 
-    val fieldWidth = MutableStateFlow(InputFieldDataWithValue("Field Width", rulesBuilder.fieldWidth.toString(), rulesBuilder.fieldWidth, isError = false))
-    val fieldHeight = MutableStateFlow(InputFieldDataWithValue("Field Height", rulesBuilder.fieldHeight.toString(), rulesBuilder.fieldHeight, isError = false))
+    val pitchWidth = MutableStateFlow(InputFieldDataWithValue("Pitch Width", rulesBuilder.pitchWidth.toString(), rulesBuilder.pitchWidth, isError = false))
+    val pitchHeight = MutableStateFlow(InputFieldDataWithValue("Pitch Height", rulesBuilder.pitchHeight.toString(), rulesBuilder.pitchHeight, isError = false))
     val endZone = MutableStateFlow(InputFieldDataWithValue("Endzone", rulesBuilder.endZone.toString(), rulesBuilder.endZone, isError = false))
     val lineOfScrimmageHome = MutableStateFlow(InputFieldDataWithValue("Line of Scrimmage (Home)", rulesBuilder.lineOfScrimmageHome.toString(), rulesBuilder.lineOfScrimmageHome, isError = false))
     val lineOfScrimmageAway = MutableStateFlow(InputFieldDataWithValue("Line of Scrimmage (Away)", rulesBuilder.lineOfScrimmageAway.toString(), rulesBuilder.lineOfScrimmageAway, isError = false))
     val wideZone = MutableStateFlow(InputFieldDataWithValue("Wide Zone", rulesBuilder.wideZone.toString(), rulesBuilder.wideZone, isError = false))
-    val maxPlayersOnField = MutableStateFlow(InputFieldDataWithValue("Max Players On Field", rulesBuilder.maxPlayersOnField.toString(), rulesBuilder.maxPlayersOnField, isError = false))
+    val maxPlayersOnPitch = MutableStateFlow(InputFieldDataWithValue("Max Players On Pitch", rulesBuilder.maxPlayersOnPitch.toString(), rulesBuilder.maxPlayersOnPitch, isError = false))
     val maxPlayersInWideZone = MutableStateFlow(InputFieldDataWithValue("Max Players In Wide Zone", rulesBuilder.maxPlayersInWideZone.toString(), rulesBuilder.maxPlayersInWideZone, isError = false))
     val halfs = MutableStateFlow(InputFieldDataWithValue("Halfs Pr. Game", rulesBuilder.halfsPrGame.toString(), rulesBuilder.halfsPrGame, isError = false))
     val turnsPrHalf = MutableStateFlow(InputFieldDataWithValue("Turns Pr. Half", rulesBuilder.turnsPrHalf.toString(), rulesBuilder.turnsPrHalf, isError = false))
@@ -61,13 +61,13 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     val allowPlayerEdits = MutableStateFlow(rulesBuilder.allowPlayerEditsDuringGame)
 
     fun updateFieldWidth(value: String) {
-        updateIntEntry(value, fieldWidth)
-        rulesBuilder.fieldWidth = fieldWidth.value.underlyingValue ?: -1
+        updateIntEntry(value, pitchWidth)
+        rulesBuilder.pitchWidth = pitchWidth.value.underlyingValue ?: -1
     }
 
     fun updateFieldHeight(value: String) {
-        updateIntEntry(value, fieldHeight)
-        rulesBuilder.fieldHeight = fieldHeight.value.underlyingValue ?: -1
+        updateIntEntry(value, pitchHeight)
+        rulesBuilder.pitchHeight = pitchHeight.value.underlyingValue ?: -1
     }
 
     fun updateEndZone(value: String) {
@@ -91,9 +91,9 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     }
 
     fun updateMaxPlayersOnField(value: String) {
-        updateIntEntry(value, maxPlayersOnField)
-        maxPlayersOnField.value.underlyingValue?.let {
-            rulesBuilder.maxPlayersOnField = it
+        updateIntEntry(value, maxPlayersOnPitch)
+        maxPlayersOnPitch.value.underlyingValue?.let {
+            rulesBuilder.maxPlayersOnPitch = it
         }
     }
 
@@ -160,9 +160,9 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     fun updateRulesBuilder(rulesBuilder: RulesParameterBuilder) {
         this.rulesBuilder = rulesBuilder
 
-        updateFieldWidth(rulesBuilder.fieldWidth.toString())
-        updateFieldHeight(rulesBuilder.fieldHeight.toString())
-        updateMaxPlayersOnField(rulesBuilder.maxPlayersOnField.toString())
+        updateFieldWidth(rulesBuilder.pitchWidth.toString())
+        updateFieldHeight(rulesBuilder.pitchHeight.toString())
+        updateMaxPlayersOnField(rulesBuilder.maxPlayersOnPitch.toString())
 
         updateHalfs(rulesBuilder.halfsPrGame.toString())
         updateTurnsPrHalf(rulesBuilder.turnsPrHalf.toString())

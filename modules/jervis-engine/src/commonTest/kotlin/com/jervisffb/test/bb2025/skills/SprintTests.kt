@@ -4,10 +4,10 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
@@ -164,7 +164,7 @@ class SprintTests: JervisGameBB2025Test() {
             *moveTo(13,5),
             *rushRoll(2.d6),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6), // Sprint
         )
@@ -199,7 +199,7 @@ class SprintTests: JervisGameBB2025Test() {
             *moveTo(13,5),
             *rushRoll(2.d6),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6), // Sprint
         )
@@ -234,7 +234,7 @@ class SprintTests: JervisGameBB2025Test() {
             *moveTo(13,5),
             *rushRoll(2.d6),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6), // Sprint
         )

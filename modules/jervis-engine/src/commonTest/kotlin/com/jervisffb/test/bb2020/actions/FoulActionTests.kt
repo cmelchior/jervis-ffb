@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2020Test
@@ -236,7 +236,7 @@ class FoulActionTests: JervisGameBB2020Test() {
             5.d8, // Ball bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(14, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(14, 4), state.singleBall().coordinates)
         assertFalse(awayTeam["A10".playerId].hasBall())
     }
 }

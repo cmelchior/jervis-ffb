@@ -126,16 +126,16 @@ object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
             // Find first square with unhandled ball in it.
             val context = state.getContext<PushContext>()
 
-            // First run through squares we know are on the field
+            // First run through squares we know are on the pitch
             var selectedBall: Ball? = null
             for (step in 0..< context.pushChain.size) {
                 val square = context.pushChain[step].to!!
-                if (square.isOnField(rules)) {
+                if (square.isOnPitch(rules)) {
                     // In case of Ball Clone, multiple balls might be bouncing from the same
                     // square. In that case, we do them in oldest to newest order. This
                     // means the ball already on the ground when the player was pushed there
                     // is bounced first.
-                    val ball = state.field[square].balls.firstOrNull()
+                    val ball = state.pitch[square].balls.firstOrNull()
                     if (ball != null && ball.state == BallState.BOUNCING) {
                         selectedBall = ball
                         break
@@ -151,7 +151,7 @@ object BB2020PushStepResolveSingleBlockPushChain: Procedure() {
 
             // Finally check the attackers location (if the choose to follow up, otherwise they coul not have lost the ball)
             if (selectedBall == null && context.followsUp) {
-                val ball = state.field[context.pushChain.first().from].balls.singleOrNull()
+                val ball = state.pitch[context.pushChain.first().from].balls.singleOrNull()
                 if (ball != null) {
                     if (ball.state != BallState.BOUNCING) INVALID_GAME_STATE("Unexpected ball state: ${ball.state}")
                     selectedBall = ball

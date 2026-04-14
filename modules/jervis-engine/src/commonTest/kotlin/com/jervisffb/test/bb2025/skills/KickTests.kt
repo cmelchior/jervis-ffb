@@ -3,13 +3,13 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Kick
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -38,7 +38,7 @@ class KickTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half,
+            PitchSquareSelected(19, 7), // Center of Away Half,
             DiceRollResults(4.d8, 1.d6), // Land on [18,7]
             Cancel, // Do not use Kick
             *defaultKickOffEvent(),
@@ -53,12 +53,12 @@ class KickTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half,
+            PitchSquareSelected(19, 7), // Center of Away Half,
             DiceRollResults(2.d8, 5.d6), // Land on [19,2]
             Confirm, // Use Kick, reduce to [19, 4]
             *defaultKickOffEvent(),
             5.d8 // Bounce to [20,4]
         )
-        assertEquals(FieldCoordinate(20, 4), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(20, 4), state.getBall().coordinates)
     }
 }

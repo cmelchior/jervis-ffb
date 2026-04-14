@@ -8,7 +8,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
@@ -55,10 +55,10 @@ data class BB2025MultipleBlockContext(
     var defender2InjuryContext: RiskingInjuryContext? = null,
     // Set to true, if a turnover happened during the first block.
     var postponeTurnOver: TurnOver? = null,
-    // Player starting locations (as they might leave the field due to injuries)
-    val attackerLocation: FieldCoordinate = attacker.coordinates,
-    val defender1Location: FieldCoordinate? = null,
-    val defender2Location: FieldCoordinate? = null,
+    // Player starting locations (as they might leave the pitch due to injuries)
+    val attackerLocation: PitchCoordinate = attacker.coordinates,
+    val defender1Location: PitchCoordinate? = null,
+    val defender2Location: PitchCoordinate? = null,
 ): ProcedureContext {
 
     val rolls: List<MultipleBlockDiceRoll>

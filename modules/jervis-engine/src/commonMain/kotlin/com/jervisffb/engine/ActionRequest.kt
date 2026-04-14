@@ -33,7 +33,6 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -43,6 +42,7 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -56,11 +56,11 @@ import com.jervisffb.engine.actions.SelectCoinSide
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPassType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectPlayers
@@ -175,8 +175,8 @@ data class ActionRequest(
             EndAction -> actions.contains(EndActionWhenReady)
             EndSetup -> actions.contains(EndSetupWhenReady)
             EndTurn -> actions.contains(EndTurnWhenReady)
-            is FieldSquareSelected -> {
-                actions.singleInstanceOfOrNull<SelectFieldLocation>()?.squares.orEmpty().any {
+            is PitchSquareSelected -> {
+                actions.singleInstanceOfOrNull<SelectPitchLocation>()?.squares.orEmpty().any {
                     it.x == action.x && it.y == action.y
                 }
             }

@@ -4,10 +4,10 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.DevModeGameAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.JUMP_DISTANCE
@@ -34,8 +34,8 @@ import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
-import com.jervisffb.ui.game.model.UiFieldPlayer
-import com.jervisffb.ui.game.model.UiFieldSquare
+import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025PassWheelController
@@ -137,8 +137,8 @@ import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BlockStatusIndicator
-import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
 import com.jervisffb.ui.game.state.indicators.MoveUsedStatusIndicator
+import com.jervisffb.ui.game.state.indicators.PitchStatusIndicator
 import com.jervisffb.ui.game.state.indicators.PreGamePlayerAndRefereeStatusIndicator
 import com.jervisffb.ui.game.state.indicators.PushDirectionArrowStatusIndicator
 import com.jervisffb.ui.game.state.indicators.SwoopDirectionArrowIndicator
@@ -203,7 +203,7 @@ class UiGameController(
 
     // Persistent UI decorations that need to be stored across actions
     val uiDecorations = UiPersistentGameIndicators()
-    private val fieldStatusIndicators: List<FieldStatusIndicator> = listOf(
+    private val pitchStatusIndicators: List<PitchStatusIndicator> = listOf(
         BallCarriedStatusIndicator,
         BallExitStatusIndicator,
         BallOnGroundStatusIndicator,
@@ -520,7 +520,7 @@ class UiGameController(
 
                     // If Undo'ing actions, this might happen through short-cuts and not the UI.
                     // If this happens while a context menu is open, its state will be left hanging.
-                    // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
+                    // In particular `LocalPitchDataWrapper.isContentMenuVisible`. For that reason, we always
                     // reset that state here when the action is Undo or Revert. It also means we do not have
                     // to deal with "back"-animations.
                     val shouldHidePrimaryActionWheel = checkHideActionWheelImmediately(gameController, actionWheelLocation)
@@ -543,7 +543,7 @@ class UiGameController(
         }
     }
 
-    fun checkHideActionWheelImmediately(gameController: GameEngineController, lastWheelLocation: FieldCoordinate?): Boolean {
+    fun checkHideActionWheelImmediately(gameController: GameEngineController, lastWheelLocation: PitchCoordinate?): Boolean {
         // If both current and previous node had a visible wheel in the same location, we can keep it around
         // Otherwise it should be hidden
         val currentNode = gameController.currentNode()
@@ -555,7 +555,7 @@ class UiGameController(
     private fun applyUiIndicators(actionRequest: ActionRequest, controller: GameEngineController, acc: UiSnapshotAccumulator) {
         val state = controller.state
         val currentNode = controller.currentNode() as ActionNode
-        fieldStatusIndicators.forEach { indicator ->
+        pitchStatusIndicators.forEach { indicator ->
             indicator.decorate(currentNode, state, actionRequest, acc)
         }
 
@@ -643,11 +643,11 @@ class UiGameController(
         // Update the persistent UI decorations before starting
         updatePersistentUiDecorations(state, delta, uiDecorations, acc)
 
-        // Re-render the entire field. This feels a bit like overkill, but making it more granular
+        // Re-render the entire pitch. This feels a bit like overkill, but making it more granular
         // is going to be challenging, and it doesn't look like there is a performance problem doing it.
-        (0 until rules.fieldWidth).forEach { x ->
-            (0 until rules.fieldHeight).forEach { y ->
-                val coordinate = FieldCoordinate(x, y)
+        (0 until rules.pitchWidth).forEach { x ->
+            (0 until rules.pitchHeight).forEach { y ->
+                val coordinate = PitchCoordinate(x, y)
                 val square= renderSquare(coordinate, state)
                 acc.addOrUpdateSquare(coordinate, square)
             }
@@ -656,10 +656,10 @@ class UiGameController(
         // This will reset the player state and the data class should ensure equality is
         // checked correctly using the auto-generated `equals()`
         state.homeTeam.forEach { player ->
-            acc.addOrUpdatePlayer(player.id, UiFieldPlayer(player))
+            acc.addOrUpdatePlayer(player.id, UiPitchPlayer(player))
         }
         state.awayTeam.forEach { player ->
-            acc.addOrUpdatePlayer(player.id, UiFieldPlayer(player))
+            acc.addOrUpdatePlayer(player.id, UiPitchPlayer(player))
         }
     }
 
@@ -696,13 +696,13 @@ class UiGameController(
 
         // Add decoration when moving player
         val normalMoveStep = delta.steps.lastOrNull()?.let {
-            it.procedure == StandardMoveStep && it.action is FieldSquareSelected
+            it.procedure == StandardMoveStep && it.action is PitchSquareSelected
         } ?: false
 
         val jumpMoveStep = delta.steps.lastOrNull()?.let {
             (it.procedure == BB2020JumpStep || it.procedure == BB2025JumpStep ||
                 it.procedure == LeapStep || it.procedure == PogoStep) &&
-                it.action is FieldSquareSelected
+                it.action is PitchSquareSelected
         } ?: false
 
         if (normalMoveStep) {
@@ -733,11 +733,11 @@ class UiGameController(
     }
 
     private fun renderSquare(
-        coordinate: FieldCoordinate,
+        coordinate: PitchCoordinate,
         game: Game,
-    ): UiFieldSquare {
-        val square = game.field[coordinate]
-        return UiFieldSquare(
+    ): UiPitchSquare {
+        val square = game.pitch[coordinate]
+        return UiPitchSquare(
             coordinates = coordinate,
             player = square.player?.id
         )

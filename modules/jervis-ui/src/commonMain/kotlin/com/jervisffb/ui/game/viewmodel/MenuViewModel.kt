@@ -7,14 +7,14 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.DogoutSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
@@ -267,25 +267,25 @@ class MenuViewModel {
                     && ((team[playerNo].state == PlayerState.RESERVE) || (team[playerNo].state == PlayerState.STANDING))
             )
 
-            // Map to field coordinate
-            val fieldCoordinate = when (team.isHomeTeam()) {
+            // Map to pitch coordinate
+            val pitchCoordinate = when (team.isHomeTeam()) {
                 true -> {
                     val x = rules.lineOfScrimmageHome - relativeCoordinate.dist
                     val y = relativeCoordinate.y
-                    FieldCoordinate(x, y)
+                    PitchCoordinate(x, y)
                 }
                 false -> {
                     val x = rules.lineOfScrimmageAway + relativeCoordinate.dist
                     val y = relativeCoordinate.y
-                    FieldCoordinate(x, y)
+                    PitchCoordinate(x, y)
                 }
             }
-            val isValidCoordinate = rules.isInSetupArea(team, fieldCoordinate)
+            val isValidCoordinate = rules.isInSetupArea(team, pitchCoordinate)
 
             if (playerAvailable && isValidCoordinate) {
                 listOf(
                     PlayerSelected(team[playerNo].id),
-                    FieldSquareSelected(fieldCoordinate)
+                    PitchSquareSelected(pitchCoordinate)
                 )
             } else {
                 emptyList()
@@ -305,15 +305,15 @@ class MenuViewModel {
                 if (controller?.currentNode() == SetupTeam.PlacePlayer) {
                     val deselectAction = when (context.currentPlayer!!.location) {
                         DogOut -> DogoutSelected
-                        is FieldCoordinate -> FieldSquareSelected(context.currentPlayer!!.coordinates)
+                        is PitchCoordinate -> PitchSquareSelected(context.currentPlayer!!.coordinates)
                         is GiantLocation -> TODO()
                     }
                     add(deselectAction)
                 }
 
-                // Move any players on the field back to the dogout.
+                // Move any players on the pitch back to the dogout.
                 context.team.forEach { player ->
-                    if (player.location.isOnField(rules)) {
+                    if (player.location.isOnPitch(rules)) {
                         add(PlayerSelected(player.id))
                         add(DogoutSelected)
                     }

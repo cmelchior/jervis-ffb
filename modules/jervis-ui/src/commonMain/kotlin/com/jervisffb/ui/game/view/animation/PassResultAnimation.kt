@@ -18,26 +18,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.asDp
 import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import kotlin.time.Duration
 
 
 @Composable
-fun PassResultAnimation(vm: FieldViewModel, animation: PassAnimation) {
+fun PassResultAnimation(vm: PitchViewModel, animation: PassAnimation) {
 
     // Kicker
     val startOffset = remember {
-        vm.squareOffsets[animation.from]!!.positionInRoot - vm.fieldCoordinates.positionInRoot
+        vm.squareOffsets[animation.from]!!.positionInRoot - vm.pitchCoordinates.positionInRoot
     }
-    // Landing field
-    val endOffset = remember { vm.squareOffsets[animation.to]!!.positionInRoot - vm.fieldCoordinates.positionInRoot }
+    // Landing Square
+    val endOffset = remember { vm.squareOffsets[animation.to]!!.positionInRoot - vm.pitchCoordinates.positionInRoot }
     // Size of square (which dictates size of ball)
     val targetSquareSize = remember { vm.squareOffsets[animation.to]!!.boundsInRoot }
 

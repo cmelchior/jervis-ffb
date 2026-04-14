@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2025.inducements
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -91,7 +91,7 @@ class TeamMascotTests: JervisGameBB2025Test() {
         setupWithTeamMascot()
         controller.rollForward(
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 bounce = null,
             ),

@@ -4,12 +4,12 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
@@ -115,18 +115,18 @@ object QuickSnap : Procedure() {
             val currentLocation = context.currentPlayer!!.coordinates
             // Player is allowed to move into any square next to it
             return currentLocation.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
-                .filter { state.field[it].isUnoccupied() }
+                .filter { state.pitch[it].isUnoccupied() }
                 .map { TargetSquare.setup(it) }
                 .let { unOccupiedSquares ->
-                    listOf(SelectFieldLocation(unOccupiedSquares + TargetSquare.setup(currentLocation)))
+                    listOf(SelectPitchLocation(unOccupiedSquares + TargetSquare.setup(currentLocation)))
                 }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castAction<FieldSquareSelected>(action) { squareSelected ->
+            return castAction<PitchSquareSelected>(action) { squareSelected ->
                 val context = state.getContext<QuickSnapContext>()
                 return if (squareSelected.coordinate == context.currentPlayer!!.coordinates) {
-                    // If the same field is selected, just treat the player as not having moved at all
+                    // If the same square is selected, just treat the player as not having moved at all
                     compositeCommandOf(
                         UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),

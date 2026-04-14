@@ -28,11 +28,11 @@ import com.jervisffb.ui.game.view.GameScreen
 import com.jervisffb.ui.game.view.LoadingScreen
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
-import com.jervisffb.ui.game.viewmodel.FieldDetails
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.PitchDetails
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
@@ -96,17 +96,17 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                         contentAlignment = Alignment.TopCenter
                     ) {
                         val useWeatherBackground by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_USE_PITCH_WEATHER_AS_GAME_BACKGROUND_VALUE, false).collectAsState(false)
-                        val currentWeather by viewModel.fieldBackground.collectAsState(FieldDetails.NICE)
+                        val currentWeather by viewModel.pitchBackground.collectAsState(PitchDetails.NICE)
                         val backgroundImage = remember(useWeatherBackground, currentWeather) {
                             if (!useWeatherBackground) {
-                                FieldDetails.NICE
+                                PitchDetails.NICE
                             } else {
                                 currentWeather
                             }
                         }
                         Image(
                             modifier = Modifier.fillMaxSize(),
-                            bitmap = IconFactory.getField(backgroundImage),
+                            bitmap = IconFactory.getPitch(backgroundImage),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                         )
@@ -133,31 +133,31 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
 @Composable
 private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () -> Unit) {
 
-    val fieldViewModel = remember(viewModel) {
-        FieldViewModel(
+    val pitchViewModel = remember(viewModel) {
+        PitchViewModel(
             viewModel,
             viewModel.uiState,
             viewModel.hoverPlayerFlow,
         )
     }
 
-    LaunchedEffect(fieldViewModel) {
+    LaunchedEffect(pitchViewModel) {
         launch {
-            fieldViewModel.actionWheelViewModel.start()
+            pitchViewModel.actionWheelViewModel.start()
         }
         launch {
-            fieldViewModel.contextActionWheelViewModel.start()
+            pitchViewModel.contextActionWheelViewModel.start()
         }
     }
 
     GameScreen(
         viewModel,
-        fieldViewModel,
+        pitchViewModel,
         SidebarViewModel(
             viewModel,
             viewModel.menuViewModel,
             viewModel.uiState,
-            viewModel.sharedFieldData,
+            viewModel.sharedPitchData,
             viewModel.homeTeam,
             viewModel.hoverPlayerFlow,
         ),
@@ -165,11 +165,11 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel,
             viewModel.menuViewModel,
             viewModel.uiState,
-            viewModel.sharedFieldData,
+            viewModel.sharedPitchData,
             viewModel.awayTeam,
             viewModel.hoverPlayerFlow,
         ),
-        GameStatusViewModel(viewModel, viewModel.sharedFieldData, viewModel.uiState),
+        GameStatusViewModel(viewModel, viewModel.sharedPitchData, viewModel.uiState),
         if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.uiState, viewModel) else null,
         if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
         ActionSelectorViewModel(viewModel.uiState),

@@ -14,7 +14,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.bb2025.skills.TakeRoot
@@ -305,7 +305,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
         )
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(13, 5), attacker.coordinates)
+        assertEquals(PitchCoordinate(13, 5), attacker.coordinates)
     }
 
 

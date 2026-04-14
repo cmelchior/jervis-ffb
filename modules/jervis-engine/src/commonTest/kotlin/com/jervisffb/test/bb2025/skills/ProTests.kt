@@ -5,8 +5,8 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
@@ -200,7 +200,7 @@ class ProTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             1.d6, // Failed Landing

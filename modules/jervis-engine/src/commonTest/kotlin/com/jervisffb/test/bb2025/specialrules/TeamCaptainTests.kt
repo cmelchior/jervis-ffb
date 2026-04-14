@@ -4,13 +4,13 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.rules.common.TeamCaptainNotOnField
+import com.jervisffb.engine.rules.common.TeamCaptainNotOnPitch
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
@@ -54,7 +54,7 @@ class TeamCaptainTests: JervisGameBB2025Test() {
             *defaultAwaySetup(endSetup = true),
         )
         assertEquals(SetupTeam.InformOfInvalidSetup, controller.currentNode())
-        val brokenRule = rules.isSetupValid(state, awayTeam).filterIsInstance<TeamCaptainNotOnField>().first()
+        val brokenRule = rules.isSetupValid(state, awayTeam).filterIsInstance<TeamCaptainNotOnPitch>().first()
         assertEquals(1, brokenRule.availablePlayers.size)
         assertEquals("A12".playerId, brokenRule.availablePlayers.single())
         controller.rollForward(
@@ -62,7 +62,7 @@ class TeamCaptainTests: JervisGameBB2025Test() {
             PlayerSelected("A1".playerId),
             DogoutSelected,
             PlayerSelected("A12".playerId),
-            FieldSquareSelected(13, 5),
+            PitchSquareSelected(13, 5),
             EndSetup
         )
         assertEquals(TheKickOff.NominateKickingPlayer, controller.currentNode())

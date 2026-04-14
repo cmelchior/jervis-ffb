@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -25,7 +25,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -41,7 +41,7 @@ abstract class D3RollWheelController: ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         if (acc.stack.currentNode() == rollDiceNode) {
             val buttons = D3Result.allOptions().map { d3Option ->
@@ -117,13 +117,13 @@ object HomeTeamFanFactorRoll: D3RollWheelController() {
     override val diceRollType: DiceRollType = DiceRollType.FAN_FACTOR
 
     // There is no "real" center for this, so we place it, assuming that the UI
-    // is showing the player "captain". The referee is placed at the center of the field
+    // is showing the player "captain". The referee is placed at the center of the Pitch
     // occupying both squares there. The Home Captain is placed just above this on the
     // Home side
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
-        val y = (state.rules.fieldHeight / 2) - 1
-        val x = (state.rules.fieldWidth / 2) - 2
-        return FieldCoordinate(x, y)
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        val y = (state.rules.pitchHeight / 2) - 1
+        val x = (state.rules.pitchWidth / 2) - 2
+        return PitchCoordinate(x, y)
     }
 }
 
@@ -133,13 +133,13 @@ object AwayTeamFanFactorRoll: D3RollWheelController() {
     override val diceRollType: DiceRollType = DiceRollType.FAN_FACTOR
 
     // There is no "real" center for this, so we place it, assuming that the UI
-    // is showing the player "captain". The referee is placed at the center of the field
+    // is showing the player "captain". The referee is placed at the center of the pitch
     // occupying both squares there. The Away Captain is placed just above this on the
     // Away side
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
-        val y = (state.rules.fieldHeight / 2) - 1
-        val x = (state.rules.fieldWidth / 2) + 1
-        return FieldCoordinate(x, y)
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        val y = (state.rules.pitchHeight / 2) - 1
+        val x = (state.rules.pitchWidth / 2) + 1
+        return PitchCoordinate(x, y)
     }
 }
 
@@ -148,8 +148,8 @@ object ChargePlayersRollWheelController: D3RollWheelController() {
     override val rollDiceNode: Node = Charge.RollForPlayers
     override val diceRollType: DiceRollType = DiceRollType.CHARGE
 
-    // There is no "real" center for this, so we place it in the center of the Field
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    // There is no "real" center for this, so we place it in the center of the pitch
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 }
 
 object QuickSnapRollWheelController: D3RollWheelController() {
@@ -157,8 +157,8 @@ object QuickSnapRollWheelController: D3RollWheelController() {
     override val rollDiceNode: Node = QuickSnap.RollDie
     override val diceRollType: DiceRollType = DiceRollType.QUICK_SNAP
 
-    // There is no "real" center for this, so we place it in the center of the Field
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    // There is no "real" center for this, so we place it in the center of the Pitch
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 }
 
 object SolidDefenseWheelController: D3RollWheelController() {
@@ -166,8 +166,8 @@ object SolidDefenseWheelController: D3RollWheelController() {
     override val rollDiceNode: Node = SolidDefense.RollDie
     override val diceRollType: DiceRollType = DiceRollType.SOLID_DEFENSE
 
-    // There is no "real" center for this, so we place it in the center of the Field
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    // There is no "real" center for this, so we place it in the center of the Pitch
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 }
 
 object PitchInvasionKickingTeamPlayersAffectedRollWheelController: D3RollWheelController() {
@@ -175,7 +175,7 @@ object PitchInvasionKickingTeamPlayersAffectedRollWheelController: D3RollWheelCo
     override val rollDiceNode: Node = PitchInvasion.RollForKickingTeamStuns
     override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.kickingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -189,7 +189,7 @@ object PitchInvasionReceivingTeamPlayersAffectedRollWheelController: D3RollWheel
     override val rollDiceNode: Node = PitchInvasion.RollForReceivingTeamStuns
     override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.receivingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)

@@ -68,8 +68,8 @@ import kotlinx.collections.immutable.toPersistentList
  *
  * 1. Roll D6.
  * 2. Calculate required modifiers. These apply to both roll and reroll.
- *      a. -1 for each marking player in the target field.
- *      b. Stunty* (Ignore all -1 marked modifiers in the target field).
+ *      a. -1 for each marking player in the target square.
+ *      b. Stunty* (Ignore all -1 marked modifiers in the target square).
  *      c. Titchy* (+1).
  * 3. Choose optional modifiers. These apply to both roll and reroll.
  *      a. Two Heads (+1).
@@ -234,11 +234,11 @@ object DodgeRoll: D6WithRerollProcedure() {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
-                    state.field[coord].player
+                    state.pitch[coord].player
                         ?.let { player -> player.team != context.player.team}
                         ?: false
                 }
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it.isSkillAvailable(SkillType.PREHENSILE_TAIL) }
                 .let { players ->
                     when (players.isNotEmpty()) {
@@ -286,11 +286,11 @@ object DodgeRoll: D6WithRerollProcedure() {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
-                    state.field[coord].player?.let { player ->
+                    state.pitch[coord].player?.let { player ->
                         player.team != context.player.team
                     } ?: false
                 }
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
                 .map { SelectPlayer(it) }
             val canUseBeforeRoll = (rules.baseVersion == GameVersion.BB2020)
@@ -330,7 +330,7 @@ object DodgeRoll: D6WithRerollProcedure() {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
             val playersWithTackle = context.startingSquare.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false).mapNotNull {
-                val player = state.field[it].player
+                val player = state.pitch[it].player
                 if (player != null && player.isSkillAvailable(SkillType.TACKLE)) {
                     player
                 } else {
@@ -414,11 +414,11 @@ object DodgeRoll: D6WithRerollProcedure() {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
-                    state.field[coord].player?.let { player ->
+                    state.pitch[coord].player?.let { player ->
                         player.team != context.player.team
                     } ?: false
                 }
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
 
             return if (eligiblePlayers.isNotEmpty()) {
@@ -438,7 +438,7 @@ object DodgeRoll: D6WithRerollProcedure() {
                     val success = isSuccess(context, overrideModifiers = updatedModifiers)
                     // If a player use Fumblerooski, they might have left a ball in the square the Diving Tackle
                     // player ends up prone in. In that case, the ball will always bounce.
-                    val ballInSquare = state.field[context.startingSquare].balls.isNotEmpty()
+                    val ballInSquare = state.pitch[context.startingSquare].balls.isNotEmpty()
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
                         UpdateContext(context.copy(
@@ -460,7 +460,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     object BounceBallInStartingSquare: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<DodgeRollContext>()
-            val ball = state.field[context.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${context.startingSquare}")
+            val ball = state.pitch[context.startingSquare].balls.singleOrNull() ?: INVALID_GAME_STATE("Too many balls in square: ${context.startingSquare}")
             return compositeCommandOf(
                 SetBallState.bouncing(ball),
                 SetCurrentBall(ball),

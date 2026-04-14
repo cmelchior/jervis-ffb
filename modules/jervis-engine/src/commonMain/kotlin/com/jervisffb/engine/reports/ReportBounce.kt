@@ -1,10 +1,10 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
 class ReportBounce(
-    bounceLocation: FieldCoordinate,
-    outOfBoundsAt: FieldCoordinate? = null,
+    bounceLocation: PitchCoordinate,
+    outOfBoundsAt: PitchCoordinate? = null,
     crossedLineOfScrimmageDuringKickOff: Boolean = false
 ) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

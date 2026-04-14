@@ -43,7 +43,7 @@ The main entry classes for the UI are:
   provider it (See `ManualActionProvider`) or through some other mechanism like
   a game event from the network (because it is created by the other player).
 
-- `FieldActionDecorator`: This interface is responsible for configuring the UI so it
+- `PitchActionDecorator`: This interface is responsible for configuring the UI so it
   can produce actions of a given type, e.g. it will setup on-click listeners on players,
   if they can be selected.
 

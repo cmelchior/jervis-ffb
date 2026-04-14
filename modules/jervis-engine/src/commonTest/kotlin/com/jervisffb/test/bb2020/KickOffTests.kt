@@ -2,10 +2,10 @@ package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -15,7 +15,7 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.test.JervisGameBB2020Test
@@ -78,9 +78,9 @@ class KickOffTests: JervisGameBB2020Test() {
         }
         controller.rollForward(
             *teamSetup(
-                "H10".playerId to FieldCoordinate(12, 4),
-                "H11".playerId to FieldCoordinate(12, 7),
-                "H12".playerId to FieldCoordinate(12, 10),
+                "H10".playerId to PitchCoordinate(12, 4),
+                "H11".playerId to PitchCoordinate(12, 7),
+                "H12".playerId to PitchCoordinate(12, 10),
             ),
             *defaultAwaySetup()
         )
@@ -102,17 +102,17 @@ class KickOffTests: JervisGameBB2020Test() {
         controller.rollForward(*defaultPregame())
         controller.rollForward(
             *teamSetup(
-                "H1".playerId to FieldCoordinate(12, 2),
-                "H2".playerId to FieldCoordinate(12, 3),
-                "H3".playerId to FieldCoordinate(12, 4),
-                "H4".playerId to FieldCoordinate(12, 5),
-                "H5".playerId to FieldCoordinate(12, 6),
-                "H6".playerId to FieldCoordinate(12, 7),
-                "H7".playerId to FieldCoordinate(12, 8),
-                "H8".playerId to FieldCoordinate(12, 9),
-                "H9".playerId to FieldCoordinate(12, 10),
-                "H10".playerId to FieldCoordinate(12, 11),
-                "H11".playerId to FieldCoordinate(12, 12)
+                "H1".playerId to PitchCoordinate(12, 2),
+                "H2".playerId to PitchCoordinate(12, 3),
+                "H3".playerId to PitchCoordinate(12, 4),
+                "H4".playerId to PitchCoordinate(12, 5),
+                "H5".playerId to PitchCoordinate(12, 6),
+                "H6".playerId to PitchCoordinate(12, 7),
+                "H7".playerId to PitchCoordinate(12, 8),
+                "H8".playerId to PitchCoordinate(12, 9),
+                "H9".playerId to PitchCoordinate(12, 10),
+                "H10".playerId to PitchCoordinate(12, 11),
+                "H11".playerId to PitchCoordinate(12, 12)
             ),
             *defaultAwaySetup()
         )
@@ -136,7 +136,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")) // Select Kicker
         )
-        val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
+        val squares = controller.getAvailableActions().first() as? SelectPitchLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         // All squares on the other side should be available
         assertEquals(13*15, squares.size)
         squares.squares.forEach {
@@ -145,24 +145,24 @@ class KickOffTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun ballLanding_onField() {
+    fun ballLanding_onPitch() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")) // Select Kicker
         )
-        val squares = controller.getAvailableActions().first() as? SelectFieldLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
+        val squares = controller.getAvailableActions().first() as? SelectPitchLocation ?: fail("Wrong type: ${controller.getAvailableActions().first()}")
         assertEquals(13*15, squares.size)
         squares.squares.forEach {
             assertTrue(it.coordinate.isOnAwaySide(rules))
         }
         controller.rollForward(
-            FieldSquareSelected(19, 7), // Center of Away Half,
+            PitchSquareSelected(19, 7), // Center of Away Half,
             DiceRollResults(4.d8, 1.d6), // Land on [18,7]
             *defaultKickOffEvent(),
             4.d8 // Bounce to [17,7]
         )
-        assertEquals(FieldCoordinate(17, 7), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(17, 7), state.getBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
     }
 
@@ -173,7 +173,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(14, 2),
+                placeKick = PitchSquareSelected(14, 2),
                 deviate = DiceRollResults(2.d8, 1.d6),
                 bounce = null
             ),
@@ -191,7 +191,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(16, 1),
+                placeKick = PitchSquareSelected(16, 1),
                 deviate = DiceRollResults(4.d8, 1.d6),
                 bounce = null
             ),
@@ -211,7 +211,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(14, 2),
+                placeKick = PitchSquareSelected(14, 2),
                 deviate = DiceRollResults(2.d8, 1.d6),
                 bounce = null
             ),
@@ -229,7 +229,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             // Place ball in end-zone and make it deviate out back of it
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 7),
+                placeKick = PitchSquareSelected(25, 7),
                 deviate = DiceRollResults(5.d8, 1.d6),
                 bounce = null
             ),
@@ -245,7 +245,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(5.d8, 6.d6), // Deviate to [19, 0]
                 bounce = 3.d8 // Bounce to [19, -1] (out of bounds)
             ),
@@ -262,12 +262,12 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = false),
-            // Move a single player to stand next to the edge of the field
+            // Move a single player to stand next to the edge of the pitch
             PlayerSelected("A8".playerId),
-            FieldSquareSelected(15, 14),
+            PitchSquareSelected(15, 14),
             EndSetup,
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(15, 13),
+                placeKick = PitchSquareSelected(15, 13),
                 deviate = DiceRollResults(7.d8, 1.d6),
                 bounce = null // Manually handle catches and bounces
             ),
@@ -286,7 +286,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(7.d8, 1.d6), // Deviate to [13, 1]
                 bounce = 4.d8 // Bounce to [12, 1] (Kicking teams side)
             ),
@@ -302,7 +302,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(7.d8, 4.d6), // Deviate to [13, 4]
                 bounce = 6.d8 // Bounce to [12, 5] (Kicking teams side, player standing there)
             ),
@@ -320,7 +320,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultSetup(),
             // Place ball in end-zone and make it deviate out the back of it
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 5),
+                placeKick = PitchSquareSelected(13, 5),
                 deviate = DiceRollResults(7.d8, 3.d6),
                 bounce = null // Manually handle catches and bounces
             ),
@@ -340,7 +340,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 7),
+                placeKick = PitchSquareSelected(25, 7),
                 deviate = DiceRollResults(5.d8, 1.d6),
                 bounce = null
             ),
@@ -360,7 +360,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 7),
+                placeKick = PitchSquareSelected(25, 7),
                 deviate = DiceRollResults(5.d8, 1.d6),
                 bounce = null
             ),
@@ -381,7 +381,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(1.d8, 1.d6),
                 bounce = null
             ),
@@ -406,7 +406,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(1.d8, 1.d6),
                 bounce = null
             ),
@@ -434,7 +434,7 @@ class KickOffTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(3.d8, 4.d6),
                 bounce = null
             ),

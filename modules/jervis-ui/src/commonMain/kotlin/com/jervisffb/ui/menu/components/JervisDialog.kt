@@ -66,7 +66,7 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
-import com.jervisffb.ui.game.viewmodel.FieldViewData
+import com.jervisffb.ui.game.viewmodel.PitchViewData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,8 +88,8 @@ import kotlin.math.roundToInt
  * especially if we want to selectively block certain events. It looks like
  * attaching any pointer listener to a layout will cause it to be the
  * "root" for which events flow, even if it only registers for certain events.
- * This makes it impossible to have a dialog scrim living outside the field that
- * intercepts Press but allows Enter/Exit events to reach the field.
+ * This makes it impossible to have a dialog scrim living outside the pitch that
+ * intercepts Press but allows Enter/Exit events to reach the pitch.
  *
  * Given that the use cases are currently not fully explored, we go with the
  * "easy"-approach, which is that the presence of a scrim also determines
@@ -106,9 +106,9 @@ fun JervisDialog(
     minHeight: Dp = 230.dp,
     draggable: Boolean = false,
     backgroundScrim: Boolean = false,
-    // If set, will be used to center the popup over the field
-    centerOnField: GameScreenModel? = null,
-    // If `centerOnField` is `null`. This alignment is used instead.
+    // If set, will be used to center the popup over the pitch
+    centerOnPitch: GameScreenModel? = null,
+    // If `centerOnPitch` is `null`. This alignment is used instead.
     fallbackAlignment: Alignment = Alignment.Center,
     dialogColor: Color = JervisTheme.rulebookRed,
     content: @Composable ColumnScope.(@Composable (String) -> TextFieldColors, Color) -> Unit = { _, _  -> /* Do nothing */  },
@@ -117,13 +117,13 @@ fun JervisDialog(
 ) {
     val focusRequester = remember { FocusRequester() }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
-    val fieldViewInfo: FieldViewData? by centerOnField?.fieldViewData?.collectAsState() ?: MutableStateFlow<FieldViewData?>(null).collectAsState()
+    val fieldViewInfo: PitchViewData? by centerOnPitch?.pitchViewData?.collectAsState() ?: MutableStateFlow<PitchViewData?>(null).collectAsState()
     var popupOffset: IntOffset by remember(fieldViewInfo) {
         fieldViewInfo?.let { fvd ->
             mutableStateOf(
                 IntOffset(
-                    x = ((fvd.fieldSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.fieldOffset.x,
-                    y = ((fvd.fieldSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.fieldOffset.y,
+                    x = ((fvd.pitchSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.pitchOffset.x,
+                    y = ((fvd.pitchSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.pitchOffset.y,
                 )
             )
         } ?: mutableStateOf(IntOffset.Zero)
@@ -179,13 +179,13 @@ fun JervisDialog(
             }
             .padding(16.dp)
         ,
-        contentAlignment = if (centerOnField == null) fallbackAlignment else Alignment.TopStart,
+        contentAlignment = if (centerOnPitch == null) fallbackAlignment else Alignment.TopStart,
     ) {
         // The popup itself
         Box(
             modifier = Modifier
                 .wrapContentSize()
-                .applyIf(centerOnField != null) {
+                .applyIf(centerOnPitch != null) {
                     offset { popupOffset }
                 }
                 .pointerInput(title) {
@@ -280,11 +280,11 @@ fun JervisDialog(
     }
 }
 
-fun recalculateOffset(fieldViewInfo: FieldViewData?, popupSize: IntSize, paddingPx: Int): IntOffset {
+fun recalculateOffset(fieldViewInfo: PitchViewData?, popupSize: IntSize, paddingPx: Int): IntOffset {
     return fieldViewInfo?.let { fvd ->
         IntOffset(
-            x = ((fvd.fieldSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.fieldOffset.x - 2*paddingPx,
-            y = ((fvd.fieldSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.fieldOffset.y - 2*paddingPx,
+            x = ((fvd.pitchSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.pitchOffset.x - 2*paddingPx,
+            y = ((fvd.pitchSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.pitchOffset.y - 2*paddingPx,
         )
     } ?: IntOffset.Zero
 }

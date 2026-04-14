@@ -14,7 +14,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.UseShadowingStep
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
-import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -25,7 +25,7 @@ import com.jervisffb.ui.game.view.SimpleContextMenuOption
 /**
  * Some "cancel" actions we want to display in inside the timer button
  */
-object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
+object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
 
     private val nodesForGameStatusButton = setOf(
         UseShadowingStep.CheckIfShadowingIsAvailable,
@@ -49,8 +49,8 @@ object CancelDecorator : FieldActionDecorator<CancelWhenReady> {
     // but need to be swallowed here to avoid showing up up as an unhandled action.
     private val swallowNodes = setOf(
         Charge.SelectPlayersToActivate,
-        ResolveBallLandingOnField.InactiveTeamChoosesDivingCatchPlayers,
-        ResolveBallLandingOnField.ActiveTeamChoosesDivingCatchPlayers
+        ResolveBallLandingOnPitch.InactiveTeamChoosesDivingCatchPlayers,
+        ResolveBallLandingOnPitch.ActiveTeamChoosesDivingCatchPlayers
     )
 
     override fun isApplicable(state: Game, request: ActionRequest): Boolean {

@@ -34,7 +34,7 @@ object BB2020TheKickOffEvent {
             val standingPlayers = mutableListOf<Player>()
             val pronePlayers = mutableListOf<Player>()
             state.receivingTeam.forEach {
-                if (it.location.isOnField(rules)) {
+                if (it.location.isOnPitch(rules)) {
                     when (it.state) {
                         PlayerState.PRONE, PlayerState.STUNNED -> {
                             pronePlayers.add(it)

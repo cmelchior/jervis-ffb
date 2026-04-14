@@ -3,8 +3,8 @@ package com.jervisffb.engine.model.context
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -25,10 +25,10 @@ data class MoveContext(
     // means the move was aborted for whatever reason. E.g. if no target square is selected or
     // Sprint isn't used.
     val hasMoved: Boolean = false,
-    val target: FieldCoordinate? = null,
-    val startingSquare: FieldCoordinate = when (val location = player.location) {
+    val target: PitchCoordinate? = null,
+    val startingSquare: PitchCoordinate = when (val location = player.location) {
         DogOut -> INVALID_GAME_STATE("Player in the dogout cannot move")
-        is FieldCoordinate -> location
+        is PitchCoordinate -> location
         is GiantLocation -> TODO("Convert startingSquare to location and adjust procedures")
     },
 ): ProcedureContext

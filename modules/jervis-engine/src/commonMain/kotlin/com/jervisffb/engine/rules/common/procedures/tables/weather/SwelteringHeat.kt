@@ -55,9 +55,9 @@ object SwelteringHeat : Procedure() {
     object RollForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // Skip rolling if there are no available players on the field.
-            val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
-            return when (onFieldPlayers.isEmpty()) {
+            // Skip rolling if there are no available players on the pitch.
+            val onPitchPlayers = state.homeTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
+            return when (onPitchPlayers.isEmpty()) {
                 true -> listOf(ContinueWhenReady)
                 false -> listOf(RollDice(Dice.D3))
             }
@@ -87,9 +87,9 @@ object SwelteringHeat : Procedure() {
     object SelectPlayersOnHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
+            val onPitchPlayers = state.homeTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().homeRoll!!.value
-            return listOf(SelectRandomPlayers(min(onFieldPlayers.size, affectedPlayers), onFieldPlayers))
+            return listOf(SelectRandomPlayers(min(onPitchPlayers.size, affectedPlayers), onPitchPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -112,9 +112,9 @@ object SwelteringHeat : Procedure() {
     object RollForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // Skip rolling if there are no available players on the field.
-            val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
-            return when (onFieldPlayers.isEmpty()) {
+            // Skip rolling if there are no available players on the pitch.
+            val onPitchPlayers = state.awayTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
+            return when (onPitchPlayers.isEmpty()) {
                 true -> listOf(ContinueWhenReady)
                 false -> listOf(RollDice(Dice.D3))
             }
@@ -144,9 +144,9 @@ object SwelteringHeat : Procedure() {
     object SelectPlayersOnAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
+            val onPitchPlayers = state.awayTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().awayRoll!!.value
-            return listOf(SelectRandomPlayers(min(onFieldPlayers.size, affectedPlayers), onFieldPlayers))
+            return listOf(SelectRandomPlayers(min(onPitchPlayers.size, affectedPlayers), onPitchPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

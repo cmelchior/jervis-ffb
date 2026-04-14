@@ -3,7 +3,7 @@ package com.jervisffb.engine.model.context
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 data class PushContext(
@@ -61,11 +61,11 @@ data class PushContext(
         val pusher: Player,
         val pushee: Player,
         // Where is the pushee being pushed from?
-        val from: FieldCoordinate,
+        val from: PitchCoordinate,
         // Where is the pushee being pushed to? Should have the same value as
         // `from` if the pushee cannot be pushed. `null` should only represent
         // a push direction has not been determined yet.
-        var to: FieldCoordinate? = null,
+        var to: PitchCoordinate? = null,
         val isBlitzing: Boolean = false, // If first pusher is doing a Blitz
         val isChainPush: Boolean = false, // True for every push beyond the first
         var usedGrab: Boolean = false,

@@ -7,9 +7,9 @@ import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
 /**
  * This class represents a Giants location on the board.
  *
- * See page 54 in Death Zone.
+ * See page 54 in BB2020 Death Zone.
  */
-class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocation {
+class GiantLocation(val coordinates: MutableList<PitchCoordinate>): OnPitchLocation {
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         TODO()
@@ -48,7 +48,7 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
 //        return x >= rules.fieldWidth / 2
     }
 
-    override fun isOnField(rules: Rules): Boolean {
+    override fun isOnPitch(rules: Rules): Boolean {
         TODO()
 //        return (x >= 0 && x < rules.fieldWidth && y >= 0 && y < rules.fieldHeight)
     }
@@ -85,7 +85,7 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
     override fun move(
         direction: Direction,
         steps: Int,
-    ): FieldCoordinate {
+    ): PitchCoordinate {
         TODO()
         //        return create(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
     }
@@ -95,16 +95,11 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
 //        return "[${x+1}, ${y+1}]"
     }
 
-    /**
-     * Return all on-field coordinates around a specific on-field location.
-     * TODO Figure out if coordinates out of bounds should be returned as that or as their real coordinate
-     * value (to make it easier to make calculations)
-     */
     override fun getSurroundingCoordinates(
         rules: Rules,
         distance: Int,
         includeOutOfBounds: Boolean,
-    ): List<FieldCoordinate> {
+    ): List<PitchCoordinate> {
         TODO()
 //        val result = mutableListOf<FieldCoordinate>()
 //        (x - distance..x + distance).forEach { x: Int ->
@@ -121,50 +116,28 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
 //        return result
     }
 
-    /**
-     * Returns the Chebyshev Distance between this field and the target location.
-     * This is equal to the minimum number of squares between two squares on the game field, if we assume
-     * that the field is a square.
-     *
-     * See https://en.wikipedia.org/wiki/Chebyshev_distance
-     */
-    override fun distanceTo(target: OnFieldLocation): Int {
+    override fun distanceTo(target: OnPitchLocation): Int {
         TODO()
 //        return when (target) {
 //            is FieldCoordinate -> max(abs(target.x - this.x), abs(target.y - this.y))
 //        }
     }
 
-    /**
-     * Returns the "real" distance between two fields, as if they were points in a coordinate system
-     * This means that unlike [distanceTo] diagonals will have a larger value than squares on a line.
-     */
-    override fun realDistanceTo(target: OnFieldLocation): Double {
+    override fun realDistanceTo(target: OnPitchLocation): Double {
         TODO()
 //        return sqrt((target.x - x).toDouble().pow(2) + (target.y - y).toDouble().pow(2))
     }
-
-    /**
-     * Returns `true` if a field is diagonal to another, false if they are not.
-     * This only works on two fields next to each other.
-     */
-    override fun isDiagonalTo(target: OnFieldLocation): Boolean {
+    override fun isDiagonalTo(target: OnPitchLocation): Boolean {
         TODO()
 //        val onLine = (x - target.x == 0 || y - target.y == 0)
 //        return !onLine
     }
 
-    /**
-     * Return all coordinates that are considered "away" from this coordinate from the point of view of the provided
-     * [location].
-     *
-     * See page 45 in the rulebook.
-     */
     override fun getCoordinatesAwayFromLocation(
         rules: Rules,
-        location: FieldCoordinate,
+        location: PitchCoordinate,
         includeOutOfBounds: Boolean,
-    ): List<FieldCoordinate> {
+    ): List<PitchCoordinate> {
         TODO()
 //        // Calculate direction
 //        val direction = Direction(this.x - location.x, this.y - location.y)

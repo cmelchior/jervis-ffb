@@ -15,11 +15,11 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurnWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
@@ -27,9 +27,9 @@ import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRandomPlayers
@@ -43,7 +43,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
@@ -68,7 +68,7 @@ import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.PickupRoll
-import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnField
+import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
@@ -98,18 +98,18 @@ import com.jervisffb.ui.game.state.decorators.CancelDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
 import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
-import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
+import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
-import com.jervisffb.ui.game.state.decorators.SelectFieldLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPitchLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
 import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
 import com.jervisffb.ui.game.view.DialogFactory
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
@@ -142,12 +142,12 @@ open class ManualActionProvider(
     private var delayBetweenActions = false
     private val queuedActions = mutableListOf<GameAction>()
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
-    private var sharedData: LocalFieldDataWrapper? = null
+    private var sharedData: LocalPitchDataWrapper? = null
 
     var nextFumblerooskiCommand: GameAction? = null
         private set
 
-    private val fieldActionDecorators = mapOf(
+    private val pitchActionDecorators = mapOf(
         // EndSetupWhenReady -> TODO()
         // EndTurnWhenReady -> TODO()
         // is RollDice -> TODO()
@@ -168,7 +168,7 @@ open class ManualActionProvider(
         EndTurnWhenReady::class to EndTurnDecorator,
         SelectDirection::class to SelectDirectionDecorator,
         SelectDogout::class to SelectDogoutDecorator,
-        SelectFieldLocation::class to SelectFieldLocationDecorator,
+        SelectPitchLocation::class to SelectPitchLocationDecorator,
         SelectMoveType::class to SelectMoveTypeDecorator,
         SelectPlayer::class to SelectPlayerDecorator,
         SelectPlayers::class to SelectPlayersDecorator,
@@ -195,7 +195,7 @@ open class ManualActionProvider(
         // Do nothing. We are sharing the controller with the main UiGameController
     }
 
-    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+    override fun updateSharedData(sharedData: LocalPitchDataWrapper) {
         this.sharedData = sharedData
     }
 
@@ -304,9 +304,9 @@ open class ManualActionProvider(
         }
     }
 
-    private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): FieldActionDecorator<GameActionDescriptor>? {
+    private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): PitchActionDecorator<GameActionDescriptor>? {
         @Suppress("UNCHECKED_CAST")
-        return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
+        return pitchActionDecorators[type] as? PitchActionDecorator<GameActionDescriptor>
     }
 
     /**
@@ -317,7 +317,7 @@ open class ManualActionProvider(
      * Similar to how a modal dialog would be.
      *
      * If they are optional they are instead configured as [com.jervisffb.ui.game.view.ContextMenuOption]
-     * using a [FieldActionDecorator].
+     * using a [PitchActionDecorator].
      *
      * Because ActionWheels sometimes have multiple steps e.g. roll-reroll-roll, we need to handle
      * transitions between these. This is why action wheel lifecycles and their setup at each stage
@@ -391,7 +391,7 @@ open class ManualActionProvider(
         // Otherwise, it means that the player is in the middle of their action and we should
         // not show the context menu up front. That should be up to the player
         state.activePlayer?.location?.let { activePlayerLocation ->
-            acc.updateSquare(activePlayerLocation as FieldCoordinate) {
+            acc.updateSquare(activePlayerLocation as PitchCoordinate) {
                 if (it.contextMenuOptions.isNotEmpty() && it.contextMenuOptions.none { it.title == "End action" }) {
                     it.copy(
                         showContextMenu = true
@@ -508,13 +508,13 @@ open class ManualActionProvider(
         }
 
         // Automatically select pushback direction when only one option is available.
-        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is CreatePushChainStep.SelectPushDirection) {
-            val loc = (actions.first() as SelectFieldLocation).squares.first()
-            return FieldSquareSelected(loc.coordinate)
+        if (actions.size == 1 && actions.first() is SelectPitchLocation && actions.first().createAll().size == 1 && currentNode is CreatePushChainStep.SelectPushDirection) {
+            val loc = (actions.first() as SelectPitchLocation).squares.first()
+            return PitchSquareSelected(loc.coordinate)
         }
-        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is BB2020PushStepInitialMoveSequence.SelectPushDirection) {
-            val loc = (actions.first() as SelectFieldLocation).squares.first()
-            return FieldSquareSelected(loc.coordinate)
+        if (actions.size == 1 && actions.first() is SelectPitchLocation && actions.first().createAll().size == 1 && currentNode is BB2020PushStepInitialMoveSequence.SelectPushDirection) {
+            val loc = (actions.first() as SelectPitchLocation).squares.first()
+            return PitchSquareSelected(loc.coordinate)
         }
 
         // When selecting block results after reroll and only 1 dice is available.
@@ -729,8 +729,8 @@ open class ManualActionProvider(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_DIVING_CATCH_ON_ADJACENT)
-            && (currentNode == ResolveBallLandingOnField.InactiveTeamChoosesDivingCatchPlayers
-                || currentNode == ResolveBallLandingOnField.ActiveTeamChoosesDivingCatchPlayers)
+            && (currentNode == ResolveBallLandingOnPitch.InactiveTeamChoosesDivingCatchPlayers
+                || currentNode == ResolveBallLandingOnPitch.ActiveTeamChoosesDivingCatchPlayers)
         ) {
             // Return all available players
             availableActions.getOrNull<SelectPlayers>()?.let {
@@ -764,7 +764,7 @@ open class ManualActionProvider(
             // If the throw is at the limit of the thrown range, the Coach should choose (as they might want to scatter beyond it)
             // Otherwise we can automatically apply Bullseye.
             val context = controller.state.getContext<ThrowTeamMateContext>()
-            val target = context.target ?: FieldCoordinate.UNKNOWN
+            val target = context.target ?: PitchCoordinate.UNKNOWN
             val rules = controller.rules
             val range = rules.rangeRuler.measure(context.thrower, target)
             if (range == Range.OUT_OF_RANGE) return Confirm

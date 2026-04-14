@@ -4,11 +4,11 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -106,7 +106,7 @@ object ThrowPlayerStep: Procedure() {
                     }
                 }
                 .map { TargetSquare.Companion.throwTarget(it) }
-                .let { SelectFieldLocation(it) }
+                .let { SelectPitchLocation(it) }
             return listOf(targetSquares, CancelWhenReady)
         }
 
@@ -114,7 +114,7 @@ object ThrowPlayerStep: Procedure() {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    castAction<FieldSquareSelected>(action) {
+                    castAction<PitchSquareSelected>(action) {
                         val context = state.getContext<ThrowTeamMateContext>()
                         val distance = rules.rangeRuler.measure(context.thrower, it.coordinate)
                         val newLocation = it.coordinate
@@ -269,7 +269,7 @@ object ThrowPlayerStep: Procedure() {
                     ),
                     UpdateContext(throwContext.copy(target = landsAt)),
                     RemoveContext<ScatterRollContext>(),
-                    if (state.field[landsAt].isOccupied()) {
+                    if (state.pitch[landsAt].isOccupied()) {
                         GotoNode(ResolveLandingInOccupiedSquare)
                     } else if (throwContext.willCrashLand) {
                         GotoNode(BouncePlayer)
@@ -313,8 +313,8 @@ object ThrowPlayerStep: Procedure() {
                 val target = thrownPlayer.coordinates.move(direction, steps = 1)
                 val landingNode = when {
                     target.isOutOfBounds(rules) -> ResolveLandingInTheCrowd
-                    target.isOnField(rules) && !state.field[target].isOccupied() -> ResolveLanding
-                    target.isOnField(rules) && state.field[target].isOccupied() -> ResolveLandingInOccupiedSquare
+                    target.isOnPitch(rules) && !state.pitch[target].isOccupied() -> ResolveLanding
+                    target.isOnPitch(rules) && state.pitch[target].isOccupied() -> ResolveLandingInOccupiedSquare
                     else -> error("Could not determine landing type at: $target")
                 }
                 compositeCommandOf(
@@ -348,7 +348,7 @@ object ThrowPlayerStep: Procedure() {
     object ResolveLandingInOccupiedSquare: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
-            val playerInSquare = state.field[throwContext.target!!].player ?: INVALID_GAME_STATE("No player found in square: ${throwContext.target}")
+            val playerInSquare = state.pitch[throwContext.target!!].player ?: INVALID_GAME_STATE("No player found in square: ${throwContext.target}")
             val injuryContext = RiskingInjuryContext(playerInSquare)
             return compositeCommandOf(
                 ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
@@ -425,7 +425,7 @@ object ThrowPlayerStep: Procedure() {
         }
     }
 
-    // Player is attempting to land in an empty square on the field.
+    // Player is attempting to land in an empty square on the pitch.
     // A player that is crash landing has already bounced when reaching this node.
     object ResolveLanding: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
@@ -458,7 +458,7 @@ object ThrowPlayerStep: Procedure() {
             }
             modifiers.add(qualityModifier)
 
-            // Add marked modifiers for the field
+            // Add marked modifiers for the pitch
             rules.addMarkedModifiers(
                 state,
                 thrownPlayer.team,
@@ -502,7 +502,7 @@ object ThrowPlayerStep: Procedure() {
             val player = context.thrownPlayer ?: INVALID_GAME_STATE("Could not find thrown player: $context")
             val playerHasBall = player.hasBall()
             // Can only be true if the moving player isn't holding a ball
-            val ballInSquare = state.field[player.coordinates].balls.isNotEmpty()
+            val ballInSquare = state.pitch[player.coordinates].balls.isNotEmpty()
             val isTurnOver = state.isTurnOver()
             // At this stage, a ball might have bounced and been caught for a touchdown; in that
             // case, the landing player is not the one who gets the touchdown.
@@ -520,7 +520,7 @@ object ThrowPlayerStep: Procedure() {
     object PickupBallAfterLanding: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
-            val ball = state.field[throwContext.thrownPlayer!!.coordinates].balls.single()
+            val ball = state.pitch[throwContext.thrownPlayer!!.coordinates].balls.single()
             val pickupContext = PickupRollContext(throwContext.thrownPlayer, ball)
             return AddContext(pickupContext)
         }

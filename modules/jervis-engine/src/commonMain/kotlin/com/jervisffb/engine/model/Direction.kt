@@ -1,14 +1,14 @@
 package com.jervisffb.engine.model
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import kotlinx.serialization.Serializable
 
 /**
- * A vector describing a direction on a Blood Bowl field. Usually used as
+ * A vector describing a direction on a Blood Bowl pitch. Usually used as
  * the result of a roll using the Random Direction Template.
  *
  * The [xModifier] and [yModifier] are the delta that needs to be applied to a
- * [FieldCoordinate] in order to move it 1 square in the desired direction.
+ * [PitchCoordinate] in order to move it 1 square in the desired direction.
  */
 @Serializable
 data class Direction(val xModifier: Int, val yModifier: Int) {
@@ -20,7 +20,7 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
 
     /**
      * Named directions. These represent a direction as defined on the internal
-     * field model, which is horizontal (left to right), and might not present
+     * [Pitch] model, which is horizontal (left to right), and might not present
      * the direction shown in the UI.
      */
     companion object {
@@ -36,7 +36,7 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
         /**
          * Returns the direction from [origin] towards [destination].
          */
-        fun from(origin: FieldCoordinate, destination: FieldCoordinate): Direction {
+        fun from(origin: PitchCoordinate, destination: PitchCoordinate): Direction {
             return Direction(destination.x - origin.x, destination.y - origin.y)
 
         }

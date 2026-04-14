@@ -16,7 +16,7 @@ import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
@@ -163,7 +163,7 @@ fun Player.assertStanding() {
     assertEquals(PlayerState.STANDING, state)
     assertNull(intermediateState)
     assertTrue(hasTackleZones)
-    assertTrue(location.isOnField(team.game.rules))
+    assertTrue(location.isOnPitch(team.game.rules))
 }
 
 /**
@@ -173,7 +173,7 @@ fun Player.assertProne() {
     assertEquals(PlayerState.PRONE, state)
     assertNull(intermediateState)
     assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
-    assertTrue(location.isOnField(team.game.rules), "Prone players should be on the field")
+    assertTrue(location.isOnPitch(team.game.rules), "Prone players should be on the Pitch")
 }
 
 /**
@@ -183,7 +183,7 @@ fun Player.assertStunned() {
     assertEquals(PlayerState.STUNNED, state)
     assertNull(intermediateState)
     assertFalse(hasTackleZones, "Stunned players should not have tackle zones")
-    assertTrue(location.isOnField(team.game.rules), "Stunned players should be on the field")
+    assertTrue(location.isOnPitch(team.game.rules), "Stunned players should be on the Pitch")
 }
 
 /**
@@ -219,18 +219,18 @@ fun Player.assertReserves() {
 }
 
 /**
- * Test Helper, checking if a player is on the Field in a given square.
+ * Test Helper, checking if a player is on the Pitch in a given square.
  */
 fun Player.assertCoordinates(x: Int, y: Int) {
-    assertEquals(FieldCoordinate(x, y), location)
+    assertEquals(PitchCoordinate(x, y), location)
 }
 
 /**
- * Test Helper, checking if a Ball is on the Field in a given square. This
+ * Test Helper, checking if a Ball is on the Pitch in a given square. This
  * also requires the ball to not be carried.
  */
 fun Ball.assertCoordinates(x: Int, y: Int) {
-    assertEquals(FieldCoordinate(x, y), coordinates)
+    assertEquals(PitchCoordinate(x, y), coordinates)
 }
 
 /**

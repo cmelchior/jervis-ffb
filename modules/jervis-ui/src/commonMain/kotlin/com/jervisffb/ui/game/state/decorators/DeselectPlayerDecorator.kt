@@ -4,11 +4,11 @@ import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
-object DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
+object DeselectPlayerDecorator: PitchActionDecorator<DeselectPlayer> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -17,7 +17,7 @@ object DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { player ->
-            val coordinate = player.location as FieldCoordinate
+            val coordinate = player.location as PitchCoordinate
             acc.updateSquare(coordinate) {
                 it.copy(onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) })
             }

@@ -20,8 +20,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.CasualtyModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
@@ -247,7 +247,7 @@ class MultipleChoiceUserInputDialog(
             )
         }
 
-        fun createDodgeRollDialog(player: Player, target: FieldCoordinate): UserInputDialog {
+        fun createDodgeRollDialog(player: Player, target: PitchCoordinate): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Dodge Roll",
                 message = "${player.name} rolls D6 to dodge to ${target.toLogString()}.",
@@ -256,7 +256,7 @@ class MultipleChoiceUserInputDialog(
             )
         }
 
-        fun createRushRollDialog(player: Player, target: OnFieldLocation): UserInputDialog {
+        fun createRushRollDialog(player: Player, target: OnPitchLocation): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",

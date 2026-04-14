@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2020.tables
 
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.test.JervisGameBB2020Test
@@ -15,35 +15,35 @@ class RangeRulerTests: JervisGameBB2020Test() {
 
     @Test
     fun passingPlayer() {
-        assertEquals(Range.PASSING_PLAYER, ruler.measure(FieldCoordinate(1, 1), FieldCoordinate(1,1)))
+        assertEquals(Range.PASSING_PLAYER, ruler.measure(PitchCoordinate(1, 1), PitchCoordinate(1,1)))
     }
 
     @Test
     fun quickPass() {
-        assertEquals(Range.QUICK_PASS, ruler.measure(FieldCoordinate(1, 1), FieldCoordinate(0,0)))
-        assertEquals(Range.QUICK_PASS, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(2,2)))
+        assertEquals(Range.QUICK_PASS, ruler.measure(PitchCoordinate(1, 1), PitchCoordinate(0,0)))
+        assertEquals(Range.QUICK_PASS, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(2,2)))
     }
 
     @Test
     fun shortPass() {
-        assertEquals(Range.SHORT_PASS, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(3,2)))
+        assertEquals(Range.SHORT_PASS, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(3,2)))
     }
 
     @Test
     fun longPass() {
-        assertEquals(Range.LONG_PASS, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(4,6)))
+        assertEquals(Range.LONG_PASS, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(4,6)))
     }
 
     @Test
     fun longBomb() {
-        assertEquals(Range.LONG_BOMB, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(13,0)))
+        assertEquals(Range.LONG_BOMB, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(13,0)))
     }
 
     @Test
     fun outOfRange() {
-        assertEquals(Range.OUT_OF_RANGE, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(14,0)))
-        assertEquals(Range.OUT_OF_RANGE, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(0,14)))
-        assertEquals(Range.OUT_OF_RANGE, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(11,9)))
+        assertEquals(Range.OUT_OF_RANGE, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(14,0)))
+        assertEquals(Range.OUT_OF_RANGE, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(0,14)))
+        assertEquals(Range.OUT_OF_RANGE, ruler.measure(PitchCoordinate(0, 0), PitchCoordinate(11,9)))
     }
 
     @Test

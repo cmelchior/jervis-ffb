@@ -7,8 +7,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
-import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.ext.d6
@@ -93,7 +92,7 @@ class RushingTests: JervisGameBB2025Test() {
 
     @Test
     fun rushBeforeDodge() {
-        val player = state.field[13, 6].player!!
+        val player = state.pitch[13, 6].player!!
         player.movesLeft = 0
         assertTrue(rules.isMarked(player))
 
@@ -120,7 +119,7 @@ class RushingTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
         )
-        val targets = controller.getAvailableActions().get<SelectFieldLocation>()
+        val targets = controller.getAvailableActions().get<SelectPitchLocation>()
         assertTrue(targets.squares.none { it.type == TargetSquare.Type.RUSH })
     }
 }

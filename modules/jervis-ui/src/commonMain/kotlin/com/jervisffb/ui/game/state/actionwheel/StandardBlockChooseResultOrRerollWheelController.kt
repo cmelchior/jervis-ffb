@@ -13,7 +13,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
@@ -28,7 +28,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 /**
  * Control selecting a block result or a reroll option.
@@ -42,7 +42,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll,
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<BlockContext>().defender.coordinates
     }
 
@@ -50,7 +50,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val currentNode = acc.gameController.currentNode()
 

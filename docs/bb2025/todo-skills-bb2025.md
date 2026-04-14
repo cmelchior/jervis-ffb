@@ -354,7 +354,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Does not work on Hand Off that results in a turnover
 - [ ] Hail Mary Pass
   - [ ] Works on Bombs
-  - [x] Select any square on the field
+  - [x] Select any square on the pitch
   - [x] Cannot intercept with Hail Mary Pass
   - [x] Always Long Bomb distance
   - [x] Always count Accurate as Inaccurate
@@ -372,7 +372,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Remove immediately if pushed into the crowd
     - [x] Disable after own player is chain-pushed into crowd
     - [x] Removed after own player is chain-pushed into crowd
-    - [x] Not Disabled if other players with Leader on the field
+    - [x] Not Disabled if other players with Leader on the pitch
     - [x] Enabled if Leader returns to the pitch
     - [x] Only one, regardless of number of players
 - [x] Nerves of Steel

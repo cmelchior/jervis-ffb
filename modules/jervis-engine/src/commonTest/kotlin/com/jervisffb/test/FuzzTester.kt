@@ -4,8 +4,8 @@ import co.touchlab.kermit.Severity
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -223,26 +223,26 @@ class FuzzTester {
 
         val setup = when (game.rules.gameType) {
             GameType.STANDARD -> listOf(
-                FieldCoordinate(12, 6),
-                FieldCoordinate(12, 7),
-                FieldCoordinate(12, 8),
-                FieldCoordinate(10, 1),
-                FieldCoordinate(10, 4),
-                FieldCoordinate(10, 10),
-                FieldCoordinate(10, 13),
-                FieldCoordinate(8, 1),
-                FieldCoordinate(8, 4),
-                FieldCoordinate(8, 10),
-                FieldCoordinate(8, 13),
+                PitchCoordinate(12, 6),
+                PitchCoordinate(12, 7),
+                PitchCoordinate(12, 8),
+                PitchCoordinate(10, 1),
+                PitchCoordinate(10, 4),
+                PitchCoordinate(10, 10),
+                PitchCoordinate(10, 13),
+                PitchCoordinate(8, 1),
+                PitchCoordinate(8, 4),
+                PitchCoordinate(8, 10),
+                PitchCoordinate(8, 13),
             )
             GameType.BB7 -> listOf(
-                FieldCoordinate(6, 2),
-                FieldCoordinate(6, 5),
-                FieldCoordinate(6, 8),
-                FieldCoordinate(5, 1),
-                FieldCoordinate(5, 4),
-                FieldCoordinate(5, 6),
-                FieldCoordinate(5, 9),
+                PitchCoordinate(6, 2),
+                PitchCoordinate(6, 5),
+                PitchCoordinate(6, 8),
+                PitchCoordinate(5, 1),
+                PitchCoordinate(5, 4),
+                PitchCoordinate(5, 6),
+                PitchCoordinate(5, 9),
             )
             else -> TODO("Game type not supported yet: ${game.rules.gameType}")
         }
@@ -258,26 +258,26 @@ class FuzzTester {
 
         val setup = when (game.rules.gameType) {
             GameType.STANDARD -> listOf(
-                FieldCoordinate(13, 6),
-                FieldCoordinate(13, 7),
-                FieldCoordinate(13, 8),
-                FieldCoordinate(15, 1),
-                FieldCoordinate(15, 4),
-                FieldCoordinate(15, 10),
-                FieldCoordinate(15, 13),
-                FieldCoordinate(17, 1),
-                FieldCoordinate(17, 4),
-                FieldCoordinate(17, 10),
-                FieldCoordinate(17, 13),
+                PitchCoordinate(13, 6),
+                PitchCoordinate(13, 7),
+                PitchCoordinate(13, 8),
+                PitchCoordinate(15, 1),
+                PitchCoordinate(15, 4),
+                PitchCoordinate(15, 10),
+                PitchCoordinate(15, 13),
+                PitchCoordinate(17, 1),
+                PitchCoordinate(17, 4),
+                PitchCoordinate(17, 10),
+                PitchCoordinate(17, 13),
             )
             GameType.BB7 -> listOf(
-                FieldCoordinate(13, 2),
-                FieldCoordinate(13, 5),
-                FieldCoordinate(13, 8),
-                FieldCoordinate(14, 1),
-                FieldCoordinate(14, 4),
-                FieldCoordinate(14, 6),
-                FieldCoordinate(14, 9),
+                PitchCoordinate(13, 2),
+                PitchCoordinate(13, 5),
+                PitchCoordinate(13, 8),
+                PitchCoordinate(14, 1),
+                PitchCoordinate(14, 4),
+                PitchCoordinate(14, 6),
+                PitchCoordinate(14, 9),
             )
             else -> TODO("Game type not supported yet: ${game.rules.gameType}")
         }
@@ -285,17 +285,17 @@ class FuzzTester {
         setupTeam(team, compositeActions, setup)
     }
 
-    private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<FieldCoordinate>) {
+    private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<PitchCoordinate>) {
         val playersTaken = mutableSetOf<PlayerId>()
 
-        setup.forEach { fieldCoordinate: FieldCoordinate ->
+        setup.forEach { pitchCoordinate: PitchCoordinate ->
             team.firstOrNull {
                 val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
                 inReserve && !playersTaken.contains(it.id)
             }?.let { selectedPlayer ->
                 playersTaken.add(selectedPlayer.id)
                 compositeActions.add(PlayerSelected(team[selectedPlayer.number]))
-                compositeActions.add(FieldSquareSelected(fieldCoordinate))
+                compositeActions.add(PitchSquareSelected(pitchCoordinate))
             }
         }
     }

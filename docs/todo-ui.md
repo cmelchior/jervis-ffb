@@ -10,7 +10,7 @@ they come up.
 - [ ] Add Action Wheel Icon for Leader Team Reroll
 - [ ] Add Action Wheel Icon for Brilliant Coaching Team Reroll
 - [ ] Add Team Captain Team Feature icon
-- [ ] Show better indicators for "Dev Mode" during Swoop, i.e. show what the values actually represent on the field, and not just the dice
+- [ ] Show better indicators for "Dev Mode" during Swoop, i.e. show what the values actually represent on the pitch, and not just the dice
 - [ ] A thrown player is rendered below a loose ball, which looks weird. We probably need to add a new "Air"-layer
 - [ ] Animations when a player is being thrown (including swoop)
 - [ ] Team Feature Icon for "+1 Offensive Assist on next Block"
@@ -23,7 +23,7 @@ they come up.
 - [ ] Action icon for Pogo
 - [ ] Reroll icon for Pass skill
 - [ ] Add Action Wheel selector and animation for "pass type".
-- [ ] During Kickoff when choosing to use the kick skill, also display on the field the end result of both results.
+- [ ] During Kickoff when choosing to use the kick skill, also display on the pitch the end result of both results.
 - [ ] When selecting dice rolls for scattering / deviating balls, show a translucent copy of where the ball will end up.
 - [ ] Kick-off pass animation doesn't work during Charge, if the kicking team ends up catching the ball on the receiving side.
 - [ ] Check that the UI works when kicking off when 0 players.
@@ -85,7 +85,7 @@ After the restructuring of the UI architecture to be more clean and immutable, I
 is a relatively clear path forward. However, we still need to figure out a good way to benchmark it.
 It seems fast enough, but I suspect there are lots of ways it can be optimized. 
 
-- [ ] Having both `FieldViewData` and `FieldSizeData` feels a bit redundant. It
+- [ ] Having both `PitchViewData` and `PitchSizeData` feels a bit redundant. It
       Would be nice to combine them some way.
 
 

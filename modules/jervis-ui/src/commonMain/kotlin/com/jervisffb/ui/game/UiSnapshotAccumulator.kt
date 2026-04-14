@@ -3,13 +3,13 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.ui.game.dialogs.UserInputDialog
-import com.jervisffb.ui.game.model.UiFieldPlayer
-import com.jervisffb.ui.game.model.UiFieldSquare
-import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
-import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
+import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.model.UiPitchSquare
+import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
+import com.jervisffb.ui.game.state.indicators.PitchStatusIndicator
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.game.view.ContextWheelUiState
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
  * Class responsible for collecting all changes to create a [UiGameSnapshot].
- * This is primarily used by [FieldActionDecorator] and [FieldStatusIndicator]
+ * This is primarily used by [PitchActionDecorator] and [PitchStatusIndicator]
  * subclasses.
  *
  * This class is mutable, but can send its current state to the UI using either
@@ -43,7 +43,7 @@ class UiSnapshotAccumulator(
     private val movesUsedBuilder = previousSnapshot.movesUsed.builder()
 
     val movesUsed: List<MoveUsed> = movesUsedBuilder
-    val squares: Map<FieldCoordinate, UiFieldSquare>
+    val squares: Map<PitchCoordinate, UiPitchSquare>
         field = previousSnapshot.squares.builder()
     val stack = uiController.state.stack
     var awayDogoutOnClickAction: (() -> Unit)? = null
@@ -59,7 +59,7 @@ class UiSnapshotAccumulator(
     var pathFinder: PathFinder.AllPathsResult? = null
 
     var showReferee = false
-    var refereeCoordinates: FieldCoordinate? = null
+    var refereeCoordinates: PitchCoordinate? = null
 
     fun addActionWheelEvent(event: ActionWheelUiState) {
         actionWheelEvents.add(event)
@@ -75,7 +75,7 @@ class UiSnapshotAccumulator(
         contextWheelEvents.add(event)
     }
 
-    fun getAllMoveUsed(): Map<FieldCoordinate, Int> {
+    fun getAllMoveUsed(): Map<PitchCoordinate, Int> {
         return movesUsed.associate { it.coordinate to it.value }
     }
 
@@ -87,13 +87,13 @@ class UiSnapshotAccumulator(
         statusBuilder = func(statusBuilder)
     }
 
-    fun addOrUpdateSquare(coordinate: FieldCoordinate, square: UiFieldSquare) {
+    fun addOrUpdateSquare(coordinate: PitchCoordinate, square: UiPitchSquare) {
         if (square != squares[coordinate]) {
             squares[coordinate] = square
         }
     }
 
-    fun updateSquare(coordinate: FieldCoordinate, func: (UiFieldSquare) -> UiFieldSquare) {
+    fun updateSquare(coordinate: PitchCoordinate, func: (UiPitchSquare) -> UiPitchSquare) {
         val currentSquare = squares[coordinate] ?: error("Could not find square for coordinate: $coordinate")
         val newSquare = func(currentSquare)
         // We probably do not need to compare here, since using this method always results in updates (I hope)
@@ -102,7 +102,7 @@ class UiSnapshotAccumulator(
         }
     }
 
-    fun updatePlayer(id: PlayerId, func: (UiFieldPlayer) -> UiFieldPlayer) {
+    fun updatePlayer(id: PlayerId, func: (UiPitchPlayer) -> UiPitchPlayer) {
         val currentPlayer = playersBuilder[id] ?: error("Could not find player for id: $id")
         val newPlayer = func(currentPlayer)
         // We probably do not need to compare here, since using this method always results in updates (I hope)
@@ -111,7 +111,7 @@ class UiSnapshotAccumulator(
         }
     }
 
-    fun addOrUpdatePlayer(id: PlayerId, player: UiFieldPlayer) {
+    fun addOrUpdatePlayer(id: PlayerId, player: UiPitchPlayer) {
         if (player != playersBuilder[id]) {
             playersBuilder[id] = player
         }
@@ -133,7 +133,7 @@ class UiSnapshotAccumulator(
         this.gameStatusText = message
     }
 
-    fun showReferee(coordinates: FieldCoordinate?) {
+    fun showReferee(coordinates: PitchCoordinate?) {
         this.showReferee = true
         this.refereeCoordinates = coordinates
     }

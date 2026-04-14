@@ -20,7 +20,7 @@ import com.jervisffb.ui.game.UiTeamInfoUpdate
  * TODO Figure out how to show both features and inducements. Should they be
  *  mixed, features first-then inducements, alphabetical?
  */
-object TeamFeatureStatusIndicator: FieldStatusIndicator {
+object TeamFeatureStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,
@@ -66,11 +66,11 @@ object TeamFeatureStatusIndicator: FieldStatusIndicator {
         // Team Captain can roll to keep rerolls
         if (team.specialRules.contains(TeamSpecialRule.TEAM_CAPTAIN)) {
             val rules = team.game.rules
-            val teamCaptainOnField = team.any { it.location.isOnField(rules) && it.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN)}
-            if (teamCaptainOnField) {
+            val teamCaptainOnPitch = team.any { it.location.isOnPitch(rules) && it.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN)}
+            if (teamCaptainOnPitch) {
                 featureList.add(
                     UiTeamFeature(
-                        name = "Team Captain on the Field",
+                        name = "Team Captain on the Pitch",
                         value = 1,
                         type = UiTeamFeatureType.TEAM_CAPTAIN,
                         used = false

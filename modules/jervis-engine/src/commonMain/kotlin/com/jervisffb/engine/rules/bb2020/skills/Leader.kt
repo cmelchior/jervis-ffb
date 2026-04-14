@@ -29,24 +29,24 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * 1. Add it at the beginning of the game, and then just toggle the "used" state
  *    depending on whether it is available or not.
  * 2. Add it after Master Chef has rolled.
- * 3. Add/Remove it during setup as the players are moved in/out of the field
+ * 3. Add/Remove it during setup as the players are moved in/out of the pitch
  * 4. Add it after the setup is complete.
  *
  * Adding it after Master Chef felt confusing, so 4) was chosen. This choice
  * probably needs user feedback to settle.
  *
- * Leader is removed when a player leaves the field. Which can happen through
+ * Leader is removed when a player leaves the pitch. Which can happen through
  * in a number of places. So far the following cases have been identified:
  *
  * - (✓) During setup: We only check for leader after the setup is complete.
  * - (✓) Knocked down: Reroll is present until player has finalized any injury.
  * - (✓) Falling over: Reroll is present until player has finalized any injury.
  * - (✓) Pushed into the crowd: Reroll is removed as soon as the player leaves the
- *   field. I.e., as soon as the player is physically moved.
+ *   pitch. I.e., as soon as the player is physically moved.
  * - (✓) Sent-off: Reroll is available only after argue the call has resolved.
  *
  * Open question: Are there any special effects that can remove a player from
- * the field without having them Knocked Down or Falling Over?
+ * the pitch without having them Knocked Down or Falling Over?
  */
 class Leader(
     override val player: Player,
@@ -65,14 +65,14 @@ class Leader(
 
     companion object {
         /**
-         * Runs through all players on the field, and if no player is found with
+         * Runs through all players on the pitch, and if no player is found with
          * the Leader skill, this method returns the commands needed to remove
          * Rerolls no longer available.
          */
         fun removeLeaderRerollIfNotAvailable(team: Team): Command? {
             val rules = team.game.rules
-            val leaderOnField = team.any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
-            return if (!leaderOnField) {
+            val leaderOnPitch = team.any { it.location.isOnPitch(rules) && it.hasSkill(SkillType.LEADER) }
+            return if (!leaderOnPitch) {
                 val commands = team.rerolls.filterIsInstance<LeaderTeamReroll>().map {
                     RemoveTeamReroll(team, it)
                 }

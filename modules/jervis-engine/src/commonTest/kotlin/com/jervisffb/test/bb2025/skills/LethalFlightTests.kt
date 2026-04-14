@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -45,7 +45,7 @@ class LethalFlightTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(3.d6, 6.d6), // Armour roll
@@ -67,7 +67,7 @@ class LethalFlightTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(2.d6, 6.d6), // Armour roll
@@ -87,7 +87,7 @@ class LethalFlightTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(5.d6, 6.d6), // Armour roll
@@ -112,7 +112,7 @@ class LethalFlightTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(3.d6, 6.d6), // Armour roll
@@ -132,7 +132,7 @@ class LethalFlightTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected(thrownPlayer),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(3.d6, 6.d6), // AV roll

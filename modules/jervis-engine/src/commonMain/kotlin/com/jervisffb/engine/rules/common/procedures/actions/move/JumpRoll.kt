@@ -98,11 +98,11 @@ object JumpRoll : D6WithRerollProcedure() {
             val context = state.getContext<JumpRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
-                    state.field[coord].player?.let { player ->
+                    state.pitch[coord].player?.let { player ->
                         player.team != context.player.team
                     } ?: false
                 }
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
 
             return if (eligiblePlayers.isNotEmpty()) {

@@ -12,7 +12,7 @@ import com.jervisffb.net.messages.GameActionServerError
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.utils.jervisLogger
@@ -38,7 +38,7 @@ class P2PActionProvider(
     }
 
     var lastServerActionIndex: GameActionId = GameActionId(-1)
-    private var sharedData: LocalFieldDataWrapper? = null
+    private var sharedData: LocalPitchDataWrapper? = null
 
     // For now, this only track Revert's from the server. Game Sync messages are handled
     // by just calling `userActionSelected`. Server Reverts will be run after all queued up
@@ -115,7 +115,7 @@ class P2PActionProvider(
         }
     }
 
-    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+    override fun updateSharedData(sharedData: LocalPitchDataWrapper) {
         this.sharedData = sharedData
         homeProvider.updateSharedData(sharedData)
         awayProvider.updateSharedData(sharedData)

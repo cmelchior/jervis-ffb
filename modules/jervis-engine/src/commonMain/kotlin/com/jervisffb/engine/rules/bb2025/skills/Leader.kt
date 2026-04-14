@@ -76,7 +76,7 @@ class Leader(
             val reroll = team.rerolls.singleOrNull { it is LeaderTeamReroll } ?: return null
             val rules = team.game.rules
             val leaders = team.filter { it.hasSkill(SkillType.LEADER) }
-            val leaderOnField = leaders.any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
+            val leaderOnPitch = leaders.any { it.location.isOnPitch(rules) && it.hasSkill(SkillType.LEADER) }
             val leadersPermanentlyRemoved = leaders
                 .all { player ->
                     val isInDogout = (player.location == DogOut)
@@ -100,10 +100,10 @@ class Leader(
                     isInDogout && removedState
                 }
             return when {
-                leaderOnField -> null
-                !leaderOnField && !leadersPermanentlyRemoved -> SetTeamRerollEnabled(team, reroll, enabled = false)
-                !leaderOnField && leadersPermanentlyRemoved -> RemoveTeamReroll(team, reroll)
-                else -> INVALID_GAME_STATE("Unexpected leader state: ($leaderOnField, $leadersPermanentlyRemoved)")
+                leaderOnPitch -> null
+                !leaderOnPitch && !leadersPermanentlyRemoved -> SetTeamRerollEnabled(team, reroll, enabled = false)
+                !leaderOnPitch && leadersPermanentlyRemoved -> RemoveTeamReroll(team, reroll)
+                else -> INVALID_GAME_STATE("Unexpected leader state: ($leaderOnPitch, $leadersPermanentlyRemoved)")
             }
         }
     }

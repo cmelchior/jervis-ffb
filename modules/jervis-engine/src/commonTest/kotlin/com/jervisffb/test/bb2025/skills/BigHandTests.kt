@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.BigHand
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
@@ -86,7 +86,7 @@ class BigHandTests: JervisGameBB2025Test() {
 
     @Test
     fun ignoreMarksOnPickup() {
-        SetPlayerLocation(homeTeam["H1".playerId], FieldCoordinate(18,8)).execute(state)
+        SetPlayerLocation(homeTeam["H1".playerId], PitchCoordinate(18,8)).execute(state)
         val player = awayTeam["A10".playerId]
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.MOVE),
@@ -115,7 +115,7 @@ class BigHandTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(player, PlayerStandardActionType.SECURE_THE_BALL)
         )
-        SetPlayerLocation(homeTeam["H1".playerId], FieldCoordinate(18,8)).execute(state)
+        SetPlayerLocation(homeTeam["H1".playerId], PitchCoordinate(18,8)).execute(state)
         controller.rollForward(
             SmartMoveTo(17, 7),
             Confirm, // Use Big Hand

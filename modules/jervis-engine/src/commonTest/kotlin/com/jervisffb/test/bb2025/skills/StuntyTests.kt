@@ -3,8 +3,8 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d6
@@ -14,7 +14,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.bb2025.skills.Stunty
 import com.jervisffb.engine.rules.common.actions.PassType
@@ -69,7 +69,7 @@ class StuntyTests: JervisGameBB2025Test() {
         controller.rollForward(
             *dodge(3.d6),
         )
-        assertEquals(FieldCoordinate(12, 4), player.coordinates)
+        assertEquals(PitchCoordinate(12, 4), player.coordinates)
         player.assertStanding()
     }
 
@@ -81,7 +81,7 @@ class StuntyTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
         )
         assertEquals(PassingType.ACCURATE, state.getContext<PassContext>().passingResult)

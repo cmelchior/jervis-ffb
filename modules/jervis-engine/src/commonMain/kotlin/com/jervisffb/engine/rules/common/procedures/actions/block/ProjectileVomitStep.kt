@@ -97,9 +97,9 @@ object ProjectileVomitStep: Procedure() {
             val attacker = state.activePlayer!!
             val eligibleDefenders: GameActionDescriptor =
                 attacker.coordinates.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isOccupied() }
-                    .filter { state.field[it].player!!.team != attacker.team }
-                    .map { state.field[it].player!! }
+                    .filter { state.pitch[it].isOccupied() }
+                    .filter { state.pitch[it].player!!.team != attacker.team }
+                    .map { state.pitch[it].player!! }
                     .let { SelectPlayer.fromPlayers(it) }
 
             return listOf(eligibleDefenders, EndActionWhenReady)

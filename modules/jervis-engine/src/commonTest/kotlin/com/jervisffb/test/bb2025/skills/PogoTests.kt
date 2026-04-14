@@ -1,19 +1,19 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Pogo
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
@@ -51,22 +51,22 @@ class PogoTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
         )
-        val availableCoordinates = controller.getAvailableActions().get<SelectFieldLocation>().squares.map { it.coordinate }
+        val availableCoordinates = controller.getAvailableActions().get<SelectPitchLocation>().squares.map { it.coordinate }
         val expectedCoordinates = setOf(
-            FieldCoordinate(13, 3),
-            FieldCoordinate(14, 3),
-            FieldCoordinate(15, 3),
-            FieldCoordinate(15, 4),
-            FieldCoordinate(15, 5),
-            FieldCoordinate(15, 6),
-            FieldCoordinate(15, 7),
-            FieldCoordinate(14, 7),
-            FieldCoordinate(11, 7),
-            FieldCoordinate(11, 6),
-            FieldCoordinate(11, 5),
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 3),
-            FieldCoordinate(12, 3),
+            PitchCoordinate(13, 3),
+            PitchCoordinate(14, 3),
+            PitchCoordinate(15, 3),
+            PitchCoordinate(15, 4),
+            PitchCoordinate(15, 5),
+            PitchCoordinate(15, 6),
+            PitchCoordinate(15, 7),
+            PitchCoordinate(14, 7),
+            PitchCoordinate(11, 7),
+            PitchCoordinate(11, 6),
+            PitchCoordinate(11, 5),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 3),
+            PitchCoordinate(12, 3),
         )
         assertEquals(expectedCoordinates.size, availableCoordinates.size)
         availableCoordinates.forEach {
@@ -85,7 +85,7 @@ class PogoTests: JervisGameBB2025Test() {
         assertEquals(2, pogoingPlayer.rushesLeft)
         controller.rollForward(
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             2.d6, // 2 Marks from leaving
         )
         assertTrue(state.getContext<PogoRollContext>().modifiers.none { it.modifier < 0 })
@@ -110,7 +110,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 6),
+            PitchSquareSelected(11, 6),
             2.d6, // 1 Mark when entering
         )
         assertTrue(state.getContext<PogoRollContext>().modifiers.none { it.modifier < 0 })
@@ -131,7 +131,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             2.d6,
             NoRerollSelected(),
         )
@@ -147,7 +147,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             1.d6,
             NoRerollSelected(),
         )
@@ -168,7 +168,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             3.d6, // Pogo
             NoRerollSelected(),
@@ -193,7 +193,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6),
             3.d6, // Pogo
@@ -218,7 +218,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(1.d6),
         )
         pogoingPlayer.assertFallenOver()
@@ -238,7 +238,7 @@ class PogoTests: JervisGameBB2025Test() {
             PlayerSelected(pogoingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.POGO),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
         )
 
         controller.rollForward(

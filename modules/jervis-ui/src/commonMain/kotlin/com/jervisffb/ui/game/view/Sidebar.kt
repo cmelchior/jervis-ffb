@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,7 +38,7 @@ import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.GameScreenModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.pixelSize
@@ -74,13 +73,13 @@ fun Sidebar(
                 }
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                        Reserves(vm.gameViewModel,vm.reserves(), vm.sharedFieldData) {
+                        Reserves(vm.gameViewModel,vm.reserves(), vm.sharedPitchData) {
                             vm.hoverExit()
                         }
                         Injuries(
                             vm.gameViewModel,
                             showIfEmpty = false,
-                            vm.sharedFieldData,
+                            vm.sharedPitchData,
                             vm.knockedOut(),
                             vm.badlyHurt(),
                             vm.seriousInjuries(),
@@ -172,7 +171,7 @@ private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> 
 private fun Reserves(
     screenModel: GameScreenModel,
     reserves: Flow<List<UiSidebarPlayer>>,
-    sharedData: LocalFieldDataWrapper,
+    sharedData: LocalPitchDataWrapper,
     onExit: () -> Unit
 ) {
     val list: List<UiSidebarPlayer> by reserves.collectAsState(emptyList())
@@ -186,7 +185,7 @@ private fun Reserves(
 private fun Injuries(
     screenModel: GameScreenModel,
     showIfEmpty: Boolean,
-    sharedFieldData: LocalFieldDataWrapper,
+    sharedPitchData: LocalPitchDataWrapper,
     knockedOut: Flow<List<UiSidebarPlayer>>,
     badlyHurt: Flow<List<UiSidebarPlayer>>,
     seriousInjuries: Flow<List<UiSidebarPlayer>>,
@@ -203,27 +202,27 @@ private fun Injuries(
         val specialList: List<UiSidebarPlayer> by special.collectAsState(emptyList())
         if (knockedOutList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Knocked Out")
-            PlayerSection(screenModel, knockedOutList, sharedFieldData)
+            PlayerSection(screenModel, knockedOutList, sharedPitchData)
         }
         if (badlyHurtList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Badly Hurt")
-            PlayerSection(screenModel, badlyHurtList, sharedFieldData)
+            PlayerSection(screenModel, badlyHurtList, sharedPitchData)
         }
         if (seriousInjuryList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Seriously Injured")
-            PlayerSection(screenModel, seriousInjuryList, sharedFieldData)
+            PlayerSection(screenModel, seriousInjuryList, sharedPitchData)
         }
         if (deadList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Dead")
-            PlayerSection(screenModel, deadList, sharedFieldData)
+            PlayerSection(screenModel, deadList, sharedPitchData)
         }
         if (bannedList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Banned")
-            PlayerSection(screenModel, bannedList, sharedFieldData)
+            PlayerSection(screenModel, bannedList, sharedPitchData)
         }
         if (specialList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Special")
-            PlayerSection(screenModel, specialList, sharedFieldData)
+            PlayerSection(screenModel, specialList, sharedPitchData)
         }
     }
 }
@@ -232,19 +231,19 @@ private fun Injuries(
  * A list of players in a dogout section
  *
  * @param compactView If `true` players will group together. If `false` players will remember their position when
- * moving between the field and the dogout.
+ * moving between the pitch and the dogout.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PlayerSection(
     screenModel: GameScreenModel,
     list: List<UiSidebarPlayer>,
-    sharedFieldData: LocalFieldDataWrapper,
+    sharedPitchData: LocalPitchDataWrapper,
     compactView: Boolean = true,
     onExit: () -> Unit = {}
 ) {
     val playersPrRow = 3
-    val fieldSize = sharedFieldData.size
+    val pitchSize = sharedPitchData.size
 
     if (!compactView) {
         val max = if (list.isNotEmpty()) list.maxBy { it.number.value }.number.value else 0
@@ -274,7 +273,7 @@ private fun PlayerSection(
                         ) {
                             if (sortedList.size > (index + x) && sortedList[index + x] != null) {
                                 val player = sortedList[index + x]!!.player
-                                val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
+                                val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
                                 Player(
                                     Modifier.pixelSize(playerSizePx),
                                     screenModel,
@@ -308,7 +307,7 @@ private fun PlayerSection(
                     ) {
                         if (list.size > (index + x)) {
                             val player = list[index + x].player
-                            val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
+                            val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
                             Player(
                                 modifier.pixelSize(playerSizePx),
                                 screenModel,

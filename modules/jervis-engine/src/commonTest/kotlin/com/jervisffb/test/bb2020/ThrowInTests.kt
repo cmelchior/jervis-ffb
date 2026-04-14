@@ -2,9 +2,9 @@ package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallLocation
@@ -14,7 +14,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
@@ -41,7 +41,7 @@ class ThrowInTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun throwInWhenLeavingField() {
+    fun throwInWhenLeavingPitch() {
         // Check that leaving the field triggers a throw-in. All other
         // tests in this class will just do this manually.
         // Starting square (0) is the square it had when leaving the field
@@ -51,7 +51,7 @@ class ThrowInTests: JervisGameBB2020Test() {
             *moveTo(17, 7),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(25, 0), // Throw into the corner
+            PitchSquareSelected(25, 0), // Throw into the corner
             *throwBall(6.d6),
             3.d8, // Bounce outside the field
         )
@@ -68,12 +68,12 @@ class ThrowInTests: JervisGameBB2020Test() {
             3.d8, // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(23, 2), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(23, 2), state.singleBall().coordinates)
     }
 
     @Test
     fun throwInFromTopBorder() {
-        leaveFieldAt(13, 0)
+        leavePitchAt(13, 0)
         controller.rollForward(
             1.d3, // Direction
             DiceRollResults(4.d6, 2.d6), // Distance to [19,6]
@@ -85,7 +85,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromBottomBorder() {
-        leaveFieldAt(13, 14)
+        leavePitchAt(13, 14)
         controller.rollForward(
             3.d3, // Direction
             DiceRollResults(4.d6, 2.d6), // Distance to [19,8]
@@ -98,7 +98,7 @@ class ThrowInTests: JervisGameBB2020Test() {
     @Test
     fun throwInFromLeftBorder() {
         // Move the ball and let the home team try to pick it up after which it will bounce
-        leaveFieldAt(0, 7)
+        leavePitchAt(0, 7)
         controller.rollForward(
             3.d3, // Direction
             DiceRollResults(1.d6, 3.d6), // Distance to [19,8]
@@ -110,7 +110,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromRightBorder() {
-        leaveFieldAt(25, 7)
+        leavePitchAt(25, 7)
         controller.rollForward(
             3.d3, // Direction
             DiceRollResults(1.d6, 1.d6), // Distance to [23,5]
@@ -122,7 +122,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromTopLeftCorner() {
-        leaveFieldAt(0, 0)
+        leavePitchAt(0, 0)
         controller.rollForward(
             3.d3, // Direction
             DiceRollResults(1.d6, 5.d6), // Distance to [0,6]
@@ -134,7 +134,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromTopRightCorner() {
-        leaveFieldAt(25, 0)
+        leavePitchAt(25, 0)
         controller.rollForward(
             1.d3, // Direction
             DiceRollResults(1.d6, 5.d6), // Distance to [25,6]
@@ -146,7 +146,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromBottomLeftCorner() {
-        leaveFieldAt(0, 14)
+        leavePitchAt(0, 14)
         controller.rollForward(
             1.d3, // Direction
             DiceRollResults(1.d6, 5.d6), // Distance to [0,6]
@@ -158,7 +158,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun throwInFromBottomRightCorner() {
-        leaveFieldAt(25, 14)
+        leavePitchAt(25, 14)
         controller.rollForward(
             1.d3, // Direction
             DiceRollResults(1.d6, 1.d6), // Distance to [23,14]
@@ -170,7 +170,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun playerInLandingSquareMustCatchIfPossible() {
-        leaveFieldAt(25, 1)
+        leavePitchAt(25, 1)
         controller.rollForward(
             2.d3, // Direction
             DiceRollResults(5.d6, 5.d6), // Distance
@@ -185,7 +185,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun bounceFromLandingSquareIfPlayerCannotCatch() {
-        leaveFieldAt(25, 1)
+        leavePitchAt(25, 1)
         awayTeam["A7".playerId].state = PlayerState.PRONE
         controller.rollForward(
             2.d3, // Direction
@@ -198,7 +198,7 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     @Test
     fun bounceFromLandingSquareIfEmpty() {
-        leaveFieldAt(25, 1)
+        leavePitchAt(25, 1)
         controller.rollForward(
             2.d3, // Direction
             DiceRollResults(2.d6, 2.d6), // Distance
@@ -212,8 +212,8 @@ class ThrowInTests: JervisGameBB2020Test() {
     }
 
     @Test
-    fun repeatThrowInUntilLandingOnField() {
-        leaveFieldAt(25, 4)
+    fun repeatThrowInUntilLandingOnPitch() {
+        leavePitchAt(25, 4)
         controller.rollForward(
             3.d3, // Direction
             DiceRollResults(6.d6, 6.d6), // Distance
@@ -229,18 +229,18 @@ class ThrowInTests: JervisGameBB2020Test() {
 
     // Manipulate game flow so the ball leaves the field after bouncing from a throw.
     // This method assumes the exit field is empty.
-    private fun leaveFieldAt(x: Int, y: Int) {
+    private fun leavePitchAt(x: Int, y: Int) {
         val bounceDirection = when {
             y == 0 -> 2.d8
-            y == rules.fieldHeight - 1 -> 7.d8
+            y == rules.pitchHeight - 1 -> 7.d8
             x == 0 -> 4.d8
-            x == rules.fieldWidth - 1 -> 5.d8
+            x == rules.pitchWidth - 1 -> 5.d8
             else -> error("Unsupported coordinate: ($x, $y)")
         }
 
         // For this we need to use the home team since they can reach the ball
         if (x == 0) {
-            SetBallLocation(state.singleBall(), FieldCoordinate(x, y)).execute(state)
+            SetBallLocation(state.singleBall(), PitchCoordinate(x, y)).execute(state)
             controller.rollForward(
                 EndTurn,
                 PlayerSelected("H11".playerId),
@@ -256,7 +256,7 @@ class ThrowInTests: JervisGameBB2020Test() {
                 *moveTo(17, 7),
                 *pickup(6.d6),
                 PassTypeSelected(PassType.STANDARD),
-                FieldSquareSelected(x, y), // Throw into the corner
+                PitchSquareSelected(x, y), // Throw into the corner
                 *throwBall(6.d6),
                 bounceDirection,
             )

@@ -5,12 +5,12 @@ import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.AddTeamReroll
@@ -38,7 +38,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -74,8 +74,8 @@ object SetupTeam : Procedure() {
             val availablePlayers =
                 context.team.filter {
                     val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
-                    val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
-                    inReserve || onField
+                    val onPitch = (it.location is PitchCoordinate && it.state == PlayerState.STANDING)
+                    inReserve || onPitch
                 }.let { players ->
                     if (players.isNotEmpty()) {
                         SelectPlayer.fromPlayers(players)
@@ -108,18 +108,18 @@ object SetupTeam : Procedure() {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val context = state.getContext<SetupTeamContext>()
-            val freeFields: List<TargetSquare> =
-                state.field
+            val freeSquares: List<TargetSquare> =
+                state.pitch
                     .filter { rules.isInSetupArea(context.team, it) }
                     .filter { it.isUnoccupied() }
                     .map { TargetSquare.setup(it.coordinates) }
 
             val playerLocation = context.currentPlayer!!.location
             var playerSquare: List<TargetSquare> = emptyList()
-            if (playerLocation is FieldCoordinate) {
+            if (playerLocation is PitchCoordinate) {
                 playerSquare = listOf(TargetSquare.setup(playerLocation))
             }
-            return listOf(SelectDogout, SelectFieldLocation(playerSquare + freeFields))
+            return listOf(SelectDogout, SelectPitchLocation(playerSquare + freeSquares))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -135,14 +135,14 @@ object SetupTeam : Procedure() {
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 }
-                is FieldSquareSelected -> {
+                is PitchSquareSelected -> {
                     when (context.team.isHomeTeam()) {
                         true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
                         false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
                     }
                     compositeCommandOf(
                         getAddLeaderRerollCommand(player),
-                        SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
+                        SetPlayerLocation(player, PitchCoordinate(action.x, action.y)),
                         SetPlayerState(player, PlayerState.STANDING),
                         UpdateContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
@@ -178,7 +178,7 @@ object SetupTeam : Procedure() {
     }
 
     // -- HELPER METHODS --
-    // If a new Leader is added to the field, also add a Leader reroll
+    // If a new Leader is added to the pitch, also add a Leader reroll
     // Only 1 leader reroll is allowed.
     fun getAddLeaderRerollCommand(playerAdded: Player): Command? {
         if (!playerAdded.isSkillAvailable(SkillType.LEADER)) return null
@@ -188,7 +188,7 @@ object SetupTeam : Procedure() {
         val startOfHalf = (team.turnMarker == 0 && team.game.halfNo <= rules.halfsPrGame)
         val otherLeaderOnPitch = team
             .filterNot { it == playerAdded }
-            .any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
+            .any { it.location.isOnPitch(rules) && it.hasSkill(SkillType.LEADER) }
 
         return when {
             startOfHalf && !otherLeaderOnPitch -> AddTeamReroll(team,LeaderTeamReroll(team.id))
@@ -209,7 +209,7 @@ object SetupTeam : Procedure() {
         val startOfHalf = (team.turnMarker == 0 && team.game.halfNo <= rules.halfsPrGame)
         val otherLeaderOnPitch = team
             .filterNot { it == playerRemoved }
-            .any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
+            .any { it.location.isOnPitch(rules) && it.hasSkill(SkillType.LEADER) }
 
         return when {
             startOfHalf && !otherLeaderOnPitch -> RemoveTeamReroll(team, reroll!!)

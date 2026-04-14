@@ -5,9 +5,9 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallState
@@ -209,7 +209,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *jump(3.d6), // 1 Marked Modifiers from leaving/entering
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6),
@@ -227,7 +227,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(jumpingPlayer, PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *jump(1.d6),
             Confirm, // Use Steady Footing
             *steadyFootingRoll(6.d6),
@@ -246,7 +246,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(10, 5),
+            PitchSquareSelected(10, 5),
             *qualityRoll(6.d6),
             DiceRollResults(2.d8, 6.d8, 5.d8), // Always scatter
             *landingRoll(1.d6),
@@ -265,7 +265,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(6.d6, 6.d6), // Armour roll
@@ -292,7 +292,7 @@ class SteadyFootingTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.THROW_TEAM_MATE),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(12, 5),
+            PitchSquareSelected(12, 5),
             *qualityRoll(6.d6),
             DiceRollResults(1.d8, 7.d8, 5.d8), // Hit target square
             DiceRollResults(6.d6, 6.d6), // Armour roll

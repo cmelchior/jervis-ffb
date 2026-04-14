@@ -2,8 +2,8 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
 /**
  * Set player location. This also include state changes related to being thrown or not.
@@ -15,31 +15,31 @@ class SetPlayerLocation(
 ) : Command {
     private var originalPlayerBeingThrown = false
     lateinit var originalPlayerLocation: Location
-    private var originalPlayerOnField: Player? = null
-    private var originalThrownPlayerOnField: Player? = null
+    private var originalPlayerOnPitch: Player? = null
+    private var originalThrownPlayerOnPitch: Player? = null
 
     override fun execute(state: Game) {
         // Save original state
         this.originalPlayerLocation = player.location
         this.originalPlayerBeingThrown = player.isBeingThrown
-        if (originalPlayerLocation is FieldCoordinate) {
-            if (player.location == FieldCoordinate.UNKNOWN || player.location.isOutOfBounds(state.rules)) {
-                this.originalPlayerOnField = null
-                this.originalThrownPlayerOnField = null
+        if (originalPlayerLocation is PitchCoordinate) {
+            if (player.location == PitchCoordinate.UNKNOWN || player.location.isOutOfBounds(state.rules)) {
+                this.originalPlayerOnPitch = null
+                this.originalThrownPlayerOnPitch = null
             } else {
-                this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
-                this.originalThrownPlayerOnField = state.field[player.location as FieldCoordinate].thrownPlayer
+                this.originalPlayerOnPitch = state.pitch[player.location as PitchCoordinate].player
+                this.originalThrownPlayerOnPitch = state.pitch[player.location as PitchCoordinate].thrownPlayer
             }
         }
 
         // Remove from old location
         val oldLocation = originalPlayerLocation
-        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && !oldLocation.isOutOfBounds(state.rules)) {
-            state.field[oldLocation].apply {
+        if (oldLocation is PitchCoordinate && oldLocation != PitchCoordinate.UNKNOWN && !oldLocation.isOutOfBounds(state.rules)) {
+            state.pitch[oldLocation].apply {
                 // In some cases, players are in an intermediate state, where
-                // field.location doesn't match player.location. E.g. when
+                // square.location doesn't match player.location. E.g. when
                 // setting up a pushback chain. In that case, do not remove the
-                // player from the field.
+                // player from the pitch.
                 if (player == this@SetPlayerLocation.player) {
                     player = null
                 }
@@ -52,8 +52,8 @@ class SetPlayerLocation(
         // Add to new location
         player.location = location
         player.isBeingThrown = isThrown
-        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
-            state.field[location].apply {
+        if (location is PitchCoordinate && location != PitchCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
+            state.pitch[location].apply {
                 if (isThrown) {
                     thrownPlayer = this@SetPlayerLocation.player
                 } else {
@@ -64,8 +64,8 @@ class SetPlayerLocation(
     }
 
     override fun undo(state: Game) {
-        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
-            state.field[location].apply {
+        if (location is PitchCoordinate && location != PitchCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
+            state.pitch[location].apply {
                 if (isThrown) {
                     thrownPlayer = null
                 } else {
@@ -76,10 +76,10 @@ class SetPlayerLocation(
         player.location = originalPlayerLocation
         player.isBeingThrown = originalPlayerBeingThrown
         val originalLoc = originalPlayerLocation
-        if (originalLoc is FieldCoordinate && originalLoc != FieldCoordinate.UNKNOWN && !originalLoc.isOutOfBounds(state.rules)) {
-            state.field[originalLoc].apply {
-                player = originalPlayerOnField
-                thrownPlayer = originalThrownPlayerOnField
+        if (originalLoc is PitchCoordinate && originalLoc != PitchCoordinate.UNKNOWN && !originalLoc.isOutOfBounds(state.rules)) {
+            state.pitch[originalLoc].apply {
+                player = originalPlayerOnPitch
+                thrownPlayer = originalThrownPlayerOnPitch
             }
         }
     }

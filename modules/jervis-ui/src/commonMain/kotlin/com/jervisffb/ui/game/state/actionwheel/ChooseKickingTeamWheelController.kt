@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.procedures.CoinTossContext
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -20,7 +20,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -31,7 +31,7 @@ object ChooseKickingTeamWheelController : ActionWheelDialogController() {
         DetermineKickingTeamStep.ChooseKickingTeam,
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<CoinTossContext>()
         return when (context.winner!!.isAwayTeam()) {
             true -> AwayTeamFanFactorRoll.getActionWheelCenter(state)
@@ -43,7 +43,7 @@ object ChooseKickingTeamWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val buttons = listOf(
             CoinButtonData(

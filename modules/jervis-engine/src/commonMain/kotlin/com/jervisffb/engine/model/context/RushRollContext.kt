@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
@@ -13,7 +13,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  */
 data class RushRollContext(
     val player: Player,
-    val target: OnFieldLocation,
+    val target: OnPitchLocation,
     val roll: D6DieRoll? = null,
     val modifiers: List<DiceModifier> = emptyList(),
     val isSuccess: Boolean = false

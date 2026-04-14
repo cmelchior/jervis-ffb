@@ -80,7 +80,7 @@ the flow of the game as well as what are valid actions for any current state.
 It has two main parts:
 
 1. A `Rules` subclass: This class contains all the static rules for the game and
-   defines things like the size of the field, which lookup tables to use, etc. 
+   defines things like the size of the pitch, which lookup tables to use, etc. 
    It should contain no runtime state and all functions should be pure.
 
 2. A set of `Procedure` and `Node` classes. These classes define the flow of 

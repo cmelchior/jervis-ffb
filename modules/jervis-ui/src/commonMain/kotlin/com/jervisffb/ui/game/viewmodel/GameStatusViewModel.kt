@@ -4,7 +4,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiTeamInfoUpdate
 import com.jervisffb.ui.menu.GameScreenModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
  */
 class GameStatusViewModel(
     val screenModel: GameScreenModel,
-    val localFieldData: LocalFieldDataWrapper,
+    val localPitchData: LocalPitchDataWrapper,
     val controller: UiGameController
 ) {
 
@@ -34,7 +34,7 @@ class GameStatusViewModel(
     }
 
     // Which "game status" message to show. It is shown below the "Game Status" button
-    // and just above the field.
+    // and just above the pitch.
     fun messageFlow(): Flow<String?> {
         return controller.uiStateFlow.map {
             it.gameStatusText

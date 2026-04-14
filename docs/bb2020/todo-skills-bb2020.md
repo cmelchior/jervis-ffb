@@ -103,7 +103,7 @@ a test class in `modules/game-model/src/commonTest/kotlin/dk/ilios/jervis/skills
   - [ ] After Knocked Down
   - [ ] After Falling over
   - [ ] Removed immediately if pushed into the crowd
-  - [ ] Not removed if other players with Leader on the field
+  - [ ] Not removed if other players with Leader on the pitch
   - [ ] Only one, regardless of number of players
 - [ ] Nerves of Steel
 - [ ] On the Ball

@@ -4,11 +4,11 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
-object SelectDirectionDecorator: FieldActionDecorator<SelectDirection> {
+object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -16,7 +16,7 @@ object SelectDirectionDecorator: FieldActionDecorator<SelectDirection> {
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
-        val origin = state.field[descriptor.origin as FieldCoordinate]
+        val origin = state.pitch[descriptor.origin as PitchCoordinate]
 
         // If pushing into the crowd is the only option, figure out how to handle this.
         // Should it just be done inside the rules engine through a "Continue" event? Are

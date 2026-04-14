@@ -3,7 +3,7 @@ package com.jervisffb.ui.game.dialogs
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.utils.assert
 import com.jervisffb.ui.game.view.ActionWheelUiState
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class PrimaryActionWheelViewModel(
     val eventFlow: Flow<List<ActionWheelUiState>>,
     team: Team,
-    sharedFieldData: LocalFieldDataWrapper
+    sharedPitchData: LocalPitchDataWrapper
 ) : AbstractActionWheelViewModel(
         team = team,
-        sharedFieldData = sharedFieldData,
+        sharedPitchData = sharedPitchData,
     ) {
 
     private val _eventFlow = MutableSharedFlow<ActionWheelUiState>(replay = 1, extraBufferCapacity = Int.MAX_VALUE)
@@ -49,9 +49,9 @@ class PrimaryActionWheelViewModel(
             val willShowWheel = !event.isHiding() && (event.topItems.isNotEmpty() || event.bottomItems.isNotEmpty())
             _eventFlow.emit(event)
 
-            val isCurrentWheelVisible = sharedFieldData.isPrimaryActionWheelVisible.value
+            val isCurrentWheelVisible = sharedPitchData.isPrimaryActionWheelVisible.value
             val ignoreEvent = (!isCurrentWheelVisible && !willShowWheel)
-            sharedFieldData.setPrimaryActionWheelVisibility(willShowWheel)
+            sharedPitchData.setPrimaryActionWheelVisibility(willShowWheel)
             if (!ignoreEvent) {
                 // Wait for UI to process the Action Wheel update, including animations
                 wheelEventDone.receive()
@@ -64,7 +64,7 @@ class PrimaryActionWheelViewModel(
     }
 
     override fun hideWheel(onDismiss: (() -> Unit)?) {
-        sharedFieldData.let {
+        sharedPitchData.let {
             assert(it.isActionWheelVisible.value) {
                 "Action wheel is not visible, but hideWheel() was called"
             }

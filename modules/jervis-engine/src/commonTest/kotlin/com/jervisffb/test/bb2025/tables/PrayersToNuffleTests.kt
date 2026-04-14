@@ -3,9 +3,9 @@ package com.jervisffb.test.bb2025.tables
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
@@ -171,7 +171,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             5.d6, // Argue the call roll
             Confirm, // Accept using Friends with the Ref
         )
-        assertTrue(state.getPlayerById("A1".playerId).location.isOnField(rules))
+        assertTrue(state.getPlayerById("A1".playerId).location.isOnPitch(rules))
         state.getPlayerById("A1".playerId).assertStanding()
 
         // Check the prayer is gone by the end of drive
@@ -691,7 +691,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(13, 1), // Requires Rush
+            PitchSquareSelected(13, 1), // Requires Rush
             2.d6, // Should fail due to Moles Under The Pitch
         )
         assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())
@@ -727,7 +727,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(13, 1), // Requires Rush
+            PitchSquareSelected(13, 1), // Requires Rush
             3.d6, // Should fail due to 2xMoles Under The Pitch
         )
         assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())

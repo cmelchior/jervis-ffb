@@ -9,8 +9,8 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RollDice
@@ -25,7 +25,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.KickoffStatModifier
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
@@ -145,9 +145,9 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
-                    FieldSquareSelected(0, 5),
+                    PitchSquareSelected(0, 5),
                     PlayerSelected("H7".playerId),
-                    FieldSquareSelected(0, 6),
+                    PitchSquareSelected(0, 6),
                     EndSetup, // Will be valid
                 ),
             )
@@ -167,13 +167,13 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
-                    FieldSquareSelected(0, 0),
+                    PitchSquareSelected(0, 0),
                     PlayerSelected("H7".playerId),
-                    FieldSquareSelected(0, 1),
+                    PitchSquareSelected(0, 1),
                     PlayerSelected("H8".playerId),
-                    FieldSquareSelected(0, 2),
+                    PitchSquareSelected(0, 2),
                     PlayerSelected("H9".playerId),
-                    FieldSquareSelected(0, 3),
+                    PitchSquareSelected(0, 3),
                     EndSetup, // Will be invalid
                 ),
                 bounce = null
@@ -218,15 +218,15 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
-                    FieldSquareSelected(11, 1), // Same location, do not count
+                    PitchSquareSelected(11, 1), // Same location, do not count
                     PlayerSelected("H7".playerId),
-                    FieldSquareSelected(9, 6), // Move 1
+                    PitchSquareSelected(9, 6), // Move 1
                     PlayerSelected("H8".playerId),
-                    FieldSquareSelected(9, 13), // Move 1
+                    PitchSquareSelected(9, 13), // Move 1
                     PlayerSelected("H9".playerId),
-                    FieldSquareSelected(10, 13), // Move 1
+                    PitchSquareSelected(10, 13), // Move 1
                     PlayerSelected("H10".playerId),
-                    FieldSquareSelected(8, 7), // Move 1
+                    PitchSquareSelected(8, 7), // Move 1
                 ),
                 bounce = null
             )
@@ -268,7 +268,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 6),
+                placeKick = PitchSquareSelected(13, 6),
                 deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [13,5] which is occupied
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick
@@ -291,7 +291,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 2.d6), // Move ball to [11,7], behind opponent LoS
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick
@@ -320,7 +320,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         awayTeam.forEach { it.state = PlayerState.PRONE }
         controller.rollForward(
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(21, 7),
+                placeKick = PitchSquareSelected(21, 7),
                 deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [21,5]
                 kickoffEvent = arrayOf(
                     DiceRollResults(1.d6, 4.d6), // Roll High Kick, cannot be used because no players are available
@@ -633,7 +633,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(18, 3), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(18, 3), state.getBall().coordinates)
     }
 
     @Test
@@ -642,7 +642,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers sid
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -664,7 +664,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 7),
+                placeKick = PitchSquareSelected(13, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers side
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -676,7 +676,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
         assertEquals(BallState.ON_GROUND, state.getBall().state)
-        assertEquals(FieldCoordinate(14, 5), state.getBall().coordinates)
+        assertEquals(PitchCoordinate(14, 5), state.getBall().coordinates)
     }
 
     @Test
@@ -685,7 +685,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
+                placeKick = PitchSquareSelected(13, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Deviate out of bounds with exit at [13, 0]
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
@@ -722,13 +722,13 @@ class KickOffEventTests: JervisGameBB2025Test() {
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))
-        assertEquals(8, controller.getAvailableActions().actionsCount) // Can move into all nearby fields
+        assertEquals(8, controller.getAvailableActions().actionsCount) // Can move into all nearby squares
         controller.rollForward(
-            FieldSquareSelected(14,0),
+            PitchSquareSelected(14,0),
             PlayerSelected("A7".playerId),
-            FieldSquareSelected(14,1),
+            PitchSquareSelected(14,1),
             PlayerSelected("A9".playerId),
-            FieldSquareSelected(14,14),
+            PitchSquareSelected(14,14),
             EndSetup
         )
         assertEquals(Bounce.RollDirection, controller.currentNode())
@@ -768,13 +768,13 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,0),
+                    PitchSquareSelected(14,0),
                     PlayerSelected("A7".playerId),
-                    FieldSquareSelected(14,1),
+                    PitchSquareSelected(14,1),
                     PlayerSelected("A9".playerId),
-                    FieldSquareSelected(14,14),
+                    PitchSquareSelected(14,14),
                     PlayerSelected("A8".playerId),
-                    FieldSquareSelected(14,13),
+                    PitchSquareSelected(14,13),
                 ),
             )
         )
@@ -782,7 +782,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun quickSnap_sameFieldDoesNotCountAsMoved() {
+    fun quickSnap_sameSquareDoesNotCountAsMoved() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -791,9 +791,9 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,1), // Same location
+                    PitchSquareSelected(14,1), // Same location
                     PlayerSelected("A6".playerId),
-                    FieldSquareSelected(14,1), // Same location
+                    PitchSquareSelected(14,1), // Same location
                     EndSetup
                 )
             )
@@ -817,7 +817,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             )
         )
         val player = state.getPlayerById("A1".playerId)
-        assertTrue(player.location.isOnField(rules))
+        assertTrue(player.location.isOnPitch(rules))
         assertTrue(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
         assertTrue(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
         assertTrue(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
@@ -839,7 +839,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
             )
         )
         val player = state.getPlayerById("A1".playerId)
-        assertFalse(player.location.isOnField(rules))
+        assertFalse(player.location.isOnPitch(rules))
         assertEquals(PlayerState.DODGY_SNACK, player.state)
         assertFalse(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
         assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
@@ -954,7 +954,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun pitchInvasion_lessAvailablePlayersOnTheField() {
+    fun pitchInvasion_lessAvailablePlayersOnThePitch() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()
@@ -983,7 +983,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun pitchInvasion_noPlayersOnField() {
+    fun pitchInvasion_noPlayersOnPitch() {
         controller.rollForward(
             *defaultPregame(),
             *defaultHomeSetup(),

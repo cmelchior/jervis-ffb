@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.common.pathfinder
 
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
@@ -12,15 +12,15 @@ import kotlin.math.abs
 @Serializable
 class BB2020PathFinder() : PathFinder {
     class DebugInformation(
-        val fieldView: Array<Array<Int>>,
+        val pitchView: Array<Array<Int>>,
         val openSet: PriorityQueue<AStarNode>,
-        val cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
-        val gScore: Map<FieldCoordinate, Double>,
-        val currentLocation: Pair<FieldCoordinate, Int>,
+        val cameFrom: Map<PitchCoordinate, PitchCoordinate?>,
+        val gScore: Map<PitchCoordinate, Double>,
+        val currentLocation: Pair<PitchCoordinate, Int>,
     )
 
     data class AStarNode(
-        val point: FieldCoordinate,
+        val point: PitchCoordinate,
         val g: Double,
         val h: Int,
     ) : Comparable<AStarNode> {
@@ -28,7 +28,7 @@ class BB2020PathFinder() : PathFinder {
         override fun compareTo(other: AStarNode) = f.compareTo(other.f)
     }
 
-    data class DjikstraNode(val point: FieldCoordinate, val distanceInSteps: Int, val realDistance: Double) : Comparable<DjikstraNode> {
+    data class DjikstraNode(val point: PitchCoordinate, val distanceInSteps: Int, val realDistance: Double) : Comparable<DjikstraNode> {
         override fun compareTo(other: DjikstraNode): Int {
             return realDistance.compareTo(other.realDistance)
         }
@@ -40,10 +40,10 @@ class BB2020PathFinder() : PathFinder {
      */
     override fun getStraightLine(
         state: Game,
-        start: FieldCoordinate,
-        end: FieldCoordinate,
-    ): List<FieldCoordinate> {
-        val line = mutableListOf<FieldCoordinate>()
+        start: PitchCoordinate,
+        end: PitchCoordinate,
+    ): List<PitchCoordinate> {
+        val line = mutableListOf<PitchCoordinate>()
         var x = start.x
         var y = start.y
         val dx = abs(end.x - x)
@@ -52,7 +52,7 @@ class BB2020PathFinder() : PathFinder {
         val sy = if (y < end.y) 1 else -1
         var error = dx - dy
         while (true) {
-            line.add(FieldCoordinate(x, y))
+            line.add(PitchCoordinate(x, y))
             if (x == end.x && y == end.y) break
             val e2 = 2 * error
             if (e2 >= -dy) {
@@ -75,38 +75,38 @@ class BB2020PathFinder() : PathFinder {
      */
     override fun calculateShortestPath(
         state: Game,
-        start: FieldCoordinate,
-        goal: FieldCoordinate,
+        start: PitchCoordinate,
+        goal: PitchCoordinate,
         maxMove: Int,
         includeDebugInfo: Boolean,
     ): PathFinder.SinglePathResult {
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeamOrThrow())
-        var pathState = listOf<FieldCoordinate>()
+        val pitchView: Array<Array<Int>> = preparePitchView(state.rules,state.pitch, state.activeTeamOrThrow())
+        var pathState = listOf<PitchCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
         val openSet = PriorityQueue<AStarNode> { a, b -> a.compareTo(b) }
-        val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
-        val gScore = mutableMapOf<FieldCoordinate, Double>().withDefault { Double.MAX_VALUE }
+        val cameFrom = mutableMapOf<PitchCoordinate, PitchCoordinate?>()
+        val gScore = mutableMapOf<PitchCoordinate, Double>().withDefault { Double.MAX_VALUE }
         // Track the closest location to the goal. Only used if goal couldn't be reached
-        var closestLocation: Pair<FieldCoordinate, Int> = Pair(start, Int.MAX_VALUE)
+        var closestLocation: Pair<PitchCoordinate, Int> = Pair(start, Int.MAX_VALUE)
 
         openSet.offer(AStarNode(start, 0.0, calculateHeuristicValue(start, goal)))
         gScore[start] = 0.0
 
         while (!openSet.isEmpty) {
             val currentNode = openSet.poll()!!
-            val currentLocation: FieldCoordinate = currentNode.point
+            val currentLocation: PitchCoordinate = currentNode.point
             if (currentLocation == goal) {
                 pathState = reconstructPath(cameFrom, currentLocation, maxMove)
                 break
             }
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
+            val neighbors: List<PitchCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
             for (neighbor in neighbors) {
                 // We do not allow any path to go through a square that either contains Tackle Zones
                 // or the Ball (anything that might require a dice roll), but we allow the path
                 // to terminate there.
-                val neighborValue = fieldView[neighbor.x][neighbor.y]
-                val hasBall = state.field[neighbor].balls.any { it.state == BallState.ON_GROUND }
+                val neighborValue = pitchView[neighbor.x][neighbor.y]
+                val hasBall = state.pitch[neighbor].balls.any { it.state == BallState.ON_GROUND }
                 val inTackleZone = (neighborValue > 0 && neighborValue < Int.MAX_VALUE)
                 val isTerminalNode = hasBall || inTackleZone
 
@@ -131,7 +131,7 @@ class BB2020PathFinder() : PathFinder {
         val debugInfo: DebugInformation? =
             if (includeDebugInfo) {
                 DebugInformation(
-                    fieldView,
+                    pitchView,
                     openSet,
                     cameFrom,
                     gScore,
@@ -156,38 +156,38 @@ class BB2020PathFinder() : PathFinder {
      */
     override fun calculateAllPaths(
         state: Game,
-        start: FieldCoordinate,
+        start: PitchCoordinate,
         maxMove: Int,
     ): PathFinder.AllPathsResult {
-        // Prepare a primitive version of the field that contains the following values:
-        // - Int.MAX if the location is occupied
+        // Prepare a primitive version of the pitch that contains the following values:
+        // - Int.MAX if the square is occupied
         // - i > 0 is the number of tackle zones.
-        // - 0 = Field is safe to move to
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeamOrThrow())
+        // - 0 = Square is safe to move to
+        val pitchView: Array<Array<Int>> = preparePitchView(state.rules,state.pitch, state.activeTeamOrThrow())
         // Calculated distances
-        val distances = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
+        val distances = mutableMapOf<PitchCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Nodes being processed
         val openSet = PriorityQueue<DjikstraNode> { a, b -> a.compareTo(b) }
         // Used to do backtracking in order to create a path
-        val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
+        val cameFrom = mutableMapOf<PitchCoordinate, PitchCoordinate?>()
 
         distances[start] = 0
         openSet.offer(DjikstraNode(start, 0, 0.0))
 
         while (!openSet.isEmpty) {
-            val currentLocation: FieldCoordinate = openSet.poll()!!.point
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
+            val currentLocation: PitchCoordinate = openSet.poll()!!.point
+            val neighbors: List<PitchCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
             for (neighbor in neighbors) {
                 val neighborValue: Int = distances.getValue(neighbor)
 
                 // Skip all squares containing a player
-                if (fieldView[neighbor.x][neighbor.y] == Int.MAX_VALUE) {
+                if (pitchView[neighbor.x][neighbor.y] == Int.MAX_VALUE) {
                     continue
                 }
 
                 // Terminal nodes can be entered, but not exited.
-                val hasTackleZone = (fieldView[neighbor.x][neighbor.y] > 0)
-                val hasBall = state.field[neighbor.x, neighbor.y].balls.any { it.state == BallState.ON_GROUND }
+                val hasTackleZone = (pitchView[neighbor.x][neighbor.y] > 0)
+                val hasBall = state.pitch[neighbor.x, neighbor.y].balls.any { it.state == BallState.ON_GROUND }
                 val isTreacherousTrapdoor = false
                 val isTerminalNode = hasTackleZone || hasBall || isTreacherousTrapdoor
                 val tentativeDistance = distances.getValue(currentLocation) + 1
@@ -207,7 +207,7 @@ class BB2020PathFinder() : PathFinder {
                     // as well as the real distance to the new location. Using this heuristic will favor
                     // straight lines over diagonals, while still keeping the line from start to end as
                     // straight as possible.
-                    val currentCameFromLocation: FieldCoordinate = cameFrom[neighbor]!!
+                    val currentCameFromLocation: PitchCoordinate = cameFrom[neighbor]!!
                     val oldDistance = currentCameFromLocation.realDistanceTo(neighbor) + currentCameFromLocation.realDistanceTo(start)
                     val newDistance = currentLocation.realDistanceTo(neighbor) + currentLocation.realDistanceTo(start)
                     if (newDistance < oldDistance) {
@@ -218,12 +218,12 @@ class BB2020PathFinder() : PathFinder {
         }
 
         return object : PathFinder.AllPathsResult {
-            override val distances: Map<FieldCoordinate, Int> = distances
+            override val distances: Map<PitchCoordinate, Int> = distances
 
             override fun getClosestPathTo(
-                goal: FieldCoordinate,
+                goal: PitchCoordinate,
                 maxMove: Int,
-            ): List<FieldCoordinate> {
+            ): List<PitchCoordinate> {
                 if (maxMove < 0) throw IllegalArgumentException("Illegal max move: $maxMove")
                 if (distances.containsKey(goal)) {
                     return reconstructPath(cameFrom, goal, maxMove)
@@ -242,9 +242,9 @@ class BB2020PathFinder() : PathFinder {
             }
 
             override fun getPathTo(
-                goal: FieldCoordinate,
+                goal: PitchCoordinate,
                 maxMove: Int,
-            ): List<FieldCoordinate>? {
+            ): List<PitchCoordinate>? {
                 return if (distances.containsKey(goal)) {
                     getClosestPathTo(goal)
                 } else {
@@ -254,49 +254,49 @@ class BB2020PathFinder() : PathFinder {
         }
     }
 
-    private fun prepareFieldView(
+    private fun preparePitchView(
         rules: Rules,
-        field: Field,
+        pitch: Pitch,
         movingTeam: Team,
     ): Array<Array<Int>> {
-        // Prepare a primitive version of the field that contains the following values:
-        // - Int.MAX if the location is occupied
+        // Prepare a primitive version of the pitch that contains the following values:
+        // - Int.MAX if the square is occupied
         // - i > 0 is the number of tackle zones.
-        // - 0 = Field is safe to move to
-        val fieldView =
+        // - 0 = square is safe to move to
+        val pitchView =
             Array(26) {
                 Array(15) { 0 }
             }
-        field.forEach { square ->
+        pitch.forEach { square ->
             if (square.isOccupied()) {
-                // Location contains a player. Mark this field and all adjacent fields as blocked
+                // Location contains a player. Mark this square and all adjacent squares as blocked
                 // if the player is an opponent.
-                fieldView[square.x][square.y] = Int.MAX_VALUE
+                pitchView[square.x][square.y] = Int.MAX_VALUE
                 if (square.player?.team != movingTeam && square.player?.hasTackleZones == true) {
                     square.coordinates.getSurroundingCoordinates(rules).forEach { neighbor ->
-                        if (fieldView[neighbor.x][neighbor.y] < Int.MAX_VALUE) {
-                            fieldView[neighbor.x][neighbor.y] += 1
+                        if (pitchView[neighbor.x][neighbor.y] < Int.MAX_VALUE) {
+                            pitchView[neighbor.x][neighbor.y] += 1
                         }
                     }
                 }
             }
             // TODO Other things, end zone detection, trapdoors? Anything else dangerous?
         }
-        return fieldView
+        return pitchView
     }
 
     private fun calculateHeuristicValue(
-        start: FieldCoordinate,
-        end: FieldCoordinate,
+        start: PitchCoordinate,
+        end: PitchCoordinate,
     ): Int {
         return start.distanceTo(end)
     }
 
     private fun reconstructPath(
-        cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
-        currentLocation: FieldCoordinate,
+        cameFrom: Map<PitchCoordinate, PitchCoordinate?>,
+        currentLocation: PitchCoordinate,
         maxMove: Int,
-    ): List<FieldCoordinate> {
+    ): List<PitchCoordinate> {
         val path = mutableListOf(currentLocation)
         var currentPoint = currentLocation
         while (cameFrom[currentPoint] != null) {

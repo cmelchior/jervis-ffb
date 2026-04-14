@@ -33,7 +33,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.InterceptionModifier
 import com.jervisffb.engine.reports.ReportInterception
@@ -59,7 +59,7 @@ data class InterceptionContext(
     val thrower: Player,
     // Target coordinates of the throw after resolving the throw type, but not including
     // scatter from a failed interception.
-    val target: FieldCoordinate,
+    val target: PitchCoordinate,
     val interceptingPlayer: Player? = null, // Player doing the interception, if any.
     val useCloudBurster: Boolean = false,
     val useExtraArms: Boolean = false, // If intercepting player is using Extra Arms or not

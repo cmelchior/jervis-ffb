@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.procedures.rerolls.MascotContext
 import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -20,7 +20,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -30,7 +30,7 @@ object ChooseAlternativeToMascotWheelController : ActionWheelDialogController() 
         TeamMascotStep.ChooseAnotherReroll
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         val context = state.getContext<MascotContext>()
         val team = context.team
         return when (team.isHomeTeam()) {
@@ -43,7 +43,7 @@ object ChooseAlternativeToMascotWheelController : ActionWheelDialogController() 
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val topButtons = listOf(
             ActionButtonData(

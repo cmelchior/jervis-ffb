@@ -3,16 +3,16 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
@@ -60,7 +60,7 @@ class TitchyTests: JervisGameBB2025Test() {
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(FieldCoordinate(12, 4)),
+            PitchSquareSelected(PitchCoordinate(12, 4)),
             DiceRollResults(2.d6), // Not good enough, even with Titchy
             TeamRerollSelected<RegularTeamReroll>(),
             DiceRollResults(3.d6), // Good enough, but only with Titchy
@@ -78,7 +78,7 @@ class TitchyTests: JervisGameBB2025Test() {
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(FieldCoordinate(13, 10)),
+            PitchSquareSelected(PitchCoordinate(13, 10)),
             DiceRollResults(3.d6), // Only good enough if square is using Titchy
             NoRerollSelected(),
             EndAction
@@ -100,7 +100,7 @@ class TitchyTests: JervisGameBB2025Test() {
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
-            FieldSquareSelected(FieldCoordinate(13, 10)),
+            PitchSquareSelected(PitchCoordinate(13, 10)),
             DiceRollResults(6.d6),
             NoRerollSelected(),
             EndAction

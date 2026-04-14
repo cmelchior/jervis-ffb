@@ -1,8 +1,8 @@
 package com.jervisffb.engine.rules.common.procedures
 
 import com.jervisffb.engine.actions.MoveType
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
@@ -55,7 +55,7 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     val options = mutableListOf<MoveType>()
 
     // Standup
-    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
+    if (player.location.isOnPitch(rules) && player.state == PlayerState.PRONE) {
         options.add(MoveType.STAND_UP)
     }
 
@@ -77,14 +77,14 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     // Jump, if next to a prone player and space on the opposite side
     val hasMoveLeft = player.movesLeft + player.rushesLeft + extraSprintRush >= JUMP_DISTANCE && rules.isStanding(player)
     val legalJumpSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
-        .mapNotNull { state.field[it].player }
+        .mapNotNull { state.pitch[it].player }
         .filter { !rules.isStanding(it) }
         .any {
             // A jumping player can only jump to the same squares you would normally push the player
             // to. See page 45 in the rulebook.
             // This should be kept up to date with `JumpStep`
             rules.getPushOptions(player, it).any { coords ->
-                coords.isOnField(rules) && state.field[coords].isUnoccupied()
+                coords.isOnPitch(rules) && state.pitch[coords].isUnoccupied()
             }
         }
 
@@ -95,7 +95,7 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     // Leap and Pogo
     val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = JUMP_DISTANCE)
     val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
-    val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.field[it].isUnoccupied() }
+    val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.pitch[it].isUnoccupied() }
     if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
         options.add(MoveType.LEAP)
     }
@@ -114,7 +114,7 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
  * Returns all the reachable squares a player can go to using a specific type of
  * move.
  */
-fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<SelectFieldLocation> {
+fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<SelectPitchLocation> {
     // How many squares of movement are used to Jump
     return when (type) {
         MoveType.JUMP -> {
@@ -122,7 +122,7 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
             val needRush = player.movesLeft < JUMP_DISTANCE
             if (hasMoveLeft) {
                 val eligibleTargetSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
-                    .mapNotNull { state.field[it].player }
+                    .mapNotNull { state.pitch[it].player }
                     .filter { !rules.isStanding(it) }
                     .flatMap {
                         rules.getPushOptions(player, it)
@@ -131,11 +131,11 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
                                 // See page 45 in the BB2020 rulebook.
                                 // See page 56 in the BB2025 rulebook.
                                 // This should be kept up to date with `calculateMoveTypesAvailable()`
-                                coords.isOnField(rules) && state.field[coords].isUnoccupied()
+                                coords.isOnPitch(rules) && state.pitch[coords].isUnoccupied()
                             }
                     }
                     .map { TargetSquare.jump(it, needRush) }
-                    .let { SelectFieldLocation(it) }
+                    .let { SelectPitchLocation(it) }
                 listOf(eligibleTargetSquares)
             } else {
                 emptyList()
@@ -149,14 +149,14 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
                 val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = JUMP_DISTANCE)
                 val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
                 val eligibleTargetSquares = (allSquares - adjacentSquares.toSet())
-                    .filter { state.field[it].isUnoccupied() }
+                    .filter { state.pitch[it].isUnoccupied() }
                     .map {
                         when (type) {
                             MoveType.LEAP -> TargetSquare.leap(it, needRush)
                             MoveType.POGO -> TargetSquare.pogo(it, needRush)
                         }
                     }
-                    .let { SelectFieldLocation(it) }
+                    .let { SelectPitchLocation(it) }
                 listOf(eligibleTargetSquares)
             } else {
                 emptyList()
@@ -166,7 +166,7 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
             val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
             if (player.movesLeft + player.rushesLeft > 0) {
                 player.coordinates.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isUnoccupied() }
+                    .filter { state.pitch[it].isUnoccupied() }
                     .map {
                         TargetSquare.move(it, player.movesLeft <= 0, requiresDodge)
                     }
@@ -174,7 +174,7 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
                         if (targets.isEmpty()) {
                             emptyList()
                         } else {
-                            listOf(SelectFieldLocation(targets))
+                            listOf(SelectPitchLocation(targets))
                         }
                     }
             } else {

@@ -19,10 +19,10 @@ are only present when a player is on the pitch, but it is pretty clear from the
 context that this is assumed.
 
 If not, it leads to weird consequences, like being able to move a player unto
-the field when rolling High Kick.
+the pitch when rolling High Kick.
 
 So when interpreting the rules, Jervis will always assume that these statuses
-also imply that the player is on the field.
+also imply that the player is on the pitch.
 
 ## Page 48 - High Kick
 
@@ -42,7 +42,7 @@ applied when High Kick is resolved.
 
 No-where is it stated that the High Kick player cannot enter the opponent's
 side. This means if the ball deviates into the opponents half, it is allowed to
-move a player into the opponent's field before resolving the ball coming down.
+move a player into the opponent's side before resolving the ball coming down.
 
 When the ball comes down, it would result in a touchback, and the ball could 
 then be given to the player that moved into the opponent's half.
@@ -267,7 +267,7 @@ fully entered their target square.
 
 Note, the rules also make a distinction between "Pushed Back" and
 "Knocked Down", these are two different things. A logical consequence of this
-is that if a player leaves the field during "Pushed Back" (like when falling
+is that if a player leaves the pitch during "Pushed Back" (like when falling
 through a Trapdoor), they are not around to suffer the consequences of being
 Knocked Down afterward. Similar to what happens when being pushed into the
 Crowd. This is a different interpretation than the one used in FUMBBL.
@@ -395,7 +395,7 @@ details):
    a. If there is a ball on the ground, it will bounce.
    b. If there is a Trapdoor, roll for it. If failed, the player will drop their
       ball (if any), be removed from play, roll injury. The ball will bounce.
-      If a player leaves the field this way, they will not suffer the
+      If a player leaves the pitch this way, they will not suffer the
       consequences of being Knocked Down.
    c. If pushed into the crowd, roll for Injury and then Throw-in the ball.
    d. if the player is holding a ball, check for touchdown. If yes, we will

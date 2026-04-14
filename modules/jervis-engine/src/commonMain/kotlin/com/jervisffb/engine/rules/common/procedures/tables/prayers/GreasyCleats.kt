@@ -39,7 +39,7 @@ object GreasyCleats : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val requestedAction = context.team.otherTeam()
-                .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
+                .filter { it.state == PlayerState.RESERVE || it.location.isOnPitch(rules) }
                 .let {
                     if (it.isNotEmpty()) {
                         com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)

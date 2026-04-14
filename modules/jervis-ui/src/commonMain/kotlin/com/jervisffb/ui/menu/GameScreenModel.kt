@@ -37,11 +37,11 @@ import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.field.FieldSizeData
-import com.jervisffb.ui.game.view.field.PointerEventBus
-import com.jervisffb.ui.game.viewmodel.FieldDetails
-import com.jervisffb.ui.game.viewmodel.FieldViewData
+import com.jervisffb.ui.game.view.pitch.PitchSizeData
+import com.jervisffb.ui.game.view.pitch.PointerEventBus
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.PitchDetails
+import com.jervisffb.ui.game.viewmodel.PitchViewData
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -69,14 +69,14 @@ data class LoadingTeamInfo(
 )
 
 // Act as a bridge between Compose and ViewModels.
-// It is stored inside a ComposeLocal for Compose to access when rendering the field
+// It is stored inside a ComposeLocal for Compose to access when rendering the pitch
 // The GameScreenModel must guarantee that one instance of this exists for the lifetime
 // of the Game Screen.
 @Stable
-class LocalFieldDataWrapper(uiState: UiGameController) {
-    // Information about the size of the Field, especially the width and height in pixels
-    var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
-    // Used to share mouse events across all field layers
+class LocalPitchDataWrapper(uiState: UiGameController) {
+    // Information about the size of the Pitch, especially the width and height in pixels
+    var size: PitchSizeData by mutableStateOf(PitchSizeData(0, IntSize.Zero, 0, 0))
+    // Used to share mouse events across all pitch layers
     val pointerBus: PointerEventBus = PointerEventBus()
     // Indicates whether any Action Wheel menu is visible.
     val isActionWheelVisible: State<Boolean>
@@ -117,18 +117,18 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
-    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(
-        FieldViewData(
+    val pitchViewData: MutableStateFlow<PitchViewData> = MutableStateFlow(
+        PitchViewData(
             Size.Zero,
             IntSize.Zero,
             0f,
             IntOffset.Zero,
-            gameController.rules.fieldWidth,
-            gameController.rules.fieldHeight
+            gameController.rules.pitchWidth,
+            gameController.rules.pitchHeight
         )
     )
 
-    val sharedFieldData: LocalFieldDataWrapper
+    val sharedPitchData: LocalPitchDataWrapper
 
     var fumbbl: FumbblReplayAdapter? = null
     val rules: Rules = gameController.rules
@@ -151,14 +151,14 @@ class GameScreenModel(
         menuViewModel,
         actions
     )
-    val fieldBackground: Flow<FieldDetails> = uiState.uiStateFlow.map { uiSnapshot ->
+    val pitchBackground: Flow<PitchDetails> = uiState.uiStateFlow.map { uiSnapshot ->
         val weather = uiSnapshot.weather
         when (weather) {
-            Weather.SWELTERING_HEAT -> FieldDetails.HEAT
-            Weather.VERY_SUNNY -> FieldDetails.SUNNY
-            Weather.PERFECT_CONDITIONS -> FieldDetails.NICE
-            Weather.POURING_RAIN -> FieldDetails.RAIN
-            Weather.BLIZZARD -> FieldDetails.BLIZZARD
+            Weather.SWELTERING_HEAT -> PitchDetails.HEAT
+            Weather.VERY_SUNNY -> PitchDetails.SUNNY
+            Weather.PERFECT_CONDITIONS -> PitchDetails.NICE
+            Weather.POURING_RAIN -> PitchDetails.RAIN
+            Weather.BLIZZARD -> PitchDetails.BLIZZARD
         }
     }
 
@@ -166,7 +166,7 @@ class GameScreenModel(
     val playerStatCardDismissed = MutableStateFlow(false)
 
     init {
-        sharedFieldData = LocalFieldDataWrapper(uiState)
+        sharedPitchData = LocalPitchDataWrapper(uiState)
     }
 
     // Calculate which player to show on either the away or home side
@@ -244,10 +244,10 @@ class GameScreenModel(
     }
 
     val logsBackgroundColor: Flow<Color> = combine(
-        fieldBackground,
+        pitchBackground,
         SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_USE_PITCH_WEATHER_AS_GAME_BACKGROUND_VALUE, false)
     ) { field, useFieldBackground ->
-        if (useFieldBackground) field.logBackground else FieldDetails.NICE.logBackground
+        if (useFieldBackground) field.logBackground else PitchDetails.NICE.logBackground
     }
 
     val selectedPlayersInUi = mutableListOf<PlayerId>()
@@ -256,7 +256,7 @@ class GameScreenModel(
     var gameStatusBoxTitle = mutableStateOf("")
 
     init {
-        actionProvider.updateSharedData(sharedFieldData)
+        actionProvider.updateSharedData(sharedPitchData)
         menuViewModel.backgroundContext.launch {
             // Use large icon for the loading screen
             homeTeamIcon.value = IconFactory.loadRosterIcon(
@@ -353,15 +353,15 @@ class GameScreenModel(
 
     fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates, borderSize: Float) {
         val offset = fieldLayoutCoordinates.localToWindow(Offset.Zero)
-        val fieldPositionData = FieldViewData(
+        val fieldPositionData = PitchViewData(
             JervisTheme.windowSizePx,
             fieldLayoutCoordinates.size,
             borderSize,
             IntOffset(offset.x.roundToInt(), offset.y.roundToInt()),
-            gameController.rules.fieldWidth,
-            gameController.rules.fieldHeight
+            gameController.rules.pitchWidth,
+            gameController.rules.pitchHeight
         )
-        fieldViewData.value = fieldPositionData
+        pitchViewData.value = fieldPositionData
     }
 
     fun showPlayerContextMenu(player: PlayerId) {

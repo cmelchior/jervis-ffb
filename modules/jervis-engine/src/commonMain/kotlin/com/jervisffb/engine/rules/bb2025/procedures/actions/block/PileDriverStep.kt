@@ -58,7 +58,7 @@ object PileDriverStep : Procedure() {
             val attacker = context.attacker
             val defender = context.defender
             val isAttackerStanding = rules.isStanding(attacker)
-            val isDefenderEligibleForFoul = defender.location.isOnField(rules) && (defender.state == PlayerState.PRONE || defender.state == PlayerState.STUNNED)
+            val isDefenderEligibleForFoul = defender.location.isOnPitch(rules) && (defender.state == PlayerState.PRONE || defender.state == PlayerState.STUNNED)
             val isAdjacentToDefender = attacker.location.isAdjacent(rules, defender.location)
             val hasPileDriver = attacker.isSkillAvailable(SkillType.PILE_DRIVER)
             return when (isAttackerStanding && isDefenderEligibleForFoul && isAdjacentToDefender && hasPileDriver) {
@@ -95,7 +95,7 @@ object PileDriverStep : Procedure() {
             val activeContext = state.getContext<ActivatePlayerContext>()
             return buildCompositeCommand {
                 add(RemoveContext(foulContext))
-                if (foulContext.fouler.location.isOnField(rules)) {
+                if (foulContext.fouler.location.isOnPitch(rules)) {
                     addAll(
                         SetPlayerState(foulContext.fouler, PlayerState.PRONE, hasTackleZones = false),
                         UpdateContext(activeContext.copy(activationEndsImmediately = true)),

@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
@@ -61,9 +61,9 @@ class PushbackTests: JervisGameBB2025Test() {
         val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         val expectedTargets = setOf(
-            FieldCoordinate(11, 5),
-            FieldCoordinate(11, 4),
-            FieldCoordinate(12, 4),
+            PitchCoordinate(11, 5),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(12, 4),
         )
         availableDirections.directions.forEach {
             val target = availableDirections.origin.move(it, 1)
@@ -81,9 +81,9 @@ class PushbackTests: JervisGameBB2025Test() {
         val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         val expectedTargets = setOf(
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 5),
-            FieldCoordinate(11, 6),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 5),
+            PitchCoordinate(11, 6),
         )
         availableDirections.directions.forEach {
             val target = availableDirections.origin.move(it, 1)
@@ -95,7 +95,7 @@ class PushbackTests: JervisGameBB2025Test() {
     // from the list of options unless all options are occupied
     @Test
     fun onlyPushIntoEmptySquares() {
-        SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[5.playerNo], PitchCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -104,8 +104,8 @@ class PushbackTests: JervisGameBB2025Test() {
         val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(2, availableDirections.directions.size)
         val expectedTargets = setOf(
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 6),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 6),
         )
         availableDirections.directions.forEach {
             val target = availableDirections.origin.move(it, 1)
@@ -121,8 +121,8 @@ class PushbackTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Confirm // Follow up
         )
-        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         assertNull(state.activePlayer)
     }
 
@@ -134,8 +134,8 @@ class PushbackTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.LEFT),
             Confirm // Follow up
         )
-        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         homeTeam["H1".playerId].assertStanding()
         assertNull(state.activePlayer)
     }
@@ -143,7 +143,7 @@ class PushbackTests: JervisGameBB2025Test() {
     @Test
     fun pushIntoBallBouncesIt() {
         // Place ball where it will bounce when H1 is pushed into it.
-        SetBallLocation(state.singleBall(), FieldCoordinate(11, 5)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -151,33 +151,33 @@ class PushbackTests: JervisGameBB2025Test() {
             Confirm, // Follow up
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(11, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(11, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
     @Test
     fun followUpBeforeBounce() {
         // Place ball where it will bounce when H1 is pushed into it.
-        SetBallLocation(state.singleBall(), FieldCoordinate(11, 5)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT),
         )
-        assertEquals(FieldCoordinate(11, 5), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(11, 5), state.singleBall().coordinates)
         assertEquals(BallState.BOUNCING, state.singleBall().state)
         controller.rollForward(
             Confirm, // Follow up
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(11, 4), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(11, 4), state.singleBall().coordinates)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
     }
 
     @Test
     fun cannotPushIntoCrowdIfEmptySquares() {
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(12, 0)).execute(state)
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(13, 0)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(12, 0)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(13, 0)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -186,7 +186,7 @@ class PushbackTests: JervisGameBB2025Test() {
         val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(1, availableDirections.directions.size)
         val expectedTargets = setOf(
-            FieldCoordinate(11, 0),
+            PitchCoordinate(11, 0),
         )
         availableDirections.directions.forEach {
             val target = availableDirections.origin.move(it, 1)
@@ -196,8 +196,8 @@ class PushbackTests: JervisGameBB2025Test() {
 
     @Test
     fun pushIntoCrowdIfNoOtherOptions() {
-        SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(1, 14)).execute(state)
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(1, 13)).execute(state)
+        SetPlayerLocation(homeTeam[8.playerNo], PitchCoordinate(1, 14)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(1, 13)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H8", 4.dblock),
@@ -206,7 +206,7 @@ class PushbackTests: JervisGameBB2025Test() {
         val availableDirections = actions.singleInstanceOf<SelectDirection>()
         assertEquals(3, availableDirections.directions.size)
         assertEquals(
-            FieldCoordinate(0, 15),
+            PitchCoordinate(0, 15),
             availableDirections.origin.move(availableDirections.directions.first(), 1)
         )
         controller.rollForward(
@@ -214,7 +214,7 @@ class PushbackTests: JervisGameBB2025Test() {
             Confirm, // Follow up
             DiceRollResults(1.d6, 1.d6), // Injury roll
         )
-        assertEquals(FieldCoordinate(1, 14), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(1, 14), awayTeam["A1".playerId].coordinates)
         homeTeam["H8".playerId].let {
             assertEquals(DogOut, it.location)
             assertEquals(PlayerState.RESERVE, it.state)
@@ -223,9 +223,9 @@ class PushbackTests: JervisGameBB2025Test() {
 
     @Test
     fun chainPush() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -233,20 +233,20 @@ class PushbackTests: JervisGameBB2025Test() {
             DirectionSelected(Direction.UP_LEFT), // 2nd push
             Confirm // Follow up
         )
-        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
-        assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PitchCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
     }
 
     @Test
     fun chainPushPronePlayer() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], PitchCoordinate(11, 5)).execute(state)
         homeTeam[10.playerNo].apply {
             state = PlayerState.STUNNED
             hasTackleZones = false
         }
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 4.dblock),
@@ -255,15 +255,15 @@ class PushbackTests: JervisGameBB2025Test() {
             Confirm // Follow up
         )
 
-        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
-        assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PitchCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
         homeTeam[10.playerNo].assertStunned()
     }
 
     @Test
     fun pushOpponentPlayerWithBallIntoCrowd() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(15, 0)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(15, 0)).execute(state)
         SetBallState.carried(state.singleBall(), homeTeam[4.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A7", PlayerStandardActionType.BLOCK),
@@ -278,14 +278,14 @@ class PushbackTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(15, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(15, 3), state.singleBall().coordinates)
         assertEquals(DogOut, homeTeam[4.playerNo].location)
-        assertEquals(FieldCoordinate(15, 0), awayTeam[7.playerNo].coordinates)
+        assertEquals(PitchCoordinate(15, 0), awayTeam[7.playerNo].coordinates)
     }
 
     @Test
     fun pushOpponentPlayerWithBallIntoCrowdUsingBlitz() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(20, 0)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(20, 0)).execute(state)
         SetBallState.carried(state.singleBall(), homeTeam[4.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.BLITZ),
@@ -303,22 +303,22 @@ class PushbackTests: JervisGameBB2025Test() {
         assertNull(state.activePlayer)
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(20, 3), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(20, 3), state.singleBall().coordinates)
         assertEquals(DogOut, homeTeam[4.playerNo].location)
-        assertEquals(FieldCoordinate(20, 0), awayTeam[10.playerNo].coordinates)
+        assertEquals(PitchCoordinate(20, 0), awayTeam[10.playerNo].coordinates)
     }
 
     @Test
     fun chainPushOwnPlayerWithBallIntoCrowd() {
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(23, 0)).execute(state)
-        SetPlayerLocation(awayTeam[2.playerNo], FieldCoordinate(23, 1)).execute(state)
-        SetPlayerLocation(awayTeam[3.playerNo], FieldCoordinate(23, 2)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(24, 0)).execute(state)
-        SetPlayerLocation(homeTeam[2.playerNo], FieldCoordinate(24, 1)).execute(state)
-        SetPlayerLocation(homeTeam[3.playerNo], FieldCoordinate(24, 2)).execute(state)
-        SetPlayerLocation(awayTeam[4.playerNo], FieldCoordinate(25, 0)).execute(state)
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(25, 1)).execute(state)
-        SetPlayerLocation(awayTeam[7.playerNo], FieldCoordinate(25, 2)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(23, 0)).execute(state)
+        SetPlayerLocation(awayTeam[2.playerNo], PitchCoordinate(23, 1)).execute(state)
+        SetPlayerLocation(awayTeam[3.playerNo], PitchCoordinate(23, 2)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(24, 0)).execute(state)
+        SetPlayerLocation(homeTeam[2.playerNo], PitchCoordinate(24, 1)).execute(state)
+        SetPlayerLocation(homeTeam[3.playerNo], PitchCoordinate(24, 2)).execute(state)
+        SetPlayerLocation(awayTeam[4.playerNo], PitchCoordinate(25, 0)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(25, 1)).execute(state)
+        SetPlayerLocation(awayTeam[7.playerNo], PitchCoordinate(25, 2)).execute(state)
         SetBallState.carried(state.singleBall(), awayTeam[5.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
@@ -333,22 +333,22 @@ class PushbackTests: JervisGameBB2025Test() {
         )
         assertEquals(homeTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(23, 1), awayTeam["A2".playerId].coordinates)
+        assertEquals(PitchCoordinate(23, 1), awayTeam["A2".playerId].coordinates)
         assertTrue(awayTeam["A2".playerId].hasBall())
         assertEquals(DogOut, awayTeam["A5".playerId].location)
     }
 
     @Test
     fun chainPushOwnPlayerIntoCrowd() {
-        SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(23, 0)).execute(state)
-        SetPlayerLocation(awayTeam[2.playerNo], FieldCoordinate(23, 1)).execute(state)
-        SetPlayerLocation(awayTeam[3.playerNo], FieldCoordinate(23, 2)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(24, 0)).execute(state)
-        SetPlayerLocation(homeTeam[2.playerNo], FieldCoordinate(24, 1)).execute(state)
-        SetPlayerLocation(homeTeam[3.playerNo], FieldCoordinate(24, 2)).execute(state)
-        SetPlayerLocation(awayTeam[4.playerNo], FieldCoordinate(25, 0)).execute(state)
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(25, 1)).execute(state)
-        SetPlayerLocation(awayTeam[7.playerNo], FieldCoordinate(25, 2)).execute(state)
+        SetPlayerLocation(awayTeam[1.playerNo], PitchCoordinate(23, 0)).execute(state)
+        SetPlayerLocation(awayTeam[2.playerNo], PitchCoordinate(23, 1)).execute(state)
+        SetPlayerLocation(awayTeam[3.playerNo], PitchCoordinate(23, 2)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(24, 0)).execute(state)
+        SetPlayerLocation(homeTeam[2.playerNo], PitchCoordinate(24, 1)).execute(state)
+        SetPlayerLocation(homeTeam[3.playerNo], PitchCoordinate(24, 2)).execute(state)
+        SetPlayerLocation(awayTeam[4.playerNo], PitchCoordinate(25, 0)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(25, 1)).execute(state)
+        SetPlayerLocation(awayTeam[7.playerNo], PitchCoordinate(25, 2)).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
             *standardBlock("H2", 4.dblock),
@@ -359,7 +359,7 @@ class PushbackTests: JervisGameBB2025Test() {
         )
         assertEquals(awayTeam, state.activeTeam)
         assertNull(state.activePlayer)
-        assertEquals(FieldCoordinate(23, 1), awayTeam["A2".playerId].coordinates)
+        assertEquals(PitchCoordinate(23, 1), awayTeam["A2".playerId].coordinates)
         assertEquals(DogOut, awayTeam["A5".playerId].location)
     }
 }

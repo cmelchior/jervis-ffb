@@ -23,7 +23,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
 
@@ -50,7 +50,7 @@ fun createPushContext(state: Game): PushContext {
             PushContext.PushData(
                 pusher = blockContext.attacker,
                 pushee = blockContext.defender,
-                from = blockContext.defender.location as FieldCoordinate,
+                from = blockContext.defender.location as PitchCoordinate,
                 isBlitzing = blockContext.isBlitzing,
                 isChainPush = false,
             )

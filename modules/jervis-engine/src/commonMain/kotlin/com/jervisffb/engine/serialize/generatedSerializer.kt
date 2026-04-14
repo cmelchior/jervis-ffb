@@ -56,7 +56,7 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.EndAction::class)
         subclass(com.jervisffb.engine.actions.EndSetup::class)
         subclass(com.jervisffb.engine.actions.EndTurn::class)
-        subclass(com.jervisffb.engine.actions.FieldSquareSelected::class)
+        subclass(com.jervisffb.engine.actions.PitchSquareSelected::class)
         subclass(com.jervisffb.engine.actions.ForegoActivationSelected::class)
         subclass(com.jervisffb.engine.actions.InducementSelected::class)
         subclass(com.jervisffb.engine.actions.MoveTypeSelected::class)

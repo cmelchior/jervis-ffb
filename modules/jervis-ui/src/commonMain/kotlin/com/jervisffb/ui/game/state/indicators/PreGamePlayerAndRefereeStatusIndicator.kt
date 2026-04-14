@@ -5,8 +5,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.common.procedures.PreGame
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.model.UiFieldPlayer
-import com.jervisffb.ui.game.model.UiFieldSquare
+import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.state.actionwheel.AwayTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll
 
@@ -20,7 +20,7 @@ import com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll
  * [com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll]
  * [com.jervisffb.ui.game.state.actionwheel.AwayTeamFanFactorRoll]
  */
-object PreGamePlayerAndRefereeStatusIndicator: FieldStatusIndicator {
+object PreGamePlayerAndRefereeStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,
@@ -37,14 +37,14 @@ object PreGamePlayerAndRefereeStatusIndicator: FieldStatusIndicator {
         if (homePlayer != null) {
             acc.addOrUpdateSquare(
                 homePlayerCoords,
-                UiFieldSquare(
+                UiPitchSquare(
                     coordinates = homePlayerCoords,
                     player = homePlayer.id
                 )
             )
             acc.addOrUpdatePlayer(
                 homePlayer.id,
-                UiFieldPlayer(
+                UiPitchPlayer(
                     model = homePlayer,
                     overrideLocation = homePlayerCoords,
                 )
@@ -54,14 +54,14 @@ object PreGamePlayerAndRefereeStatusIndicator: FieldStatusIndicator {
         if (awayPlayer != null) {
             acc.addOrUpdateSquare(
                 homePlayerCoords,
-                UiFieldSquare(
+                UiPitchSquare(
                     coordinates = awayPlayerCoords,
                     player = awayPlayer.id
                 )
             )
             acc.addOrUpdatePlayer(
                 awayPlayer.id,
-                UiFieldPlayer(
+                UiPitchPlayer(
                     model = awayPlayer,
                     overrideLocation = awayPlayerCoords,)
             )

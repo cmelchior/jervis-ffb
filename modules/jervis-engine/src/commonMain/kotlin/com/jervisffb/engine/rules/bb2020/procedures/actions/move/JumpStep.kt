@@ -5,10 +5,10 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -80,7 +80,7 @@ import kotlin.math.max
  * doesn't mention what happens when you fail the 2nd Rush.
  *
  * BB2025 Update: In BB2025 it is defined that failing any Rush leaves the player
- * in the starting field. So we apply the same rule to BB2020.
+ * in the starting square. So we apply the same rule to BB2020.
  *
  * The interaction between Jump and Tentacles is also a bit unclear,
  * https://www.reddit.com/r/bloodbowl/comments/xodttp/shadowing_and_tentacles_work_on_followups_jumps/
@@ -107,7 +107,7 @@ object JumpStep : Procedure() {
             return when (action) {
                 Cancel -> ExitProcedure()
                 else -> {
-                    castAction<FieldSquareSelected>(action) { target ->
+                    castAction<PitchSquareSelected>(action) { target ->
                         val context = state.getContext<MoveContext>()
                         compositeCommandOf(
                             UpdateContext(context.copy(target = target.coordinate)),

@@ -2,20 +2,20 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Leap
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
@@ -54,22 +54,22 @@ class LeapTests: JervisGameBB2025Test() {
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
         )
-        val availableCoordinates = controller.getAvailableActions().get<SelectFieldLocation>().squares.map { it.coordinate }
+        val availableCoordinates = controller.getAvailableActions().get<SelectPitchLocation>().squares.map { it.coordinate }
         val expectedCoordinates = setOf(
-            FieldCoordinate(13, 3),
-            FieldCoordinate(14, 3),
-            FieldCoordinate(15, 3),
-            FieldCoordinate(15, 4),
-            FieldCoordinate(15, 5),
-            FieldCoordinate(15, 6),
-            FieldCoordinate(15, 7),
-            FieldCoordinate(14, 7),
-            FieldCoordinate(11, 7),
-            FieldCoordinate(11, 6),
-            FieldCoordinate(11, 5),
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 3),
-            FieldCoordinate(12, 3),
+            PitchCoordinate(13, 3),
+            PitchCoordinate(14, 3),
+            PitchCoordinate(15, 3),
+            PitchCoordinate(15, 4),
+            PitchCoordinate(15, 5),
+            PitchCoordinate(15, 6),
+            PitchCoordinate(15, 7),
+            PitchCoordinate(14, 7),
+            PitchCoordinate(11, 7),
+            PitchCoordinate(11, 6),
+            PitchCoordinate(11, 5),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 3),
+            PitchCoordinate(12, 3),
         )
         assertEquals(expectedCoordinates.size, availableCoordinates.size)
         availableCoordinates.forEach {
@@ -88,7 +88,7 @@ class LeapTests: JervisGameBB2025Test() {
         assertEquals(2, leapingPlayer.rushesLeft)
         controller.rollForward(
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             Cancel, // Do not use Leap modifier
             4.d6, // 2 Modifiers from leaving, no to enter, so should fail
         )
@@ -113,7 +113,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 6),
+            PitchSquareSelected(11, 6),
             3.d6, // -1 Marked Modifiers from entering, so a 3 will fail
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)
@@ -135,7 +135,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 7),
+            PitchSquareSelected(11, 7),
             Cancel, // Do not use Leap modifier
             4.d6, // 1 Marked Modifiers from leaving, 2 from entering
         )
@@ -156,7 +156,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             Cancel, // Do not use Leap modifier
             3.d6, // -2 Marked Modifiers from leaving/entering
             NoRerollSelected(),
@@ -173,7 +173,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             Cancel, // Do not use Leap modifier
             1.d6,
             NoRerollSelected(),
@@ -195,7 +195,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             Cancel, // Do not use Leap modifier
             5.d6, // Leap
@@ -221,7 +221,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(2.d6),
             *rushRoll(2.d6),
             Cancel, // Do not use Leap modifier
@@ -247,7 +247,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             *rushRoll(1.d6),
         )
         leapingPlayer.assertFallenOver()
@@ -267,7 +267,7 @@ class LeapTests: JervisGameBB2025Test() {
             PlayerSelected(leapingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
         )
 
         controller.rollForward(
@@ -302,7 +302,7 @@ class LeapTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             Confirm, // Use Leap modifier
             3.d6, // 2 Modifiers from leaving
         )
@@ -324,7 +324,7 @@ class LeapTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.LEAP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             3.d6, // 1 Modifiers from leaving/entering. Leap modifier cannot be applied
         )
         assertFalse(state.getContext<LeapRollContext>().isSuccess)

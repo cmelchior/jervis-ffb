@@ -64,7 +64,7 @@ before "What Goes Up, Must Come Down". This means that the touchback rule cannot
 yet be applied before High Kick is resolved. 
 
 No-where is it stated that the High Kick player cannot enter the opponent's 
-field (unlike for the "On the Ball" skill). So if the ball deviates back to the 
+pitch (unlike for the "On the Ball" skill). So if the ball deviates back to the 
 kicking teams side, Jervis will allow a player on the receiving team to move 
 under the ball on the kicking teams side. 
 
@@ -232,7 +232,7 @@ Consider the following sequence of events.
    hand it off to H2 in the end zone for a score in the next turn.
 2. Player A1 throws A2, so they hit H1, knocking them over. We resolve the 
    knockdown before bouncing A2. In this case H1 is injured and leaves the 
-   field. Per the rules for Knocked Down, the ball is knocked loose and bounce.
+   pitch. Per the rules for Knocked Down, the ball is knocked loose and bounce.
    It bounces to H2, who catches it.
 3. A2 now bounces to H2 and knocks them over too. Knocking the ball loose yet
    again.
@@ -480,7 +480,7 @@ does it as it would be the least surprising to people.
    touchdowns are scored.
 
 10. Now go through the push chain starting from the defender but do not include
-    the attacker. For any location still on the field, bounce the ball until it
+    the attacker. For any location still on the pitch, bounce the ball until it
     is either caught or lands in an empty square. The first player to trigger a
     touchdown will score it (if one wasn't triggered in step 9). 
 
@@ -623,7 +623,7 @@ Some examples:
 - For normal blocks, you bounce the ball after choosing to follow up, but it 
   is unclear when this step happens for multiple block. After each block
   or after both blocks are resolved, and all unjuried players have left the 
-  field?
+  pitch?
 
 Since no exact description of what "simultaneously" means exists, the
 implementation has to take quite a few, somewhat arbitrary, choices. Among
@@ -717,7 +717,7 @@ meaning in Blood Bowl Sevens.
 
 Fortunately, the Designer's Commentary (May 2024) clarifies it a bit, allowing 
 the ball to be placed "Center Field", but again, it is unclear exactly what that 
-means. Since (technically) "Center Field" runs the entire length of the field 
+means. Since (technically) "Center Field" runs the entire length of the pitch 
 (and doesn't include the wide zones). Even if you assume it just talks about the 
 area between the two lines of scrimmage, it still doesn't clarify if you can 
 place it across the entire No Man's Land zone or only on the receiving teams 

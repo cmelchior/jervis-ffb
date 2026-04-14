@@ -11,7 +11,7 @@ import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -36,7 +36,7 @@ class ReplayActionProvider(
     private lateinit var actions: ActionRequest
     var started = false
     private val pauseMutex = Mutex(locked = true)
-    private var sharedData: LocalFieldDataWrapper? = null
+    private var sharedData: LocalPitchDataWrapper? = null
 
     override fun init(controller: UiGameController) {
         // Do nothing
@@ -114,7 +114,7 @@ class ReplayActionProvider(
         // Do nothing
     }
 
-    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+    override fun updateSharedData(sharedData: LocalPitchDataWrapper) {
         this.sharedData = sharedData
     }
 

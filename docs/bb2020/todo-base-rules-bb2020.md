@@ -157,14 +157,14 @@ rule book.
     - [ ] Choice is optional
   - [ ] Under Scrutiny
   - [ ] Intensive Training
-    - [ ] "Available to Play" also include all players on the field when rolled as a kick-off result
+    - [ ] "Available to Play" also include all players on the pitch when rolled as a kick-off result
 - [x] Determine Kicking Team
 
 ## Start of Drive
 
 - [x] Setup
-  - [x] Too many players on the field
-  - [x] Too few players on the field
+  - [x] Too many players on the pitch
+  - [x] Too few players on the pitch
   - [x] Too many players in Wide Zones
   - [x] 0 players available
   - [x] Too few players on the LoS
@@ -192,11 +192,11 @@ rule book.
     - [ ] Rerolls are available
   - [x] Officious Ref
   - [ ] Dodgy Snack
-    - [ ] On 2+, player stays on field with -1 AV, MA
+    - [ ] On 2+, player stays on pitch with -1 AV, MA
     - [ ] On 1, player is put in Reserves until end of drive
   - [x] Pitch Invasion
 - [x] What goes up, must come down
-  - [x] Land on Field
+  - [x] Land on Pitch
   - [x] Lands on Player
   - [x] Team rerolls not available for catch
 - [x] Touchbacks
@@ -286,9 +286,9 @@ rule book.
 - [x] Throw-in (basic no skills)
   - [x] From corners
   - [x] From south/north/east/west
-  - [x] Player in landing field must catch it if possible
+  - [x] Player in landing square must catch it if possible
   - [x] Will bounce if player is not able to catch a ball
-  - [x] Repeat process if leaving the field again
+  - [x] Repeat process if leaving the pitch again
 - [ ] Armour and Injuries
   - [ ] Failing armor roll leaves player prone
   - [ ] Stunned in other team turn / Roll to prone in own turn

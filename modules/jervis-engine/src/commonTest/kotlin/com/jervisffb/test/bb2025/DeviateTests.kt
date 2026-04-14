@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2025
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -36,7 +36,7 @@ class DeviateTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
         )
         // Check that we need to roll a random D8 + D6 to deviate
         assertEquals(BallState.IN_AIR, state.currentBall().state)
@@ -55,7 +55,7 @@ class DeviateTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 3.d6),
             *defaultKickOffEvent(),
             6.d6 // Catch Landing
@@ -70,7 +70,7 @@ class DeviateTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 3.d6),
             *defaultKickOffEvent(),
         )
@@ -91,7 +91,7 @@ class DeviateTests: JervisGameBB2025Test() {
         awayTeam["A11".playerId].makeDistracted()
         controller.rollForward(
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 3.d6),
             *defaultKickOffEvent(),
             8.d8 // Bounce because A11 cannot catch
@@ -106,7 +106,7 @@ class DeviateTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
-            FieldSquareSelected(19, 7), // Center of Away Half
+            PitchSquareSelected(19, 7), // Center of Away Half
             DiceRollResults(5.d8, 4.d6),
             *defaultKickOffEvent(),
         )

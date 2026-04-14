@@ -127,7 +127,7 @@ class BlitzActionTests: JervisGameBB2020Test() {
     fun cannotDeclareBlitzIfNoTargets() {
         val attacker = state.getPlayerById("A1".playerId)
         state.homeTeam
-            .filter { it.location.isOnField(rules) }
+            .filter { it.location.isOnPitch(rules) }
             .forEach {
                 it.state = PlayerState.PRONE
                 it.hasTackleZones = false

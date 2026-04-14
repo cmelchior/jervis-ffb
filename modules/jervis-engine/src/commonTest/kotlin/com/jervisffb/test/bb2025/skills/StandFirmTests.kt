@@ -13,7 +13,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.StandFirm
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -65,9 +65,9 @@ class StandFirmTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         val firstBlockedPlayer = homeTeam[1.playerNo]
         val secondBlockedPlayer = homeTeam[4.playerNo]
-        SetPlayerLocation(secondBlockedPlayer, FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(secondBlockedPlayer, PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[5.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[6.playerNo], PitchCoordinate(11, 6)).execute(state)
         secondBlockedPlayer.addSkill(SkillType.STAND_FIRM)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),

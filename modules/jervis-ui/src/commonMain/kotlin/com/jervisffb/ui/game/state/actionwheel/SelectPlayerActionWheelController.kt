@@ -13,7 +13,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -28,7 +28,7 @@ import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 /**
  * Select a player action after selecting the player.
@@ -36,7 +36,7 @@ import com.jervisffb.ui.menu.LocalFieldDataWrapper
 object SelectPlayerActionWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(ActivatePlayer.DeclareActionOrDeselectPlayer)
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayerOrThrow().coordinates
     }
 
@@ -44,7 +44,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper
+        sharedData: LocalPitchDataWrapper
     ) {
         val wheelOptions = actions.get<SelectPlayerAction>().actions.map {
             val id = ButtonId("player-action-${it.type}")
@@ -55,7 +55,6 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         // action has a move component. Similar to FUMBBL.
         val activePlayer = acc.game.activePlayer ?: error("No active player")
         if (activePlayer.state == PlayerState.PRONE) {
-            // val oldData = acc.fieldSquares[activePlayer.location as FieldCoordinate]!!
             val menuItem = ActionButtonData(
                 id = ButtonId("[${actions.id.value}] Stand Up & End Action"),
                 label = { "Stand Up & End Action" },
@@ -94,7 +93,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         acc.addActionWheelEvent(wheelState)
     }
 
-    // Temporary work-around while transition from FieldDecorator api
+    // Temporary work-around while transition from PitchDecorator api
     private fun createActionOption(
         id: ButtonId,
         state: Game,

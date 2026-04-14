@@ -10,7 +10,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerKeyword
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.engine.rules.common.tables.Weather
@@ -142,7 +142,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
 
     @Test
     fun notAllowedIfStandingPlayerWithTackleZonesWithinTwoSquares() {
-        SetBallLocation(state.singleBall(), FieldCoordinate(14, 7)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(14, 7)).execute(state)
 
         val player = state.getPlayerById("A8".playerId)
         val opponent = state.getPlayerById("H3".playerId)
@@ -161,14 +161,14 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
 
     @Test
     fun actionAvailableIfDistractedOpponentWithinTwoSquares() {
-        SetBallLocation(state.singleBall(), FieldCoordinate(14, 7)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(14, 7)).execute(state)
         homeTeam.forEach { player ->
-            if (player.location.isOnField(rules)) {
+            if (player.location.isOnPitch(rules)) {
                 player.makeDistracted()
                 assertTrue(rules.isDistracted(player), "Player ${player.id} is not distracted")
             }
         }
-        assertEquals(homeTeam, state.field[12, 7].player!!.team)
+        assertEquals(homeTeam, state.pitch[12, 7].player!!.team)
 
         val player = state.getPlayerById("A8".playerId)
         controller.rollForward(PlayerSelected(player.id))

@@ -2,14 +2,14 @@ package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.BB2025Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
@@ -76,7 +76,7 @@ abstract class JervisGameBB2025Test {
             *defaultPregame(),
             *arrayOf(*throwTeamMateHomeSetup(), *throwTeamMateAwaySetup()),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 5),
+                placeKick = PitchSquareSelected(17, 5),
                 deviate = DiceRollResults(4.d8, 1.d6),
                 bounce = 4.d8
             ),
@@ -86,17 +86,17 @@ abstract class JervisGameBB2025Test {
     private fun throwTeamMateHomeSetup(endSetup: Boolean = true): Array<GameAction> {
         val setup = buildList {
             // Place Hafling behind Ogre, ready to be thrown
-            add("H1".playerId to FieldCoordinate(12, 5))
-            add("H13".playerId to  FieldCoordinate(11, 5))
-            add("H2".playerId to FieldCoordinate(12, 6))
-            add("H3".playerId to FieldCoordinate(12, 7))
-            add("H4".playerId to FieldCoordinate(12, 8))
-            add("H5".playerId to FieldCoordinate(12, 9))
-            add("H6".playerId to FieldCoordinate(11, 1))
-            add("H7".playerId to FieldCoordinate(10, 1))
-            add("H8".playerId to FieldCoordinate(10, 13))
-            add("H9".playerId to FieldCoordinate(11, 13))
-            add("H10".playerId to  FieldCoordinate(9, 7))
+            add("H1".playerId to PitchCoordinate(12, 5))
+            add("H13".playerId to  PitchCoordinate(11, 5))
+            add("H2".playerId to PitchCoordinate(12, 6))
+            add("H3".playerId to PitchCoordinate(12, 7))
+            add("H4".playerId to PitchCoordinate(12, 8))
+            add("H5".playerId to PitchCoordinate(12, 9))
+            add("H6".playerId to PitchCoordinate(11, 1))
+            add("H7".playerId to PitchCoordinate(10, 1))
+            add("H8".playerId to PitchCoordinate(10, 13))
+            add("H9".playerId to PitchCoordinate(11, 13))
+            add("H10".playerId to  PitchCoordinate(9, 7))
         }
         return teamSetup(setup, endSetup)
     }
@@ -104,17 +104,17 @@ abstract class JervisGameBB2025Test {
     private fun throwTeamMateAwaySetup(endSetup: Boolean = true): Array<GameAction> {
         val setup= listOf(
             // Place Hafling behind Ogre, ready to be thrown
-            "A1".playerId to FieldCoordinate(13, 5),
-            "A13".playerId to FieldCoordinate(14, 5),
-            "A2".playerId to FieldCoordinate(13, 6),
-            "A3".playerId to FieldCoordinate(13, 7),
-            "A4".playerId to FieldCoordinate(13, 8),
-            "A5".playerId to FieldCoordinate(13, 9),
-            "A6".playerId to FieldCoordinate(14, 1),
-            "A7".playerId to FieldCoordinate(15, 1),
-            "A8".playerId to FieldCoordinate(15, 13),
-            "A9".playerId to FieldCoordinate(14, 13),
-            "A10".playerId to FieldCoordinate(16, 7),
+            "A1".playerId to PitchCoordinate(13, 5),
+            "A13".playerId to PitchCoordinate(14, 5),
+            "A2".playerId to PitchCoordinate(13, 6),
+            "A3".playerId to PitchCoordinate(13, 7),
+            "A4".playerId to PitchCoordinate(13, 8),
+            "A5".playerId to PitchCoordinate(13, 9),
+            "A6".playerId to PitchCoordinate(14, 1),
+            "A7".playerId to PitchCoordinate(15, 1),
+            "A8".playerId to PitchCoordinate(15, 13),
+            "A9".playerId to PitchCoordinate(14, 13),
+            "A10".playerId to PitchCoordinate(16, 7),
         )
         return teamSetup(setup, endSetup)
     }

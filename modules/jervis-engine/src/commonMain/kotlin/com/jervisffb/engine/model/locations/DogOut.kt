@@ -11,7 +11,7 @@ data object DogOut : Location {
     override fun isInNoMansLand(rules: Rules): Boolean = false
     override fun isOnHomeSide(rules: Rules): Boolean = false
     override fun isOnAwaySide(rules: Rules): Boolean = false
-    override fun isOnField(rules: Rules): Boolean = false
+    override fun isOnPitch(rules: Rules): Boolean = false
     override fun isOutOfBounds(rules: Rules): Boolean = false
     override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = null
     override fun isAdjacent(rules: Rules, location: Location): Boolean = false

@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -27,10 +27,10 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.assert
 
 data class ScatterRollContext(
-    val from: FieldCoordinate,
+    val from: PitchCoordinate,
     val scatterRoll: List<D8Result> = emptyList(),
-    val landsAt: FieldCoordinate? = null,
-    val outOfBoundsAt: FieldCoordinate? = null, // Will contain the last field before the ball went out of bounds.
+    val landsAt: PitchCoordinate? = null,
+    val outOfBoundsAt: PitchCoordinate? = null, // Will contain the last square before the ball went out of bounds.
 ): ProcedureContext
 
 /**
@@ -66,7 +66,7 @@ object ScatterRoll : Procedure() {
                 assert(dice.size == 3)
                 val context = state.getContext<ScatterRollContext>()
                 var scatteredLocation = context.from
-                var outOfBoundsAt: FieldCoordinate? = null
+                var outOfBoundsAt: PitchCoordinate? = null
                 for (diceResult in dice) {
                     val startLocation = scatteredLocation
                     scatteredLocation = scatteredLocation.move(rules.direction(diceResult), 1)

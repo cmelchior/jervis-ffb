@@ -20,8 +20,8 @@ import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020BothDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
@@ -65,7 +65,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -112,7 +112,7 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val buttons = listOf(
             ActionButtonData(
@@ -155,7 +155,7 @@ object FollowUpWheelController: YesNoAnswerWheelController() {
     override val yesLabel: String = "Follow Up"
     override val noLabel: String = "Stay"
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BlockContext>()
         return context.attacker.coordinates
     }
@@ -166,7 +166,7 @@ object UseBigHandWheelController: UseSkillWheelController(SkillType.BIG_HAND) {
         Pickup.ChooseToUseBigHand,
         SecureTheBallStep.ChooseToUseBigHand,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = when (state.stack.currentNode()) {
             Pickup.ChooseToUseBigHand -> state.getContext<PickupRollContext>().player
             SecureTheBallStep.ChooseToUseBigHand -> state.getContext<SecureTheBallContext>().player
@@ -183,7 +183,7 @@ object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
         BB2025BothDown.AttackerChooseToUseBlock,
         BB2025BothDown.DefenderChooseToUseBlock
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
             BB2020BothDown.AttackerChooseToUseBlock -> context.attacker.coordinates
@@ -199,7 +199,7 @@ object UseBullseyeWheelController: UseSkillWheelController(SkillType.BULLSEYE) {
     override val nodes: Set<Node> = setOf(
         ThrowPlayerStep.ChooseToUseBullseye,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<ThrowTeamMateContext>().thrower
         return player.coordinates
     }
@@ -209,7 +209,7 @@ object UseDivingCatchWheelController: UseSkillWheelController(SkillType.DIVING_C
     override val nodes: Set<Node> = setOf(
         Catch.ChooseToUseDivingCatch,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<CatchContext>().catchingPlayer
         return player.coordinates
     }
@@ -219,7 +219,7 @@ object UseGrabWheelController: UseSkillWheelController(SkillType.GRAB) {
     override val nodes: Set<Node> = setOf(
         CreatePushChainStep.DecideToUseGrab,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<PushContext>().firstPusher
         return player.coordinates
     }
@@ -229,7 +229,7 @@ object UseHitAndRunWheelController: UseSkillWheelController(SkillType.HIT_AND_RU
     override val nodes: Set<Node> = setOf(
         HitAndRunStep.ChooseToUseHitAndRun,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.activePlayerOrThrow()
         return player.coordinates
     }
@@ -242,7 +242,7 @@ object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
         BB2025BothDown.AttackerChooseToUseWrestle,
         BB2025BothDown.DefenderChooseToUseWrestle
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
             BB2020BothDown.AttackerChooseToUseWrestle -> context.attacker.coordinates
@@ -259,7 +259,7 @@ object UseSafePairOfHandsWheelController: UseSkillWheelController(SkillType.SAFE
         SafePairOfHandsStep.ChooseToUseSafePairOfHands,
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<RiskingInjuryContext>().player
         return player.coordinates
     }
@@ -269,7 +269,7 @@ object UseSafePassWheelController: UseSkillWheelController(SkillType.SAFE_PASS) 
     override val nodes: Set<Node> = setOf(
         com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep.ChooseToUseSafePass
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<PassContext>().thrower
         return player.coordinates
     }
@@ -280,7 +280,7 @@ object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
         BB2020PushStepInitialMoveSequence.DecideToUseSidestep,
         CreatePushChainStep.DecideToUseSidestep,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<PushContext>().pushee()
         return player.coordinates
     }
@@ -291,7 +291,7 @@ object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
         BB2020Stumble.ChooseToUseDodge,
         BB2025Stumble.ChooseToUseDodge,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val defender = state.getContext<StumbleContext>().defender
         return defender.coordinates
     }
@@ -302,7 +302,7 @@ object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
         BB2020Stumble.ChooseToUseTackle,
         BB2025Stumble.ChooseToUseTackle
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val attacker = state.getContext<StumbleContext>().attacker
         return attacker.coordinates
     }
@@ -313,7 +313,7 @@ object UseVeryLongLegsWheelController: UseSkillWheelController(SkillType.VERY_LO
         com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs,
         com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<MoveContext>().player
         return player.coordinates
     }
@@ -323,7 +323,7 @@ object UseKickWheelController: UseSkillWheelController(SkillType.KICK) {
     override val nodes: Set<Node> = setOf(
         TheKickOff.ChooseToUseKick
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.kickingPlayer ?: error("Missing kicking player: $state")
         return player.coordinates
     }
@@ -334,7 +334,7 @@ object UseDirtyPlayerWheelController: UseSkillWheelController(SkillType.DIRTY_PL
         ArmourRoll.ChooseToUseDirtyPlayer,
         InjuryRoll.ChooseToUseDirtyPlayer
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = state.getContext<FoulContext>().fouler
         return player.coordinates
     }
@@ -344,7 +344,7 @@ object UseEyeGougeWheelController: UseSkillWheelController(SkillType.EYE_GOUGE) 
     override val nodes: Set<Node> = setOf(
         CreatePushChainStep.ChooseToUseEyeGouge
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<PushContext>()
         return context.firstPusher.coordinates
     }
@@ -354,7 +354,7 @@ object UseFendWheelController: UseSkillWheelController(SkillType.FEND) {
     override val nodes: Set<Node> = setOf(
         FollowUpStep.ChooseToUseFend
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = when (state.stack.currentNode()) {
             FollowUpStep.ChooseToUseFend -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
@@ -370,7 +370,7 @@ object UseFumblerooskiWheelController: UseSkillWheelController(SkillType.FUMBLER
         LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare,
         PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<MoveContext>()
         return context.player.coordinates
     }
@@ -380,7 +380,7 @@ object UseSneakyGitWheelController: UseSkillWheelController(SkillType.SNEAKY_GIT
     override val nodes: Set<Node> = setOf(
         FoulStep.ChooseToUseSneakyGit
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<FoulContext>()
         val player = context.fouler
         return player.coordinates
@@ -391,7 +391,7 @@ object UseSprintWheelController: UseSkillWheelController(SkillType.SPRINT) {
     override val nodes: Set<Node> = setOf(
         BlitzAction.ChooseToUseSprintForBlocking,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BlitzActionContext>()
         val player = context.attacker
         return player.coordinates
@@ -402,7 +402,7 @@ object UseStandFirmWheelController: UseSkillWheelController(SkillType.STAND_FIRM
     override val nodes: Set<Node> = setOf(
         CreatePushChainStep.DecideToUseStandFirm
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<PushContext>()
         val player = context.pushee()
         return player.coordinates
@@ -414,7 +414,7 @@ object UseSteadyFootingWheelController: UseSkillWheelController(SkillType.STEADY
         BB2025KnockedDown.ChooseToUseSteadyFooting,
         BB2025FallingOver.ChooseToUseSteadyFooting
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<SteadyFootingRollContext>()
         val player = context.player
         return player.coordinates
@@ -426,7 +426,7 @@ object UseStripBallWheelController: UseSkillWheelController(SkillType.STRIP_BALL
         UseStripBallStep.ChooseToUseStripBall,
         UseStripBallStep.ChooseToUseStripBall
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<PushContext>()
         val player = context.firstPusher
         return player.coordinates
@@ -437,7 +437,7 @@ object UseStrongArmWheelController: UseSkillWheelController(SkillType.STRONG_ARM
     override val nodes: Set<Node> = setOf(
         ThrowTeammateAccuracyRoll.ChooseToUseStrongArm,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<ThrowTeamMateContext>()
         val player = context.thrower
         return player.coordinates
@@ -448,7 +448,7 @@ object UseSureHandsWheelController: UseSkillWheelController(SkillType.SURE_HANDS
     override val nodes: Set<Node> = setOf(
         UseStripBallStep.ChooseToUseSureHands,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<PushContext>()
         val player = context.firstPushee
         return player.coordinates
@@ -459,7 +459,7 @@ object UseTauntWheelController: UseSkillWheelController(SkillType.TAUNT) {
     override val nodes: Set<Node> = setOf(
         FollowUpStep.ChooseToUseTaunt
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val player = when (state.stack.currentNode()) {
             FollowUpStep.ChooseToUseTaunt -> state.getContext<PushContext>().firstPushee
             else -> error("Unsupported node: ${state.stack.currentNode()}")
@@ -472,7 +472,7 @@ object UseThickSkullWheelController: UseSkillWheelController(SkillType.THICK_SKU
     override val nodes: Set<Node> = setOf(
         InjuryRoll.ChooseToUseThickSkull
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
         val player = context.player
         return player.coordinates
@@ -483,7 +483,7 @@ object UseLeapWheelController: UseSkillWheelController(SkillType.LEAP) {
     override val nodes: Set<Node> = setOf(
         LeapStep.ChooseToUseLeapModifier
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<MoveContext>()
         val player = context.player
         return player.coordinates
@@ -495,7 +495,7 @@ object UseLethalFlightWheelController: UseSkillWheelController(SkillType.LETHAL_
         ArmourRoll.ChooseToUseLethalFlight,
         InjuryRoll.ChooseToUseLethalFlight,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
         val player = context.causedBy ?: error("Missing causedBy: $state")
         return player.coordinates
@@ -506,7 +506,7 @@ object UseLoneFoulerWheelController: UseSkillWheelController(SkillType.LONE_FOUL
     override val nodes: Set<Node> = setOf(
         ArmourRoll.ChooseToUseLoneFouler
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
         val player = context.causedBy ?: error("Missing causedBy: $state")
         return player.coordinates
@@ -517,7 +517,7 @@ object UsePileDriverWheelController: UseSkillWheelController(SkillType.PILE_DRIV
     override val nodes: Set<Node> = setOf(
         PileDriverStep.ChooseToUsePileDriver
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BlockContext>()
         val player = context.attacker
         return player.coordinates
@@ -529,7 +529,7 @@ object UseMightyBlowController: UseSkillWheelController(SkillType.MIGHTY_BLOW) {
         ArmourRoll.ChooseToUseMightyBlow,
         InjuryRoll.ChooseToUseMightyBlow
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<RiskingInjuryContext>()
         val player = context.causedBy ?: error("Missing causedBy: $state")
         return player.coordinates
@@ -540,7 +540,7 @@ object UseSwoopWheelController: UseSkillWheelController(SkillType.SWOOP) {
     override val nodes: Set<Node> = setOf(
         SwoopStep.ChooseToUseSwoop,
     )
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<SwoopContext>()
         return context.player.coordinates
     }
@@ -554,13 +554,13 @@ object UseApothecaryWheelController: YesNoAnswerWheelController() {
     override val yesLabel: String = "Use Apothecary"
     override val noLabel: String = "Do not use Apothecary"
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         val player = state.getContext<RiskingInjuryContext>().player
         return when (player.location) {
             DogOut -> {
                 state.getContext<PushContext>().pushChain.last().from
             }
-            is FieldCoordinate -> {
+            is PitchCoordinate -> {
                 // TODO Figure out a better player to show the Action Wheel for players out-of-bounds
                 when (player.coordinates.isOutOfBounds(state.rules)) {
                     true -> null
@@ -579,7 +579,7 @@ object ArgueTheCallWheelController: YesNoAnswerWheelController() {
     override val yesLabel: String = "Argue The Call"
     override val noLabel: String = "Stay Silent"
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<FoulContext>()
         val player = context.fouler
         return player.coordinates

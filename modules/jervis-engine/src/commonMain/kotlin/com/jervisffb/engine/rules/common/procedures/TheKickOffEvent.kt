@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -36,8 +36,8 @@ import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.tables.TableResult
 
 /**
- * Run the Kick-Off Event as well as the results of the ball coming back to the
- * field.
+ * Run the Kick-Off Event as well as the results of the ball coming back down
+ * onto the pitch.
  *
  * See page 41 in the BB2020 rulebook.
  * See page 47 in the BB2025 rulebook.
@@ -122,14 +122,14 @@ object TheKickOffEvent : Procedure() {
             // If on an empty square, bounce
             // if landing on a player, they must/can(?) attempt to catch it
             val ball = state.singleBall()
-            val ballLocation: FieldCoordinate = ball.coordinates
+            val ballLocation: PitchCoordinate = ball.coordinates
 
             // According to Designer's Errata May 2024, it is only a touchback if a ball
             // goes beyond the kicking teams Line of Scrimmage. This rule also generalizes
             // to Standard board setups. In particular, the ball is allowed to land in any
             // configured No Man's Land.
             val outOfBounds =
-                !ball.coordinates.isOnField(rules)
+                !ball.coordinates.isOnPitch(rules)
                     || (state.kickingTeam.isHomeTeam() && ballLocation.x <= rules.lineOfScrimmageHome)
                     || (state.kickingTeam.isAwayTeam() && ballLocation.x >= rules.lineOfScrimmageAway)
 
@@ -144,7 +144,7 @@ object TheKickOffEvent : Procedure() {
     }
 
     object ResolveBallLanding : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnField
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnPitch
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Some effect, like the ball bouncing or Diving Catch might cause the ball to end
             // up on the opponent side. Instead of trying to fix that, at every possible scenario

@@ -110,7 +110,7 @@ object SecureTheBallAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their action
             val moveContext = state.getContext<MoveContext>()
             val secureBallContext = state.getContext<SecureTheBallContext>()

@@ -95,9 +95,9 @@ object StabStep: Procedure() {
             val attacker = state.activePlayer!!
             val eligibleDefenders =
                 attacker.coordinates.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isOccupied() }
-                    .filter { state.field[it].player!!.team != attacker.team }
-                    .map { state.field[it].player!! }
+                    .filter { state.pitch[it].isOccupied() }
+                    .filter { state.pitch[it].player!!.team != attacker.team }
+                    .map { state.pitch[it].player!! }
 
             return when (eligibleDefenders.isNotEmpty()) {
                 true -> listOf(SelectPlayer.fromPlayers(eligibleDefenders), EndActionWhenReady)

@@ -78,6 +78,10 @@ But there are other more compelling reasons:
 The rules are implemented in [`modules/jervis-engine`](../modules/jervis-engine). See a full description
 of the architecture in the [architecture-rules-engine.md](architecture-rules-engine.md) document.
 
+Generally, the Rules Engine will attempt to faithfully implement the rules
+as described, using the terminology in the rulebook. Where appropriate, the 
+implementation will reference pages from the rulebook. The documentation will
+only quote the rules in small chunks to avoid problems with copyright.
 
 ## How is the UI implemented?
 

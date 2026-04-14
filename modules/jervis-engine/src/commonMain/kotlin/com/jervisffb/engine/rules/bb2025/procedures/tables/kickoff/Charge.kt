@@ -376,7 +376,7 @@ object Charge : Procedure() {
     // Reset player stats back to start, this e.g. include moves
     private fun resetPlayerTemporaryStats(state: Game, rules: Rules): Array<Command> {
         return state.kickingTeam
-            .filter { it.location.isOnField(rules) }
+            .filter { it.location.isOnPitch(rules) }
             .map {
                 SetPlayerTemporaryStats(
                     it,
@@ -405,7 +405,7 @@ object Charge : Procedure() {
         val rules = state.rules
         // TODO Is there anyone who should not be made available? I.e. Stunned players will be turned KO
         return state.kickingTeam.map {
-            if (it.location.isOnField(rules) && (it.state == PlayerState.STANDING || it.state == PlayerState.PRONE)) {
+            if (it.location.isOnPitch(rules) && (it.state == PlayerState.STANDING || it.state == PlayerState.PRONE)) {
                 SetPlayerAvailability(it, Availability.AVAILABLE)
             } else {
                 SetPlayerAvailability(it, Availability.UNAVAILABLE)

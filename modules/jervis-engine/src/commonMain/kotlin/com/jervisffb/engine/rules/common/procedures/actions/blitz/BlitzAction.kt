@@ -46,7 +46,7 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
@@ -112,7 +112,7 @@ object BlitzAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<BlitzActionContext>().attacker
             val availableTargetPlayers = attacker.team.otherTeam()
-                .filter { it.location.isOnField(rules) && it.state == PlayerState.STANDING }
+                .filter { it.location.isOnPitch(rules) && it.state == PlayerState.STANDING }
 
             return listOf(SelectPlayer.fromPlayers(availableTargetPlayers), EndActionWhenReady)
         }
@@ -185,7 +185,7 @@ object BlitzAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their blitz
             // TODO This is wrong. It is only a turnover if the player was Knocked Down
             //  or went prone with the Ball. Need to rework this.
@@ -283,7 +283,7 @@ object BlitzAction : Procedure() {
     object RushBeforeBlock : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val blitzContext = state.getContext<BlitzActionContext>()
-            return AddContext(RushRollContext(blitzContext.attacker, blitzContext.attacker.location as OnFieldLocation))
+            return AddContext(RushRollContext(blitzContext.attacker, blitzContext.attacker.location as OnPitchLocation))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -414,7 +414,7 @@ object BlitzAction : Procedure() {
             }
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their blitz
             // TODO This approach to turn overs might not be correct, i.e. a touchdown
             // could have been scored after a Blitz

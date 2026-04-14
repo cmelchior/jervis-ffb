@@ -32,13 +32,13 @@ import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -78,7 +78,7 @@ fun ActionSelector(
                             DogoutSelected -> "DogoutSelected"
                             EndSetup -> "EndSetup"
                             EndTurn -> "EndTurn"
-                            is FieldSquareSelected -> action.toString()
+                            is PitchSquareSelected -> action.toString()
                             is PlayerSelected -> "Player[${action.playerId}]"
                             is DiceRollResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                             is PlayerActionSelected -> "Action: $action"

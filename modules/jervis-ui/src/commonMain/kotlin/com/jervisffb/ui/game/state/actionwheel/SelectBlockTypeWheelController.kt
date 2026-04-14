@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
@@ -15,7 +15,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 /**
  * Select a player action after selecting the player.
@@ -27,7 +27,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.SelectBlockType
     )
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayerOrThrow().coordinates
     }
 
@@ -35,7 +35,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper
+        sharedData: LocalPitchDataWrapper
     ) {
         val state = acc.game
 
@@ -55,7 +55,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
         acc.addActionWheelEvent(wheelState)
     }
 
-    // Temporary work-around while transition from FieldDecorator api
+    // Temporary work-around while transition from PitchDecorator api
     private fun createActionOption(
         id: ButtonId,
         state: Game,

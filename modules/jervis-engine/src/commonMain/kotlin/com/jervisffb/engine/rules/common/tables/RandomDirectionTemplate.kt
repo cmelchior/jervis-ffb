@@ -32,7 +32,7 @@ object RandomDirectionTemplate {
         )
 
     /**
-     * When the template is placed on the field (and not in a corner), roll
+     * When the template is placed on the pitch (and not in a corner), roll
      * a D8 to determine the direction the object is moving in.
      */
     fun roll(roll: D8Result): Direction {

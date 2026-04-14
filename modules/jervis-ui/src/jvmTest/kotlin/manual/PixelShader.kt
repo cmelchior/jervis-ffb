@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
@@ -57,7 +57,7 @@ private fun main() = singleWindowApplication {
         rules,
         createDefaultBB2020HomeTeam(rules),
         createDefaultBB2020AwayTeam(rules),
-        Field.createForRuleset(rules),
+        Pitch.createForRuleset(rules),
     )
     runBlocking {
         IconFactory.initializeFumbblMapping()

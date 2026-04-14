@@ -3,14 +3,14 @@ package com.jervisffb.engine.reports
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 
 class ReportKickResult(
     kickingTeam: Team,
     d8: D8Result,
     d6: D6Result,
-    ballLocation: FieldCoordinate,
+    ballLocation: PitchCoordinate,
     rules: Rules,
 ) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

@@ -5,12 +5,12 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.ui.game.dialogs.UserInputDialog
-import com.jervisffb.ui.game.model.UiFieldPlayer
-import com.jervisffb.ui.game.model.UiFieldSquare
+import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.model.UiPitchSquare
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 
@@ -27,12 +27,12 @@ import kotlinx.collections.immutable.PersistentMap
 data class UiGameSnapshot(
     val actionOwner: Team?,
     val game: Game, // We should try to remove this since it is mutable
-    val squares: PersistentMap<FieldCoordinate, UiFieldSquare>,
-    val players: PersistentMap<PlayerId, UiFieldPlayer>,
+    val squares: PersistentMap<PitchCoordinate, UiPitchSquare>,
+    val players: PersistentMap<PlayerId, UiPitchPlayer>,
     // Quick access to squares with known free balls and bombs
-    val freeBalls: Map<FieldCoordinate, UiFieldSquare>,
+    val freeBalls: Map<PitchCoordinate, UiPitchSquare>,
     val status: UiGameStatusUpdate,
-    // Black text above the field
+    // Black text above the pitch
     val gameStatusText: String?,
     val unknownActions: PersistentList<GameAction>,
     val homeDogoutOnClickAction: (() -> Unit)?,
@@ -48,7 +48,7 @@ data class UiGameSnapshot(
     // to move multiple squares.
     val pathFinder: PathFinder.AllPathsResult?,
     val showReferee: Boolean,
-    val refereeCoordinates: FieldCoordinate?,
+    val refereeCoordinates: PitchCoordinate?,
 
 ) {
     val stack = game.stack

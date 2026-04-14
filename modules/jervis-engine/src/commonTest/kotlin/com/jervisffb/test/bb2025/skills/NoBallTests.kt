@@ -1,12 +1,12 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.NoBall
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -43,13 +43,13 @@ class NoBallTests: JervisGameBB2025Test() {
             SmartMoveTo(17, 7),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             5.d8, // Bounce due to No Ball
         )
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(16, 1), ball.coordinates)
+        assertEquals(PitchCoordinate(16, 1), ball.coordinates)
     }
 
     @Test
@@ -63,14 +63,14 @@ class NoBallTests: JervisGameBB2025Test() {
             SmartMoveTo(17, 7),
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(6.d6),
             5.d8, // Bounce due to No Ball
         )
         assertEquals(homeTeam, state.activeTeam)
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(16, 1), ball.coordinates)
+        assertEquals(PitchCoordinate(16, 1), ball.coordinates)
     }
 
     @Test
@@ -84,7 +84,7 @@ class NoBallTests: JervisGameBB2025Test() {
         assertEquals(homeTeam, state.activeTeam)
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(17, 6), ball.coordinates)
+        assertEquals(PitchCoordinate(17, 6), ball.coordinates)
     }
 
     @Test
@@ -102,7 +102,7 @@ class NoBallTests: JervisGameBB2025Test() {
         assertEquals(homeTeam, state.activeTeam)
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(17, 6), ball.coordinates)
+        assertEquals(PitchCoordinate(17, 6), ball.coordinates)
     }
 
     @Test
@@ -115,7 +115,7 @@ class NoBallTests: JervisGameBB2025Test() {
         )
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(18, 8), ball.coordinates)
+        assertEquals(PitchCoordinate(18, 8), ball.coordinates)
     }
 
     @Test
@@ -132,7 +132,7 @@ class NoBallTests: JervisGameBB2025Test() {
         )
         val ball = state.singleBall()
         assertEquals(BallState.ON_GROUND, ball.state)
-        assertEquals(FieldCoordinate(18, 8), ball.coordinates)
+        assertEquals(PitchCoordinate(18, 8), ball.coordinates)
     }
 
     @Test
@@ -146,7 +146,7 @@ class NoBallTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             *catch(6.d6),
         )

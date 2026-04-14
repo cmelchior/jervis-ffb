@@ -13,7 +13,7 @@ import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.menu.GameScreenModel
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,13 +31,13 @@ class SidebarViewModel(
     val gameViewModel: GameScreenModel,
     private val menuViewModel: MenuViewModel,
     private val uiState: UiGameController,
-    val sharedFieldData: LocalFieldDataWrapper,
+    val sharedPitchData: LocalPitchDataWrapper,
     val team: Team,
     // Channel specifically for handling the Player Stat Card being visible or not
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
 
-    // The original FUMBBL image is 145f/430f, but we need to stretch to make it fit the field image.
+    // The original FUMBBL image is 145f/430f, but we need to stretch to make it fit the pitch image.
     val aspectRatio: Float = 410f/1030f // 145f/430f
 
     private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->

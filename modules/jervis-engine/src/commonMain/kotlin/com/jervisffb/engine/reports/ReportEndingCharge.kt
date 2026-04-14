@@ -8,7 +8,7 @@ class ReportEndingCharge(team: Team, turnOver: TurnOver?, noPlayers: Boolean = f
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
         if (noPlayers) {
-            append("No players on field for ${team.name}")
+            append("No players on pitch for ${team.name}")
         } else if (turnOver != null) {
             val msg = when (turnOver) {
                 TurnOver.STANDARD -> "Charge! for ${team.name} ended due to a Turnover"

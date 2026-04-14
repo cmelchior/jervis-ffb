@@ -33,8 +33,8 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportPickingUpPlayerToThrow
@@ -71,7 +71,7 @@ data class ThrowTeamMateContext(
     val thrownPlayer: Player? = null,
     val hasMoved: Boolean = false,
     // Target of the throw in the current step. This means it will be updated when the ball scatters, deviates, etc.
-    val target: FieldCoordinate? = null,
+    val target: PitchCoordinate? = null,
     val range: Range? = null,
     val qualityRoll: D6DieRoll? = null,
     val qualityRollModifiers: PersistentList<DiceModifier> = persistentListOf(),
@@ -92,8 +92,8 @@ data class ThrowTeamMateContext(
     val fallOverWhenLanding: Boolean = false,
     val knockedDownWhenLanding: Boolean = false,
     // If the player scattered, deviated or bounced into the crowd while holding the ball.
-    // The ball should be thrown in from this field.
-    val outOfBoundsAt: FieldCoordinate? = null
+    // The ball should be thrown in from this square.
+    val outOfBoundsAt: PitchCoordinate? = null
 ) : ProcedureContext {
     val isQualityRollSuccess: Boolean
         get() {
@@ -161,9 +161,9 @@ object ThrowTeamMateAction : Procedure() {
 
             // If the thrower is next to a player with "Right Stuff", they can be selected for the throw
             if (rules.isStanding(thrower)) {
-                (throwerLocation as OnFieldLocation).getSurroundingCoordinates(rules, 1)
+                (throwerLocation as OnPitchLocation).getSurroundingCoordinates(rules, 1)
                     .mapNotNull {
-                        state.field[it].player
+                        state.pitch[it].player
                     }
                     .mapNotNull { player ->
                         val maxStrength = when (val rightStuffSkill = player.getSkillOrNull(SkillType.RIGHT_STUFF)) {
@@ -237,7 +237,7 @@ object ThrowTeamMateAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If a player is not standing on the field after the move, it is a turnover,
+            // If a player is not standing on the pitch after the move, it is a turnover,
             // otherwise they are free to continue their Throw Team-mate action.
             val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<ThrowTeamMateContext>()

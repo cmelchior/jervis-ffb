@@ -19,7 +19,7 @@ Some questions:
 1. Does it work outside Puggy's Activation? Like when rolling for Landing.
 2. Does it work on rolls, not on Puggy's behalf? Like Argue the Call.
 3. Does it work on other player rolls?
-4. Does it work if Puggy is not on the field?
+4. Does it work if Puggy is not on the pitch?
 
 All of these questions are unclear, but given that the description mirrors Pro, 
 Jervis is using the interpretation that Hafling Luck behaves like a one-time

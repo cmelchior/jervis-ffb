@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDialogController() {
 
@@ -47,7 +47,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         if (acc.stack.currentNode() == rollDiceNode || acc.stack.currentNode() == rerollDiceNode) {
             val buttons = allOptions.map { dieOption ->

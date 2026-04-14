@@ -47,7 +47,7 @@ object MovePlayersInPushChainStep: Procedure() {
 
     /**
      * Resolve the push-chain by moving all players part of it. For now, we only
-     * update their field location. Crowd injuries and balls bouncing happens
+     * update their pitch location. Crowd injuries and balls bouncing happens
      * later.
      */
     object MovePushedPlayers: ComputationNode() {
@@ -83,7 +83,7 @@ object MovePlayersInPushChainStep: Procedure() {
                         // At this stage, there should only be one ball on the square,
                         // Even if the player is holding another ball, it isn't knocked loose yet.
                         add(SetPlayerLocation(push.pushee, to))
-                        state.field[to].balls.singleOrNull()?.let {
+                        state.pitch[to].balls.singleOrNull()?.let {
                             add(SetBallState.bouncing(it))
                         }
                     }

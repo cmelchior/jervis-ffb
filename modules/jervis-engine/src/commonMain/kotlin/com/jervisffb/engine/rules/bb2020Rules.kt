@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.rules.bb2020.DEFAULT_INDUCEMENTS_BB2020
 import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
@@ -41,7 +41,7 @@ abstract class BB2020Rules(
 
     override fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
-        if (player.location !is OnFieldLocation) return emptyList()
+        if (player.location !is OnPitchLocation) return emptyList()
         return buildList {
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let { turnData ->
@@ -53,9 +53,9 @@ abstract class BB2020Rules(
                 if (turnData.handOffActions > 0) add(teamActions.handOff)
                 if (turnData.blockActions > 0) {
                     val isStanding = (player.state == PlayerState.STANDING)
-                    val hasEligibleTargets = (player.location as OnFieldLocation)
+                    val hasEligibleTargets = (player.location as OnPitchLocation)
                         .getSurroundingCoordinates(this@BB2020Rules, 1)
-                        .mapNotNull { state.field[it].player }
+                        .mapNotNull { state.pitch[it].player }
                         .filter { otherPlayer -> otherPlayer.team != player.team }
                         .filter { otherPlayer -> isStanding(otherPlayer)}
                         .any { otherPlayer -> isMarking(player, otherPlayer)}
@@ -67,7 +67,7 @@ abstract class BB2020Rules(
                 }
                 if (turnData.blitzActions > 0) {
                     val hasEligibleBlitzTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@BB2020Rules) }
+                        .filter { targetPlayer ->  targetPlayer.location.isOnPitch(this@BB2020Rules) }
                         .any {  targetPlayer -> isStanding(targetPlayer) }
 
                     if (hasEligibleBlitzTargets) {
@@ -76,7 +76,7 @@ abstract class BB2020Rules(
                 }
                 if (turnData.foulActions > 0) {
                     val hasEligibleFoulTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@BB2020Rules) }
+                        .filter { targetPlayer ->  targetPlayer.location.isOnPitch(this@BB2020Rules) }
                         .any {  targetPlayer -> targetPlayer.state == PlayerState.PRONE || targetPlayer.state == PlayerState.STUNNED }
                     if (hasEligibleFoulTargets) {
                         add(teamActions.foul)
@@ -106,7 +106,7 @@ abstract class BB2020Rules(
                             distance = 2,
                             includeOutOfBounds = false
                         ).any { coordinate ->
-                            state.field[coordinate].player?.let { p->
+                            state.pitch[coordinate].player?.let { p->
                                 (p.team != player.team) && this@BB2020Rules.canMarkPlayers(p)
                             } ?: false
                         }
@@ -219,15 +219,15 @@ class BB72020Rules(
         val DEFAULTS = BB2020Rules.DEFAULTS.copy(
             name = "Blood Bowl Sevens 2020 Rules",
             gameType = GameType.BB7,
-            fieldWidth = 20,
-            fieldHeight = 11,
+            pitchWidth = 20,
+            pitchHeight = 11,
             wideZone = 2,
             endZone = 1,
             lineOfScrimmageHome = 6,
             lineOfScrimmageAway = 13,
             playersRequiredOnLineOfScrimmage = 3,
             maxPlayersInWideZone = 1,
-            maxPlayersOnField = 7,
+            maxPlayersOnPitch = 7,
             turnsPrHalf = 6,
             kickOffEventTable = BB7KickOffEventTable,
             injuryTable = BB7StandardInjuryTable,

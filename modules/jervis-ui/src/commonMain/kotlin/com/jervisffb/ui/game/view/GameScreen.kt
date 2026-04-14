@@ -21,13 +21,13 @@ import androidx.compose.ui.zIndex
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_undo
-import com.jervisffb.ui.game.view.field.Field
+import com.jervisffb.ui.game.view.pitch.Pitch
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
-import com.jervisffb.ui.game.viewmodel.FieldDetails
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
+import com.jervisffb.ui.game.viewmodel.PitchDetails
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
@@ -40,7 +40,7 @@ import com.jervisffb.ui.utils.jdp
 @Composable
 fun GameScreen(
     screenModel: GameScreenModel,
-    field: FieldViewModel,
+    pitch: PitchViewModel,
     leftDugout: SidebarViewModel,
     rightDugout: SidebarViewModel,
     gameStatusController: GameStatusViewModel,
@@ -63,7 +63,7 @@ fun GameScreen(
         Row(
             modifier = Modifier
                 .aspectRatio(aspectRation)
-                // Field should be above the sidebar and bottom log viewers, so the Action Wheel
+                // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
                 // is the first thing that intercepts touch events if it overlaps with these sections.
                 .zIndex(1f)
             ,
@@ -73,13 +73,13 @@ fun GameScreen(
                 Sidebar(leftDugout, Modifier)
             }
             Column(
-                // Make sure that field layers (including the Action Wheel) are placed above the sidebar
+                // Make sure that pitch layers (including the Action Wheel) are placed above the sidebar
                 modifier = Modifier.zIndex(1f).weight(/*782f*/ 2354f).align(Alignment.Top),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Field(
+                Pitch(
                     Modifier,
-                    field,
+                    pitch,
                     borderBrushSize = 3.dp
                 )
                 // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
@@ -90,7 +90,7 @@ fun GameScreen(
         }
         Spacer(modifier = Modifier.height(24.jdp))
         Row(modifier = Modifier.padding(horizontal = 24.jdp)) {
-            val backgroundColor by screenModel.logsBackgroundColor.collectAsState(FieldDetails.NICE.logBackground)
+            val backgroundColor by screenModel.logsBackgroundColor.collectAsState(PitchDetails.NICE.logBackground)
             LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
             Spacer(modifier = Modifier.width(24.dp))
             // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))

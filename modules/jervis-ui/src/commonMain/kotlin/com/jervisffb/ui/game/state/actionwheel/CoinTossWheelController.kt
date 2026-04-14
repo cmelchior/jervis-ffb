@@ -9,7 +9,7 @@ import com.jervisffb.engine.ext.d2
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -20,7 +20,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -31,14 +31,14 @@ object CoinTossWheelController : ActionWheelDialogController() {
 
     override val nodes: Set<Node> = setOf(DetermineKickingTeamStep.CoinToss)
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 
     // Only relevant for local-side dice rolls
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val coinButtons = listOf(
             CoinButtonData(

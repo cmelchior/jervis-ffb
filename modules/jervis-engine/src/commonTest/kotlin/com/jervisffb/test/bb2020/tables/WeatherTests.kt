@@ -1,13 +1,13 @@
 package com.jervisffb.test.bb2020.tables
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
@@ -103,7 +103,7 @@ class WeatherTests: JervisGameBB2020Test() {
         // Move all players to KO
         listOf(homeTeam, awayTeam).forEach { team ->
             team.forEach { player ->
-                if (player.location.isOnField(rules)) {
+                if (player.location.isOnPitch(rules)) {
                     player.apply {
                         state = PlayerState.KNOCKED_OUT
                         location = DogOut
@@ -132,7 +132,7 @@ class WeatherTests: JervisGameBB2020Test() {
         // Move almost all players to KO
         listOf(homeTeam, awayTeam).forEach { team ->
             team.forEach { player ->
-                if (player.location.isOnField(rules) && player.id != "H1".playerId && player.id != "A1".playerId) {
+                if (player.location.isOnPitch(rules) && player.id != "H1".playerId && player.id != "A1".playerId) {
                     player.apply {
                         state = PlayerState.KNOCKED_OUT
                         location = DogOut
@@ -167,7 +167,7 @@ class WeatherTests: JervisGameBB2020Test() {
             4.d6, // Pickup ball
             NoRerollSelected(),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(18, 7), // 1 Field away = Quick Pass
+            PitchSquareSelected(18, 7), // 1 square away = Quick Pass
             *throwBall(4.d6), // Roll for Accuracy roll (should be 5+ to be accurate)
         )
         val context = state.getContext<PassContext>()
@@ -257,8 +257,8 @@ class WeatherTests: JervisGameBB2020Test() {
         )
 
         // Check that no squares outside the valid range can be selected.
-        controller.getAvailableActions().actions.filterIsInstance<SelectFieldLocation>().first().squares.forEach {
-            val range = rules.rangeRuler.measure(FieldCoordinate(17, 7), it.coordinate)
+        controller.getAvailableActions().actions.filterIsInstance<SelectPitchLocation>().first().squares.forEach {
+            val range = rules.rangeRuler.measure(PitchCoordinate(17, 7), it.coordinate)
             if (range != Range.QUICK_PASS && range != Range.SHORT_PASS) {
                 fail("Invalid range: $range for ${it.coordinate}")
             }

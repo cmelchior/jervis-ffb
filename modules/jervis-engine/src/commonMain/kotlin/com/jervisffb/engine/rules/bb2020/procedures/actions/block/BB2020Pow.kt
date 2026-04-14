@@ -91,10 +91,10 @@ object BB2020Pow: Procedure() {
     object ResolveDefenderDownInjury: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<PushContext>()
-            val isOnField = context.firstPushee.location.isOnField(rules)
+            val isOnPitch = context.firstPushee.location.isOnPitch(rules)
             return when {
                 !context.isDefenderKnockedDown -> {
-                    when (isOnField) {
+                    when (isOnPitch) {
                         true -> DecideToUseStripBall
                         false -> {
                             if (context.isMultipleBlock) {

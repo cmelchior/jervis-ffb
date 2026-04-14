@@ -71,7 +71,7 @@ data class JervisRosterFile(
 
 // A relative coordinate that will differ based on the game type:
 // - Standard/BB7/Gutter Bowl: Y-axis is from a teams Line of Scrimmage towards
-//   their own end-zone. Y=0 is the top of the field (which is in a horizontal position)
+//   their own end-zone. Y=0 is the top of the pitch (which is in a horizontal position)
 // - Dungeon Bowl: Y-axis is the back of the End-zone tile facing the
 //   entrance. Y=0 is (top-left) for an End Zone tile with the entrance
 //   to the south. Rotate this axis with the end zone.

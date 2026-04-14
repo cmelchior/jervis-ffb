@@ -8,7 +8,7 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.rules.bb2025.skills.PrehensileTail
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -58,7 +58,7 @@ class PrehensileTailTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         movingPlayer.assertProne()
-        assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
+        assertEquals(PitchCoordinate(14, 5), movingPlayer.coordinates)
     }
 
     @Test
@@ -79,6 +79,6 @@ class PrehensileTailTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         movingPlayer.assertStanding()
-        assertEquals(FieldCoordinate(14, 5), movingPlayer.coordinates)
+        assertEquals(PitchCoordinate(14, 5), movingPlayer.coordinates)
     }
 }

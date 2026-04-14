@@ -38,7 +38,7 @@ fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> 
         icon = { JervisLogo() },
         width = DialogSize.MEDIUM,
         draggable = true,
-        centerOnField = viewModel,
+        centerOnPitch = viewModel,
         backgroundScrim = true,
         content = { textFieldColors, textColor ->
             Box(

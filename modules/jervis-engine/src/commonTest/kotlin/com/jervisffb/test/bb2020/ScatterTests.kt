@@ -1,12 +1,12 @@
 package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
@@ -29,7 +29,7 @@ class ScatterTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Weather change (to trigger scatter)
@@ -55,12 +55,12 @@ class ScatterTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Weather change (to trigger scatter)
                     DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
-                    DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to field with player
+                    DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to square with player
                 ),
                 bounce = null
             ),
@@ -79,7 +79,7 @@ class ScatterTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Weather change (to trigger scatter)
@@ -92,11 +92,11 @@ class ScatterTests: JervisGameBB2020Test() {
         player.hasTackleZones = false
         assertFalse(rules.canCatch(player))
         controller.rollForward(
-            DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to field with player
+            DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to square with player
             7.d8 // Bounce
         )
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-        assertEquals(FieldCoordinate(16, 8), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(16, 8), state.singleBall().coordinates)
     }
 
     @Test
@@ -105,7 +105,7 @@ class ScatterTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Weather change (to trigger scatter)

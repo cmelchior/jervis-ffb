@@ -24,7 +24,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.CatchContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportBounce
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
@@ -59,14 +59,14 @@ object Bounce : Procedure() {
             return castDiceRoll<D8Result>(action) { d8 ->
                 val direction: Direction = rules.direction(d8)
                 val ball = state.currentBall()
-                val newLocation: FieldCoordinate = ball.coordinates.move(direction, 1)
+                val newLocation: PitchCoordinate = ball.coordinates.move(direction, 1)
 
-                // Out of bounds is normally just outside the field, but during kick-off we need to
+                // Out of bounds is normally just outside the pitch, but during kick-off we need to
                 // consider the case where the ball bounces back to the kicking teams side.
                 val isDuringKickOff = state.stack.containsNode(StartOfDriveSequence.KickOffEvent)
                 val isOnKickingTeamSide = if (state.kickingTeam.isHomeTeam()) newLocation.isOnHomeSide(rules) else newLocation.isOnAwaySide(rules)
                 val outOfBounds: Boolean = newLocation.isOutOfBounds(rules) || (isDuringKickOff && isOnKickingTeamSide)
-                val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null
+                val playerAtTarget: Player? = if (!outOfBounds) state.pitch[newLocation].player else null
 
                 val nextNode: Command =
                     if (outOfBounds) {
@@ -141,7 +141,7 @@ object Bounce : Procedure() {
     object ResolveCatch : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            val player = state.field[ball.coordinates].player ?: INVALID_GAME_STATE("Missing player on: ${ball.coordinates}")
+            val player = state.pitch[ball.coordinates].player ?: INVALID_GAME_STATE("Missing player on: ${ball.coordinates}")
             return AddContext(CatchContext(player, ball))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch

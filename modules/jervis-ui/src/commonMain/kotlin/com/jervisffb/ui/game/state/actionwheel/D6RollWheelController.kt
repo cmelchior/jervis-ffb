@@ -11,7 +11,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.DodgySnackContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -27,7 +27,7 @@ import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -43,7 +43,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         if (nodes.contains(acc.stack.currentNode())) {
             val buttons = D6Result.allOptions().map { d6Option ->
@@ -123,7 +123,7 @@ object CheeringFansKickingTeamRollWheelController: D6RollWheelController() {
     )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.kickingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -142,7 +142,7 @@ object CheeringFansReceivingTeamRollWheelController: D6RollWheelController() {
     )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.receivingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -157,7 +157,7 @@ object BrilliantCoachingKickingTeamRollWheelController: D6RollWheelController() 
     override val diceRollType: DiceRollType = DiceRollType.BRILLIANT_COACHING
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.kickingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -172,7 +172,7 @@ object BrilliantCoachingReceivingTeamRollWheelController: D6RollWheelController(
     override val diceRollType: DiceRollType = DiceRollType.BRILLIANT_COACHING
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.receivingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -187,7 +187,7 @@ object DodgySnackKickingTeamRollWheelController: D6RollWheelController() {
     override val diceRollType: DiceRollType = DiceRollType.DODGY_SNACK_ROLL_OFF
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.kickingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -202,7 +202,7 @@ object DodgySnackReceivingTeamRollWheelController: D6RollWheelController() {
     override val diceRollType: DiceRollType = DiceRollType.DODGY_SNACK_ROLL_OFF
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.receivingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -216,7 +216,7 @@ object DodgySnackEffectOnKickingTeamRollWheelController: D6RollWheelController()
     override val rollDiceNode: Node = DodgySnack.RollForKickingTeamSelectedPlayer
     override val diceRollType: DiceRollType = DiceRollType.DODGY_SNACK_EFFECT
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<DodgySnackContext>()
         return context.kickingTeamPlayerSelected?.coordinates ?: error("Missing kicking team player: $state")
     }
@@ -227,7 +227,7 @@ object DodgySnackEffectOnReceivingTeamRollWheelController: D6RollWheelController
     override val rollDiceNode: Node = DodgySnack.RollForReceivingTemSelectedPlayer
     override val diceRollType: DiceRollType = DiceRollType.DODGY_SNACK_EFFECT
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<DodgySnackContext>()
         return context.receivingTeamPlayerSelected?.coordinates ?: error("Missing receiving team player: $state")
     }
@@ -238,7 +238,7 @@ object PitchInvasionKickingTeamRollWheelController: D6RollWheelController() {
     override val rollDiceNode: Node = PitchInvasion.RollForKickingTeamFans
     override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_FAN_FACTOR
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.kickingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)
@@ -252,7 +252,7 @@ object PitchInvasionReceivingTeamRollWheelController: D6RollWheelController() {
     override val rollDiceNode: Node = PitchInvasion.RollForReceivingTeamFans
     override val diceRollType: DiceRollType = DiceRollType.PITCH_INVASION_FAN_FACTOR
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val isHomeTeam = state.receivingTeam.isHomeTeam()
         return when (isHomeTeam) {
             true -> getHomeCenterCoordinates(state)

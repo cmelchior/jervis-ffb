@@ -21,7 +21,7 @@ import com.jervisffb.engine.model.context.SecureTheBallContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
@@ -53,7 +53,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *  [MoveType.STANDARD, Square(x,y), MoveType.STANDARD, Square(x1, y1), ...]
  *
  * The other option would have been to calculate all possible targets and
- * then enhance the field location with that type data. This was considered but
+ * then enhance the pitch location with that type data. This was considered but
  * rejected because it would lead to a lot of calculations on each move,
  * especially if you also want to support the UI moving multiple steps in one go.
  *
@@ -111,8 +111,8 @@ object ResolveMoveTypeStep : Procedure() {
             val player = moveContext.player
             val pickupBall = (
                 rules.isStanding(player)
-                    && state.field[player.location as FieldCoordinate].balls.isNotEmpty()
-                    && state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
+                    && state.pitch[player.location as PitchCoordinate].balls.isNotEmpty()
+                    && state.pitch[player.location as PitchCoordinate].balls.all { it.state == BallState.ON_GROUND }
             )
             val secureTheBall = (secureTheBallContext?.player === player) && pickupBall
             return when {
@@ -152,7 +152,7 @@ object ResolveMoveTypeStep : Procedure() {
     object SecureTheBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            val ball = state.field[context.player.coordinates].balls.single()
+            val ball = state.pitch[context.player.coordinates].balls.single()
             if (ball.coordinates != context.player.coordinates) {
                 INVALID_GAME_STATE("Ball ${ball.coordinates} must be at ${context.player.coordinates}")
             }
@@ -172,7 +172,7 @@ object ResolveMoveTypeStep : Procedure() {
     object PickUpBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            val ball = state.field[context.player.coordinates].balls.single()
+            val ball = state.pitch[context.player.coordinates].balls.single()
             if (!context.player.coordinates.overlap(ball.coordinates)) {
                 INVALID_GAME_STATE("Ball ${ball.coordinates} must be at ${context.player.coordinates}")
             }

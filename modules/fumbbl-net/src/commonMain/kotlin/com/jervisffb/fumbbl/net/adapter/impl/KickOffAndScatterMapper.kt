@@ -2,7 +2,7 @@ package com.jervisffb.fumbbl.net.adapter.impl
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
@@ -71,7 +71,7 @@ object KickOffAndScatterMapper: CommandActionMapper {
             )
 
         // TODO Kick not supported yet
-        newActions.add(FieldSquareSelected(startingPoint.x, startingPoint.y), TheKickOff.PlaceTheKick)
+        newActions.add(PitchSquareSelected(startingPoint.x, startingPoint.y), TheKickOff.PlaceTheKick)
         newActions.add(
             DiceRollResults(
                 RandomDirectionTemplate.getRollForDirection(

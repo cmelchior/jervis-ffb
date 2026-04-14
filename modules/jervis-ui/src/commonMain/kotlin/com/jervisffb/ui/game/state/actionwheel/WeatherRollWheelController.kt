@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
 
 
@@ -35,16 +35,16 @@ object WeatherRollWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(WeatherRoll.RollWeatherDice)
 
     // There is no "real" center for this, so we place it, assuming that the UI
-    // is showing the refee in the center. The referee is placed at the center of the field
+    // is showing the refee in the center. The referee is placed at the center of the pitch
     // occupying both squares there. The Away Captain is placed just above this on the
     // Away side
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? = null
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 
     override fun onDecorateActions(
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         val diceButtons = listOf(
             // We want D6 on the "right" side, so it has to go first in the list

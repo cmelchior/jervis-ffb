@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2025
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
@@ -41,7 +41,7 @@ class MarkedTests: JervisGameBB2025Test() {
     fun isOpen_standing() {
         val player = awayTeam[10.playerNo]
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).none {
-            state.field[it].isOccupied()
+            state.pitch[it].isOccupied()
         })
         assertTrue(rules.isOpen(player))
     }
@@ -52,7 +52,7 @@ class MarkedTests: JervisGameBB2025Test() {
         val player = awayTeam[10.playerNo]
         player.state = PlayerState.PRONE
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).none {
-            state.field[it].isOccupied()
+            state.pitch[it].isOccupied()
         })
         assertFalse(rules.isOpen(player))
         assertFalse(rules.isMarked(player))
@@ -62,7 +62,7 @@ class MarkedTests: JervisGameBB2025Test() {
     fun isMarked_standing() {
         val player = awayTeam[1.playerNo]
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).any {
-            state.field[it].let { it.isOccupied() && it.player!!.team != player.team }
+            state.pitch[it].let { it.isOccupied() && it.player!!.team != player.team }
         })
         assertTrue(rules.isMarked(player))
         assertFalse(rules.isOpen(player))
@@ -73,7 +73,7 @@ class MarkedTests: JervisGameBB2025Test() {
         val player = awayTeam[1.playerNo]
         player.state = PlayerState.PRONE
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).any {
-            state.field[it].let { it.isOccupied() && it.player!!.team != player.team }
+            state.pitch[it].let { it.isOccupied() && it.player!!.team != player.team }
         })
         assertTrue(rules.isMarked(player))
         assertFalse(rules.isOpen(player))
@@ -83,7 +83,7 @@ class MarkedTests: JervisGameBB2025Test() {
     fun isNotMarkedByTeamPlayers() {
         val player = awayTeam[6.playerNo]
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).any {
-            state.field[it].let { it.isOccupied() && it.player!!.team == player.team }
+            state.pitch[it].let { it.isOccupied() && it.player!!.team == player.team }
         })
         assertFalse(rules.isMarked(player))
         assertTrue(rules.isOpen(player))
@@ -120,7 +120,7 @@ class MarkedTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 6),
+            PitchSquareSelected(13, 6),
             *throwBall(6.d6),
             *catch(6.d6) // Catch, because H1 and H2 cannot intercept
         )
@@ -136,7 +136,7 @@ class MarkedTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(16, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1),
+            PitchSquareSelected(15, 1),
             *throwBall(4.d6),
             7.d8 // Bounce because player cannot catch
         )

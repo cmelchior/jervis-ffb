@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2020
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -59,7 +59,7 @@ class BounceTests: JervisGameBB2020Test() {
             *moveTo(17, 7), // Move into the ball
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1), // Target player
+            PitchSquareSelected(15, 1), // Target player
             *throwBall(6.d6),
             *catch(1.d6), // Fail to catch
             4.d8, // Bounce to another player
@@ -83,7 +83,7 @@ class BounceTests: JervisGameBB2020Test() {
             *moveTo(17, 7), // Move into the ball
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1), // Target player
+            PitchSquareSelected(15, 1), // Target player
             *throwBall(6.d6),
             *catch(1.d6), // Fail to catch
         )
@@ -106,7 +106,7 @@ class BounceTests: JervisGameBB2020Test() {
             *moveTo(17, 7), // Move into the ball
             *pickup(6.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(15, 1), // Target player
+            PitchSquareSelected(15, 1), // Target player
             *throwBall(6.d6), // Throw ball to A7
             *catch(1.d6), // Fail to catch
             4.d8, // Bounce to A6

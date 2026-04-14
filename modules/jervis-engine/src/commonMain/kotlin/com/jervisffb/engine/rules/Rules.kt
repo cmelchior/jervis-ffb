@@ -4,16 +4,16 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PitchSquare
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
@@ -22,7 +22,7 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
 import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
-import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
+import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnPitch
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -41,7 +41,7 @@ import kotlinx.serialization.Serializable
  *
  * This class should only contain rules for running a game, not rules for building rosters.
  *
- * When defining field sizes, the "board" is assumed to be laid out vertically. I.e., from left to right
+ * When defining pitch sizes, the "board" is assumed to be laid out vertically. I.e., from left to right
  * with the home team always on the left and the away team always on the right. Coordinates start from
  * the upper-left corner with (0,0). If the UI wants to represent things differently, it is responsible
  * for swapping coordinates.
@@ -51,7 +51,7 @@ import kotlinx.serialization.Serializable
  *
  * Developer's Commentary:
  * The idea is that this class should be able to represent all game types, but that hasn't been
- * fully tested yet, e.g., Dungeon Bowl has a very different view of what the field looks
+ * fully tested yet, e.g., Dungeon Bowl has a very different view of what the pitch looks
  * and behaves, so most likely some aspects need to be redesigned.*
  * It is also a bit unclear how well this class transcends ruleset, i.e., between BB2016 and BB2020
  */
@@ -66,38 +66,38 @@ abstract class Rules(
      */
     open fun isSetupValid(state: Game, team: Team): List<SetupRule> {
         val isHomeTeam = team.isHomeTeam()
-        val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnField(this) }
-        val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnField(this) }
+        val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnPitch(this) }
+        val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnPitch(this) }
         val totalAvailablePlayers: Int = inReserve.size + onField.size
 
         val brokenRules = mutableListOf<SetupRule>()
 
-        // If below 11 players, all players must be fielded
-        if (totalAvailablePlayers < maxPlayersOnField && inReserve.isNotEmpty()) {
+        // If below 11 players, all players must be fielded on the pitch
+        if (totalAvailablePlayers < maxPlayersOnPitch && inReserve.isNotEmpty()) {
             brokenRules.add(
-                WrongAmountOfPlayersOnField(
+                WrongAmountOfPlayersOnPitch(
                     availablePlayers = totalAvailablePlayers,
-                    playersOnField = onField.size
+                    playersOnPitch = onField.size
                 )
             )
         }
 
-        // Otherwise 11 players must be on the field
+        // Otherwise 11 players must be on the pitch
         // TODO Swarming might change this
-        if (totalAvailablePlayers >= maxPlayersOnField && onField.size != maxPlayersOnField) {
+        if (totalAvailablePlayers >= maxPlayersOnPitch && onField.size != maxPlayersOnPitch) {
             brokenRules.add(
-                WrongAmountOfPlayersOnField(
+                WrongAmountOfPlayersOnPitch(
                     availablePlayers = totalAvailablePlayers,
-                    playersOnField = onField.size
+                    playersOnPitch = onField.size
                 )
             )
         }
 
         // Check LoS requirements
-        val field = state.field
+        val field = state.pitch
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
         val playersOnLos =
-            (wideZone .. fieldHeight - wideZone).filter { y: Int ->
+            (wideZone .. pitchHeight - wideZone).filter { y: Int ->
                 field[losIndex, y].isOccupied()
             }.size
 
@@ -132,7 +132,7 @@ abstract class Rules(
                 }
             }
         } else {
-            (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
+            (pitchWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
                 (0 until wideZone).forEach { y ->
                     if (field[x, y].isOccupied()) {
                         topWideZoneCount++
@@ -154,15 +154,15 @@ abstract class Rules(
         var bottomWideZoneCount = 0
         if (isHomeTeam) {
             (0..lineOfScrimmageHome).forEach { x ->
-                (fieldHeight - wideZone  until fieldHeight).forEach { y ->
+                (pitchHeight - wideZone  until pitchHeight).forEach { y ->
                     if (field[x, y].isOccupied()) {
                         bottomWideZoneCount++
                     }
                 }
             }
         } else {
-            (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
-                (fieldHeight - wideZone  until fieldHeight).forEach { y ->
+            (pitchWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
+                (pitchHeight - wideZone  until pitchHeight).forEach { y ->
                     if (field[x, y].isOccupied()) {
                         bottomWideZoneCount++
                     }
@@ -187,7 +187,7 @@ abstract class Rules(
      * While this is described as a bit different between Standard and BB7, it generalizes
      * to the area up to the team's Line of Scrimmage.
      */
-    fun isInSetupArea(team: Team, location: FieldCoordinate): Boolean {
+    fun isInSetupArea(team: Team, location: PitchCoordinate): Boolean {
         return if (team.isHomeTeam()) {
             location.x <= lineOfScrimmageHome
         } else {
@@ -204,7 +204,7 @@ abstract class Rules(
      *
      * This is in line with the Designer's Commentary, May 2024, page 10.
      */
-    fun canPlaceBallForKickoff(kickingTeam: Team, location: FieldSquare): Boolean {
+    fun canPlaceBallForKickoff(kickingTeam: Team, location: PitchSquare): Boolean {
         return when (kickingTeam.isHomeTeam()) {
             true -> location.x > lineOfScrimmageHome
             false -> location.x < lineOfScrimmageAway
@@ -219,16 +219,16 @@ abstract class Rules(
      * template when attempting to throw a ball in after it went out-of-bounds
      * (or Random Direction template in case of corners).
      */
-    fun throwIn(from: FieldCoordinate, d3: D3Result): Direction {
+    fun throwIn(from: PitchCoordinate, d3: D3Result): Direction {
         val corner = from.getCornerLocation(this)
         return if (corner != null) {
             randomDirectionTemplate.roll(corner, d3)
         } else {
             when {
                 (from.x == 0) -> ThrowInTemplate.roll(ThrowInPosition.LEFT, d3)
-                (from.x == fieldWidth - 1) -> ThrowInTemplate.roll(ThrowInPosition.RIGHT, d3)
+                (from.x == pitchWidth - 1) -> ThrowInTemplate.roll(ThrowInPosition.RIGHT, d3)
                 (from.y == 0) -> ThrowInTemplate.roll(ThrowInPosition.TOP, d3)
-                (from.y == fieldHeight - 1) -> ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
+                (from.y == pitchHeight - 1) -> ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
                 else -> throw IllegalArgumentException("Cannot determine position of: $from")
             }
         }
@@ -243,14 +243,14 @@ abstract class Rules(
     }
 
     /**
-     * Returns whether a player is eligible for catching a ball that landed in their field.
+     * Returns whether a player is eligible for catching a ball that landed in their location.
      */
     fun canCatch(player: Player): Boolean {
         // TODO Probably need to account for difference between Bomb and Ball here
         return player.hasTackleZones
             && player.statusEffects.none { it.type == PlayerStatusEffectType.DISTRACTED }
             && player.state == PlayerState.STANDING
-            && player.location.isOnField(this)
+            && player.location.isOnPitch(this)
             && !player.hasBall()
     }
 
@@ -263,7 +263,7 @@ abstract class Rules(
         // TODO Players with "No Hands" cannot deflect
         return player.hasTackleZones
             && player.state == PlayerState.STANDING
-            && player.location.isOnField(this)
+            && player.location.isOnPitch(this)
     }
 
     /**
@@ -286,7 +286,7 @@ abstract class Rules(
      * on page 38 in the BB2025 rulebook.
      */
     fun isStanding(player: Player): Boolean {
-        return player.state == PlayerState.STANDING && player.location.isOnField(this)
+        return player.state == PlayerState.STANDING && player.location.isOnPitch(this)
     }
 
     /**
@@ -330,9 +330,9 @@ abstract class Rules(
      *     being in another location (used, e.g., when checking if dodging is needed).
      */
     fun isMarked(player: Player, location: Location = player.location): Boolean {
-        if (!location.isOnField(this)) return false
-        if (location !is FieldCoordinate) return false
-        val field = player.team.game.field
+        if (!location.isOnPitch(this)) return false
+        if (location !is PitchCoordinate) return false
+        val field = player.team.game.pitch
         return location.getSurroundingCoordinates(this, 1)
             .asSequence()
             .filter {
@@ -346,13 +346,13 @@ abstract class Rules(
      * Returns `true` if [player] count as marking [target], `false` if not.*
      */
     fun isMarking(player: Player, target: Player): Boolean {
-        if (!player.location.isOnField(this)) return false
-        if (!target.location.isOnField(this)) return false
+        if (!player.location.isOnPitch(this)) return false
+        if (!target.location.isOnPitch(this)) return false
         if (!player.hasTackleZones) return false
         if (player.state != PlayerState.STANDING) return false
         val state = player.team.game
         return player.coordinates.getSurroundingCoordinates(this, 1)
-            .any { state.field[it].player == target }
+            .any { state.pitch[it].player == target }
     }
 
     /**
@@ -367,7 +367,7 @@ abstract class Rules(
      * @param defender the defending player
      */
     fun calculateOffensiveAssists(attacker: Player, defender: Player): Int {
-        val field = defender.team.game.field
+        val field = defender.team.game.pitch
         return defender.coordinates.getSurroundingCoordinates(this)
             .mapNotNull { field[it].player }
             .filter { it != attacker && it.team == attacker.team }
@@ -388,7 +388,7 @@ abstract class Rules(
      * @param attacker The attacking player
      */
     fun calculateDefensiveAssists(defender: Player, attacker: Player): Int {
-        val field = defender.team.game.field
+        val field = defender.team.game.pitch
         return attacker.coordinates.getSurroundingCoordinates(this)
             .mapNotNull { field[it].player }
             .filter { it != defender && it.team == defender.team }
@@ -432,7 +432,7 @@ abstract class Rules(
 
         // A player can only assist if they themselves are not being marked.
         // This logic does not take into account any skills.
-        val field = assister.team.game.field
+        val field = assister.team.game.pitch
         return assister.coordinates
             .getSurroundingCoordinates(this, 1, false)
             .none { coordinate ->
@@ -455,7 +455,7 @@ abstract class Rules(
     fun addMarkedModifiers(
         game: Game,
         markedTeam: Team,
-        square: FieldCoordinate,
+        square: PitchCoordinate,
         modifiers: MutableList<DiceModifier>,
         markedModifier: DiceModifier = CatchModifier.MARKED
     ) {
@@ -471,11 +471,11 @@ abstract class Rules(
     fun getMarkingPlayers(
         game: Game,
         markedTeam: Team,
-        square: FieldCoordinate,
+        square: PitchCoordinate,
     ): List<Player> {
-        if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
+        if (!square.isOnPitch(this)) throw IllegalArgumentException("${square.toLogString()} is not on the Pitch")
         return square.getSurroundingCoordinates(this).mapNotNull { coordinate ->
-            val markingPlayer: Player? = game.field[coordinate].player
+            val markingPlayer: Player? = game.pitch[coordinate].player
             val otherTeam = markingPlayer?.team
             val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
             if (markingPlayer != null && otherTeam != markedTeam && canMark) {
@@ -487,7 +487,7 @@ abstract class Rules(
     }
 
     /**
-     * Calculates how many opponent players are marking a given field square.
+     * Calculates how many opponent players are marking a given pitch square.
      * See page 26 in the rulebook.
      *
      * A player is marking a square if:
@@ -498,11 +498,11 @@ abstract class Rules(
     fun calculateMarks(
         game: Game,
         markedTeam: Team,
-        square: OnFieldLocation,
+        square: OnPitchLocation,
     ): Int {
-        if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
+        if (!square.isOnPitch(this)) throw IllegalArgumentException("${square.toLogString()} is not on the Pitch")
         return square.getSurroundingCoordinates(this).fold(initial = 0) { acc, coordinate ->
-            val markingPlayer: Player? = game.field[coordinate].player
+            val markingPlayer: Player? = game.pitch[coordinate].player
             val otherTeam = markingPlayer?.team
             val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
             if (markingPlayer != null && otherTeam != markedTeam && canMark) {
@@ -531,16 +531,16 @@ abstract class Rules(
      * If that matters or not, it is up to the caller of this method.
      *
      * If pushing a player OUT_OF_BOUNDS is possible, all options to do so will
-     * be possible and should be deteted using [FieldCoordinate.isOutOfBounds].
+     * be possible and should be deteted using [PitchCoordinate.isOutOfBounds].
      */
-    fun getPushOptions(pusher: Player, pushee: Player): Set<FieldCoordinate> {
-        val start: FieldCoordinate = pusher.location as? FieldCoordinate ?: throw IllegalStateException("Pusher must be on field.")
-        val direction: FieldCoordinate = pushee.location as? FieldCoordinate ?: throw IllegalStateException("Pushee must be on field.")
+    fun getPushOptions(pusher: Player, pushee: Player): Set<PitchCoordinate> {
+        val start: PitchCoordinate = pusher.location as? PitchCoordinate ?: throw IllegalStateException("Pusher must be on Pitch.")
+        val direction: PitchCoordinate = pushee.location as? PitchCoordinate ?: throw IllegalStateException("Pushee must be on Pitch.")
         if (!start.isAdjacent(this, direction)) {
             throw IllegalArgumentException("Pusher and Pushee must be adjacent to each other")
         }
 
-        val all =  (pushee.location as FieldCoordinate).getSurroundingCoordinates(this, includeOutOfBounds = true).toSet()
+        val all =  (pushee.location as PitchCoordinate).getSurroundingCoordinates(this, includeOutOfBounds = true).toSet()
         val map = all.map { Pair(it, it.realDistanceTo(start)) }
         val result = map
             .sortedByDescending { it.second }

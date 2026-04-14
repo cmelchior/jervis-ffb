@@ -142,9 +142,9 @@ object ResolveEventsInPushChainStep: Procedure() {
     object ResolveBouncingBall: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<ResolvePushChainEventsContext>()
-            val isOnField = stepIsOnField(context, rules)
+            val isOnPitch = stepIsOnPitch(context, rules)
             val containsBouncingBall = stepContainsBouncingBall(context, state, rules)
-            return if (isOnField && containsBouncingBall) {
+            return if (isOnPitch && containsBouncingBall) {
                 null
             } else {
                 ResolveTrapdoor
@@ -268,25 +268,25 @@ object ResolveEventsInPushChainStep: Procedure() {
 
     // --- HELPER METHODS ---
 
-    private fun stepIsOnField(context: ResolvePushChainEventsContext, rules: Rules): Boolean {
+    private fun stepIsOnPitch(context: ResolvePushChainEventsContext, rules: Rules): Boolean {
         with(context) {
-            return currentPushStep?.to?.isOnField(rules) ?: resolvingAttacker?.location?.isOnField(rules) ?: false
+            return currentPushStep?.to?.isOnPitch(rules) ?: resolvingAttacker?.location?.isOnPitch(rules) ?: false
         }
     }
 
     private fun stepContainsBouncingBall(context: ResolvePushChainEventsContext, state: Game, rules: Rules): Boolean {
-        if (!stepIsOnField(context, rules)) return false
+        if (!stepIsOnPitch(context, rules)) return false
         with(context) {
             return if (currentPushStep != null) {
                 val coord = currentPushStep.to
-                if (coord != null && coord.isOnField(rules)) {
-                    state.field[coord].balls.any { it.state == BallState.BOUNCING }
+                if (coord != null && coord.isOnPitch(rules)) {
+                    state.pitch[coord].balls.any { it.state == BallState.BOUNCING }
                 } else {
                     false
                 }
-            } else if (resolvingAttacker != null && resolvingAttacker.location.isOnField(rules)) {
+            } else if (resolvingAttacker != null && resolvingAttacker.location.isOnPitch(rules)) {
                 val coord = resolvingAttacker.coordinates
-                state.field[coord].balls.any { it.state == BallState.BOUNCING }
+                state.pitch[coord].balls.any { it.state == BallState.BOUNCING }
             } else {
                 false
             }
@@ -297,10 +297,10 @@ object ResolveEventsInPushChainStep: Procedure() {
         with(context) {
             return if (currentPushStep != null) {
                 val coord = currentPushStep.to ?: error("No target coordinates found: $context")
-                state.field[coord].balls.first { it.state == BallState.BOUNCING }
+                state.pitch[coord].balls.first { it.state == BallState.BOUNCING }
             } else if (resolvingAttacker != null) {
                 val coord = resolvingAttacker.coordinates
-                state.field[coord].balls.first { it.state == BallState.BOUNCING }
+                state.pitch[coord].balls.first { it.state == BallState.BOUNCING }
             } else {
                 error("No bouncing ball: $context")
             }
@@ -308,13 +308,13 @@ object ResolveEventsInPushChainStep: Procedure() {
     }
 
     private fun stepContainsTrapdoor(context: ResolvePushChainEventsContext, state: Game, rules: Rules): Boolean {
-        if (!stepIsOnField(context, rules)) return false
+        if (!stepIsOnPitch(context, rules)) return false
         // TODO Add support for Trapdoors
         return false
     }
 
     private fun stepIsInTheCrowd(context: ResolvePushChainEventsContext, state: Game, rules: Rules): Boolean {
-        return !stepIsOnField(context, rules)
+        return !stepIsOnPitch(context, rules)
     }
 
     private fun checkPlayerForTouchdown(player: Player): Boolean {

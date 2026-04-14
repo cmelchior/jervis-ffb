@@ -8,8 +8,8 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.CoachType.COMPUTER
 import com.jervisffb.engine.model.CoachType.HUMAN
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.JervisExitCode
@@ -207,7 +207,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
         homeTeam.coach = networkAdapter.homeCoach.value!!
         val awayTeam = networkAdapter.awayTeam.value!!
         awayTeam.coach = networkAdapter.awayCoach.value!!
-        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
         val homeActionProvider = RemoteActionProvider(

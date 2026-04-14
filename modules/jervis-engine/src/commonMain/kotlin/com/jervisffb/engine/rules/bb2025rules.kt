@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.rules.bb2025.BB2025SkillSettings
 import com.jervisffb.engine.rules.bb2025.BB2025TeamActions
 import com.jervisffb.engine.rules.bb2025.tables.BB2025ArgueTheCallTable
@@ -23,7 +23,7 @@ import com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.SetupRule
-import com.jervisffb.engine.rules.common.TeamCaptainNotOnField
+import com.jervisffb.engine.rules.common.TeamCaptainNotOnPitch
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -42,23 +42,23 @@ abstract class BB2025Rules(
     override fun isSetupValid(state: Game, team: Team): List<SetupRule> {
         val setupErrors = super.isSetupValid(state, team).toMutableList()
         val rules = state.rules
-        // If a Team has a Team Captain, he must be placed on the field
+        // If a Team has a Team Captain, he must be placed on the pitch
         // if possible
-        val (inReserve, onField, notAvailable) = team
+        val (inReserve, onPitch, notAvailable) = team
             .filter { it.specialRules.contains(PlayerSpecialRule.TEAM_CAPTAIN) }
             .fold(
                 initial = Triple(mutableListOf<Player>(), mutableListOf<Player>(), mutableListOf<Player>())
             ) { data, player ->
                 when {
-                    player.location.isOnField(rules) -> data.second.add(player)
-                    !player.location.isOnField(rules) && player.state == PlayerState.RESERVE -> data.first.add(player)
+                    player.location.isOnPitch(rules) -> data.second.add(player)
+                    !player.location.isOnPitch(rules) && player.state == PlayerState.RESERVE -> data.first.add(player)
                     else -> data.third.add(player)
                 }
                 data
             }
 
-        if (onField.isEmpty() && inReserve.isNotEmpty()) {
-            setupErrors.add(TeamCaptainNotOnField(inReserve.map { it.id }))
+        if (onPitch.isEmpty() && inReserve.isNotEmpty()) {
+            setupErrors.add(TeamCaptainNotOnPitch(inReserve.map { it.id }))
         }
 
         return setupErrors
@@ -66,7 +66,7 @@ abstract class BB2025Rules(
 
     override fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
-        if (player.location !is OnFieldLocation) return emptyList()
+        if (player.location !is OnPitchLocation) return emptyList()
         return buildList {
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let { turnData ->
@@ -81,9 +81,9 @@ abstract class BB2025Rules(
                     val isStanding = (player.state == PlayerState.STANDING)
                     // Jump Up can only be used on Block Actions, not Special Actions
                     val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP) && player.state == PlayerState.PRONE
-                    val hasEligibleTargets = (player.location as OnFieldLocation)
+                    val hasEligibleTargets = (player.location as OnPitchLocation)
                         .getSurroundingCoordinates(this@BB2025Rules, 1)
-                        .mapNotNull { state.field[it].player }
+                        .mapNotNull { state.pitch[it].player }
                         .filter { otherPlayer -> otherPlayer.team != player.team }
                         .filter { otherPlayer -> isStanding(otherPlayer)}
                         .any { otherPlayer ->
@@ -95,7 +95,7 @@ abstract class BB2025Rules(
                 }
                 if (turnData.blitzActions > 0) {
                     val hasEligibleBlitzTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@BB2025Rules) }
+                        .filter { targetPlayer ->  targetPlayer.location.isOnPitch(this@BB2025Rules) }
                         .any {  targetPlayer -> isStanding(targetPlayer) }
 
                     if (hasEligibleBlitzTargets) {
@@ -104,7 +104,7 @@ abstract class BB2025Rules(
                 }
                 if (turnData.foulActions > 0) {
                     val hasEligibleFoulTargets = player.team.otherTeam()
-                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@BB2025Rules) }
+                        .filter { targetPlayer ->  targetPlayer.location.isOnPitch(this@BB2025Rules) }
                         .any {  targetPlayer -> targetPlayer.state == PlayerState.PRONE || targetPlayer.state == PlayerState.STUNNED }
                     if (hasEligibleFoulTargets) {
                         add(teamActions.foul)
@@ -132,7 +132,7 @@ abstract class BB2025Rules(
                             distance = 2,
                             includeOutOfBounds = false
                         ).any { coordinate ->
-                            state.field[coordinate].player?.let { p->
+                            state.pitch[coordinate].player?.let { p->
                                 (p.team != player.team) && this@BB2025Rules.canMarkPlayers(p)
                             } ?: false
                         }

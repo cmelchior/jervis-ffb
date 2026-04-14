@@ -3,14 +3,14 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.rules.bb2025.skills.Accurate
 import com.jervisffb.engine.rules.common.actions.PassType
@@ -54,7 +54,7 @@ class AccurateTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(16, 6),
+            PitchSquareSelected(16, 6),
             3.d6, // Throw, will only be an accurate throw because of the Accurate skill
             Confirm, // Use Accurate
             NoRerollSelected(),
@@ -63,7 +63,7 @@ class AccurateTests: JervisGameBB2025Test() {
         controller.rollForward(
             1.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(15, 5), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(15, 5), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -74,7 +74,7 @@ class AccurateTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(23, 7),
+            PitchSquareSelected(23, 7),
             4.d6, // Throw, will only be an accurate throw because of the Accurate skill
             Confirm, // Use Accurate
             NoRerollSelected(),
@@ -83,7 +83,7 @@ class AccurateTests: JervisGameBB2025Test() {
         controller.rollForward(
             1.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(22, 6), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(22, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -95,14 +95,14 @@ class AccurateTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(25, 7),
+            PitchSquareSelected(25, 7),
             *throwBall(6.d6), // Accurate is skipped
         )
         assertFalse(state.getContext<PassContext>().passingModifiers.contains(AccuracyModifier.ACCURATE))
         controller.rollForward(
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(25, 6), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(25, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -113,7 +113,7 @@ class AccurateTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(16, 6),
+            PitchSquareSelected(16, 6),
             3.d6, // Throw, will only be an accurate throw because of the Accurate skill
             Cancel, // Do not use Accurate
             NoRerollSelected(),
@@ -123,7 +123,7 @@ class AccurateTests: JervisGameBB2025Test() {
             DiceRollResults(2.d8, 2.d8, 4.d8), // Scatter
             7.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(15, 5), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(15, 5), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }

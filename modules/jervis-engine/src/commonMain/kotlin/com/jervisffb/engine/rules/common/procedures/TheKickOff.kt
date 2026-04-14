@@ -8,12 +8,12 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
@@ -36,7 +36,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.ReportKickResult
 import com.jervisffb.engine.reports.ReportKickSkillResult
 import com.jervisffb.engine.reports.ReportKickingPlayer
@@ -73,7 +73,7 @@ object TheKickOff : Procedure() {
             // center line of scrimmage must be selected.
             val players =
                 state.kickingTeam.fold(PlayersAvailableForKicking()) { acc, player ->
-                    val inDogOut = !player.location.isOnField(rules)
+                    val inDogOut = !player.location.isOnPitch(rules)
                     val onLoS = player.location.isOnLineOfScrimmage(rules)
                     val inWideZone = player.location.isInWideZone(rules)
                     val available = !(onLoS || inWideZone || inDogOut)
@@ -130,18 +130,18 @@ object TheKickOff : Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
-            return state.field
+            return state.pitch
                 .filter { rules.canPlaceBallForKickoff(state.kickingTeam, it) }
                 .map { TargetSquare.kick(it.coordinates) }
-                .let { listOf(SelectFieldLocation(it)) }
+                .let { listOf(SelectPitchLocation(it)) }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castAction<FieldSquareSelected>(action) {
+            return castAction<PitchSquareSelected>(action) {
                 val ball = state.balls.single()
                 compositeCommandOf(
                     SetBallState.inAir(ball),
-                    SetBallLocation(ball, FieldCoordinate(it.x, it.y)),
+                    SetBallLocation(ball, PitchCoordinate(it.x, it.y)),
                     GotoNode(TheKickDeviates),
                 )
             }
@@ -184,7 +184,7 @@ object TheKickOff : Procedure() {
                 // Move the ball one at a time and check for out of bounds at every move
                 val ball = state.currentBall()
                 var newLocation = context.from
-                var outOfBoundsAt: FieldCoordinate? = null
+                var outOfBoundsAt: PitchCoordinate? = null
                 val d8 = context.deviateRoll.first() as D8Result
                 val d6 = context.deviateRoll.last() as D6Result
                 val direction = rules.direction(d8)
@@ -284,18 +284,18 @@ object TheFUMBBLKickOff : Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
-            return state.field
+            return state.pitch
                 .filter { rules.canPlaceBallForKickoff(state.kickingTeam, it) }
                 .map { TargetSquare.kick(it.coordinates) }
-                .let { listOf(SelectFieldLocation(it)) }
+                .let { listOf(SelectPitchLocation(it)) }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castAction<FieldSquareSelected>(action) {
+            return castAction<PitchSquareSelected>(action) {
                 val ball = state.balls.single()
                 compositeCommandOf(
                     SetBallState.inAir(ball),
-                    SetBallLocation(ball, FieldCoordinate(it.x, it.y)),
+                    SetBallLocation(ball, PitchCoordinate(it.x, it.y)),
                     GotoNode(TheKickDeviates),
                 )
             }

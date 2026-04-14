@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2025.procedures
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
@@ -32,7 +32,7 @@ object BB2025TheKickOffEvent {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val standingPlayers = mutableListOf<Player>()
             state.receivingTeam.forEach {
-                if (it.location.isOnField(rules) && it.state == PlayerState.STANDING) {
+                if (it.location.isOnPitch(rules) && it.state == PlayerState.STANDING) {
                     standingPlayers.add(it)
                 }
             }
@@ -41,11 +41,11 @@ object BB2025TheKickOffEvent {
                 return listOf(SelectPlayer.fromPlayers(standingPlayers))
             } else {
                 val freeSquares: List<TargetSquare> =
-                    state.field
+                    state.pitch
                         .filter { rules.isInSetupArea(state.receivingTeam, it) }
                         .filter { it.isUnoccupied() }
                         .map { TargetSquare.setup(it.coordinates) }
-                return listOf(SelectFieldLocation(freeSquares))
+                return listOf(SelectPitchLocation(freeSquares))
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -58,7 +58,7 @@ object BB2025TheKickOffEvent {
                         ExitProcedure(),
                     )
                 }
-                is FieldSquareSelected -> {
+                is PitchSquareSelected -> {
                     compositeCommandOf(
                         SetBallLocation(state.singleBall(), action.coordinate),
                         SetBallState.onGround(state.singleBall()),

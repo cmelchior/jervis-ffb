@@ -43,7 +43,7 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.
@@ -57,7 +57,7 @@ object DialogFactory {
         controller: GameEngineController,
         request: ActionRequest,
         provider: UiActionProvider,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
         acc: UiSnapshotAccumulator,
         mapUnknownActions: (ActionRequest) -> List<GameAction>
     ): UserInputDialog? {

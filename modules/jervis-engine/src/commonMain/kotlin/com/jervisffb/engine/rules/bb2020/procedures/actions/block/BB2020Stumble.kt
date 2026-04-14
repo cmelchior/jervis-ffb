@@ -135,7 +135,7 @@ object BB2020Stumble: Procedure() {
             return compositeCommandOf(
                 UpdateContext(context.copy(pushContext = pushContext)),
                 RemoveContext<PushContext>(),
-                when (context.defender.location.isOnField(rules) && context.isDefenderDown()) {
+                when (context.defender.location.isOnPitch(rules) && context.isDefenderDown()) {
                     true -> GotoNode(ResolvePlayerDown)
                     false -> ExitProcedure()
                 }
@@ -143,7 +143,7 @@ object BB2020Stumble: Procedure() {
         }
     }
 
-    // If the player is still on the field, resolve them going down.
+    // If the player is still on the pitch, resolve them going down.
     // Otherwise, it was resolved as part of the Chain Push
     object ResolvePlayerDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {

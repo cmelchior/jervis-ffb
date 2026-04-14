@@ -39,7 +39,7 @@ object ChangingWeather : Procedure() {
             // If the ball is not out-of-bounds already, it scatters further.
             return if (
                 state.weather == Weather.PERFECT_CONDITIONS &&
-                state.singleBall().coordinates.isOnField(rules)
+                state.singleBall().coordinates.isOnPitch(rules)
             ) {
                 compositeCommandOf(
                     SetBallState.scattered(state.singleBall()),

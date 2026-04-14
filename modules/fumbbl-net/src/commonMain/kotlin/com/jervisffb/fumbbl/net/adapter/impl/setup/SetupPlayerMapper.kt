@@ -1,7 +1,7 @@
 package com.jervisffb.fumbbl.net.adapter.impl.setup
 
 import com.jervisffb.engine.actions.DogoutSelected
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
@@ -49,7 +49,7 @@ object SetupPlayerMapper: CommandActionMapper {
         if (coordinates.x < 0 || coordinates.y > 25) {
             newActions.add(DogoutSelected, SetupTeam.PlacePlayer)
         } else {
-            newActions.add(FieldSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
+            newActions.add(PitchSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
         }
     }
 }

@@ -34,7 +34,7 @@ object ThrowInTemplate {
     }
 
     /**
-     * When the template is placed anywhere on the field and pointed in a specific direction,
+     * When the template is placed anywhere on the pitch and pointed in a specific direction,
      * compute the rotation angle from that direction and apply the throw-in template.
      *
      * @param direction The direction determining the "center" of the throw-in template.

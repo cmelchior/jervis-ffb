@@ -5,10 +5,10 @@ import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -129,7 +129,7 @@ object LeapStep : Procedure() {
             return when (action) {
                 Cancel -> ExitProcedure()
                 else -> {
-                    castAction<FieldSquareSelected>(action) { target ->
+                    castAction<PitchSquareSelected>(action) { target ->
                         val context = state.getContext<MoveContext>()
                         compositeCommandOf(
                             UpdateContext(context.copy(target = target.coordinate)),

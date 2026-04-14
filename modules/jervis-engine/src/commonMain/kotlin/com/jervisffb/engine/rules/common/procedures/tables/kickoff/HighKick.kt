@@ -45,7 +45,7 @@ object HighKick : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val openPlayers = state.receivingTeam
-                .filter { it.location.isOnField(rules) && rules.isOpen(it) }
+                .filter { it.location.isOnPitch(rules) && rules.isOpen(it) }
                 .let {
                     if (it.isEmpty()) {
                         null
@@ -56,8 +56,8 @@ object HighKick : Procedure() {
 
             val ball = state.currentBall()
             return if (
-                ball.coordinates.isOnField(rules) &&
-                state.field[ball.coordinates].isUnoccupied() &&
+                ball.coordinates.isOnPitch(rules) &&
+                state.pitch[ball.coordinates].isUnoccupied() &&
                 openPlayers != null
             ) {
                 listOf(openPlayers)

@@ -12,11 +12,11 @@ import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
 import com.jervisffb.ui.game.animations.LogoAnimation
 import com.jervisffb.ui.game.animations.PassAnimation
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 
 @Composable
 fun AnimationLayer(
-    vm: FieldViewModel,
+    vm: PitchViewModel,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val animationFlow = remember { vm.observeAnimation() }

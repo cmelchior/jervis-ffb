@@ -108,7 +108,7 @@ object JervisTheme {
     val contentTextColor: Color = Color.Black.copy(alpha = 0.9f)
     val darkGray = Color(0xFF1f1f1f)
     val lightGray = Color(0xFF616161)
-    val fieldSquareTextStyle = TextStyle(
+    val pitchSquareTextStyle = TextStyle(
         color = Color.Cyan.copy(alpha = 0.75f),
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,

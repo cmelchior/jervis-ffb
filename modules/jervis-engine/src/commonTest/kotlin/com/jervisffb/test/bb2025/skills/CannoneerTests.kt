@@ -2,14 +2,14 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.common.actions.PassType
@@ -53,7 +53,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(8, 7),
+            PitchSquareSelected(8, 7),
             3.d6, // Throw, will only be an accurate throw because of the Cannoneer skill
             Confirm, // Use Cannoneer
             NoRerollSelected(),
@@ -63,7 +63,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(7, 7), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(7, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -74,7 +74,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(5, 7),
+            PitchSquareSelected(5, 7),
             4.d6, // Throw, will only be an accurate throw because of the Cannoneer skill
             Confirm, // Use Cannoneer
             NoRerollSelected(),
@@ -84,7 +84,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             4.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(4, 7), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(4, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -96,14 +96,14 @@ class CannoneerTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(18, 7),
+            PitchSquareSelected(18, 7),
             *throwBall(6.d6) // Cannoneer is skipped
         )
         assertFalse(state.getContext<PassContext>().passingModifiers.contains(AccuracyModifier.CANNONEER))
         controller.rollForward(
             5.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(19, 7), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(19, 7), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -114,7 +114,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             *moveTo(17, 7),
             *pickup(4.d6),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(8, 7),
+            PitchSquareSelected(8, 7),
             4.d6, // Throw, will only be an accurate throw because of the Cannoneer skill
             Cancel, // Do not Cannoneer
             NoRerollSelected(),
@@ -124,7 +124,7 @@ class CannoneerTests: JervisGameBB2025Test() {
             Cancel, // Do not intercept
             2.d8 // Bounce
         )
-        assertEquals(FieldCoordinate(8, 6), state.singleBall().coordinates)
+        assertEquals(PitchCoordinate(8, 6), state.singleBall().coordinates)
         assertEquals(homeTeam, state.activeTeam)
     }
 }

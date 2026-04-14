@@ -77,7 +77,7 @@ object ReallyStupidRoll: D6WithRerollProcedure() {
             val activateContext = state.getContext<ActivatePlayerContext>()
             val player = activateContext.player
             val helpAvailable = player.coordinates.getSurroundingCoordinates(rules)
-                .mapNotNull { state.field[it].player }
+                .mapNotNull { state.pitch[it].player }
                 .filter { it.team == player.team }
                 .any { helper -> !helper.hasSkill(SkillType.REALLY_STUPID) && !rules.isDistracted(helper) }
             val isSuccess = calculateSuccess(d6, helpAvailable)

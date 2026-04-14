@@ -399,7 +399,7 @@ Some examples:
 - For normal blocks, you bounce the ball after choosing to follow up, but it
   is unclear when this step happens for Multiple Block. After each block
   or after both blocks are resolved, and all unjuried players have left the
-  field?
+  pitch?
 
 Since no exact description of what "simultaneously" means exists, Jervis has to
 take quite a few, somewhat arbitrary, choices. Among others, this includes:
@@ -656,7 +656,7 @@ rolls. This means that rerolls can be used on both rolls, but you need to choose
 to reroll the direction before you roll for distance.
 
 It is also slightly unclear what happens if a player is near the sidelines.
-Are you allowed to point the throw-in template out of the field?
+Are you allowed to point the throw-in template out of the pitch?
 
 The rules say "...so it faces one of the two End Zones or either Sideline",
 since you are not facing the sideline when putting the template on the other

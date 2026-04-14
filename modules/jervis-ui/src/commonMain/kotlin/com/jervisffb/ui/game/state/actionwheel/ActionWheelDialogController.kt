@@ -4,10 +4,10 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -27,8 +27,8 @@ abstract class ActionWheelDialogController {
     abstract val nodes: Set<Node>
 
     // Where should this ActionWheel be centered?
-    // If `null` it will be centered in the middle of the field.
-    abstract fun getActionWheelCenter(state: Game): FieldCoordinate?
+    // If `null` it will be centered in the middle of the pitch.
+    abstract fun getActionWheelCenter(state: Game): PitchCoordinate?
 
     open fun onApplyCurrentState(
         acc: UiSnapshotAccumulator,
@@ -43,7 +43,7 @@ abstract class ActionWheelDialogController {
         acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         actions: ActionRequest,
-        sharedData: LocalFieldDataWrapper,
+        sharedData: LocalPitchDataWrapper,
     ) {
         // Do nothing
     }
@@ -55,15 +55,15 @@ abstract class ActionWheelDialogController {
         return false
     }
 
-    protected fun getHomeCenterCoordinates(state: Game): FieldCoordinate {
-        val y = (state.rules.fieldHeight / 2)
-        val x = (state.rules.fieldWidth / 4)
-        return FieldCoordinate(x, y)
+    protected fun getHomeCenterCoordinates(state: Game): PitchCoordinate {
+        val y = (state.rules.pitchHeight / 2)
+        val x = (state.rules.pitchWidth / 4)
+        return PitchCoordinate(x, y)
     }
 
-    protected fun getAwayCenterCoordinates(state: Game): FieldCoordinate {
-        val y = (state.rules.fieldHeight / 2)
-        val x = state.rules.fieldWidth - (state.rules.fieldWidth / 4) - 1
-        return FieldCoordinate(x, y)
+    protected fun getAwayCenterCoordinates(state: Game): PitchCoordinate {
+        val y = (state.rules.pitchHeight / 2)
+        val x = state.rules.pitchWidth - (state.rules.pitchWidth / 4) - 1
+        return PitchCoordinate(x, y)
     }
 }

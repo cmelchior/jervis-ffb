@@ -110,7 +110,7 @@ object HandOffAction : Procedure() {
             // Check if adjacent to a possible receiver
             if (context.thrower.hasBall()) {
                 context.thrower.coordinates.getSurroundingCoordinates(rules, 1)
-                    .mapNotNull { state.field[it].player }
+                    .mapNotNull { state.pitch[it].player }
                     .filter {
                         // In BB2025, the target must also have their tackle zones, unlike
                         // BB2020, where this wasn't a requirement.
@@ -165,7 +165,7 @@ object HandOffAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
+            // If player is not standing on the pitch after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
             val moveContext = state.getContext<MoveContext>()
             val handOffContext = state.getContext<HandOffContext>()
@@ -206,7 +206,7 @@ object HandOffAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Determine target and modifiers for the Catch roll
             val ball = state.currentBall()
-            val catchingPlayer = state.field[ball.coordinates].player!!
+            val catchingPlayer = state.pitch[ball.coordinates].player!!
             val rollContext = CatchContext(catchingPlayer, ball)
             return AddContext(rollContext)
         }

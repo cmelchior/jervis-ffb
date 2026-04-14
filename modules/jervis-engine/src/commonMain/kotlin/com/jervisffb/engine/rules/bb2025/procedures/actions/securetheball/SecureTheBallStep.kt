@@ -55,7 +55,7 @@ object SecureTheBallStep: Procedure() {
     override val initialNode: Node = CheckForNoBallSkill
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val ball = state.currentBall()
-        val securingPlayer = state.field[ball.coordinates].player!!
+        val securingPlayer = state.pitch[ball.coordinates].player!!
         val secureContext = SecureTheBallRollContext(securingPlayer, ball)
         return AddContext(secureContext)
     }
@@ -153,7 +153,7 @@ object SecureTheBallStep: Procedure() {
             val context = state.getContext<SecureTheBallRollContext>()
             val modifiers = mutableListOf<DiceModifier>()
             if (!context.useBigHands) {
-                // Add modifiers for other opponent players marking the field.
+                // Add modifiers for other opponent players marking the square.
                 rules.addMarkedModifiers(
                     state,
                     context.player.team,

@@ -88,7 +88,7 @@ class RushingTests: JervisGameBB2020Test() {
 
     @Test
     fun rushBeforeDodge() {
-        val player = state.field[13, 6].player!!
+        val player = state.pitch[13, 6].player!!
         player.movesLeft = 0
         assertTrue(rules.isMarked(player))
 

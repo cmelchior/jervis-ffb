@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -52,7 +52,7 @@ class PassSkillTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             4.d6
         )
         assertTrue(
@@ -79,7 +79,7 @@ class PassSkillTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(14, 4),
             PassTypeSelected(PassType.HAIL_MARY_PASS),
-            FieldSquareSelected(14, 1),
+            PitchSquareSelected(14, 1),
             4.d6
         )
         assertTrue(

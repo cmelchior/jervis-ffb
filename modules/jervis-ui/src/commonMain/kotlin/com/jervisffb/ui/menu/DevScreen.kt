@@ -32,8 +32,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
@@ -139,7 +139,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             GameVersion.BB2020 -> createDefaultBB2020AwayTeam(rules)
             GameVersion.BB2025 -> createDefaultBB2025AwayTeam(rules)
         }
-        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {
@@ -199,7 +199,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
         val homeTeam = createDefaultBB7HomeTeam(rules)
         val awayTeam = createDefaultBB7AwayTeam(rules)
-        val game = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {

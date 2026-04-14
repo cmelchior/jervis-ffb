@@ -35,7 +35,6 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -43,6 +42,7 @@ import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -56,12 +56,12 @@ import com.jervisffb.engine.actions.SelectCoinSide
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectInducement
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPassType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectPlayers
@@ -122,7 +122,7 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
             is SelectDicePoolResult -> false
             is SelectDirection -> false
             SelectDogout -> false
-            is SelectFieldLocation -> false
+            is SelectPitchLocation -> false
             is SelectInducement -> false
             is SelectMoveType -> false
             is SelectNoReroll -> false
@@ -173,7 +173,7 @@ fun GameAction.isRandomAction(): Boolean {
         EndAction -> false
         EndSetup -> false
         EndTurn -> false
-        is FieldSquareSelected -> false
+        is PitchSquareSelected -> false
         is InducementSelected -> false
         is MoveTypeSelected -> false
         is NoRerollSelected -> false
@@ -473,11 +473,11 @@ fun doDivingTackleHaveAnAffect(state: Game): Boolean {
     // First check if the opponent even has Diving Tackle
     val opponentHasDivingTackle = startingSquare.getSurroundingCoordinates(state.rules)
         .filter { coord ->
-            state.field[coord].player?.let { player ->
+            state.pitch[coord].player?.let { player ->
                 player.team != movingPlayer.team
             } ?: false
         }
-        .mapNotNull { state.field[it].player }
+        .mapNotNull { state.pitch[it].player }
         .any { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
 
     if (!opponentHasDivingTackle) {

@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ContextHolder
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.RerollSource
@@ -70,7 +70,7 @@ class Game(
     val rules: Rules,
     val homeTeam: Team,
     val awayTeam: Team,
-    val field: Field,
+    val pitch: Pitch,
 ) {
     init {
         // The Game State doesn't support the same team playing against itself.
@@ -108,7 +108,7 @@ class Game(
     // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
     val logChanges: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
 
-    // Weather conditions for the field
+    // Weather conditions for the pitch
     var weather: Weather = Weather.PERFECT_CONDITIONS
 
     // Game progress
@@ -189,7 +189,7 @@ class Game(
     var kickingTeamInLastHalf: Team = kickingTeam
 
     // Temporary states - Figure out where/how to store these
-    var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
+    var moveStepTarget: Pair<PitchCoordinate, PitchCoordinate>? = null
 
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
@@ -217,7 +217,7 @@ class Game(
     }
 
     /**
-     * Returns a reference to the only ball on the field.
+     * Returns a reference to the only ball on the pitch.
      * Will throw if multiple balls exits.
      */
     fun getBall(): Ball {

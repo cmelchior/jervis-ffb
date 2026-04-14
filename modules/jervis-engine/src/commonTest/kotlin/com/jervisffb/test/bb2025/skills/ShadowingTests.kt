@@ -96,7 +96,7 @@ class ShadowingTests: JervisGameBB2025Test() {
             EndAction,
             EndTurn
         )
-        assertEquals("H2".playerId, state.field[13, 5].player?.id)
+        assertEquals("H2".playerId, state.pitch[13, 5].player?.id)
         movingPlayer.assertCoordinates(14, 5)
         assertEquals(homeTeam, state.activeTeam)
     }

@@ -75,9 +75,9 @@ import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_apothercary
 import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_keg
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.game.model.UiFieldPlayer
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.viewmodel.FieldDetails
+import com.jervisffb.ui.game.viewmodel.PitchDetails
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.utils.getSubImage
@@ -245,7 +245,7 @@ object IconFactory {
     // higher memory usage, but it will probably not be problematic.
     suspend fun initialize(density: Density, homeTeam: Team, awayTeam: Team): Boolean {
         this.density = density
-        FieldDetails.entries.forEach {
+        PitchDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
         initializeDiceMappings(scaleFactor)
@@ -538,7 +538,7 @@ object IconFactory {
         }
     }
 
-    fun getPlayerIcon(player: UiFieldPlayer): ImageBitmap {
+    fun getPlayerIcon(player: UiPitchPlayer): ImageBitmap {
         val isActive = player.isActive
         if (cachedPlayers.contains(player.id)) {
             return if (isActive) {
@@ -614,8 +614,8 @@ object IconFactory {
         return imageResource(Res.drawable.jervis_dogout)
     }
 
-    fun getField(field: FieldDetails): ImageBitmap {
-        return loadImageFromCache(field.resource)
+    fun getPitch(pitch: PitchDetails): ImageBitmap {
+        return loadImageFromCache(pitch.resource)
     }
 
     @Composable

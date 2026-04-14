@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
@@ -112,7 +112,7 @@ object AccuracyBB2020WheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = AccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = AccuracyRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<PassContext>().thrower.coordinates
     }
 
@@ -132,7 +132,7 @@ object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<PassContext>().thrower.coordinates
     }
 
@@ -149,7 +149,7 @@ object AccuracyBB2025ThrowTeamMateWheelController : D6WithRerollWheelController(
     override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ChooseReRollSource
     override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ThrowTeamMateContext>().thrower.coordinates
     }
 
@@ -169,7 +169,7 @@ object CatchWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = CatchRoll.ChooseReRollSource
     override val rerollDiceNode: Node = CatchRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<CatchContext>().catchingPlayer.coordinates
     }
 
@@ -190,7 +190,7 @@ object DodgeWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = DodgeRoll.ChooseReRollSource
     override val rerollDiceNode: Node = DodgeRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayer?.coordinates ?: error("Missing active player: $state")
     }
 
@@ -207,7 +207,7 @@ object DauntlessWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = DauntlessRoll.ChooseReRollSource
     override val rerollDiceNode: Node = DauntlessRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<DauntlessRollContext>()
         return context.attacker.coordinates
     }
@@ -225,7 +225,7 @@ object FoulAppearanceWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = FoulAppearanceRoll.ChooseReRollSource
     override val rerollDiceNode: Node = FoulAppearanceRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<FoulAppearanceContext>()
         return context.defender.coordinates
     }
@@ -246,7 +246,7 @@ object InterceptionWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = InterceptionRoll.ChooseReRollSource
     override val rerollDiceNode: Node = InterceptionRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<InterceptionContext>()
         return context.interceptingPlayer?.coordinates ?: error("Missing intercepting player: $state")
     }
@@ -267,7 +267,7 @@ object PickupWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = PickupRoll.ChooseReRollSource
     override val rerollDiceNode: Node = PickupRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         return state.activePlayer?.coordinates
     }
 
@@ -287,7 +287,7 @@ object RushWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = RushRoll.ChooseReRollSource
     override val rerollDiceNode: Node = RushRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayer?.coordinates ?: error("Missing active player: $state")
     }
 
@@ -307,7 +307,7 @@ object SecureTheBallWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = SecureTheBallRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SecureTheBallRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         return state.activePlayer?.coordinates
     }
 
@@ -328,7 +328,7 @@ object ShadowingWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = ShadowingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ShadowingRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ShadowingRollContext>().player.coordinates
     }
 
@@ -345,7 +345,7 @@ object SteadyFootingWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = SteadyFootingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SteadyFootingRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<SteadyFootingRollContext>().player.coordinates
     }
 
@@ -362,7 +362,7 @@ object TakeRootWheelController : D6WithRerollWheelController() {
     override val chooseRerollSourceNode: Node = TakeRootRoll.ChooseReRollSource
     override val rerollDiceNode: Node = TakeRootRoll.ReRollDie
 
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
 
@@ -381,7 +381,7 @@ object JumpWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = JumpRoll.RollDie
     override val chooseRerollSourceNode: Node = JumpRoll.ChooseReRollSource
     override val rerollDiceNode: Node = JumpRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<MoveContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -396,7 +396,7 @@ object JumpUpWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = JumpUpRoll.RollDie
     override val chooseRerollSourceNode: Node = JumpUpRoll.ChooseReRollSource
     override val rerollDiceNode: Node = JumpUpRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<JumpUpRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -414,7 +414,7 @@ object BoneHeadWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = BoneHeadRoll.RollDie
     override val chooseRerollSourceNode: Node = BoneHeadRoll.ChooseReRollSource
     override val rerollDiceNode: Node = BoneHeadRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -432,7 +432,7 @@ object ReallyStupidWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = ReallyStupidRoll.RollDie
     override val chooseRerollSourceNode: Node = ReallyStupidRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ReallyStupidRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -450,7 +450,7 @@ object UnchannelledFuryWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = UnchannelledFuryRoll.RollDie
     override val chooseRerollSourceNode: Node = UnchannelledFuryRoll.ChooseReRollSource
     override val rerollDiceNode: Node = UnchannelledFuryRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -468,7 +468,7 @@ object LeapWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = LeapRoll.RollDie
     override val chooseRerollSourceNode: Node = LeapRoll.ChooseReRollSource
     override val rerollDiceNode: Node = LeapRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<LeapRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -483,7 +483,7 @@ object LonerWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = LonerRoll.RollDie
     override val chooseRerollSourceNode: Node = LonerRoll.ChooseReRollSource
     override val rerollDiceNode: Node = LonerRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<LonerRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -501,7 +501,7 @@ object PogoWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = PogoRoll.RollDie
     override val chooseRerollSourceNode: Node = PogoRoll.ChooseReRollSource
     override val rerollDiceNode: Node = PogoRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<PogoRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -519,7 +519,7 @@ object LandingWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = LandingRoll.RollDie
     override val chooseRerollSourceNode: Node = LandingRoll.ChooseReRollSource
     override val rerollDiceNode: Node = LandingRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ThrowTeamMateContext>().thrownPlayer!!.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -534,7 +534,7 @@ object ProWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = ProRoll.RollDie
     override val chooseRerollSourceNode: Node = ProRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ProRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ProRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -549,7 +549,7 @@ object ProjectileVomitWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = ProjectileVomitRoll.RollDie
     override val chooseRerollSourceNode: Node = ProjectileVomitRoll.ChooseReRollSource
     override val rerollDiceNode: Node = ProjectileVomitRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ProjectileVomitContext>().attacker.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -564,7 +564,7 @@ object BreatheFireWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = BreatheFireRoll.RollDie
     override val chooseRerollSourceNode: Node = BreatheFireRoll.ChooseReRollSource
     override val rerollDiceNode: Node = BreatheFireRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<BreatheFireContext>().attacker.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -579,7 +579,7 @@ object SwoopDistanceWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = SwoopDistanceRoll.RollDie
     override val chooseRerollSourceNode: Node = SwoopDistanceRoll.ChooseReRollSource
     override val rerollDiceNode: Node = SwoopDistanceRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<SwoopContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -594,7 +594,7 @@ object TeamCaptainWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = TeamCaptainRoll.RollDie
     override val chooseRerollSourceNode: Node = TeamCaptainRoll.ChooseReRollSource
     override val rerollDiceNode: Node = TeamCaptainRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<TeamCaptainRollContext>().player.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -609,12 +609,12 @@ object TeamMascotWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = TeamMascotRoll.RollDie
     override val chooseRerollSourceNode: Node = TeamMascotRoll.ChooseReRollSource
     override val rerollDiceNode: Node = TeamMascotRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): FieldCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
         val context = state.getRerollContextOrNull()
         val team = context?.team
         val player = context?.player
         return when {
-            (player != null && player.location.isOnField(state.rules)) -> player.coordinates
+            (player != null && player.location.isOnPitch(state.rules)) -> player.coordinates
             (team != null) -> when (team.isHomeTeam()) {
                 true -> getHomeCenterCoordinates(state)
                 false -> getAwayCenterCoordinates(state)

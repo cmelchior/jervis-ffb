@@ -5,11 +5,10 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.JervisSerialization.jsonFormat
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.platformFileSystem
@@ -41,7 +40,7 @@ data class GameFileData(
                 rules = rules,
                 homeTeam = game.state.homeTeam,
                 awayTeam = game.state.awayTeam,
-                field = Field.createForRuleset(rules)
+                pitch = Pitch.createForRuleset(rules)
             ),
             initialActions = actions
         )
@@ -142,7 +141,7 @@ object JervisSerialization {
             val homeTeam = SerializedTeam.deserialize(rules, serializedHomeTeam, unknownCoach)
             val serializedAwayTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.awayTeam)
             val awayTeam = SerializedTeam.deserialize(rules, serializedAwayTeam, unknownCoach)
-            val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
+            val state = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
             val controller = GameEngineController(state, fileData.game.actions)
             val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
             return Result.success(gameData)

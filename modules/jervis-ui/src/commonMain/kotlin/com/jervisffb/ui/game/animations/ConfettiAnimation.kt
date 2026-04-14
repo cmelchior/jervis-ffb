@@ -1,8 +1,8 @@
 package com.jervisffb.ui.game.animations
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 class ConfettiAnimation(
@@ -25,33 +25,33 @@ class ConfettiAnimation(
     )
 
     // List of available coordinates. We will cycle through them if shotCount exceeds the list size.
-    val shotCoords: List<FieldCoordinate> = buildList {
+    val shotCoords: List<PitchCoordinate> = buildList {
         when (homeTeamScored) {
             false -> {
-                add(FieldCoordinate(0, rules.fieldHeight - 1))
-                add(FieldCoordinate(0, rules.fieldHeight - 2))
-                add(FieldCoordinate(1, rules.fieldHeight - 1))
+                add(PitchCoordinate(0, rules.pitchHeight - 1))
+                add(PitchCoordinate(0, rules.pitchHeight - 2))
+                add(PitchCoordinate(1, rules.pitchHeight - 1))
             }
             true -> {
-                add(FieldCoordinate(rules.fieldWidth - 1, rules.fieldHeight - 1))
-                add(FieldCoordinate(rules.fieldWidth - 1, rules.fieldHeight - 2))
-                add(FieldCoordinate(rules.fieldWidth - 2, rules.fieldHeight - 1))
+                add(PitchCoordinate(rules.pitchWidth - 1, rules.pitchHeight - 1))
+                add(PitchCoordinate(rules.pitchWidth - 1, rules.pitchHeight - 2))
+                add(PitchCoordinate(rules.pitchWidth - 2, rules.pitchHeight - 1))
             }
         }
     }
 
-    fun getShotCoords(index: Int, vm: FieldViewModel): Pair<Float, Float> {
+    fun getShotCoords(index: Int, vm: PitchViewModel): Pair<Float, Float> {
         val coordinate = shotCoords[index % shotCoords.size]
         val sq = vm.squareOffsets[coordinate]
-        if (coordinate.x < rules.fieldWidth / 2) {
+        if (coordinate.x < rules.pitchWidth / 2) {
             // Bottom-left corner when on the Home side
-            val cx = sq?.let { it.positionInRoot.x - vm.fieldCoordinates.positionInRoot.x } ?: 0f
-            val cy = sq?.let { it.positionInRoot.y + vm.sharedFieldData.size.squareSize.height - vm.fieldCoordinates.positionInRoot.y } ?: 0f
+            val cx = sq?.let { it.positionInRoot.x - vm.pitchCoordinates.positionInRoot.x } ?: 0f
+            val cy = sq?.let { it.positionInRoot.y + vm.sharedPitchData.size.squareSize.height - vm.pitchCoordinates.positionInRoot.y } ?: 0f
             return cx to cy
         } else {
             // Bottom-right corner when on the Away side
-            val cx = sq?.let { it.positionInRoot.x + vm.sharedFieldData.size.squareSize.width - vm.fieldCoordinates.positionInRoot.x } ?: 0f
-            val cy = sq?.let { it.positionInRoot.y + vm.sharedFieldData.size.squareSize.height - vm.fieldCoordinates.positionInRoot.y } ?: 0f
+            val cx = sq?.let { it.positionInRoot.x + vm.sharedPitchData.size.squareSize.width - vm.pitchCoordinates.positionInRoot.x } ?: 0f
+            val cy = sq?.let { it.positionInRoot.y + vm.sharedPitchData.size.squareSize.height - vm.pitchCoordinates.positionInRoot.y } ?: 0f
             return cx to cy
         }
     }

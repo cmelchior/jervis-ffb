@@ -10,7 +10,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Sidestep
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -67,11 +67,11 @@ class SidestepTests: JervisGameBB2025Test() {
 
     @Test
     fun notAvailableIfNoEmptyAdjacentSquares() {
-        SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
-        SetPlayerLocation(homeTeam[7.playerNo], FieldCoordinate(12, 4)).execute(state)
-        SetPlayerLocation(homeTeam[8.playerNo], FieldCoordinate(13, 4)).execute(state)
+        SetPlayerLocation(homeTeam[5.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[6.playerNo], PitchCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[7.playerNo], PitchCoordinate(12, 4)).execute(state)
+        SetPlayerLocation(homeTeam[8.playerNo], PitchCoordinate(13, 4)).execute(state)
         homeTeam[7.playerNo].putProne()
         homeTeam[8.playerNo].putProne()
         val defender = homeTeam[1.playerNo]
@@ -96,9 +96,9 @@ class SidestepTests: JervisGameBB2025Test() {
     @Test
     fun notAvailableIfProne() {
         val player = homeTeam[4.playerNo]
-        SetPlayerLocation(player, FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(player, PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[5.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[6.playerNo], PitchCoordinate(11, 6)).execute(state)
         player.apply {
             addSkill(SkillType.SIDESTEP)
             putProne()
@@ -124,9 +124,9 @@ class SidestepTests: JervisGameBB2025Test() {
     @Test
     fun workDuringChainPush() {
         val player = homeTeam[4.playerNo]
-        SetPlayerLocation(player, FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[6.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(player, PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[5.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[6.playerNo], PitchCoordinate(11, 6)).execute(state)
         player.addSkill(SkillType.SIDESTEP)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),

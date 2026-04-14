@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
@@ -34,7 +34,7 @@ class DeviateTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -42,7 +42,7 @@ class DeviateTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(21, 7), // Throw Short Pass to empty square
+            PitchSquareSelected(21, 7), // Throw Short Pass to empty square
             *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 
@@ -62,7 +62,7 @@ class DeviateTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -70,11 +70,11 @@ class DeviateTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(22, 7), // Throw Short Pass to empty square
+            PitchSquareSelected(22, 7), // Throw Short Pass to empty square
             *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 
-        // Check that player in landing field must attempt to catch the ball
+        // Check that player in landing square must attempt to catch the ball
         assertEquals(BallState.DEVIATING, state.currentBall().state)
         controller.rollForward(
             DiceRollResults(5.d8, 6.d6), // Deviate roll
@@ -89,7 +89,7 @@ class DeviateTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -97,7 +97,7 @@ class DeviateTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(22, 7), // Throw Short Pass to empty square
+            PitchSquareSelected(22, 7), // Throw Short Pass to empty square
         )
         awayTeam["A11".playerId].hasTackleZones = false
         controller.rollForward(
@@ -119,7 +119,7 @@ class DeviateTests: JervisGameBB2020Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(17, 7),
+                placeKick = PitchSquareSelected(17, 7),
                 deviate = DiceRollResults(4.d8, 1.d6), // Deviate so lands on player
                 bounce = null
             ),
@@ -127,7 +127,7 @@ class DeviateTests: JervisGameBB2020Test() {
             PlayerSelected("A10".playerId),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(21, 7), // Throw Short Pass to empty square
+            PitchSquareSelected(21, 7), // Throw Short Pass to empty square
             *throwBall(2.d6), // Wildly Inaccurate Pass
         )
 

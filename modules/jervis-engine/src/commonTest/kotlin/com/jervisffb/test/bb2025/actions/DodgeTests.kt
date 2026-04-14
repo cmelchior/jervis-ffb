@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
@@ -48,7 +48,7 @@ class DodgeTests: JervisGameBB2025Test() {
             6.d6,
             NoRerollSelected()
         )
-        assertEquals(FieldCoordinate(14, 5), player.coordinates)
+        assertEquals(PitchCoordinate(14, 5), player.coordinates)
         player.assertStanding()
     }
 
@@ -75,7 +75,7 @@ class DodgeTests: JervisGameBB2025Test() {
         val player = awayTeam["A6".playerId]
         assertTrue(rules.isMarked(player))
         assertEquals(1, rules.calculateMarks(state, awayTeam, player.coordinates))
-        assertEquals(2, rules.calculateMarks(state, awayTeam, FieldCoordinate(11, 5)))
+        assertEquals(2, rules.calculateMarks(state, awayTeam, PitchCoordinate(11, 5)))
         controller.rollForward(
             *moveTo(11, 5),
             4.d6, // Need 5+ to dodge
@@ -92,13 +92,13 @@ class DodgeTests: JervisGameBB2025Test() {
             *moveTo(13, 4) // Move player first
         )
         val player = awayTeam["A1".playerId]
-        assertEquals(FieldCoordinate(13, 4), player.coordinates)
+        assertEquals(PitchCoordinate(13, 4), player.coordinates)
         // Then roll for dodge
         controller.rollForward(
             6.d6,
             NoRerollSelected()
         )
-        assertEquals(FieldCoordinate(13, 4), player.coordinates)
+        assertEquals(PitchCoordinate(13, 4), player.coordinates)
         player.assertStanding()
     }
 
@@ -113,7 +113,7 @@ class DodgeTests: JervisGameBB2025Test() {
         )
         val player = awayTeam["A1".playerId]
         player.assertFallenOver()
-        assertEquals(FieldCoordinate(12, 4), player.coordinates)
+        assertEquals(PitchCoordinate(12, 4), player.coordinates)
     }
 
     @Test
@@ -128,6 +128,6 @@ class DodgeTests: JervisGameBB2025Test() {
         )
         val player = awayTeam["A1".playerId]
         player.assertStanding()
-        assertEquals(FieldCoordinate(12, 4), player.coordinates)
+        assertEquals(PitchCoordinate(12, 4), player.coordinates)
     }
 }

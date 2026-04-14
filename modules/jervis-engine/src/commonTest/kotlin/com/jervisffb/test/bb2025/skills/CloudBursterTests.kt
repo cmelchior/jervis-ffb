@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2025.skills
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.rules.bb2025.skills.CloudBurster
@@ -40,7 +40,7 @@ class CloudBursterTests: JervisGameBB2025Test() {
             *pickup(4.d6),
             SmartMoveTo(12, 3),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(13, 9),
+            PitchSquareSelected(13, 9),
             *throwBall(6.d6),
             *catch(6.d6), // Go directly to Catch as Cloud Burster remove all, otherwise, eligible interceptors
         )

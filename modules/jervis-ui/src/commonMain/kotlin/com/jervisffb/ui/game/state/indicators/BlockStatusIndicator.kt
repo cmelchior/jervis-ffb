@@ -8,15 +8,15 @@ import com.jervisffb.engine.model.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**
  * Show a small "block" indicator on the player is they are currently in a block
  * sequence.
  */
-object BlockStatusIndicator: FieldStatusIndicator {
+object BlockStatusIndicator: PitchStatusIndicator {
     override fun decorate(
         node: ActionNode,
         state: Game,
@@ -37,7 +37,7 @@ object BlockStatusIndicator: FieldStatusIndicator {
             when (val loc = player.location) {
                 DogOut -> { /* Do not show indicators in the Dogout */ }
                 is GiantLocation -> TODO("Giant locations not supported yet")
-                is FieldCoordinate -> {
+                is PitchCoordinate -> {
                     acc.updatePlayer(player.id) {
                         it.copy(isBlocked = true)
                     }

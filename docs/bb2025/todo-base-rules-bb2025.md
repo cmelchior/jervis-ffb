@@ -174,14 +174,14 @@ book.
         - [ ] Choice is optional
     - [ ] Under Scrutiny
     - [ ] Intensive Training
-        - [ ] "Available to Play" also include all players on the field when rolled as a kick-off result
+        - [ ] "Available to Play" also include all players on the pitch when rolled as a kick-off result
 - [ ] Determine Kicking Team
 
 ## Start of Drive
 
 - [x] Setup
-    - [x] Too many players on the field
-    - [x] Too few players on the field
+    - [x] Too many players on the pitch
+    - [x] Too few players on the pitch
     - [x] Too many players in Wide Zones
     - [x] 0 players available
     - [x] Too few players on the LoS
@@ -192,7 +192,7 @@ book.
     - [x] 3 or less, allowed to select player on LoS
     - [x] All players on LoS
     - [x] Place Kick: Only locations on the opponent side
-    - [ ] No players on the field to kick off from.
+    - [ ] No players on the pitch to kick off from.
 - [ ] The Kick-off Event
     - [x] Get the Ref
     - [x] Time-out
@@ -228,14 +228,14 @@ book.
         - [x] Stunned players are marked as STUNNED after Charge ended
         - [x] Amount of players selected are a max limit, not a requirement
     - [x] Dodgy Snack
-        - [x] On 2+, player stays on field with -1 AV, MA
+        - [x] On 2+, player stays on pitch with -1 AV, MA
         - [x] On 1, player is put in Reserves until end of drive.
         - [x] Skipped if no eligible players.
     - [x] Pitch Invasion
-      - [x] No players on the field
+      - [x] No players on the pitch
       - [x] Less available players than needed
 - [x] What goes up...
-    - [x] Land on Field
+    - [x] Land on Pitch
     - [x] Lands on Player
     - [x] Team rerolls not available for catch
 - [x] Touchbacks
@@ -331,9 +331,9 @@ book.
     - [x] Count first square as 1
     - [x] From corners
     - [x] From south/north/east/west
-    - [x] Player in landing field must catch it if possible
+    - [x] Player in landing square must catch it if possible
     - [x] Will bounce if player is not able to catch a ball
-    - [x] Repeat process if leaving the field again
+    - [x] Repeat process if leaving the square again
 - [ ] Armour and Injuries
     - [ ] Failing armor roll leaves player prone
     - [ ] Stunned in other team turn / Roll to prone in own turn

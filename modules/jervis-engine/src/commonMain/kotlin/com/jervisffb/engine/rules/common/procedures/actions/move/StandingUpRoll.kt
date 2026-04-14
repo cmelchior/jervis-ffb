@@ -51,7 +51,7 @@ object StandingUpRoll : D6WithRerollProcedure() {
                 true -> {
                     player.coordinates.getSurroundingCoordinates(rules, 1)
                         .count { coordinate ->
-                            val neighborPlayer = state.field[coordinate].player
+                            val neighborPlayer = state.pitch[coordinate].player
                             val sameTeam = neighborPlayer?.team == player.team
                             val isOpen = neighborPlayer?.let { rules.isOpen(it) } ?: false
                             sameTeam && isOpen

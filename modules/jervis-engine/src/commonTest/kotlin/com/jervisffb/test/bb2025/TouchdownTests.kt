@@ -6,11 +6,11 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PassTypeSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetBallLocation
@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -61,7 +61,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -88,7 +88,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -124,7 +124,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultSetup(homeFirst = false),
             *defaultKickOffHomeTeam(
                 selectKicker = PlayerSelected("A10".playerId),
-                placeKick = FieldSquareSelected(0, 0),
+                placeKick = PitchSquareSelected(0, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -158,7 +158,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultSetup(homeFirst = false),
             *defaultKickOffHomeTeam(
                 selectKicker = PlayerSelected("A10".playerId),
-                placeKick = FieldSquareSelected(0, 0),
+                placeKick = PitchSquareSelected(0, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -187,7 +187,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -212,7 +212,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         )
         assertEquals(homeTeam, state.activeTeamOrThrow())
         assertEquals(0, state.awayScore)
-        assertEquals(BallState.ON_GROUND, state.field[0, 2].balls.single().state)
+        assertEquals(BallState.ON_GROUND, state.pitch[0, 2].balls.single().state)
     }
 
     @Test
@@ -221,7 +221,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -233,7 +233,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         assertTrue(player.hasBall())
 
         // Move opponent player in the way, so it forces a dodge
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(0, 4)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(0, 4)).execute(state)
 
         // Give player enough move to reach the End Zone
         player.movesLeft = 20
@@ -249,7 +249,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         )
         assertEquals(homeTeam, state.activeTeamOrThrow())
         assertEquals(0, state.awayScore)
-        assertEquals(BallState.ON_GROUND, state.field[0, 2].balls.single().state)
+        assertEquals(BallState.ON_GROUND, state.pitch[0, 2].balls.single().state)
     }
 
     @Test
@@ -258,7 +258,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 1.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null,
@@ -270,7 +270,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         assertTrue(player.hasBall())
 
         // Move opponent player in the way and put them prone, so we can jump over them
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(1, 4)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(1, 4)).execute(state)
         homeTeam[11.playerNo].state = PlayerState.PRONE
 
         // Give player enough moves to reach the End Zone
@@ -280,7 +280,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             SmartMoveTo(2, 4),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(0, 4),
+            PitchSquareSelected(0, 4),
             4.d6, // Jump
             NoRerollSelected(),
         )
@@ -299,7 +299,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -309,8 +309,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -318,7 +318,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(0, 3),
+            PitchSquareSelected(0, 3),
             6.d6, // Accurate Throw
             NoRerollSelected(),
             6.d6, // Catch + Score
@@ -333,7 +333,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -343,8 +343,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -352,7 +352,7 @@ class TouchdownTests: JervisGameBB2025Test() {
         controller.rollForward(
             *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(1, 3), // Hit square in front of player in end zone
+            PitchSquareSelected(1, 3), // Hit square in front of player in end zone
             *throwBall(3.d6), // Inaccurate Throw
             DiceRollResults(4.d8, 5.d8, 4.d8), // Scatter on top of player ind end zone
             *catch(6.d6), // Catch + Score
@@ -372,7 +372,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -382,8 +382,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a hand-off
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(1, 3)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(1, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -402,7 +402,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -412,8 +412,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -421,7 +421,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(1, 3), // Target empty square
+            PitchSquareSelected(1, 3), // Target empty square
             *throwBall(6.d6),
             4.d8, // Bounce to player
             *catch(6.d6), // Catch + Score
@@ -435,7 +435,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -445,8 +445,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -454,7 +454,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.PASS),
             PassTypeSelected(PassType.STANDARD),
-            FieldSquareSelected(0, 0), // Hit empty square
+            PitchSquareSelected(0, 0), // Hit empty square
             *throwBall(6.d6),
             2.d8, // Bounce Out-of-Bounds
             3.d3, // Throw-in direction
@@ -472,14 +472,14 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 2),
+                placeKick = PitchSquareSelected(25, 2),
                 deviate = DiceRollResults(7.d8, 2.d6), // Ball lands in [25,4]
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = 2.d8, // Bounce to [25,3]
             ),
         )
         // Fake moving the ball into the Home team End Zone
-        SetBallLocation(state.singleBall(), FieldCoordinate(0, 3)).execute(state)
+        SetBallLocation(state.singleBall(), PitchCoordinate(0, 3)).execute(state)
 
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
@@ -502,7 +502,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -512,11 +512,11 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of players, so we can chain-push
         // A6 into the end zone.
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(1, 3)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(2, 3)).execute(state)
-        SetPlayerLocation(homeTeam[2.playerNo], FieldCoordinate(1, 4)).execute(state)
-        SetPlayerLocation(homeTeam[3.playerNo], FieldCoordinate(2, 4)).execute(state)
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(3, 5)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(1, 3)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(2, 3)).execute(state)
+        SetPlayerLocation(homeTeam[2.playerNo], PitchCoordinate(1, 4)).execute(state)
+        SetPlayerLocation(homeTeam[3.playerNo], PitchCoordinate(2, 4)).execute(state)
+        SetPlayerLocation(awayTeam[5.playerNo], PitchCoordinate(3, 5)).execute(state)
 
         assertEquals(0, state.awayScore)
         controller.rollForward(
@@ -535,7 +535,7 @@ class TouchdownTests: JervisGameBB2025Test() {
             *defaultPregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(25, 0),
+                placeKick = PitchSquareSelected(25, 0),
                 deviate = DiceRollResults(2.d8, 2.d6), // Out-of-bounds
                 kickoffEvent = defaultKickOffEvent(),
                 bounce = null
@@ -545,8 +545,8 @@ class TouchdownTests: JervisGameBB2025Test() {
 
         // Away turn has started. Fake the position of players, so we can push
         // an opponent into the away endzone.
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(23, 3)).execute(state)
-        SetPlayerLocation(homeTeam[1.playerNo], FieldCoordinate(24, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], PitchCoordinate(23, 3)).execute(state)
+        SetPlayerLocation(homeTeam[1.playerNo], PitchCoordinate(24, 3)).execute(state)
         SetBallState.carried(state.singleBall(), homeTeam[1.playerNo]).execute(state)
 
         assertEquals(0, state.awayScore)

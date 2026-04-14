@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
 // Helper method for creating a push context before moving a player back
 // This is used by all results that push back.
@@ -31,7 +31,7 @@ fun createPushContext(state: Game): PushContext {
             PushContext.PushData(
                 pusher = blockContext.attacker,
                 pushee = blockContext.defender,
-                from = blockContext.defender.location as FieldCoordinate,
+                from = blockContext.defender.location as PitchCoordinate,
                 isBlitzing = blockContext.isBlitzing,
                 isChainPush = false,
             )

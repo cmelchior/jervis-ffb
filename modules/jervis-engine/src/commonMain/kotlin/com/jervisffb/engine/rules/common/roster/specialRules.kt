@@ -61,5 +61,5 @@ enum class PlayerSpecialRule(override val description: String): SpecialRules {
     I_DID_NOT_SEE_A_THING("I Didn't See A Thing"), // Biased Referee Inducement, see page 95 in the rulebook
     KEEN_PLAYER("Keen Player"), // Infamous Coaching Staff: Josef Bugman, see page 93 in the rulebook
     RIOTOUS_ROOKIE("Riotous Rookie"), // Inducement, see page 91 in the rulebook.
-    SPOT_THE_SNEAK("Spot the Sneak") // This player was placed on the field using the Dirty Trick Spot the Sneak
+    SPOT_THE_SNEAK("Spot the Sneak") // This player was placed on the pitch using the Dirty Trick Spot the Sneak
 }

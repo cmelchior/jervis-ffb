@@ -9,7 +9,7 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
@@ -121,7 +121,7 @@ class TimmmberTests: JervisGameBB2025Test() {
             movesLeft = 2
             putProne()
         }
-        SetPlayerLocation(homeTeam["H1".playerId], FieldCoordinate(16, 1)).execute(state)
+        SetPlayerLocation(homeTeam["H1".playerId], PitchCoordinate(16, 1)).execute(state)
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
@@ -145,7 +145,7 @@ class TimmmberTests: JervisGameBB2025Test() {
             putProne()
         }
         // Move a player to help A2. We now have 3 assists
-        SetPlayerLocation(awayTeam["A6".playerId], FieldCoordinate(14, 6)).execute(state)
+        SetPlayerLocation(awayTeam["A6".playerId], PitchCoordinate(14, 6)).execute(state)
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),

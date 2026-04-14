@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 
 class Ball {
     var state: BallState = BallState.ON_GROUND
@@ -8,19 +8,19 @@ class Ball {
     // TODO Giant Support
     // Returns the balls location.
     // If carried, UNKNOWN is returned, use `resolvedLocation` instead.
-    var coordinates: FieldCoordinate = FieldCoordinate.UNKNOWN
+    var coordinates: PitchCoordinate = PitchCoordinate.UNKNOWN
 
     // Only != null if CARRIED
     var carriedBy: Player? = null
 
     // Only set if state = OUT_OF_BOUNDS
-    var outOfBoundsAt: FieldCoordinate? = null
+    var outOfBoundsAt: PitchCoordinate? = null
 
     /**
      * Returns the ball location, taking into account that it might be carried
      * by a player, in which case the player coordinate is returned.
      */
-    fun resolvedLocation(): FieldCoordinate {
+    fun resolvedLocation(): PitchCoordinate {
         return carriedBy?.coordinates ?: coordinates
     }
 }

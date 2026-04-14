@@ -32,7 +32,7 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportSkillUsed
@@ -207,7 +207,7 @@ object CreatePushChainStep: Procedure() {
             val isStandFirmUsed = pushContext.pushChain.first().usedStandFirm
             val hasValidGrabTargets = pushContext.firstPushee.coordinates
                 .getSurroundingCoordinates(rules, includeOutOfBounds = false)
-                .any { state.field[it].isUnoccupied() }
+                .any { state.pitch[it].isUnoccupied() }
             val canUseGrab = hasGrab && isFirstBlock && !isBlitz && !isStandFirmUsed && hasValidGrabTargets
             return when (canUseGrab) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
@@ -241,7 +241,7 @@ object CreatePushChainStep: Procedure() {
             val hasSidestep = context.pushee.isSkillAvailable(SkillType.SIDESTEP)
             val validSideStepTargets = context.pushee.coordinates
                 .getSurroundingCoordinates(rules, includeOutOfBounds = false)
-                .any { state.field[it].isUnoccupied() }
+                .any { state.pitch[it].isUnoccupied() }
             val isGrabUsed = context.usedGrab
             val isStandFirmUsed = context.usedStandFirm
             val canUseSidestep = hasSidestep && !isGrabUsed && !isStandFirmUsed && validSideStepTargets
@@ -328,12 +328,12 @@ object CreatePushChainStep: Procedure() {
             // Calculate all push options taking into account a chain push in progress.
             // In chain pushes, only the square of Player B could be empty, but it might
             // not be in case of a circular chain.
-            val emptyFields = getEmptySquaresForPushing(pushContext, pushOptions, state)
+            val emptySquares = getEmptySquaresForPushing(pushContext, pushOptions, state)
             return listOf(
-                if (emptyFields.isNotEmpty()) {
+                if (emptySquares.isNotEmpty()) {
                     SelectDirection(
                         origin = lastPushInChain.pushee.coordinates,
-                        directions = emptyFields.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
+                        directions = emptySquares.map {Direction.from(lastPushInChain.pushee.coordinates, it) }
                     )
                 } else {
                     SelectDirection(
@@ -367,8 +367,8 @@ object CreatePushChainStep: Procedure() {
                     val pushData = context.pushChain.last()
                     val updateActions = listOfNotNull(
                         SetContextProperty(PushContext.PushData::to, pushData, target),
-                        if (target.isOnField(rules)) {
-                            AddContextListItem(context.looseBalls, state.field[target].balls)
+                        if (target.isOnPitch(rules)) {
+                            AddContextListItem(context.looseBalls, state.pitch[target].balls)
                         } else {
                             null
                         }
@@ -381,11 +381,11 @@ object CreatePushChainStep: Procedure() {
                             ExitProcedure()
                         )
                     } else {
-                        // Target field is occupied, resulting in a chain push, add the
+                        // Target square is occupied, resulting in a chain push, add the
                         // new chain push to the context and restart the process
                         val newPush = PushContext.PushData(
                             pusher = context.pushChain.last().pushee,
-                            pushee = state.field[target].player!!, // TODO This doesn't take into account chain pushes
+                            pushee = state.pitch[target].player!!, // TODO This doesn't take into account chain pushes
                             from = target,
                             isChainPush = true,
                         )
@@ -405,27 +405,27 @@ object CreatePushChainStep: Procedure() {
         // Return squares considered "empty" when doing a Push. This takes into account any ongoing chain pushes.
         private fun getEmptySquaresForPushing(
             pushContext: PushContext,
-            pushOptions: Set<FieldCoordinate>,
+            pushOptions: Set<PitchCoordinate>,
             state: Game,
-        ): List<FieldCoordinate> {
+        ): List<PitchCoordinate> {
             val options = pushOptions.toMutableSet()
 
             // Find all occupied squares
             val firstPushedFromLocation = pushContext.pushChain.first().from
             val isFirstPushLocationAvailable = pushContext.pushChain.none { it.to == firstPushedFromLocation }
-            val onFieldSquares = options.filter { it.isOnField(state.rules) }
-            val occupiedSquares = onFieldSquares.filter {
+            val onPitchSquares = options.filter { it.isOnPitch(state.rules) }
+            val occupiedSquares = onPitchSquares.filter {
                 // This also takes into account chain-pushes. E.g. the first square in the chain
                 // might be available, but only if something else wasn't chain pushed into it.
-                state.field[it].isOccupied()
+                state.pitch[it].isOccupied()
                     || (it == firstPushedFromLocation && !isFirstPushLocationAvailable)
             }
 
-            // All squares on the field are taken. It is only in this case anyone can be pushed out of bounds.
-            return if (onFieldSquares.size == occupiedSquares.size) {
+            // All squares on the pitch are taken. It is only in this case anyone can be pushed out of bounds.
+            return if (onPitchSquares.size == occupiedSquares.size) {
                 options.filter { it.isOutOfBounds(state.rules) }
             } else {
-                (onFieldSquares.toSet() - occupiedSquares.toSet()).toList()
+                (onPitchSquares.toSet() - occupiedSquares.toSet()).toList()
             }
         }
     }

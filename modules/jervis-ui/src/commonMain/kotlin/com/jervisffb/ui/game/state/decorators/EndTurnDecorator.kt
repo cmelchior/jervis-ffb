@@ -8,7 +8,7 @@ import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
-object EndTurnDecorator : FieldActionDecorator<EndTurnWhenReady> {
+object EndTurnDecorator : PitchActionDecorator<EndTurnWhenReady> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,

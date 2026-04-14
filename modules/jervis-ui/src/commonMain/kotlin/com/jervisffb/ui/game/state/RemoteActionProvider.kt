@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.menu.LocalFieldDataWrapper
+import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
@@ -31,7 +31,7 @@ class RemoteActionProvider(
     private var job: Job? = null
     private var paused = false
     private lateinit var actions: ActionRequest
-    private var sharedData: LocalFieldDataWrapper? = null
+    private var sharedData: LocalPitchDataWrapper? = null
 
     override fun init(controller: UiGameController) {
         // Do nothing
@@ -45,7 +45,7 @@ class RemoteActionProvider(
         // Do nothing
     }
 
-    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+    override fun updateSharedData(sharedData: LocalPitchDataWrapper) {
         this.sharedData = sharedData
     }
 

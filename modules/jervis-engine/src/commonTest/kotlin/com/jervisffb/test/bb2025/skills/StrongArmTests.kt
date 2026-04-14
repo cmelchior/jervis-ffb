@@ -3,14 +3,14 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.QualityModifier
 import com.jervisffb.engine.rules.bb2025.skills.StrongArm
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -47,7 +47,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4), // Quick Pass - No modifiers
+            PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             Confirm, // Use Strong Arm
         )
         assertTrue(state.getContext<ThrowTeamMateContext>().qualityRollModifiers.contains(QualityModifier.STRONG_ARM))
@@ -58,7 +58,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *landingRoll(6.d6)
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -69,7 +69,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(9, 4), // Short Pass (-1)
+            PitchSquareSelected(9, 4), // Short Pass (-1)
             Confirm, // Use Strong Arm
         )
         assertTrue(state.getContext<ThrowTeamMateContext>().qualityRollModifiers.contains(QualityModifier.STRONG_ARM))
@@ -80,7 +80,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *landingRoll(6.d6)
         )
         awayTeam["A13".playerId].assertStanding()
-        assertEquals(FieldCoordinate(6, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(6, 4), awayTeam["A13".playerId].coordinates)
     }
 
     @Test
@@ -91,7 +91,7 @@ class StrongArmTests: JervisGameBB2025Test() {
             *moveTo(14, 4),
             *dodge(),
             PlayerSelected("A13".playerId),
-            FieldSquareSelected(11, 4), // Quick Pass - No modifiers
+            PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             Cancel, // Do not use Strong Arm
             4.d6, // Should only succeed with +1 from Strong Arm
             NoRerollSelected(), // Subpar throw
@@ -100,6 +100,6 @@ class StrongArmTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6),
         )
         awayTeam["A13".playerId].assertProne()
-        assertEquals(FieldCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
+        assertEquals(PitchCoordinate(8, 4), awayTeam["A13".playerId].coordinates)
     }
 }

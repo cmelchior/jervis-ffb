@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
@@ -273,18 +273,18 @@ class BlockActionTests: JervisGameBB2020Test() {
     // Check that only the first player in the chain is knocked down
     @Test
     fun chainPushPowPlayer() {
-        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
-        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        SetPlayerLocation(homeTeam[4.playerNo], PitchCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], PitchCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], PitchCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
             *standardBlock("H1", 6.dblock),
             DirectionSelected(Direction.LEFT), // First push
             DirectionSelected(Direction.UP_LEFT), // 2nd push
         )
-        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PitchCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
         homeTeam["H1".playerId].assertKnockedDown()
-        assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PitchCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
         homeTeam["H10".playerId].assertStanding()
     }
 }

@@ -31,11 +31,11 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.model.UiFieldPlayer
-import com.jervisffb.ui.game.view.field.FieldPointerEventType
-import com.jervisffb.ui.game.view.field.jervisPointerEvent
+import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.view.pitch.SquarePointerEventType
+import com.jervisffb.ui.game.view.pitch.jervisPointerEvent
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
@@ -70,7 +70,7 @@ private val playerAvailableDropShadowEffect: RenderEffect = ImageFilter.makeDrop
 fun Player(
     modifier: Modifier,
     screenModel: GameScreenModel,
-    player: UiFieldPlayer,
+    player: UiPitchPlayer,
     transientData: UiPlayerTransientData?,
     parentHandleClick: Boolean,
     contextMenuShowing: Boolean,
@@ -100,8 +100,8 @@ fun Player(
                 .onPointerEvent(eventType = PointerEventType.Exit) {
                     transientData.onHoverExit.invoke()
                 }
-                .applyIf(player.location is FieldCoordinate) {
-                    jervisPointerEvent(event = FieldPointerEventType.SecondaryClickSquare, player.location as FieldCoordinate) {
+                .applyIf(player.location is PitchCoordinate) {
+                    jervisPointerEvent(event = SquarePointerEventType.SecondaryClickSquare, player.location as PitchCoordinate) {
                         transientData.onHoverExit.invoke()
                     }
                 }
@@ -238,7 +238,7 @@ val playerInFocus = playerBorderShaderTemplate.replace(
     //    newValue = "vec4(255.0/255.0, 255.0/255.0, 255.0/255.0, 1.0); // JervisTheme.rulebookBlue"
 )
 
-// Custom rendering of Player images on a field square.
+// Custom rendering of Player images on a pitch square.
 // Players that are available will render with a glowing border around them.
 // Some of the icons seem to go all the way to the edge, which means the glow doesn't render correctly
 // Maybe we need to draw the image to a slightly larger canvas before applying the blur. This requires

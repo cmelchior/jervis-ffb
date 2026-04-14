@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
@@ -46,14 +46,14 @@ fun AStarContent() {
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), 4, true)
+    val result = rules.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), PitchCoordinate(0, 14), 4, true)
     when (result) {
         is PathFinder.Failure -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
                 BoxGrid(
-                    rules.fieldHeight,
-                    rules.fieldWidth,
-                    it.fieldView,
+                    rules.pitchHeight,
+                    rules.pitchWidth,
+                    it.pitchView,
                     it.gScore,
                     result.path,
                 )
@@ -63,9 +63,9 @@ fun AStarContent() {
         is PathFinder.Success -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
                 BoxGrid(
-                    rules.fieldHeight,
-                    rules.fieldWidth,
-                    it.fieldView,
+                    rules.pitchHeight,
+                    rules.pitchWidth,
+                    it.pitchView,
                     it.gScore,
                     result.path,
                 )
@@ -78,22 +78,22 @@ fun AStarContent() {
 fun BoxGrid(
     rows: Int,
     cols: Int,
-    field: Array<Array<Int>>,
-    gScore: Map<FieldCoordinate, Double>,
-    path: List<FieldCoordinate>,
+    pitch: Array<Array<Int>>,
+    gScore: Map<PitchCoordinate, Double>,
+    path: List<PitchCoordinate>,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
-                    val onPath = path.contains(FieldCoordinate(x, y))
-                    val squareValue = field[x][y]
+                    val onPath = path.contains(PitchCoordinate(x, y))
+                    val squareValue = pitch[x][y]
                     val (text: String, bgColor: Color) =
                         when {
-                            onPath -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.Blue
+                            onPath -> gScore[PitchCoordinate(x, y)].formatToString(1) to Color.Blue
                             squareValue == Int.MAX_VALUE -> "" to Color.Black
                             squareValue > 0 -> "($squareValue)" to Color.LightGray
-                            squareValue == 0 -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.White
+                            squareValue == 0 -> gScore[PitchCoordinate(x, y)].formatToString(1) to Color.White
                             else -> "" to Color.Red
                         }
                     Box(

@@ -14,7 +14,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
@@ -408,10 +408,10 @@ data object DogoutSelected : GameAction
 data class DirectionSelected(val direction: Direction) : GameAction
 
 @Serializable
-data class FieldSquareSelected(val x: Int, val y: Int) : GameAction {
-    constructor(coordinate: FieldCoordinate): this(coordinate.x, coordinate.y)
+data class PitchSquareSelected(val x: Int, val y: Int) : GameAction {
+    constructor(coordinate: PitchCoordinate): this(coordinate.x, coordinate.y)
 
-    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
+    val coordinate: PitchCoordinate = PitchCoordinate(x, y)
 
     override fun toString(): String {
         return "${this::class.simpleName}[$x, $y]"

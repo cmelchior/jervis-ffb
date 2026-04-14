@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createStartingTestSetup
@@ -38,12 +38,12 @@ class BresenhamTests {
                     val rules = StandardBB2020Rules()
                     val state = createDefaultGameStateBB2020(rules)
                     createStartingTestSetup(state)
-                    val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
+                    val path = remember { mutableStateOf(listOf<PitchCoordinate>()) }
                     BresenhamGrid(
-                        rules.fieldHeight,
-                        rules.fieldWidth,
+                        rules.pitchHeight,
+                        rules.pitchWidth,
                         path.value,
-                        { start: FieldCoordinate, end: FieldCoordinate ->
+                        { start: PitchCoordinate, end: PitchCoordinate ->
                             path.value = rules.pathFinder.getStraightLine(state, start, end)
                         },
                     )
@@ -58,14 +58,14 @@ class BresenhamTests {
 fun BresenhamGrid(
     rows: Int,
     cols: Int,
-    path: List<FieldCoordinate>,
-    update: (start: FieldCoordinate, end: FieldCoordinate) -> Unit,
+    path: List<PitchCoordinate>,
+    update: (start: PitchCoordinate, end: PitchCoordinate) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
-                    val onPath = path.contains(FieldCoordinate(x, y))
+                    val onPath = path.contains(PitchCoordinate(x, y))
                     val bgColor: Color =
                         when {
                             onPath -> Color.Blue
@@ -75,7 +75,7 @@ fun BresenhamGrid(
                         modifier =
                             Modifier
                                 .onPointerEvent(PointerEventType.Enter) {
-                                    update(FieldCoordinate(12, 7), FieldCoordinate(x, y))
+                                    update(PitchCoordinate(12, 7), PitchCoordinate(x, y))
                                 }
                                 .size(30.dp)
                                 .padding(1.dp)

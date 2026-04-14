@@ -19,7 +19,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -97,8 +97,8 @@ object GameDrive : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // The End of Drive Sequence doesn't mention moving players off the pitch, so we
             // do it here after the sequence has completed. This also includes removing the
-            // ball from the field.
-            val movePlayers: List<Command> = state.field
+            // ball from the pitch.
+            val movePlayers: List<Command> = state.pitch
                 .filter { !it.isUnoccupied() }
                 .map {
                     val player = it.player!!
@@ -110,7 +110,7 @@ object GameDrive : Procedure() {
             // At this point, all temporary balls should have been removed.
             return compositeCommandOf(
                 SetBallState.onGround(state.getBall()),
-                SetBallLocation(state.getBall(), FieldCoordinate.UNKNOWN),
+                SetBallLocation(state.getBall(), PitchCoordinate.UNKNOWN),
                 // Us having to do this here, indicates we don't fully track the the lifecycle of the current ball
                 SetCurrentBall(null),
                 *movePlayers.toTypedArray(),

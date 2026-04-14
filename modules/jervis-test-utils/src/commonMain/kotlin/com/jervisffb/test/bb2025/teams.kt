@@ -6,14 +6,14 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
@@ -97,35 +97,35 @@ fun lizardMenAwayTeam(rules: Rules): Team {
  * - 8-9 are setup next to each on the left line 1 step away from LoS
  * - 10-11 are setup in the backfield
  */
-fun setupTeamsOnField(controller: GameEngineController) {
+fun setupTeamsOnPitch(controller: GameEngineController) {
     val homeCommands = with(controller.state.homeTeam) {
         listOf(
-            SetPlayerLocation(get(PlayerNo(1)), FieldCoordinate(12, 5)),
-            SetPlayerLocation(get(PlayerNo(2)), FieldCoordinate(12, 6)),
-            SetPlayerLocation(get(PlayerNo(3)), FieldCoordinate(12, 7)),
-            SetPlayerLocation(get(PlayerNo(4)), FieldCoordinate(12, 8)),
-            SetPlayerLocation(get(PlayerNo(5)), FieldCoordinate(12, 9)),
-            SetPlayerLocation(get(PlayerNo(6)), FieldCoordinate(11, 1)),
-            SetPlayerLocation(get(PlayerNo(7)), FieldCoordinate(11, 2)),
-            SetPlayerLocation(get(PlayerNo(8)), FieldCoordinate(11, 12)),
-            SetPlayerLocation(get(PlayerNo(9)), FieldCoordinate(11, 13)),
-            SetPlayerLocation(get(PlayerNo(10)), FieldCoordinate(9, 7)),
-            SetPlayerLocation(get(PlayerNo(11)), FieldCoordinate(3, 7))
+            SetPlayerLocation(get(PlayerNo(1)), PitchCoordinate(12, 5)),
+            SetPlayerLocation(get(PlayerNo(2)), PitchCoordinate(12, 6)),
+            SetPlayerLocation(get(PlayerNo(3)), PitchCoordinate(12, 7)),
+            SetPlayerLocation(get(PlayerNo(4)), PitchCoordinate(12, 8)),
+            SetPlayerLocation(get(PlayerNo(5)), PitchCoordinate(12, 9)),
+            SetPlayerLocation(get(PlayerNo(6)), PitchCoordinate(11, 1)),
+            SetPlayerLocation(get(PlayerNo(7)), PitchCoordinate(11, 2)),
+            SetPlayerLocation(get(PlayerNo(8)), PitchCoordinate(11, 12)),
+            SetPlayerLocation(get(PlayerNo(9)), PitchCoordinate(11, 13)),
+            SetPlayerLocation(get(PlayerNo(10)), PitchCoordinate(9, 7)),
+            SetPlayerLocation(get(PlayerNo(11)), PitchCoordinate(3, 7))
         )
     }
     val awayCommands = with(controller.state.awayTeam) {
         listOf(
-            SetPlayerLocation(get(PlayerNo(1)), FieldCoordinate(13, 5)),
-            SetPlayerLocation(get(PlayerNo(2)), FieldCoordinate(13, 6)),
-            SetPlayerLocation(get(PlayerNo(3)), FieldCoordinate(13, 7)),
-            SetPlayerLocation(get(PlayerNo(4)), FieldCoordinate(13, 8)),
-            SetPlayerLocation(get(PlayerNo(5)), FieldCoordinate(13, 9)),
-            SetPlayerLocation(get(PlayerNo(6)), FieldCoordinate(14, 1)),
-            SetPlayerLocation(get(PlayerNo(7)), FieldCoordinate(14, 2)),
-            SetPlayerLocation(get(PlayerNo(8)), FieldCoordinate(14, 12)),
-            SetPlayerLocation(get(PlayerNo(9)), FieldCoordinate(14, 13)),
-            SetPlayerLocation(get(PlayerNo(10)), FieldCoordinate(16, 7)),
-            SetPlayerLocation(get(PlayerNo(11)), FieldCoordinate(22, 7))
+            SetPlayerLocation(get(PlayerNo(1)), PitchCoordinate(13, 5)),
+            SetPlayerLocation(get(PlayerNo(2)), PitchCoordinate(13, 6)),
+            SetPlayerLocation(get(PlayerNo(3)), PitchCoordinate(13, 7)),
+            SetPlayerLocation(get(PlayerNo(4)), PitchCoordinate(13, 8)),
+            SetPlayerLocation(get(PlayerNo(5)), PitchCoordinate(13, 9)),
+            SetPlayerLocation(get(PlayerNo(6)), PitchCoordinate(14, 1)),
+            SetPlayerLocation(get(PlayerNo(7)), PitchCoordinate(14, 2)),
+            SetPlayerLocation(get(PlayerNo(8)), PitchCoordinate(14, 12)),
+            SetPlayerLocation(get(PlayerNo(9)), PitchCoordinate(14, 13)),
+            SetPlayerLocation(get(PlayerNo(10)), PitchCoordinate(16, 7)),
+            SetPlayerLocation(get(PlayerNo(11)), PitchCoordinate(22, 7))
         )
     }
 
@@ -196,53 +196,53 @@ fun createDefaultGameStateBB2025(
     homeTeam: Team = createDefaultHomeTeamBB2025(rules),
     awayTeam: Team = humanTeamAwayBB2025(rules)
 ): Game {
-    val field = Field.createForRuleset(rules)
-    return Game(rules, homeTeam, awayTeam, field)
+    val pitch = Pitch.createForRuleset(rules)
+    return Game(rules, homeTeam, awayTeam, pitch)
 }
 
 /**
- * Move all players onto the field as if starting a game.
+ * Move all players onto the pitch as if starting a game.
  * Only works on the setup defined above
  */
 fun createStartingTestSetup(state: Game) {
     fun setupPlayer(
         state: Game,
         player: Player?,
-        fieldCoordinate: FieldCoordinate,
+        pitchCoordinate: PitchCoordinate,
     ) {
         player?.let {
-            SetPlayerLocation(it, fieldCoordinate).execute(state)
+            SetPlayerLocation(it, pitchCoordinate).execute(state)
             SetPlayerState(it, PlayerState.STANDING)
         } ?: error("")
     }
 
     // Home
     with(state.homeTeam) {
-        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(12, 6))
-        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(12, 7))
-        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(12, 8))
-        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(10, 1))
-        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(10, 4))
-        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(10, 10))
-        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(10, 13))
-        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(8, 1))
-        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(8, 4))
-        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(8, 10))
-        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(8, 13))
+        setupPlayer(state, this[PlayerNo(1)], PitchCoordinate(12, 6))
+        setupPlayer(state, this[PlayerNo(2)], PitchCoordinate(12, 7))
+        setupPlayer(state, this[PlayerNo(3)], PitchCoordinate(12, 8))
+        setupPlayer(state, this[PlayerNo(4)], PitchCoordinate(10, 1))
+        setupPlayer(state, this[PlayerNo(5)], PitchCoordinate(10, 4))
+        setupPlayer(state, this[PlayerNo(6)], PitchCoordinate(10, 10))
+        setupPlayer(state, this[PlayerNo(7)], PitchCoordinate(10, 13))
+        setupPlayer(state, this[PlayerNo(8)], PitchCoordinate(8, 1))
+        setupPlayer(state, this[PlayerNo(9)], PitchCoordinate(8, 4))
+        setupPlayer(state, this[PlayerNo(10)], PitchCoordinate(8, 10))
+        setupPlayer(state, this[PlayerNo(11)], PitchCoordinate(8, 13))
     }
 
     // Away
     with(state.awayTeam) {
-        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(13, 6))
-        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(13, 7))
-        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(13, 8))
-        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(15, 1))
-        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(15, 4))
-        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(15, 10))
-        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(15, 13))
-        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(17, 1))
-        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(17, 4))
-        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(17, 10))
-        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(17, 13))
+        setupPlayer(state, this[PlayerNo(1)], PitchCoordinate(13, 6))
+        setupPlayer(state, this[PlayerNo(2)], PitchCoordinate(13, 7))
+        setupPlayer(state, this[PlayerNo(3)], PitchCoordinate(13, 8))
+        setupPlayer(state, this[PlayerNo(4)], PitchCoordinate(15, 1))
+        setupPlayer(state, this[PlayerNo(5)], PitchCoordinate(15, 4))
+        setupPlayer(state, this[PlayerNo(6)], PitchCoordinate(15, 10))
+        setupPlayer(state, this[PlayerNo(7)], PitchCoordinate(15, 13))
+        setupPlayer(state, this[PlayerNo(8)], PitchCoordinate(17, 1))
+        setupPlayer(state, this[PlayerNo(9)], PitchCoordinate(17, 4))
+        setupPlayer(state, this[PlayerNo(10)], PitchCoordinate(17, 10))
+        setupPlayer(state, this[PlayerNo(11)], PitchCoordinate(17, 13))
     }
 }

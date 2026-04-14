@@ -44,8 +44,8 @@ import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
-import com.jervisffb.ui.game.viewmodel.FieldViewData
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.PitchViewData
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.utils.JervisLogo
 import com.jervisffb.ui.utils.applyIf
@@ -66,7 +66,7 @@ fun SingleSelectUserActionDialog(
         width = dialog.width,
         draggable = dialog.moveable,
         backgroundScrim = false,
-        centerOnField = vm.screenViewModel,
+        centerOnPitch = vm.screenViewModel,
         dialogColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue,
         content = { inputFieldTextColor, textColor ->
             Text(
@@ -173,7 +173,7 @@ fun MultipleSelectUserActionDialog(
                 width = dialog.width,
                 draggable = dialog.movable,
                 backgroundScrim = false,
-                centerOnField = vm.screenViewModel,
+                centerOnPitch = vm.screenViewModel,
                 dialogColor = dialogColor,
                 content = { inputFieldTextColor, textColor ->
                     Column(
@@ -246,18 +246,18 @@ fun MultipleSelectUserActionDialog(
 
 /**
  * Composable responsible for showing the Action Wheel. It will also calculate the rotation and offset needed
- * to place the wheel in a visible location (i.e. if at the edge of the Field, the wheel will be moved inside the field).
+ * to place the wheel in a visible location (i.e. if at the edge of the Pitch, the wheel will be moved inside the field).
  *
  * TODO Reconsider this logic in light of the new game UI. It might be possible we have enough room to always show the wheel
- *  over the field square. But this might mean we need to disable some other events while it is showing to avoid accidental
+ *  over the pitch square. But this might mean we need to disable some other events while it is showing to avoid accidental
  *  misclicks (like End Turn).
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionWheelDialog(
     uiState: ActionWheelUiState,
-    fieldVm: FieldViewModel,
-    fieldData: FieldViewData,
+    pitchVm: PitchViewModel,
+    pitchData: PitchViewData,
     // We need to know the "primary wheel" as only the primary wheel are allowed
     // to send `notifyUiHandledActionWheelEvent` events back to the ViewModel.
     // This boolean is an ugly way of doing it, but it works for now.
@@ -292,13 +292,13 @@ fun ActionWheelDialog(
                     val center = uiState.center
                     if (center == null) {
                         offset = IntOffset(
-                            x = ((fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
-                            y = ((fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
+                            x = ((pitchData.pitchSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
+                            y = ((pitchData.pitchSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
                         )
                     } else {
-                        val data = fieldData.calculateActionWheelPlacement(
+                        val data = pitchData.calculateActionWheelPlacement(
                             center,
-                            fieldVm,
+                            pitchVm,
                             boxWidthPx,
                             ringSizePx,
                         )
@@ -313,9 +313,9 @@ fun ActionWheelDialog(
                 tipRotationDegree = tipRotationDegree,
                 onAnimationFinished = {
                     if (isPrimary) {
-                        fieldVm.actionWheelViewModel.notifyUiHandledActionWheelEvent()
+                        pitchVm.actionWheelViewModel.notifyUiHandledActionWheelEvent()
                         if (uiState.animationOnly) {
-                            fieldVm.screenModel.uiState.notifyAnimationDone()
+                            pitchVm.screenModel.uiState.notifyAnimationDone()
                         }
                     }
                 },

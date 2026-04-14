@@ -1,19 +1,19 @@
 package com.jervisffb.test.bb2020.actions
 
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
@@ -88,15 +88,15 @@ class JumpTests: JervisGameBB2020Test() {
         )
 
         val targetCoordinates = controller.getAvailableActions().actions
-            .filterIsInstance<SelectFieldLocation>()
+            .filterIsInstance<SelectPitchLocation>()
             .first().squares
             .map { it.coordinate }
             .toSet()
 
         val expectedCoordinates = setOf(
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 5),
-            FieldCoordinate(11, 6)
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 5),
+            PitchCoordinate(11, 6)
         )
         assertTrue(expectedCoordinates.containsAll(targetCoordinates))
         assertTrue(targetCoordinates.containsAll(targetCoordinates))
@@ -113,15 +113,15 @@ class JumpTests: JervisGameBB2020Test() {
         )
 
         val targetCoordinates = controller.getAvailableActions().actions
-            .filterIsInstance<SelectFieldLocation>()
+            .filterIsInstance<SelectPitchLocation>()
             .first().squares
             .map { it.coordinate }
             .toSet()
 
         val expectedCoordinates = setOf(
-            FieldCoordinate(12, 4),
-            FieldCoordinate(11, 4),
-            FieldCoordinate(11, 5)
+            PitchCoordinate(12, 4),
+            PitchCoordinate(11, 4),
+            PitchCoordinate(11, 5)
         )
         assertTrue(expectedCoordinates.containsAll(targetCoordinates))
         assertTrue(targetCoordinates.containsAll(targetCoordinates))
@@ -135,7 +135,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 4),
+            PitchSquareSelected(11, 4),
             4.d6, // 2 Modifiers from leaving, no to enter, so should fail
         )
         val reroll = RerollOptionSelected(
@@ -158,7 +158,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 6),
+            PitchSquareSelected(11, 6),
             4.d6, // 1 Marked Modifiers from entering, so a 4 will fail
         )
         val reroll = RerollOptionSelected(
@@ -181,7 +181,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 7),
+            PitchSquareSelected(11, 7),
             5.d6, // 1 Marked Modifiers from leaving, 2 from entering
         )
         val reroll = RerollOptionSelected(
@@ -203,7 +203,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             3.d6, // 1 Marked Modifiers from leaving/entering
             NoRerollSelected(),
         )
@@ -219,7 +219,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             1.d6,
             NoRerollSelected(),
         )
@@ -240,7 +240,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             2.d6, // Rush
             NoRerollSelected(),
             4.d6, // Jump
@@ -264,7 +264,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             2.d6, // Rush
             NoRerollSelected(),
             2.d6, // Rush
@@ -292,7 +292,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             1.d6, // Rush
             NoRerollSelected(),
         )
@@ -313,7 +313,7 @@ class JumpTests: JervisGameBB2020Test() {
             PlayerSelected(jumpingPlayer.id),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.JUMP),
-            FieldSquareSelected(11, 5),
+            PitchSquareSelected(11, 5),
             2.d6, // Rush
             NoRerollSelected(),
             1.d6, // Rush

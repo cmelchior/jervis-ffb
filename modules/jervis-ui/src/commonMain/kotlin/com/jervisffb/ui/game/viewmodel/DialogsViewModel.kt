@@ -25,7 +25,7 @@ class DialogsViewModel(
     val dialogData: Flow<UserInputDialog?> = uiState.uiStateFlow.map { it.dialogInput }
     val contextMenu: Flow<Player?> = screenViewModel.contextMenuFlow.onEach {
         if (it != null) {
-            screenViewModel.sharedFieldData.pointerBus.notifyExitField()
+            screenViewModel.sharedPitchData.pointerBus.notifyExitPitch()
         }
     }
 }

@@ -30,14 +30,14 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
 
     val inputFieldModifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
 
-    val fieldWidth by viewModel.fieldWidth.collectAsState()
-    val fieldHeight by viewModel.fieldHeight.collectAsState()
+    val pitchWidth by viewModel.pitchWidth.collectAsState()
+    val pitchHeight by viewModel.pitchHeight.collectAsState()
     val endZone by viewModel.endZone.collectAsState()
     val lineOfScrimmageHome by viewModel.lineOfScrimmageHome.collectAsState()
     val lineOfScrimmageAway by viewModel.lineOfScrimmageAway.collectAsState()
     val wideZone by viewModel.wideZone.collectAsState()
 
-    val maxPlayersOnField by viewModel.maxPlayersOnField.collectAsState()
+    val maxPlayersOnPitch by viewModel.maxPlayersOnPitch.collectAsState()
     val maxPlayersInWideZone by viewModel.maxPlayersInWideZone.collectAsState()
 
     val halfs by viewModel.halfs.collectAsState()
@@ -63,20 +63,20 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                 Column(
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
-                    SmallHeader("Field", bottomPadding = smallHeaderBottomPadding)
+                    SmallHeader("Pitch", bottomPadding = smallHeaderBottomPadding)
                     OutlinedTextField(
                         modifier = inputFieldModifier.width(40.dp),
-                        value = fieldWidth.value,
+                        value = pitchWidth.value,
                         onValueChange = { viewModel.updateFieldWidth(it) },
                         enabled = true,
-                        label = { Text(fieldWidth.label) },
+                        label = { Text(pitchWidth.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
-                        value = fieldHeight.value,
+                        value = pitchHeight.value,
                         onValueChange = { viewModel.updateFieldHeight(it) },
                         enabled = true,
-                        label = { Text(fieldHeight.label) },
+                        label = { Text(pitchHeight.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
@@ -108,10 +108,10 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
-                        value = maxPlayersOnField.value,
+                        value = maxPlayersOnPitch.value,
                         onValueChange = { viewModel.updateMaxPlayersOnField(it) },
                         enabled = true,
-                        label = { Text(maxPlayersOnField.label) },
+                        label = { Text(maxPlayersOnPitch.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
