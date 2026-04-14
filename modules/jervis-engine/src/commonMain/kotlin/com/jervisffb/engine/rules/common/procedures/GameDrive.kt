@@ -21,7 +21,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -50,7 +49,7 @@ object GameDrive : Procedure() {
             }
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val activeGoalScored = (state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN)
+            val activeTouchdownScored = (state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN)
             val inactiveTouchdownScored = (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN)
             val isOutOfTime = if (state.halfNo <= rules.halfsPrGame) {
                 state.homeTeam.turnMarker == rules.turnsPrHalf
@@ -59,8 +58,8 @@ object GameDrive : Procedure() {
                 state.homeTeam.turnMarker == rules.turnsInExtraTime
                     && state.awayTeam.turnMarker == rules.turnsInExtraTime
             }
-            val endDrive = activeGoalScored || isOutOfTime
-            val swapTeams = !isOutOfTime && !activeGoalScored
+            val endDrive = activeTouchdownScored || isOutOfTime
+            val swapTeams = !isOutOfTime && !activeTouchdownScored
 
             return when {
                 inactiveTouchdownScored -> {

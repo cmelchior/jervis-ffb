@@ -462,7 +462,7 @@ open class ManualActionProvider(
 
         // We only have "Confirm" actions on Touchdowns to trigger animations (for now)
         // So we always provide it.
-        if (currentNode == ScoringATouchdown.InformOfGoal) {
+        if (currentNode == ScoringATouchdown.InformOfTouchdown) {
             return Confirm
         }
 

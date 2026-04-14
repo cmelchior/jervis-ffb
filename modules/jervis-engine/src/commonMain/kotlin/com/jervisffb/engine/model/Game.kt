@@ -135,15 +135,15 @@ class Game(
 
     var turnOver: TurnOver? = null
     var hasConceeded: Team? = null
-    var homeGoals: Int = 0
-    var homeExtraTimeGoals: Int = 0
-    var homeSuddenDeathGoals: Int = 0
-    var awayGoals: Int = 0
-    var awayExtraTimeGoals: Int = 0
-    var awaySuddenDeathGoals: Int = 0
+    var homeTouchdowns: Int = 0
+    var homeExtraTimeTouchdowns: Int = 0
+    var homeSuddenDeathTouchdowns: Int = 0
+    var awayTouchdowns: Int = 0
+    var awayExtraTimeTouchdowns: Int = 0
+    var awaySuddenDeathTouchdowns: Int = 0
 
-    val homeScore: Int get() = homeGoals + homeExtraTimeGoals + homeSuddenDeathGoals
-    val awayScore: Int get() = awayGoals + awayExtraTimeGoals + awaySuddenDeathGoals
+    val homeScore: Int get() = homeTouchdowns + homeExtraTimeTouchdowns + homeSuddenDeathTouchdowns
+    val awayScore: Int get() = awayTouchdowns + awayExtraTimeTouchdowns + awaySuddenDeathTouchdowns
 
     /**
      * The player that is being activated. This is set as soon as the player is

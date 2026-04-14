@@ -182,7 +182,7 @@ object BlockAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
-            // TODO This approach to turn overs might not be correct, i.e. a goal
+            // TODO This approach to turn overs might not be correct, i.e. a touchdown
             // could have been scored after a Blitz
             val context = state.getContext<BlockActionContext>()
 

@@ -16,7 +16,7 @@ import com.jervisffb.engine.rules.Rules
 
 /**
  * Class wrapping using the Trickster skill in BB2025, but does not include
- * checking for goals after the Block.
+ * checking for touchdowns after the Block.
  */
 object UseTricksterStep: Procedure() {
     override val initialNode: Node = ChooseTouseTrickster

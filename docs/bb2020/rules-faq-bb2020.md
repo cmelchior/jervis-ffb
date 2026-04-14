@@ -819,9 +819,9 @@ Blood Lust both says that:
   must bite a Thrall before they ... score."
 
 If "scoring" and "end of activation" as two separate events (which it is since a
-goal only causes a turn-over, it doesn't immediately end the activation). One 
-interpretation would be that you must bite two thralls in case of a scoring 
-event. One to score and one when the activation ends due to the goal.
+touchdown only causes a turn-over, it doesn't immediately end the activation). 
+One interpretation would be that you must bite two thralls in case of a scoring 
+event. One to score and one when the activation ends due to the touchdown.
 
 No-one will argue that this is the intended reading of the rules, which leads to 
 the next question. Do we roll when scoring or when the activation ends?
@@ -830,9 +830,9 @@ At a glance, the distinction doesn't make a difference, but since some special
 rules affect scoring and end of activation, it might.
 
 Since the Skill explicitly state that they must roll _before_ they score, we 
-adopt the interpretation that in the case of a goal, Blood Lust is rolled 
-immediately after the goal is detected and not when the action ends. For all 
-other cases is Blood Lust still rolled at the end of activation.
+adopt the interpretation that in the case of a touchdown, Blood Lust is rolled 
+immediately after the touchdown is detected and not when the action ends. For 
+all other cases is Blood Lust still rolled at the end of activation.
 
 
 ## Star Players

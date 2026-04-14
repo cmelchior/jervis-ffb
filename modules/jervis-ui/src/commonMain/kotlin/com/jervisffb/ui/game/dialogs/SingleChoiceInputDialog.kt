@@ -194,7 +194,7 @@ data class SingleChoiceInputDialog(
                 owner = team
             )
 
-        fun createGoalScoredDialog(player: Player): SingleChoiceInputDialog =
+        fun createTouchdownScoredDialog(player: Player): SingleChoiceInputDialog =
             create(
                 title = "TOUCHDOWN!",
                 message = "A touchdown was scored by ${player.name}",

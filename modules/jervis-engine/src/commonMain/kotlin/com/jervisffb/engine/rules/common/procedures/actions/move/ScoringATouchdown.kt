@@ -5,9 +5,8 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.commands.AddGoal
+import com.jervisffb.engine.commands.AddTouchdown
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.NoOpCommand
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -25,7 +24,7 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.reports.ReportGoal
+import com.jervisffb.engine.reports.ReportTouchdown
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -141,17 +140,17 @@ object ScoringATouchdown : Procedure() {
                 // increased until your next real turn, but this has some problematic
                 // side effects for the end of the half. So we do it immediately instead.
                 // See rules-faq.md (page 64) for a discussion on this.
-                AddGoal(context.player.team, 1),
-                ReportGoal(state, context),
+                AddTouchdown(context.player.team, 1),
+                ReportTouchdown(state, context),
                 SetTurnOver(turnover),
-                GotoNode(InformOfGoal)
+                GotoNode(InformOfTouchdown)
             )
         }
 
     }
 
-    // Mostly relevant to give the UI a hook to show "goal" messages
-    object InformOfGoal : ActionNode() {
+    // Mostly relevant to give the UI a hook to show "Touchdown" messages
+    object InformOfTouchdown : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ScoringATouchDownContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(ConfirmWhenReady)

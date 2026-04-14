@@ -190,8 +190,8 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createScatterRollDialog(rules)
                 }
 
-                is ScoringATouchdown.InformOfGoal -> {
-                    SingleChoiceInputDialog.createGoalScoredDialog(controller.state.getContext<ScoringATouchDownContext>().player)
+                is ScoringATouchdown.InformOfTouchdown -> {
+                    SingleChoiceInputDialog.createTouchdownScoredDialog(controller.state.getContext<ScoringATouchDownContext>().player)
                 }
 
                 is SetupTeam.InformOfInvalidSetup -> {

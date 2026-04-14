@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetSuddenDeathGoals
+import com.jervisffb.engine.commands.SetSuddenDeathTouchdowns
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -70,17 +70,17 @@ object SuddenDeath : Procedure() {
                 val context = state.getContext<SuddenDeathContext>()
                 val homeResult = context.homeRolls.last()
                 val rollOffs = context.rollOffs + if (homeResult != d6) 1 else 0
-                val (rollOffWinner, goals) = when {
+                val (rollOffWinner, touchdowns) = when {
                     homeResult == d6 -> null to 0
-                    homeResult.value > d6.value -> state.homeTeam to state.homeSuddenDeathGoals + 1
-                    homeResult.value < d6.value -> state.awayTeam to state.awaySuddenDeathGoals + 1
+                    homeResult.value > d6.value -> state.homeTeam to state.homeSuddenDeathTouchdowns + 1
+                    homeResult.value < d6.value -> state.awayTeam to state.awaySuddenDeathTouchdowns + 1
                     else -> INVALID_GAME_STATE("Unsupported state")
                 }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SUDDEN_DEATH, d6),
                     if (rollOffWinner == null) SimpleLogEntry("Roll-off is a draw", category = LogCategory.GAME_PROGRESS) else null,
                     if (rollOffWinner != null) SimpleLogEntry("${rollOffWinner.name} wins ${rollOffs}. roll-off", category = LogCategory.GAME_PROGRESS) else null,
-                    if (rollOffWinner != null) SetSuddenDeathGoals(rollOffWinner, goals) else null,
+                    if (rollOffWinner != null) SetSuddenDeathTouchdowns(rollOffWinner, touchdowns) else null,
                     UpdateContext(context.copy(
                         awayRolls = context.awayRolls + d6,
                         rollOffs = rollOffs

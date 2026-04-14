@@ -34,7 +34,7 @@ class ExtraTimeTests: JervisGameBB2020Test() {
 
     @Test
     fun stoppingGameAfterNormalTimeIfWinnerFound() {
-        controller.state.homeGoals = 1 // Fake Home having one goal
+        controller.state.homeTouchdowns = 1 // Fake Home having one touchdown
         controller.rollForward(
             *skipTurns(16),
             *defaultSetup(homeFirst = false),
@@ -43,9 +43,9 @@ class ExtraTimeTests: JervisGameBB2020Test() {
         )
         assertTrue(controller.stack.isEmpty()) // Game has ended
         assertEquals(1, state.homeScore)
-        assertEquals(1, state.homeGoals)
+        assertEquals(1, state.homeTouchdowns)
         assertEquals(0, state.awayScore)
-        assertEquals(0, state.awayGoals)
+        assertEquals(0, state.awayTouchdowns)
     }
 
     @Test
@@ -73,13 +73,13 @@ class ExtraTimeTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam(),
             *skipTurns(15)
         )
-        state.homeExtraTimeGoals = 1
+        state.homeExtraTimeTouchdowns = 1
         controller.rollForward(*skipTurns(1))
         assertTrue(controller.stack.isEmpty()) // Game has ended
         assertEquals(1, state.homeScore)
         assertEquals(0, state.awayScore)
-        assertEquals(1, state.homeExtraTimeGoals)
-        assertEquals(0, state.awayExtraTimeGoals)
+        assertEquals(1, state.homeExtraTimeTouchdowns)
+        assertEquals(0, state.awayExtraTimeTouchdowns)
     }
 
     @Test
@@ -111,7 +111,7 @@ class ExtraTimeTests: JervisGameBB2020Test() {
         assertEquals(1, state.driveNo)
         assertEquals(3, state.homeScore)
         assertEquals(2, state.awayScore)
-        assertEquals(3, state.homeSuddenDeathGoals)
-        assertEquals(2, state.awaySuddenDeathGoals)
+        assertEquals(3, state.homeSuddenDeathTouchdowns)
+        assertEquals(2, state.awaySuddenDeathTouchdowns)
     }
 }

@@ -23,7 +23,7 @@ class ReportGameResult(
             val logEntry = when {
                 state.homeScore > state.awayScore -> reportExtraTimeWin(state.homeTeam, state.homeScore, state.awayTeam, state.awayScore)
                 state.homeScore < state.awayScore -> reportExtraTimeWin(state.awayTeam, state.awayScore, state.homeTeam, state.homeScore)
-                else -> "${state.homeTeam.name} draws ${state.awayScore} : ${state.homeScore} against ${state.awayTeam.name} (${state.homeGoals} - ${state.awayGoals} at normal time)"
+                else -> "${state.homeTeam.name} draws ${state.awayScore} : ${state.homeScore} against ${state.awayTeam.name} (${state.homeTouchdowns} - ${state.awayTouchdowns} at normal time)"
             }
             append(logEntry)
         } else {

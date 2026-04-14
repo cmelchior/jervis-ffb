@@ -118,7 +118,7 @@ object AnimationFactory {
         }
 
         // Animate confetti cannon on touchdown
-        if (stack.singleCurrentNode(ScoringATouchdown.InformOfGoal)) {
+        if (stack.singleCurrentNode(ScoringATouchdown.InformOfTouchdown)) {
             val context = state.getContextOrNull<ScoringATouchDownContext>()
             if (context?.isTouchdownScored == true) {
                 return ConfettiAnimation(rules = rules, homeTeamScored = context.player.isOnHomeTeam())
