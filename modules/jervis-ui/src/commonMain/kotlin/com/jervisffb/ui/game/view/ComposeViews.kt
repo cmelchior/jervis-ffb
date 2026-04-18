@@ -31,14 +31,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.jervisffb.engine.model.Player
+import com.jervisffb.ui.debugBorder
+import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
@@ -50,18 +56,23 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 
-// TODO Figure out how to do drop shadows
 @Composable
 fun SectionDivider(modifier: Modifier) {
     Box(
         modifier =
             modifier
-                .padding(4.dp)
-                .height(2.dp)
+                .padding(4.jdp)
+                .height(2.jdp)
                 .background(color = Color.White)
-//                .dropShadow(color = Color.Red, offsetX = 2.dp, offsetY = 2.dp, blurRadius = 2.dp)
-
+                .dropShadow(
+                    color = Color.Black,
+                    offsetX = 0.dp,
+                    offsetY = 0.5.dp,
+                    blurRadius = 1.dp
+                )
     )
 }
 
@@ -71,8 +82,9 @@ fun SectionHeader(title: String) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp)
-                .aspectRatio(152.42f / (452f / 15)),
+                .padding(start = 4.jdp, end = 4.jdp)
+                .aspectRatio(152.42f / (452f / 15))
+        ,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SectionDivider(modifier = Modifier.weight(1f))
@@ -80,8 +92,11 @@ fun SectionHeader(title: String) {
             text = title,
             color = Color.White,
             maxLines = 1,
+            lineHeight = 1.em,
+            textAlign = TextAlign.Center,
             modifier = Modifier.wrapContentSize(),
             style = LocalTextStyle.current.copy(
+                fontSize = 20.jsp,
                 shadow = Shadow(
                     color = Color.Black,
                     offset = Offset(2f, 2f),
