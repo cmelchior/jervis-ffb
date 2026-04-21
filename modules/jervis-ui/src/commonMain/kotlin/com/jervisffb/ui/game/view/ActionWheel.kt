@@ -1149,7 +1149,7 @@ fun ExpandableDiceSelector(
         }
     }
     val itemsPrRow = diceList.size / rows
-    val buttonSize = remember(currentDiceValue) { IconFactory.getDiceSizeDp(currentDiceValue) }
+    val buttonSize = remember(currentDiceValue, JervisTheme.windowSizeDp) { IconFactory.getDiceSizeDp(currentDiceValue) }
     val (buttonWidth, buttonHeight) = buttonSize
     val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
     val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)

@@ -47,7 +47,7 @@ fun DialogDiceButton(
     onClick: () -> Unit,
     useSelectedColorAsHover: Boolean = false,
 ) {
-    val buttonSize = IconFactory.getDiceSizeDp(die)
+    val buttonSize = remember(JervisTheme.windowSizeDp) { IconFactory.getDiceSizeDp(die) }
     Box(
         modifier = modifier.size(buttonSize),
         contentAlignment = Alignment.Center
