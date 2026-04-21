@@ -1113,7 +1113,7 @@ fun ExpandableDiceSelector(
     // Current state tracking
     var currentDiceValue by remember(button) { mutableStateOf(button.diceValue) }
     val density = LocalDensity.current
-    val diceList = remember(button) {
+    val diceList = remember(currentDiceValue) {
         button.options.toMutableList().apply {
             remove(button.diceValue)
             add(0, button.diceValue)
