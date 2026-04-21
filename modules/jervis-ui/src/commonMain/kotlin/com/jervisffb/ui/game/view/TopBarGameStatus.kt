@@ -202,6 +202,7 @@ fun GameStatusTopBar(
     }
 }
 
+// Message just above the pitch that describes the current game status
 @Composable
 fun GameStatusMessage(viewModel: GameStatusViewModel) {
     val alpha = remember { Animatable(0f) }
@@ -231,7 +232,7 @@ fun GameStatusMessage(viewModel: GameStatusViewModel) {
             )
         }
         Box(
-            modifier = Modifier.height(32.dp).drawWithContent {
+            modifier = Modifier.height(42.jdp).drawWithContent {
                 // Create fade brush for left and right edges
                 val fadeBrush = Brush.horizontalGradient(
                     0f to Color.Transparent,
