@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -95,7 +96,6 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
-import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
@@ -1092,15 +1092,10 @@ fun CoinImage(
 
 /**
  * Composable responsible for handling a single die that can be expanded into a
- * value selector. The options will always expand to the right side.
- *
+ * value selector.
+
  * It also supports being animated to a new value. This is done by rotating up
  * in the air before landing, similar to a dice roll.
- *
- * TODO Check location of die and how much space is on the screen before
- *  selecting whether to expand to the right or left side. We could also consider
- *  using different layouts, i.e. more "boxed" when closer to the edge rather
- *  that swapping direction.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -1132,7 +1127,7 @@ fun ExpandableDiceSelector(
     val bgAlpha = remember { Animatable(0f) }
 
     // Padding between background bar and dice buttons
-    val backgroundPadding = 8.dp
+    val backgroundPadding = 8.jdp
     val spacingBetweenItems = backgroundPadding / 2f
 
     val rows = remember(button.diceValue) {
@@ -1151,38 +1146,36 @@ fun ExpandableDiceSelector(
     val itemsPrRow = diceList.size / rows
     val buttonSize = remember(currentDiceValue, JervisTheme.windowSizeDp) { IconFactory.getDiceSizeDp(currentDiceValue) }
     val (buttonWidth, buttonHeight) = buttonSize
-    val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
+    val maxWidthDp = (backgroundPadding * 2f) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
     val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)
 
     // Determine the placement of popup
-    val (popupDirection, popupOffset) = remember(button) {
-        when (button.preferLtr) {
-            true -> {
-                val padding = with(density) { (backgroundPadding/2).toPx().roundToInt() }
-                val adjustment = with(density) {
-                    backgroundPadding.toPx().roundToInt() * -1
-                }
-                LayoutDirection.Ltr to IntOffset(adjustment, -padding)
+    val (popupDirection, popupOffset) = when (button.preferLtr) {
+        true -> {
+            val padding = with(density) { (backgroundPadding/2f).toPx().roundToInt() }
+            val adjustment = with(density) {
+                backgroundPadding.toPx().roundToInt() * -1
             }
-            false -> {
-                val padding = with(density) { (backgroundPadding/2).toPx().roundToInt() }
-                val adjustment = with(density) {
-                    (maxWidthDp - buttonWidth - backgroundPadding - backgroundPadding / 2).toPx().roundToInt()
-                }
-                LayoutDirection.Rtl to IntOffset(-adjustment, -padding)
+            LayoutDirection.Ltr to IntOffset(adjustment, -padding)
+        }
+        false -> {
+            val padding = with(density) { (backgroundPadding/2f).toPx().roundToInt() }
+            val adjustment = with(density) {
+                (maxWidthDp - buttonWidth - backgroundPadding - backgroundPadding/2f).toPx().roundToInt()
             }
+            LayoutDirection.Rtl to IntOffset(-adjustment, -padding)
         }
     }
 
     // Handle opening and closing animation of the dice selector
     if (expanded) {
-        LaunchedEffect(button) {
+        LaunchedEffect(button, buttonSize) {
             bgWidthDp.snapTo(maxWidthDp.value)
             // launch { bgWidthDp.animateTo(maxWidthDp.value, animation) }
             launch { bgAlpha.animateTo(1f) }
         }
     } else {
-        LaunchedEffect(button) {
+        LaunchedEffect(button, buttonSize) {
             bgWidthDp.snapTo(0f)
             // launch { bgWidthDp.animateTo(0f, animation) }
             launch { bgAlpha.animateTo(0f) }
@@ -1262,7 +1255,9 @@ fun ExpandableDiceSelector(
 
                     // All buttons in the button group
                     Column(
-                        modifier = Modifier.fillMaxHeight().padding(top = backgroundPadding/2f, bottom = backgroundPadding/2f),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(top = backgroundPadding/2f, bottom = backgroundPadding/2f),
                         verticalArrangement = Arrangement.SpaceBetween,
                     ) {
                         val diceRow = diceList.chunked(diceList.size / rows)
@@ -1270,6 +1265,7 @@ fun ExpandableDiceSelector(
                             Row(
                                 modifier =
                                     Modifier
+                                        .fillMaxWidth()
                                         .height(buttonHeight)
                                         .padding(start = backgroundPadding/2)
                                 ,
@@ -1280,7 +1276,7 @@ fun ExpandableDiceSelector(
                                 // selected value in the front
                                 row.forEachIndexed { index, dieValue ->
                                     val currentBgWidth = bgWidthDp.value.dp
-                                    val alpha = when (index == 0 || currentBgWidth > 52.dp * (index + 1)) {
+                                    val alpha = when (index == 0 || currentBgWidth > 52.jdp * (index + 1)) {
                                         true -> bgAlpha.value
                                         false -> 0f
                                     }
@@ -1397,7 +1393,7 @@ private fun DiceButton(
                 dropShadow(shape = shape) {
                     color = dropShadowColor.copy(alpha = 0.75f)
                     offset = Offset.Zero
-                    radius = 12.dp.toPx()
+                    radius = 12.jdp.toPx()
                     this.alpha = alpha * alpha
                 }
             }
