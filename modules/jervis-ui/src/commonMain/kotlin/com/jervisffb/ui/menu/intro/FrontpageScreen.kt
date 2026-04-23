@@ -353,8 +353,9 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         // Calculate how to place the text.
         // It should follow the red line, while skewing the
         // text so it is following the left border.
-        val maxFontSize = 90f
-        skiaFont.size = ((min(70 * scale, maxFontSize))).sp.toPx()
+        val maxFontSize = 180f / density
+        val screenScaling = 140f / density // Don't remember where this value came from...
+        skiaFont.size = ((min(screenScaling * scale, maxFontSize))).sp.toPx()
         val line1 = mainTitle
         val line2 = subTitle
         val angleRadians = atan(size.height / size.width)

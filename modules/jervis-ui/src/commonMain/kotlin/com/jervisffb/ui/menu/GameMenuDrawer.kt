@@ -67,6 +67,7 @@ import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
 import com.jervisffb.ui.menu.dice.DiceColorSettingsPanel
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.jsp
 import org.jetbrains.compose.resources.painterResource
 
 private sealed interface DrawerSecondLevelContent
@@ -114,7 +115,7 @@ fun GameMenuDrawer(
             MenuTitleBar(
                 modifier = Modifier.fillMaxWidth().height(116.dp),
                 title = "Game Menu",
-                fontSize = 32.dp,
+                fontSize = 64.jsp,
                 textPaddingLeft = 16.dp,
             )
             Column(
