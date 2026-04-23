@@ -90,14 +90,15 @@ fun main() = runBlocking {
                                 true
                             }
                             // Also allow Esc to be used to exit fullscreen as that is a natural "oh shit"-button
-                            event.key == Key.Escape && windowState.placement == WindowPlacement.Fullscreen -> {
-                                windowState.placement = WindowPlacement.Floating
-                                windowState.size = sizeBeforeFullscreen
-                                true
-                            }
+                            // EDIT: Actually, it might be annoying that ESC does different things depending on where
+                            // you press it. So think a bit more about this before enabling it.
+                            //    event.key == Key.Escape && windowState.placement == WindowPlacement.Fullscreen -> {
+                            //        windowState.placement = WindowPlacement.Floating
+                            //        windowState.size = sizeBeforeFullscreen
+                            //        true
+                            //    }
                             event.key == Key.Escape -> {
                                 BackNavigationHandler.execute()
-                                true
                             }
                             else -> false
                         }

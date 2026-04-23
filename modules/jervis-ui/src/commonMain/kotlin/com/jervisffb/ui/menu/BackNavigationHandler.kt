@@ -11,15 +11,16 @@ object BackNavigationHandler {
     fun unregister(onBackPress: OnBackPress) {
         callbacks.remove(onBackPress)
     }
-    fun execute() {
+    fun execute(): Boolean {
         // Iterate from the back, so we give the highest priority
         // to callbacks added last.
         for (index in callbacks.indices.reversed()) {
             val callback: OnBackPress = callbacks[index]
             if (callback.onBackPressed()) {
-                break
+                return true
             }
         }
+        return false
     }
 }
 
