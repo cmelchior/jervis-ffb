@@ -361,7 +361,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
-        val padding = 32.dp.toPx()
+        val padding = 32.jdp.toPx()
         val lineHeight = skiaFont.size * 1.3f
 
         drawContext.canvas.nativeCanvas.apply {
