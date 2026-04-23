@@ -557,8 +557,8 @@ object IconFactory {
     fun getDiceSizeDp(die: DieResult): DpSize {
         val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find: $die")
         return DpSize(
-            (image.width / density.density).jdp * 1.25f,
-            (image.height / density.density).jdp * 1.25f
+            (image.width / scaleFactor).jdp * 1.25f,
+            (image.height / scaleFactor).jdp * 1.25f
         )
     }
 
@@ -583,8 +583,8 @@ object IconFactory {
     fun getCoinSizeDp(coin: Coin): DpSize {
         val image = cachedCoin[coin] ?: error("Could not find coin: $coin")
         return DpSize(
-            (image.width / density.density).jdp * 1.25f,
-            (image.height / density.density).jdp * 1.25f
+            (image.width / scaleFactor).jdp * 1.25f,
+            (image.height / scaleFactor).jdp * 1.25f
         )
     }
 
