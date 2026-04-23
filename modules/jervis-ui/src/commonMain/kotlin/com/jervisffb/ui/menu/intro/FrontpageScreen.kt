@@ -63,6 +63,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreen
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -265,7 +266,7 @@ private fun ColumnScope.FrontpageMenu(viewModel: FrontpageScreenModel, navigator
 
 @Composable
 private fun ColumnScope.FrontpageMenuEntry(title: String, onClick: () -> Unit, enabled: Boolean = true) {
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .background(color = if (enabled) JervisTheme.rulebookBlue else JervisTheme.rulebookDisabled)
             .fillMaxSize()
@@ -273,14 +274,15 @@ private fun ColumnScope.FrontpageMenuEntry(title: String, onClick: () -> Unit, e
         ,
         contentAlignment = Alignment.BottomEnd,
     ) {
+        val fontSize = (maxWidth * 0.10f).value.sp
         Text(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.jdp),
             text = title.uppercase(),
             textAlign = TextAlign.End,
             maxLines = 2,
             color = JervisTheme.buttonTextColor,
             fontWeight = FontWeight.Bold,
-            fontSize = 32.sp,
+            fontSize = fontSize,
             style = LocalTextStyle.current.copy(
                 lineHeight = 1.0.em,
                 lineHeightStyle = LineHeightStyle(

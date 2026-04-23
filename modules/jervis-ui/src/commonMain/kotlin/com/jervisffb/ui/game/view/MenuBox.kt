@@ -2,7 +2,7 @@ package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -26,15 +26,14 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.ui.utils.jdp
 
 @Composable
-fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true, frontPage: Boolean = false) {
+fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true) {
 
     var modifier = Modifier
-        .padding(if (frontPage) 0.dp else 16.dp)
         .fillMaxHeight(0.9f)
         .weight(9f/36f,  false)
         .aspectRatio(1f)
@@ -45,19 +44,20 @@ fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true
         modifier.background(color = JervisTheme.rulebookDisabled)
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier,
         contentAlignment = Alignment.BottomEnd,
 
     ) {
+        val fontSize = (maxWidth * 0.1f).value.sp
         Text(
-            modifier = Modifier.padding(16.dp),//.offset(y = 16.dp),
+            modifier = Modifier.padding(16.jdp),
             text = label.uppercase(),
             textAlign = TextAlign.End,
             maxLines = 1,
             color = JervisTheme.buttonTextColor,
             fontWeight = FontWeight.Bold,
-            fontSize = if (frontPage) 36.sp else 32.sp,
+            fontSize = fontSize,
             style = LocalTextStyle.current.copy(
                 lineHeight = 1.0.em,
                 lineHeightStyle = LineHeightStyle(
@@ -83,6 +83,12 @@ fun RowScope.
         aspectRatio: Float = 0.67f,
     ) {
 
+    val spaceBetweenButtons = 32.jdp
+    // Scaling is set to match the font size of the bigger "Hotseat" box.
+    // We should probably calculate this from the difference in width, but
+    // this is a good enough approximation for now.
+    val fontScaleFactor = 0.148f
+
     var hostLabel by remember { mutableStateOf(labelMiddle) }
 
     Column(
@@ -97,18 +103,19 @@ fun RowScope.
             } else {
                 JervisTheme.rulebookBlue
             }
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier.background(color = topBgColor).weight(1f).fillMaxSize().let { if (onClickTop != null) it.clickable { onClickTop() } else it },
                 contentAlignment = Alignment.BottomEnd,
             ) {
+                val fontSize = (maxWidth * fontScaleFactor).value.sp
                 Text(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.jdp),
                     text = labelTop.uppercase(),
                     textAlign = TextAlign.End,
                     maxLines = 2,
                     color = JervisTheme.buttonTextColor,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp,
+                    fontSize = fontSize,
                     style = LocalTextStyle.current.copy(
                         lineHeight = 1.0.em,
                         lineHeightStyle = LineHeightStyle(
@@ -118,7 +125,7 @@ fun RowScope.
                     ),
                 )
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(spaceBetweenButtons))
 
             val bgColor = if (!p2pHostAvailable) {
                 JervisTheme.rulebookDisabled
@@ -126,7 +133,7 @@ fun RowScope.
                 JervisTheme.rulebookBlue
             }
 
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .background(bgColor)
                     .weight(1f)
@@ -145,14 +152,15 @@ fun RowScope.
                 ,
                 contentAlignment = Alignment.BottomEnd,
             ) {
+                val fontSize = (maxWidth * fontScaleFactor).value.sp
                 Text(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.jdp),
                     text = hostLabel.uppercase(),
                     textAlign = TextAlign.End,
                     maxLines = 2,
                     color = JervisTheme.buttonTextColor,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp,
+                    fontSize = fontSize,
                     style = LocalTextStyle.current.copy(
                         lineHeight = 1.0.em,
                         lineHeightStyle = LineHeightStyle(
@@ -169,19 +177,20 @@ fun RowScope.
                 } else {
                     JervisTheme.rulebookBlue
                 }
-                Spacer(modifier = Modifier.height(32.dp))
-                Box(
+                Spacer(modifier = Modifier.height(spaceBetweenButtons))
+                BoxWithConstraints(
                     modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (onClickBottom != null) it.clickable { onClickBottom() } else it },
                     contentAlignment = Alignment.BottomEnd,
                 ) {
+                    val fontSize = (maxWidth * fontScaleFactor).value.sp
                     Text(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(16.jdp),
                         text = labelBottom.uppercase(),
                         textAlign = TextAlign.End,
                         maxLines = 2,
                         color = JervisTheme.buttonTextColor,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 32.sp,
+                        fontSize = fontSize,
                         style = LocalTextStyle.current.copy(
                             lineHeight = 1.0.em,
                             lineHeightStyle = LineHeightStyle(

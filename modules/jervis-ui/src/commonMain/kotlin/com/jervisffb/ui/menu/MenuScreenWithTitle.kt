@@ -30,6 +30,7 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
+import com.jervisffb.ui.utils.jdp
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
@@ -84,7 +85,7 @@ fun MenuScreenWithTitle(
 fun MenuTitleBar(
     modifier: Modifier,
     title: String,
-    fontSize: Dp = 45.dp,
+    fontSize: Dp = 52.jdp,
     textBottomPadding: Dp = 0.dp,
     textPaddingLeft: Dp = 32.dp
 ) {
@@ -120,11 +121,8 @@ fun MenuTitleBar(
         // Calculate how to place the text.
         // It should follow the red line, while skewing the
         // text so it is following the left border.
-        // TODO Need to figure out exactly how to scale the text, so it
-        //  looks "nice" in more situations
-        val scale = 1.0f
-        val fontSize = fontSize.toPx()
-        skiaFont.size = (fontSize * scale).sp.toPx()
+        val fontSizePx = fontSize.toPx()
+        skiaFont.size = fontSizePx.sp.toPx()
         val angleRadians = atan((size.height - (size.height * (160f/280f))) / size.width)
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)

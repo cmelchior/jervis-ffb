@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.jervisffb.engine.model.Player
-import com.jervisffb.ui.debugBorder
 import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog

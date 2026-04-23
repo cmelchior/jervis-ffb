@@ -37,6 +37,7 @@ import com.jervisffb.ui.menu.p2p.client.P2PClientScreen
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreen
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
+import com.jervisffb.ui.utils.jdp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
@@ -92,26 +93,26 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
         }
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Row(
+            Box(
                 modifier = Modifier.fillMaxWidth(0.62f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                contentAlignment = Alignment.Center
             ) {
-                MenuBox(
-                    label = "Hotseat",
-                    onClick = { viewModel.startHotSeatGame(navigator) },
-                    frontPage = true
-                )
-                Spacer(modifier = Modifier.width(32.dp))
-                SplitMenuBox(
-                    labelTop = "P2P\nClient",
-                    onClickTop = { viewModel.startP2PClient(navigator) },
-                    labelMiddle = "P2P\nHost",
-                    onClickMiddle = { viewModel.startP2PServer(navigator) },
-                    labelBottom = "Replay",
-                    onClickBottom = null,
-                    menuViewModel.p2pHostAvaiable,
-                )
+                Row {
+                    MenuBox(
+                        label = "Hotseat",
+                        onClick = { viewModel.startHotSeatGame(navigator) },
+                    )
+                    Spacer(modifier = Modifier.width(32.jdp))
+                    SplitMenuBox(
+                        labelTop = "P2P\nClient",
+                        onClickTop = { viewModel.startP2PClient(navigator) },
+                        labelMiddle = "P2P\nHost",
+                        onClickMiddle = { viewModel.startP2PServer(navigator) },
+                        labelBottom = "Replay",
+                        onClickBottom = null,
+                        menuViewModel.p2pHostAvaiable,
+                    )
+                }
             }
             Box(modifier = Modifier.fillMaxWidth(0.70f)) {
 

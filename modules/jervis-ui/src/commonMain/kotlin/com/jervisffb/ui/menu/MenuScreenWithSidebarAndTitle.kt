@@ -42,6 +42,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -63,6 +64,7 @@ import com.jervisffb.ui.menu.components.JervisTooltipArea
 import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
+import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Point
@@ -278,7 +280,10 @@ fun SidebarEntry(text: String, state: SideBarEntryState, onClick: (() -> Unit)) 
 }
 
 @Composable
-fun TitleBarWithSidebar(modifier: Modifier, title: String) {
+fun TitleBarWithSidebar(
+    modifier: Modifier, title: String,
+    fontSize: Dp = 52.jdp,
+) {
     val skiaFont = loadJervisFont()
     Canvas(modifier = modifier) {
         val grayscaleShader = createGrayscaleNoiseShader()
@@ -310,11 +315,8 @@ fun TitleBarWithSidebar(modifier: Modifier, title: String) {
         // Calculate how to place the text.
         // It should follow the red line, while skewing the
         // text so it is following the left border.
-        // TODO Need to figure out exactly how to scale the text, so it
-        //  looks "nice" in more situations
-        val scale = 1.0f
-        val fontSize = 80
-        skiaFont.size = (fontSize * scale).sp.toPx()
+        val fontSizePx = fontSize.toPx()
+        skiaFont.size = fontSizePx.sp.toPx()
         val angleRadians = atan((size.height - (size.height * (160f/280f))) / size.width)
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)
