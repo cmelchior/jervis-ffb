@@ -2,6 +2,7 @@ package com.jervisffb
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,49 +68,54 @@ fun main() = runBlocking {
         // When going into fullscreen mode, we want to be able to restore the previous size.
         var sizeBeforeFullscreen by remember { mutableStateOf(windowState.size) }
 
-        Window(
-            onCloseRequest = ::exitApplication,
-            state = windowState,
-            onKeyEvent = { event ->
-                if (event.type == KeyEventType.KeyDown) {
-                    val isFullscreenShortcut = detectFullscreenShortcut(event)
-                    when {
-                        isFullscreenShortcut -> {
-                            if (windowState.placement == WindowPlacement.Fullscreen) {
+        // We need to re-create the Compose and create a new AWT Frame as changing `undecorated` cannot be done once
+        // the frame is visible.
+        val isFullscreen = (windowState.placement == WindowPlacement.Fullscreen)
+        key(isFullscreen) {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = windowState,
+                onKeyEvent = { event ->
+                    if (event.type == KeyEventType.KeyDown) {
+                        val isFullscreenShortcut = detectFullscreenShortcut(event)
+                        when {
+                            isFullscreenShortcut -> {
+                                if (windowState.placement == WindowPlacement.Fullscreen) {
+                                    windowState.placement = WindowPlacement.Floating
+                                    windowState.size = sizeBeforeFullscreen
+                                } else {
+                                    sizeBeforeFullscreen = windowState.size
+                                    windowState.placement = WindowPlacement.Fullscreen
+                                }
+                                true
+                            }
+                            // Also allow Esc to be used to exit fullscreen as that is a natural "oh shit"-button
+                            event.key == Key.Escape && windowState.placement == WindowPlacement.Fullscreen -> {
                                 windowState.placement = WindowPlacement.Floating
                                 windowState.size = sizeBeforeFullscreen
-                            } else {
-                                sizeBeforeFullscreen = windowState.size
-                                windowState.placement = WindowPlacement.Fullscreen
+                                true
                             }
-                            true
+                            event.key == Key.Escape -> {
+                                BackNavigationHandler.execute()
+                                true
+                            }
+                            else -> false
                         }
-                        // Also allow Esc to be used to exit fullscreen as that is a natural "oh shit"-button
-                        event.key == Key.Escape && windowState.placement == WindowPlacement.Fullscreen -> {
-                            windowState.placement = WindowPlacement.Floating
-                            windowState.size = sizeBeforeFullscreen
-                            true
-                        }
-                        event.key == Key.Escape -> {
-                            BackNavigationHandler.execute()
-                            true
-                        }
-                        else -> false
+                    } else {
+                        false
                     }
-                } else {
-                    false
-                }
-            },
-            // On Mac, native fullscreen handles decoration automatically.
-            // On Windows/Linux, we remove decorations manually when entering fullscreen.
-            undecorated = !hasMacKeyboard() && (windowState.placement == WindowPlacement.Fullscreen),
-            title = "Jervis Fantasy Football"
-        ) {
-            // Hide the Window tool bar for now. Ideally, the UI should be work-able across all platforms,
-            // and having a Window Toolbar goes against that goal. However, there might be good reasons for
-            // having one, so do not completely remove it yet.
-            // WindowMenuBar(menuViewModel)
-            App(menuViewModel)
+                },
+                // On Mac, native fullscreen handles decoration automatically.
+                // On Windows/Linux, we remove decorations manually when entering fullscreen.
+                undecorated = !hasMacKeyboard() && isFullscreen,
+                title = "Jervis Fantasy Football"
+            ) {
+                // Hide the Window tool bar for now. Ideally, the UI should be work-able across all platforms,
+                // and having a Window Toolbar goes against that goal. However, there might be good reasons for
+                // having one, so do not completely remove it yet.
+                // WindowMenuBar(menuViewModel)
+                App(menuViewModel)
+            }
         }
     }
 }
