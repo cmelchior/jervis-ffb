@@ -49,7 +49,9 @@ fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true
         contentAlignment = Alignment.BottomEnd,
 
     ) {
-        val fontSize = (maxWidth * 0.1f).value.sp
+        // Same scaling as the frontpage boxes, which is slightly smaller and
+        // uses a 0.1 factor.
+        val fontSize = ((maxWidth.value) * 0.08722f).sp
         Text(
             modifier = Modifier.padding(16.jdp),
             text = label.uppercase(),
@@ -84,10 +86,11 @@ fun RowScope.
     ) {
 
     val spaceBetweenButtons = 32.jdp
-    // Scaling is set to match the font size of the bigger "Hotseat" box.
-    // We should probably calculate this from the difference in width, but
-    // this is a good enough approximation for now.
-    val fontScaleFactor = 0.148f
+    // Same scaling as Frontpage and "Hotseat" box. Adjusted for a slightly
+    // different box size.
+    // We should probably calculate this dynamically from the difference in width,
+    // but this is a good enough approximation for now.
+    val fontScaleFactor = 0.13015f
 
     var hostLabel by remember { mutableStateOf(labelMiddle) }
 
