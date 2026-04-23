@@ -2,7 +2,6 @@ package com.jervisffb.ui.keybinds
 
 import androidx.compose.ui.input.key.Key
 import com.jervisffb.utils.hasMacKeyboard
-import kotlin.collections.get
 
 data class PlatformKeyShortcut(
     val key: Key,
