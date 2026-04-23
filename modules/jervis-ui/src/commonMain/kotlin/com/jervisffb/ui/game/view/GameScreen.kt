@@ -74,7 +74,11 @@ fun GameScreen(
             }
             Column(
                 // Make sure that pitch layers (including the Action Wheel) are placed above the sidebar
-                modifier = Modifier.zIndex(1f).weight(/*782f*/ 2354f).align(Alignment.Top),
+                modifier = Modifier
+                    .zIndex(1f)
+                    .weight(/*782f*/ 2354f)
+                    .align(Alignment.Top)
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Pitch(

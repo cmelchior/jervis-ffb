@@ -1,11 +1,13 @@
 package com.jervisffb
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -19,6 +21,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.ui.App
 import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -58,64 +61,93 @@ fun main() = runBlocking {
         val scale = 1.22f
         val width = 145f + 782f + 145f
         val height = 690f
-        val windowState =
-            rememberWindowState(
-                size = (
-                    DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
-                    + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
+        val defaultWindowSize =
+            (DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) +
+                DpSize(0.dp, pixelsToDp(28f))
+
+        var sizeBeforeFullscreen by remember { mutableStateOf(defaultWindowSize) }
+        var savedScreenStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+
+        @Composable
+        fun AppContent() {
+            App(
+                menuViewModel = menuViewModel,
+                initialScreens = savedScreenStack,
+                onSaveScreenStack = { savedScreenStack = it }
             )
+        }
 
-        // When going into fullscreen mode, we want to be able to restore the previous size.
-        var sizeBeforeFullscreen by remember { mutableStateOf(windowState.size) }
-
-        // We need to re-create the Compose and create a new AWT Frame as changing `undecorated` cannot be done once
-        // the frame is visible.
-        val isFullscreen = (windowState.placement == WindowPlacement.Fullscreen)
-        key(isFullscreen) {
+        if (hasMacKeyboard()) {
+            // On macOS, native fullscreen handles decorations automatically, so there is no
+            // need to recreate the Window. Both the shortcut and the green maximize button
+            // work via windowState.placement, so they are always consistent with each other.
+            val windowState = rememberWindowState(size = defaultWindowSize)
+            LaunchedEffect(windowState) {
+                snapshotFlow { windowState.placement to windowState.size }
+                    .collect { (placement, size) ->
+                        if (placement == WindowPlacement.Floating) {
+                            sizeBeforeFullscreen = size
+                        }
+                    }
+            }
             Window(
                 onCloseRequest = ::exitApplication,
                 state = windowState,
                 onKeyEvent = { event ->
                     if (event.type == KeyEventType.KeyDown) {
-                        val isFullscreenShortcut = detectFullscreenShortcut(event)
                         when {
-                            isFullscreenShortcut -> {
+                            detectFullscreenShortcut(event) -> {
                                 if (windowState.placement == WindowPlacement.Fullscreen) {
                                     windowState.placement = WindowPlacement.Floating
                                     windowState.size = sizeBeforeFullscreen
                                 } else {
-                                    sizeBeforeFullscreen = windowState.size
                                     windowState.placement = WindowPlacement.Fullscreen
                                 }
                                 true
                             }
-                            // Also allow Esc to be used to exit fullscreen as that is a natural "oh shit"-button
-                            // EDIT: Actually, it might be annoying that ESC does different things depending on where
-                            // you press it. So think a bit more about this before enabling it.
-                            //    event.key == Key.Escape && windowState.placement == WindowPlacement.Fullscreen -> {
-                            //        windowState.placement = WindowPlacement.Floating
-                            //        windowState.size = sizeBeforeFullscreen
-                            //        true
-                            //    }
-                            event.key == Key.Escape -> {
-                                BackNavigationHandler.execute()
-                            }
+                            event.key == Key.Escape -> BackNavigationHandler.execute()
                             else -> false
                         }
-                    } else {
-                        false
-                    }
+                    } else false
                 },
-                // On Mac, native fullscreen handles decoration automatically.
-                // On Windows/Linux, we remove decorations manually when entering fullscreen.
-                undecorated = !hasMacKeyboard() && isFullscreen,
                 title = "Jervis Fantasy Football"
             ) {
-                // Hide the Window tool bar for now. Ideally, the UI should be work-able across all platforms,
-                // and having a Window Toolbar goes against that goal. However, there might be good reasons for
-                // having one, so do not completely remove it yet.
-                // WindowMenuBar(menuViewModel)
-                App(menuViewModel)
+                AppContent()
+            }
+        } else {
+            // On Windows/Linux, `undecorated` cannot change on a visible AWT frame, so we must
+            // recreate the Window when toggling fullscreen mode.
+            var isFullscreen by remember { mutableStateOf(false) }
+            key(isFullscreen) {
+                val windowState = rememberWindowState(
+                    placement = if (isFullscreen) WindowPlacement.Fullscreen else WindowPlacement.Floating,
+                    size = sizeBeforeFullscreen
+                )
+                LaunchedEffect(windowState) {
+                    snapshotFlow { windowState.placement to windowState.size }
+                        .collect { (placement, size) ->
+                            if (placement == WindowPlacement.Floating) {
+                                sizeBeforeFullscreen = size
+                            }
+                        }
+                }
+                Window(
+                    onCloseRequest = ::exitApplication,
+                    state = windowState,
+                    onKeyEvent = { event ->
+                        if (event.type == KeyEventType.KeyDown) {
+                            when {
+                                detectFullscreenShortcut(event) -> { isFullscreen = !isFullscreen; true }
+                                event.key == Key.Escape -> BackNavigationHandler.execute()
+                                else -> false
+                            }
+                        } else false
+                    },
+                    undecorated = isFullscreen,
+                    title = "Jervis Fantasy Football"
+                ) {
+                    AppContent()
+                }
             }
         }
     }

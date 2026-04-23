@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.toSize
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervis.generated.resetSettings
@@ -99,16 +103,28 @@ fun rememberWindowSize() {
 }
 
 @Composable
-fun App(menuViewModel: MenuViewModel) {
-    val windowSize = rememberWindowSize()
+fun App(
+    menuViewModel: MenuViewModel,
+    initialScreens: List<Screen>,
+    onSaveScreenStack: ((List<Screen>) -> Unit)
+) {
+    // Tracking Window size changes, so we can notify the rest of the app about them
+    rememberWindowSize()
+    val screens = remember(initialScreens) {
+        initialScreens.takeUnless { it.isEmpty() } ?: listOf(FrontpageScreen(menuViewModel))
+    }
     MyAppTheme {
         Navigator(
-            screen = FrontpageScreen(menuViewModel),
+            screens = screens,
             onBackPressed = {
                 BackNavigationHandler.execute()
                 true
             }
         ) { navigator ->
+            LaunchedEffect(Unit) {
+                snapshotFlow { navigator.items.toList() }
+                    .collect { onSaveScreenStack(it) }
+            }
             DisposableEffect(navigator) {
                 val observer = OnBackPress {
                     // On the Game screen, we intercept this and show the game menu instead
