@@ -93,22 +93,15 @@ fun main() = runBlocking {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = windowState,
-                onKeyEvent = { event ->
-                    if (event.type == KeyEventType.KeyDown) {
-                        when {
-                            detectFullscreenShortcut(event) -> {
-                                if (windowState.placement == WindowPlacement.Fullscreen) {
-                                    windowState.placement = WindowPlacement.Floating
-                                    windowState.size = sizeBeforeFullscreen
-                                } else {
-                                    windowState.placement = WindowPlacement.Fullscreen
-                                }
-                                true
-                            }
-                            event.key == Key.Escape -> BackNavigationHandler.execute()
-                            else -> false
+                onPreviewKeyEvent = { event ->
+                    detectSharedShortcuts(menuViewModel, event, onFullscreenToggle = {
+                        if (windowState.placement == WindowPlacement.Fullscreen) {
+                            windowState.placement = WindowPlacement.Floating
+                            windowState.size = sizeBeforeFullscreen
+                        } else {
+                            windowState.placement = WindowPlacement.Fullscreen
                         }
-                    } else false
+                    })
                 },
                 title = "Jervis Fantasy Football"
             ) {
@@ -134,18 +127,18 @@ fun main() = runBlocking {
                 Window(
                     onCloseRequest = ::exitApplication,
                     state = windowState,
-                    onKeyEvent = { event ->
-                        if (event.type == KeyEventType.KeyDown) {
-                            when {
-                                detectFullscreenShortcut(event) -> { isFullscreen = !isFullscreen; true }
-                                event.key == Key.Escape -> BackNavigationHandler.execute()
-                                else -> false
-                            }
-                        } else false
+                    onPreviewKeyEvent = { event ->
+                        detectSharedShortcuts(menuViewModel, event, onFullscreenToggle = {
+                            isFullscreen = !isFullscreen
+                        })
                     },
                     undecorated = isFullscreen,
                     title = "Jervis Fantasy Football"
                 ) {
+                    // Hide the Window toolbar for now. Ideally, the UI should be work-able across all platforms,
+                    // and having a Window Toolbar goes against that goal. However, there might be good reasons for
+                    // having one, so do not completely remove it yet.
+                    // WindowMenuBar(menuViewModel)
                     AppContent()
                 }
             }
@@ -161,5 +154,23 @@ private fun detectFullscreenShortcut(event: KeyEvent): Boolean {
         true -> event.isCtrlPressed && event.isMetaPressed && event.key == Key.F
         false -> event.key == Key.F11 // Use same shortcut on Linux and Windows
     }
+}
+
+private fun detectUndo(event: KeyEvent): Boolean {
+    return when (hasMacKeyboard()) {
+        true -> event.isMetaPressed && event.key == Key.Z
+        false -> event.isCtrlPressed && event.key == Key.Z
+    }
+}
+
+private fun detectSharedShortcuts(menuViewModel: MenuViewModel, event: KeyEvent, onFullscreenToggle: () -> Unit): Boolean {
+    return if (event.type == KeyEventType.KeyDown) {
+        when {
+            detectUndo(event) -> { menuViewModel.undoAction(); true}
+            detectFullscreenShortcut(event) -> { onFullscreenToggle(); true }
+            event.key == Key.Escape -> BackNavigationHandler.execute()
+            else -> false
+        }
+    } else false
 }
 
