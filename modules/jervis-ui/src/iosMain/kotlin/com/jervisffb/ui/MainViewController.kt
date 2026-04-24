@@ -1,6 +1,11 @@
 package com.jervisffb.ui
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.ComposeUIViewController
+import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.utils.runBlocking
 import kotlinx.cinterop.CPointer
@@ -23,8 +28,13 @@ fun MainViewController(): UIViewController {
             terminateWithUnhandledException(exception)
         }
         handleNSUncaughtException()
+        var savedScreenStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
         val menuViewModel = MenuViewModel()
-        App(menuViewModel)
+        App(
+            menuViewModel = menuViewModel,
+            initialScreens = savedScreenStack,
+            onSaveScreenStack = { savedScreenStack = it }
+        )
     }
 }
 

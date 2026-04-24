@@ -2,8 +2,14 @@
 
 package com.jervisffb
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.ui.App
 import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -39,7 +45,12 @@ suspend fun main() {
         error
     }
     ComposeViewport(document.body!!) {
-        App(menuViewModel)
+        var savedScreenStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+        App(
+            menuViewModel = menuViewModel,
+            initialScreens = savedScreenStack,
+            onSaveScreenStack = { savedScreenStack = it }
+        )
     }
 }
 
