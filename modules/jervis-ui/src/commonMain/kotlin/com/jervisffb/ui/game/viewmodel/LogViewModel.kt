@@ -20,7 +20,7 @@ class LogViewModel(
         val LOG = jervisLogger()
     }
 
-    val showDebugLogs: Boolean = true
+    val showDebugLogs: Boolean = false
     val state = uiState.state
     val controller = uiState.gameController
     val logsCache = mutableListOf<LogEntry>()

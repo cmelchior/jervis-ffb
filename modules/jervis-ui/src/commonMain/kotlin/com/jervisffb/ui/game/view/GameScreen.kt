@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -60,70 +62,93 @@ fun GameScreen(
     ) {
         GameStatusTopBar(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(8.jdp))
-        Row(
-            modifier = Modifier
-                .aspectRatio(aspectRation)
-                // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
-                // is the first thing that intercepts touch events if it overlaps with these sections.
-                .zIndex(1f)
-            ,
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
-                Sidebar(leftDugout, Modifier)
-            }
+        BoxWithConstraints(modifier = Modifier.weight(1f)) {
+            val minBottomHeight = 48.dp
+            val spacerHeight = 24.jdp
+            val maxPitchHeight = maxHeight - minBottomHeight - spacerHeight
             Column(
-                // Make sure that pitch layers (including the Action Wheel) are placed above the sidebar
-                modifier = Modifier
-                    .zIndex(1f)
-                    .weight(/*782f*/ 2354f)
-                    .align(Alignment.Top)
-                ,
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Pitch(
-                    Modifier,
-                    pitch,
-                    borderBrushSize = 3.dp
-                )
-                // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
-            }
-            Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
-                Sidebar(rightDugout, Modifier)
-            }
-        }
-        Spacer(modifier = Modifier.height(24.jdp))
-        Row(modifier = Modifier.padding(horizontal = 24.jdp)) {
-            val backgroundColor by screenModel.logsBackgroundColor.collectAsState(PitchDetails.NICE.logBackground)
-            LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
-            Spacer(modifier = Modifier.width(24.dp))
-            // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
-            Column(modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize()) {
-                if (replayActionsBar != null) {
-                    ReplayCommandBar(replayActionsBar, modifier = Modifier)
-                }
-                if (randomActionsBar != null) {
-                    RandomCommandBar(randomActionsBar, modifier = Modifier)
-                }
-                ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
-            }
-            Spacer(modifier = Modifier.width(24.dp))
-            Column(
-                modifier = Modifier.width(48.dp).fillMaxHeight().background(backgroundColor),
-                verticalArrangement = Arrangement.Bottom,
-            ) {
-                TopbarButton(
-                    icon = Res.drawable.jervis_icon_menu_undo,
-                    contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.UNDO),
-                    onClick = {
-                        screenModel.menuViewModel.undoAction()
+                Row(
+                    modifier = Modifier
+                        .heightIn(max = maxPitchHeight)
+                        .aspectRatio(aspectRation)
+                        // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
+                        // is the first thing that intercepts touch events if it overlaps with these sections.
+                        .zIndex(1f)
+                    ,
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
+                        Sidebar(leftDugout, Modifier)
                     }
-                )
-                TopbarButton(
-                    icon = Res.drawable.jervis_icon_menu_settings,
-                    contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.GAME_MENU),
-                    onClick = onSettingsClick
-                )
+                    Column(
+                        // Make sure that pitch layers (including the Action Wheel) are placed above the sidebar
+                        modifier = Modifier
+                            .zIndex(1f)
+                            .weight(/*782f*/ 2354f)
+                            .align(Alignment.Top)
+                        ,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Pitch(
+                            Modifier,
+                            pitch,
+                            borderBrushSize = 3.dp
+                        )
+                        // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
+                    }
+                    Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
+                        Sidebar(rightDugout, Modifier)
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.jdp))
+                Row(modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 24.jdp)
+                ) {
+                    val backgroundColor by screenModel.logsBackgroundColor.collectAsState(PitchDetails.NICE.logBackground)
+                    LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Column(modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize()) {
+                        if (replayActionsBar != null) {
+                            ReplayCommandBar(replayActionsBar, modifier = Modifier)
+                        }
+                        if (randomActionsBar != null) {
+                            RandomCommandBar(randomActionsBar, modifier = Modifier)
+                        }
+                        ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
+                    }
+                    Spacer(modifier = Modifier.width(24.dp))
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .fillMaxHeight()
+                            .background(backgroundColor)
+                        ,
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        val rowHeight = maxHeight
+                        Column(verticalArrangement = Arrangement.Bottom) {
+                            TopbarButton(
+                                icon = Res.drawable.jervis_icon_menu_undo,
+                                contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.UNDO),
+                                onClick = {
+                                    screenModel.menuViewModel.undoAction()
+                                }
+                            )
+                            if (rowHeight >= 96.dp) {
+                                TopbarButton(
+                                    icon = Res.drawable.jervis_icon_menu_settings,
+                                    contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.GAME_MENU),
+                                    onClick = onSettingsClick
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

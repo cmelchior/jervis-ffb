@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -191,6 +192,7 @@ fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: ()
                 )
             }
         },
+        modifier = Modifier.requiredSize(48.dp),
         delayMillis = 300,
         tooltipPlacement = JervisTooltipPlacement.CursorPoint(offset = DpOffset((-16).dp, 16.dp))
     ) {
@@ -198,7 +200,7 @@ fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: ()
         Image(
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
-                .height(48.dp)
+                .fillMaxSize()
                 .alpha(if (isHovered) 1f else 0.8f)
                 .clickable { onClick() }
                 .onPointerEvent(PointerEventType.Enter) { isHovered = true }
