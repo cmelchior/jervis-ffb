@@ -15,6 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.icons.IconFactory
@@ -24,6 +25,7 @@ import com.jervisffb.ui.game.view.ContextPopupMenu
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.UiPathFinderData
+import com.jervisffb.ui.utils.jsp
 
 /**
  * Layer 4: Pitch Actions and Underlays:
@@ -67,6 +69,7 @@ private fun SquareHighlightAndAction(
     square: UiPitchSquare,
     player: UiPitchPlayer? = null,
     pathfinderData: UiPathFinderData?,
+    fontSize: TextUnit = 16.jsp // Size of PathFinder and "Moves Used" indicators
 ) {
     val sharedPitchData = vm.sharedPitchData
     val isActionWheelVisible by sharedPitchData.isActionWheelVisible
@@ -153,6 +156,7 @@ private fun SquareHighlightAndAction(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = moveValue,
+                    fontSize = fontSize,
                     style = JervisTheme.pitchSquareTextStyle.copy(
                         color = Color.White.copy(0.75f)
                     ),
@@ -162,6 +166,7 @@ private fun SquareHighlightAndAction(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = square.moveUsed.toString(),
+                    fontSize = fontSize,
                     style = JervisTheme.pitchSquareTextStyle.copy(
                         color = Color.Cyan.copy(0.75f)
                     )
