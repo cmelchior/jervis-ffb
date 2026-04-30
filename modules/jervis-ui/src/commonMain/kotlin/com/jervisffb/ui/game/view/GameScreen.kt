@@ -358,6 +358,7 @@ private fun ExpandableActionPanel(
 //        ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
 //    }
 
+    val expansionEnabled = collapsedHeight < expandedHeight
     val inputs: List<GameAction> by remember(actions.availableActions) { actions.availableActions }.collectAsState(emptyList())
     var hovered by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -386,7 +387,7 @@ private fun ExpandableActionPanel(
             .height(animatedHeight)
             .background(if (hovered) background.hoverColor else background.color)
             .onPointerEvent(PointerEventType.Enter) {
-                if (inputs.isNotEmpty()) {
+                if (inputs.isNotEmpty() && expansionEnabled) {
                     hovered = true
                 }
             }
@@ -401,23 +402,25 @@ private fun ExpandableActionPanel(
                 actions.actionSelected(action)
             }
         }
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .width(48.dp)
-                .fillMaxHeight()
-            ,
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            if (inputs.isNotEmpty()) {
-                Text(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
-                    fontFamily = JervisTheme.extendedDefaultFontFamily(),
-                    text = if (hovered) "▼" else "▲",
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
+        if (inputs.isNotEmpty() && expansionEnabled) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .width(48.dp)
+                    .fillMaxHeight()
+                ,
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                if (inputs.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                        fontFamily = JervisTheme.extendedDefaultFontFamily(),
+                        text = if (hovered) "▼" else "▲",
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }
