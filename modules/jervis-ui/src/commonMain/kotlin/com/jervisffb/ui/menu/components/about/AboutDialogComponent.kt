@@ -244,7 +244,7 @@ private fun ColumnScope.CreditDialogContent(
         Row {
             CreditLabel(
                 "Material Design Icons",
-                "Several icons used in the UI come from the Material Design Icons: Arrows, Back, Copy, Folder, Settings, Undo.",
+                "Several icons used in the UI come from the Material Design Icons: Arrows, Back, Copy, Folder, Settings, Undo, Open Lock, Closed Lock.",
                 textColor
             )
             Spacer(modifier = Modifier.width(columnSpace))

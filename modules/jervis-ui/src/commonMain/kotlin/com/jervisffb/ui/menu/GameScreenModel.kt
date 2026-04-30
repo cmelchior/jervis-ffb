@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.Density
@@ -40,6 +39,7 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.pitch.PitchSizeData
 import com.jervisffb.ui.game.view.pitch.PointerEventBus
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.PanelBackground
 import com.jervisffb.ui.game.viewmodel.PitchDetails
 import com.jervisffb.ui.game.viewmodel.PitchViewData
 import kotlinx.coroutines.channels.BufferOverflow
@@ -243,11 +243,14 @@ class GameScreenModel(
         playerStatCardDismissed.value = true
     }
 
-    val logsBackgroundColor: Flow<Color> = combine(
+    val logsBackgroundColor: Flow<PanelBackground> = combine(
         pitchBackground,
         SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_USE_PITCH_WEATHER_AS_GAME_BACKGROUND_VALUE, false)
     ) { field, useFieldBackground ->
-        if (useFieldBackground) field.logBackground else PitchDetails.NICE.logBackground
+        when (useFieldBackground) {
+            true -> field.panelBackground
+            false -> PitchDetails.NICE.panelBackground
+        }
     }
 
     val selectedPlayersInUi = mutableListOf<PlayerId>()

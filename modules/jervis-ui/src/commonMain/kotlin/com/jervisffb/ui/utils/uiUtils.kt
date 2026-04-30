@@ -48,7 +48,7 @@ import kotlin.math.min
  */
 fun Modifier.applyIf(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier {
     return if (condition) {
-        this.then(modifier(this))
+        modifier()
     } else {
         this
     }

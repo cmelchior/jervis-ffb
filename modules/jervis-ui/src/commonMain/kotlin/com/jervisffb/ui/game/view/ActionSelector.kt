@@ -1,16 +1,15 @@
 package com.jervisffb.ui.game.view
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -48,27 +47,27 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 
 @Composable
 fun ActionSelector(
-    vm: ActionSelectorViewModel,
+    actions: List<GameAction>,
     modifier: Modifier,
+    scrollState: ScrollState,
+    onActionSelected: (GameAction) -> Unit,
 ) {
-    val inputs: List<GameAction> by vm.availableActions.collectAsState(emptyList())
     Column(modifier = modifier.padding(8.dp)) {
         Column(
             modifier =
                 modifier
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            inputs.forEach { action ->
+            actions.forEach { action ->
                 Button(
                     modifier = Modifier.padding(0.dp),
                     shape = RoundedCornerShape(2.dp),
-                    onClick = { vm.actionSelected(action) },
+                    onClick = { onActionSelected(action) },
                 ) {
                     val text =
                         when (action) {

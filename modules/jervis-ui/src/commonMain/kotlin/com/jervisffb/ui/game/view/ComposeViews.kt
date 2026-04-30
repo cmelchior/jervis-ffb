@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.view
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,10 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
@@ -41,6 +44,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Player
 import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
@@ -56,6 +60,7 @@ import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun SectionDivider(modifier: Modifier) {
@@ -188,6 +193,7 @@ fun Dialogs(vm: DialogsViewModel) {
 fun LogViewer(
     vm: LogViewModel,
     modifier: Modifier,
+    listState: LazyListState
 ) {
     var tabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Game", "Debug")
@@ -205,7 +211,7 @@ fun LogViewer(
 
                 // Always show the content for the selected tab
                 when (tabIndex) {
-                    0 -> GameLog(vm)
+                    0 -> GameLog(vm, listState)
                     1 -> DebugLog(vm)
                 }
 
@@ -233,22 +239,25 @@ fun LogViewer(
                 }
             }
         } else {
-            GameLog(vm)
+            GameLog(vm, listState)
         }
     }
 }
 
 @Composable
-fun GameLog(vm: LogViewModel) {
-    val listData by vm.logs.collectAsState(initial = emptyList())
-    val listState = rememberLazyListState()
+fun GameLog(vm: LogViewModel, listState: LazyListState) {
+    val listData by remember(vm.logs) { vm.logs.map { it.asReversed() } }.collectAsState(initial = emptyList())
     LaunchedEffect(listData) {
-        if (listData.isNotEmpty()) {
-            listState.scrollToItem(listData.size - 1)
-        }
+        listState.scrollToItem(0)
     }
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .animateContentSize(
+                alignment = Alignment.BottomCenter,
+            )
+        ,
+        reverseLayout = true,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState
@@ -257,6 +266,7 @@ fun GameLog(vm: LogViewModel) {
             Text(
                 color = Color.White,
                 text = it.message,
+                fontSize = 14.sp,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
             )
         }
@@ -269,7 +279,7 @@ fun DebugLog(vm: LogViewModel) {
     val listState = rememberLazyListState()
     LaunchedEffect(listData) {
         if (listData.isNotEmpty()) {
-            listState.scrollToItem(listData.size - 1)
+            listState.scrollToItem(listData.lastIndex)
         }
     }
     LazyColumn(
