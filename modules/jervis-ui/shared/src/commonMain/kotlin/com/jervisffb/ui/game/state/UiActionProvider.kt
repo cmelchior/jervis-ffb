@@ -8,7 +8,6 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.utils.singleThreadDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,16 +33,10 @@ abstract class UiActionProviderGroup: UiActionProvider() {
  * the UI.
  */
 abstract class UiActionProvider {
-    val errorHandler = CoroutineExceptionHandler { _, exception ->
-        // TODO This doesn't seem to work?
-        exception.printStackTrace()
-    }
-
     // Must be single threaded so we can guarantee the order of events in it.
     protected val actionScope = CoroutineScope(
         CoroutineName("ActionSelectorScope")
             + singleThreadDispatcher("ActionScope@${this::hashCode}")
-            + errorHandler
     )
 
     // Used to communicate internally in the ActionProvider. Needed so we can decouple the lifecycle of things.

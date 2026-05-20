@@ -25,6 +25,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:jervis-engine"))
+                api(libs.jsonserialization)
             }
         }
     }

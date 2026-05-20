@@ -81,10 +81,12 @@ kotlin {
             dependsOn(commonMain)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
-            dependencies {
-            }
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
 }
 
 // ----
