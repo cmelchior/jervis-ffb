@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -54,7 +55,7 @@ fun mainBackground() =
 fun GrayscaleNoise(modifier: Modifier = Modifier) {
 
     // Create Noise
-    val shader = Shader.makeFractalNoise(
+    val shader = org.jetbrains.skia.Shader.makeFractalNoise(
         baseFrequencyX = 0.1f, // Adjust for desired texture
         baseFrequencyY = 0.1f,
         numOctaves = 5,
@@ -82,7 +83,7 @@ fun GrayscaleNoise(modifier: Modifier = Modifier) {
         // Add Noise
         drawRect(
             size = size,
-            brush = ShaderBrush(grayscaleShader),
+            brush = ShaderBrush(grayscaleShader.asComposeShader()),
             alpha = 0.3f,
         )
         // Re-add background color to make the noise blend more into the background
@@ -156,7 +157,7 @@ fun NoiseBackgroundExample() {
         )
         compositeShaderBuilder.uniform("radius", 20.0f * density)
         compositeShaderBuilder.child(
-            "noise", Shader.makeFractalNoise(
+            "noise", org.jetbrains.skia.Shader.makeFractalNoise(
                 baseFrequencyX = 0.45f,
                 baseFrequencyY = 0.45f,
                 numOctaves = 4,

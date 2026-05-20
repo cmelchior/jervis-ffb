@@ -24,7 +24,9 @@ import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.skiaShader
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -286,11 +288,11 @@ fun PlayerImage(
 
                 // Feed data to the Shader
                 val shader = RuntimeShaderBuilder(runtimeEffect).apply {
-                    child("image", imageShader)
+                    child("image", imageShader.skiaShader)
                     uniform("resolution", size.width, size.height)
                     uniform("scaleFactor", scaleX, scaleY)
                 }.makeShader()
-                val shaderBrush = ShaderBrush(shader)
+                val shaderBrush = ShaderBrush(shader.asComposeShader())
 
                 // Draw the "glow" behind the real player image
                 onDrawBehind {

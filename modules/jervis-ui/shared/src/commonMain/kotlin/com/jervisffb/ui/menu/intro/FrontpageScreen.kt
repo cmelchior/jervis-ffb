@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.skiaCanvas
+import androidx.compose.ui.graphics.skiaPaint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.SpanStyle
@@ -348,7 +350,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
             color = JervisTheme.rulebookOrange
             isAntiAlias = true
         }
-        val nativePaint = paint.asFrameworkPaint()
+        val nativePaint = paint.skiaPaint
 
         // Calculate how to place the text.
         // It should follow the red line, while skewing the
@@ -365,7 +367,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         val padding = 32.jdp.toPx()
         val lineHeight = skiaFont.size * 1.3f
 
-        drawContext.canvas.nativeCanvas.apply {
+        drawContext.canvas.skiaCanvas.apply {
             save()
             translate(0f, size.height)
             rotate(-angleDegrees)
@@ -382,7 +384,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
 fun createGrayscaleNoiseShader(): Shader {
 
     // Create Noise
-    val shader = Shader.makeFractalNoise(
+    val shader = org.jetbrains.skia.Shader.makeFractalNoise(
         baseFrequencyX = 0.1f, // Adjust for desired texture
         baseFrequencyY = 0.1f,
         numOctaves = 5,
@@ -402,7 +404,7 @@ fun createGrayscaleNoiseShader(): Shader {
                 0f, 0f, 0f, 1f, 0f                      // Alpha unchanged
             )
         )
-    )
+    ).asComposeShader()
 }
 
 fun DrawScope.drawPaperBackground(size: Size) {

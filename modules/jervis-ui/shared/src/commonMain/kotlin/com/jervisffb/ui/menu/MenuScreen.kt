@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.asComposeShader
 import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -20,7 +21,7 @@ import org.jetbrains.skia.ISize
 fun PaperBackground(modifier: Modifier = Modifier) {
 
     // Create Noise
-    val shader = Shader.makeFractalNoise(
+    val shader = org.jetbrains.skia.Shader.makeFractalNoise(
         baseFrequencyX = 0.1f, // Adjust for desired texture
         baseFrequencyY = 0.1f,
         numOctaves = 5,
@@ -48,7 +49,7 @@ fun PaperBackground(modifier: Modifier = Modifier) {
         // Add Noise
         drawRect(
             size = size,
-            brush = ShaderBrush(grayscaleShader),
+            brush = ShaderBrush(grayscaleShader.asComposeShader()),
             alpha = 0.3f,
         )
         // Re-add background color to make the noise blend more into the background

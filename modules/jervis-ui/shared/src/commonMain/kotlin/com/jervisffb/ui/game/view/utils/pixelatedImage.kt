@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.skiaCanvas
 import androidx.compose.ui.platform.LocalDensity
 import com.jervisffb.ui.utils.toImageBitmap
 import org.jetbrains.skia.Paint
@@ -83,7 +83,7 @@ fun PixelatedImage(
                 val paint = Paint().apply {
                     this.shader = shader
                 }
-                canvas.nativeCanvas.drawRect(Rect.makeXYWH(0f, 0f, widthPx, heightPx), paint)
+                canvas.skiaCanvas.drawRect(Rect.makeXYWH(0f, 0f, widthPx, heightPx), paint)
             }
         }
     }

@@ -45,7 +45,6 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.fail
 import kotlin.time.Clock
-import kotlin.time.Instant
 
 /**
  * This class can be used to fuzz-test the rule engine by running a lot of

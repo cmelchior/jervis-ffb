@@ -43,7 +43,7 @@ object KeyBindings {
         // Special Keys
         Key.Escape to "Esc", Key.Enter to "Enter", Key.Spacebar to "Space",
         Key.Tab to "Tab", Key.Backspace to "Backspace", Key.Delete to "Delete",
-        Key.Insert to "Insert", Key.Home to "Home", Key.MoveEnd to "End",
+        Key.Insert to "Insert", Key.MoveHome to "Home", Key.MoveEnd to "End",
         Key.PageUp to "Page Up", Key.PageDown to "Page Down",
 
         // Modifier Keys

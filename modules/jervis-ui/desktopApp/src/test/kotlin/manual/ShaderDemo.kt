@@ -16,9 +16,11 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.skiaShader
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
@@ -152,11 +154,11 @@ half4 main(vec2 fragCoord) {
                 val scale = min(scaleX, scaleY) // Maintain aspect ratio
 
                 val shader = RuntimeShaderBuilder(runtimeEffect).apply {
-                    child("image", imageShader)
+                    child("image", imageShader.skiaShader)
                     uniform("resolution", size.width / 2.0f, size.height / 2.0f)
                     uniform("scaleFactor", scaleX, scaleY)
                 }.makeShader()
-                val brush = ShaderBrush(shader)
+                val brush = ShaderBrush(shader.asComposeShader())
 
                 // Apply transformation
                 onDrawBehind {
