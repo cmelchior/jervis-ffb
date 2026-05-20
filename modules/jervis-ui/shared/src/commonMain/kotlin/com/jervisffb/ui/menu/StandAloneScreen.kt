@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -38,10 +39,12 @@ import com.jervisffb.ui.menu.p2p.client.P2PClientScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreen
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
 import com.jervisffb.ui.utils.jdp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.imageResource
+import kotlin.time.Duration.Companion.milliseconds
 
 class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
@@ -80,6 +83,12 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, viewModel: Stan
 fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val viewModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
+
+    LaunchedEffect(Unit) {
+        delay(100.milliseconds)
+        viewModel.startHotSeatGame(navigator)
+    }
+
     MenuScreenWithTitle(
         menuViewModel,
         title = "Standalone Games",

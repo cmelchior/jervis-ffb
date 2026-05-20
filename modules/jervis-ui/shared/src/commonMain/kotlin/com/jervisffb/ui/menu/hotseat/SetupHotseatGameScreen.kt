@@ -6,15 +6,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponent
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SetupHotseatGamePage(viewModel: SetupHotseatGameScreenModel, modifier: Modifier) {
+
+    LaunchedEffect(Unit) {
+        delay(100.milliseconds)
+        viewModel.gameSetupDone()
+    }
+
     val isSetupValid: Boolean by viewModel.gameConfigModel.isSetupValid.collectAsState(false)
     Column(
         modifier = modifier.fillMaxSize(),

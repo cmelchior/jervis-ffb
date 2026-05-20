@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreen
 import com.jervisffb.ui.menu.TopbarButton
 import com.jervisffb.ui.utils.jdp
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -77,6 +79,7 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.tan
+import kotlin.time.Duration.Companion.milliseconds
 import org.jetbrains.skia.Font as SkiaFont
 
 /**
@@ -227,6 +230,12 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
 
 @Composable
 private fun ColumnScope.FrontpageMenu(viewModel: FrontpageScreenModel, navigator: Navigator) {
+
+    LaunchedEffect(Unit) {
+        delay(100.milliseconds)
+        viewModel.gotoStandAloneScreen(navigator)
+    }
+
     Column(modifier = Modifier.fillMaxSize().aspectRatio(1f)) {
         Row(modifier = Modifier.weight(17/36f).fillMaxSize()) {
             // Top Left Corner

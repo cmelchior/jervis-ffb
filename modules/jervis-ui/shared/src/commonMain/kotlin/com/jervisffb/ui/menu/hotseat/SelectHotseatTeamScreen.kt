@@ -14,6 +14,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,12 +26,21 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SelectHotseatTeamScreen(
     viewModel: SelectHotseatTeamScreenModel,
 ) {
+
+    LaunchedEffect(Unit) {
+        delay(1.seconds) // Must be higher than delay in SelectTeamComponent
+        viewModel.teamSelectionDone()
+    }
+
     val isValidTeamSelection by viewModel.isValidTeamSelection.collectAsState(false)
     Column(
         modifier = Modifier.fillMaxSize(),
