@@ -142,7 +142,7 @@ object JervisSerialization {
             val serializedAwayTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.awayTeam)
             val awayTeam = SerializedTeam.deserialize(rules, serializedAwayTeam, unknownCoach)
             val state = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
-            val controller = GameEngineController(state, fileData.game.actions)
+            val controller = GameEngineController(state, fileData.game.actions, validateActions = false)
             val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
             return Result.success(gameData)
         } catch (ex: Exception) {

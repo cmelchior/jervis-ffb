@@ -160,7 +160,8 @@ object SetupTeam : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<SetupTeamContext>()
             val team = context.team
-            return when (rules.isSetupValid(state, team).isEmpty()) {
+            val valid = rules.allowPlayerEditsDuringGame || rules.isSetupValid(state, team).isEmpty()
+            return when (valid) {
                 true -> {
                     // If a player with Secret Weapon is on the pitch, we need to track it.
                     val trackSecretWeaponCommands = team
