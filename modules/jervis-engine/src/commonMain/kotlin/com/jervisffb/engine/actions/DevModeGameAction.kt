@@ -1,10 +1,17 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.BallId
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerKeyword
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.locations.DogOut
+import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.StatModifier
 import kotlinx.serialization.Serializable
 
@@ -58,4 +65,43 @@ data class RemovePlayerKeyword(
     val keyword: PlayerKeyword
 ): DevModeGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
+}
+
+@Serializable
+data class SetPlayerState(
+    val playerId: PlayerId,
+    val state: PlayerState,
+    val x: Int,
+    val y: Int,
+) : DevModeGameAction {
+    fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
+    fun coordinate(): PitchCoordinate = PitchCoordinate(x, y)
+    fun targetLocation(): Location {
+        val isDogOutState = state in setOf(
+            PlayerState.RESERVE,
+            PlayerState.KNOCKED_OUT,
+            PlayerState.BADLY_HURT,
+            PlayerState.LASTING_INJURY,
+            PlayerState.SERIOUSLY_HURT,
+            PlayerState.SERIOUS_INJURY,
+            PlayerState.DEAD,
+            PlayerState.FAINTED,
+            PlayerState.BANNED,
+            PlayerState.DODGY_SNACK,
+        )
+        return if (isDogOutState) DogOut else coordinate()
+    }
+}
+
+@Serializable
+data class SetBallState(
+    val ballId: BallId,
+    val x: Int,
+    val y: Int,
+    val ballState: BallState? = null,
+    val carriedBy: PlayerId? = null,
+) : DevModeGameAction {
+    fun getBall(state: Game): Ball = state.balls.first { it.id == ballId }
+    fun getPlayer(state: Game): Player? = carriedBy?.let { state.getPlayerById(it) }
+    fun coordinate(): PitchCoordinate = PitchCoordinate(x, y)
 }
