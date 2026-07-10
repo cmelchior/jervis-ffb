@@ -1,5 +1,6 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -41,7 +42,7 @@ val AMAZON_LINEMAN =
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_triballinewoman.png",9),
         SingleSprite.ini("${portraitRootPath}/amazon_triballinewoman.png")
@@ -65,7 +66,7 @@ val AMAZON_THROWER =
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_eaglewarriorthrower.png",2),
         SingleSprite.ini("${portraitRootPath}/amazon_eaglewarriorthrower.png")
@@ -78,7 +79,7 @@ val AMAZON_BLITZER =
         "Piranha Warrior Blitzer",
         "B",
         90_000,
-        7, 3, 3, 5, 8,
+        7, 3, 3, 4, 8,
         listOf(
             DODGE.id(),
             HIT_AND_RUN.id(),
@@ -87,7 +88,7 @@ val AMAZON_BLITZER =
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_piranhawarriorblitzer.png", 2),
         SingleSprite.ini("${portraitRootPath}/amazon_piranhawarriorblitzer.png")
@@ -100,7 +101,7 @@ val AMAZON_BLOCKER =
         "Jaguar Warrior Blocker",
         "Bl",
         110_000,
-        6, 4, 3, 5, 9,
+        6, 4, 3, 4, 9,
         listOf(
             DEFENSIVE.id(),
             DODGE.id(),
@@ -108,7 +109,7 @@ val AMAZON_BLOCKER =
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.BLOCKER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/amazon_jaguarwarriorblocker.png", 2),
         SingleSprite.ini("${portraitRootPath}/amazon_jaguarwarriorblocker.png")
