@@ -8,12 +8,29 @@ import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
+import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
 import com.jervisffb.engine.rules.common.skills.SkillCategory.DEVIOUS
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.common.skills.SkillType.BREAK_TACKLE
+import com.jervisffb.engine.rules.common.skills.SkillType.DAUNTLESS
+import com.jervisffb.engine.rules.common.skills.SkillType.DEFENSIVE
+import com.jervisffb.engine.rules.common.skills.SkillType.DIRTY_PLAYER
+import com.jervisffb.engine.rules.common.skills.SkillType.DIVING_TACKLE
+import com.jervisffb.engine.rules.common.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.common.skills.SkillType.HATRED
+import com.jervisffb.engine.rules.common.skills.SkillType.JUGGERNAUT
+import com.jervisffb.engine.rules.common.skills.SkillType.LONER
+import com.jervisffb.engine.rules.common.skills.SkillType.MIGHTY_BLOW
+import com.jervisffb.engine.rules.common.skills.SkillType.NO_BALL
+import com.jervisffb.engine.rules.common.skills.SkillType.SECRET_WEAPON
+import com.jervisffb.engine.rules.common.skills.SkillType.SPRINT
+import com.jervisffb.engine.rules.common.skills.SkillType.STAND_FIRM
+import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
+import com.jervisffb.engine.rules.common.skills.SkillType.TACKLE
+import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -33,9 +50,13 @@ val DWARF_LINEMAN =
         "L",
         70_000,
         4, 3, 4, 5, 10,
-        listOf(BLOCK.id(), SkillType.THICK_SKULL.id()),
+        listOf(
+            BLOCK.id(),
+            DEFENSIVE.id(),
+            THICK_SKULL.id()
+        ),
         listOf(DEVIOUS, GENERAL),
-        emptyList(),
+        listOf(STRENGTH),
         emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
@@ -45,7 +66,7 @@ val DWARF_LINEMAN =
 
 val DWARF_RUNNER =
     RosterPosition(
-        PositionId("dwarf-lineman"),
+        PositionId("dwarf-runner"),
         2,
         "Dwarf Runner",
         "Dwarf Runner",
@@ -53,12 +74,12 @@ val DWARF_RUNNER =
         80_000,
         6, 3, 3, 4, 9,
         listOf(
-            SkillType.SPRINT.id(),
-            SkillType.SURE_HANDS.id(),
-            SkillType.THICK_SKULL.id()
+            SPRINT.id(),
+            SURE_HANDS.id(),
+            THICK_SKULL.id()
         ),
         listOf(GENERAL, PASSING),
-        listOf(STRENGTH),
+        listOf(STRENGTH, AGILITY),
         emptyList(),
         listOf(PlayerKeyword.DWARF, PlayerKeyword.RUNNER),
         PlayerSize.STANDARD,
@@ -76,10 +97,10 @@ val DWARF_BLITZER =
         100_000,
         5, 3, 4, 4, 10,
         listOf(
-            SkillType.BLOCK.id(),
-            SkillType.DIVING_TACKLE.id(),
-            SkillType.TACKLE.id(),
-            SkillType.THICK_SKULL.id()
+            BLOCK.id(),
+            DIVING_TACKLE.id(),
+            TACKLE.id(),
+            THICK_SKULL.id()
         ),
         listOf(GENERAL, STRENGTH),
         listOf(PASSING),
@@ -93,18 +114,18 @@ val DWARF_BLITZER =
 val TROLL_SLAYER =
     RosterPosition(
         PositionId("dwarf-slayer"),
-        16,
+        2,
         "Troll Slayer",
         "Troll Slayer",
         "Ts",
         95_000,
         5, 3, 4, 5, 9,
         listOf(
-            SkillType.BLOCK.id(),
-            SkillType.DAUNTLESS.id(),
-            SkillType.FRENZY.id(),
-            SkillType.HATRED.id(PlayerKeyword.TROLL),
-            SkillType.THICK_SKULL.id()
+            BLOCK.id(),
+            DAUNTLESS.id(),
+            FRENZY.id(),
+            HATRED.id(PlayerKeyword.TROLL),
+            THICK_SKULL.id()
         ),
         listOf(GENERAL, STRENGTH),
         listOf(DEVIOUS),
@@ -119,20 +140,20 @@ val DEATHROLLER =
     RosterPosition(
         PositionId("dwarf-deathroller"),
         1,
-        "Death Roller",
-        "Death Roller",
+        "Deathroller",
+        "Deathroller",
         "D",
         170_000,
         5, 7, 5, null, 11,
         listOf(
-            SkillType.BREAK_TACKLE.id(),
-            SkillType.DIRTY_PLAYER.id(),
-            SkillType.JUGGERNAUT.id(),
-            SkillType.LONER.id(4),
-            SkillType.MIGHTY_BLOW.id(),
-            SkillType.NO_BALL.id(),
-            SkillType.SECRET_WEAPON.id(),
-            SkillType.STAND_FIRM.id(),
+            BREAK_TACKLE.id(),
+            DIRTY_PLAYER.id(),
+            JUGGERNAUT.id(),
+            LONER.id(4),
+            MIGHTY_BLOW.id(),
+            NO_BALL.id(),
+            SECRET_WEAPON.id(),
+            STAND_FIRM.id(),
         ),
         listOf(DEVIOUS, STRENGTH),
         listOf(GENERAL),
@@ -147,7 +168,7 @@ val DEATHROLLER =
 val DWARF_TEAM_BB2025 = Roster(
     id = RosterId("jervis-dwarf"),
     name = "Dwarf",
-    tier = 1,
+    tier = 2,
     numberOfRerolls = 8,
     rerollCost = 60_000,
     allowApothecary = true,
