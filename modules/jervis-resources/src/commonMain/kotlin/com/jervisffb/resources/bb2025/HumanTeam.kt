@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
+import com.jervisffb.engine.rules.common.skills.SkillCategory.DEVIOUS
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
@@ -22,6 +23,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.rules.common.skills.SkillType.RIGHT_STUFF
 import com.jervisffb.engine.rules.common.skills.SkillType.STUNTY
 import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
+import com.jervisffb.engine.rules.common.skills.SkillType.TACKLE
 import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
 import com.jervisffb.engine.serialize.RosterLogo
@@ -44,7 +46,7 @@ val HUMAN_LINEMAN =
         6, 3, 3, 4, 9,
         emptyList(),
         listOf(GENERAL),
-        listOf(AGILITY, STRENGTH),
+        listOf(AGILITY, STRENGTH, DEVIOUS),
         emptyList(),
         listOf(PlayerKeyword.HUMAN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
@@ -59,14 +61,11 @@ val HUMAN_THROWER =
         "Throwers",
         "Thrower",
         "T",
-        80_000,
-        6, 3, 3, 2, 9,
-        listOf(
-            PASS.id(),
-            SURE_HANDS.id()
-        ),
+        75_000,
+        6, 3, 3, 3, 9,
+        listOf(PASS.id(), SURE_HANDS.id()),
         listOf(GENERAL, PASSING),
-        listOf(AGILITY, STRENGTH),
+        listOf(AGILITY, STRENGTH, DEVIOUS),
         emptyList(),
         listOf(PlayerKeyword.HUMAN, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
@@ -76,18 +75,15 @@ val HUMAN_THROWER =
 val HUMAN_CATCHER =
     RosterPosition(
         PositionId("human-catcher"),
-        4,
+        2,
         "Catchers",
         "Catcher",
         "C",
-        65_000,
-        8, 2, 3, 5, 8,
-        listOf(
-            CATCH.id(),
-            DODGE.id()
-        ),
+        75_000,
+        8, 3, 3, 4, 8,
+        listOf(CATCH.id(), DODGE.id()),
         listOf(AGILITY, GENERAL),
-        listOf(STRENGTH, PASSING),
+        listOf(STRENGTH, PASSING, DEVIOUS),
         emptyList(),
         listOf(PlayerKeyword.HUMAN, PlayerKeyword.CATCHER),
         PlayerSize.STANDARD,
@@ -97,15 +93,15 @@ val HUMAN_CATCHER =
 val HUMAN_BLITZER =
     RosterPosition(
         PositionId("human-blitzer"),
-        4,
+        2,
         "Blitzers",
         "Blitzer",
         "B",
         85_000,
         7, 3, 3, 4, 9,
-        listOf(BLOCK.id()),
+        listOf(BLOCK.id(), TACKLE.id()),
         listOf(GENERAL, STRENGTH),
-        listOf(AGILITY, PASSING),
+        listOf(AGILITY, DEVIOUS),
         emptyList(),
         listOf(PlayerKeyword.HUMAN, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
@@ -121,13 +117,9 @@ val HALFLING_HOPEFUL =
         "H",
         30_000,
         5, 2, 3, 4, 7,
-        listOf(
-            DODGE.id(),
-            RIGHT_STUFF.id(),
-            STUNTY.id()
-        ),
+        listOf(DODGE.id(), RIGHT_STUFF.id(), STUNTY.id()),
         listOf(AGILITY),
-        listOf(GENERAL, STRENGTH),
+        listOf(GENERAL, STRENGTH, DEVIOUS),
         emptyList(),
         listOf(PlayerKeyword.HALFLING, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
@@ -145,7 +137,7 @@ val OGRE =
         5, 5, 4, 5, 10,
         listOf(
             BONE_HEAD.id(),
-            LONER.idTarget(4),
+            LONER.idTarget(3),
             MIGHTY_BLOW.idAdjustment(1),
             THICK_SKULL.id(),
             THROW_TEAMMATE.id()
@@ -162,7 +154,7 @@ val OGRE =
 val HUMAN_TEAM_BB2025 = Roster(
     id = RosterId("jervis-human"),
     name = "Human Team",
-    tier = 1,
+    tier = 2,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
