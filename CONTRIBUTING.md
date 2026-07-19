@@ -1,14 +1,9 @@
 # Contributing to Jervis FFB
-This document covers how to build, test and run the various parts of the Jervis 
+This document covers how to build, test, and run the various parts of the Jervis 
 project.
 
 For a more in-depth technical and architectural background, see the documents
-under [`docs/](docs/)
-see [`README.md`](README.md) and the 
-deeper design
-notes under [`docs/`](docs/). Coding agents should also read
-[`AGENTS.md`](AGENTS.md) for engine and rule-authoring conventions.
-
+under [`docs/`](docs/). 
 
 ## Requirements
 Development requirements are:
@@ -18,7 +13,7 @@ Development requirements are:
 - The project has been developed in IntelliJ IDEA, while optional, it will
   provide a better experience.
 
-Note, this has only been tested on Mac and Windows. Linux has not been 
+Note: this has only been tested on Mac and Windows. Linux has not been 
 tested thoroughly, but _should_ work.
 
 Some code for handling game settings is generated as part of the build process,
@@ -187,11 +182,11 @@ file is very much a work-in-progress and currently provides little guidance.
 
 Some notes when using these:
 - AI Agents do not fully grasp the often conflicting rules and will make 
-  errors when implementing these. Do not expect them to one-shoot any Procedures
+  errors when implementing these. Do not expect them to one-shot any Procedures
   and associated tests. You will end up overspecifying things to a degree where
   it is faster to implement them manually.
 - AI Agents are fairly capable when working with Compose, and with some 
-  guidance they can speed up building UI elements. But beware of the difference
+  guidance, they can speed up building UI elements. But beware of the difference
   between Jetpack Compose and Compose Multiplatform. There are subtle 
   differences, and AI will make mistakes here, especially on more niche 
   framework features.
@@ -203,7 +198,7 @@ Before creating a PR against Jervis, run through the following steps:
 2. `./gradlew jvmTest`
 3. If you touched both `engine/rules/bb2020/` and `engine/rules/bb2025/`, verify
    the change is mirrored consistently across both rulesets.
-4. All changes that add to or change the the rules implementation should have 
+4. All changes that add to or change the rules implementation should have 
    associated unit tests in `modules/jervis-engine/src/commonTest/` 
 5. Do not commit generated files under `build/` or resource copies produced by
    `updateFFBResources` unless updating those resources is the point of the PR.
