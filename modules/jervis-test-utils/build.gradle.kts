@@ -24,7 +24,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:jervis-engine"))
+                api(kotlin("test"))
+                implementation(project(":modules:jervis-engine:package"))
             }
         }
     }

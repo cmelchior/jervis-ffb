@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.jervisffb.engine.serialize.FILE_EXTENSION_SETUP_FILE
 import com.jervisffb.engine.serialize.FILE_EXTENSION_TEAM_FILE
-import com.jervisffb.engine.serialize.JervisSerialization.jervisEngineModule
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.resources.DefaultSetups
@@ -31,7 +31,7 @@ object CacheManager {
     val fileManager = FileManager()
     val jsonSerializer = Json {
         useArrayPolymorphism = true
-        serializersModule = jervisEngineModule
+        serializersModule = JervisSerialization.jervisEngineSerializerModule
         prettyPrint = true
     }
 

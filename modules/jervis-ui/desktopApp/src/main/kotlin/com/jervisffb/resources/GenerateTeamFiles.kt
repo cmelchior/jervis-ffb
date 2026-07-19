@@ -24,7 +24,7 @@ class GenerateTeamFiles {
         prettyPrint = true
         useArrayPolymorphism = true
         serializersModule = SerializersModule {
-            include(JervisSerialization.jervisEngineModule)
+            include(JervisSerialization.jervisEngineSerializerModule)
         }
     }
 

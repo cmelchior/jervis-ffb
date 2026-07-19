@@ -92,7 +92,6 @@ object TeamFeatureStatusIndicator: PitchStatusIndicator {
             )
         }
 
-
         return teamInfo.copy(
             featureList = teamInfo.featureList.addAll(featureList)
         )

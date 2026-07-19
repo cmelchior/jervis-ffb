@@ -34,7 +34,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))
-                implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-engine:package"))
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.websockets)
@@ -47,7 +47,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(project(":modules:jervis-test-utils"))
-                implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-engine:package"))
                 implementation(kotlin("test"))
             }
         }

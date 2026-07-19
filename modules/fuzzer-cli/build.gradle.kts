@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation(project(":modules:platform-utils"))
-    implementation(project(":modules:jervis-engine"))
+    implementation(project(":modules:jervis-engine:package"))
     implementation(project(":modules:jervis-test-utils"))
     implementation(libs.clikt)
     implementation(libs.coroutines)

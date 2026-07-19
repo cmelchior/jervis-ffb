@@ -8,6 +8,15 @@ for launching the actual application on the particular platform.
 
 iOS has its own `iOSApp` module that is an XCode project.
 
+IntelliJ supports running this if you have the `Kotlin Multiplatform` and 
+`Compose Multiplatform` plugins installed. In this case, there should be a 
+`iosApp` Run Configuration.
+
+If this run configuration is not available, the iPad version can also be built
+and installed using Xcode. Use the project file found here
+[`modules/jervis-ui/iosApp/iosApp.xcodeproj`](../../modules/jervis-ui/iosApp/iosApp.xcodeproj).
+You might need to supply your own signature under "Signing & Capabilities".
+
 ## Updating Resources
 
 It is possible to sync the latest FUMBBL resource with the Jervis project

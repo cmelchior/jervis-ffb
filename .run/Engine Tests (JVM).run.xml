@@ -10,7 +10,6 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":modules:jervis-engine:cleanJvmTest" />
           <option value=":modules:jervis-engine:jvmTest" />
         </list>
       </option>

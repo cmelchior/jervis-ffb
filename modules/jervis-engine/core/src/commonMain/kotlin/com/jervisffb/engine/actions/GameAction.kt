@@ -1,0 +1,608 @@
+package com.jervisffb.engine.actions
+
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.engine.ext.d6
+import com.jervisffb.engine.ext.d8
+import com.jervisffb.engine.ext.dblock
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.DicePoolId
+import com.jervisffb.engine.model.DieId
+import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.WizardId
+import com.jervisffb.engine.model.inducements.BiasedRefereeType
+import com.jervisffb.engine.model.inducements.InfamousCoachingStaffType
+import com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement
+import com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList
+import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement
+import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList
+import com.jervisffb.engine.model.inducements.settings.MercenaryInducement
+import com.jervisffb.engine.model.inducements.settings.SimpleInducement
+import com.jervisffb.engine.model.inducements.settings.SingleInducement
+import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement
+import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
+import com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList
+import com.jervisffb.engine.model.inducements.settings.WizardInducement
+import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
+import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.actions.ActionType
+import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PassType
+import com.jervisffb.engine.rules.common.procedures.DieRoll
+import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
+import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.skills.RerollSource
+import kotlinx.serialization.Serializable
+import kotlin.math.ceil
+import kotlin.random.Random
+
+
+sealed interface GameAction
+
+inline fun <reified T : GameAction> GameAction.safeCast(): T = this as? T ?: error("Cannot cast $this to ${T::class.simpleName}")
+
+/**
+ * Game Action that can delay its value until called.
+ * This is only for testing and should never be accepted by a [Procedure].
+ */
+class CalculatedAction(private val action: GameEngineController.(Game, Rules) -> GameAction) : GameAction {
+    fun get(controller: GameEngineController, state: Game, rules: Rules): GameAction {
+        return action(controller, state, rules)
+    }
+}
+
+/**
+ * Group multiple actions together as one.
+ * The rule engine will this action as an atomic action. This means that when you
+ * Undo this action, all "sub-actions" will all be undone as one.
+ *
+ * It is not allowed to put [DevModeGameAction] inside of this action.
+ */
+@Serializable
+data class CompositeGameAction(val actionList: List<GameAction>): GameAction {
+    constructor(vararg actions: GameAction) : this(listOf(*actions))
+}
+
+/**
+ * Special action that will undo the previous user action (and associated
+ * side effects).
+ */
+@Serializable
+data object Undo : GameAction
+
+/**
+ * This action is a special variant of [Undo]. Similar to [Undo] it also
+ * reverts the last user action, but on top of this, it also decrements
+ * the last seen [GameActionId]. This means that after handling the Revert,
+ * there is no way to observe on the [com.jervisffb.engine.GameEngineController]
+ * that it was modified.
+ *
+ * Since we use the [GameActionId] to synchronize state between distributed
+ * clients, this action should be used with caution. Currently the only
+ * valid use case, is rewinding the game state based on errors from the server.
+ * E.g. if the client sends an action that is reverted by the server, the client
+ * needs to remove the action again, while making sure that its internal action
+ * id counter is the same as other clients.
+ */
+@Serializable
+data object Revert : GameAction
+
+@Serializable
+data object Continue : GameAction
+
+@Serializable
+data object Confirm : GameAction
+
+@Serializable
+data object Cancel : GameAction
+
+@Serializable
+data object EndTurn : GameAction
+
+@Serializable
+data object EndAction : GameAction
+
+@Serializable
+data object EndSetup : GameAction
+
+@Serializable
+data class CoinSideSelected(val side: Coin) : GameAction {
+    companion object {
+        fun allOptions(): List<CoinSideSelected> {
+            return Coin.entries.map { CoinSideSelected(it) }
+        }
+    }
+}
+
+@Serializable
+data class CoinTossResult(val result: Coin) : GameAction {
+    companion object {
+        fun allOptions(): List<CoinTossResult> {
+            return Coin.entries.map { CoinTossResult(it) }
+        }
+    }
+}
+
+@Serializable
+data class D2Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 2
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D2Result> {
+        return Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(): List<D2Result> {
+            return (1..2).map { D2Result(it) }
+        }
+    }
+}
+
+@Serializable
+data class D3Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 4)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 3
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D3Result> {
+        return Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun random(random: Random = Random): D3Result {
+            return random.nextInt(1, 3).d3
+        }
+        fun allOptions(): List<D3Result> {
+            return (1..3).map { D3Result(it) }
+        }
+    }
+}
+
+@Serializable
+data class D4Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 5)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 4
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D4Result> {
+        return D4Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(): List<D4Result> {
+            return (1..4).map { D4Result(it) }
+        }
+    }
+}
+
+@Serializable
+data class D6Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 6
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D6Result> {
+        return D6Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    /**
+     * Convert a D6 roll into a D3 value using the rules described on page 26 in the BB2025 rulebook.
+     */
+    fun toD3(): D3Result = ceil(value / 2f).toInt().d3
+
+    companion object {
+        fun allOptions(): List<D6Result> {
+            return (1..6).map { D6Result(it) }
+        }
+        fun random(random: Random = Random): D6Result {
+            return random.nextInt(1, 7).d6
+        }
+        fun randomExcept(except: D6Result): D6Result {
+            return allOptions().filter { it == except }.random()
+        }
+    }
+}
+
+@Serializable
+data class D8Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 8
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D8Result> {
+        return D8Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(startWith: Int = 1): List<D8Result> {
+            require(startWith in 1..8) { "startWith must be in 1..8, was $startWith" }
+            return (0 until 8).map { D8Result(((startWith - 1 + it) % 8) + 1) }
+        }
+        fun random(random: Random = Random): D8Result {
+            return random.nextInt(1, 8).d8
+        }
+    }
+}
+
+@Serializable
+data class D12Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 13)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 12
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D12Result> {
+        return Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(): List<D12Result> {
+            return (1..12).map { D12Result(it) }
+        }
+    }
+}
+
+@Serializable
+data class D16Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 17)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 16
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D16Result> {
+        return D16Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(): List<D16Result> {
+            return (1..16).map { D16Result(it) }
+        }
+    }
+}
+
+@Serializable
+data class D20Result(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 21)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 20
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<D20Result> {
+        return D20Result.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+
+    companion object {
+        fun allOptions(): List<D20Result> {
+            return (1..20).map { D20Result(it) }
+        }
+    }
+}
+
+// This class is a bit annoying; it is treated as a special D6, where the result can be found in `blockResult`
+@Serializable
+data class DBlockResult(override val value: Int) : DieResult() {
+    constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
+    override val min: Short = 1
+    override val max: Short = 6
+    init { checkRange() }
+
+    override fun allOptions(vararg except: DieResult): List<DBlockResult> {
+        return DBlockResult.Companion.allOptions().toMutableList().apply {
+            removeAll(except.toList())
+        }
+    }
+    val blockResult: BlockDice = BlockDice.fromD6(D6Result(value))
+
+    companion object {
+        fun allOptions(): List<DBlockResult> {
+            return (1..6).map { DBlockResult(it) }
+        }
+        fun random(random: Random = Random): DBlockResult {
+            return random.nextInt(1, 7).dblock
+        }
+    }
+}
+
+@Serializable
+data class DicePoolChoice(val id: DicePoolId, val diceSelected: List<SelectedDiceRoll>) {
+    @Serializable
+    data class SelectedDiceRoll(
+        val id: DieId,
+        val result: DieResult
+    ) {
+        constructor(roll: DieRoll<*>): this(roll.id, roll.result)
+    }
+
+}
+
+
+// TODO Is it safe to return DieResult from here? Shouldn't it be DieRoll instead?
+//  Otherwise there is no way to connect the result to the "exact" die, e.g. in case
+//  you are allowed to reroll multiple times and there are several die with the same
+//  value
+/**
+ * We only use multiple results during "Multiple Block" where blocks happen at the same
+ * time, but this class has been generalized for all dice roll types.
+ */
+@Serializable
+data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
+    fun singleResult(): DieResult = results.single().diceSelected.single().result
+    companion object {
+        /**
+         * Factory method for easily creating the simple case, where there is only
+         * one dice pool with a single die.
+         */
+        fun fromSingleDice(die: DieRoll<*>): DicePoolResultsSelected {
+            return DicePoolResultsSelected(listOf(DicePoolChoice(DicePoolId(0), listOf(DicePoolChoice.SelectedDiceRoll(die)))))
+        }
+    }
+}
+
+@Serializable
+data class DiceRollResults(val rolls: List<DieResult>) : GameAction, List<DieResult> by rolls {
+    constructor(vararg roll: DieResult) : this(listOf(*roll))
+    fun sum(): Int {
+        return rolls.sumOf { it.value }
+    }
+}
+
+@Serializable
+data class PlayersSelected(
+    val players: List<PlayerId>,
+): GameAction {
+    init {
+        require(players.isNotEmpty()) { "PlayersSelected must have at least one player" }
+    }
+
+    fun getPlayers(state: Game): List<Player> {
+        return players.map {
+            state.getPlayerById(it)
+        }
+    }
+}
+
+@Serializable
+data class PlayerSelected(val playerId: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(playerId)
+    }
+}
+
+@Serializable
+data class PlayerDeselected(val playerId: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(playerId)
+    }
+}
+
+@Serializable
+data class ForegoActivationSelected(val player: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(player)
+    }
+}
+
+@Serializable
+data class PlayerActionSelected(val action: ActionType) : GameAction
+
+@Serializable
+data object DogoutSelected : GameAction
+
+// TODO This should propably also include the origin
+@Serializable
+data class DirectionSelected(val direction: Direction) : GameAction
+
+@Serializable
+data class PitchSquareSelected(val x: Int, val y: Int) : GameAction {
+    constructor(coordinate: PitchCoordinate): this(coordinate.x, coordinate.y)
+
+    val coordinate: PitchCoordinate = PitchCoordinate(x, y)
+
+    override fun toString(): String {
+        return "${this::class.simpleName}[$x, $y]"
+    }
+}
+
+@Serializable
+data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
+    fun getPlayers(state: Game): List<Player> {
+        return players.map {
+            state.getPlayerById(it)
+        }
+    }
+}
+
+@Serializable
+data class RerollOptionSelected(val option: DiceRerollOption, val dicePoolId: Int = 0) : GameAction {
+    fun getRerollSource(state: Game): RerollSource {
+        return state.getRerollSourceById(option.rerollId)
+    }
+    fun getRerollDice(): List<DieRoll<*>> {
+        return option.dice.orEmpty()
+    }
+}
+
+@Serializable
+data class NoRerollSelected(val dicePoolId: Int = 0) : GameAction
+
+@Serializable
+data class MoveTypeSelected(val moveType: MoveType) : GameAction
+
+@Serializable
+data class SkillSelected(val skill: SkillId): GameAction
+
+/**
+ * Action carrying a team's full pre-game inducement purchase as one atomic
+ * submission. The reason for this is so we avoid having to introduce a lot of
+ * more granular actions needed to support the UI.
+ *
+ * The downside is that the UI is required to know a lot of the details about
+ * how inducements work. The game controller will still validate the inducements
+ * using the [InducementsSelected.isValid] method, but it will validate all of
+ * them in one go.
+ *
+ * Developer's Commentary:
+ * It still isn't clear if this approach is the best, but it seems the one that
+ * introduces the least amount of complexity, even though the UI gets more
+ * complex. We should revisit this design once more inducements have been
+ * added.
+ */
+@Serializable
+data class InducementsSelected(val inducements: List<InducementSelection<*>>) : GameAction {
+
+    // Calculate the total price of all selected inducements
+    fun totalPrice(team: Team): Int {
+        return inducements.sumOf {
+            it.getPrice(team)
+        }
+    }
+}
+
+/**
+ * This interface is used to capture information about each single bought inducement.
+ * It is up to the Rules Engine to map these into the concrete inducements in the
+ * model layer.
+ *
+ * This is done in [com.jervisffb.engine.rules.common.procedures.ApplyInducements].
+ */
+@Serializable
+sealed interface InducementSelection<T: SingleInducement<*>> {
+
+    val type: InducementType
+    val count: Int
+
+    fun getSettings(rules: Rules): T
+    // Returns the full price that must be paid for this inducement by the current team.
+    // This takes into account any discounts that may be available to the team.
+    fun getPrice(team: Team): Int = getSettings(team.game.rules).getPrice(team) * count
+    // Returns `false` if this inducement is not available to the given team.
+    // This method is a shortcut for looking up the same information in the Rules for the inducement.
+    fun isAvailableToTeam(team: Team): Boolean {
+        val settings = getSettings(team.game.rules).requirements
+        return settings.isEmpty() || team.specialRules.any { it in settings }
+    }
+
+    @Serializable
+    data class Simple(override val type: InducementType, override val count: Int) : InducementSelection<SimpleInducement> {
+        override fun getSettings(rules: Rules): SimpleInducement = rules.inducements[type] as SimpleInducement
+    }
+
+    @Serializable
+    data class Wizard(val id: WizardId) : InducementSelection<WizardInducement> {
+        override val count: Int = 1
+        override val type: InducementType = InducementType.WIZARD
+        override fun getSettings(rules: Rules): WizardInducement = (rules.inducements[type] as WizardsInducementList).items.first { it.wizard.id == id }
+
+    }
+
+
+    @Serializable
+    data class BiasedReferee(val referee: BiasedRefereeType) : InducementSelection<BiasedRefereeInducement> {
+        override val count: Int = 1
+        override val type: InducementType = InducementType.BIASED_REFEREE
+        override fun getSettings(rules: Rules): BiasedRefereeInducement = (rules.inducements[type] as BiasedRefereesInducementList).items.first { it.referee.type == referee }
+    }
+
+    @Serializable
+    data class InfamousCoach(val coachType: InfamousCoachingStaffType) : InducementSelection<InfamousCoachingStaffInducement> {
+        override val count: Int = 1
+        override val type: InducementType = InducementType.INFAMOUS_COACHING_STAFF
+        override fun getSettings(rules: Rules): InfamousCoachingStaffInducement = (rules.inducements[type] as InfamousCoachingStaffsInducementList).items.first { it.staff.type == coachType }
+
+    }
+
+
+    @Serializable
+    data class StarPlayer(val position: PositionId) : InducementSelection<StarPlayerInducement> {
+        override val count: Int = 1
+        override val type: InducementType = InducementType.STAR_PLAYERS
+        override fun getSettings(rules: Rules): StarPlayerInducement = (rules.inducements[type] as StarPlayersInducementList).items.first { it.starPlayer.id == position }
+
+    }
+
+    @Serializable
+    data class Mercenary(
+        val position: Position,
+        val extraSkills: List<SkillId> = emptyList(),
+    ) : InducementSelection<MercenaryInducement> {
+        override val count: Int = 1
+        override val type: InducementType = InducementType.STANDARD_MERCENARY_PLAYERS
+        override fun getSettings(rules: Rules): MercenaryInducement {
+            val groupSettings = (rules.inducements[type] as StandardMercenaryInducement)
+            return MercenaryInducement(
+                position,
+                extraSkills,
+                groupSettings.extraCost,
+                groupSettings.skillCost
+            )
+        }
+    }
+}
+
+@Serializable
+data class BlockTypeSelected(val type: BlockType): GameAction
+
+@Serializable
+data class PassTypeSelected(val type: PassType): GameAction
+
+// Available actions
+@Serializable
+sealed class DieResult : Number(), GameAction {
+    abstract val value: Int
+    abstract val min: Short
+    abstract val max: Short
+
+    protected fun checkRange() {
+        if (value !in min..max) {
+            throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
+        }
+    }
+
+    abstract fun allOptions(vararg except: DieResult): List<DieResult>
+    override fun toByte(): Byte = value.toByte()
+    override fun toDouble(): Double = value.toDouble()
+    override fun toFloat(): Float = value.toFloat()
+    override fun toInt(): Int = value
+    override fun toLong(): Long = value.toLong()
+    override fun toShort(): Short = value.toShort()
+    override fun toString(): String {
+        return "${this::class.simpleName}[$value]"
+    }
+
+    fun toLogString(): String = "[$value]"
+}

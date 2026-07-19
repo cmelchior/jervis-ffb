@@ -14,7 +14,6 @@ import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.common.procedures.BuyInducements
 import com.jervisffb.engine.rules.common.procedures.CoinTossContext
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.FanFactorRolls
@@ -27,6 +26,7 @@ import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll

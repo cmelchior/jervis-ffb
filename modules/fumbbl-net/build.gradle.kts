@@ -33,7 +33,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))
-                implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-engine:package"))
                 // Only here to be able to swap FUMBBL rosters with default ones. Should be removed when
                 // we create rosters from the FUMBBL API instead.
                 implementation(project(":modules:jervis-resources"))

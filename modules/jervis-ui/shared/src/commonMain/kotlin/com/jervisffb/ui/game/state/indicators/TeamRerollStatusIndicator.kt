@@ -4,15 +4,15 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.common.rerolls.BrilliantCoachingReroll
-import com.jervisffb.engine.rules.common.rerolls.ExtraTeamTrainingReroll
-import com.jervisffb.engine.rules.common.rerolls.LeaderTeamReroll
-import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
-import com.jervisffb.engine.rules.common.rerolls.TeamMascotReroll
+import com.jervisffb.shared.generated.resources.Res
+import com.jervisffb.shared.generated.resources.jervis_icon_brilliant_coaching_reroll
+import com.jervisffb.shared.generated.resources.jervis_icon_leader_reroll
+import com.jervisffb.shared.generated.resources.jervis_icon_mascot_reroll
+import com.jervisffb.shared.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.ui.game.UiReroll
-import com.jervisffb.ui.game.UiRerollType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamInfoUpdate
+import com.jervisffb.ui.game.mappings.UiTeamReroll
 
 /**
  * Show the list of rerolls available to the team. Rerolls from special sources
@@ -39,37 +39,24 @@ object TeamRerollStatusIndicator: PitchStatusIndicator {
         // Define the order in which we want to show Rerolls. Generally, we want to show the
         // one that disappears first at the front of the list (we also want to use it first).
         val order = listOf(
-            UiRerollType.BRILLIANT_COACHING,
-            UiRerollType.LEADER,
-            UiRerollType.UNKNOWN,
-            UiRerollType.TEAM,
+            UiTeamReroll.BRILLIANT_COACHING,
+            UiTeamReroll.LEADER,
+            UiTeamReroll.MASCOT,
+            UiTeamReroll.TEAM,
         )
         val rank = order.withIndex().associate { it.value to it.index }
 
         // Find all rerolls
-        val rerolls = team.rerolls.mapNotNull {
-            when (it) {
-                is BrilliantCoachingReroll -> {
-                    UiReroll("Brilliant Coaching Reroll", UiRerollType.BRILLIANT_COACHING, it.rerollUsed, it.enabled)
-                }
-
-                is LeaderTeamReroll -> {
-                    // We assume the rules will remove it if the player leaves the pitch
-                    UiReroll("Leader Reroll", UiRerollType.LEADER, it.rerollUsed, it.enabled)
-                }
-
-                is RegularTeamReroll -> {
-                    UiReroll("Team Reroll", UiRerollType.TEAM, it.rerollUsed, it.enabled)
-                }
-
-                is TeamMascotReroll -> {
-                    UiReroll("Mascot Reroll", UiRerollType.MASCOT, it.rerollUsed, it.enabled)
-                }
-
-                is ExtraTeamTrainingReroll -> {
-                    UiReroll("Team Reroll (Extra Team Training)", UiRerollType.TEAM, it.rerollUsed, it.enabled)
-                }
+        val rerolls = team.rerolls.map { reroll ->
+            val uiType = UiTeamReroll.mapFrom(reroll)
+            val (title, image) = when (uiType) {
+                UiTeamReroll.BRILLIANT_COACHING ->"Brilliant Coaching Reroll" to Res.drawable.jervis_icon_brilliant_coaching_reroll
+                UiTeamReroll.LEADER -> "Leader Reroll" to Res.drawable.jervis_icon_leader_reroll
+                UiTeamReroll.MASCOT -> "Mascot Reroll" to Res.drawable.jervis_icon_mascot_reroll
+                UiTeamReroll.TEAM -> "Team Reroll" to Res.drawable.jervis_icon_team_reroll
+                UiTeamReroll.EXTRA_TRAINING -> "Team Reroll (Extra Team Training)" to  Res.drawable.jervis_icon_team_reroll
             }
+            UiReroll(title, uiType, image, reroll.rerollUsed, reroll.enabled)
         }
         val reorderedRerolls = rerolls.sortedWith(
             compareBy<UiReroll> { rank[it.type] }.thenBy { !it.isAvailable() }

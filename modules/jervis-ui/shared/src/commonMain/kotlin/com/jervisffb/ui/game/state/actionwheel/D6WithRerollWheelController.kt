@@ -10,6 +10,8 @@ import com.jervisffb.engine.model.context.CatchContext
 import com.jervisffb.engine.model.context.ChainsawContext
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.HypnoticGazeContext
+import com.jervisffb.engine.model.context.InterceptionContext
+import com.jervisffb.engine.model.context.InterceptionRollContext
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.LeapRollContext
@@ -18,7 +20,6 @@ import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.PogoRollContext
 import com.jervisffb.engine.model.context.PuntContext
 import com.jervisffb.engine.model.context.RushRollContext
-import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.TentaclesRollContext
@@ -26,13 +27,12 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.rules.bb2025.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungryContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungryRoll

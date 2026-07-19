@@ -13,7 +13,6 @@ import com.jervisffb.engine.model.context.DodgySnackContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.RecoverKnockedOutPlayersContext
 import com.jervisffb.engine.rules.common.procedures.RecoverPlayerRoll
@@ -25,6 +24,7 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId

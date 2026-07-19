@@ -11,7 +11,6 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
 import com.jervisffb.engine.rules.common.skills.SkillType.CATCH
 import com.jervisffb.engine.rules.common.skills.SkillType.DIVING_CATCH

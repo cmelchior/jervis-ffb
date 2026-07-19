@@ -117,3 +117,36 @@ TODO ProcedureContext
 
 ### Disadvantages
 TODO Sounds / Animations / Multiple Actions in One Go
+
+
+## Splitting Engine Module - Refactor thoughts
+This is just a temporary section, holding my thoughts about the architecture,
+while working on getting the "best" separation of concerns:
+
+- `core` should contain as little rules logic as possible
+  - Consequence: Prefer interfaces to implementations
+  - Drawback: Modeling TableResults is more difficult
+  - Drawback: GameActions must support all rulesets.
+  - Enums are nice because they are easy to use and understand, but they encode
+    different ruleset logic. It also leads to patterns like 
+    `KickOffEvent.BB2020BriliantCoaching` and 
+    `KickOffEvent.BB2025BriliantCoaching`.
+- It should be easy to completely remove/disable an entire ruleset.
+- The Rules hierarchy is nice, but it doesn't show up in procedures as they all
+  just use "Rules".
+- For a new ruleset, we lean towards duplicating code, rather than trying to 
+  figure out a common superset. Downside: Bug-fixes must happen in multiple 
+  places. Upside: It gets _a lot_ easier to reason about rule changes
+- Right now, the split is a bit messy as we are using different patterns for
+  different aspects. It would be nice to unify them more.
+- To move things out from `core` we probably need to introduce generic rule
+  parameters to all procedures. Need to prototype this.
+- The DevModeGameActions force us to have a number of `Set*` commands in `core`.
+  This is slightly annoying. It would be nice to find a way around that.
+- What to do with packages. Keeping the same packages across modules make it 
+  easier to move classes between them. But maybe it would make sense to make
+  it harder by default. This also means that we dont have to prefix a lot of 
+  classes with "BB2020" or "BB2025". The package does this for us. Only downside
+  to that is that the UI (which consumes both), will have a harder time 
+  disambiguating them.
+  

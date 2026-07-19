@@ -42,7 +42,7 @@ kotlin {
                 api(project(":modules:platform-utils"))
                 api(project(":modules:fumbbl-net"))
                 api(project(":modules:tourplay-net"))
-                api(project(":modules:jervis-engine"))
+                api(project(":modules:jervis-engine:package"))
                 api(project(":modules:jervis-net"))
                 api(project(":modules:jervis-resources"))
                 api(libs.okio)

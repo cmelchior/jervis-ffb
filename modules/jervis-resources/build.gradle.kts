@@ -25,7 +25,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))
-                implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-engine:package"))
             }
         }
 

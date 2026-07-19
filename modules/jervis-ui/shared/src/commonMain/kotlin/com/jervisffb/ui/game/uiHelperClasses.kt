@@ -3,10 +3,12 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.ui.game.mappings.UiTeamReroll
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.DrawableResource
 
 enum class UiTeamFeatureType {
     APOTHECARY,
@@ -17,17 +19,10 @@ enum class UiTeamFeatureType {
     UNKNOWN,
 }
 
-enum class UiRerollType {
-    TEAM,
-    LEADER,
-    BRILLIANT_COACHING,
-    MASCOT,
-    UNKNOWN
-}
-
 class UiReroll(
     val name: String,
-    val type: UiRerollType,
+    val type: UiTeamReroll,
+    val icon: DrawableResource,
     val used: Boolean = false,
     val enabled: Boolean = true,
 ) {

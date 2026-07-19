@@ -24,7 +24,7 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.rules.common.tables.KickOffEvent
+import com.jervisffb.engine.rules.common.tables.KickOffEventResult
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off_blitz
@@ -144,26 +144,26 @@ object AnimationFactory {
         // to support animations is also annoying.
         if (currentNode == TheKickOffEvent.RollForKickOffEvent) {
             val roll = (action as DiceRollResults).rolls.map { it as D6Result }
-            val result = state.rules.kickOffEventTable.roll(roll.first(), roll.last())
+            val result = state.rules.kickOffEventTable.roll(roll.first(), roll.last()) as KickOffEventResult
             val image = when (result) {
-                KickOffEvent.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEvent.BLITZ_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEvent.BRILLIANT_COACHING -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
-                KickOffEvent.CHANGING_WEATHER -> null // Animation is handled by the Weather Roll
-                KickOffEvent.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEvent.BB2020_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
-                KickOffEvent.BB2025_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
-                KickOffEvent.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
-                KickOffEvent.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
-                KickOffEvent.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
-                KickOffEvent.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
-                KickOffEvent.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
-                KickOffEvent.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
-                KickOffEvent.QUICK_SNAP_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
-                KickOffEvent.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
-                KickOffEvent.SOLID_DEFENSE_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
-                KickOffEvent.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
-                KickOffEvent.TIME_OUT_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_timeout
+                KickOffEventResult.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                KickOffEventResult.BLITZ_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                KickOffEventResult.BRILLIANT_COACHING -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                KickOffEventResult.CHANGING_WEATHER -> null // Animation is handled by the Weather Roll
+                KickOffEventResult.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                KickOffEventResult.BB2020_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                KickOffEventResult.BB2025_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
+                KickOffEventResult.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
+                KickOffEventResult.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
+                KickOffEventResult.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
+                KickOffEventResult.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
+                KickOffEventResult.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
+                KickOffEventResult.QUICK_SNAP_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
+                KickOffEventResult.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
+                KickOffEventResult.SOLID_DEFENSE_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
+                KickOffEventResult.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
+                KickOffEventResult.TIME_OUT_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_timeout
             }
             return if (image != null) {
                 KickOffEventAnimation(image)

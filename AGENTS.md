@@ -62,6 +62,61 @@ Some guidelines when creating new procedures:
   `GameController.validateAction(action)`.
 - Naming of Procedures should follow terminology and keywords from the rulebook.
 
+### Add a new "concept"
+When adding a new concept, like a new type of inducement. We strive to keep 
+the `core` module as clean of rules-specific code as possible. We use the 
+following approach:
+
+1. In Core there should (only) be an interface describing the concept. The
+   `Game` and `Team` classes should reference this interface. Example:
+
+    ```
+    interface Wizard { 
+        // Properties / Functions
+    }
+    ```
+
+2. Add the rule-specific implementation in the rules module where it makes 
+   sense. To make it easier to catch changes in the UI, there should always 
+   exists a sealed interface in the given module. Its name should be the 
+   module name + `core` interface name. Examples:
+
+    ```kotlin
+    // In `rules-common`
+    interface CommonWizard: Wizard
+    // In `rules-bb2020`
+    interface BB2020Wizard: Wizard
+    // In `rules-bb2025`
+    interface BB2025Wizard: Wizard
+    ```
+
+3. Implementing the concept in that module should then inherit from the sealed
+   interface. Example:
+
+    ```kotlin
+    // Wizard in BB2025
+    data class SportsWizard(val name: String): BB2025Wizard
+    ```
+
+4. The UI layer should then have a pattern that looks like this:
+
+    ```kotlin
+    fun renderWizard(wiz: Wizard) {
+        when (wiz) {
+            is CommonWizard -> when (wiz) {
+                   // Handle all cases using exhausitive when
+            }
+            is BB2020Wizard -> when (wiz) {
+                // Handle all cases using exhausitive when
+            } 
+            is BB2025Wizard -> when (wiz) {
+                // Handle all cases using exhausitive when
+            }
+            else -> error("Unknown wizard: $wiz") 
+        }
+   }
+   ```
+
 ## Running tests
 
 CI runs `./gradlew jvmTest` (see `.github/workflows/test.yml`). Match that
@@ -127,3 +182,15 @@ fresh clone usually resolve after the first successful build.
   but keep the quoted text short (avoid copyright). Do not try to guess a page 
   number, just use XXX as a placeholder.
 - An online rulebook can be found here: https://bloodbowlbase.ru/bb2025/
+- For now, we focus only on the BB20205 ruleset. So all new rules should go 
+  to the `rules-bb2025` module instead of `rules-common`.
+- Interfaces in `com.jervisffb.engine.*` that are being rendered in the UI, 
+  should have a mapping in `com.jervisffb.ui.game.mappings` that has the core 
+  interface name with as a prefix, e.g. `Wizard` should be `UiWizard`. This
+  class is responsible for mapping all subclasses of Wizard to a corresponding
+  UI enum. This makes it easier to detect where to change things in the UI
+  whenever a new concept is added.
+- When modeling concepts in the `core` module, we strive to only use interfaces
+  with their actual implementations being in the `rules-*` modules. This way
+  it is easier to add or remove new variants.
+

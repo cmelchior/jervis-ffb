@@ -45,8 +45,6 @@ import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesRoll
 import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesStep
-import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
-import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
@@ -103,6 +101,8 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothec
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense

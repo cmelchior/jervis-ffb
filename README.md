@@ -112,7 +112,19 @@ of the following modules:
    teams and make them available to Jervis.
 
 - `jervis-engine`: The full Blood Bowl game and rules model as well as logic
-  for running the game.
+  for running the game. It contains submodules split by responsibility: 
+  - `core`: Infrastructure for for setting up and running games. The module is
+    rules agnostic.
+  - `rules-common`: Contains all rules classes and logic that is shared 
+    among all supported rulesets.
+  - `rules-bb2020`: Contains all BB2020 specific rules and classes. It also
+    contains all variants that are based on BB2020, like Sevens.
+  - `rules-bb2025`: Similar to `rules-bb2020`, but contains all the logic and
+    classes for BB2025.
+  - `package`: This module is what downstream modules should use. It is
+    responsible for combing the `core` module with the set of currently 
+    supported rules. It also contains the code needed to serialize and 
+    deserialize game, team and roster files.
 
 - `jervis-net`: The infrastructure to create and communicate with a light-weight 
   Game Server that is only used to play a single game.
@@ -121,8 +133,9 @@ of the following modules:
   This is a work-around for https://youtrack.jetbrains.com/issue/KT-35073.
 
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has in large parts
-   been inspired by the FUMBBL Client UI. This contains submodules for each
-   platform supported: `desktopApp`, `iosApp`, and `webApp`.
+   been inspired by the FUMBBL Client UI. It contains submodules for each
+   platform supported: `desktopApp`, `iosApp`, and `webApp`. `shared` contains
+   the UI implementation shared between all platforms, which is most of it.
 
 - `platform-utils`: All helper methods that require platform-specific
   APIs are placed here. This includes things like filesystem access, setting up 

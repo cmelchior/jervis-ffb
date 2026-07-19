@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Charge
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 

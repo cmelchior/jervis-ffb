@@ -17,13 +17,13 @@ import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.PuntStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingStep
 import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesStep
-import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Charge
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider

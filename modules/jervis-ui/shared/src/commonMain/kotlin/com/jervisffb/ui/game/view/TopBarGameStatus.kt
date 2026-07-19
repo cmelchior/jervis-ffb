@@ -71,16 +71,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_brush_chalk
-import com.jervisffb.shared.generated.resources.jervis_icon_brilliant_coaching_reroll
-import com.jervisffb.shared.generated.resources.jervis_icon_leader_reroll
-import com.jervisffb.shared.generated.resources.jervis_icon_mascot_reroll
-import com.jervisffb.shared.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiReroll
-import com.jervisffb.ui.game.UiRerollType
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
 import com.jervisffb.ui.game.UiTeamInfoUpdate
@@ -286,13 +280,6 @@ private fun TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
         if (i > 0) {
             Spacer(modifier = Modifier.width(distance))
         }
-        val image = when (reroll.type) {
-            UiRerollType.TEAM -> Res.drawable.jervis_icon_team_reroll
-            UiRerollType.LEADER -> Res.drawable.jervis_icon_leader_reroll
-            UiRerollType.BRILLIANT_COACHING -> Res.drawable.jervis_icon_brilliant_coaching_reroll
-            UiRerollType.MASCOT -> Res.drawable.jervis_icon_mascot_reroll
-            UiRerollType.UNKNOWN -> Res.drawable.jervis_icon_team_reroll
-        }
         JervisTooltipArea(
             tooltip = {
                 Surface(
@@ -315,7 +302,7 @@ private fun TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
                     .height(40.jdp)
                     .alpha(if (!reroll.isAvailable()) unavailableAlpha else availableAlpha)
                 ,
-                painter = painterResource(image),
+                painter = painterResource(reroll.icon),
                 contentDescription = reroll.name,
                 contentScale = ContentScale.Fit,
             )

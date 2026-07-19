@@ -1,0 +1,293 @@
+package com.jervisffb.engine.model
+
+import com.jervisffb.engine.AddEntry
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.ListEvent
+import com.jervisffb.engine.RemoveEntry
+import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.MutableProcedureStack
+import com.jervisffb.engine.fsm.MutableProcedureState
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.context.ContextHolder
+import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.reports.LogEntry
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.rules.common.tables.Weather
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.safeTryEmit
+import kotlinx.coroutines.flow.MutableSharedFlow
+
+// TODO Just keep it as a singleton until we explore the requirements further.
+/**
+ * Deterministic ID generator used to generate IDs [Command] and other
+ * objects created as part of [ActionNode.applyAction].
+ *
+ * Note, in particular, this class should _NOT_ be used as part of
+ * [ActionNode.getAvailableActions] since we do not control when this is called,
+ *
+ * These ID's should only be generated from inside a request to
+ * [GameEngineController.handleAction] ensuring that all access to the generator
+ * is thread-safe. As it is not thread-safe by itself.
+ *
+ * The generator is tied to a specific [Game] instance. Ids are always incremental
+ * even if actions are undone. This ensures that all connected clients can agree
+ * on the sequence of events even with [com.jervisffb.engine.actions.Undo] in
+ * the mix.
+ */
+class IdGenerator {
+    private var diceId: Int = 0
+    private var logId: Int = 0
+    private var playerId: Int = 0
+
+    fun reset() {
+        diceId = 0
+        logId = 0
+        playerId = 0
+    }
+
+    fun nextDiceId(): DieId {
+        return DieId((++diceId).toString())
+    }
+
+    fun nextLogId(): String {
+        return (++logId).toString()
+    }
+
+    /**
+     * Generates a unique [PlayerId] for players added after the game is started
+     * (Mercenaries, Star Players, Journeymen).
+     */
+    fun nextPlayerId(team: Team): PlayerId {
+        // Include team id for improve debuggability
+        return PlayerId("${team.id.value}-runtime-${++playerId}")
+    }
+}
+
+/**
+ * Entry point for tracking the state of a game of Blood Bowl.
+ * It should only contain the static state and not enforce any rules.
+ *
+ * All rules should either be enforced by a [com.jervisffb.fsm.Procedure]
+ * or by calling methods in [com.jervisffb.rules.Rules]. This means that
+ * changes to this class must only happen through [com.jervisffb.engine.commands]
+ * objects.
+ */
+class Game(
+    val rules: Rules,
+    val homeTeam: Team,
+    val awayTeam: Team,
+    val pitch: Pitch,
+) {
+    init {
+        // The Game State doesn't support the same team playing against itself.
+        // Mostly because we use playerIds to identify players on the UI.
+        // We could probably lift this restriction, but I suspect there is little
+        // need.
+        if (homeTeam.id == awayTeam.id) {
+            INVALID_GAME_STATE("Home and away teams cannot be the same: ${homeTeam.id}")
+        }
+
+        // Check that all player ids are unique
+        val allIds = homeTeam.map { it.id }.toSet() + awayTeam.map { it.id }.toSet()
+        if (allIds.size != homeTeam.size + awayTeam.size) {
+            val duplicates = (homeTeam.map { it.id } + awayTeam.map { it.id }).groupingBy { it }.eachCount().filter { it.value > 1 }
+            INVALID_GAME_STATE("Duplicate player ids found: ${duplicates.keys}}")
+        }
+
+        // Setup circular references, making it easier to navigate
+        // the object graph.
+        homeTeam.setGameReference(this)
+        awayTeam.setGameReference(this)
+    }
+
+    companion object
+
+    val idGenerator = IdGenerator()
+
+    // Track all current active procedures.
+    val stack = MutableProcedureStack()
+
+    // Track all logs related to the game state, this includes
+    // game progress as well as meta data debug events like procedure
+    // changes.
+    val logs: MutableList<LogEntry> = mutableListOf()
+    // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
+    val logChanges: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
+
+    // Weather conditions for the pitch
+    var weather: Weather = Weather.PERFECT_CONDITIONS
+
+    // Game progress
+    var abortIfBallOutOfBounds: Boolean = false
+    var halfNo: Int = 0 // [1-x], 0 = Pre-game
+    var driveNo: Int = 0 // [1-x], 0 = Pre-game
+
+    // Global state properties
+    // We should only have properties here that are relevant to more than
+    // one procedure, otherwise it should be moved into a [ProcedureContext]
+    fun isTurnOver(): Boolean = (turnOver != null)
+
+    var turnOver: TurnOver? = null
+    var hasConceeded: Team? = null
+    var homeTouchdowns: Int = 0
+    var homeExtraTimeTouchdowns: Int = 0
+    var homeSuddenDeathTouchdowns: Int = 0
+    var awayTouchdowns: Int = 0
+    var awayExtraTimeTouchdowns: Int = 0
+    var awaySuddenDeathTouchdowns: Int = 0
+
+    val homeScore: Int get() = homeTouchdowns + homeExtraTimeTouchdowns + homeSuddenDeathTouchdowns
+    val awayScore: Int get() = awayTouchdowns + awayExtraTimeTouchdowns + awaySuddenDeathTouchdowns
+
+    /**
+     * The player that is being activated. This is set as soon as the player is
+     * selected. Whether the player counts as being activated is determined by
+     * [Player.available]
+     */
+    var activePlayer: Player? = null
+    var kickingPlayer: Player? = null // TODO Move into a context?
+    fun activePlayerOrThrow(): Player {
+        return activePlayer ?: INVALID_GAME_STATE("No active player")
+    }
+
+    // Kick-off events are not considered any teams turn, which means
+    // a number of rules are not applicable there.
+    // Especially the concept of "Active Team", which would be neither.
+    // But due to how many times we want to access the active team, we
+    // are instead making a special note of whether it being kick-off
+    // or not. If you ask for the active or inactive team during that
+    // period, an exception is thrown.
+    var isDuringKickOff: Boolean = false
+    var canUseTeamRerolls: Boolean = false
+
+    // Active/Inactive indicates a teams "active turn".
+    // These terms are not applicable during the pre-game sequence, setup or
+    // post-game sequence.
+    // See page 42 in the BB2020 rulebook.
+    // See page 50 in the BB2025 rulebook.
+    var activeTeam: Team? = null
+    var inactiveTeam: Team? = null
+
+    fun activeTeamOrThrow(): Team {
+        return activeTeam ?: error("No team is active")
+    }
+    fun inactiveTeamOrThrow(): Team {
+        return inactiveTeam ?: error("No team is inactive")
+    }
+
+    // Kicking/Receiving team is decided during the pre-game sequence.
+    // See page 38 in the BB2020 rulebook.
+    // See page 46 in the BB2025 rulebook.
+    var kickingTeam: Team = this.homeTeam
+    var receivingTeam: Team = this.awayTeam
+    var kickingTeamInLastHalf: Team = kickingTeam
+
+    // Temporary states - Figure out where/how to store these
+    var moveStepTarget: Pair<PitchCoordinate, PitchCoordinate>? = null
+
+    // Context objects are state holders used by procedures
+    // when they need to track state between nodes
+    val contexts: ContextHolder = ContextHolder()
+    // Rerolls are so widely used across multiple procedures that we want to
+    // make it really easy get access them.
+    fun getRerollContext(): UseRerollContext {
+        return getContextOrNull<UseRerollContext>() ?: INVALID_GAME_STATE("No reroll context found")
+    }
+    fun getRerollContextOrNull(): UseRerollContext? {
+        return getContextOrNull<UseRerollContext>()
+    }
+
+    val balls: MutableList<Ball> = mutableListOf(Ball(BallId.DEFAULT))
+    // Easy reference to the ball that is currently being "handled" somehow. This makes
+    // it easier to access it across multiple procedures.
+    var currentBallReference: Ball? = null
+    // Helper method for returning the current ball. Will throw an exception if no
+    // ball was set as current.
+    fun currentBall(): Ball {
+        return currentBallReference ?: INVALID_GAME_STATE("No current ball found")
+    }
+    fun currentBallOrNull(): Ball? {
+        return currentBallReference
+    }
+
+    /**
+     * Returns a reference to the only ball on the pitch.
+     * Will throw if multiple balls exits.
+     */
+    fun getBall(): Ball {
+        return balls.single()
+    }
+
+    /**
+     * Returns a reference to the current ball in play.
+     *
+     * This method only works if one ball exists, otherwise an
+     * exception is thrown.
+     */
+    fun singleBall(): Ball {
+        if (balls.size > 1) {
+            INVALID_GAME_STATE("More than one ball found")
+        }
+        return balls.first()
+    }
+
+    /**
+     * Returns the player matching the given [PlayerId].
+     * If no player matches, an [com.jervisffb.utils.InvalidGameStateException] is thrown
+     */
+    fun getPlayerById(id: PlayerId): Player {
+        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id } ?: INVALID_GAME_STATE("Player with $id not found")
+    }
+
+    /**
+     * Returns the [RerollSource] for a given [RerollSourceId]. If not found an
+     * [InvalidGameStateException] is thrown
+     */
+    fun getRerollSourceById(id: RerollSourceId): RerollSource {
+        // Optimize this
+        return homeTeam.rerolls.firstOrNull { it.id == id }
+            ?: homeTeam.flatMap { it.skills.filterIsInstance<RerollSource>() }.firstOrNull { skill-> skill.id == id }
+            ?: awayTeam.rerolls.firstOrNull { it.id == id }
+            ?: awayTeam.flatMap { it.skills.filterIsInstance<RerollSource>() }.firstOrNull { skill-> skill.id == id }
+            ?: INVALID_GAME_STATE("Reroll $id could not be found")
+    }
+
+    fun currentProcedureState(): MutableProcedureState? = stack.peepOrNull()
+
+    fun addProcedure(procedure: Procedure) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun addProcedure(procedure: MutableProcedureState) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun removeProcedure(): MutableProcedureState {
+        return stack.popProcedure()
+    }
+
+    fun addLog(entry: LogEntry) {
+        // Inject log id before exposing it to the outside.
+        // Not the nicest, but quick to do while figuring out a better solution.
+        entry.id = idGenerator.nextLogId()
+        logs.add(entry)
+        logChanges.safeTryEmit(AddEntry(entry))
+    }
+
+    fun removeLog(entry: LogEntry) {
+        if (logs.lastOrNull() == entry) {
+            val logEntry = logs.removeLast()
+            logChanges.safeTryEmit(RemoveEntry(logEntry))
+        } else {
+            throw IllegalStateException("Log could not be removed: ${entry.message}")
+        }
+    }
+
+    fun setCurrentNode(nextState: Node) {
+        stack.peepOrNull()!!.setCurrentNode(nextState)
+    }
+}

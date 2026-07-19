@@ -8,6 +8,6 @@ val jervisNetworkSerializer = Json {
     useArrayPolymorphism = true
     allowStructuredMapKeys = true // Required by Inducements
     serializersModule = SerializersModule {
-        include(JervisSerialization.jervisEngineModule)
+        include(JervisSerialization.jervisEngineSerializerModule)
     }
 }

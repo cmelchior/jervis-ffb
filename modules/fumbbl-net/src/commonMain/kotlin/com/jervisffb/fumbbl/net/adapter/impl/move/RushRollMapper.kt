@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.SureFeet
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
-import com.jervisffb.engine.rules.common.rerolls.RegularTeamReroll
+import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
@@ -52,7 +52,7 @@ object RushRollMapper: CommandActionMapper {
                         .first { it is SelectRerollOption }
                         .let { it as SelectRerollOption }
                     val selectedOption = when (fumbblSource) {
-                        "Team ReRoll" -> rerollOptions.options.first { it.getRerollSource(state) is RegularTeamReroll }
+                        "Team ReRoll" -> rerollOptions.options.first { it.getRerollSource(state) is BB2020StandardTeamReroll }
                         "Sure Feet" -> rerollOptions.options.first { it.getRerollSource(state) is SureFeet }
                         else -> INVALID_GAME_STATE("No matching reroll: $rerollOptions")
                     }

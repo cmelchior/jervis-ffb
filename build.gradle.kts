@@ -136,6 +136,7 @@ subprojects {
         filter {
             exclude("**/LZString.kt")
             exclude("**/package-info.kt")
+            exclude { it.file.absolutePath.contains("/build/generated/") }
         }
         reporters {
             reporter(ReporterType.PLAIN)
