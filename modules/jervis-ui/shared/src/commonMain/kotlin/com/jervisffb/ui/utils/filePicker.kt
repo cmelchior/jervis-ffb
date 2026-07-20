@@ -1,6 +1,6 @@
 package com.jervisffb.ui.utils
 
-import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
+import com.jervisffb.engine.serialization.FILE_EXTENSION_GAME_FILE
 import okio.Path
 
 

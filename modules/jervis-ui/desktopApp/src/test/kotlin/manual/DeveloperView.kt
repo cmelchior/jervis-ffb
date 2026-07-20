@@ -45,7 +45,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialization.SingleSprite
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory

@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
 import kotlinx.coroutines.runBlocking
 import kotlin.test.BeforeTest

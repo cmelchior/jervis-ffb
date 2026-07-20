@@ -5,8 +5,8 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.engine.serialization.SingleSprite
+import com.jervisffb.engine.serialization.SpriteSheet
 
 val THE_BLACK_GOBBO = StarPlayerPosition(
     PositionId("the-black-gobbo"),

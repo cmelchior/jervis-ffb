@@ -17,9 +17,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType.JUMP_UP
 import com.jervisffb.engine.rules.common.skills.SkillType.ON_THE_BALL
 import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.rules.common.skills.SkillType.SAFE_PASS
-import com.jervisffb.engine.serialize.RosterLogo
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.engine.serialization.RosterLogo
+import com.jervisffb.engine.serialization.SingleSprite
+import com.jervisffb.engine.serialization.SpriteSheet
 import com.jervisffb.resources.iconRootPath
 import com.jervisffb.resources.portraitRootPath
 

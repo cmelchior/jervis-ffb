@@ -2,7 +2,7 @@ package com.jervisffb.ui
 
 import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_MESSAGE
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_STACKTRACE

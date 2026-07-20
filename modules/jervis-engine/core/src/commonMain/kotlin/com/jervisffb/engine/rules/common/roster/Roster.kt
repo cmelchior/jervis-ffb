@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.common.roster
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialization.RosterLogo
 import kotlinx.serialization.Serializable
 
 /**

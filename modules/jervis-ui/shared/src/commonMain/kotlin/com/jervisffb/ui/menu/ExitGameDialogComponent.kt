@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor

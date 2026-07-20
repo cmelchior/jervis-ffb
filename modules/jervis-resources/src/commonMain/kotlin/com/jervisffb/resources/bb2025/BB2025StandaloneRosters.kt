@@ -1,8 +1,8 @@
 package com.jervisffb.resources.bb2025
 
-import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
-import com.jervisffb.engine.serialize.JervisMetaData
-import com.jervisffb.engine.serialize.JervisRosterFile
+import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
+import com.jervisffb.engine.serialization.JervisMetaData
+import com.jervisffb.engine.serialization.JervisRosterFile
 
 object BB2025StandaloneRosters {
     val defaultRosters = mapOf(

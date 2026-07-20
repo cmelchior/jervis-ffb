@@ -18,10 +18,10 @@ import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
-import com.jervisffb.engine.serialize.PlayerUiData
-import com.jervisffb.engine.serialize.RosterLogo
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.engine.serialization.PlayerUiData
+import com.jervisffb.engine.serialization.RosterLogo
+import com.jervisffb.engine.serialization.SingleSprite
+import com.jervisffb.engine.serialization.SpriteSheet
 import kotlin.random.Random
 
 private data class PlayerData(

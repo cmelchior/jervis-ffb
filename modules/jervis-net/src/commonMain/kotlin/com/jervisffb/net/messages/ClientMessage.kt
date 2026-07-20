@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.GameId
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketExtension

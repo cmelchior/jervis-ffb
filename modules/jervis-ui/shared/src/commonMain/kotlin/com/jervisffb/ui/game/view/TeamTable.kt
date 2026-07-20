@@ -52,7 +52,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.SpecialRules
-import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialization.RosterLogo
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize

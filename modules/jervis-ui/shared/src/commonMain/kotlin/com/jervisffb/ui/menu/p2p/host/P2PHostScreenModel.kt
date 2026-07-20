@@ -10,7 +10,7 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.GameFileData
+import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState

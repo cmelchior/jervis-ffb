@@ -1,4 +1,4 @@
-package com.jervisffb.engine.serialize
+package com.jervisffb.engine.serialization
 
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.common.roster.Roster

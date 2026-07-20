@@ -1,6 +1,6 @@
 package com.jervisffb.net.handlers
 
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameState

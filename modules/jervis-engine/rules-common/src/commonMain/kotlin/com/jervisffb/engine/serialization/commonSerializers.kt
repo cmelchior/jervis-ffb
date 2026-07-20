@@ -1,4 +1,4 @@
-package com.jervisffb.engine.serialize
+package com.jervisffb.engine.serialization
 
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic

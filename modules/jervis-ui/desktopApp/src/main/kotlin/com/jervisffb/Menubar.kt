@@ -12,7 +12,7 @@ import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import com.jervisffb.engine.rules.builder.GameType
-import com.jervisffb.engine.serialize.JervisSetupFile
+import com.jervisffb.engine.serialization.JervisSetupFile
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
 

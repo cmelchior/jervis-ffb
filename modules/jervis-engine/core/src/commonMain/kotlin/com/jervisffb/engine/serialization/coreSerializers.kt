@@ -1,4 +1,4 @@
-package com.jervisffb.engine.serialize
+package com.jervisffb.engine.serialization
 
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -133,9 +133,9 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.common.roster.RosterPosition::class)
         subclass(com.jervisffb.engine.rules.common.roster.StarPlayerPosition::class)
     }
-    polymorphic(com.jervisffb.engine.serialize.SerializedPlayer::class) {
+    polymorphic(com.jervisffb.engine.serialization.SerializedPlayer::class) {
     }
-    polymorphic(com.jervisffb.engine.serialize.SerializedTeam::class) {
+    polymorphic(com.jervisffb.engine.serialization.SerializedTeam::class) {
     }
     polymorphic(com.jervisffb.engine.rules.builder.StadiumRule::class) {
         subclass(com.jervisffb.engine.rules.builder.NoStadium::class)

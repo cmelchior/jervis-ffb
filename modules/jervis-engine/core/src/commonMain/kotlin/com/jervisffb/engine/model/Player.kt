@@ -13,7 +13,7 @@ import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.serialization.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.LiveMergeList
 import kotlinx.serialization.ExperimentalSerializationApi

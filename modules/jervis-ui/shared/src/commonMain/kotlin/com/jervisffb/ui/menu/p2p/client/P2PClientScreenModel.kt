@@ -11,7 +11,7 @@ import com.jervisffb.engine.model.CoachType.HUMAN
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.ui.game.icons.IconFactory

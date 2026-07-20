@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode

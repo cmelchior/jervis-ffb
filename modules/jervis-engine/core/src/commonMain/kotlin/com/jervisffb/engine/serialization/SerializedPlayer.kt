@@ -1,4 +1,4 @@
-package com.jervisffb.engine.serialize
+package com.jervisffb.engine.serialization
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId

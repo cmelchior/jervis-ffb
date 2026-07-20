@@ -13,9 +13,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType.SPRINT
 import com.jervisffb.engine.rules.common.skills.SkillType.SURE_FEET
 import com.jervisffb.engine.rules.common.skills.SkillType.TACKLE
 import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
-import com.jervisffb.engine.serialize.RosterLogo
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.engine.serialization.RosterLogo
+import com.jervisffb.engine.serialization.SingleSprite
+import com.jervisffb.engine.serialization.SpriteSheet
 import com.jervisffb.resources.iconRootPath
 import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable

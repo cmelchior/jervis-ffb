@@ -11,8 +11,8 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillCategory
-import com.jervisffb.engine.serialize.PlayerUiData
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialization.PlayerUiData
+import com.jervisffb.engine.serialization.SpriteSource
 
 /**
  * Interface describing a position on a team. This includes all types
