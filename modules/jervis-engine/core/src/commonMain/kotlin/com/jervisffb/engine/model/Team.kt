@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffleEvent
-import com.jervisffb.engine.serialization.RosterLogo
+import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

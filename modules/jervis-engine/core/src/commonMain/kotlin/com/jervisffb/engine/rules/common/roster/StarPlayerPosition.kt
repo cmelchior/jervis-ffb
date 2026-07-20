@@ -12,7 +12,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.serialization.PlayerUiData
-import com.jervisffb.engine.serialization.SpriteSource
+import com.jervisffb.engine.sprites.SpriteSource
 import com.jervisffb.engine.utils.assert
 import kotlinx.serialization.Serializable
 

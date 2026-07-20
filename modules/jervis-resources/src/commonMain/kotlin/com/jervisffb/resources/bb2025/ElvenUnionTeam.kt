@@ -19,9 +19,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType.HAIL_MARY_PASS
 import com.jervisffb.engine.rules.common.skills.SkillType.NERVES_OF_STEEL
 import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP
-import com.jervisffb.engine.serialization.RosterLogo
-import com.jervisffb.engine.serialization.SingleSprite
-import com.jervisffb.engine.serialization.SpriteSheet
+import com.jervisffb.engine.sprites.RosterLogo
+import com.jervisffb.engine.sprites.SingleSprite
+import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.resources.iconRootPath
 import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable

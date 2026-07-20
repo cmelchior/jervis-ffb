@@ -10,9 +10,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
 import com.jervisffb.engine.rules.common.skills.SkillType.CATCH
 import com.jervisffb.engine.rules.common.skills.SkillType.PASS
-import com.jervisffb.engine.serialization.RosterLogo
-import com.jervisffb.engine.serialization.SingleSprite
-import com.jervisffb.engine.serialization.SpriteSheet
+import com.jervisffb.engine.sprites.RosterLogo
+import com.jervisffb.engine.sprites.SingleSprite
+import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.resources.iconRootPath
 import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable

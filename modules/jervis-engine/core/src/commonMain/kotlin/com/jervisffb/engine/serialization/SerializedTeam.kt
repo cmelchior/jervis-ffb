@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.utils.jervisLogger
 import kotlinx.serialization.Serializable
