@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.bb2020.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -21,7 +22,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.model.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.rules.bb2025.model.context.BB2025MultipleBlockContext
 import com.jervisffb.engine.utils.INVALID_ACTION
 

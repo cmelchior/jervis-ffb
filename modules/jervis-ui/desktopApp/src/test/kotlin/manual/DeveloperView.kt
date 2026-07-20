@@ -41,10 +41,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam

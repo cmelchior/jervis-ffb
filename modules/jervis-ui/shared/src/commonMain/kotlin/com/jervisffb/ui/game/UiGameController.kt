@@ -191,7 +191,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep as BB2020JumpStep
+import com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep as BB2020JumpStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep as BB2025JumpStep
 
 /**

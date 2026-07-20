@@ -6,6 +6,8 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
@@ -20,9 +22,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior

@@ -3,6 +3,7 @@
 package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ActivatePlayerContext
@@ -26,7 +27,6 @@ import com.jervisffb.engine.model.context.TentaclesRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRollContext

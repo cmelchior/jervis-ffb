@@ -4,11 +4,11 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.net.GameId

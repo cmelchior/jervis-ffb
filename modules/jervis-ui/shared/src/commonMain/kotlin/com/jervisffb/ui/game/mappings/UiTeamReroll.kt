@@ -1,8 +1,8 @@
 package com.jervisffb.ui.game.mappings
 
-import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020BrilliantCoachingReroll
-import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020StandardTeamReroll
-import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020TeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020TeamReroll
 import com.jervisffb.engine.rules.common.procedures.rerolls.BB2025TeamReroll
 import com.jervisffb.engine.rules.common.procedures.rerolls.BrilliantCoachingReroll
 import com.jervisffb.engine.rules.common.procedures.rerolls.ExtraTeamTrainingReroll

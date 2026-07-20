@@ -1,7 +1,7 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.serialization.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020

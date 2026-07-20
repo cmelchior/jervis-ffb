@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2025.procedures.actions.block.push
 
+import com.jervisffb.engine.bb2020.procedures.actions.block.createPushContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -18,7 +19,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.createPushContext
 
 /**
  * Procedure controlling "Pushed Players", "Chain Pushes", "Pushed Into the

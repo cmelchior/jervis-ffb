@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInduceme
 import com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList
 import com.jervisffb.engine.model.inducements.settings.WizardInducement
 import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
-import com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard
+import com.jervisffb.engine.model.inducements.wizards.SportsWizard
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 
 /**
@@ -43,7 +43,7 @@ val DEFAULT_INDUCEMENTS_BB2025 = mapOf<InducementType, Inducement<*>>(
         enabled = true,
         items = listOf(
             WizardInducement(
-                wizard = HirelingSportsWizard(),
+                wizard = SportsWizard(),
                 max = 1,
                 defaultPrice = 150_000,
                 named = false,

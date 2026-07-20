@@ -159,10 +159,15 @@ The following root packages are used for each module:
 - `rules-bb2020`: `com.jervisffb.engine.bb2020`
 - `rules-bb2025`: `com.jervisffb.engine.bb2025`
 
-Inside each module, package names should follow the same hierarchy for:
+Inside each `rules-*` module, package names should follow the same hierarchy 
+for these packages:
 
   - `.commands`: Contains all `*Command` classes for this ruleset.
   - `.reports`: Contains all `*Report` classes for this ruleset.
   - `.model`: Contains the relevant model classes for this ruleset.
-  - `.rules`: Contains Procedures for this ruleset.
-  - `.serialization`: Contains the Kotlin Serialization module for the package
+  - `.context`': Contains all `*Context` classes used by this ruleset.
+  - `.procedures`: Contains Procedures for this ruleset.
+  - `.serialization`: Contains the Kotlin Serialization module for the ruleset.
+  - `.skills`: Contain all skills for the ruleset.
+  - `.specialrules`: Contain all Star Player special rules for the ruleset.
+  - `.tables`: Contain all lookup tables for the ruleset.

@@ -6,6 +6,8 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
@@ -16,7 +18,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
@@ -86,7 +87,7 @@ class NetworkFuzzTester {
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             try {
-                runRandomGame(seed, com.jervisffb.engine.rules.BB72020Rules())
+                runRandomGame(seed, BB72020Rules())
             } catch (ex: Throwable) {
                 fail("Game $gameNo (seed: $seed) crashed with exception:\n${ex.stackTraceToString()}")
             }

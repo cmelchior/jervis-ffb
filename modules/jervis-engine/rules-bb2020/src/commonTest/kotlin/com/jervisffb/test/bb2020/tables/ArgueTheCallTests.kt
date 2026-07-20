@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerDogoutState
@@ -11,7 +12,6 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020BrilliantCoachingReroll
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer

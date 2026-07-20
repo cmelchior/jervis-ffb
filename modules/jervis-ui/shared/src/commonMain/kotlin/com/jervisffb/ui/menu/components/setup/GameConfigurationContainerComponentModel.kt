@@ -1,11 +1,11 @@
 package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.jervisffb.engine.rules.BB72020Rules
-import com.jervisffb.engine.rules.FumbblBB2020Rules
+import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.FumbblBB2020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.RulesParameterBuilder
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior

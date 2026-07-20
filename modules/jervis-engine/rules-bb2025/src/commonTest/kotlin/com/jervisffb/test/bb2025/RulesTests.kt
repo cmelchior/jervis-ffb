@@ -1,13 +1,13 @@
 package com.jervisffb.test.bb2025
 
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RulesTests {
 
-    val rules = StandardBB2020Rules()
+    val rules = StandardBB2025Rules()
 
     @Test
     fun getSurroundingCoordinates_topLeftCorner_insidePitch() {

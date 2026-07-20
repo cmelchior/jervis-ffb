@@ -5,6 +5,10 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020BothDown
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlitzActionContext
@@ -23,9 +27,6 @@ import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020BothDown
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
@@ -48,7 +49,6 @@ import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.rules.common.procedures.RegenerationRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.rules.common.procedures.actions.foul.BeingSentOffContext
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ChainsawFoulStep
@@ -317,7 +317,7 @@ object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
 
 object UseVeryLongLegsWheelController: UseSkillWheelController(SkillType.VERY_LONG_LEGS) {
     override val nodes: Set<Node> = setOf(
-        com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs,
+        com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs,
         com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {

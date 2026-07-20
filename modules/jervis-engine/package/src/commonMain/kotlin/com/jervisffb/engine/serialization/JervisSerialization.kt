@@ -4,12 +4,12 @@ import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.bb2020.serialization.bb2020SerializerModule
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.serialize.bb2020SerializerModule
 import com.jervisffb.engine.rules.bb2025.serialize.bb2025SerializerModule
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription

@@ -60,7 +60,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * requires us to run these in lock-step, it means we need to split them up
  * into multiple procedures so we can switch context after each step.
  *
- * This split looks different in BB2020 and BB2025. See [com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep]
+ * This split looks different in BB2020 and BB2025. See [com.jervisffb.engine.bb2020.procedures.actions.block.StandardBlockStep]
  * for more information about BB2020 and [com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep] for BB2025.
  */
 object BlockAction : Procedure() {
