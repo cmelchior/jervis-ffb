@@ -24,9 +24,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType.STUNTY
 import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
 import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
-import com.jervisffb.engine.serialization.RosterLogo
-import com.jervisffb.engine.serialization.SingleSprite
-import com.jervisffb.engine.serialization.SpriteSheet
+import com.jervisffb.engine.sprites.RosterLogo
+import com.jervisffb.engine.sprites.SingleSprite
+import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.resources.iconRootPath
 import com.jervisffb.resources.portraitRootPath
 

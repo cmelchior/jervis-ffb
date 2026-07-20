@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
+import com.jervisffb.engine.sprites.SpriteSource
 import kotlinx.serialization.Serializable
 
 /**
