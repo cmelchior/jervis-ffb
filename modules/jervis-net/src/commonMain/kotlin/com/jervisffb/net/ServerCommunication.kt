@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage

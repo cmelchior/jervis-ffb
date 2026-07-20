@@ -40,7 +40,7 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.skills.Duration
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.InvalidGameStateException

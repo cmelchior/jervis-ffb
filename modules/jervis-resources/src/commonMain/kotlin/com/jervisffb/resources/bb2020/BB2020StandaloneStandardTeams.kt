@@ -3,9 +3,9 @@ package com.jervisffb.resources.bb2020
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
-import com.jervisffb.engine.serialize.JervisMetaData
-import com.jervisffb.engine.serialize.buildTeamFile
+import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
+import com.jervisffb.engine.serialization.JervisMetaData
+import com.jervisffb.engine.serialization.buildTeamFile
 import com.jervisffb.engine.teamBuilder
 
 // The List of default starter team rosters

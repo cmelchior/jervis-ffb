@@ -8,7 +8,7 @@ import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialization.RosterLogo
 
 /**
  * Human Teams

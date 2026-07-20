@@ -20,8 +20,8 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
-import com.jervisffb.engine.serialize.JervisSerialization
-import com.jervisffb.engine.serialize.JervisSetupFile
+import com.jervisffb.engine.serialization.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSetupFile
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.SETTINGS_MANAGER

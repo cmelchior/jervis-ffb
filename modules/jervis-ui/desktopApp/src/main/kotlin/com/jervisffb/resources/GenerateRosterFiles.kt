@@ -1,6 +1,6 @@
 package com.jervisffb.resources
 
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.resources.bb2020.BB2020StandaloneRosters
 import com.jervisffb.resources.bb2025.BB2025StandaloneRosters
 import kotlinx.serialization.json.Json

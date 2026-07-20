@@ -3,10 +3,10 @@ package com.jervisffb.resources
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.SetupId
 import com.jervisffb.engine.rules.builder.GameType
-import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
-import com.jervisffb.engine.serialize.JervisMetaData
-import com.jervisffb.engine.serialize.JervisSetupFile
-import com.jervisffb.engine.serialize.RelativeCoordinate
+import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
+import com.jervisffb.engine.serialization.JervisMetaData
+import com.jervisffb.engine.serialization.JervisSetupFile
+import com.jervisffb.engine.serialization.RelativeCoordinate
 
 object DefaultSetups {
     val standardSetups = mapOf(

@@ -33,11 +33,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.serialize.RosterLogo
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteLocation
-import com.jervisffb.engine.serialize.SpriteSheet
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialization.RosterLogo
+import com.jervisffb.engine.serialization.SingleSprite
+import com.jervisffb.engine.serialization.SpriteLocation
+import com.jervisffb.engine.serialization.SpriteSheet
+import com.jervisffb.engine.serialization.SpriteSource
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.icons_decorations_block1d
 import com.jervisffb.shared.generated.resources.icons_decorations_block2d

@@ -85,7 +85,7 @@ import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialization.SpriteSource
 import com.jervisffb.engine.utils.dedupSkillsByType
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus

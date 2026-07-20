@@ -11,7 +11,7 @@ import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.handlers.AcceptGameHandler
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.CloseHostedServerHandler

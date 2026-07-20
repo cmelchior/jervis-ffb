@@ -1,6 +1,6 @@
 package com.jervisffb.net.serialize
 
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSerialization
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 

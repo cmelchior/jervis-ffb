@@ -40,9 +40,9 @@ import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
-import com.jervisffb.engine.serialize.GameFileData
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.FILE_EXTENSION_GAME_FILE
+import com.jervisffb.engine.serialization.GameFileData
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_frontpage_goblin

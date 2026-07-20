@@ -3,11 +3,11 @@ package com.jervisffb.ui
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import com.jervisffb.engine.serialize.FILE_EXTENSION_SETUP_FILE
-import com.jervisffb.engine.serialize.FILE_EXTENSION_TEAM_FILE
-import com.jervisffb.engine.serialize.JervisSerialization
-import com.jervisffb.engine.serialize.JervisSetupFile
-import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.engine.serialization.FILE_EXTENSION_SETUP_FILE
+import com.jervisffb.engine.serialization.FILE_EXTENSION_TEAM_FILE
+import com.jervisffb.engine.serialization.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSetupFile
+import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.resources.DefaultSetups
 import com.jervisffb.resources.bb2020.BB2020StandaloneBB7Teams
 import com.jervisffb.resources.bb2020.BB2020StandaloneStandardTeams

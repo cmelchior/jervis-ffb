@@ -31,7 +31,7 @@ import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialization.RosterLogo
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020

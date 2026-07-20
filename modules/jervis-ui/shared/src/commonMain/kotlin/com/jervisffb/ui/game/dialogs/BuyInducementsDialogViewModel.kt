@@ -25,7 +25,7 @@ import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
 import com.jervisffb.engine.model.inducements.settings.WizardInducement
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialization.SpriteSource
 import com.jervisffb.engine.utils.dedupSkillsByType
 import kotlin.math.max
 import kotlin.math.min

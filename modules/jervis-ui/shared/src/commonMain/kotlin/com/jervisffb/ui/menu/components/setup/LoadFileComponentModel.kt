@@ -2,9 +2,9 @@ package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.rules.RulesParameterBuilder
-import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
-import com.jervisffb.engine.serialize.GameFileData
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.FILE_EXTENSION_GAME_FILE
+import com.jervisffb.engine.serialization.GameFileData
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.utils.readFile
 import kotlinx.coroutines.flow.MutableStateFlow

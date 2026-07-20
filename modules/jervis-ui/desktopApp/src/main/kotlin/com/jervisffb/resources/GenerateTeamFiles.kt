@@ -1,6 +1,6 @@
 package com.jervisffb.resources
 
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.resources.bb2020.BB2020StandaloneBB7Teams
 import com.jervisffb.resources.bb2020.BB2020StandaloneStandardTeams
 import com.jervisffb.utils.APPLICATION_DIRECTORY

@@ -6,8 +6,8 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.JervisTeamFile
-import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.serialization.JervisTeamFile
+import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.CacheManager
