@@ -1,6 +1,6 @@
 package com.jervisffb.test.bb2020.skills
 
-import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
+import com.jervisffb.engine.bb2020.skills.MultipleBlock
 import com.jervisffb.test.JervisGameBB2020Test
 
 /**

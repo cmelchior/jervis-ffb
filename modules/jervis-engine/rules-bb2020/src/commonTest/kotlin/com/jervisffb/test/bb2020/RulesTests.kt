@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2020
 
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

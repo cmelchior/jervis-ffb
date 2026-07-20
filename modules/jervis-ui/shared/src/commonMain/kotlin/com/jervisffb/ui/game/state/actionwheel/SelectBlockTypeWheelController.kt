@@ -3,6 +3,8 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.SelectBlockType
+import com.jervisffb.engine.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
@@ -22,9 +24,9 @@ import com.jervisffb.ui.menu.LocalPitchDataWrapper
  */
 object SelectBlockTypeWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(
-        com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectBlockType,
+        BlockAction.SelectBlockType,
         com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
-        com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.SelectBlockType
+        BlitzAction.SelectBlockType
     )
 
     override fun getActionWheelCenter(state: Game): PitchCoordinate {

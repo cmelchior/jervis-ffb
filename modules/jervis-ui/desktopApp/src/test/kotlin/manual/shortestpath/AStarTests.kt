@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.StandardPathFinder
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020

@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.bb2025.model.context
 
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.bb2020.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.SetContextProperty
@@ -15,7 +16,6 @@ import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.model.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice

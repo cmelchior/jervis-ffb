@@ -27,6 +27,10 @@ import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.context.MoveContext
@@ -34,8 +38,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
@@ -61,7 +63,6 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.RecoverKnockedOutPlayersStep
 import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
@@ -186,7 +187,7 @@ class AutomatedActionsFactory(
         if (
             menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION)
             && (currentNode in setOf(
-                com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectBlockType,
+                BlockAction.SelectBlockType,
                 com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
                 BlitzAction.SelectBlockType,
             ))
@@ -242,7 +243,7 @@ class AutomatedActionsFactory(
         // Whether to use the Very Long Legs skill or not
         if (
             menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_VERY_LONG_LEGS)
-            && (currentNode == JumpStep.ChooseToUseVeryLongLegs || currentNode == com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs)) {
+            && (currentNode == JumpStep.ChooseToUseVeryLongLegs || currentNode == com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs)) {
             if (controller.state.getContextOrNull<MoveContext>()?.player?.isSkillAvailable(SkillType.VERY_LONG_LEGS) == true) {
                 return Confirm
             }

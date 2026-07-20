@@ -1,0 +1,42 @@
+package com.jervisffb.engine.bb2020.procedures.actions.block
+
+import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020KnockedDown
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.ParentNode
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.reports.ReportPlayerDownResult
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+
+/**
+ * Resolve a "Player Down!" selected as a block result.
+ * See page 57 in the rulebook.
+ */
+object BB2020PlayerDown: Procedure() {
+    override val initialNode: Node = ResolvePlayerDown
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BlockContext>()
+        val injuryContext = RiskingInjuryContext(
+            player = context.attacker,
+            causedBy = context.defender,
+            isPartOfMultipleBlock = context.isUsingMultiBlock
+        )
+        return AddContext(injuryContext)
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return ReportPlayerDownResult(state.getContext<BlockContext>().attacker)
+    }
+
+    object ResolvePlayerDown: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
+        }
+    }
+}

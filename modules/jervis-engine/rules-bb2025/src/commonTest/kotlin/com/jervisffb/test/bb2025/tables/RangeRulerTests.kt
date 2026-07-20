@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2025.tables
 
+import com.jervisffb.engine.bb2020.tables.BB2020RangeRuler
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.test.JervisGameBB2025Test
 import kotlin.test.Test

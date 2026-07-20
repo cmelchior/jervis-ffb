@@ -3,10 +3,10 @@ package com.jervisffb.test.bb2020.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.bb2020.skills.Block
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2020Test

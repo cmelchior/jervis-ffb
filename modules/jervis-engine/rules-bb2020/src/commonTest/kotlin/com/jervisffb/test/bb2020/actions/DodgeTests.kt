@@ -3,11 +3,11 @@ package com.jervisffb.test.bb2020.actions
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward

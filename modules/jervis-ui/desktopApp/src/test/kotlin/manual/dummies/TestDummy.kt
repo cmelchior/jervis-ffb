@@ -2,7 +2,7 @@ package manual.dummies
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.state.LocalActionProvider

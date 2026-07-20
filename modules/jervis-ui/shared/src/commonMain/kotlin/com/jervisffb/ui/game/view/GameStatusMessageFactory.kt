@@ -1,6 +1,11 @@
 package com.jervisffb.ui.game.view
 
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
+import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
@@ -8,9 +13,6 @@ import com.jervisffb.engine.model.context.ChargeContext
 import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020Stumble
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
@@ -70,7 +72,6 @@ import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ChompRoll
@@ -99,7 +100,6 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.DodgySnack
@@ -142,7 +142,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         val skills = mapOf(
             Pickup.ChooseToUseBigHand to SkillType.BIG_HAND,
             SecureTheBallStep.ChooseToUseBigHand to SkillType.BIG_HAND,
-            com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
+            com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
             com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
             CreatePushChainStep.DecideToUseSidestep to SkillType.SIDESTEP,
             CreatePushChainStep.DecideToUseGrab to SkillType.GRAB,
@@ -282,7 +282,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             UnchannelledFuryRoll.ReRollDie to "Re-roll D6 to avoid Unchannelle Fury",
             UnchannelledFuryRoll.RollDie to "Roll D6 for Unchannelled Fury",
             WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather",
-            com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to "Roll D8 to Bounce the Player",
+            com.jervisffb.engine.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to "Roll D8 to Bounce the Player",
             com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
             com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
         )

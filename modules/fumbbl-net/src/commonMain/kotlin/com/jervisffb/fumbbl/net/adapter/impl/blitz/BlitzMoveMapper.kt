@@ -3,9 +3,9 @@ package com.jervisffb.fumbbl.net.adapter.impl.blitz
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder

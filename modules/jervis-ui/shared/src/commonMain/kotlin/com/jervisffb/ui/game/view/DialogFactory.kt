@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectInducements
+import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
@@ -34,7 +35,6 @@ import com.jervisffb.engine.rules.common.procedures.tables.injury.LastingInjuryR
 import com.jervisffb.engine.rules.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRefContext

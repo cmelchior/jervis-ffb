@@ -2,6 +2,8 @@ package com.jervisffb.ui.game.state.decorators
 
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.Dogout
@@ -30,7 +32,7 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
 
             // Calculate dice decorators (if any)
             var dice = when (state.stack.currentNode()) {
-                com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction.SelectDefenderOrEndAction -> {
+                BlockAction.SelectDefenderOrEndAction -> {
                     val attacker = state.activePlayer!!
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
@@ -40,7 +42,7 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
                 }
-                com.jervisffb.engine.rules.common.procedures.actions.blitz.BlitzAction.MoveOrBlockOrEndAction -> {
+                BlitzAction.MoveOrBlockOrEndAction -> {
                     val attacker = state.activePlayer!!
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = true)

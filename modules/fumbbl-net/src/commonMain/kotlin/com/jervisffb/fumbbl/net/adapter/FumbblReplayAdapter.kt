@@ -1,7 +1,7 @@
 package com.jervisffb.fumbbl.net.adapter
 
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.FumbblFileReplayAdapter
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandReplay

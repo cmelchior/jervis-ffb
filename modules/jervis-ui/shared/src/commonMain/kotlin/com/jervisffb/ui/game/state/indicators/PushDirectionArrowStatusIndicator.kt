@@ -1,12 +1,12 @@
 package com.jervisffb.ui.game.state.indicators
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator

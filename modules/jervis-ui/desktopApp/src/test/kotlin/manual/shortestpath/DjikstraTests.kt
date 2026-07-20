@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createStartingTestSetup
 import org.junit.Ignore

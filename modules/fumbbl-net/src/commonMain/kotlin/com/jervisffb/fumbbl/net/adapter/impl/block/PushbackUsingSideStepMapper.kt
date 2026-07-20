@@ -2,8 +2,8 @@ package com.jervisffb.fumbbl.net.adapter.impl.blitz
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

@@ -1,0 +1,64 @@
+package com.jervisffb.engine.bb2020.procedures.actions.pass
+
+import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.PassingInterferenceRollContext
+import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.assertContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.rules.common.testAgainstAgility
+
+/**
+ * Procedure for handling rolling for Passing Interference as described on page 50
+ * in the rulebook.
+ *
+ * It is only responsible for handling the actual dice roll. The result is stored
+ * in [PassingInterferenceRollContext] and it is up to the caller of the procedure
+ * to choose the appropriate action depending on the outcome.
+ */
+object PassingInterferenceRoll : D6WithRerollProcedure() {
+    override val rollType: DiceRollType = DiceRollType.PASSING_INTERFERENCE
+    override val initialNode: Node get() = RollDie
+    override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitRollProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<PassingInterferenceRollContext>()
+    override fun getActionOwner(state: Game): Player = state.getContext<PassingInterferenceRollContext>().player
+
+    override val RollDie = object : AbstractRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val rollContext = state.getContext<PassingInterferenceRollContext>()
+            return rollContext.copy(
+                roll = D6DieRoll.create(state, d6),
+                isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
+            )
+        }
+    }
+
+    override val ChooseReRollSource = object : AbstractChooseRerollSource() {
+        override fun getRerollData(state: Game, rules: Rules): RerollData {
+            val context = state.getContext<PassingInterferenceRollContext>()
+            return RerollData(context.player, context.roll!!, context.isSuccess)
+        }
+    }
+
+    override val ReRollDie = object : AbstractReRollDie() {
+        override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
+            val context = state.getContext<PassingInterferenceRollContext>()
+            return context.copy(
+                roll = context.roll!!.copyReroll(
+                    rerollSource = state.getRerollContext().source,
+                    rerolledResult = d6,
+                ),
+                isSuccess = testAgainstAgility(context.player, d6, context.modifiers)
+            )
+        }
+    }
+}

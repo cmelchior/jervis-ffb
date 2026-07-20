@@ -32,10 +32,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
+import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
-import com.jervisffb.engine.rules.BB72020Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameVersion

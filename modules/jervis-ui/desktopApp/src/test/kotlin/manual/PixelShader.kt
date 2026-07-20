@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory

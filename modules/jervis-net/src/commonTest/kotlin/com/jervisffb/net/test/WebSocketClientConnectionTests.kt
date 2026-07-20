@@ -1,7 +1,7 @@
 package com.jervisffb.net.test
 
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode

@@ -21,9 +21,9 @@ import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
 import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.engine.serialization.PlayerUiData
-import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.serialization.SerializedPlayer
 import com.jervisffb.engine.serialization.SerializedTeam
+import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.fumbbl.net.utils.convertFumbblSkillToSkillId

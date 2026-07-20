@@ -1,7 +1,7 @@
 package tourplay.rest
 
+import com.jervisffb.engine.bb2020.FumbblBB2020Rules
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.tourplay.TourPlayApi
 import kotlinx.coroutines.runBlocking

@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.rules.BB2020Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.bb2020.BB2020Rules
+import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.defaultDetermineKickingTeam

@@ -9,6 +9,10 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.bb2020.skills.Loner
+import com.jervisffb.engine.bb2020.skills.MightyBlow
+import com.jervisffb.engine.bb2020.skills.Pro
+import com.jervisffb.engine.bb2020.skills.Stab
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -19,10 +23,6 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.RushModifier
-import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
-import com.jervisffb.engine.rules.bb2020.skills.Pro
-import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.FullGame
