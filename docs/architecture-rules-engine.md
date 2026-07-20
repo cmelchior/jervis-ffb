@@ -150,3 +150,19 @@ while working on getting the "best" separation of concerns:
   to that is that the UI (which consumes both), will have a harder time 
   disambiguating them.
   
+## Architecture Conventions
+
+The following root packages are used for each module:
+
+- `core`: `com.jervisffb.engine`
+- `rules-common`: `com.jervisffb.engine.common`
+- `rules-bb2020`: `com.jervisffb.engine.bb2020`
+- `rules-bb2025`: `com.jervisffb.engine.bb2025`
+
+Inside each module, package names should follow the same hierarchy for:
+
+  - `.commands`: Contains all `*Command` classes for this ruleset.
+  - `.reports`: Contains all `*Report` classes for this ruleset.
+  - `.model`: Contains the relevant model classes for this ruleset.
+  - `.rules`: Contains Procedures for this ruleset.
+  - `.serialization`: Contains the Kotlin Serialization module for the package
