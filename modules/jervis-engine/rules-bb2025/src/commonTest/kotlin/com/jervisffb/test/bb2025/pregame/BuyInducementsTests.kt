@@ -4,11 +4,11 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.SelectInducements
+import com.jervisffb.engine.bb2025.procedures.TeamTurn
+import com.jervisffb.engine.bb2025.procedures.rerolls.ExtraTeamTrainingReroll
 import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.rules.common.procedures.inducements.BuyInducements
-import com.jervisffb.engine.rules.common.procedures.rerolls.ExtraTeamTrainingReroll
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultFanFactor

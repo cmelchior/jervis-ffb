@@ -1,8 +1,8 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData

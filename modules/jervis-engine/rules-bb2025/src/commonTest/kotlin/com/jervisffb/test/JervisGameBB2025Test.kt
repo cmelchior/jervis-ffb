@@ -4,14 +4,14 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.BB2025Rules
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.procedures.FullGame
 import com.jervisffb.test.bb2020.advancedHumanTeamAway

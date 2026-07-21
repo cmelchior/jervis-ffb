@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.ballId
@@ -26,7 +27,6 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.test.JervisGameBB2025Test

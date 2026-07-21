@@ -1,8 +1,8 @@
 package com.jervisffb.test.bb2025.pitch
 
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.BeforeTest
 import kotlin.test.Test

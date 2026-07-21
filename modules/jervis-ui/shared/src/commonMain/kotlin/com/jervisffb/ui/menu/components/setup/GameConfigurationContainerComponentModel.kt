@@ -4,9 +4,9 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.FumbblBB2020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.RulesParameterBuilder
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.viewmodel.MenuViewModel

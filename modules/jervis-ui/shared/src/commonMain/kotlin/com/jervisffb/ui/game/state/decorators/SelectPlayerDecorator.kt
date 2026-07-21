@@ -37,7 +37,7 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
                 }
-                com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectDefenderOrEndAction -> {
+                com.jervisffb.engine.bb2025.procedures.actions.block.BlockAction.SelectDefenderOrEndAction -> {
                     val attacker = state.activePlayer!!
                     val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)

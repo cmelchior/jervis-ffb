@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -12,7 +13,6 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test

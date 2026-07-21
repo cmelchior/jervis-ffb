@@ -8,6 +8,8 @@ import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.skills.Kick
+import com.jervisffb.engine.bb2025.skills.Punt
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -15,8 +17,6 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2025.skills.Kick
-import com.jervisffb.engine.rules.bb2025.skills.Punt
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType

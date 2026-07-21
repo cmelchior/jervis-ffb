@@ -1,8 +1,8 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.serialization.JervisSerialization.jervisEngineSerializerModule
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json

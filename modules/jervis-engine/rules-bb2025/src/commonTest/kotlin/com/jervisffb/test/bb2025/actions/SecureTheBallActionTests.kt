@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d6
@@ -14,7 +15,6 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.singleInstanceOf

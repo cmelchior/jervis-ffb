@@ -6,12 +6,12 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.procedures.rerolls.MascotContext
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotStep
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.procedures.rerolls.MascotContext
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId

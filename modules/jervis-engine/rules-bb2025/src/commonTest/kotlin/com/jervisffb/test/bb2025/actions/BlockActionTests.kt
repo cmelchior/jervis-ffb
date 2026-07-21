@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
@@ -24,7 +25,6 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.test.JervisGameBB2025Test

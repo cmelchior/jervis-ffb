@@ -4,6 +4,36 @@ package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
+import com.jervisffb.engine.bb2025.context.SecureTheBallRollContext
+import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireContext
+import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.ChompContext
+import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRollContext
+import com.jervisffb.engine.bb2025.procedures.actions.block.JumpUpRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.JumpUpRollContext
+import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.PogoRoll
+import com.jervisffb.engine.bb2025.procedures.actions.pass.InterceptionRoll
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.AlwaysHungryContext
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.AlwaysHungryRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.AlwaysHungrySquirmFreeRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopContext
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDistanceRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.injury.SteadyFootingRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.MascotRollContext
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRollContext
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
+import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
+import com.jervisffb.engine.bb2025.skills.PuntDistanceRoll
+import com.jervisffb.engine.bb2025.skills.ShadowingRoll
+import com.jervisffb.engine.bb2025.skills.TentaclesRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ActivatePlayerContext
@@ -27,22 +57,6 @@ import com.jervisffb.engine.model.context.TentaclesRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2025.model.context.SecureTheBallRollContext
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRollContext
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.InterceptionRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungryContext
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungryRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungrySquirmFreeRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopContext
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDistanceRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.HypnoticGazeRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.PuntDistanceRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesRoll
 import com.jervisffb.engine.rules.common.procedures.AnimalSavageryContext
 import com.jervisffb.engine.rules.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
@@ -52,18 +66,10 @@ import com.jervisffb.engine.rules.common.procedures.PickupRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.rules.common.procedures.ReallyStupidRollContext
 import com.jervisffb.engine.rules.common.procedures.RegenerationRoll
-import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRollContext
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRollContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.ChainsawRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.ChompContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.ChompRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRollContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitContext
@@ -76,12 +82,8 @@ import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.Landin
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRollContext
-import com.jervisffb.engine.rules.common.procedures.rerolls.MascotRollContext
 import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
 import com.jervisffb.engine.rules.common.procedures.rerolls.ProRollContext
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRollContext
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import kotlin.time.ExperimentalTime
 
@@ -151,9 +153,9 @@ object AccuracyBB2020WheelController : D6WithRerollWheelController() {
 object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "accuracy"
     override val diceRollType: DiceRollType = DiceRollType.ACCURACY
-    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie
-    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie
+    override val rollDiceNode: Node = PassAccuracyRoll.RollDie
+    override val chooseRerollSourceNode: Node = PassAccuracyRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = PassAccuracyRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<PassContext>().thrower.coordinates
@@ -168,9 +170,9 @@ object AccuracyBB2025PassWheelController : D6WithRerollWheelController() {
 object AccuracyBB2025ThrowTeamMateWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "quality"
     override val diceRollType: DiceRollType = DiceRollType.ACCURACY
-    override val rollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.RollDie
-    override val chooseRerollSourceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll.ReRollDie
+    override val rollDiceNode: Node = ThrowTeammateAccuracyRoll.RollDie
+    override val chooseRerollSourceNode: Node = ThrowTeammateAccuracyRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ThrowTeammateAccuracyRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ThrowTeamMateContext>().thrower.coordinates

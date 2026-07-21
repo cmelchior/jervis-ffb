@@ -5,11 +5,11 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.skills.Shadowing
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.rules.bb2025.skills.Shadowing
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
