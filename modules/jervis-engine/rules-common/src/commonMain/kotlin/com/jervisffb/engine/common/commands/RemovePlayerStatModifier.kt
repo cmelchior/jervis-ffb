@@ -1,0 +1,22 @@
+package com.jervisffb.engine.common.commands
+
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.modifiers.StatModifier
+
+class RemovePlayerStatModifier(private val player: Player, val modifier: StatModifier) : Command {
+    override fun execute(state: Game) {
+        player.apply {
+            removeStatModifier(modifier)
+            player.team.game.rules.updatePlayerStat(player, modifier.type)
+        }
+    }
+
+    override fun undo(state: Game) {
+        player.apply {
+            addStatModifier(modifier)
+            player.team.game.rules.updatePlayerStat(player, modifier.type)
+        }
+    }
+}

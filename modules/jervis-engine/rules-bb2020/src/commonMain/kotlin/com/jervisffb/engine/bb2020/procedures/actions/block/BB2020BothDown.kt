@@ -25,12 +25,12 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.BlockContext
-import com.jervisffb.engine.model.context.BothDownContext
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.BothDownContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportBothDownResult
+import com.jervisffb.engine.common.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 

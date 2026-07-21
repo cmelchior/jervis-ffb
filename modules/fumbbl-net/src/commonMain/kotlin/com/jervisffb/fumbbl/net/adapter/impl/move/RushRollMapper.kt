@@ -8,7 +8,7 @@ import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.engine.bb2020.skills.SureFeet
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder

@@ -15,11 +15,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRollList
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import kotlin.math.absoluteValue

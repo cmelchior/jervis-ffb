@@ -1,7 +1,7 @@
 package com.jervisffb.engine.bb2020.tables
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.rules.common.tables.KickOffEventResult
+import com.jervisffb.engine.common.tables.KickOffEventResult
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable

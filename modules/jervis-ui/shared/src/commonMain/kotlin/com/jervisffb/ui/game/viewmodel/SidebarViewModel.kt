@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
+import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot

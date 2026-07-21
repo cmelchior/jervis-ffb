@@ -17,15 +17,15 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.reports.ReportPowResult
+import com.jervisffb.engine.common.reports.ReportPowResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 
 /**
  * Resolve POW! selected on the block dice.
@@ -111,11 +111,12 @@ object BB2020Pow: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val defender = context.firstPushee
-            val injuryContext = RiskingInjuryContext(
-                player = defender,
-                causedBy = context.firstPusher,
-                isPartOfMultipleBlock = context.isMultipleBlock
-            )
+            val injuryContext =
+                RiskingInjuryContext(
+                    player = defender,
+                    causedBy = context.firstPusher,
+                    isPartOfMultipleBlock = context.isMultipleBlock
+                )
             return buildCompositeCommand {
                 addAll(
                     AddContext(injuryContext)
@@ -129,16 +130,17 @@ object BB2020Pow: Procedure() {
                 }
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
+            RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val multipleBlockContext = state.getContextOrNull<BB2020MultipleBlockContext>()
-            val injuryContext = state.getContext<RiskingInjuryContext>()
+            val injuryContext = state.getContext<com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext>()
             val updateInjuryCommand = multipleBlockContext?.addInjuryReferenceForPlayer(
                 injuryContext.player,
                 injuryContext
             )
             return compositeCommandOf(
-                RemoveContext<RiskingInjuryContext>(),
+                RemoveContext<com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext>(),
                 updateInjuryCommand,
                 if (multipleBlockContext != null) {
                     ExitProcedure()

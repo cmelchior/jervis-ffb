@@ -11,8 +11,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 object AlwaysHungrySquirmFreeRoll: D6WithRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT

@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2025.skills
 
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetHasTackleZones
+import com.jervisffb.engine.common.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -14,15 +14,15 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.HypnoticGazeContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

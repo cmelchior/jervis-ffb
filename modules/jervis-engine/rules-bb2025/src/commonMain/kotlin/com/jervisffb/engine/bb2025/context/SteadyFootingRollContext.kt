@@ -1,8 +1,8 @@
 package com.jervisffb.engine.model.context
 
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 
 data class SteadyFootingRollContext(
     val player: Player,

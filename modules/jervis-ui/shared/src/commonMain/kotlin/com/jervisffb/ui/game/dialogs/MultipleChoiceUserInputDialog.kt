@@ -18,13 +18,13 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.FoulContext
+import com.jervisffb.engine.common.context.FoulContext
+import com.jervisffb.engine.common.modifiers.CasualtyModifier
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.model.modifiers.CasualtyModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**

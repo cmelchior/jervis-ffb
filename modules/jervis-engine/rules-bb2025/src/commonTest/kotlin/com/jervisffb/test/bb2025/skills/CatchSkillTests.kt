@@ -35,7 +35,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the [com.jervisffb.engine.rules.common.procedures.Catch] skill
+ * Class testing usage of the [com.jervisffb.engine.common.procedures.Catch] skill
  *
  * See page 126 in the BB2025 rulebook for the skill.
  * See page 72 in the BB2025 rulebook for the catching description.

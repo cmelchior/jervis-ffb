@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2025
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
+import com.jervisffb.engine.common.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.model.Coach

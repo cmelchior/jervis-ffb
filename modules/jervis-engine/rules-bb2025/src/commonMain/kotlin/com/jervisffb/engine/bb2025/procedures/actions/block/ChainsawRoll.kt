@@ -5,15 +5,15 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.context.ChainsawContext
+import com.jervisffb.engine.common.context.ChainsawContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Implement the Chainsaw Roll as described on page 126 in the BB2025

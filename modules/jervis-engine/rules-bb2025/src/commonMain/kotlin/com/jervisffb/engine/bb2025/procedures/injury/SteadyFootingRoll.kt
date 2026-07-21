@@ -12,8 +12,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Procedure for handling a Steady Footing Roll as described on page 136 in the

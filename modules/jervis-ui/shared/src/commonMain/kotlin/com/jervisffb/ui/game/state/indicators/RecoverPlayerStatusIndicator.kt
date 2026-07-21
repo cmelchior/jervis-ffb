@@ -4,8 +4,8 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.common.procedures.RecoverKnockedOutPlayersContext
-import com.jervisffb.engine.rules.common.procedures.RecoverPlayerRoll
+import com.jervisffb.engine.common.procedures.RecoverKnockedOutPlayersContext
+import com.jervisffb.engine.common.procedures.RecoverPlayerRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**

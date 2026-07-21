@@ -25,20 +25,20 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ActivatePlayerContext
-import com.jervisffb.engine.model.context.BlitzActionContext
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BlitzActionContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceContext
-import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 

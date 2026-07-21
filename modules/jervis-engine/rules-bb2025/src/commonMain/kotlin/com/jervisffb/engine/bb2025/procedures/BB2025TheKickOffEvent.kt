@@ -17,7 +17,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.reports.ReportTouchback
+import com.jervisffb.engine.common.reports.ReportTouchback
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 

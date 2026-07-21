@@ -2,9 +2,9 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.bb2020.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.bb2020.procedures.actions.block.StandardBlockStep
-import com.jervisffb.engine.commands.AddPlayerStatModifier
+import com.jervisffb.engine.common.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveTeamFeature
+import com.jervisffb.engine.common.commands.RemoveTeamFeature
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -14,7 +14,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill

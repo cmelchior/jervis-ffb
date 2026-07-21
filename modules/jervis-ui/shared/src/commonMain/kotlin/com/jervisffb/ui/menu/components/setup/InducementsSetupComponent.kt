@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jervisffb.engine.reports.ReportStartingExtraTime.category
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisSwitch

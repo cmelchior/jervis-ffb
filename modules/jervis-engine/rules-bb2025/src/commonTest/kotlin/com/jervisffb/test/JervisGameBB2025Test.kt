@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.rules.common.procedures.FullGame
+import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.test.bb2020.advancedHumanTeamAway
 import com.jervisffb.test.bb2020.createAdvancedHomeTeam
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020

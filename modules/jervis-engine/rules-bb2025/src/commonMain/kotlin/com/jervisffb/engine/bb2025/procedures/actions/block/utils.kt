@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.block
 
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext

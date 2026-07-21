@@ -6,7 +6,7 @@ import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDirecti
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.PuntContext
+import com.jervisffb.engine.common.context.PuntContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType

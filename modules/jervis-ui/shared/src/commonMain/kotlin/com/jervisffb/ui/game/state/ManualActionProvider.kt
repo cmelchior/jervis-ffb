@@ -29,8 +29,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
-import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveStep
+import com.jervisffb.engine.common.procedures.ActivatePlayer
+import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator

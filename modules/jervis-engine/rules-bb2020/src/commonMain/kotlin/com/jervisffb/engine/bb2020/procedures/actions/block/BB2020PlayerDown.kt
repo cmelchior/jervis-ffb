@@ -8,11 +8,11 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportPlayerDownResult
+import com.jervisffb.engine.common.reports.ReportPlayerDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Resolve a "Player Down!" selected as a block result.
@@ -22,11 +22,12 @@ object BB2020PlayerDown: Procedure() {
     override val initialNode: Node = ResolvePlayerDown
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<BlockContext>()
-        val injuryContext = RiskingInjuryContext(
-            player = context.attacker,
-            causedBy = context.defender,
-            isPartOfMultipleBlock = context.isUsingMultiBlock
-        )
+        val injuryContext =
+            RiskingInjuryContext(
+                player = context.attacker,
+                causedBy = context.defender,
+                isPartOfMultipleBlock = context.isUsingMultiBlock
+            )
         return AddContext(injuryContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {

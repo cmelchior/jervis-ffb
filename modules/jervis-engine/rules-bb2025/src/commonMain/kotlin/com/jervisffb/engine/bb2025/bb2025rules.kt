@@ -49,7 +49,7 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.rules.AbstractRules
+import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.RulesParameters
 import com.jervisffb.engine.rules.RulesParametersHolder
@@ -65,7 +65,7 @@ import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.TeamCaptainNotOnPitch
 import com.jervisffb.engine.rules.common.actions.PlayerAction
-import com.jervisffb.engine.rules.common.pathfinder.StandardPathFinder
+import com.jervisffb.engine.common.pathfinder.StandardPathFinder
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule

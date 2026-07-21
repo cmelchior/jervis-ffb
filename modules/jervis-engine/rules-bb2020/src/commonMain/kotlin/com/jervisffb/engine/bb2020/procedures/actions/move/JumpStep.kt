@@ -11,11 +11,11 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020FallingOver
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerIntermediateState
+import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.commands.SetPlayerMoveLeft
-import com.jervisffb.engine.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetPlayerMoveLeft
+import com.jervisffb.engine.common.commands.SetPlayerRushesLeft
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -39,15 +39,15 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.JumpModifier
-import com.jervisffb.engine.model.modifiers.MarkedModifier
+import com.jervisffb.engine.common.modifiers.JumpModifier
+import com.jervisffb.engine.common.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
-import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
+import com.jervisffb.engine.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.common.procedures.calculateOptionsForMoveType
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.max
@@ -235,7 +235,10 @@ object JumpStep : Procedure() {
             val player = moveContext.player
             val jumpFromMarks = rules.calculateMarks(state, player.team, moveContext.startingSquare)
             val jumpToMarks = rules.calculateMarks(state, player.team, moveContext.target!!)
-            val markModifier = MarkedModifier(max(jumpToMarks, jumpFromMarks), JumpModifier.MARKED)
+            val markModifier = MarkedModifier(
+                max(jumpToMarks, jumpFromMarks),
+                JumpModifier.MARKED
+            )
             val modifiers = mutableListOf<DiceModifier>()
             modifiers.add(markModifier)
             if (moveContext.useVeryLongLegs) {
