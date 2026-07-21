@@ -10,7 +10,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -18,91 +17,35 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ThrowTeamMateContext
+import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
+import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
+import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.common.reports.ReportPickingUpPlayerToThrow
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
-import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.common.reports.ReportPickingUpPlayerToThrow
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
-import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.tables.Range
-import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import com.jervisffb.engine.utils.sum
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-
-// See page 53 in the BB2020 rulebook
-// See page 77 in the BB2025 rulebook
-enum class ThrowPlayerResult {
-    SUPERB, // Both BB2020 and BB2025
-    SUCCESSFUL, // Only BB2020
-    TERRIBLE, // Only BB2020
-    SUBPAR, // Only BB2025
-    FUMBLED, // Both BB2020 and BB2025
-}
-
-data class ThrowTeamMateContext(
-    val thrower: Player,
-    val thrownPlayer: Player? = null,
-    val hasMoved: Boolean = false,
-    // Target of the throw in the current step. This means it will be updated when the ball scatters, deviates, etc.
-    val target: PitchCoordinate? = null,
-    val range: Range? = null,
-    val qualityRoll: D6DieRoll? = null,
-    val qualityRollModifiers: PersistentList<DiceModifier> = persistentListOf(),
-    val qualityRollResult: ThrowPlayerResult? = null,
-
-    // BB2020: If a player without TZ or prone/stunned are thrown they will bounce one
-    // extra time before landing. They will automatically fail the landing roll. This is called
-    // Crash Landing.
-    // BB2025: If a player without TZ or prone/stunned is thrown, they will just automatically
-    // fail the landing roll. This is not a named concept, instea "Crash Landing" is only used
-    // as a side-remark for landing on another player.
-    // In Jervis, we use "Crash Landing" to mean being thrown while being Distracted, Prone or
-    // Stunned across all rulesets.
-    val willCrashLand: Boolean = false,
-    // If a player bounces on another player, the result when they land differs between rulesets.
-    // - in BB2020, the rulebook says they will Fall Down, but it was errata'ed to a Knock Down
-    // - in BB2025, the rulebook says they will Fall Over, and no errata currently exist.
-    val fallOverWhenLanding: Boolean = false,
-    val knockedDownWhenLanding: Boolean = false,
-    // If the player scattered, deviated or bounced into the crowd while holding the ball.
-    // The ball should be thrown in from this square.
-    val outOfBoundsAt: PitchCoordinate? = null
-) : ProcedureContext {
-    val isQualityRollSuccess: Boolean
-        get() {
-            val pa = thrower.passing
-            val roll = qualityRoll
-            if (pa == null || pa == 0) return false
-            if (roll == null) return false
-            return pa >= roll.result.value + qualityRollModifiers.sum()
-        }
-}
 
 /**
  * Procedure for controlling a player's Throw team-mate action.

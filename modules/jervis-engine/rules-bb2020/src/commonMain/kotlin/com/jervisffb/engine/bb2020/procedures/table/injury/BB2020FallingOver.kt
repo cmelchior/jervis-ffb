@@ -3,12 +3,16 @@ package com.jervisffb.engine.bb2020.procedures.table.injury
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetCurrentBall
-import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -18,10 +22,6 @@ import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

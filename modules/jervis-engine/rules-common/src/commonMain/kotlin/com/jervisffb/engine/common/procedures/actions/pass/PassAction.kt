@@ -10,8 +10,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.SelectPassType
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetCurrentBall
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -19,74 +17,35 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.PassContext
+import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
+import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
+import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.common.reports.ReportSkillUsed
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.context.InterceptionContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.PassingInterferenceContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PassType
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
-import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
-import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-
-enum class PassingType {
-    ACCURATE,
-    INACCURATE,
-    WILDLY_INACCURATE,
-    FUMBLED
-}
-
-data class PassContext(
-    val thrower: Player,
-    val type: PassType = PassType.STANDARD,
-    val hasMoved: Boolean = false,
-    // Target of the Pass in the current step. This means it will be updated when the ball scatters or deviates, but
-    // not bounces after it lands.
-    val target: PitchCoordinate? = null,
-    val range: Range? = null,
-    val useNervesOfSteel: Boolean = false,
-    val passingRoll: D6DieRoll? = null,
-    val passingModifiers: PersistentList<DiceModifier> = persistentListOf(),
-    val passingResult: PassingType? = null,
-    val useSafePass: Boolean = false,
-    val runInterference: Player? = null,
-    // Used in BB2020
-    val passingInterference: PassingInterferenceContext? = null,
-    // Used in BB2025
-    val intercept: InterceptionContext? = null,
-) : ProcedureContext {
-    fun copyAndAdd(passingModifier: DiceModifier): PassContext = this.copy(
-        passingModifiers = passingModifiers.add(passingModifier)
-    )
-    val hasThrown: Boolean
-        get() = (range != null)
-}
 
 /**
  * Procedure for controlling a player's Pass action.

@@ -3,10 +3,10 @@ package com.jervisffb.fumbbl.net.adapter.impl.move
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.common.procedures.actions.move.MoveAction
 import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

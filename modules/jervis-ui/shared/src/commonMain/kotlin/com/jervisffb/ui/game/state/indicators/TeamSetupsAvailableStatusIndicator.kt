@@ -1,11 +1,11 @@
 package com.jervisffb.ui.game.state.indicators
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.ButtonData

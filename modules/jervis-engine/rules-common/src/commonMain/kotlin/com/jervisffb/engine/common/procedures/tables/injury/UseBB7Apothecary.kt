@@ -12,12 +12,16 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetApothecaryUsed
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetApothecaryUsed
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.inducements.StandardApothecary
+import com.jervisffb.engine.common.reports.ReportApothecaryUsed
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -26,10 +30,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.inducements.StandardApothecary
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.common.reports.ReportApothecaryUsed
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.InjuryResult
@@ -37,7 +38,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
  * Procedure for using an apothecary as described on page 95 in Death Zone.
- * The result of using the apothecary is stored in [RiskingInjuryContext]
+ * The result of using the apothecary is stored in [com.jervisffb.engine.common.context.RiskingInjuryContext]
  *
  * Developer's Commentary:
  * This procedure has a lot of overlap with the [UseBB11Apothecary] procedure.

@@ -51,14 +51,9 @@ import com.jervisffb.engine.bb2025.skills.ShadowingRoll
 import com.jervisffb.engine.bb2025.skills.ShadowingStep
 import com.jervisffb.engine.bb2025.skills.TentaclesRoll
 import com.jervisffb.engine.bb2025.skills.TentaclesStep
-import com.jervisffb.engine.fsm.Node
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChargeContext
-import com.jervisffb.engine.model.context.QuickSnapContext
-import com.jervisffb.engine.model.context.SteadyFootingRollContext
-import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.common.context.DeviateRollContext
 import com.jervisffb.engine.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.common.procedures.Bounce
@@ -67,7 +62,6 @@ import com.jervisffb.engine.common.procedures.CatchRoll
 import com.jervisffb.engine.common.procedures.DealWithSecretWeaponsStep
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.common.procedures.DeviateRoll
-import com.jervisffb.engine.common.procedures.DeviateRollContext
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.Pickup
 import com.jervisffb.engine.common.procedures.PickupRoll
@@ -107,6 +101,12 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.QuickSnapContext
+import com.jervisffb.engine.model.context.SteadyFootingRollContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider

@@ -10,11 +10,11 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.TargetSquare
+import com.jervisffb.engine.common.procedures.actions.move.MoveAction
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo

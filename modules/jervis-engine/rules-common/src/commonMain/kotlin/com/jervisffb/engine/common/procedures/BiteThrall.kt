@@ -2,11 +2,11 @@ package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.rules.Rules
 

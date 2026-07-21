@@ -1,7 +1,7 @@
 package com.jervisffb.ui.game.state.indicators
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopContext
+import com.jervisffb.engine.bb2025.context.SwoopContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContextOrNull

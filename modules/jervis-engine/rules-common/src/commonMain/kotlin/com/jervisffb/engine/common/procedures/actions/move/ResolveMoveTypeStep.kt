@@ -2,19 +2,21 @@ package com.jervisffb.engine.common.procedures.actions.move
 
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.procedures.Pickup
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.SecureTheBallContext
@@ -23,8 +25,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.Pickup
-import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

@@ -2,6 +2,8 @@ package com.jervisffb.engine.bb2025.procedures.injury
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -12,8 +14,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Procedure for handling a Steady Footing Roll as described on page 136 in the

@@ -13,24 +13,20 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.context.DealWithSecretWeaponsContext
+import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
+import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOffContext
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class DealWithSecretWeaponsContext(
-    val selectedPlayer: Player? = null,
-): ProcedureContext
 
 /**
  * This procedure controls the Deal with Secret Weapons step that is part of

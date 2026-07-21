@@ -14,6 +14,8 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.RecoverKnockedOutPlayersContext
+import com.jervisffb.engine.common.reports.ReportRecoverPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -21,34 +23,10 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.common.reports.ReportRecoverPlayer
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.persistentSetOf
-
-data class RecoverKnockedOutPlayersContext(
-    val playersHandled: PersistentSet<Player> = persistentSetOf(),
-    val selectedPlayer: Player? = null,
-    val recoverRoll: D6DieRoll? = null,
-    val modifiers: List<DiceModifier> = emptyList(),
-    val isSuccess: Boolean = false,
-): ProcedureContext {
-    fun reset(playerHandled: Player): RecoverKnockedOutPlayersContext {
-        return this.copy(
-            playersHandled = playersHandled.add(playerHandled),
-            selectedPlayer = null,
-            recoverRoll = null,
-            modifiers = emptyList(),
-            isSuccess = false,
-        )
-    }
-}
 
 /**
  * This procedure controls the "Recover Knocked-out Players" step that is part

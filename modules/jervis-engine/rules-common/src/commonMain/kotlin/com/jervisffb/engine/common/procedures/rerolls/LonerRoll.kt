@@ -2,6 +2,9 @@ package com.jervisffb.engine.common.procedures.rerolls
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.context.LonerRollContext
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -11,15 +14,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.skills.SkillType
-
-data class LonerRollContext(
-    val player: Player,
-    val roll: D6DieRoll? = null,
-    val isSuccess: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure controlling the Loner roll, i.e., when a player with the Loner

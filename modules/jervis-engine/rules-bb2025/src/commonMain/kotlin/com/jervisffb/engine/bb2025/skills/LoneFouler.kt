@@ -1,7 +1,9 @@
 package com.jervisffb.engine.bb2025.skills
 
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.modifiers.DefensiveAssistsArmourModifier
 import com.jervisffb.engine.common.modifiers.OffensiveAssistArmourModifier
+import com.jervisffb.engine.common.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -11,8 +13,6 @@ import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.common.procedures.UseStandardSkillReroll
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource

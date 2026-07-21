@@ -5,12 +5,12 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.common.context.CoinTossContext
+import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.common.procedures.CoinTossContext
-import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId

@@ -1,6 +1,7 @@
 package com.jervisffb.engine.bb2025.skills
 
 import com.jervisffb.engine.bb2025.procedures.actions.pass.PassAccuracyRoll
+import com.jervisffb.engine.common.skills.D6StandardSkillReroll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
@@ -8,7 +9,6 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.common.skills.D6StandardSkillReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType

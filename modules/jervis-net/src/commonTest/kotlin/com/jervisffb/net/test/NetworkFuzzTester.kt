@@ -8,6 +8,8 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.common.context.SetupTeamContext
+import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
@@ -21,8 +23,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.common.procedures.SetupTeam
-import com.jervisffb.engine.common.procedures.SetupTeamContext
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction

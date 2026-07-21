@@ -2,7 +2,6 @@ package com.jervisffb.engine.common.procedures.actions.move
 
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -11,34 +10,24 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetPlayerMoveLeft
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.StandingUpRollContext
+import com.jervisffb.engine.common.reports.ReportStandingUp
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerPitchState
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.common.reports.ReportStandingUp
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-
-data class StandingUpRollContext(
-    val player: Player,
-    val modifiers: PersistentList<DiceModifier> = persistentListOf(),
-    val roll: D6DieRoll? = null,
-    val isSuccess: Boolean = false
-): ProcedureContext
 
 /**
  * Procedure for handling a prone player standing up as part of a Move, Blitz, Pass, Hand-Off or Foul action.

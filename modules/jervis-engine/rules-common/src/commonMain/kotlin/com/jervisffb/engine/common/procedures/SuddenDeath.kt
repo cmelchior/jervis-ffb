@@ -6,32 +6,26 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetSuddenDeathTouchdowns
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetSuddenDeathTouchdowns
+import com.jervisffb.engine.common.context.SuddenDeathContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.LogCategory
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class SuddenDeathContext(
-    val homeRolls: List<D6Result> = emptyList(),
-    val awayRolls: List<D6Result> = emptyList(),
-    val rollOffs: Int = 0 // How many roll offs has happened. Roll offs with the same result are not counted.
-): ProcedureContext
 
 /**
  * Procedure responsible for handling Sudden Death as described on page 67 in the rulebook.

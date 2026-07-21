@@ -13,16 +13,17 @@ import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
-import com.jervisffb.engine.common.commands.AddTeamReroll
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.common.commands.SetTeamRerollEnabled
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.AddTeamReroll
+import com.jervisffb.engine.common.commands.RemoveTeamReroll
+import com.jervisffb.engine.common.commands.SetTeamRerollEnabled
+import com.jervisffb.engine.common.context.SetupTeamContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -33,7 +34,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
@@ -44,11 +44,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class SetupTeamContext(
-    val team: Team,
-    var currentPlayer: Player? = null
-): ProcedureContext
 
 object SetupTeam : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup

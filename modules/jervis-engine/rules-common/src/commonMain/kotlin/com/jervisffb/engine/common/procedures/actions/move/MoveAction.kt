@@ -13,6 +13,10 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
+import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -21,11 +25,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
-import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.skills.Duration
-import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

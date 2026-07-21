@@ -4,10 +4,10 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.procedures.TheKickOff
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder

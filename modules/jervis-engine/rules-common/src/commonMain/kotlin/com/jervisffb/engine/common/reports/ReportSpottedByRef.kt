@@ -1,8 +1,8 @@
 package com.jervisffb.engine.common.reports
 
+import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOffContext
 
 class ReportSpottedByRef(val context: BeingSentOffContext, val usingSecretWeapon: Boolean) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

@@ -7,12 +7,13 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -30,7 +31,6 @@ import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Class wrapping one of the block actions part of a multiple block actions.
@@ -164,9 +164,9 @@ data class BB2020MultipleBlockContext(
     val attackerBallHandled: Boolean = false,
     // Set if any of the players involved received an injury. The attacker might suffer an
     // injury from both blocks
-    val attackerInjuryContext: MutableList<com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext> = mutableListOf(),
-    var defender1InjuryContext: com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext? = null,
-    var defender2InjuryContext: com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext? = null,
+    val attackerInjuryContext: MutableList<RiskingInjuryContext> = mutableListOf(),
+    var defender1InjuryContext: RiskingInjuryContext? = null,
+    var defender2InjuryContext: RiskingInjuryContext? = null,
     // Set to true, if a turnover happened during the first block.
     var postponeTurnOver: TurnOver? = null,
     // Player starting locations (as they might leave the pitch due to injuries)
@@ -305,7 +305,7 @@ data class BB2020MultipleBlockContext(
     /**
      * Return the commands needed to add an Injury to the injury pool.
      */
-    fun addInjuryReferenceForPlayer(player: Player, injuryContext: com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext): Command {
+    fun addInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): Command {
         return when (player) {
             attacker -> AddContextListItem(attackerInjuryContext, injuryContext)
             defender1 -> SetContextProperty(BB2020MultipleBlockContext::defender1InjuryContext, this, injuryContext)

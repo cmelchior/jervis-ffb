@@ -1,7 +1,7 @@
 package com.jervisffb.engine.common.reports
 
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.common.context.CheeringFansContext
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.builder.GameVersion

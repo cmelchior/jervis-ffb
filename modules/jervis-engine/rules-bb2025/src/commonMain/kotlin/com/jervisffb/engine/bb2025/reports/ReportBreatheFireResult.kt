@@ -1,6 +1,6 @@
 package com.jervisffb.engine.bb2025.reports
 
-import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireContext
+import com.jervisffb.engine.bb2025.context.BreatheFireContext
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireResult
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry

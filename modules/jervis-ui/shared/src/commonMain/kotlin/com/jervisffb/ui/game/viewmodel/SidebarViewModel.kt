@@ -1,12 +1,12 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot

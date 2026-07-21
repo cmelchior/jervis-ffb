@@ -5,12 +5,12 @@ import com.jervisffb.engine.bb2020.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContextListItem
 import com.jervisffb.engine.commands.context.SetContextProperty
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.common.context.BlockContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.UseRerollContext

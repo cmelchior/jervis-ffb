@@ -1,20 +1,21 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetActiveTeam
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetActiveTeam
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.SetupTeamContext
+import com.jervisffb.engine.common.reports.ReportSetupKickingTeam
+import com.jervisffb.engine.common.reports.ReportSetupReceivingTeam
+import com.jervisffb.engine.common.reports.ReportStartingKickOff
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.reports.ReportSetupKickingTeam
-import com.jervisffb.engine.common.reports.ReportSetupReceivingTeam
-import com.jervisffb.engine.common.reports.ReportStartingKickOff
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 

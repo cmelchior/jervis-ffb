@@ -2,9 +2,9 @@ package com.jervisffb.fumbbl.net.adapter.impl.setup
 
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
+import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

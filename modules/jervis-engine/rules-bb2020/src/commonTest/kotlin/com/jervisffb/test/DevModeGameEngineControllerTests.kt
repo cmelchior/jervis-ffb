@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.SetBallState
 import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.model.BallId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
@@ -13,7 +14,6 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.Test

@@ -9,6 +9,8 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.common.context.SetupTeamContext
+import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
@@ -26,8 +28,6 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.common.procedures.SetupTeam
-import com.jervisffb.engine.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillType

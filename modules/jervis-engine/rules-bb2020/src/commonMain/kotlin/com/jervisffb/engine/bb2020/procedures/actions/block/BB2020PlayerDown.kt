@@ -4,15 +4,15 @@ import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020KnockedDown
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.reports.ReportPlayerDownResult
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportPlayerDownResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Resolve a "Player Down!" selected as a block result.

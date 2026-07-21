@@ -13,6 +13,7 @@ import com.jervisffb.engine.bb2025.inducements.StandardTeamMascot
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotReroll
 import com.jervisffb.engine.bb2025.skills.Pro
+import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
@@ -21,7 +22,6 @@ import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.inducements.TeamMascot
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType

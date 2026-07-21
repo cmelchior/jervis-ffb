@@ -3,8 +3,8 @@ package com.jervisffb.fumbbl.net.adapter.impl
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.common.procedures.PickupRoll
+import com.jervisffb.engine.model.Game
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

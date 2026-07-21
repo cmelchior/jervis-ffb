@@ -1,9 +1,9 @@
 package com.jervisffb.fumbbl.net.adapter.impl.setup
 
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

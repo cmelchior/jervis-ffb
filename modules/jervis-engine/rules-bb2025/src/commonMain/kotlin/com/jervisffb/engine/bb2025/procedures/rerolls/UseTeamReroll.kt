@@ -1,8 +1,9 @@
 package com.jervisffb.engine.bb2025.procedures.rerolls
 
+import com.jervisffb.engine.bb2025.context.MascotContext
+import com.jervisffb.engine.bb2025.context.TeamCaptainRollContext
 import com.jervisffb.engine.bb2025.reports.ReportTeamCaptainResult
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetTeamRerollUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -10,6 +11,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetTeamRerollUsed
+import com.jervisffb.engine.common.context.LonerRollContext
+import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -19,8 +23,6 @@ import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
-import com.jervisffb.engine.common.procedures.rerolls.LonerRollContext
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType

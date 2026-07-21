@@ -1,10 +1,10 @@
 package com.jervisffb.engine.common.serialization
 
-import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.common.inducements.wizards.Fireball
 import com.jervisffb.engine.common.inducements.wizards.Zap
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.common.pathfinder.StandardPathFinder
+import com.jervisffb.engine.model.inducements.Spell
+import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass

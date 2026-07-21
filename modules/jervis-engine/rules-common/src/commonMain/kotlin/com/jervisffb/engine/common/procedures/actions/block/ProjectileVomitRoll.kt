@@ -2,6 +2,9 @@ package com.jervisffb.engine.common.procedures.actions.block
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.context.ProjectileVomitContext
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -11,14 +14,12 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Implement the Projectile Vomit Roll as described on page 133 in the BB2025
  * rulebook.
  *
- * The result is stored in [ProjectileVomitContext] and it is up to the caller to
+ * The result is stored in [com.jervisffb.engine.common.context.ProjectileVomitContext] and it is up to the caller to
  * determine what to do with the result.
  */
 object ProjectileVomitRoll: D6WithRerollProcedure() {

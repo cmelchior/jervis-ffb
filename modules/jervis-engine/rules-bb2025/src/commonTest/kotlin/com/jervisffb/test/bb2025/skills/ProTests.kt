@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.Brawler
 import com.jervisffb.engine.bb2025.skills.Pro
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -21,7 +22,6 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerDogoutState
-import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.locations.Dogout

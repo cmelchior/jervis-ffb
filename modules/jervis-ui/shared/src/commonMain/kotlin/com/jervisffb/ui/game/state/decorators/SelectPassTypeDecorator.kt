@@ -3,11 +3,11 @@ package com.jervisffb.ui.game.state.decorators
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.SelectPassType
+import com.jervisffb.engine.common.procedures.actions.pass.PassAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.common.actions.PassType
-import com.jervisffb.engine.common.procedures.actions.pass.PassAction
 import com.jervisffb.engine.rules.common.procedures.actions.punt.PuntAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon

@@ -2,11 +2,11 @@ package com.jervisffb.test.bb2025
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.common.context.CatchContext
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.common.context.CatchContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.test.JervisGameBB2025Test
