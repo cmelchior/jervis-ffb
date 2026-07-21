@@ -1,8 +1,8 @@
 package com.jervisffb.fumbbl.net.adapter.impl.foul
 
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

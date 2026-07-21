@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.bb2025.skills.Sidestep
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
@@ -11,7 +12,6 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2025.skills.Sidestep
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

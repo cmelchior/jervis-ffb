@@ -11,6 +11,9 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
+import com.jervisffb.engine.bb2025.skills.Brawler
+import com.jervisffb.engine.bb2025.skills.Pro
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -22,10 +25,7 @@ import com.jervisffb.engine.model.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.getSkill
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.rules.bb2025.skills.Brawler
-import com.jervisffb.engine.rules.bb2025.skills.Pro
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

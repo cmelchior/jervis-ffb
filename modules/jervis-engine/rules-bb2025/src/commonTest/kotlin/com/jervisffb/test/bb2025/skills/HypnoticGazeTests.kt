@@ -2,9 +2,9 @@ package com.jervisffb.test.bb2025.skills
 
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.bb2025.skills.HypnoticGaze
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.rules.bb2025.skills.HypnoticGaze
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

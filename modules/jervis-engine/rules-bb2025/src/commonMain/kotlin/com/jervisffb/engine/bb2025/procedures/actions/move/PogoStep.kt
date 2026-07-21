@@ -1,0 +1,408 @@
+package com.jervisffb.engine.bb2025.procedures.actions.move
+
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
+import com.jervisffb.engine.bb2025.skills.TentaclesStep
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
+import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerMoveLeft
+import com.jervisffb.engine.commands.SetPlayerRushesLeft
+import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.ParentNode
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.castAction
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.PogoRollContext
+import com.jervisffb.engine.model.context.RushRollContext
+import com.jervisffb.engine.model.context.TentaclesRollContext
+import com.jervisffb.engine.model.context.assertContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.reports.ReportPogoResult
+import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.rules.JUMP_DISTANCE
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
+import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.common.procedures.calculateOptionsForMoveType
+import com.jervisffb.engine.rules.common.procedures.getResetChompedStateCommands
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
+
+/**
+ * Procedure controlling a Pogo Action.
+ * Pogo behaves the same as Leap, expect negative modifiers do not apply (nor
+ * does Diving Tackle works against Pogo).
+ *
+ * See page 56 in the BB2025 rulebook for rules on Jump.
+ * See page 133 in the BB2025 rulebook for rules on Leap.
+ *
+ * The order of checks is:
+ * 1. Tentacles
+ * 2. Rush(es)
+ * 3. Pogo Roll
+ * 4. Fumblerooski
+ *
+ * Since the player does not need to Dodge to leave the square, any skills
+ * that trigger on Dodge cannot trigger on Jumps.
+ *
+ * In BB2025, the rules define the consequence of failing either Rush roll as
+ * the player will Fall Over in the starting square.
+ *
+ * Note, Jump, Leap and Pogo behave almost the same way, but they are still
+ * separated into 3 different procedures. This means that it is easier to
+ * introduce specific functionality, but shared logic must also be implemented
+ * across the 3 procedures.
+ *
+ * See [com.jervisffb.engine.rules.common.procedures.actions.move.JumpStep]
+ * See [LeapStep]
+ */
+object PogoStep : Procedure() {
+    override val initialNode: Node = CheckForSprint
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<MoveContext>()
+
+    // If the moving player has no more moves or rushes left, they will
+    // automatically apply Sprint to gain one extra square of movement.
+    // If this isn't possible, the move is not possible after all and will be
+    // automatically rejected
+    object CheckForSprint: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val movingPlayer = context.player
+            val hasMovesLeft = (movingPlayer.movesLeft + context.player.rushesLeft >= JUMP_DISTANCE)
+            val hasSprint = movingPlayer.isSkillAvailable(SkillType.SPRINT)
+            return when {
+                hasMovesLeft -> GotoNode(SelectTargetSquareOrCancel)
+                hasSprint -> {
+                    compositeCommandOf(
+                        ReportSkillUsed(movingPlayer, SkillType.SPRINT),
+                        SetSkillUsed(movingPlayer, movingPlayer.getSkill(SkillType.SPRINT), true),
+                        SetPlayerRushesLeft(movingPlayer, movingPlayer.rushesLeft + SPRINT_EXTRA_RUSHES),
+                        GotoNode(SelectTargetSquareOrCancel)
+                    )
+                }
+                !hasSprint -> ExitProcedure()
+                else -> INVALID_GAME_STATE("hasMovesLeft=$hasMovesLeft, hasSprint=$hasSprint")
+            }
+        }
+    }
+
+    object SelectTargetSquareOrCancel : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<MoveContext>().player.team
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val pogoPlayer = context.player
+            val eligiblePogoSquares = calculateOptionsForMoveType(state, rules, pogoPlayer, MoveType.POGO)
+            return eligiblePogoSquares + CancelWhenReady
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return when (action) {
+                Cancel -> ExitProcedure()
+                else -> {
+                    castAction<PitchSquareSelected>(action) { target ->
+                        val context = state.getContext<MoveContext>()
+                        compositeCommandOf(
+                            UpdateContext(context.copy(target = target.coordinate)),
+                            GotoNode(ChooseToUseTentacles)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    object ChooseToUseTentacles: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node {
+            // For now, we ignore Tentacles when using Pogo as that is strictly the RAW
+            // reading of the rules. Pogo not on that list seems like a mistake, but until
+            // there is a FAQ for it, we will ignore it. But since there is a high chance that we
+            // need a toggle in the ruleset for it, the code is added (for now).
+            return CheckIfRushingIsNeeded
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            val tentaclesContext = TentaclesRollContext(
+                movingPlayer = moveContext.player
+            )
+            return AddContext(tentaclesContext)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = TentaclesStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val activeContext = state.getContext<ActivatePlayerContext>()
+            val context = state.getContext<TentaclesRollContext>()
+            return buildCompositeCommand {
+                add(RemoveContext(context))
+                // Logging is done inside TentaclesStep, so just determine next step here
+                when (context.isSuccess) {
+                    true -> addAll(
+                        UpdateContext(activeContext.copy(activationEndsImmediately = true)),
+                        ExitProcedure()
+                    )
+                    false -> GotoNode(CheckIfRushingIsNeeded)
+                }
+            }
+        }
+    }
+
+    // Check if rushing is needed and move player, so they will fall over in the correct
+    // place if any potential rushes fail.
+    object CheckIfRushingIsNeeded : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val target = context.target!!
+            return when (context.player.movesLeft) {
+                0 -> compositeCommandOf(
+                    GotoNode(RushTwice)
+                )
+                1 -> compositeCommandOf(
+                    GotoNode(RushOnce)
+                )
+                else -> compositeCommandOf(
+                    SetPlayerLocation(context.player, target),
+                    getResetChompedStateCommands(context.player, target),
+                    GotoNode(ChooseToUseVeryLongLegs)
+                )
+            }
+        }
+    }
+
+    /**
+     * Player needs two rushes to reach the target square. If they fail the first
+     * Rush, they stay in the starting square. If they fail the second, they also
+     * fall over in the starting square.
+     */
+    object RushTwice: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            val rushContext = state.getContext<RushRollContext>()
+            val player = rushContext.player
+            return if (rushContext.isSuccess) {
+                compositeCommandOf(
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
+                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
+                    RemoveContext(rushContext),
+                    GotoNode(RushOnce)
+                )
+            } else {
+                // Rush failed, player is Knocked Down in target square
+                compositeCommandOf(
+                    RemoveContext(rushContext),
+                    GotoNode(ResolvePlayerFallingOver)
+                )
+            }
+        }
+    }
+
+    /**
+     * Player only need one rush to reach target square
+     */
+    object RushOnce: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            val target = moveContext.target!!
+            val rushContext = state.getContext<RushRollContext>()
+            val player = rushContext.player
+            return if (rushContext.isSuccess) {
+                compositeCommandOf(
+                    SetPlayerMoveLeft(player, player.movesLeft + 1),
+                    SetPlayerRushesLeft(player, player.rushesLeft - 1),
+                    SetPlayerLocation(moveContext.player, target),
+                    getResetChompedStateCommands(moveContext.player, target),
+                    RemoveContext(rushContext),
+                    GotoNode(ChooseToUseVeryLongLegs)
+                )
+            } else {
+                // Rush failed, player is Knocked Down in target square
+                compositeCommandOf(
+                    RemoveContext(rushContext),
+                    GotoNode(ResolvePlayerFallingOver)
+                )
+            }
+        }
+    }
+
+    object ChooseToUseVeryLongLegs: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val player = context.player
+            return if (player.isSkillAvailable(SkillType.VERY_LONG_LEGS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
+            } else {
+                listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val usingVeryLongLegs = (action is Confirm)
+            return compositeCommandOf(
+                UpdateContext(context.copy(useVeryLongLegs = usingVeryLongLegs)),
+                GotoNode(CalculatePogoModifiers)
+            )
+        }
+    }
+
+    object CalculatePogoModifiers: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            val player = moveContext.player
+            // No known modifiers exist for using the Pogo
+            val modifiers = mutableListOf<DiceModifier>()
+            return compositeCommandOf(
+                AddContext(
+                    PogoRollContext(
+                        player = player,
+                        startingSquare = moveContext.startingSquare,
+                        modifiers = modifiers,
+                    )
+                ),
+                GotoNode(RollForPogo)
+            )
+        }
+    }
+
+    /**
+     * Player could move to the target square (after rushes, tentacles) and can
+     * now roll for Pogo.
+     */
+    object RollForPogo: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PogoRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            val pogoContext = state.getContext<PogoRollContext>()
+            val player = pogoContext.player
+            return if (pogoContext.isSuccess) {
+                compositeCommandOf(
+                    SetPlayerMoveLeft(player, player.movesLeft - JUMP_DISTANCE),
+                    ReportPogoResult(pogoContext, moveContext.target!!),
+                    GotoNode(ChooseToUseFumblerooskiAfterPogoToTargetSquare)
+                )
+            } else if (!pogoContext.isSuccess && pogoContext.roll!!.result.value == 1) {
+                // Pogo failed catastrophically, player Falls Over in starting square
+                compositeCommandOf(
+                    SetPlayerLocation(player, moveContext.startingSquare),
+                    RemoveContext(pogoContext),
+                    ReportPogoResult(pogoContext, moveContext.startingSquare),
+                    GotoNode(ResolvePlayerFallingOver)
+                )
+            } else {
+                // Pogo failed, player is Knocked Down in target square
+                compositeCommandOf(
+                    ReportPogoResult(pogoContext, moveContext.target!!),
+                    GotoNode(ChooseToUseFumblerooskiAfterPogoToTargetSquare)
+                )
+            }
+        }
+    }
+
+    object ChooseToUseFumblerooskiAfterPogoToTargetSquare: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            return state.getContext<MoveContext>().player.team
+        }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<MoveContext>()
+            val hasFumblerooski = context.player.isSkillAvailable(SkillType.FUMBLEROOSKI)
+            val hasBall = context.player.hasBall()
+            return when (hasFumblerooski && hasBall) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val pogoContext = state.getContext<PogoRollContext>()
+            val skillUsed = (action == Confirm)
+            return buildCompositeCommand {
+                add(RemoveContext(pogoContext))
+                if (skillUsed) {
+                    val player = context.player
+                    val ball = player.ball ?: INVALID_GAME_STATE("Player must have a ball to use Fumblerooski: $player")
+                    addAll(
+                        ReportSkillUsed(player, SkillType.FUMBLEROOSKI),
+                        SetBallState.onGround(ball),
+                        SetBallLocation(ball, context.startingSquare),
+                    )
+                }
+                val targetNode = when (pogoContext.isSuccess) {
+                    true -> ResolveMove
+                    false -> ResolvePlayerFallingOver
+                }
+                add(GotoNode(targetNode))
+            }
+        }
+    }
+
+    /**
+     * The player failed its move and fell over. This creates a turnover
+     * and requires an injury roll. Regardless of why the player fell down.
+     */
+    object ResolvePlayerFallingOver: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            return AddContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // Regardless of the outcome, the player's action ends in a turnover
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
+        }
+    }
+
+    /**
+     * Resolve the final result of the move after rolling for potential rushes, dodge and other skills.
+     */
+    object ResolveMove: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            return compositeCommandOf(
+                // Player was already moved just after rolling dice, so we just exit here.
+                ExitProcedure()
+            )
+        }
+    }
+}

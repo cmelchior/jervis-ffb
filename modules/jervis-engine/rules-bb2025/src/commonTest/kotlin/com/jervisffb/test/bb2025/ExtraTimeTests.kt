@@ -3,13 +3,13 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.rules.BB2025Rules
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeamStep
-import com.jervisffb.engine.rules.common.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultDetermineKickingTeam

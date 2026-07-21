@@ -1,9 +1,9 @@
 package fumbbl.rest
 
 import com.jervisffb.engine.bb2020.FumbblBB2020Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi

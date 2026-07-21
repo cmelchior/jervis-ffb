@@ -8,6 +8,8 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.safeCast
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
@@ -16,8 +18,6 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData

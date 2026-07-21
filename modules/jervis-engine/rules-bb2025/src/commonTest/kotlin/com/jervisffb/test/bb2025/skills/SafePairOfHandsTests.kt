@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.skills.SafePairOfHands
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d6
@@ -16,7 +17,6 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.bb2025.skills.SafePairOfHands
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType

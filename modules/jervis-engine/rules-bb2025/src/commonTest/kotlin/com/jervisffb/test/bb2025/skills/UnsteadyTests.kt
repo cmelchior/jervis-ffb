@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the Unstead*(Passive) [com.jervisffb.engine.rules.bb2025.skills.Unsteady]
+ * Class testing usage of the Unstead*(Passive) [com.jervisffb.engine.bb2025.skills.Unsteady]
  * skill.
  */
 class UnsteadyTests: JervisGameBB2025Test() {

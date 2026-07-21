@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.bb2025.skills.Decay
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
@@ -13,7 +14,6 @@ import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.modifiers.CasualtyModifier
-import com.jervisffb.engine.rules.bb2025.skills.Decay
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType

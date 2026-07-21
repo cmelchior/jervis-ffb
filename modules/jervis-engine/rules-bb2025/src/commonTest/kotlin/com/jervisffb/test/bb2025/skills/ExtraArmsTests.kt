@@ -5,10 +5,10 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.skills.ExtraArms
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2025.skills.ExtraArms
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext

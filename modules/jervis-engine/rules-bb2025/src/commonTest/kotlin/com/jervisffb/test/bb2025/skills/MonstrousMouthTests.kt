@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.skills.MonstrousMouth
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
@@ -22,7 +23,6 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.OwnedPlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.rules.bb2025.skills.MonstrousMouth
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType

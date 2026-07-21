@@ -25,7 +25,7 @@ import com.jervisffb.ui.menu.LocalPitchDataWrapper
 object SelectBlockTypeWheelController : ActionWheelDialogController() {
     override val nodes: Set<Node> = setOf(
         BlockAction.SelectBlockType,
-        com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
+        com.jervisffb.engine.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
         BlitzAction.SelectBlockType
     )
 

@@ -51,7 +51,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * will crash the game engine.
  *
  * Right now, there is only a single procedure that does the same for Teams,
- * [com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotRoll]. This
+ * `com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll`. This
  * procedure implements the same nodes as found here, so any changes should
  * be mirrored there.
  */

@@ -12,6 +12,11 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.bb2025.procedures.rerolls.LeaderTeamReroll
+import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
+import com.jervisffb.engine.bb2025.skills.Leader
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d16
@@ -22,13 +27,8 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.BB2025Rules
-import com.jervisffb.engine.rules.StandardBB2025Rules
-import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.rerolls.LeaderTeamReroll
-import com.jervisffb.engine.rules.common.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo

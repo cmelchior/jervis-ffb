@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -14,7 +15,6 @@ import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BB2020TheKickOffEvent
-import com.jervisffb.engine.rules.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll

@@ -6,6 +6,51 @@ import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025BothDown
+import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.JumpUpRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.PileDriverStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.CreatePushChainStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.FollowUpStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseReroll
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
+import com.jervisffb.engine.bb2025.procedures.actions.foul.ChainsawFoulStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.PogoRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassStep
+import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallRoll
+import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.AlwaysHungryRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.AlwaysHungrySquirmFreeRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDirectionRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDistanceRoll
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopStep
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.injury.SteadyFootingRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotStep
+import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
+import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
+import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
+import com.jervisffb.engine.bb2025.skills.PuntDistanceRoll
+import com.jervisffb.engine.bb2025.skills.PuntStep
+import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
+import com.jervisffb.engine.bb2025.skills.ShadowingRoll
+import com.jervisffb.engine.bb2025.skills.ShadowingStep
+import com.jervisffb.engine.bb2025.skills.TentaclesRoll
+import com.jervisffb.engine.bb2025.skills.TentaclesStep
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.BlockContext
@@ -13,40 +58,6 @@ import com.jervisffb.engine.model.context.ChargeContext
 import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025BothDown
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.HitAndRunStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.JumpUpRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.PileDriverStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseReroll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRerollDice
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.PogoStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungryRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.AlwaysHungrySquirmFreeRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDirectionRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopDistanceRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.SwoopStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.HypnoticGazeRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.PuntDirectionRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.PuntDistanceRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.PuntStep
-import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
-import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.ShadowingStep
-import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.TentaclesStep
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.rules.common.procedures.BoneHeadRoll
@@ -66,22 +77,16 @@ import com.jervisffb.engine.rules.common.procedures.RecoverPlayerRoll
 import com.jervisffb.engine.rules.common.procedures.RegenerationRoll
 import com.jervisffb.engine.rules.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
-import com.jervisffb.engine.rules.common.procedures.SteadyFootingRoll
 import com.jervisffb.engine.rules.common.procedures.TakeRootRoll
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.rules.common.procedures.WeatherRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.BreatheFireRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.ChainsawRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.ChompRoll
-import com.jervisffb.engine.rules.common.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.rules.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.rules.common.procedures.actions.foul.BribeRoll
-import com.jervisffb.engine.rules.common.procedures.actions.foul.ChainsawFoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.JumpRoll
@@ -90,10 +95,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.StandardMoveSte
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamMascotStep
-import com.jervisffb.engine.rules.common.procedures.rerolls.UseBrawlerReroll
 import com.jervisffb.engine.rules.common.procedures.rerolls.UseProReroll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
@@ -143,7 +144,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             Pickup.ChooseToUseBigHand to SkillType.BIG_HAND,
             SecureTheBallStep.ChooseToUseBigHand to SkillType.BIG_HAND,
             com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
-            com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
+            JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
             CreatePushChainStep.DecideToUseSidestep to SkillType.SIDESTEP,
             CreatePushChainStep.DecideToUseGrab to SkillType.GRAB,
             CreatePushChainStep.DecideToUseStandFirm to SkillType.STAND_FIRM,
@@ -283,8 +284,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             UnchannelledFuryRoll.RollDie to "Roll D6 for Unchannelled Fury",
             WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather",
             com.jervisffb.engine.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to "Roll D8 to Bounce the Player",
-            com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
-            com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
+            PassAccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
+            PassAccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
@@ -324,7 +325,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             TentaclesRoll.ChooseReRollSource to "Accept Tentacles Result or Re-roll D6?",
             ThrowTeammateAccuracyRoll.ChooseReRollSource to "Accept Accuracy Result or Reroll D6?",
             UnchannelledFuryRoll.ChooseReRollSource to "Accept Unchannelled Fury Result or Reroll D6?",
-            com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
+            PassAccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
         )
 
         val rollMessages: Map<Node, (Boolean, Boolean, Game) -> String?> = rollDiceScenarios.associate { data ->

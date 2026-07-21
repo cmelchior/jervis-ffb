@@ -31,6 +31,24 @@ import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitia
 import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
+import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025Stumble
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.CreatePushChainStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.FollowUpStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassStep
+import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallStep
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
+import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
+import com.jervisffb.engine.bb2025.procedures.injury.BB2025KnockedDown
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
+import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
+import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
+import com.jervisffb.engine.bb2025.skills.SureHands
 import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.context.MoveContext
@@ -39,22 +57,6 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.BB2025Stumble
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.CreatePushChainStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.FollowUpStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.block.push.UseStripBallStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.JumpStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.move.LeapStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassAccuracyRoll
-import com.jervisffb.engine.rules.bb2025.procedures.actions.pass.PassStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
-import com.jervisffb.engine.rules.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
-import com.jervisffb.engine.rules.bb2025.procedures.skills.SafePairOfHandsStep
-import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025FallingOver
-import com.jervisffb.engine.rules.bb2025.procedures.tables.injury.BB2025KnockedDown
-import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
 import com.jervisffb.engine.rules.common.procedures.DealWithSecretWeaponsStep
@@ -71,8 +73,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.rules.common.procedures.rerolls.ProRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.TeamCaptainRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.UseBrawlerReroll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
@@ -188,7 +188,7 @@ class AutomatedActionsFactory(
             menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION)
             && (currentNode in setOf(
                 BlockAction.SelectBlockType,
-                com.jervisffb.engine.rules.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
+                com.jervisffb.engine.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
                 BlitzAction.SelectBlockType,
             ))
         ) {
