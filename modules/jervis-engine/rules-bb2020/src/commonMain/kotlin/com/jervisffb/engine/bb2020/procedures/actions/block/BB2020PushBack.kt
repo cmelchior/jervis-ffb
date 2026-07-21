@@ -1,7 +1,6 @@
 package com.jervisffb.engine.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.actions.BlockDice
-import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -11,6 +10,7 @@ import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.reports.ReportPushResult
 import com.jervisffb.engine.fsm.ComputationNode

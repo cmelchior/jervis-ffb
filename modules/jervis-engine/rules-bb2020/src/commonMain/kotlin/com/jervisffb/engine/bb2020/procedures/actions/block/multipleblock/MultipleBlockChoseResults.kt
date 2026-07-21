@@ -4,10 +4,10 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDicePoolResult
-import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node

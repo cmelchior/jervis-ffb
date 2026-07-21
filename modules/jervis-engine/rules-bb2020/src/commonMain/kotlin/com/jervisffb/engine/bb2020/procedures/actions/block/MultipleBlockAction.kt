@@ -12,7 +12,6 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.bb2020.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import com.jervisffb.engine.bb2020.procedures.actions.block.multipleblock.MultipleBlockRerollDice
 import com.jervisffb.engine.bb2020.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
@@ -29,6 +28,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.ThrowIn

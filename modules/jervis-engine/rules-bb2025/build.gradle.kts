@@ -35,10 +35,6 @@ kotlin {
             dependencies {
                 api(project(":modules:jervis-engine:core"))
                 api(project(":modules:jervis-engine:rules-common"))
-                // BB2025 rules are built as an incremental layer on top of BB2020's
-                // implementation and share several procedures (Multiple Block, push
-                // chain, etc.). Depend on bb2020 explicitly so the reuse is honest.
-                api(project(":modules:jervis-engine:rules-bb2020"))
             }
         }
         val commonTest by getting {

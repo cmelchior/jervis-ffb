@@ -1,6 +1,5 @@
 package com.jervisffb.engine.bb2020.procedures.table.injury
 
-import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -11,6 +10,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode

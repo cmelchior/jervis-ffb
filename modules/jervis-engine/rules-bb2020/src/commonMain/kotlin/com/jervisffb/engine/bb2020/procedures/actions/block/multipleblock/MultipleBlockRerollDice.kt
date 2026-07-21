@@ -6,14 +6,14 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
-import com.jervisffb.engine.bb2020.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
+import com.jervisffb.engine.common.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
