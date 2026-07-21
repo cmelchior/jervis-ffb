@@ -13,8 +13,8 @@ import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.common.TeamCaptainNotOnPitch
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.SetupTeam
-import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.common.procedures.SetupTeam
+import com.jervisffb.engine.common.procedures.TheKickOff
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

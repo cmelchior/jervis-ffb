@@ -13,8 +13,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.common.procedures.ScatterRoll
-import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
+import com.jervisffb.engine.common.procedures.ScatterRoll
+import com.jervisffb.engine.common.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData

@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
-import com.jervisffb.engine.rules.common.procedures.rerolls.UseProReroll
+import com.jervisffb.engine.common.procedures.rerolls.UseProReroll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource

@@ -18,7 +18,7 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultAwaySetup

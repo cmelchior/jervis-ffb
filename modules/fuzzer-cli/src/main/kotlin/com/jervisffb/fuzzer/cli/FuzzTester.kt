@@ -26,8 +26,8 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.rules.common.procedures.SetupTeam
-import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
+import com.jervisffb.engine.common.procedures.SetupTeam
+import com.jervisffb.engine.common.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillType

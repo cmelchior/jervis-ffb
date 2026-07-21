@@ -2,12 +2,12 @@ package com.jervisffb.engine.bb2025.procedures.injury
 
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemovePlayerStatusEffect
+import com.jervisffb.engine.common.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -20,13 +20,13 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Resolve a player being Place Prone.

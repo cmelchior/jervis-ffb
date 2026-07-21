@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -27,29 +27,29 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.CatchContext
+import com.jervisffb.engine.common.context.CatchContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.reports.ReportStartingPass
+import com.jervisffb.engine.common.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.Catch
-import com.jervisffb.engine.rules.common.procedures.DeviateRoll
-import com.jervisffb.engine.rules.common.procedures.DeviateRollContext
-import com.jervisffb.engine.rules.common.procedures.ScatterRoll
-import com.jervisffb.engine.rules.common.procedures.ScatterRollContext
-import com.jervisffb.engine.rules.common.procedures.ThrowIn
-import com.jervisffb.engine.rules.common.procedures.ThrowInContext
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.Catch
+import com.jervisffb.engine.common.procedures.DeviateRoll
+import com.jervisffb.engine.common.procedures.DeviateRollContext
+import com.jervisffb.engine.common.procedures.ScatterRoll
+import com.jervisffb.engine.common.procedures.ScatterRollContext
+import com.jervisffb.engine.common.procedures.ThrowIn
+import com.jervisffb.engine.common.procedures.ThrowInContext
+import com.jervisffb.engine.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the passing part of a [com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction].
+ * Procedure for handling the passing part of a [com.jervisffb.engine.common.procedures.actions.pass.PassAction].
  *
  * See page 48 in the BB2020 rulebook.
  */

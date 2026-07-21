@@ -9,12 +9,12 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.bb2025.reports.ReportSteadyFootingResult
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemovePlayerStatusEffect
+import com.jervisffb.engine.common.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetPlayerIntermediateState
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -37,13 +37,13 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.AnimalSavageryContext
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.procedures.AnimalSavageryContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

@@ -12,7 +12,7 @@ import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleSt
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType

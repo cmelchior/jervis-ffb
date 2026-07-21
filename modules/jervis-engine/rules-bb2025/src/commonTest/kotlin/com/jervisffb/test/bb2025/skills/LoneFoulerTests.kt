@@ -6,14 +6,14 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.bb2025.skills.LoneFouler
+import com.jervisffb.engine.common.modifiers.DefensiveAssistsArmourModifier
+import com.jervisffb.engine.common.modifiers.OffensiveAssistArmourModifier
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DefensiveAssistsArmourModifier
-import com.jervisffb.engine.model.modifiers.OffensiveAssistArmourModifier
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo

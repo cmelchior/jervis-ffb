@@ -23,8 +23,8 @@ import com.jervisffb.engine.model.context.TentaclesRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.reports.ReportSkillUsed
-import com.jervisffb.engine.reports.ReportTentaclesResult
+import com.jervisffb.engine.common.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportTentaclesResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION

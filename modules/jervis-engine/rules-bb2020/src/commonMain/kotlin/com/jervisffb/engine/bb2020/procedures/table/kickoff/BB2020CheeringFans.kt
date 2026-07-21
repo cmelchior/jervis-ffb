@@ -20,16 +20,16 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.CheeringFansContext
+import com.jervisffb.engine.common.context.CheeringFansContext
+import com.jervisffb.engine.common.modifiers.CheerleadersModifiers
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.CheerleadersModifiers
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.reports.ReportCheeringFansResult
-import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportCheeringFansResult
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRoll
-import com.jervisffb.engine.rules.common.procedures.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
+import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 

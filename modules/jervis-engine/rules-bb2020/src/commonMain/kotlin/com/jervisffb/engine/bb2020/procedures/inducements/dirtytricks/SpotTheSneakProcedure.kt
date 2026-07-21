@@ -11,7 +11,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducementContext
+import com.jervisffb.engine.common.procedures.inducements.ActivateInducementContext
 
 /**
  * Procedure handling the effect of using the "Spot the Sneak" Dirty Tricks cards

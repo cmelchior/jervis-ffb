@@ -29,12 +29,12 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportRerollUsed
+import com.jervisffb.engine.common.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

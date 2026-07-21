@@ -23,16 +23,16 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.reports.ReportSkillUsed
-import com.jervisffb.engine.reports.ReportStumbleResult
+import com.jervisffb.engine.common.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -149,11 +149,12 @@ object BB2020Stumble: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val defender = state.getContext<StumbleContext>().defender
             val blockContext = state.getContext<BlockContext>()
-            val injuryContext = RiskingInjuryContext(
-                player = defender,
-                causedBy = blockContext.attacker,
-                isPartOfMultipleBlock = blockContext.isUsingMultiBlock
-            )
+            val injuryContext =
+                RiskingInjuryContext(
+                    player = defender,
+                    causedBy = blockContext.attacker,
+                    isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+                )
             return AddContext(injuryContext)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown

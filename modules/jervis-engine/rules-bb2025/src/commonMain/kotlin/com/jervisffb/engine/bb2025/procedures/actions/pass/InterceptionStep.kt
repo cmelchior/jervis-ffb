@@ -12,7 +12,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -29,19 +29,19 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.InterceptionContext
-import com.jervisffb.engine.model.context.InterceptionRollContext
+import com.jervisffb.engine.common.context.InterceptionContext
+import com.jervisffb.engine.common.context.InterceptionRollContext
+import com.jervisffb.engine.common.modifiers.DisturbingPresenceModifier
+import com.jervisffb.engine.common.modifiers.InterceptionModifier
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.DisturbingPresenceModifier
-import com.jervisffb.engine.model.modifiers.InterceptionModifier
-import com.jervisffb.engine.reports.ReportInterception
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportInterception
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

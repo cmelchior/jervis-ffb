@@ -1,8 +1,8 @@
 package com.jervisffb.engine.bb2025.skills
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveTeamReroll
-import com.jervisffb.engine.commands.SetTeamRerollEnabled
+import com.jervisffb.engine.common.commands.RemoveTeamReroll
+import com.jervisffb.engine.common.commands.SetTeamRerollEnabled
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState

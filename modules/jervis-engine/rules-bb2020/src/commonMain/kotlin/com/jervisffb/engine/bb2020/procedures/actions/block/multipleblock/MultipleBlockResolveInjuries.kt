@@ -20,11 +20,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.PatchUpPlayer
+import com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -36,7 +36,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * regeneration roll to use a Mortuary Assistant on.
  *
  * For now, we opt for simplicity and instead just choose which player to fully resolve.
- * To make a proper flow, we need to split [PatchUpPlayer] into steps that can be run
+ * To make a proper flow, we need to split [com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer] into steps that can be run
  * in parallel, similar to [StandardBlocKStep]
  */
 object MultipleBlockResolveInjuries: Procedure() {

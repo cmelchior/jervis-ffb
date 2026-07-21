@@ -16,6 +16,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.modifiers.LeapModifier
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -28,13 +29,12 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.LeapModifier
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.testAgainstAgility
 import com.jervisffb.engine.utils.INVALID_ACTION

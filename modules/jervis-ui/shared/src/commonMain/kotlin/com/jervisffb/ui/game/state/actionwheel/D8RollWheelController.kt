@@ -14,8 +14,8 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode

@@ -19,9 +19,9 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
-import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
-import com.jervisffb.engine.rules.common.tables.PrayerToNuffleTableResult
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2020Test

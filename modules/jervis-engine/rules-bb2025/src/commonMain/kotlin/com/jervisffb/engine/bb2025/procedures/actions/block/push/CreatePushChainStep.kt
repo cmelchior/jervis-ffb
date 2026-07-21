@@ -30,14 +30,14 @@ import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION

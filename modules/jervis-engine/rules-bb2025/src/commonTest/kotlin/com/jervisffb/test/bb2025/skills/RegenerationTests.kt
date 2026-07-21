@@ -10,7 +10,7 @@ import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.inducements.MortuaryAssistant
-import com.jervisffb.engine.model.inducements.PlagueDoctor
+import com.jervisffb.engine.common.inducements.PlagueDoctor
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

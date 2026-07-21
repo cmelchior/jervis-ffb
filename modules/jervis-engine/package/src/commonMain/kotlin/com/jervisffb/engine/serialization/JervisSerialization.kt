@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.bb2020.serialization.bb2020SerializerModule
 import com.jervisffb.engine.bb2025.serialization.bb2025SerializerModule
+import com.jervisffb.engine.common.serialization.commonSerializerModule
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch

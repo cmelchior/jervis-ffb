@@ -16,13 +16,13 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.reports.ReportPowResult
+import com.jervisffb.engine.common.reports.ReportPowResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Resolve POW! selected on the block dice.

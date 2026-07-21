@@ -11,7 +11,7 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -27,22 +27,22 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.CatchContext
+import com.jervisffb.engine.common.context.CatchContext
+import com.jervisffb.engine.common.modifiers.PassingInterferenceModifier
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.PassingInterferenceRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.PassingInterferenceModifier
-import com.jervisffb.engine.reports.ReportDeflection
+import com.jervisffb.engine.common.reports.ReportDeflection
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.Catch
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
-import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
+import com.jervisffb.engine.common.procedures.Catch
+import com.jervisffb.engine.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for checking for passing interference as part of a [com.jervisffb.engine.rules.common.procedures.actions.pass.PassAction].
+ * Procedure for checking for passing interference as part of a [com.jervisffb.engine.common.procedures.actions.pass.PassAction].
  *
  * See page 50 in the BB2020 rulebook.
  */

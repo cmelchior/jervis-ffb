@@ -1,9 +1,9 @@
 package com.jervisffb.engine.bb2025.reports
 
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 
 class ReportSteadyFootingResult(context: SteadyFootingRollContext, mode: RiskingInjuryMode) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

@@ -11,8 +11,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D3DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D3WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D3WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Procedure for handling rolling for the Swoop direction.

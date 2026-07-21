@@ -9,8 +9,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillKeyword
-import com.jervisffb.engine.model.context.ActivatePlayerContext
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType

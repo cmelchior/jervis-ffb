@@ -14,7 +14,7 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
+import com.jervisffb.engine.common.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo

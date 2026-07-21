@@ -8,7 +8,7 @@ import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayer
+import com.jervisffb.engine.common.procedures.ActivatePlayer
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

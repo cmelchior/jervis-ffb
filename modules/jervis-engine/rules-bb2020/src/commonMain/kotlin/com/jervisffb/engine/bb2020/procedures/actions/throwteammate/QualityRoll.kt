@@ -2,6 +2,8 @@ package com.jervisffb.engine.bb2020.procedures.actions.throwteammate
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.modifiers.DisturbingPresenceModifier
+import com.jervisffb.engine.common.modifiers.QualityModifier
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -10,15 +12,13 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.DisturbingPresenceModifier
-import com.jervisffb.engine.model.modifiers.QualityModifier
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
-import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
-import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowPlayerResult
+import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowTeamMateContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather

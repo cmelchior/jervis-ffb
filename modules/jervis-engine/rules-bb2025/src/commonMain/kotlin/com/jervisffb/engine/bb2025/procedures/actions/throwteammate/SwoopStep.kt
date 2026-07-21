@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D3DieRoll
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll

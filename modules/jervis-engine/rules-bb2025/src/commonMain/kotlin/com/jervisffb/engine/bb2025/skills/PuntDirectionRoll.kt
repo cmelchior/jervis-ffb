@@ -6,14 +6,14 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
-import com.jervisffb.engine.model.context.PuntContext
+import com.jervisffb.engine.common.context.PuntContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D3DieRoll
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.D3WithRerollProcedure
-import com.jervisffb.engine.rules.common.procedures.actions.dicerolls.RerollData
+import com.jervisffb.engine.common.procedures.dicerolls.D3WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 
 /**
  * Procedure responsible for rolling the direction for Punt once the throw-in

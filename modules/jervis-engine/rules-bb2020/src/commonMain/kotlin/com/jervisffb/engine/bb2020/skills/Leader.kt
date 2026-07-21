@@ -1,7 +1,7 @@
 package com.jervisffb.engine.bb2020.skills
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveTeamReroll
+import com.jervisffb.engine.common.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId

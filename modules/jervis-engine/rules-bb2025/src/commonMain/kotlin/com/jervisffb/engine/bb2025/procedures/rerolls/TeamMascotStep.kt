@@ -25,12 +25,12 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.reports.ReportRerollUsed
+import com.jervisffb.engine.common.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
-import com.jervisffb.engine.rules.common.utils.calculateAvailableRerollsForTeam
+import com.jervisffb.engine.common.utils.calculateAvailableRerollsForTeam
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class MascotContext(

@@ -5,7 +5,7 @@ import com.jervisffb.engine.bb2020.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.GiantLocation

@@ -11,15 +11,15 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.ResetAvailableTeamActions
-import com.jervisffb.engine.commands.SetCanUseTeamRerolls
-import com.jervisffb.engine.commands.SetPlayerAvailability
+import com.jervisffb.engine.common.commands.ResetAvailableTeamActions
+import com.jervisffb.engine.common.commands.SetCanUseTeamRerolls
+import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.SetPlayerTemporaryStats
+import com.jervisffb.engine.common.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.commands.SetSkillUsed
-import com.jervisffb.engine.commands.SetSpecialActionSkillUsed
-import com.jervisffb.engine.commands.SetTurnMarker
-import com.jervisffb.engine.commands.UpdateTurnOver
+import com.jervisffb.engine.common.commands.SetSpecialActionSkillUsed
+import com.jervisffb.engine.common.commands.SetTurnMarker
+import com.jervisffb.engine.common.commands.UpdateTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -36,24 +36,24 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ForegoActivationContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.reports.ReportEndingTurn
-import com.jervisffb.engine.reports.ReportStartingTurn
+import com.jervisffb.engine.common.reports.ReportEndingTurn
+import com.jervisffb.engine.common.reports.ReportStartingTurn
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
-import com.jervisffb.engine.rules.common.procedures.ForegoActivation
-import com.jervisffb.engine.rules.common.procedures.getResetPlayerAvailabilityCommands
-import com.jervisffb.engine.rules.common.procedures.getResetTeamTemporaryModifiersCommands
-import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducementContext
-import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducements
-import com.jervisffb.engine.rules.common.procedures.tables.prayers.ResolveThrowARock
+import com.jervisffb.engine.common.procedures.ForegoActivation
+import com.jervisffb.engine.common.procedures.getResetPlayerAvailabilityCommands
+import com.jervisffb.engine.common.procedures.getResetTeamTemporaryModifiersCommands
+import com.jervisffb.engine.common.procedures.inducements.ActivateInducementContext
+import com.jervisffb.engine.common.procedures.inducements.ActivateInducements
+import com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
-import com.jervisffb.engine.rules.common.tables.PrayerToNuffleTableResult
+import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -192,7 +192,7 @@ object TeamTurn : Procedure() {
     }
 
     object ActivatePlayer: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = com.jervisffb.engine.rules.common.procedures.ActivatePlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = com.jervisffb.engine.common.procedures.ActivatePlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ActivatePlayerContext>(),

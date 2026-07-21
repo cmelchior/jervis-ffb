@@ -10,13 +10,13 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.BreakTackle
+import com.jervisffb.engine.common.modifiers.BreakTackleModifier
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test

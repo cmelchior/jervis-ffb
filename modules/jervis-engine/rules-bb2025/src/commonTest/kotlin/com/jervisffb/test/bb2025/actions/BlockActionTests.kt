@@ -20,8 +20,8 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerPitchState
-import com.jervisffb.engine.model.context.BlockActionContext
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockActionContext
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.PitchCoordinate

@@ -12,7 +12,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
+import com.jervisffb.engine.common.procedures.actions.move.StandingUpRollContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 import com.jervisffb.test.JervisGameBB2025Test

@@ -12,7 +12,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.common.procedures.PickupRoll
+import com.jervisffb.engine.common.procedures.PickupRoll
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId

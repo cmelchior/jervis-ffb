@@ -8,7 +8,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.context.CatchContext
+import com.jervisffb.engine.common.context.CatchContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultKickOffEvent

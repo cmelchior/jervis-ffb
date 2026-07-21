@@ -12,7 +12,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.common.procedures.TheKickOffEvent
+import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId

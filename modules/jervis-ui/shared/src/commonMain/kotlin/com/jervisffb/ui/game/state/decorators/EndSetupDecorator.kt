@@ -2,10 +2,10 @@ package com.jervisffb.ui.game.state.decorators
 
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
+import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
-import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 

@@ -9,7 +9,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.BlockContext
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -25,7 +26,6 @@ import com.jervisffb.engine.rules.common.actions.BlockType.MULTIPLE_BLOCK
 import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 /**
  * Context containing state related to doing a Multiple Block.
  *

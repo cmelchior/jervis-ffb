@@ -1,0 +1,18 @@
+package com.jervisffb.engine.common.commands
+
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.common.tables.Weather
+
+class SetWeather(private val weather: Weather) : Command {
+    private lateinit var originalWeather: Weather
+
+    override fun execute(state: Game) {
+        originalWeather = state.weather
+        state.weather = weather
+    }
+
+    override fun undo(state: Game) {
+        state.weather = originalWeather
+    }
+}

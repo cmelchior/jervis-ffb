@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2020.tables
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.rules.common.tables.PrayerToNuffleTableResult
+import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

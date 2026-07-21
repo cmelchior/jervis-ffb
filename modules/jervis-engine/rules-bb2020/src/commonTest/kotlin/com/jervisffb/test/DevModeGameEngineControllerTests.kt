@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.rules.common.procedures.FullGame
+import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.Test
