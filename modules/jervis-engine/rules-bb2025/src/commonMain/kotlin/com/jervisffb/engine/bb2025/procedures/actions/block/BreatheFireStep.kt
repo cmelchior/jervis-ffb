@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.context.BreatheFireContext
 import com.jervisffb.engine.bb2025.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.bb2025.procedures.injury.BB2025PlacedProne
 import com.jervisffb.engine.bb2025.reports.ReportBreatheFireResult
@@ -17,45 +18,28 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BlitzActionContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.context.BlitzActionContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
-import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
-enum class BreatheFireResult {
-    ATTACKER_KNOCKED_DOWN,
-    TARGET_PLACED_PRONE,
-    TARGET_KNOCKED_DOWN,
-    NO_EFFECT
-}
-
-data class BreatheFireContext(
-    val attacker: Player,
-    val defender: Player? = null,
-    val breatheRoll: D6DieRoll? = null,
-    val result: BreatheFireResult? = null,
-    val injuryResult: RiskingInjuryContext? = null,
-): ProcedureContext
 
 /**
  * Procedure for handling the "Breathe Fire"-part of a Breathe Fire Special

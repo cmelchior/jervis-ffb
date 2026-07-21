@@ -7,22 +7,17 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ProjectileVomitActionContext
+import com.jervisffb.engine.common.context.ProjectileVomitContext
+import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
-
-data class ProjectileVomitActionContext(
-    val attacker: Player,
-    val hasVomited: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure for handling the Projectile Vomit special action as described on

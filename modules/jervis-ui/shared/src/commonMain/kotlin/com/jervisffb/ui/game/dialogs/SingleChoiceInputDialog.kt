@@ -36,12 +36,12 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.common.context.FoulContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.FoulContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Skill
 

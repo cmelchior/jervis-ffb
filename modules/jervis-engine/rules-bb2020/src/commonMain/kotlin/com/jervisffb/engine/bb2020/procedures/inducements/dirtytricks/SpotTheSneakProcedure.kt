@@ -3,6 +3,7 @@ package com.jervisffb.engine.bb2020.procedures.inducements.dirtytricks
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.context.ActivateInducementContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -11,7 +12,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.inducements.ActivateInducementContext
 
 /**
  * Procedure handling the effect of using the "Spot the Sneak" Dirty Tricks cards

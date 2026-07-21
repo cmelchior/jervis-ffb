@@ -18,6 +18,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.OfficiousRefContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -28,26 +31,10 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.common.reports.ReportDiceRoll
-import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-
-data class OfficiousRefContext(
-    val kickingTeamRoll: D6Result,
-    val kickingTeamFanFactor: Int,
-    val kickingTeamResult: Int,
-    val receivingTeamRoll: D6Result? = null,
-    val receivingTeamFanFactor: Int = -1,
-    val receivingTeamResult: Int = -1,
-    val kickingTeamPlayerSelected: Player? = null,
-    val receivingTeamPlayerSelected: Player? = null,
-    val kickingTeamRefereeRoll: D6Result? = null,
-    val receivingTeamRefereeRoll: D6Result? = null,
-): ProcedureContext
 
 /**
  * Procedure for handling the Kick-Off Event: "Officious Ref" as described on page 41

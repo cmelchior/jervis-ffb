@@ -9,15 +9,15 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.reports.ReportPlayerDownResult
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.context.BlockContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportPlayerDownResult
 import com.jervisffb.engine.rules.Rules
 
 /**

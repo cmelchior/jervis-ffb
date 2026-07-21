@@ -1,17 +1,17 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetCurrentBall
-import com.jervisffb.engine.common.commands.SetKickingTeam
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetActiveTeam
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetKickingTeam
+import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure

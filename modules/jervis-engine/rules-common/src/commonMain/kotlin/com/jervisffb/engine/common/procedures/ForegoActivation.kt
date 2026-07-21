@@ -1,9 +1,10 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.commands.SetPlayerAvailability
+import com.jervisffb.engine.common.reports.ReportForegoActivation
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -11,7 +12,6 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ForegoActivationContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportForegoActivation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

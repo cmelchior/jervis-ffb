@@ -9,6 +9,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -17,13 +19,12 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
 /**
- * Implement the Bribe roll. The result is stored in [BeingSentOffContext] and
+ * Implement the Bribe roll. The result is stored in [com.jervisffb.engine.common.context.BeingSentOffContext] and
  * it is up to the caller to determine what to do with the result.
  *
  * No known effect allows you to reroll the Bribe Roll. Team Rerolls explicitly

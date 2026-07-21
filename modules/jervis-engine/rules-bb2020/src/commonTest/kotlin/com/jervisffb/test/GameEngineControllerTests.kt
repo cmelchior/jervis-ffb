@@ -5,12 +5,12 @@ import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
-import com.jervisffb.engine.ext.d3
-import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.common.procedures.WeatherRoll
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.Test

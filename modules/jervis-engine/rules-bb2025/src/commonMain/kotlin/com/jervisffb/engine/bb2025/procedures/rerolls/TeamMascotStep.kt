@@ -8,6 +8,8 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.context.MascotContext
+import com.jervisffb.engine.bb2025.context.MascotRollContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -15,36 +17,20 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.reports.ReportRerollUsed
+import com.jervisffb.engine.common.utils.calculateAvailableRerollsForTeam
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportRerollUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
-import com.jervisffb.engine.common.utils.calculateAvailableRerollsForTeam
 import com.jervisffb.engine.utils.INVALID_ACTION
-
-data class MascotContext(
-    val team: Team,
-    val reroll: TeamMascotReroll,
-    val roll: D6DieRoll? = null,
-    // Whether the mascot roll was successful,
-    val isSuccessful: Boolean = false,
-    // If Mascot failed, this tracks any alternative reroll selected
-    val alternativeRerollSelected: DiceRerollOption? = null,
-    // Track whether Mascot or another re-roll was use successfully, allowing
-    // the caller procedure to continue with their reroll.
-    val isRerollAllowed: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure responsible for handling checking if a Team Mascot works, and

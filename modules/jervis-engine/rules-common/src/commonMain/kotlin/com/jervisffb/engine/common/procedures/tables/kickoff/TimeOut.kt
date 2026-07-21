@@ -1,16 +1,16 @@
 package com.jervisffb.engine.common.procedures.tables.kickoff
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetTurnMarker
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.commands.SetTurnMarker
+import com.jervisffb.engine.common.reports.ReportTimeout
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportTimeout
 import com.jervisffb.engine.rules.Rules
 
 /**

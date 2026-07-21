@@ -4,7 +4,14 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.inducements.StandardApothecary
 import com.jervisffb.engine.common.modifiers.MarkedModifier
+import com.jervisffb.engine.common.procedures.FullGame
+import com.jervisffb.engine.common.procedures.TheFumbblKickOff
+import com.jervisffb.engine.common.procedures.TheKickOff
+import com.jervisffb.engine.common.procedures.inducements.BuyInducements
+import com.jervisffb.engine.common.procedures.tables.injury.UseBB11Apothecary
+import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
@@ -16,7 +23,6 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.Apothecary
-import com.jervisffb.engine.common.inducements.StandardApothecary
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.Location
@@ -41,12 +47,6 @@ import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.TooMuchGoldUsed
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnPitch
 import com.jervisffb.engine.rules.common.actions.BlockType
-import com.jervisffb.engine.common.procedures.FullGame
-import com.jervisffb.engine.common.procedures.TheFumbblKickOff
-import com.jervisffb.engine.common.procedures.TheKickOff
-import com.jervisffb.engine.common.procedures.inducements.BuyInducements
-import com.jervisffb.engine.common.procedures.tables.injury.UseBB11Apothecary
-import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill

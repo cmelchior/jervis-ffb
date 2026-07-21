@@ -6,12 +6,12 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.common.procedures.tables.injury.LastingInjuryRoll
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

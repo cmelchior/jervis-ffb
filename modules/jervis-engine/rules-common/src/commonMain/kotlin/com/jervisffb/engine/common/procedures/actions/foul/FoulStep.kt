@@ -11,7 +11,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayersSelected
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -19,6 +18,16 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.context.FoulContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.modifiers.DefensiveAssistsArmourModifier
+import com.jervisffb.engine.common.modifiers.OffensiveAssistArmourModifier
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.reports.ReportSkillUsed
+import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -26,24 +35,15 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.FoulContext
-import com.jervisffb.engine.common.modifiers.DefensiveAssistsArmourModifier
-import com.jervisffb.engine.common.modifiers.OffensiveAssistArmourModifier
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.common.reports.ReportSkillUsed
-import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlinx.collections.immutable.toPersistentList
-import kotlin.collections.get
 
 /**
  * Procedure for handling the Foul part of a Foul Action.

@@ -7,6 +7,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -14,7 +15,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
-import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import kotlin.math.abs
 
 /**

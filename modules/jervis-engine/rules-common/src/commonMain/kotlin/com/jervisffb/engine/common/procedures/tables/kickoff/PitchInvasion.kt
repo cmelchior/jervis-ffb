@@ -18,6 +18,10 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.PitchInvasionContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportGameProgress
+import com.jervisffb.engine.common.reports.ReportPitchInvasionRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -26,11 +30,7 @@ import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.PitchInvasionContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportDiceRoll
-import com.jervisffb.engine.common.reports.ReportGameProgress
-import com.jervisffb.engine.common.reports.ReportPitchInvasionRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

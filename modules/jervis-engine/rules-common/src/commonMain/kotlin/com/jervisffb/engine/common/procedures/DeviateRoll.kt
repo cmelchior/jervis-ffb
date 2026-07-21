@@ -3,7 +3,6 @@ package com.jervisffb.engine.common.procedures
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
@@ -11,33 +10,26 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.DeviateRollContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-
-data class DeviateRollContext(
-    val from: PitchCoordinate,
-    val deviateRoll: List<DieResult> = emptyList(),
-    val landsAt: PitchCoordinate? = null,
-    val outOfBoundsAt: PitchCoordinate? = null, // Will contain the last square before the ball went out of bounds.
-): ProcedureContext
 
 /**
  * Resolve a Deviate Roll.
  *
  * Both balls and players can deviate, but note that this procedure does not
  * move either of them nor change their state. It only saves the result inside
- * [DeviateRollContext]. It is up to the parent procedure to handle it.
+ * [com.jervisffb.engine.common.context.DeviateRollContext]. It is up to the parent procedure to handle it.
  *
  * See page 25 in the rulebook.
  */

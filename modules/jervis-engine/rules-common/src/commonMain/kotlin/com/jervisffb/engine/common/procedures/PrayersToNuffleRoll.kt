@@ -4,12 +4,14 @@ import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.common.commands.AddPrayersToNuffle
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.AddPrayersToNuffle
+import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -20,11 +22,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.LogCategory
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffleEvent
 
 /**

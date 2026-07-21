@@ -7,15 +7,23 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetCurrentBall
-import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.commands.SetPlayerLocation
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.reports.ReportDiceRoll
+import com.jervisffb.engine.common.reports.ReportGameProgress
+import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -31,16 +39,8 @@ import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.common.reports.ReportDiceRoll
-import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 
 
 /**

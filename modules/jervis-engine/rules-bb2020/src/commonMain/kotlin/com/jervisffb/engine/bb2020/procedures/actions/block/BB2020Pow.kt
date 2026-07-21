@@ -12,20 +12,20 @@ import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.reports.ReportPowResult
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.common.reports.ReportPowResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 
 /**
  * Resolve POW! selected on the block dice.
@@ -134,13 +134,13 @@ object BB2020Pow: Procedure() {
             RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val multipleBlockContext = state.getContextOrNull<BB2020MultipleBlockContext>()
-            val injuryContext = state.getContext<com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext>()
+            val injuryContext = state.getContext<RiskingInjuryContext>()
             val updateInjuryCommand = multipleBlockContext?.addInjuryReferenceForPlayer(
                 injuryContext.player,
                 injuryContext
             )
             return compositeCommandOf(
-                RemoveContext<com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext>(),
+                RemoveContext<RiskingInjuryContext>(),
                 updateInjuryCommand,
                 if (multipleBlockContext != null) {
                     ExitProcedure()

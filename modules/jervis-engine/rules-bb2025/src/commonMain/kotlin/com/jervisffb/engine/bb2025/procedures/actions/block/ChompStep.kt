@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.context.ChompContext
 import com.jervisffb.engine.bb2025.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.bb2025.reports.ReportChompResult
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
@@ -17,37 +18,27 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BlitzActionContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
+import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.context.BlitzActionContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
-import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
-import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class ChompContext(
-    val attacker: Player,
-    val defender: Player? = null,
-    val chompRoll: D6DieRoll? = null,
-    val isSuccess: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure for handling the "Chomp"-part of a Chomp Special Action.

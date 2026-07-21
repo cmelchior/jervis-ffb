@@ -17,6 +17,8 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.common.modifiers.KickoffStatModifier
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -34,8 +36,6 @@ import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.singleInstanceOfOrNull

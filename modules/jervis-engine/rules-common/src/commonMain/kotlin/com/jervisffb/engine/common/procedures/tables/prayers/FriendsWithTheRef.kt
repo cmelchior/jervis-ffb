@@ -4,15 +4,15 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 
 /**
  * Procedure for handling the Prayer to Nuffle "Friends with the Ref" as described on page 39

@@ -1,20 +1,20 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.common.commands.SetDrive
 import com.jervisffb.engine.common.commands.SetHalf
 import com.jervisffb.engine.common.commands.SetKickingTeamAtHalfTime
 import com.jervisffb.engine.common.commands.SetTurnMarker
-import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.reports.ReportStartingDrive
+import com.jervisffb.engine.common.reports.ReportStartingHalf
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.reports.ReportStartingDrive
-import com.jervisffb.engine.common.reports.ReportStartingHalf
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 

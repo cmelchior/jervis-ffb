@@ -3,9 +3,9 @@ package com.jervisffb.fumbbl.net.adapter.impl.setup
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

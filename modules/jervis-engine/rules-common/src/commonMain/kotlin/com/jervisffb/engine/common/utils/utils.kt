@@ -1,9 +1,9 @@
 package com.jervisffb.engine.common.utils
 
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll

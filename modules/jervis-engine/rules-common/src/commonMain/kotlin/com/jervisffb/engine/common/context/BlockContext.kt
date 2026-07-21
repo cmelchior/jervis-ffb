@@ -1,11 +1,11 @@
 package com.jervisffb.engine.common.context
 
 import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.common.procedures.actions.block.calculateBlockDiceToRoll
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
-import com.jervisffb.engine.common.procedures.actions.block.calculateBlockDiceToRoll
 
 /**
  * Wrap temporary data needed to track a "standard block". This can either

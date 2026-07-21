@@ -7,12 +7,12 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.skills.Timmmber
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.common.context.StandingUpRollContext
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.actions.move.StandingUpRollContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 import com.jervisffb.test.JervisGameBB2025Test

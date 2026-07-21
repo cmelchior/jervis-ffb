@@ -17,12 +17,16 @@ import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetKickingPlayer
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetKickingPlayer
+import com.jervisffb.engine.common.context.DeviateRollContext
+import com.jervisffb.engine.common.reports.ReportKickResult
+import com.jervisffb.engine.common.reports.ReportKickSkillResult
+import com.jervisffb.engine.common.reports.ReportKickingPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -34,9 +38,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.common.reports.ReportKickResult
-import com.jervisffb.engine.common.reports.ReportKickSkillResult
-import com.jervisffb.engine.common.reports.ReportKickingPlayer
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

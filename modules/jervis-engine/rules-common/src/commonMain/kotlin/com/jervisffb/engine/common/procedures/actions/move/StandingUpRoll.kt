@@ -5,7 +5,11 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.StandingUpRollContext
 import com.jervisffb.engine.common.modifiers.HelpingHandsModifier
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
+import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -15,19 +19,16 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.sum
 
 /**
  * Procedure for handling a Standing Up Roll as described on page 44 in the rulebook.
  * It is only responsible for handling the actual dice roll. The result is stored
- * in [StandingUpRollContext] and it is up to the caller of the procedure to choose
+ * in [com.jervisffb.engine.common.context.StandingUpRollContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
 object StandingUpRoll : D6WithRerollProcedure() {

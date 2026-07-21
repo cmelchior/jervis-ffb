@@ -7,14 +7,15 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetPettyCash
-import com.jervisffb.engine.common.commands.SetTreasury
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetPettyCash
+import com.jervisffb.engine.common.commands.SetTreasury
+import com.jervisffb.engine.common.context.BuyInducementsContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -22,21 +23,10 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlin.math.min
-
-data class BuyInducementsContext(
-    val higherCtvTeam: Team,
-    val lowerCtvTeam: Team,
-    val higherCtvTeamInducements: InducementsSelected? = null,
-    val lowerCtvTeamInducements: InducementsSelected? = null
-) : ProcedureContext {
-    val ctvDifference: Int
-        get() = higherCtvTeam.currentTeamValue - lowerCtvTeam.currentTeamValue
-}
 
 /**
  * Procedure controlling both teams purchasing inducements as described on

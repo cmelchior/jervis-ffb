@@ -1,41 +1,30 @@
 package com.jervisffb.engine.bb2025.procedures.actions.throwteammate
 
+import com.jervisffb.engine.bb2025.context.AlwaysHungryContext
 import com.jervisffb.engine.bb2025.skills.AlwaysHungry
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-
-data class AlwaysHungryContext(
-    val thrower: Player,
-    val thrownPlayer: Player,
-    val isHungryRoll: D6DieRoll? = null,
-    val isHungry: Boolean = false,
-    val squirmFreeRoll: D6DieRoll? = null,
-    val squirmedFree: Boolean = false,
-) : ProcedureContext
 
 /**
  * Procedure controlling rolling for [AlwaysHungry] including side-effects.

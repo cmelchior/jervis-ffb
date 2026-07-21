@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.common.context.SetupTeamContext
+import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerNo
@@ -15,8 +17,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameType
-import com.jervisffb.engine.common.procedures.SetupTeam
-import com.jervisffb.engine.common.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController

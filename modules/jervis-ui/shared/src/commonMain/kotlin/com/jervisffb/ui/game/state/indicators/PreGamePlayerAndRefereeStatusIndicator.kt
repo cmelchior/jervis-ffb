@@ -1,9 +1,9 @@
 package com.jervisffb.ui.game.state.indicators
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.common.procedures.PreGame
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.common.procedures.PreGame
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare

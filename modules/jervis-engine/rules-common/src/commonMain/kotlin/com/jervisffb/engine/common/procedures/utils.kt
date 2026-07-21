@@ -6,6 +6,9 @@ import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
+import com.jervisffb.engine.commands.SetSkillRerollUsed
+import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.common.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.common.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.common.commands.RemovePrayersToNuffle
@@ -13,10 +16,8 @@ import com.jervisffb.engine.common.commands.RemoveTeamFeature
 import com.jervisffb.engine.common.commands.RemoveTeamReroll
 import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.common.commands.SetPlayerRushesLeft
-import com.jervisffb.engine.commands.SetSkillRerollUsed
-import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.common.commands.SetSpecialPlayCardActive
-import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -40,7 +41,6 @@ import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.common.utils.endActionImmediately
 
 /**
  * Returns a list of all possible move actions for a given player.

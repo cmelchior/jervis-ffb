@@ -1,10 +1,10 @@
 package com.jervisffb.ui.game.state
 
+import com.jervisffb.engine.common.procedures.actions.block.calculateBlockDiceToRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
-import com.jervisffb.engine.common.procedures.actions.block.calculateBlockDiceToRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**

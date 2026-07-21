@@ -6,7 +6,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.bb2025.procedures.rerolls.MascotContext
+import com.jervisffb.engine.bb2025.context.MascotContext
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotStep
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game

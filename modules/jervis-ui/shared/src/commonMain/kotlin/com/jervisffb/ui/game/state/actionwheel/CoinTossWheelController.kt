@@ -5,13 +5,13 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.ext.d2
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode

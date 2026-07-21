@@ -1,7 +1,6 @@
 package com.jervisffb.engine.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -9,6 +8,11 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.ThrowInContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.ThrowIn
+import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -20,10 +24,6 @@ import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.common.procedures.ThrowIn
-import com.jervisffb.engine.common.procedures.ThrowInContext
-import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

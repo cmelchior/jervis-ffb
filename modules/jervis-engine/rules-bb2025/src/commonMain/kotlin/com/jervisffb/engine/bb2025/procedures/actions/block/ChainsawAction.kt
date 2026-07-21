@@ -1,5 +1,6 @@
 package com.jervisffb.engine.bb2025.procedures.actions.block
 
+import com.jervisffb.engine.bb2025.context.ChainsawActionContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -7,23 +8,16 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.ChainsawContext
+import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.context.ChainsawContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.skills.Duration
-
-data class ChainsawActionContext(
-    val attacker: Player,
-    val hasUsedChainsaw: Boolean = false,
-): ProcedureContext
 
 /**
  * Procedure for handling the Chainsaw special action as described on

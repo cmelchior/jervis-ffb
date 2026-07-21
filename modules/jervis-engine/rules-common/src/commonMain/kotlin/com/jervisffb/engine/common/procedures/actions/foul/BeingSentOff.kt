@@ -9,58 +9,46 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.common.commands.AddDiceModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.commands.SetBribeUsed
-import com.jervisffb.engine.common.commands.SetCoachBanned
-import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.AddDiceModifier
+import com.jervisffb.engine.common.commands.SetBribeUsed
+import com.jervisffb.engine.common.commands.SetCoachBanned
+import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.commands.SetTurnOver
+import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.EndOfDriveSequence
+import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
+import com.jervisffb.engine.common.reports.ReportBribeResult
+import com.jervisffb.engine.common.reports.ReportBribeUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
-import com.jervisffb.engine.common.reports.ReportBribeResult
-import com.jervisffb.engine.common.reports.ReportBribeUsed
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
-import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.EndOfDriveSequence
-import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
-
-data class BeingSentOffContext(
-    val player: Player,
-    val argueTheCall: Boolean = false,
-    val argueTheCallRoll: D6DieRoll? = null,
-    val argueTheCallResult: ArgueTheCallResult? = null,
-    val isBribeAvailable: Boolean = false,
-    val usedBribe: Boolean = false,
-    val bribeRoll: D6DieRoll? = null,
-): ProcedureContext
 
 /**
  * Procedure controlling "Being Sent-off".

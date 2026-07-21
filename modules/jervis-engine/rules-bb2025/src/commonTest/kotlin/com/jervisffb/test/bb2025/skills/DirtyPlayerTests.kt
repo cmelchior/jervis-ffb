@@ -5,8 +5,8 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.skills.DirtyPlayer
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.modifiers.ArmourModifier
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerDogoutState

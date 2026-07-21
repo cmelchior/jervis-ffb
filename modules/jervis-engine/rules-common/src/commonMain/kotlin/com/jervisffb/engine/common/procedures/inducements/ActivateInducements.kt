@@ -5,24 +5,18 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.common.context.ActivateInducementContext
+import com.jervisffb.engine.common.procedures.getAvailableAbilities
+import com.jervisffb.engine.common.procedures.getAvailableCards
+import com.jervisffb.engine.common.procedures.getAvailableSpells
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.getAvailableAbilities
-import com.jervisffb.engine.common.procedures.getAvailableCards
-import com.jervisffb.engine.common.procedures.getAvailableSpells
-
-data class ActivateInducementContext(
-    val team: Team,
-    val timing: Timing
-): ProcedureContext
 
 /**
  * This procedure is responsible for activating optional inducements at

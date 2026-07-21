@@ -1,6 +1,6 @@
 package com.jervisffb.engine.bb2025.reports
 
-import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRollContext
+import com.jervisffb.engine.bb2025.context.DauntlessRollContext
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 

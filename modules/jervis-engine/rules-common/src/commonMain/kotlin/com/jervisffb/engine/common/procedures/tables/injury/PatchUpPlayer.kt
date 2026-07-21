@@ -1,15 +1,18 @@
 package com.jervisffb.engine.common.procedures.tables.injury
 
-import com.jervisffb.engine.common.commands.AddNigglingInjuries
-import com.jervisffb.engine.common.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetMissNextGame
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.commands.AddNigglingInjuries
+import com.jervisffb.engine.common.commands.AddPlayerStatModifier
+import com.jervisffb.engine.common.commands.SetMissNextGame
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
+import com.jervisffb.engine.common.reports.ReportInjuryResult
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -20,9 +23,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.common.reports.ReportInjuryResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

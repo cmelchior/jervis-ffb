@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.bb2025.BB2025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
@@ -13,7 +14,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.test.bb2020.advancedHumanTeamAway
 import com.jervisffb.test.bb2020.createAdvancedHomeTeam
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020

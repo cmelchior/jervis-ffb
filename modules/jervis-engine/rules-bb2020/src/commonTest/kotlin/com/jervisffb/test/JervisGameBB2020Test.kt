@@ -3,10 +3,10 @@ package com.jervisffb.test
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.bb2020.BB2020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createDefaultHomeTeamBB2020
 import com.jervisffb.test.bb2020.humanTeamAwayBB2020

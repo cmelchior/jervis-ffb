@@ -8,16 +8,16 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.ScatterRollContext
+import com.jervisffb.engine.common.procedures.ScatterRoll
+import com.jervisffb.engine.common.procedures.WeatherRoll
+import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.ScatterRoll
-import com.jervisffb.engine.common.procedures.ScatterRollContext
-import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**

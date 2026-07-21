@@ -3,11 +3,11 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.UnchannelledFury
+import com.jervisffb.engine.common.context.UnchannelledFuryRollContext
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.UnchannelledFuryRollContext
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer

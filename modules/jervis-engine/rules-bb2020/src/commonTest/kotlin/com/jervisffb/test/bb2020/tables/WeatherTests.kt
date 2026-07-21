@@ -8,6 +8,13 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.SelectPitchLocation
+import com.jervisffb.engine.common.context.CatchContext
+import com.jervisffb.engine.common.context.PassContext
+import com.jervisffb.engine.common.modifiers.AccuracyModifier
+import com.jervisffb.engine.common.modifiers.CatchModifier
+import com.jervisffb.engine.common.modifiers.PickupModifier
+import com.jervisffb.engine.common.modifiers.RushModifier
+import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -15,11 +22,6 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.common.context.CatchContext
-import com.jervisffb.engine.common.modifiers.AccuracyModifier
-import com.jervisffb.engine.common.modifiers.CatchModifier
-import com.jervisffb.engine.common.modifiers.PickupModifier
-import com.jervisffb.engine.common.modifiers.RushModifier
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
@@ -27,8 +29,6 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.common.procedures.actions.pass.PassContext
-import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.test.JervisGameBB2020Test

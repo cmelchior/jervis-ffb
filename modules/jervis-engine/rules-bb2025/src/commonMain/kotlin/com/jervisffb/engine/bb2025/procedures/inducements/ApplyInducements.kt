@@ -3,21 +3,22 @@ package com.jervisffb.engine.bb2025.procedures.inducements
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.bb2025.commands.AddTeamMascot
 import com.jervisffb.engine.bb2025.procedures.rerolls.ExtraTeamTrainingReroll
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.context.UpdateContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.AddBribe
 import com.jervisffb.engine.common.commands.AddMortuaryAssistant
 import com.jervisffb.engine.common.commands.AddPlagueDoctor
 import com.jervisffb.engine.common.commands.AddTeamReroll
 import com.jervisffb.engine.common.commands.AddWanderingApothecary
 import com.jervisffb.engine.common.commands.AddWeatherMage
-import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.commands.SetBlitzersBestKegs
 import com.jervisffb.engine.common.commands.SetHalflingMasterChefs
 import com.jervisffb.engine.common.commands.SetPartTimeAssistantCoaches
 import com.jervisffb.engine.common.commands.SetTempAgencyCheerleaders
-import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.context.UpdateContext
-import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.procedures.inducements.ApplyInducementsContext
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -27,7 +28,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Bribe
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.common.procedures.inducements.ApplyInducementsContext
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

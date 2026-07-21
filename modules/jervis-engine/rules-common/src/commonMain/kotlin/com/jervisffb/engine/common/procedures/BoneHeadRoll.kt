@@ -3,15 +3,18 @@ package com.jervisffb.engine.common.procedures
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
+import com.jervisffb.engine.common.commands.SetHasTackleZones
+import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.BoneHeadRollContext
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
@@ -19,17 +22,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
-import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class BoneHeadRollContext(
-    val player: Player,
-    val roll: D6DieRoll? = null,
-    val isSuccess: Boolean = false,
-) : ProcedureContext {
-    val rerolled: Boolean = roll?.rerollSource != null && roll.rerolledResult != null
-}
 
 /**
  * Procedure for rolling for Bone Head as described on page 84 in the rulebook.
