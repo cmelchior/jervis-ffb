@@ -120,7 +120,7 @@ object PassAccuracyRoll: D6WithRerollProcedure() {
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<PassContext>()
-            return context.copy(passingRoll = D6DieRoll.create(state, d6))
+            return context.copy(passingRoll = D6DieRoll.create(d6))
         }
         override val nextNode: Node = ChooseToUseAccurate
     }

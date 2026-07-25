@@ -45,8 +45,8 @@ object StandardBlockRollDice: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
                 val roll =
-                    it.map { diceRoll: DBlockResult ->
-                        BlockDieRoll.create(state, diceRoll)
+                    it.mapIndexed { index, dieRoll: DBlockResult ->
+                        BlockDieRoll.create(dieRoll, index)
                     }
                 return compositeCommandOf(
                     ReportDiceRoll(roll),

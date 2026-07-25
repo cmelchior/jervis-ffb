@@ -57,7 +57,7 @@ object LeapRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val rollContext = state.getContext<LeapRollContext>()
             return rollContext.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isSuccess(rollContext, overrideD6 = d6)
             )
         }

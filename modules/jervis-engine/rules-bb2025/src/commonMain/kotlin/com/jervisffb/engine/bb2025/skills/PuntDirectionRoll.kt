@@ -35,7 +35,7 @@ object PuntDirectionRoll : D3WithRerollProcedure() {
             val context = state.getContext<PuntContext>()
             val selectedDirection = context.selectedDirection ?: error("No direction selected: $context")
             return context.copy(
-                directionRoll = D3DieRoll.create(state, d3),
+                directionRoll = D3DieRoll.create(d3),
                 kickDirection = rules.throwIn(selectedDirection, d3)
             )
         }

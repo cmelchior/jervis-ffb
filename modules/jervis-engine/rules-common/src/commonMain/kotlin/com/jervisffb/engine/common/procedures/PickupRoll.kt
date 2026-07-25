@@ -35,7 +35,7 @@ object PickupRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<PickupRollContext>()
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isPickupSuccess(d6, context.player.agility, context.modifiers),
             )
         }

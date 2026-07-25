@@ -82,7 +82,7 @@ object ReallyStupidRoll: D6WithRerollProcedure() {
             val isSuccess = calculateSuccess(d6, helpAvailable)
             return context.copy(
                 helpAvailable = helpAvailable,
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isSuccess
             )
         }

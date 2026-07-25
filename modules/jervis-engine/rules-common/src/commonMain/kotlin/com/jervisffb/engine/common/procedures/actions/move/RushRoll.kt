@@ -104,7 +104,7 @@ object RushRoll: D6WithRerollProcedure() {
             val context = state.getContext<RushRollContext>()
             val success = isRushSuccess(d6, context.modifiers)
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = success,
             )
         }

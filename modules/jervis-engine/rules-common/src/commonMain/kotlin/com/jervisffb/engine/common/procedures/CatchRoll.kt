@@ -34,7 +34,7 @@ object CatchRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val rollContext = state.getContext<CatchContext>()
             return rollContext.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = testAgainstAgility(rollContext.catchingPlayer, d6, rollContext.modifiers)
             )
         }

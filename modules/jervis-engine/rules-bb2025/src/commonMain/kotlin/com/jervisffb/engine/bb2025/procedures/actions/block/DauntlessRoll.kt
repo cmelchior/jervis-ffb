@@ -45,7 +45,7 @@ object DauntlessRoll: D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<DauntlessRollContext>()
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 modifier = calculateModifier(context.attacker, context.defender, d6),
             )
         }

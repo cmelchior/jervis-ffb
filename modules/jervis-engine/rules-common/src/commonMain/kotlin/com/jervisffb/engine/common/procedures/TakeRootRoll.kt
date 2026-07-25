@@ -61,7 +61,7 @@ object TakeRootRoll: D6WithRerollProcedure() {
             val context = state.getContext<TakeRootRollContext>()
             val isSuccess = calculateSuccess(d6)
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isSuccess
             )
         }

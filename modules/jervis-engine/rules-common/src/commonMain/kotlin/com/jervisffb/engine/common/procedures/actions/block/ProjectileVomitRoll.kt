@@ -34,7 +34,7 @@ object ProjectileVomitRoll: D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<ProjectileVomitContext>()
             return context.copy(
-                vomitRoll = D6DieRoll.create(state, d6),
+                vomitRoll = D6DieRoll.create(d6),
                 isSuccess = isSuccess(d6),
             )
         }

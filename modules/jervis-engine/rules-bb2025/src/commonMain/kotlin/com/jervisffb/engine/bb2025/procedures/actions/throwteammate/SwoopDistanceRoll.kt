@@ -35,7 +35,7 @@ object SwoopDistanceRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<SwoopContext>()
             return context.copy(
-                distanceRoll = D6DieRoll.create(state, d6),
+                distanceRoll = D6DieRoll.create(d6),
             )
         }
     }

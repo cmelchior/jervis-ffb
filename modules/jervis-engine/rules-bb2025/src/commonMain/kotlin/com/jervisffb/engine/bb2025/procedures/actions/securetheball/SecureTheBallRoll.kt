@@ -35,7 +35,7 @@ object SecureTheBallRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<SecureTheBallRollContext>()
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isSecuringSuccessful(d6, context.modifiers),
             )
         }

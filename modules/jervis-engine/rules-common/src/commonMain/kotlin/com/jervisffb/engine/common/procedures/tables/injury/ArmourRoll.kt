@@ -136,8 +136,8 @@ object ArmourRoll: Procedure() {
                 val roll = listOf(die1, die2)
                 val updatedContext = state.getContext<RiskingInjuryContext>().copy(
                     armourRoll = persistentListOf(
-                        D6DieRoll.create(state, die1),
-                        D6DieRoll.create(state, die2),
+                        D6DieRoll.create(die1, indexInPool = 0),
+                        D6DieRoll.create(die2, indexInPool = 1),
                     ),
                 )
                 compositeCommandOf(

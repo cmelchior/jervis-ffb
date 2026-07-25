@@ -78,7 +78,7 @@ object TeamMascotRoll: Procedure() {
                 val context = state.getContext<MascotRollContext>()
                 val rerollContext = state.getRerollContext()
                 val success = isSuccess(d6)
-                val roll = D6DieRoll.create(state, d6)
+                val roll = D6DieRoll.create(d6)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.TEAM_MASCOT, d6),
                     UpdateContext(context.copy(

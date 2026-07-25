@@ -28,7 +28,7 @@ object AlwaysHungryRoll: D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<AlwaysHungryContext>()
             return context.copy(
-                isHungryRoll = D6DieRoll.create(state, d6),
+                isHungryRoll = D6DieRoll.create(d6),
                 isHungry = calculateIsHungry(d6)
             )
         }

@@ -54,7 +54,7 @@ object RecoverPlayerRoll: Procedure() {
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RECOVER_PLAYER, d6),
                     UpdateContext(context.copy(
-                        recoverRoll = D6DieRoll.create(state, d6),
+                        recoverRoll = D6DieRoll.create(d6),
                         modifiers = modifiers,
                         isSuccess = isSuccess(d6, modifiers)
                     )),

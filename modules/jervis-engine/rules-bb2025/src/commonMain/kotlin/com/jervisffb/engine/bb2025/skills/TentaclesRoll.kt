@@ -42,7 +42,7 @@ object TentaclesRoll : D6WithRerollProcedure() {
                 DefensiveTentaclesModifier(context.movingPlayer)
             )
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 modifiers = modifiers,
                 isSuccess = isTentaclesSuccessful(d6, modifiers),
             )

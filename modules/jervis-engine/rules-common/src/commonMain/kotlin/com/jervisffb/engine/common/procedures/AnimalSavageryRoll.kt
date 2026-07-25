@@ -31,7 +31,7 @@ object AnimalSavageryRoll: D6WithRerollProcedure() {
             val activateContext = state.getContext<ActivatePlayerContext>()
             val isSuccess = calculateSuccess(activateContext, d6)
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isSuccess
             )
         }

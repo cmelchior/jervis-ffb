@@ -49,7 +49,7 @@ object BribeRoll: Procedure() {
                 val context = state.getContext<BeingSentOffContext>()
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRIBE, d6),
-                    UpdateContext(context.copy(bribeRoll = D6DieRoll.create(state, d6))),
+                    UpdateContext(context.copy(bribeRoll = D6DieRoll.create(d6))),
                     ExitProcedure()
                 )
             }

@@ -2,6 +2,7 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.LogId
 
 /**
  * Developer's Commentary:
@@ -10,7 +11,7 @@ import com.jervisffb.engine.model.Game
  * https://issuetracker.google.com/issues/139320238
  */
 abstract class LogEntry : Command {
-    var id: String = "" // Currently being set from the outside...not nice, but easier for now
+    var id: LogId = LogId("") // Currently being set from the outside...not nice, but easier for now
     abstract val category: LogCategory
     abstract val message: String
 

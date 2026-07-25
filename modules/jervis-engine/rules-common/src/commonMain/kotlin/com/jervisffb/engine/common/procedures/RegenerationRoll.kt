@@ -60,7 +60,7 @@ object RegenerationRoll: D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<RiskingInjuryContext>()
             return context.copy(
-                regenerationRoll = D6DieRoll.create(state, d6),
+                regenerationRoll = D6DieRoll.create(d6),
                 regenerationSuccess = calculateSuccess(d6),
             )
         }

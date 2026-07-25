@@ -35,7 +35,7 @@ object ShadowingRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<ShadowingRollContext>()
             return context.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isShadowingSuccessful(d6, context.modifiers),
             )
         }

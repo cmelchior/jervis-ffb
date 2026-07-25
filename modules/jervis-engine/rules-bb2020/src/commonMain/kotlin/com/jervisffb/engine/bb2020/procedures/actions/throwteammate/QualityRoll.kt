@@ -121,7 +121,7 @@ object QualityRoll: D6WithRerollProcedure() {
             )
         } else {
             context.copy(
-                qualityRoll = D6DieRoll.create(state, d6),
+                qualityRoll = D6DieRoll.create(d6),
                 qualityRollModifiers = modifiers.toPersistentList(),
                 qualityRollResult = result
             )

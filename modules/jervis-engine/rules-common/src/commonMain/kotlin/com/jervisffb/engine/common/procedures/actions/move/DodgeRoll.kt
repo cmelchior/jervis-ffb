@@ -119,7 +119,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     override val RollDie = object : AbstractRollDie() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<DodgeRollContext>()
-            return context.copy(roll = D6DieRoll.create(state, d6))
+            return context.copy(roll = D6DieRoll.create(d6))
         }
         override val nextNode: Node = CalculateMandatoryModifiers
     }

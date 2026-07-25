@@ -110,7 +110,7 @@ object SwoopStep: Procedure() {
             val isOutOfBounds = context.coordinate.move(context.rolledDirection!!, steps = 1).isOutOfBounds(rules)
             return when (isOutOfBounds) {
                 true -> compositeCommandOf(
-                    UpdateContext(context.copy(distanceRoll = D6DieRoll.create(state, 1.d6))),
+                    UpdateContext(context.copy(distanceRoll = D6DieRoll.create(1.d6))),
                     GotoNode(DetermineSwoopResult)
                 )
                 false -> GotoNode(RollDistance)

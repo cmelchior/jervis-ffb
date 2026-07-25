@@ -2,13 +2,13 @@ package com.jervisffb.engine.rules.common.procedures
 
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.model.DieId
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
 
 /**
- * Wrap a single Block die roll. This makes it possible to track it all the way from being rolled to its final result
+ * Wrap a single Block die roll. This makes it possible to track it all the way
+ * from being rolled to its final result.
  */
 @Serializable
 @ConsistentCopyVisibility
@@ -31,8 +31,15 @@ data class BlockDieRoll private constructor(
     }
 
     companion object {
-        fun create(state: Game, originalRoll: DBlockResult): BlockDieRoll {
-            return BlockDieRoll(state.idGenerator.nextDiceId(), originalRoll)
+        /**
+         * Create a new [BlockDieRoll] for tracking a single die across rolling
+         * and rerolling a dice pool.
+         *
+         * [indexInPool] is the index of the die in the pool. It should be stable
+         * across the entire lifetime of the dice pool.
+         */
+        fun create(originalRoll: DBlockResult, indexInPool: Int): BlockDieRoll {
+            return BlockDieRoll(DieId("dblock-$indexInPool"), originalRoll)
         }
     }
 }

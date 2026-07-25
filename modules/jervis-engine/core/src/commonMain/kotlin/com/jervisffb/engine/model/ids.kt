@@ -13,25 +13,45 @@ import kotlin.jvm.JvmInline
 
 @Serializable
 @JvmInline
+value class BallId(val value: String) {
+    companion object {
+        val DEFAULT = BallId("ball")
+    }
+}
+
+@Serializable
+@JvmInline
 value class CoachId(val value: String)
 
 @Serializable
 @JvmInline
 value class SpectatorId(val value: String)
 
-// ID that identities a single die
-// Used to track individual dice through rerolls
+/**
+ * ID that identities a single die.
+ *
+ * Used to track individual dice through rerolls. It is only required to be
+ * unique across the lifetime of the dice pool the die is part of.
+ */
 @JvmInline
 @Serializable
-value class DieId(val id: String) {
-    companion object {
-        fun generate(state: Game): DieId = state.idGenerator.nextDiceId()
-    }
-}
+value class DieId(val id: String)
 
+/**
+ * ID that identifies a dice pool.
+ *
+ * All dice rolls are done using a dice pool, even just rolling a single die.
+ * The id is used to track the pool across the procudures it takes to resolve
+ * the result of the roll. The ID is only relevant when multiple pools are in
+ * play, like during Multiple Block.
+ */
 @JvmInline
 @Serializable
 value class DicePoolId(val value: Int)
+
+@JvmInline
+@Serializable
+value class LogId(val value: String)
 
 /**
  * Unique identifier for a player.
@@ -44,14 +64,6 @@ value class PlayerId(val value: String)
 @Serializable
 @JvmInline
 value class PositionId(val value: String)
-
-@Serializable
-@JvmInline
-value class BallId(val value: String) {
-    companion object {
-        val DEFAULT = BallId("ball")
-    }
-}
 
 /**
  * Unique identifier for a [RerollSource]. This must be unique across the entire
@@ -95,37 +107,13 @@ data class SkillId(val type: SkillType, val value: SkillValue = SkillValue.None)
     }
 }
 
-/**
- * Some skills have a value associated with them. For example "Loner (4+)" or
- * "Hatred (Troll)". this interface encapsulates that concept.
- * Skills with no value should use [SkillValue.None] or an optional ?
- *
- * See [com.jervisffb.engine.rules.common.skills.Skill] for usage.
- */
-@Serializable
-sealed interface SkillValue {
-
-    // Skills that look like `SkillName (+Value)`
-    @Serializable
-    @JvmInline
-    value class IntAdjustment(val value: Int) : SkillValue
-
-    // Skills that look like `SkillName (Value+)`
-    @Serializable
-    @JvmInline
-    value class IntTarget(val value: Int) : SkillValue
-
-    @Serializable
-    @JvmInline
-    value class Keyword(val value: PlayerKeyword) : SkillValue
-
-    @Serializable
-    object None : SkillValue
-}
-
 @Serializable
 @JvmInline
 value class RosterId(val id: String)
+
+@Serializable
+@JvmInline
+value class SetupId(val value: String)
 
 @Serializable
 @JvmInline
@@ -138,10 +126,6 @@ value class TeamId(val value: String = "") {
         }
     }
 }
-
-@Serializable
-@JvmInline
-value class SetupId(val value: String)
 
 @Serializable
 @JvmInline

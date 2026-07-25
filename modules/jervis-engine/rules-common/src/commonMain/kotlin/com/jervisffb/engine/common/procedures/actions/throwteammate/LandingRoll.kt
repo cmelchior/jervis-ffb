@@ -34,7 +34,7 @@ object LandingRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val rollContext = state.getContext<LandingRollContext>()
             return rollContext.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = testAgainstAgility(rollContext.landingPlayer, d6, rollContext.modifiers)
             )
         }

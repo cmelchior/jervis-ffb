@@ -67,7 +67,7 @@ object ArgueTheCallRoll: Procedure() {
                 }
 
                 val updatedContext = context.copy(
-                    argueTheCallRoll = D6DieRoll.create(state, d6),
+                    argueTheCallRoll = D6DieRoll.create(d6),
                     argueTheCallResult = result
                 )
                 return compositeCommandOf(

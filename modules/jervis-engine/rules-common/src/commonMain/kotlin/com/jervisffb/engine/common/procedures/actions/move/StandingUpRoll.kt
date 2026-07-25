@@ -76,7 +76,7 @@ object StandingUpRoll : D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val rollContext = state.getContext<StandingUpRollContext>()
             return rollContext.copy(
-                roll = D6DieRoll.create(state, d6),
+                roll = D6DieRoll.create(d6),
                 isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext.modifiers)
             )
         }

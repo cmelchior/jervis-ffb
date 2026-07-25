@@ -34,7 +34,7 @@ object ChainsawRoll: D6WithRerollProcedure() {
         override fun updateContext(state: Game, rules: Rules, d6: D6Result): ProcedureContext {
             val context = state.getContext<ChainsawContext>()
             return context.copy(
-                kickbackRoll = D6DieRoll.create(state, d6),
+                kickbackRoll = D6DieRoll.create(d6),
                 isSuccess = isChainsawSuccess(d6)
             )
         }

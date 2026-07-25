@@ -1,10 +1,8 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.AddEntry
-import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ListEvent
 import com.jervisffb.engine.RemoveEntry
-import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.MutableProcedureStack
 import com.jervisffb.engine.fsm.MutableProcedureState
 import com.jervisffb.engine.fsm.Node
@@ -20,52 +18,6 @@ import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
-
-// TODO Just keep it as a singleton until we explore the requirements further.
-/**
- * Deterministic ID generator used to generate IDs [Command] and other
- * objects created as part of [ActionNode.applyAction].
- *
- * Note, in particular, this class should _NOT_ be used as part of
- * [ActionNode.getAvailableActions] since we do not control when this is called,
- *
- * These ID's should only be generated from inside a request to
- * [GameEngineController.handleAction] ensuring that all access to the generator
- * is thread-safe. As it is not thread-safe by itself.
- *
- * The generator is tied to a specific [Game] instance. Ids are always incremental
- * even if actions are undone. This ensures that all connected clients can agree
- * on the sequence of events even with [com.jervisffb.engine.actions.Undo] in
- * the mix.
- */
-class IdGenerator {
-    private var diceId: Int = 0
-    private var logId: Int = 0
-    private var playerId: Int = 0
-
-    fun reset() {
-        diceId = 0
-        logId = 0
-        playerId = 0
-    }
-
-    fun nextDiceId(): DieId {
-        return DieId((++diceId).toString())
-    }
-
-    fun nextLogId(): String {
-        return (++logId).toString()
-    }
-
-    /**
-     * Generates a unique [PlayerId] for players added after the game is started
-     * (Mercenaries, Star Players, Journeymen).
-     */
-    fun nextPlayerId(team: Team): PlayerId {
-        // Include team id for improve debuggability
-        return PlayerId("${team.id.value}-runtime-${++playerId}")
-    }
-}
 
 /**
  * Entry point for tracking the state of a game of Blood Bowl.
@@ -105,8 +57,6 @@ class Game(
     }
 
     companion object
-
-    val idGenerator = IdGenerator()
 
     // Track all current active procedures.
     val stack = MutableProcedureStack()
@@ -273,7 +223,7 @@ class Game(
     fun addLog(entry: LogEntry) {
         // Inject log id before exposing it to the outside.
         // Not the nicest, but quick to do while figuring out a better solution.
-        entry.id = idGenerator.nextLogId()
+        entry.id = LogId(logs.size.toString())
         logs.add(entry)
         logChanges.safeTryEmit(AddEntry(entry))
     }
