@@ -49,7 +49,7 @@ val SKAVEN_THROWER =
         "Throwers",
         "Thrower",
         "T",
-        85_000,
+        80_000,
         7, 3, 3, 2, 8,
         listOf(PASS.id(), SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
