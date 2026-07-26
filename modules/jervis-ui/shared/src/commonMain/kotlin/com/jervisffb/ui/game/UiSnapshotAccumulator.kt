@@ -65,7 +65,11 @@ class UiSnapshotAccumulator(
         actionWheelEvents.add(event)
         when (event) {
             is ActionWheelUiStateData -> {
-                event.lastActionWasUndo = gameController.lastActionWasUndo()
+                // Animation-only action wheels are only used to show dice rolls before the actual action
+                // is applied. This means they must NOT inherit the engine's previous-action undo state,
+                // as otherwise the first forward roll after an Undo/rewind is snapped instantly via EXPAND_UNDO
+                // instead of animating.
+                event.lastActionWasUndo = !event.animationOnly && gameController.lastActionWasUndo()
             }
             else -> { /* Do nothing */ }
         }
@@ -164,12 +168,14 @@ class UiSnapshotAccumulator(
     }
 
     suspend fun emitUiState() {
+        if (uiController.suppressUiUpdates) return
         uiStateFlow.emit(build())
     }
 
     // Send any current accumulated action-wheel events to the UI. The list
     // is cleared after sending it.
     suspend fun emitActionWheelState() {
+        if (uiController.suppressUiUpdates) return
         if (contextWheelEvents.isNotEmpty()) {
             uiContextWheelFlow.emit(contextWheelEvents.single())
             contextWheelEvents.clear()

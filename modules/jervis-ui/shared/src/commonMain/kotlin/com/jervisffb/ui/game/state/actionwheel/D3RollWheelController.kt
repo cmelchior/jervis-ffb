@@ -4,9 +4,8 @@ package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D3Result
-import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.safeCast
+import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.ThrowIn
@@ -81,8 +80,7 @@ abstract class D3RollWheelController: ActionWheelDialogController() {
         val currentNode = acc.stack.currentNode()
         if (!((currentNode == rollDiceNode) && serverRoll)) return false
 
-        val button = selectedAction.safeCast<DiceRollResults>().let { roll ->
-            val d3Roll = roll.rolls.first() as D3Result
+        val button = selectedAction.safeDiceRollCast<D3Result>().let { d3Roll ->
             val buttonId = ButtonId("$buttonIdPrefix-${d3Roll.value}")
             DieButtonData(
                 id = buttonId,

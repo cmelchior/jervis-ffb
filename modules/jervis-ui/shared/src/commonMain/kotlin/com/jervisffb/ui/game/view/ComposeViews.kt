@@ -54,8 +54,6 @@ import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
-import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
-import com.jervisffb.ui.game.viewmodel.ReplayState
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import kotlinx.coroutines.flow.map
@@ -106,35 +104,6 @@ fun SectionHeader(title: String) {
             )
         )
         SectionDivider(modifier = Modifier.weight(1f))
-    }
-}
-
-@Composable
-fun ReplayCommandBar(
-    vm: ReplayControllerViewModel,
-    modifier: Modifier,
-) {
-    val state by vm.state.collectAsState()
-    Box(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(color = Color.Red),
-    ) {
-        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            when (state) {
-                ReplayState.STARTED -> {
-                    Button(modifier = Modifier.weight(1f), onClick = { vm.pause() }) {
-                        Text("Pause Replay")
-                    }
-                }
-                ReplayState.PAUSED ->  {
-                    Button(modifier = Modifier.weight(1f), onClick = { vm.start() }) {
-                        Text("Start Replay")
-                    }
-                }
-            }
-        }
     }
 }
 

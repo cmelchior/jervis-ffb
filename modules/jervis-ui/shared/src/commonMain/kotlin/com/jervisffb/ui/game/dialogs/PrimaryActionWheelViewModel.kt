@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class PrimaryActionWheelViewModel(
     val eventFlow: Flow<List<ActionWheelUiState>>,
     team: Team,
-    sharedPitchData: LocalPitchDataWrapper
+    sharedPitchData: LocalPitchDataWrapper,
+    private val isReplay: Boolean = false,
 ) : AbstractActionWheelViewModel(
         team = team,
         sharedPitchData = sharedPitchData,
@@ -41,8 +42,11 @@ class PrimaryActionWheelViewModel(
 
     // Start processing events from the UIGameController
     suspend fun start() {
-        // Swallow initial event sent from the UI during setup.
-        wheelEventDone.receive()
+        // Swallow initial event sent from the UI during setup. During replay the initial (non-animation)
+        // setup wheel is not rendered, so no such ack is sent -> skip the swallow to avoid blocking forever.
+        if (!isReplay) {
+            wheelEventDone.receive()
+        }
         eventFlow.collect { wheelEvents ->
             val event = wheelEvents.first()
             this.hideOnClickedOutside.value = event.hideWhenClickOutside
@@ -52,7 +56,9 @@ class PrimaryActionWheelViewModel(
             val isCurrentWheelVisible = sharedPitchData.isPrimaryActionWheelVisible.value
             val ignoreEvent = (!isCurrentWheelVisible && !willShowWheel)
             sharedPitchData.setPrimaryActionWheelVisibility(willShowWheel)
-            if (!ignoreEvent) {
+            // During replay only animation wheels are actually rendered (interactive wheels are skipped by the
+            // ComposeDialogs replay guard and never ack), so only wait for those. Live games wait for all.
+            if (!ignoreEvent && (!isReplay || event.animationOnly)) {
                 // Wait for UI to process the Action Wheel update, including animations
                 wheelEventDone.receive()
             }

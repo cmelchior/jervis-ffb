@@ -21,8 +21,8 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
 }
 
 /**
- * All games have a top-level [UiActionProviderGroup], that an action provider
- * for each player.
+ * All games have a top-level [UiActionProviderGroup] that should contain an
+ * action provider for each player and expose the current active one.
  */
 abstract class UiActionProviderGroup: UiActionProvider() {
     abstract val currentProvider: UiActionProvider

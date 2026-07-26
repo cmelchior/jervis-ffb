@@ -24,6 +24,7 @@ import com.jervisffb.ui.asDp
 import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 
 
@@ -49,6 +50,7 @@ fun PassResultAnimation(vm: PitchViewModel, animation: PassAnimation) {
         duration = duration,
         image = IconFactory.getBall(),
         squareSize = targetSquareSize,
+        speedFactor = animation.uiController.animationSpeedFactor,
         animationDone = { vm.notifyAnimationFinished() }
     )
 }
@@ -59,6 +61,7 @@ fun BallAnimation(
     duration: Duration,
     image: ImageBitmap,
     squareSize: Rect,
+    speedFactor: Float = 1f,
     animationDone: () -> Unit,
 ) {
     var time by remember { mutableStateOf(0f) }
@@ -75,7 +78,7 @@ fun BallAnimation(
             animate(
                 initialValue = 0.toFloat(),
                 targetValue = duration.inWholeMilliseconds.toFloat(),
-                animationSpec = tween(duration.inWholeMilliseconds.toInt() / timeScalingFactor, easing = LinearEasing),
+                animationSpec = tween(((duration.inWholeMilliseconds.toInt() / timeScalingFactor) * speedFactor).roundToInt().coerceAtLeast(1), easing = LinearEasing),
             ) { value, _ ->
                 time = value.toInt() / 1_000f // Convert back to seconds
             }

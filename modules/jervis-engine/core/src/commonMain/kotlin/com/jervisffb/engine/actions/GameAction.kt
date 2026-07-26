@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -49,6 +50,11 @@ import kotlin.random.Random
 sealed interface GameAction
 
 inline fun <reified T : GameAction> GameAction.safeCast(): T = this as? T ?: error("Cannot cast $this to ${T::class.simpleName}")
+
+inline fun <reified T : DieResult> GameAction.safeDiceRollCast(): T {
+    if (this is T) return this
+    return this.safeCast<DiceRollResults>().rolls.first() as T
+}
 
 /**
  * Game Action that can delay its value until called.

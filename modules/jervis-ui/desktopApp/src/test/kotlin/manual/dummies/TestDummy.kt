@@ -4,6 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -30,6 +31,7 @@ object TestDummy {
     )
 
     val gameModel = GameScreenModel(
+        UiGameClientType.HOTSEAT,
         TeamActionMode.ALL_TEAMS,
         controller,
         state.homeTeam,

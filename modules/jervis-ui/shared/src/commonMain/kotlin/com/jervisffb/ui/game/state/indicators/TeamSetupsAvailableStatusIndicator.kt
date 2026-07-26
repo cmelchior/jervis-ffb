@@ -6,8 +6,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
-import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.Setups
 import com.jervisffb.ui.menu.TeamActionMode
@@ -41,8 +41,8 @@ object TeamSetupsAvailableStatusIndicator: PitchStatusIndicator {
     }
 
     private fun createBadgeActions(uiSnapshot: UiSnapshotAccumulator): List<ButtonData> {
-        // TODO Find a better way to detect game mode
-        if (uiSnapshot.uiController.actionProvider is ReplayActionProvider) return emptyList()
+        // Showing badge actions during replay has no value, so just ignore them.
+        if (uiSnapshot.uiController.clientType == UiGameClientType.REPLAY) return emptyList()
         val state = uiSnapshot.uiController.state
         val buttons = mutableListOf<ButtonData>()
 

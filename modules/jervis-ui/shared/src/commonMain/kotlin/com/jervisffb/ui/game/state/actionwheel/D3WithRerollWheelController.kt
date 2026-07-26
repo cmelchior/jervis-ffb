@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.DiceRollType
  * - Swoop (Direction)
  */
 abstract class D3WithRerollWheelController : SingleDieWithRerollWheelController<D3Result>() {
+    override val dieClass = D3Result::class
     override val allOptions: List<D3Result> = D3Result.allOptions()
 }
 

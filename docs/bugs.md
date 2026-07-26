@@ -3,6 +3,9 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Blitzing during a Charge! does not map SelectBlockType correctly, so it 
+  shows the fallback action buttons for it.
+- Player cards do not show up for players on the pitch when rolling the coin.
 - "Stand Up & End Action" should not be shown for players with negatraits. It crashes the rules engine.
 - Animated Dice performance on Web is really bad for some reason.
 - Using the Player Editor in-game does not correctly modify MovesLeft, since that value is set at the beginning of the turn.

@@ -124,6 +124,7 @@ import kotlin.time.ExperimentalTime
  * - Unchannelled Fury
  */
 abstract class D6WithRerollWheelController : SingleDieWithRerollWheelController<D6Result>() {
+    override val dieClass = D6Result::class
     override val allOptions: List<D6Result> = D6Result.allOptions()
 }
 

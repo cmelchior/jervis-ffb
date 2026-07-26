@@ -24,9 +24,11 @@ import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
+import kotlin.reflect.KClass
 
 abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDialogController() {
 
+    abstract val dieClass: KClass<T>
     abstract val allOptions: List<T>
 
     // Parameters / Methods required to customize the behavior
@@ -120,9 +122,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
         val currentNode = acc.stack.currentNode()
         if ((currentNode == rollDiceNode || currentNode == rerollDiceNode) && serverRoll) {
-            val button = selectedAction.safeCast<DiceRollResults>().let { roll ->
-                @Suppress("UNCHECKED_CAST")
-                val dieRoll = roll.rolls.first() as T
+            val button = getDieResult(selectedAction, dieClass).let  { dieRoll ->
                 val buttonId = when (currentNode) {
                     rollDiceNode -> ButtonId("$buttonIdPrefix-${dieRoll.value}")
                     rerollDiceNode -> {
@@ -161,4 +161,11 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         }
         return false
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T: DieResult> getDieResult(action: GameAction, clazz: KClass<T>): T {
+        if (clazz.isInstance(action)) return action as T
+        return action.safeCast<DiceRollResults>().rolls.first() as T
+    }
+
 }

@@ -26,6 +26,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun KickOffEventResultAnimation(vm: PitchViewModel, animation: KickOffEventAnimation) {
@@ -42,15 +43,15 @@ fun KickOffEventResultAnimation(vm: PitchViewModel, animation: KickOffEventAnima
                 animate(
                     initialValue = 0.0f,
                     targetValue = 1f,
-                    animationSpec = tween(durationMillis = 500, easing = FastOutLinearInEasing),
+                    animationSpec = tween(durationMillis = animation.duration, easing = FastOutLinearInEasing),
                 ) { value: Float, _: Float ->
                     scale = value
                 }
-                delay(500)
+                delay(animation.duration.milliseconds)
                 animate(
                     initialValue = 1f,
                     targetValue = 0f,
-                    animationSpec = tween(durationMillis = 500, easing = LinearEasing),
+                    animationSpec = tween(durationMillis = animation.duration, easing = LinearEasing),
                 ) { value: Float, _: Float ->
                     alpha = value
                 }
@@ -62,7 +63,7 @@ fun KickOffEventResultAnimation(vm: PitchViewModel, animation: KickOffEventAnima
                 animate(
                     initialValue = 100.0f,
                     targetValue = 0f,
-                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                    animationSpec = tween(durationMillis = animation.duration, easing = FastOutSlowInEasing),
                 ) { value: Float, _: Float ->
                     translationY = value
                 }

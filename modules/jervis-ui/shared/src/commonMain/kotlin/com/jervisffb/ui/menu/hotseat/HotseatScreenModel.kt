@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.GameFileData
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.LocalActionProvider
@@ -237,11 +238,12 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
         )
 
         val model = GameScreenModel(
-            TeamActionMode.ALL_TEAMS,
-            gameController,
-            gameController.state.homeTeam,
-            gameController.state.awayTeam,
-            actionProvider,
+            uiClientType = UiGameClientType.HOTSEAT,
+            uiMode = TeamActionMode.ALL_TEAMS,
+            gameController = gameController,
+            homeTeam = gameController.state.homeTeam,
+            awayTeam = gameController.state.awayTeam,
+            actionProvider = actionProvider,
             mode = Manual(TeamActionMode.ALL_TEAMS),
             menuViewModel = menuViewModel,
             onEngineInitialized = {

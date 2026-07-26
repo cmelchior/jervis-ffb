@@ -4,9 +4,8 @@ package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.safeCast
+import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.common.context.BeingSentOffContext
@@ -87,8 +86,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
         val currentNode = acc.stack.currentNode()
         if (!((nodes.contains(currentNode)) && serverRoll)) return false
 
-        val button = selectedAction.safeCast<DiceRollResults>().let { roll ->
-            val d6Roll = roll.rolls.first() as D6Result
+        val button = selectedAction.safeDiceRollCast<D6Result>().let { d6Roll ->
             val buttonId = ButtonId("$buttonIdPrefix-${d6Roll.value}")
             DieButtonData(
                 id = buttonId,

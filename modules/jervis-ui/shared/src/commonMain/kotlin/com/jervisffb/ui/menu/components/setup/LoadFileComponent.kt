@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -27,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.shared.generated.resources.Res
@@ -35,17 +35,22 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun LoadFileComponent(viewModel: LoadFileComponentModel) {
+fun LoadFileComponent(
+    viewModel: LoadFileComponentModel,
+    width: Dp = 600.dp,
+    title: String = "Select Save File",
+    hintText: String = "Save File",
+    iconDescription: String = "Find Save File",
+) {
     val filePath by viewModel.filePath.collectAsState()
-    val loadErrror by viewModel.fileError.collectAsState()
+    val loadError by viewModel.fileError.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
-            LoadFileHeader()
+        Column(modifier = Modifier.width(width).padding(bottom = 100.dp)) {
+            LoadFileHeader(title)
             Spacer(modifier = Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
@@ -54,7 +59,7 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
                     onValueChange = { /* Do nothing */ },
                     readOnly = true,
                     singleLine = true,
-                    label = { Text("Save File") },
+                    label = { Text(hintText) },
                 )
                 Box(
                     modifier = Modifier
@@ -70,15 +75,15 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
                         modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
                         painter = painterResource(Res.drawable.jervis_icon_menu_folder),
-                        contentDescription = "Find Save File",
+                        contentDescription = iconDescription,
                     )
                 }
             }
             @Suppress("SENSELESS_COMPARISON")
-            if (loadErrror != null) {
+            if (loadError != null) {
                 Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = loadErrror,
+                        text = loadError,
                         color = JervisTheme.rulebookRed,
                         fontSize = 14.sp,
                     )
@@ -89,7 +94,7 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
 }
 
 @Composable
-private fun LoadFileHeader(color: Color = JervisTheme.rulebookRed) {
+private fun LoadFileHeader(header: String, color: Color = JervisTheme.rulebookRed) {
     TitleBorder(color)
     Box(
         modifier = Modifier.height(36.dp),
@@ -97,7 +102,7 @@ private fun LoadFileHeader(color: Color = JervisTheme.rulebookRed) {
     ) {
         Text(
             modifier = Modifier.padding(bottom = 2.dp),
-            text = "Select Save File",
+            text = header,
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = color

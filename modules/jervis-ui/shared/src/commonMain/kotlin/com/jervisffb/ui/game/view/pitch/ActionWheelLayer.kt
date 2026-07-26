@@ -68,7 +68,7 @@ fun ActionWheelLayer(vm: PitchViewModel) {
             currentState,
             vm,
             pitchData,
-            isPrimary = true
+            isPrimary = true,
         )
     }
 }

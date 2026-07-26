@@ -1,38 +1,28 @@
 package com.jervisffb.ui.game.viewmodel
 
-import com.jervisffb.ui.game.UiGameController
-import com.jervisffb.ui.game.state.ReplayActionProvider
-import com.jervisffb.ui.menu.GameScreenModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.jervisffb.ui.game.state.ReplayController
+import com.jervisffb.ui.game.state.ReplayPlayback
 import kotlinx.coroutines.flow.StateFlow
 
-enum class ReplayState {
-    STARTED,
-    PAUSED,
-}
-
-// TODO Need to figure out what to do with this when the ui controller has multiple action providers
+/**
+ * View model for controlling replaying a Jervis game.
+ *
+ * It delegates to whatever [ReplayController] is driving the current replay (the
+ * native [com.jervisffb.ui.game.state.ReplayActionProvider] for `.jrg` save
+ * files, or the FUMBBL [com.jervisffb.ui.game.state.ReplayActionProvider] for the
+ * developer FUMBBL replays). It is only created when the game is in replay mode.
+ */
 class ReplayControllerViewModel(
-    private val uiState: UiGameController,
-    private val gameModel: GameScreenModel,
+    private val controller: ReplayController,
 ) {
-    val state: StateFlow<ReplayState>
-        field = MutableStateFlow(ReplayState.PAUSED)
-
-    private val actionProvider = uiState.actionProvider as ReplayActionProvider
-    private var hasStarted = false
-
-    fun start() {
-        state.value = ReplayState.STARTED
-        if (hasStarted) {
-            actionProvider.pauseActionProvider()
-        }
-        actionProvider.startActionProvider()
-        hasStarted = true
-    }
-
-    fun pause() {
-        state.value = ReplayState.PAUSED
-        actionProvider.pauseActionProvider()
-    }
+    val playback: StateFlow<ReplayPlayback> = controller.playback
+    val position: StateFlow<Int> = controller.position
+    val totalActions: Int = controller.totalActions
+    fun jumpToStart() = controller.jumpToStart()
+    fun fastBackward() = controller.fastBackward()
+    fun backward() = controller.backward()
+    fun pause() = controller.pause()
+    fun forward() = controller.forward()
+    fun fastForward() = controller.fastForward()
+    fun jumpToEnd() = controller.jumpToEnd()
 }

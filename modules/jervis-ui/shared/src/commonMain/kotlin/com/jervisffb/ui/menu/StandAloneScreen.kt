@@ -65,6 +65,13 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
             navigator.push(P2PClientScreen(menuViewModel, viewModel))
         }
     }
+
+    fun startReplay(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            val viewModel = ReplayScreenModel(menuViewModel)
+            navigator.push(ReplayScreen(menuViewModel, viewModel))
+        }
+    }
 }
 
 class StandAloneScreen(private val menuViewModel: MenuViewModel, viewModel: StandAloneScreenModel) : Screen {
@@ -109,7 +116,7 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
                         labelMiddle = "P2P\nHost",
                         onClickMiddle = { viewModel.startP2PServer(navigator) },
                         labelBottom = "Replay",
-                        onClickBottom = null,
+                        onClickBottom = { viewModel.startReplay(navigator) },
                         menuViewModel.p2pHostAvaiable,
                     )
                 }

@@ -1,3 +1,7 @@
 package com.jervisffb.ui.game.animations
 
-class LogoAnimation: JervisAnimation
+import com.jervisffb.ui.game.UiGameController
+
+class LogoAnimation(override val uiController: UiGameController): JervisAnimation {
+    val durationMillis = uiController.scaledAnimationMs(500)
+}

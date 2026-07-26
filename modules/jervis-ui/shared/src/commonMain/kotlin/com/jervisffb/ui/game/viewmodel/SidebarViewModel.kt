@@ -12,7 +12,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
-import com.jervisffb.ui.game.state.ReplayActionProvider
+import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
@@ -43,7 +43,7 @@ class SidebarViewModel(
 
     private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
         // TODO Find a better way to detect game mode
-        if (uiState.actionProvider is ReplayActionProvider) return@map emptyList()
+        if (uiState.actionProvider is ReplayController) return@map emptyList()
         val buttons = mutableListOf<ButtonData>()
 
         // Check if this team is during the setup phase. For now, we just hard-code a few examples

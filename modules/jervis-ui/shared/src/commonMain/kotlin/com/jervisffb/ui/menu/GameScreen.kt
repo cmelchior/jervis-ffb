@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.game.view.GameScreen
 import com.jervisffb.ui.game.view.LoadingScreen
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
@@ -170,7 +171,7 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.hoverPlayerFlow,
         ),
         GameStatusViewModel(viewModel, viewModel.sharedPitchData, viewModel.uiState),
-        if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.uiState, viewModel) else null,
+        if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.actionProvider as ReplayController) else null,
         if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
         ActionSelectorViewModel(viewModel.uiState),
         LogViewModel(viewModel.uiState),

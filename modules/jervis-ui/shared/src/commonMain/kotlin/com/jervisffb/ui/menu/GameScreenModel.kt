@@ -30,6 +30,7 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.formatCurrency
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
@@ -105,6 +106,7 @@ class LocalPitchDataWrapper(uiState: UiGameController) {
  * Top-level ViewModel foreverything on the Game Screen.
  */
 class GameScreenModel(
+    private val uiClientType: UiGameClientType,
     private val uiMode: TeamActionMode,
     private val gameController: GameEngineController,
     val homeTeam: Team,
@@ -145,6 +147,7 @@ class GameScreenModel(
     private val _contextMenuFlow  = MutableSharedFlow<PlayerId?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val contextMenuFlow: Flow<Player?> = _contextMenuFlow.map { it?.let { uiState.state.getPlayerById(it) } }
     val uiState: UiGameController = UiGameController(
+        uiClientType,
         uiMode,
         gameController,
         actionProvider,

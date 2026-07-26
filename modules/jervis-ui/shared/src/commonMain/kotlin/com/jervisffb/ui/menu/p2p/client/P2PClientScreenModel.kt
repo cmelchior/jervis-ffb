@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.messages.P2PClientState
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -235,11 +236,12 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
         )
 
         gameViewModel = GameScreenModel(
-            TeamActionMode.AWAY_TEAM,
-            gameController,
-            gameController.state.homeTeam,
-            gameController.state.awayTeam,
-            actionProvider,
+            uiClientType = UiGameClientType.P2P_CLIENT,
+            uiMode = TeamActionMode.AWAY_TEAM,
+            gameController = gameController,
+            homeTeam = gameController.state.homeTeam,
+            awayTeam = gameController.state.awayTeam,
+            actionProvider = actionProvider,
             mode = Manual(TeamActionMode.AWAY_TEAM),
             menuViewModel = menuViewModel,
             onEngineInitialized = {

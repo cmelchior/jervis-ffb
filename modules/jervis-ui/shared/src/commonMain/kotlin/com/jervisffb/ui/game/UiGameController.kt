@@ -3,6 +3,7 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -12,15 +13,14 @@ import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
+import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.common.procedures.ActivatePlayer
 import com.jervisffb.engine.common.procedures.StartOfDriveSequence
-import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.PitchCoordinate
@@ -191,8 +191,22 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep as BB2020JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep as BB2025JumpStep
+
+
+/**
+ * This enums describes what kind of high-level "client" a game is. This can
+ * be used to determine what kind of UI to show.
+ */
+enum class UiGameClientType {
+    REPLAY,
+    HOTSEAT,
+    P2P_CLIENT,
+    P2P_HOST,
+    HOSTED_GAME,
+}
 
 /**
  * This class is the main entry point for holding the UI game state. It acts
@@ -206,6 +220,8 @@ import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep as BB2025Jum
  * so they are suitable for being consumed by the UI.
  */
 class UiGameController(
+    // Which type of client should we create. This affects what kind of UI to show.
+    val clientType: UiGameClientType,
     // Which Teams are controlled through this UI controller.
     // This mostly affects UNDO.
     val uiMode: TeamActionMode,
@@ -408,6 +424,16 @@ class UiGameController(
     // Channel used by the UI to indicate when the animation is done
     val animationDone = Channel<Boolean>(capacity = Channel.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
 
+    // Multiplier applied to all animation durations.
+    // 0.0 = Animations are disabled.
+    // 0.5 = Animations run twice as fast.
+    // 1.0 = Animations run at normal speed.
+    var animationSpeedFactor: Float = 1f
+
+    // When `true`, the game loop suppresses all UI updates so engine can be advanced silently.
+    // Used by Replay Jump-to-Start / Jump-to-End to rewind/forward without the UI flickering.
+    var suppressUiUpdates: Boolean = false
+
     init {
         actionProvider.init(this)
     }
@@ -492,10 +518,12 @@ class UiGameController(
                 val actions = controller.getAvailableActions()
                 val (previousNode, currentNode) = controller.previousNode() to controller.currentNode()
                 val acc = UiSnapshotAccumulator(
-                    uiStateFlow,
-                    uiActionWheelFlow,
-                    uiContextWheelFlow,
-                    lastUiState, this@UiGameController)
+                    uiStateFlow = uiStateFlow,
+                    uiActionWheelFlow = uiActionWheelFlow,
+                    uiContextWheelFlow = uiContextWheelFlow,
+                    previousSnapshot = lastUiState,
+                    uiController = this@UiGameController
+                )
 
                 runPreUpdateAnimations(acc, previousNode, currentNode)
 
@@ -550,6 +578,7 @@ class UiGameController(
 
                 // After an action was selected, run all decorators that modify
                 // the UI while the action is being processed.
+                updatePersistentUiDecorationsBeforeActionUpdate(state, userAction)
                 actionProvider.decorateSelectedAction(userAction, acc)
                 acc.emitAllUpdates()
 
@@ -615,10 +644,11 @@ class UiGameController(
 
     // Run animations before we update the UI to represent the state we moved to after applying the last GameAction
     private suspend fun runPreUpdateAnimations(acc: UiSnapshotAccumulator, previousNode: Node?, currentNode: Node?) {
+
         val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
             controller.nodes.contains(currentNode)
         }
-        if (currentWheelHandler != null) {
+        if (currentWheelHandler != null && !suppressUiUpdates) {
             if (currentWheelHandler.onApplyCurrentState(
                     acc,
                     gameController.lastAction,
@@ -627,27 +657,27 @@ class UiGameController(
                 )
             ) {
                 acc.emitActionWheelState()
-                animationDone.receive()
+                awaitAnimationCompletion()
             }
         }
 
-        if (!gameController.lastActionWasUndo()) {
+        if (isAnimationsEnabled()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
                 animationFlow.emit(animation)
-                animationDone.receive()
+                awaitAnimationCompletion()
             }
         }
     }
 
     private suspend fun runPostUpdateStateAnimations(state: Game, acc: UiSnapshotAccumulator) {
-        if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getFrameAnimation(state, rules)
+        if (isAnimationsEnabled()) {
+            val animation = AnimationFactory.getFrameAnimation(this, state, rules)
             if (animation != null) {
                 acc.addActionWheelEvent(HideActionWheel(hideImmediately = true))
                 acc.emitActionWheelState()
                 animationFlow.emit(animation)
-                animationDone.receive()
+                awaitAnimationCompletion()
                 // Enable this to have a promotional logo show up on touchdowns
                 //    if (animation is ConfettiAnimation) {
                 //        animationFlow.emit(LogoAnimation())
@@ -662,7 +692,7 @@ class UiGameController(
         action: GameAction,
         acc: UiSnapshotAccumulator
     ) {
-        if (action != Undo) {
+        if (isAnimationsEnabled(action)) {
             // Run any animations on Wheel Controllers first, before triggering more custom animations.
             // This is because we want to "finish" rolling dice, before showing the actual result of those dice rolls
             val currentWheelHandler = actionWheelControllers.firstOrNull { controller ->
@@ -670,16 +700,16 @@ class UiGameController(
             }
             if (currentWheelHandler?.onPostActionAnimation(acc, action) == true) {
                 acc.emitActionWheelState()
-                animationDone.receive()
+                awaitAnimationCompletion()
             }
-            val animation = AnimationFactory.getPostActionAnimation(state, action)
+            val animation = AnimationFactory.getPostActionAnimation(this, state, action)
             if (animation != null) {
                 // We do not want animations to run on top of action wheels, so hide them
                 // before running the animation.
                 acc.addActionWheelEvent(HideActionWheel(hideImmediately = true))
                 acc.emitActionWheelState()
                 animationFlow.emit(animation)
-                animationDone.receive()
+                awaitAnimationCompletion()
             }
         }
     }
@@ -709,6 +739,17 @@ class UiGameController(
         }
         state.awayTeam.forEach { player ->
             acc.addOrUpdatePlayer(player.id, UiPitchPlayer(player))
+        }
+    }
+
+    private fun updatePersistentUiDecorationsBeforeActionUpdate(state: Game, action: GameAction) {
+        // Register intent to move
+        if (action is CompositeGameAction && action.actionList.size == 2) {
+            val moveType = action.actionList.firstOrNull().let { (it as? MoveTypeSelected)?.moveType }
+            if (moveType == MoveType.STANDARD) {
+                val player = state.activePlayer ?: error("Missing active player")
+                uiDecorations.registerStartingMoveStep(player, player.coordinates)
+            }
         }
     }
 
@@ -744,9 +785,16 @@ class UiGameController(
         }
 
         // Add decoration when moving player
-        val normalMoveStep = delta.steps.lastOrNull()?.let {
-            it.procedure == StandardMoveStep && it.node == StandardMoveStep.MovePlayer && it.action is PitchSquareSelected
-        } ?: false
+        val normalMoveStep = if (uiIndicators.playerIsMoving()) {
+            val moveData = uiIndicators.getMovingPlayerInfo()
+            delta.steps.any { step ->
+                step.commands.any { command ->
+                    command is SetPlayerLocation && command.player == moveData.first && command.originalPlayerLocation.isAdjacent(state.rules, command.location)
+                }
+            }
+        } else {
+            false
+        }
 
         val jumpMoveStep = delta.steps.lastOrNull()?.let {
             (it.procedure == BB2020JumpStep || it.procedure == BB2025JumpStep ||
@@ -755,13 +803,13 @@ class UiGameController(
         } ?: false
 
         if (normalMoveStep) {
-            // The player might not have moved yet, if we need to roll for tenacles.
-            val start = state.getContext<MoveContext>().startingSquare
-            uiIndicators.addMoveUsed(start)
+            val startingCoordinates = uiDecorations.getMovingPlayerInfo().second
+            uiIndicators.addMoveUsed(startingCoordinates)
             uiIndicators.registerUndo(
                 deltaId = delta.id,
                 action = { uiIndicators.removeLastMoveUsed() }
             )
+            uiIndicators.finishMoveStep()
         } else if (jumpMoveStep) {
             val start = state.getContextOrNull<MoveContext>()?.startingSquare
             if (start != null) {
@@ -787,6 +835,12 @@ class UiGameController(
         )
     }
 
+    private fun isAnimationsEnabled(currentAction: GameAction? = null): Boolean {
+        if (currentAction == null && gameController.lastActionWasUndo()) return false
+        if (currentAction != null && currentAction is Undo) return false
+        return animationSpeedFactor > 0f
+    }
+
     fun userSelectedAction(action: GameAction) {
         actionProvider.userActionSelected(action)
     }
@@ -801,4 +855,52 @@ class UiGameController(
             }
         }
     }
+
+    /**
+     * Discard any pending animation-completion signals sitting on [animationDone].
+     *
+     * The game loop pairs each `animationDone.receive()` with a `notifyAnimationDone()` purely by
+     * arrival order. A replay jump or an interrupted animation can leave a stale completion
+     * parked on the rendezvous channel; if not cleared it would satisfy the next animation's wait
+     * prematurely and cut it short. The replay controller calls this when resuming from pause,
+     * where no legitimate completion can be in flight. It is a no-op when the channel is idle,
+     * so normal games are unaffected.
+     */
+    fun drainAnimationSignals() {
+        while (animationDone.tryReceive().isSuccess) { /* discard stale completion(s) */ }
+    }
+
+    /**
+     * Await the completion of the animation the loop just emitted.
+     *
+     * First, discarding any STALE completion left parked on [animationDone] by
+     * an animation that fired more than once - e.g. a cancelled full-screen
+     * animation whose `finally` still calls [notifyAnimationDone], or a
+     * straggler from a replay jump.
+     *
+     * The loop consumes exactly one completion per animation and always before
+     * emitting the next, so anything already parked when we start waiting for
+     * a NEW animation is stale by construction. The just-emitted animation
+     * cannot have completed yet (the UI processes the emit on a later frame,
+     * while this drain runs synchronously microseconds after the emit), so this
+     * never drops the genuine signal.
+     */
+    private suspend fun awaitAnimationCompletion() {
+        while (animationDone.tryReceive().isSuccess) { /* discard stale completion(s) */ }
+        animationDone.receive()
+    }
+
+    /**
+     * Scale a base animation duration (in milliseconds) by the current
+     * [com.jervisffb.ui.game.UiGameController.animationSpeedFactor].
+     *
+     * The result is clamped to at least 1ms so Compose `tween` and
+     * `delay` calls stay valid even when the factor is very small.
+     *
+     * Note: full-screen animations are skipped entirely when the
+     * factor is `<= 0`, so this helper is only reached with a positive factor.
+     */
+    fun scaledAnimationMs(baseMillis: Int): Int =
+        (baseMillis * animationSpeedFactor).roundToInt().coerceAtLeast(1)
+
 }

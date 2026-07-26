@@ -215,12 +215,24 @@ fun GameScreen(
             ) {
                 // Mirror the weight(1f) split from the bottom Row:
                 val logPanelWidth = (gameScreenWidth - 4 * 24.jdp - 48.dp) / 2
-                ExpandableActionPanel(
-                    unknownActions,
-                    panelBackground,
-                    bottomRowHeight,
-                    Modifier.width(logPanelWidth)
-                )
+                // During replay, the transport controls take the place of the action panel.
+                when (replayActionsBar != null) {
+                    true -> {
+                        ReplayControllerPanel(
+                            replayActionsBar,
+                            panelBackground,
+                            Modifier.width(logPanelWidth).height(bottomRowHeight)
+                        )
+                    }
+                    false -> {
+                        ExpandableActionPanel(
+                            unknownActions,
+                            panelBackground,
+                            bottomRowHeight,
+                            Modifier.width(logPanelWidth)
+                        )
+                    }
+                }
             }
         }
     }
@@ -348,16 +360,6 @@ private fun ExpandableActionPanel(
     expandedHeight: Dp = 300.jdp,
     animateHeightChangeMs: Int = 200
 ) {
-//    Column(modifier = Modifier.weight(1f).background(panelBackground.color).fillMaxSize()) {
-//        if (replayActionsBar != null) {
-//            ReplayCommandBar(replayActionsBar, modifier = Modifier)
-//        }
-//        if (randomActionsBar != null) {
-//            RandomCommandBar(randomActionsBar, modifier = Modifier)
-//        }
-//        ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
-//    }
-
     val expansionEnabled = collapsedHeight < expandedHeight
     val inputs: List<GameAction> by remember(actions.availableActions) { actions.availableActions }.collectAsState(emptyList())
     var hovered by remember { mutableStateOf(false) }

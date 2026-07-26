@@ -38,10 +38,12 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_dice_roll
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.view.NoActionWheel.animationOnly
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.PitchViewData
@@ -252,7 +254,6 @@ fun MultipleSelectUserActionDialog(
  *  over the pitch square. But this might mean we need to disable some other events while it is showing to avoid accidental
  *  misclicks (like End Turn).
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionWheelDialog(
     uiState: ActionWheelUiState,
@@ -261,7 +262,7 @@ fun ActionWheelDialog(
     // We need to know the "primary wheel" as only the primary wheel are allowed
     // to send `notifyUiHandledActionWheelEvent` events back to the ViewModel.
     // This boolean is an ugly way of doing it, but it works for now.
-    isPrimary: Boolean
+    isPrimary: Boolean,
 ) {
 
     val ringSize = 250.jdp
@@ -280,8 +281,15 @@ fun ActionWheelDialog(
                     offset { offset ?: IntOffset.Zero }
                 }
         ) {
+            if (!uiState.animationOnly && pitchVm.screenModel.uiState.clientType == UiGameClientType.REPLAY) {
+                // Interactive (non-animation) action wheels should not be shown during replay. During
+                // Replay, PrimaryActionWheelViewModel does not wait on wheelEventDone for these, so no
+                // need to call `notifyUiHandledActionWheelEvent()` here.
+                return@Box
+            }
             ActionWheel(
                 uiState = uiState,
+                animationSpeedFactor = pitchVm.screenModel.uiState.animationSpeedFactor,
                 offsetDelegate = { state: ActionWheelUiState? ->
                     // It is challenging for the hiding action to know where the last wheel
                     // was shown, so in the case where we are hiding the wheel, we do not

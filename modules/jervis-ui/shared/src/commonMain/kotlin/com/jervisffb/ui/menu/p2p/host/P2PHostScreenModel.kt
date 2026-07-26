@@ -14,6 +14,7 @@ import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -270,11 +271,12 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         )
 
         gameViewModel = GameScreenModel(
-            TeamActionMode.HOME_TEAM,
+            uiClientType = UiGameClientType.P2P_HOST,
+            uiMode = TeamActionMode.HOME_TEAM,
             gameController = gameController,
-            gameController.state.homeTeam,
-            gameController.state.awayTeam,
-            actionProvider,
+            homeTeam = gameController.state.homeTeam,
+            awayTeam = gameController.state.awayTeam,
+            actionProvider = actionProvider,
             mode = Manual(TeamActionMode.HOME_TEAM),
             menuViewModel = menuViewModel,
             onEngineInitialized = {

@@ -19,6 +19,7 @@ import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.safeTryEmit
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.animations.JervisAnimation
@@ -87,10 +88,13 @@ class PitchViewModel(
     val pitchViewData: MutableStateFlow<PitchViewData> = screenModel.pitchViewData
     val pitchBackground: Flow<PitchDetails> = screenModel.pitchBackground
 
+    val isReplay: Boolean = (uiState.clientType == UiGameClientType.REPLAY)
+
     val actionWheelViewModel = PrimaryActionWheelViewModel(
         eventFlow = uiState.uiActionWheelFlow,
         team = uiState.state.homeTeam,
         sharedPitchData = sharedPitchData,
+        isReplay = isReplay,
     )
     val contextActionWheelViewModel = SecondaryActionWheelViewModel(
         pitchViewModel = this,

@@ -156,6 +156,7 @@ fun ActionWheel(
     maxRingAlpha: Float = 0.50f,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
+    animationSpeedFactor: Float = 1f,
     onAnimationFinished: () -> Unit,
 ) {
     // Track UI states so we can support navigating in and out of submenus.
@@ -184,11 +185,11 @@ fun ActionWheel(
         }
     }
 
-    val animationDurationMs = when {
+    val animationDurationMs = (when {
         currentUiState.enableAnimation && currentUiState.isHiding() -> 100 // Hiding should be faster
         currentUiState.enableAnimation -> 300
         else -> 0
-    }
+    } * animationSpeedFactor).roundToInt()
     var previousState by remember { mutableStateOf<ActionWheelUiState>(NoActionWheel) }
     val topAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }
     val bottomAnimatable = remember { mutableStateMapOf<ButtonId, ItemAnimatable>() }

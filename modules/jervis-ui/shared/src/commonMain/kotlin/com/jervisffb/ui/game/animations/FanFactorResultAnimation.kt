@@ -1,18 +1,20 @@
 package com.jervisffb.ui.game.animations
 
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.UiGameController
 
 class FanFactorResultAnimation(
+    override val uiController: UiGameController,
     val homeFairWeatherRoll: Int,
     val awayFairWeatherRoll: Int,
     val homeTeam: Team,
     val awayTeam: Team,
 ) : JervisAnimation {
 
-    val teamFadeInDurationMillis: Int = 400
-    val valueTranslateDurationMillis: Int = 400
-    val valueFadeDurationMillis: Int = 200
-    val fadeOutDelayMills: Int = 1_800
+    val teamFadeInDurationMillis: Int = uiController.scaledAnimationMs(400)
+    val valueTranslateDurationMillis: Int = uiController.scaledAnimationMs(400)
+    val valueFadeDurationMillis: Int = uiController.scaledAnimationMs(200)
+    val fadeOutDelayMills: Int = uiController.scaledAnimationMs(1800)
 
     val totalHomeFans: String
     val totalAwayFans: String

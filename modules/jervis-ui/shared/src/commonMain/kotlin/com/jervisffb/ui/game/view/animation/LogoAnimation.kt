@@ -30,7 +30,7 @@ import com.jervisffb.ui.utils.jsp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LogoAnimation(vm: PitchViewModel, animation: LogoAnimation) {
@@ -47,11 +47,11 @@ fun LogoAnimation(vm: PitchViewModel, animation: LogoAnimation) {
                 animate(
                     initialValue = 0.0f,
                     targetValue = 1f,
-                    animationSpec = tween(durationMillis = 500, easing = FastOutLinearInEasing),
+                    animationSpec = tween(durationMillis = animation.durationMillis, easing = FastOutLinearInEasing),
                 ) { value: Float, _: Float ->
                     scale = value
                 }
-                delay(5.seconds)
+                delay(animation.durationMillis.milliseconds)
                 vm.notifyAnimationFinished()
             }
             launch {
@@ -60,7 +60,7 @@ fun LogoAnimation(vm: PitchViewModel, animation: LogoAnimation) {
                 animate(
                     initialValue = 100.0f,
                     targetValue = 0f,
-                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+                    animationSpec = tween(durationMillis = animation.durationMillis, easing = FastOutSlowInEasing),
                 ) { value: Float, _: Float ->
                     translationY = value
                 }

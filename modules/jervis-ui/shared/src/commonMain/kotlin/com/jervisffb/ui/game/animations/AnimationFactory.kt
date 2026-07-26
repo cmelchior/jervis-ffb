@@ -43,6 +43,7 @@ import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off
 import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off_sweltering_heat
 import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off_timeout
 import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off_very_sunny
+import com.jervisffb.ui.game.UiGameController
 
 /**
  * Class responsible for detecting if an animation should be run, and which one.
@@ -69,7 +70,7 @@ object AnimationFactory {
      * Return animation being run after the UI has been updated to the latest state,
      * but before action decorators are used.
      */
-    fun getFrameAnimation(state: Game, rules: Rules): JervisAnimation? {
+    fun getFrameAnimation(controller: UiGameController, state: Game, rules: Rules): JervisAnimation? {
         val state = state
         val stack = state.stack
 
@@ -114,14 +115,14 @@ object AnimationFactory {
             if (to.isOutOfBounds(rules)) {
                 to = state.singleBall().outOfBoundsAt!!
             }
-            return PassAnimation(from, to, outOfBounds)
+            return PassAnimation(controller, from, to, outOfBounds)
         }
 
         // Animate confetti cannon on touchdown
         if (stack.singleCurrentNode(ScoringATouchdown.InformOfTouchdown)) {
             val context = state.getContextOrNull<ScoringATouchDownContext>()
             if (context?.isTouchdownScored == true) {
-                return ConfettiAnimation(rules = rules, homeTeamScored = context.player.isOnHomeTeam())
+                return ConfettiAnimation(uiController = controller, rules = rules, homeTeamScored = context.player.isOnHomeTeam())
             }
         }
 
@@ -132,7 +133,7 @@ object AnimationFactory {
      * Returns animation being run after an action has been selected, but
      * before it is being sent to the [GameEngineController].
      */
-    fun getPostActionAnimation(state: Game, action: GameAction): JervisAnimation? {
+    fun getPostActionAnimation(uiController: UiGameController, state: Game, action: GameAction): JervisAnimation? {
         if (action == Undo) return null
         val currentNode = state.currentProcedureState()?.currentNode()
 
@@ -166,7 +167,7 @@ object AnimationFactory {
                 KickOffEventResult.TIME_OUT_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_timeout
             }
             return if (image != null) {
-                KickOffEventAnimation(image)
+                KickOffEventAnimation(uiController, image)
             } else {
                 null
             }
@@ -185,7 +186,7 @@ object AnimationFactory {
                 Weather.POURING_RAIN -> Res.drawable.icons_animation_kickoff_kick_off_pouring_rain
                 Weather.BLIZZARD -> Res.drawable.icons_animation_kickoff_kick_off_blizzard
             }
-            return KickOffEventAnimation(weatherImage)
+            return KickOffEventAnimation(uiController, weatherImage)
         }
 
         if (currentNode == FanFactorRolls.SetFanFactorForAwayTeam) {
@@ -196,10 +197,12 @@ object AnimationFactory {
             }
 
             return FanFactorResultAnimation(
+                uiController = uiController,
                 homeFairWeatherRoll = state.homeTeam.fairWeatherFans,
                 awayFairWeatherRoll = awayFanFactor,
-                state.homeTeam,
-                state.awayTeam)
+                homeTeam = state.homeTeam,
+                awayTeam = state.awayTeam
+            )
         }
 
         return null

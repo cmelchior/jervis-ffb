@@ -111,6 +111,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
+import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 
@@ -711,6 +712,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         return when (actionProvider) {
             is LocalActionProvider -> true
             is P2PActionProvider -> actionProvider.currentClientIsCreatingAction()
+            // Replays are viewed like a local/hotseat game, so always show message there.
+            is ReplayController -> true
             else -> error("Unsupported action provider: $actionProvider")
         }
     }

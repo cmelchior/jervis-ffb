@@ -4,9 +4,8 @@ package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D8Result
-import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.safeCast
+import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.procedures.Bounce
@@ -76,8 +75,7 @@ abstract class D8RollWheelController: ActionWheelDialogController() {
         val currentNode = acc.stack.currentNode()
         if (!((nodes.contains(currentNode)) && serverRoll)) return false
 
-        val button = selectedAction.safeCast<DiceRollResults>().let { roll ->
-            val d8Roll = roll.rolls.first() as D8Result
+        val button = selectedAction.safeDiceRollCast<D8Result>().let { d8Roll ->
             val buttonId = ButtonId("$buttonIdPrefix-${d8Roll.value}")
             DieButtonData(
                 id = buttonId,

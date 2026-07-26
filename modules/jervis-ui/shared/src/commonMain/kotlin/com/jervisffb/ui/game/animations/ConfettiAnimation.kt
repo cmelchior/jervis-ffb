@@ -2,19 +2,22 @@ package com.jervisffb.ui.game.animations
 
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class ConfettiAnimation(
+    override val uiController: UiGameController,
     val rules: Rules,
     val homeTeamScored: Boolean,
 ) : JervisAnimation {
 
-    val particleCount = 80
-    val shotCount = 3
-    val shotDelay = 500.milliseconds // Delay between each shot
-    val burstDuration = 1750.milliseconds
-    val duration = burstDuration + shotDelay * (shotCount - 1) // Total duration for all shots to finish
+    val particleCount: Int = 80
+    val shotCount: Int = 3
+    val shotDelay: Duration = uiController.scaledAnimationMs(500).milliseconds // Delay between each shot
+    val burstDuration: Duration = uiController.scaledAnimationMs(1750).milliseconds
+    val duration: Duration = burstDuration + shotDelay * (shotCount - 1) // Total duration for all shots to finish
     val colors = listOf(
         0xFFE53935L,
         0xFFFDD835L,

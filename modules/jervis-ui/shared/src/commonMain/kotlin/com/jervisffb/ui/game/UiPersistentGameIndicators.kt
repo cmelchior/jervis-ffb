@@ -26,6 +26,7 @@ class UiPersistentGameIndicators {
     private val undostack: MutableMap<GameActionId, () -> Unit> = mutableMapOf()
     private val blodspots: MutableMap<PitchCoordinate, BloodSpot> = mutableMapOf()
 
+    private var moveStarted: Pair<Player, PitchCoordinate>? = null
     private var usedMoveToStandUp: Int? = null
     private var extraMoveOffset: Int = 0
     val movesUsed: MutableList<MoveUsed> = mutableListOf() // TODO Probably shouldn't be public
@@ -39,23 +40,32 @@ class UiPersistentGameIndicators {
         usedMoveToStandUp = move
     }
 
+    // This method registers a player's intent to move out of a square during
+    // their action. We use this to add "move-used"-indicators on the pitch.
+    //
+    // Ideally, we could just detect this when the player actually moved, but
+    // this is hard just using after-the-fact-data. So using this method makes
+    // the detection logic a lot easier to implement.
+    fun registerStartingMoveStep(player: Player, startingPosition: PitchCoordinate) {
+        moveStarted = Pair(player, startingPosition)
+    }
+
+    fun finishMoveStep() {
+        moveStarted = null
+    }
+
+    fun playerIsMoving(): Boolean {
+        return moveStarted != null
+    }
+
+    fun getMovingPlayerInfo(): Pair<Player, PitchCoordinate> {
+        return moveStarted ?: error("No player is moving")
+    }
+
     fun addMoveUsed(coordinate: Location, extraMoveCost: Int = 0) {
         if (coordinate !is PitchCoordinate) TODO("Missing support for $coordinate")
         this.movesUsed.add(MoveUsed(coordinate, movesUsed.size + extraMoveOffset + (usedMoveToStandUp ?: 0)))
         extraMoveOffset += extraMoveCost
-    }
-
-    fun getAllMoveUsed(): Map<PitchCoordinate, Int> {
-        return movesUsed.associate { it.coordinate to it.value }
-    }
-
-    fun getMoveUsedOrNull(coordinate: PitchCoordinate): Int? {
-        for (i in movesUsed.indices.reversed()) {
-            if (movesUsed[i].coordinate == coordinate) {
-                return movesUsed[i].value
-            }
-        }
-        return null
     }
 
     fun removeLastMoveUsed(extraMoveCost: Int = 0) {
@@ -67,6 +77,7 @@ class UiPersistentGameIndicators {
         usedMoveToStandUp = null
         extraMoveOffset = 0
         movesUsed.clear()
+        moveStarted = null
     }
 
     fun registerUndo(deltaId: GameActionId, action: () -> Unit) {

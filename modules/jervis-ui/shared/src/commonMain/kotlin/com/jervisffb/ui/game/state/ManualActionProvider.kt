@@ -32,6 +32,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
@@ -309,10 +310,9 @@ open class ManualActionProvider(
         if (state.dialogInput != null) {
             error("Only 1 dialog is allowed. Dialog already configured: ${state.dialogInput}")
         }
-        when (dialogData) {
-            else -> {
-                state.dialogInput = dialogData
-            }
+
+        if (dialogData != null && state.uiController.clientType != UiGameClientType.REPLAY) {
+            state.dialogInput = dialogData
         }
     }
 

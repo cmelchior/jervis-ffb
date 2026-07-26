@@ -1,3 +1,7 @@
 package com.jervisffb.ui.game.animations
 
-sealed interface JervisAnimation
+import com.jervisffb.ui.game.UiGameController
+
+sealed interface JervisAnimation {
+    val uiController: UiGameController
+}

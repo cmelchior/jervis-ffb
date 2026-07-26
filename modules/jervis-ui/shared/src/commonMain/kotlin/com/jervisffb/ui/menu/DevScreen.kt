@@ -53,6 +53,7 @@ import com.jervisffb.ui.createDefaultBB2025AwayTeam
 import com.jervisffb.ui.createDefaultBB2025HomeTeam
 import com.jervisffb.ui.createDefaultBB7AwayTeam
 import com.jervisffb.ui.createDefaultBB7HomeTeam
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -102,12 +103,21 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         val fumbbl = FumbblReplayAdapter(replayFile, checkCommandsWhenLoading = false)
         fumbbl.loadCommands()
         val gameController = GameEngineController(fumbbl.getGame())
+        val gameSettings = GameSettings(gameRules = gameController.rules, isHotseatGame = true)
         return GameScreenModel(
+            uiClientType = UiGameClientType.REPLAY,
             uiMode = TeamActionMode.ALL_TEAMS,
             gameController = gameController,
             homeTeam = gameController.state.homeTeam,
             awayTeam = gameController.state.awayTeam,
-            actionProvider = ReplayActionProvider(menuViewModel, fumbbl),
+            actionProvider = ReplayActionProvider(
+                gameController.history.flatMap { delta ->
+                    delta.steps.map { step -> step.action }
+                },
+                gameController,
+                menuViewModel,
+                gameSettings,
+            ),
             mode = Replay(replayFile),
             menuViewModel = menuViewModel,
         ).also {
@@ -139,7 +149,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             GameVersion.BB2020 -> createDefaultBB2020AwayTeam(rules)
             GameVersion.BB2025 -> createDefaultBB2025AwayTeam(rules)
         }
-        val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {
@@ -171,6 +181,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             awayActionProvider
         )
         return GameScreenModel(
+            UiGameClientType.HOTSEAT,
             TeamActionMode.ALL_TEAMS,
             gameController,
             gameController.state.homeTeam,
@@ -231,6 +242,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             awayActionProvider
         )
         return GameScreenModel(
+            UiGameClientType.HOTSEAT,
             TeamActionMode.ALL_TEAMS,
             gameController,
             gameController.state.homeTeam,
@@ -283,6 +295,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             awayActionProvider
         )
         return GameScreenModel(
+            UiGameClientType.HOTSEAT,
             TeamActionMode.ALL_TEAMS,
             updatedController,
             updatedController.state.homeTeam,

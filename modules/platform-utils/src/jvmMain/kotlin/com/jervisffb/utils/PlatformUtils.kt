@@ -142,7 +142,7 @@ public actual fun getPlatformLogWriter(): LogWriter? {
         }
         override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
             val throwableMsg = if (throwable == null) "" else "\n${throwable.stackTraceToString()}"
-            writer.println("${Clock.System.now().toString()} ${severity.name}: $message$throwableMsg")
+            writer.println("${Clock.System.now()} ${severity.name}: $message$throwableMsg")
             writer.flush()
         }
     }

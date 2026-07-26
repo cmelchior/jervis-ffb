@@ -52,7 +52,7 @@ import com.jervisffb.engine.rules.Rules
  * might result in the player being removed from play immediately.
  *
  * This procedure should not be called until after all rolls for entering the
- * square have been resolved, i.e., Tentacles, Rush, Dodge, Jump, Leap and
+ * square have been resolved, i.e., Tentacles, Rush, Dodge, Jump, Leap, and
  * Landing. This is covered under Picking Up The Ball on page 46 in the rulebook.
  *
  * This procedure does NOT check for touchdowns nor pickups. That is left up
@@ -64,10 +64,8 @@ import com.jervisffb.engine.rules.Rules
  * NOTE: This procedure only supports a player landing successfully after a
  * throw. Falling Over after a throw is handled in XXX.
  *
- * @see each ruleset's `PushStepInitialMoveSequence`, `PushStepResolveSingleBlockPushChain`,
- *      `MultipleBlockAction`, and `ThrowPlayerStep`.
- *
  * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
+ * TODO Not sure the above is still relevant
  */
 object MovePlayerIntoSquare : Procedure() {
     override val initialNode: Node = MoveIntoSquare

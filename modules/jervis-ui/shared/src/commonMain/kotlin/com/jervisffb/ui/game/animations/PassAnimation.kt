@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.animations
 import androidx.compose.ui.geometry.Offset
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.toRadians
 import kotlin.math.cos
 import kotlin.math.pow
@@ -12,7 +13,12 @@ import kotlin.math.tan
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class PassAnimation(val from: OnPitchLocation, val to: PitchCoordinate, val outOufBounds: Boolean) : JervisAnimation {
+class PassAnimation(
+    override val uiController: UiGameController,
+    val from: OnPitchLocation,
+    val to: PitchCoordinate,
+    val outOufBounds: Boolean
+) : JervisAnimation {
 
     val viewingDistance = 500f
     val angleRadians = toRadians(45.0)
@@ -120,6 +126,9 @@ class PassAnimation(val from: OnPitchLocation, val to: PitchCoordinate, val outO
      */
     private fun calculateDurationSeconds(velocity: Double, angle: Double): Double {
         val time = 2 * velocity * sin(angle) / g
-        return if (time.isNaN()) 0.0 else time
+        return when {
+            time.isNaN() -> 0.0
+            else -> uiController.animationSpeedFactor * time
+        }
     }
 }
