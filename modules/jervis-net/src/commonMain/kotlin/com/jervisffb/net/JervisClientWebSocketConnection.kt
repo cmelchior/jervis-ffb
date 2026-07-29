@@ -112,8 +112,9 @@ class JervisClientWebSocketConnection(
             jervisCloseReason.complete(reason)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            LOG.e(e) { "Client disconnected unexpectedly:\n$e.stackTraceToString()" }
-            jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, e.stackTraceToString()))
+            val stacktrace = e.stackTraceToString()
+            LOG.e(e) { "Client disconnected unexpectedly:\n$stacktrace" }
+            jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, stacktrace))
         } finally {
             closeFromServer() // Also cleanup internal channels and scopes
         }
