@@ -85,8 +85,7 @@ class BB2025Mapper: JervisMapper() {
         return SerializedTeam(
             id = TeamId(team.id.toString()),
             name = team.teamName,
-            // TourPlay doesn't support BB2025 yet, so just hardcode the version to BB2020
-            version = GameVersion.BB2020,
+            version = GameVersion.BB2025,
             // Right now we just assume that the FUMBBL team matches the given game type
             // We probably need to refine this later.
             type = rules.gameType,

@@ -28,6 +28,15 @@ import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
 
+/**
+ * Component responsible for showing a "Team Card" when selecting teams for
+ * a game. The Team Card contains the most important high-level information:
+ *
+ * - Team Name
+ * - Team Logo
+ * - CTV
+ * - Rerolls
+ */
 @Composable
 fun TeamCard(
     name: String,

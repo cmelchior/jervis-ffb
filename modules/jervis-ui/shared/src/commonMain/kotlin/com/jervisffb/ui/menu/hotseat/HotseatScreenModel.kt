@@ -55,9 +55,9 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
 
     // Page 2: Select Home Team
     val selectHomeTeamModel: SelectHotseatTeamScreenModel = SelectHotseatTeamScreenModel(
-        menuViewModel,
-        this,
-        {
+        menuViewModel = menuViewModel,
+        parentModel = this,
+        onNextScreen = {
             selectHomeTeamModel.selectedTeam.value?.teamId?.let { teamSelectedByOtherCoach ->
                 selectAwayTeamModel.makeTeamUnavailable(teamSelectedByOtherCoach)
             }

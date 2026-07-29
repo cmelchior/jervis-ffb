@@ -22,7 +22,7 @@ class SelectHotseatTeamScreenModel(
     val menuViewModel: MenuViewModel,
     val parentModel: HotseatScreenModel,
     private val onNextScreen: () -> Unit,
-    private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,
+    onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,
 ) : ScreenModel {
     val rules: Rules?
         get() = parentModel.rules
