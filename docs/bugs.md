@@ -3,6 +3,11 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
+- Custom teams loaded from e.g. TourPlay are not persisted when you leave 
+  the Hotseat menu and go back to it.
+- If a player has a high player number (e.g.
+  https://tourplay.net/en/blood-bowl/roster/214739), they are placed wrong 
+  in the dogout during setup.
 - Blitzing during a Charge! does not map SelectBlockType correctly, so it 
   shows the fallback action buttons for it.
 - Player cards do not show up for players on the pitch when rolling the coin.

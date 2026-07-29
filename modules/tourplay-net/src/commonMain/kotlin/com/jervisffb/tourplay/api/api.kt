@@ -11,9 +11,7 @@ import kotlin.collections.List
  * This class contains the auto-generated classes representing the TourPlay REST API.
  * They have been generated using `tools/TourPlay.ipynb` notebook.
  */
-
 // Mappings for https://tourplay.net/api/rosters/<rosterId>
-
 @Serializable
 public data class TourPlayRoster(
     public val id: Int,
@@ -34,8 +32,10 @@ public data class TourPlayRoster(
     public val extraGoldQuantity: Int,
     public val rosterMaster: RosterMaster,
     public val teamSpecialRules: Int,
+    public val league: Int? = null,
     public val hasMatchesInProgress: Boolean,
     public val hasMatchesPlayed: Boolean,
+    public val freeHireAndFireOrder: Boolean,
     public val isRedrafting: Boolean,
     public val partialPaymentStadium: Int,
     public val teamValue: Int,
@@ -48,14 +48,16 @@ public data class TourPlayRoster(
     // public val availableStadiums: List<Any?>,
     public val hasSppAdvancement: Boolean,
     public val isUsingGoldPiecesBudget: Boolean,
+    // public val tags: List<Any?>,
+    public val state: Int,
     public val player: Player,
     public val coachRank: CoachRank,
     // public val squadRosters: List<Any?>,
-    // public val inscriptions: List<Inscription>,
+    public val inscriptions: List<Inscription>,
     // public val inducements: List<Any?>,
     public val hasOldPlayers: Boolean,
     public val lineUps: List<LineUp>,
-    // public val lastMatches: List<LastMatch>,
+    public val lastMatches: List<LastMatch>,
 )
 
 @Serializable
@@ -73,6 +75,8 @@ public data class RosterMaster(
     public val selectableTeamSpecialRules: Int,
     public val tier: Int,
     public val maxBigGuys: Int,
+    public val leagues: Int = 0,
+    public val selectableLeagues: Int = 0,
     public val id: Int,
 )
 
@@ -81,6 +85,7 @@ public data class LineUpMaster(
     public val rosterMasterId: Int,
     public val quantity: Int,
     public val position: String,
+    public val positionTypes: Int? = null,
     public val cost: Int,
     public val ma: Int,
     public val st: Int,
@@ -92,30 +97,17 @@ public data class LineUpMaster(
     public val skillDouble: Int,
     public val iconVariation: Int,
     public val iconClass: String,
-    public val availableRaces: Int,
-    public val availableTeamSpecialRules: Int,
     public val ruleSet: Int,
+    public val race: List<Int> = emptyList(),
     public val id: Int,
     public val isBigGuy: Boolean? = null,
-) {
-    val positionShortHand: String
-        get() {
-            // TODO This doesn't work with full Unicode. Revisit it, if it turns out to be a problem
-            return position.trim()
-                .split(Regex("\\s+"))
-                .filter { it.isNotEmpty() }
-                .map { it.first().uppercaseChar() }
-                .joinToString("")
-                .lowercase()
-                .replaceFirstChar { it.uppercase() }
-        }
-}
+)
 
 @Serializable
 public data class Skill(
     public val lineUpMasterId: Int,
-    public val skillMasterId: Int, // = null,
-    public val skillMaster: SkillMaster, // = null,
+    public val skillMasterId: Int,
+    public val skillMaster: SkillMaster,
     public val id: Int,
     public val skillAttributeMasterId: Int? = null,
     public val skillAttributeMaster: SkillAttributeMaster? = null,
@@ -126,7 +118,9 @@ public data class SkillMaster(
     public val name: String,
     public val type: Int,
     public val ruleSet: Int,
+    // public val lineUpRaces: List<Any?>,
     public val id: Int,
+    public val isElite: Boolean? = null,
     public val skillAttributeMasterId: Int? = null,
     public val skillAttributeMaster: SkillAttributeMaster? = null,
 )
@@ -142,31 +136,53 @@ public data class SkillAttributeMaster(
 public data class StarPlayersMaster(
     public val quantity: Int,
     public val position: String,
+    public val positionTypes: Int? = null,
     public val cost: Int,
     public val ma: Int,
     public val st: Int,
     public val ag: Int,
     public val av: Int,
     public val pa: Int,
-    public val skills: List<Skill>,
-    public val skillNormal: Int,
-    public val skillDouble: Int,
+    public val skills: List<Skill1>,
     public val iconVariation: Int,
     public val iconClass: String,
     public val isStarPlayer: Boolean,
-    public val availableRaces: Int,
-    public val availableTeamSpecialRules: Int,
+    public val availableLeagues: Int = 0,
     public val ruleSet: Int,
     public val specialRuleName: String,
+    public val race: List<Int> = emptyList(),
     public val id: Int,
+    public val isBigGuy: Boolean? = null,
     public val linkedWith: Int? = null,
+)
+
+@Serializable
+public data class Skill1(
+    public val lineUpMasterId: Int,
+    public val skillMasterId: Int,
+    public val skillMaster: SkillMaster1,
+    public val id: Int,
+    public val skillAttributeMasterId: Int? = null,
+    public val skillAttributeMaster: SkillAttributeMaster? = null,
+)
+
+@Serializable
+public data class SkillMaster1(
+    public val name: String,
+    public val type: Int,
+    public val ruleSet: Int,
+    // public val lineUpRaces: List<Any?>,
+    public val id: Int,
+    public val skillAttributeMasterId: Int? = null,
+    public val skillAttributeMaster: SkillAttributeMaster? = null,
+    public val isElite: Boolean? = null,
 )
 
 @Serializable
 public data class Player(
     public val applicationUserId: String,
     public val userNameToShow: String,
-    public val pictureFileName: String? = null,
+    public val avatarUrl: String,
     public val country: String,
 )
 
@@ -258,12 +274,12 @@ public data class Phas(
     public val rosteredStarPlayers: Boolean,
     public val referees: Boolean,
     public val spirallingExpenses: Boolean,
-    public val roundName: String? = null,
+    public val roundName: String = "",
     public val roundGeneration: Int? = null,
     public val weatherAvailables: List<Int>,
+    public val groups: List<Group> = emptyList(),
     public val hideStandings: Boolean,
     public val dedicatedFansWinIncrement: Boolean,
-    // public val sponsorsAvailables: List<Any?>,
     public val stadiumsAvailables: List<Int>,
     public val hasStadiums: Boolean,
     public val hasSponsors: Boolean,
@@ -273,15 +289,21 @@ public data class Phas(
     public val pointsBonusByeSquad: Double,
     public val pointsConcedeSquad: Double,
     public val injuryRecoveryAfterMatch: Boolean,
+    // public val secretObjectivesAvailable: List<Any?>,
+    public val prayersToNuffle: Boolean = false,
     public val id: Int,
-    // public val secretObjectivesAvailable: List<Any?>? = null,
-    public val excludeFromHonors: Boolean? = null,
     public val limitRepeatOpponent: Int? = null,
     public val limitRepeatRace: Int? = null,
     public val limitMatchesByTeam: Int? = null,
     public val coachesCanChallenge: Boolean? = null,
-    public val swissSystem: Int? = null,
-    public val useCustomBonusPoints: Boolean? = null,
+    public val excludeFromHonors: Boolean? = null,
+)
+
+@Serializable
+public data class Group(
+    public val name: String,
+    public val phaseId: Int,
+    public val id: Int,
 )
 
 @Serializable
@@ -296,6 +318,7 @@ public data class LineUp(
     public val id: Int,
     public val lineUpMasterId: Int,
     public val lineUpMaster: LineUpMaster1,
+    public val mercenary: Mercenary,
     public val name: String,
     public val nigglingInjuries: Int,
     public val number: Int,
@@ -304,7 +327,7 @@ public data class LineUp(
     public val rosterId: Int,
     public val sessions: Int,
     public val level: Int,
-    public val skills: List<Skill2>,
+    public val skills: List<Skill3>,
     public val starPlayerPoints: Int,
     public val state: Int,
     public val isActive: Boolean,
@@ -332,41 +355,46 @@ public data class LineUpMaster1(
     public val st: Int,
     public val pa: Int,
     public val quantity: Int,
-    public val availableRaces: Int,
-    public val availableTeamSpecialRules: Int,
     public val id: Int,
-    public val skills: List<Skill1>,
+    public val positionTypes: Int? = null,
+    public val race: List<Int> = emptyList(),
+    public val skills: List<Skill2>,
     public val cost: Int,
+    public val isBigGuy: Boolean? = null,
 )
 
 @Serializable
-public data class Skill1(
+public data class Skill2(
     public val id: Int,
     public val lineUpMasterId: Int,
-    public val skillMaster: SkillMaster1,
+    public val skillMaster: SkillMaster2,
     public val skillMasterId: Int,
+    public val isDefault: Boolean,
     public val isHidden: Boolean,
     public val skillAttributeMaster: SkillAttributeMaster? = null,
     public val skillAttributeMasterId: Int? = null,
 )
 
 @Serializable
-public data class SkillMaster1(
+public data class SkillMaster2(
     public val id: Int,
     public val name: String,
     public val type: Int,
 )
 
 @Serializable
-public data class Skill2(
+public data object Mercenary
+
+@Serializable
+public data class Skill3(
     public val id: Int,
     public val lineUpId: Int,
-    public val skillMaster: SkillMaster1,
+    public val skillMaster: SkillMaster2,
     public val skillMasterId: Int,
     public val isRandom: Boolean,
     public val isSecondary: Boolean,
+    public val isElite: Boolean? = null,
     public val isHidden: Boolean,
-    public val skillAttributeMaster: SkillAttributeMaster? = null,
 )
 
 @Serializable
@@ -381,10 +409,10 @@ public data class LastMatch(
     public val groupsCount: Int,
     public val phaseType: Int,
     public val system: Int,
+    public val roundName: String? = null,
     public val categoryType: Int,
     public val tournament: Tournament1,
     public val round: Int,
-    public val roundName: String? = null,
 )
 
 @Serializable
@@ -395,7 +423,7 @@ public data class Score(
     public val concedeVisitor: Boolean,
     public val hasIncidence: Boolean,
     public val finishInstant: String,
-    public val hasNoPointsInClassification: Boolean,
+    public val hasNoPointsInStandings: Boolean,
     public val scoreLocal: Int,
     public val scoreVisitor: Int,
 )
@@ -424,15 +452,23 @@ public data class Player2(
 @Serializable
 public data class ApplicationUser(
     public val userNameToShow: String,
-    public val pictureFileName: String,
+    public val avatarUrl: String,
     public val country: String,
-    public val goldStarAwards: Int? = null,
 )
 
 @Serializable
 public data class InscriptionVisitor(
-    public val roster: Roster,
+    public val roster: Roster1,
     public val player: Player2,
+)
+
+@Serializable
+public data class Roster1(
+    public val id: Int,
+    public val teamColor: String,
+    public val teamName: String,
+    public val teamRace: String,
+    public val shortTeamName: String,
 )
 
 @Serializable

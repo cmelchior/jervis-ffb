@@ -85,7 +85,6 @@ import com.jervisffb.ui.utils.getSubImage
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.ui.utils.toImageBitmap
-import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.loggerInstance
 import io.ktor.client.request.accept
@@ -359,18 +358,27 @@ object IconFactory {
         val deferred = CompletableDeferred<ImageBitmap?>()
         inFlightRequests[url] = deferred
         try {
-            // Use server proxy to bypass CORS restrictions but only on Web. JVM and iOS does not need this.
-            // Right now we are just using the "canBeHost()" as an easy way to check for the Web target.
-            // Probably need to find something better in the future.
-            val callUrl = when (useProxy && !canBeHost()) {
-                true -> Url("${BASE_URL}/proxy.php?url=${url.toString().encodeURLParameter()}")
-                false -> url
-            }
+            // Originally the proxy was only used to bypass CORS restrictions on the web client when
+            // running on localhost. JVM and iOS did not need this.
+            // However, TourPlay is using AVIF images, which Compose does not yet support. To work around
+            // this, we also let the proxy convert any AVIF images to PNG.
+            // Due to this, all targets must use the proxy for now.
+
+            // Old check
+            //    val callUrl = when (useProxy && !canBeHost()) {
+            //        true -> Url("${BASE_URL}/proxy.php?url=${url.toString().encodeURLParameter()}")
+            //        false -> url
+            //    }
+
+            // New check: Always use the proxy to work around both CORS and AVIF issues.
+            val callUrl = Url("${BASE_URL}/proxy.php?url=${url.toString().encodeURLParameter()}")
+
             val result = httpClient.get(callUrl) {
                 headers {
                     // In some cases, gifs are returned even though the path is a png. Problem?
                     accept(ContentType.Image.PNG)
                     accept(ContentType.Image.GIF)
+                    accept(ContentType.Image.AVIF)
                 }
             }
             val image = when (result.status.isSuccess()) {
@@ -724,7 +732,7 @@ object IconFactory {
     suspend fun saveLogo(id: TeamId, logo: SpriteSource, size: LogoSize) {
         val image = when (logo.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource), false)
+            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource), true)
             SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(logo.resource)
             SpriteLocation.GENERATED -> error("Generated logos are not supported yet")
         }

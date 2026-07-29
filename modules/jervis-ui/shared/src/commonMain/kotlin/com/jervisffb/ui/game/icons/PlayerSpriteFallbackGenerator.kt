@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.theme.loadTrumpTownSkiaFont
+import com.jervisffb.ui.theme.loadNotoSansSymbols2SkiaFont
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.toSkiaColor
 import org.jetbrains.skia.Bitmap
@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 
 /**
  * Class wrapping the creation of fallback sprites if we cannot load the correct ones.
- * They are just a basic circle with the positon letters in the middle.
+ * They are just a basic circle with the position letters in the middle.
  */
 object PlayerSpriteFallbackGenerator {
 
@@ -38,7 +38,7 @@ object PlayerSpriteFallbackGenerator {
         val canvas = org.jetbrains.skia.Canvas(bitmap)
 
         // Load default system font
-        val typeface = loadTrumpTownSkiaFont()
+        val typeface = loadNotoSansSymbols2SkiaFont()
         val fontSize = when (size) {
             PlayerSize.STANDARD -> 14f
             PlayerSize.BIG_GUY -> 14f
@@ -46,10 +46,10 @@ object PlayerSpriteFallbackGenerator {
         }
         val font = org.jetbrains.skia.Font(typeface, fontSize).apply {
             isEmboldened = false
-            isSubpixel = false
+            isSubpixel = true
             isBaselineSnapped = true
-            hinting = FontHinting.NONE
-            edging = FontEdging.ALIAS
+            hinting = FontHinting.NORMAL
+            edging = FontEdging.SUBPIXEL_ANTI_ALIAS
         }
 
         // Draw sprites

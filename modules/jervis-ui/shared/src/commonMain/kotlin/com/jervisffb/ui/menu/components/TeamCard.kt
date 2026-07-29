@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +43,7 @@ fun TeamCard(
     val borderColor = if (isSelected || !isEnabled) JervisTheme.rulebookRed else Color.Transparent
     Box(
         modifier = Modifier
-            .width(300.dp)
+            .size(width = 300.dp, height = 150.dp)
             .alpha(if (isEnabled) 1f else 0.3f)
             .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
             .border(width = borderWidth, color = borderColor)
