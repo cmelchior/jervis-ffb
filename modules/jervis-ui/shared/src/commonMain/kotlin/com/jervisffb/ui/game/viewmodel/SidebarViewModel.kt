@@ -28,6 +28,55 @@ data class ButtonData(
     val onClick: () -> Unit
 )
 
+/**
+ * Class representing the sidebar players for a specific part of the dogout,
+ * including their location.
+ *
+ * We support two modes:
+ * - Compact: Players are laid out and placed next to each other based on how
+ *   many players that are currently showing.
+ * - Fixed: Players are given a fixed position from the start and will always
+ *   be in the same position. Regardless of intermediate players being removed.
+ *
+ * TODO We might want to show injured players in the order it happened rather
+ *  than by their player number. This will require extra metadata in the model.
+ */
+class UiSidebarData private constructor(
+    val players: List<UiSidebarPlayer?>,
+): List<UiSidebarPlayer?> by players {
+
+    companion object {
+
+        fun compact(players: List<UiSidebarPlayer?>): UiSidebarData {
+            return UiSidebarData(players.sortedBy { it?.number })
+        }
+
+        fun fixed(team: Team, players: List<UiSidebarPlayer>): UiSidebarData {
+
+            // Create compact list using all players
+            val sortedTeamPlayers = team
+                .filter { !it.missNextGame }
+                .sortedBy { it.number }
+
+            // Make it easy to find the correct player
+            val uiPlayers = players.associateBy { player -> player.number }
+
+            // Create the fixed list. Empty spaces are marked with `null`
+            val fixedListPlayers = Array<UiSidebarPlayer?>(sortedTeamPlayers.size) { index ->
+                sortedTeamPlayers[index].let {
+                    uiPlayers[it.number]
+                }
+            }
+
+            return UiSidebarData(fixedListPlayers.toList())
+        }
+
+        val DEFAULT = UiSidebarData(
+            players = emptyList(),
+        )
+    }
+}
+
 class SidebarViewModel(
     val gameViewModel: GameScreenModel,
     private val menuViewModel: MenuViewModel,
@@ -101,26 +150,28 @@ class SidebarViewModel(
 
     val playerStatCardFlow: Flow<UiPlayerCard?> = gameViewModel.playerStatCardFlowFor(team)
 
-    fun reserves(): Flow<List<UiSidebarPlayer>> {
+    fun reserves(compact: Boolean): Flow<UiSidebarData> {
         return dogoutFlow
             .map { (_, players) ->
-                players
-                    .filter { it.player.state == PlayerDogoutState.RESERVE }
-                    .sortedBy { it.player.number }
+                val reservePlayers = players.filter { it.player.state == PlayerDogoutState.RESERVE }
+                when (compact) {
+                    true -> UiSidebarData.compact(reservePlayers)
+                    false -> UiSidebarData.fixed(team, reservePlayers)
+                }
             }
     }
 
-    fun knockedOut(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerDogoutState.KNOCKED_OUT, dogoutFlow)
+    fun knockedOut(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.KNOCKED_OUT, dogoutFlow)
 
-    fun badlyHurt(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerDogoutState.BADLY_HURT, dogoutFlow)
+    fun badlyHurt(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BADLY_HURT, dogoutFlow)
 
-    fun seriousInjuries(): Flow<List<UiSidebarPlayer>> = mapTo(listOf(PlayerDogoutState.SERIOUSLY_HURT, PlayerDogoutState.SERIOUS_INJURY, PlayerDogoutState.LASTING_INJURY), dogoutFlow)
+    fun seriousInjuries(): Flow<UiSidebarData> = mapToCompactView(listOf(PlayerDogoutState.SERIOUSLY_HURT, PlayerDogoutState.SERIOUS_INJURY, PlayerDogoutState.LASTING_INJURY), dogoutFlow)
 
-    fun dead(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerDogoutState.DEAD, dogoutFlow)
+    fun dead(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.DEAD, dogoutFlow)
 
-    fun banned(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerDogoutState.BANNED, dogoutFlow)
+    fun banned(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BANNED, dogoutFlow)
 
-    fun special(): Flow<List<UiSidebarPlayer>> = mapTo(
+    fun special(): Flow<UiSidebarData> = mapToCompactView(
         listOf(PlayerDogoutState.FAINTED, PlayerDogoutState.DODGY_SNACK),
         dogoutFlow
     )
@@ -135,17 +186,20 @@ class SidebarViewModel(
 
     fun dismissFixedCard() = gameViewModel.dismissPlayerStatCard()
 
-    private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>>): Flow<List<UiSidebarPlayer>> {
+    private fun mapToCompactView(states: List<PlayerState>, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer?>>>): Flow<UiSidebarData> {
         return dogoutFlow
             .map { it.second }
             .map { playerList ->
                 playerList.filter { uiPlayer ->
-                    states.contains(uiPlayer.state)
+                    states.contains(uiPlayer?.state)
                 }
+            }
+            .map { players ->
+                UiSidebarData.compact(players)
             }
     }
 
-    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>>): Flow<List<UiSidebarPlayer>> {
-        return mapTo(listOf(state), dogoutFlow)
+    private fun mapToCompactView(state: PlayerState, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer?>>>): Flow<UiSidebarData> {
+        return mapToCompactView(listOf(state), dogoutFlow)
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,15 +35,16 @@ import androidx.compose.ui.unit.sp
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.game.viewmodel.UiSidebarData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.pixelSize
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.ceil
 
 @Composable
 fun Sidebar(
@@ -50,6 +52,7 @@ fun Sidebar(
     modifier: Modifier,
 ) {
     val sidebarAction by vm.dogoutAction().collectAsState(null)
+    val reservesFlow = remember(vm) { vm.reserves(compact = false) }
     Box(
         modifier = Modifier
             .applyIf(sidebarAction != null) {
@@ -73,7 +76,7 @@ fun Sidebar(
                 }
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                        Reserves(vm.gameViewModel,vm.reserves(), vm.sharedPitchData) {
+                        Reserves(vm.gameViewModel, reservesFlow, vm.sharedPitchData) {
                             vm.hoverExit()
                         }
                         Injuries(
@@ -170,11 +173,11 @@ private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> 
 @Composable
 private fun Reserves(
     screenModel: GameScreenModel,
-    reserves: Flow<List<UiSidebarPlayer>>,
+    reserves: Flow<UiSidebarData>,
     sharedData: LocalPitchDataWrapper,
     onExit: () -> Unit
 ) {
-    val list: List<UiSidebarPlayer> by reserves.collectAsState(emptyList())
+    val list: UiSidebarData by reserves.collectAsState(UiSidebarData.DEFAULT)
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
         PlayerSection(screenModel, list, sharedData, compactView = false, onExit = onExit)
@@ -186,20 +189,20 @@ private fun Injuries(
     screenModel: GameScreenModel,
     showIfEmpty: Boolean,
     sharedPitchData: LocalPitchDataWrapper,
-    knockedOut: Flow<List<UiSidebarPlayer>>,
-    badlyHurt: Flow<List<UiSidebarPlayer>>,
-    seriousInjuries: Flow<List<UiSidebarPlayer>>,
-    dead: Flow<List<UiSidebarPlayer>>,
-    banned: Flow<List<UiSidebarPlayer>>,
-    special: Flow<List<UiSidebarPlayer>>,
+    knockedOut: Flow<UiSidebarData>,
+    badlyHurt: Flow<UiSidebarData>,
+    seriousInjuries: Flow<UiSidebarData>,
+    dead: Flow<UiSidebarData>,
+    banned: Flow<UiSidebarData>,
+    special: Flow<UiSidebarData>,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        val knockedOutList: List<UiSidebarPlayer> by knockedOut.collectAsState(emptyList())
-        val badlyHurtList: List<UiSidebarPlayer> by badlyHurt.collectAsState(emptyList())
-        val seriousInjuryList: List<UiSidebarPlayer> by seriousInjuries.collectAsState(emptyList())
-        val deadList: List<UiSidebarPlayer> by dead.collectAsState(emptyList())
-        val bannedList: List<UiSidebarPlayer> by banned.collectAsState(emptyList())
-        val specialList: List<UiSidebarPlayer> by special.collectAsState(emptyList())
+        val knockedOutList: UiSidebarData by knockedOut.collectAsState(UiSidebarData.DEFAULT)
+        val badlyHurtList: UiSidebarData by badlyHurt.collectAsState(UiSidebarData.DEFAULT)
+        val seriousInjuryList: UiSidebarData by seriousInjuries.collectAsState(UiSidebarData.DEFAULT)
+        val deadList: UiSidebarData by dead.collectAsState(UiSidebarData.DEFAULT)
+        val bannedList: UiSidebarData by banned.collectAsState(UiSidebarData.DEFAULT)
+        val specialList: UiSidebarData by special.collectAsState(UiSidebarData.DEFAULT)
         if (knockedOutList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Knocked Out")
             PlayerSection(screenModel, knockedOutList, sharedPitchData)
@@ -237,7 +240,7 @@ private fun Injuries(
 @Composable
 private fun PlayerSection(
     screenModel: GameScreenModel,
-    list: List<UiSidebarPlayer>,
+    players: UiSidebarData,
     sharedPitchData: LocalPitchDataWrapper,
     compactView: Boolean = true,
     onExit: () -> Unit = {}
@@ -246,16 +249,9 @@ private fun PlayerSection(
     val pitchSize = sharedPitchData.size
 
     if (!compactView) {
-        val max = if (list.isNotEmpty()) list.maxBy { it.number.value }.number.value else 0
-        if (max > 0) {
-            val sortedList: ArrayList<UiSidebarPlayer?> = ArrayList<UiSidebarPlayer?>(max)
-                .also { list ->
-                    repeat(max) {
-                        list.add(null)
-                    }
-                }
-            list.forEach { sortedList[it.number.value - 1] = it }
-            for (index in sortedList.indices step playersPrRow) {
+        if (players.isNotEmpty()) {
+            val rows = ceil(players.size/playersPrRow.toFloat()).toInt()
+            for (y in 0 until rows) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -271,14 +267,16 @@ private fun PlayerSection(
                             modifier = modifier.weight(1f),
                             contentAlignment = Alignment.Center,
                         ) {
-                            if (sortedList.size > (index + x) && sortedList[index + x] != null) {
-                                val player = sortedList[index + x]!!.player
+                            val index = y * playersPrRow + x
+                            val uiPlayer = if (index < players.size) players[index] else null
+                            if (uiPlayer != null) {
+                                val player = uiPlayer.player
                                 val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
                                 Player(
                                     Modifier.pixelSize(playerSizePx),
                                     screenModel,
                                     player,
-                                    sortedList[index + x]!!.transientData,
+                                    uiPlayer.transientData,
                                     parentHandleClick = false,
                                     contextMenuShowing = false
                                 )
@@ -289,7 +287,7 @@ private fun PlayerSection(
             }
         }
     } else {
-        for (index in list.indices step playersPrRow) {
+        for (index in players.indices step playersPrRow) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -305,14 +303,14 @@ private fun PlayerSection(
                         modifier = modifier.weight(1f),
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (list.size > (index + x)) {
-                            val player = list[index + x].player
+                        if (players.size > (index + x)) {
+                            val player = players[index + x]!!.player
                             val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
                             Player(
                                 modifier.pixelSize(playerSizePx),
                                 screenModel,
                                 player,
-                                list[index + x].transientData,
+                                players[index + x]!!.transientData,
                                 parentHandleClick = false,
                                 contextMenuShowing = false
                             )
