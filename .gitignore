@@ -8,8 +8,12 @@
 build/
 
 # AI folders
+# Eventually we might want to keep some of these, but
+# for now do not persist them.
 .claude/
 .mcp/
+.agents/skills/
+skills-lock.json
 
 # The tools folder should be built for each platform, so do not commit build artifacts
 tools/fumbblcli.jar
