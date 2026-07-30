@@ -16,6 +16,8 @@ import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,6 +28,15 @@ import kotlinx.coroutines.flow.shareIn
 data class ButtonData(
     val title: String,
     val onClick: () -> Unit
+)
+
+/**
+ * A single titled group of players in the dogout, e.g. "Knocked Out" or
+ * "Reserves".
+ */
+data class SidebarSection(
+    val title: String,
+    val players: Flow<UiSidebarData>,
 )
 
 /**
@@ -41,10 +52,10 @@ data class ButtonData(
  * TODO We might want to show injured players in the order it happened rather
  *  than by their player number. This will require extra metadata in the model.
  */
-class UiSidebarData private constructor(
-    val players: List<UiSidebarPlayer?>,
-): List<UiSidebarPlayer?> by players {
-
+data class UiSidebarData private constructor(
+    val players: ImmutableList<UiSidebarPlayer?>,
+): ImmutableList<UiSidebarPlayer?> by players {
+    constructor(players: List<UiSidebarPlayer?>): this(players.toImmutableList())
     companion object {
 
         fun compact(players: List<UiSidebarPlayer?>): UiSidebarData {
@@ -90,6 +101,10 @@ class SidebarViewModel(
     // The original FUMBBL image is 145f/430f, but we need to stretch to make it fit the pitch image.
     val aspectRatio: Float = 410f/1030f // 145f/430f
 
+    // TODO Right now Setup Buttons are in the Game Status Message bar. It would probably be slightly
+    //  better to have them show in the dogout (in the bottom), as that area is more flexible.
+    //  This code is first step towards doing that, but hasn't been wired up yet.
+    //  See `SidebarButtons` composable in Sidebar.kt for the other half of this.
     private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
         // TODO Find a better way to detect game mode
         if (uiState.actionProvider is ReplayController) return@map emptyList()
@@ -141,7 +156,7 @@ class SidebarViewModel(
         Pair(snapshot, newList)
     }.shareIn(menuViewModel.uiScope, SharingStarted.Eagerly, 1)
 
-    fun dogoutAction(): Flow<(() -> Unit)?> = uiState.uiStateFlow.map {
+    val dogoutAction: Flow<(() -> Unit)?> = uiState.uiStateFlow.map {
         when (team.isHomeTeam()) {
             true -> it.homeDogoutOnClickAction
             false -> it.awayDogoutOnClickAction
@@ -150,30 +165,35 @@ class SidebarViewModel(
 
     val playerStatCardFlow: Flow<UiPlayerCard?> = gameViewModel.playerStatCardFlowFor(team)
 
-    fun reserves(compact: Boolean): Flow<UiSidebarData> {
-        return dogoutFlow
-            .map { (_, players) ->
-                val reservePlayers = players.filter { it.player.state == PlayerDogoutState.RESERVE }
-                when (compact) {
-                    true -> UiSidebarData.compact(reservePlayers)
-                    false -> UiSidebarData.fixed(team, reservePlayers)
-                }
-            }
-    }
+    /** Standard Reserves keep their position when moving between the pitch and the dogout. */
+    val reserves: Flow<UiSidebarData> = dogoutFlow
+        .map { (_, players) ->
+            val reservePlayers = players.filter { it.player.state == PlayerDogoutState.RESERVE }
+            UiSidebarData.fixed(team, reservePlayers)
+        }
 
-    fun knockedOut(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.KNOCKED_OUT, dogoutFlow)
+    val knockedOut: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.KNOCKED_OUT)
+    val badlyHurt: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BADLY_HURT)
+    val seriousInjuries: Flow<UiSidebarData> = mapToCompactView(
+        PlayerDogoutState.SERIOUSLY_HURT,
+        PlayerDogoutState.SERIOUS_INJURY,
+        PlayerDogoutState.LASTING_INJURY,
+    )
+    val dead: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.DEAD)
+    val banned: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BANNED)
+    val special: Flow<UiSidebarData> = mapToCompactView(
+        PlayerDogoutState.FAINTED,
+        PlayerDogoutState.DODGY_SNACK,
+    )
 
-    fun badlyHurt(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BADLY_HURT, dogoutFlow)
-
-    fun seriousInjuries(): Flow<UiSidebarData> = mapToCompactView(listOf(PlayerDogoutState.SERIOUSLY_HURT, PlayerDogoutState.SERIOUS_INJURY, PlayerDogoutState.LASTING_INJURY), dogoutFlow)
-
-    fun dead(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.DEAD, dogoutFlow)
-
-    fun banned(): Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BANNED, dogoutFlow)
-
-    fun special(): Flow<UiSidebarData> = mapToCompactView(
-        listOf(PlayerDogoutState.FAINTED, PlayerDogoutState.DODGY_SNACK),
-        dogoutFlow
+    /** The injury sections of the dogout, in the order they should be rendered. */
+    val injurySections: List<SidebarSection> = listOf(
+        SidebarSection("Knocked Out", knockedOut),
+        SidebarSection("Badly Hurt", badlyHurt),
+        SidebarSection("Seriously Injured", seriousInjuries),
+        SidebarSection("Dead", dead),
+        SidebarSection("Banned", banned),
+        SidebarSection("Special", special),
     )
 
     fun hoverOver(player: Player) {
@@ -186,20 +206,11 @@ class SidebarViewModel(
 
     fun dismissFixedCard() = gameViewModel.dismissPlayerStatCard()
 
-    private fun mapToCompactView(states: List<PlayerState>, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer?>>>): Flow<UiSidebarData> {
+    private fun mapToCompactView(vararg states: PlayerState): Flow<UiSidebarData> {
         return dogoutFlow
-            .map { it.second }
-            .map { playerList ->
-                playerList.filter { uiPlayer ->
-                    states.contains(uiPlayer?.state)
-                }
+            .map { (_, players) ->
+                val matchingPlayers = players.filter { states.contains(it.state) }
+                UiSidebarData.compact(matchingPlayers)
             }
-            .map { players ->
-                UiSidebarData.compact(players)
-            }
-    }
-
-    private fun mapToCompactView(state: PlayerState, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer?>>>): Flow<UiSidebarData> {
-        return mapToCompactView(listOf(state), dogoutFlow)
     }
 }

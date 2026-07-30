@@ -17,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -36,6 +36,7 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.ButtonData
+import com.jervisffb.ui.game.viewmodel.SidebarSection
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.game.viewmodel.UiSidebarData
 import com.jervisffb.ui.menu.GameScreenModel
@@ -44,68 +45,81 @@ import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.pixelSize
 import kotlinx.coroutines.flow.Flow
-import kotlin.math.ceil
+
+private const val PLAYERS_PR_ROW = 3
 
 @Composable
 fun Sidebar(
     vm: SidebarViewModel,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    val sidebarAction by vm.dogoutAction().collectAsState(null)
-    val reservesFlow = remember(vm) { vm.reserves(compact = false) }
+    val sidebarAction by vm.dogoutAction.collectAsState(null)
     Box(
-        modifier = Modifier
+        modifier = modifier
             .applyIf(sidebarAction != null) {
                 clickable { sidebarAction?.invoke() }.background(JervisTheme.availableActionBackground)
             },
         contentAlignment = Alignment.TopCenter
     ) {
-        // Side bar content
-        Column(modifier = Modifier) {
-            // Dogout + player stats
-            Box(modifier = modifier.fillMaxSize()) {
-                val useSidebarImage by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_SHOW_DOGOUT_BACKGROUND_VALUE, true).collectAsState(true)
-                if (useSidebarImage) {
-                    Image(
-                        alignment = Alignment.TopStart,
-                        painter = BitmapPainter(IconFactory.getSidebarBackground()),
-                        contentDescription = "Box",
-                        contentScale = ContentScale.FillWidth,
-                        modifier = modifier.fillMaxSize().padding(bottom = 8.dp).alpha(0.8f),
-                    )
-                }
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                        Reserves(vm.gameViewModel, reservesFlow, vm.sharedPitchData) {
-                            vm.hoverExit()
-                        }
-                        Injuries(
-                            vm.gameViewModel,
-                            showIfEmpty = false,
-                            vm.sharedPitchData,
-                            vm.knockedOut(),
-                            vm.badlyHurt(),
-                            vm.seriousInjuries(),
-                            vm.dead(),
-                            vm.banned(),
-                            vm.special()
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
 
-                // Make sure player stats are shown on top of reserves
-                PlayerStatsCard(
-                    flow = vm.playerStatCardFlow,
-                    onClick = vm::dismissFixedCard
+        Box(modifier = Modifier.fillMaxSize()) {
+            val useSidebarImage by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_SHOW_DOGOUT_BACKGROUND_VALUE, true).collectAsState(true)
+
+            // Background image for the sidebar (if any)
+            if (useSidebarImage) {
+                Image(
+                    alignment = Alignment.TopStart,
+                    painter = BitmapPainter(IconFactory.getSidebarBackground()),
+                    contentDescription = "Box",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 8.dp)
+                        .alpha(0.8f),
                 )
             }
+
+            // Players rendered in sections depending on their state
+            Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Reserves(
+                        vm.gameViewModel,
+                        vm.reserves,
+                        vm.sharedPitchData,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        vm.hoverExit()
+                    }
+                    Injuries(
+                        screenModel = vm.gameViewModel,
+                        sections = vm.injurySections,
+                        sharedPitchData = vm.sharedPitchData,
+                        showIfEmpty = false,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            // Player Stat Card, will be rendered above everything else when visible.
+            PlayerStatsCard(
+                flow = vm.playerStatCardFlow,
+                onClick = vm::dismissFixedCard
+            )
         }
     }
 }
 
 // Area just below the Sidebar where we can show extra buttons like "End Turn", "End Setup"
-// or
+// or the available setups.
+//
+// TODO Not wired up yet. This and the two button composables below are staged for WASM/iOS,
+//  which have no menu bar. `SidebarViewModel._buttons` is the other half and produces the
+//  setup buttons this is meant to render.
 @Composable
 private fun ColumnScope.SidebarButtons(buttons: Flow<List<ButtonData>>) {
     val buttons by buttons.collectAsState(emptyList())
@@ -175,66 +189,47 @@ private fun Reserves(
     screenModel: GameScreenModel,
     reserves: Flow<UiSidebarData>,
     sharedData: LocalPitchDataWrapper,
-    onExit: () -> Unit
+    modifier: Modifier = Modifier,
+    onExit: () -> Unit,
 ) {
     val list: UiSidebarData by reserves.collectAsState(UiSidebarData.DEFAULT)
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
         SectionHeader("Reserves")
-        PlayerSection(screenModel, list, sharedData, compactView = false, onExit = onExit)
+        PlayerSection(screenModel, list, sharedData, onExit = onExit)
     }
 }
 
 @Composable
 private fun Injuries(
     screenModel: GameScreenModel,
-    showIfEmpty: Boolean,
+    sections: List<SidebarSection>,
     sharedPitchData: LocalPitchDataWrapper,
-    knockedOut: Flow<UiSidebarData>,
-    badlyHurt: Flow<UiSidebarData>,
-    seriousInjuries: Flow<UiSidebarData>,
-    dead: Flow<UiSidebarData>,
-    banned: Flow<UiSidebarData>,
-    special: Flow<UiSidebarData>,
+    showIfEmpty: Boolean,
+    modifier: Modifier = Modifier,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        val knockedOutList: UiSidebarData by knockedOut.collectAsState(UiSidebarData.DEFAULT)
-        val badlyHurtList: UiSidebarData by badlyHurt.collectAsState(UiSidebarData.DEFAULT)
-        val seriousInjuryList: UiSidebarData by seriousInjuries.collectAsState(UiSidebarData.DEFAULT)
-        val deadList: UiSidebarData by dead.collectAsState(UiSidebarData.DEFAULT)
-        val bannedList: UiSidebarData by banned.collectAsState(UiSidebarData.DEFAULT)
-        val specialList: UiSidebarData by special.collectAsState(UiSidebarData.DEFAULT)
-        if (knockedOutList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Knocked Out")
-            PlayerSection(screenModel, knockedOutList, sharedPitchData)
-        }
-        if (badlyHurtList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Badly Hurt")
-            PlayerSection(screenModel, badlyHurtList, sharedPitchData)
-        }
-        if (seriousInjuryList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Seriously Injured")
-            PlayerSection(screenModel, seriousInjuryList, sharedPitchData)
-        }
-        if (deadList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Dead")
-            PlayerSection(screenModel, deadList, sharedPitchData)
-        }
-        if (bannedList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Banned")
-            PlayerSection(screenModel, bannedList, sharedPitchData)
-        }
-        if (specialList.isNotEmpty() || showIfEmpty) {
-            SectionHeader("Special")
-            PlayerSection(screenModel, specialList, sharedPitchData)
+    Column(modifier = modifier) {
+        sections.forEach { section ->
+            key(section.title) {
+                val players: UiSidebarData by section.players.collectAsState(UiSidebarData.DEFAULT)
+                if (players.isNotEmpty() || showIfEmpty) {
+                    SectionHeader(section.title)
+                    PlayerSection(screenModel, players, sharedPitchData)
+                }
+            }
         }
     }
 }
 
 /**
- * A list of players in a dogout section
+ * A list of players in a dogout section, laid out [PLAYERS_PR_ROW] per row.
  *
- * @param compactView If `true` players will group together. If `false` players will remember their position when
- * moving between the pitch and the dogout.
+ * Whether players group together or keep a fixed position is decided by the [UiSidebarData]
+ * itself (see `UiSidebarData.compact` vs `UiSidebarData.fixed`), so this only has to render
+ * the list it is given. Empty slots in a fixed list are `null` and render as gaps.
+ *
+ * Note: this emits one [Row] per line of players into the caller's [Column] rather than a
+ * single root layout, so it deliberately has no `modifier` parameter - there is no one node
+ * for the caller's modifier to apply to.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -242,79 +237,38 @@ private fun PlayerSection(
     screenModel: GameScreenModel,
     players: UiSidebarData,
     sharedPitchData: LocalPitchDataWrapper,
-    compactView: Boolean = true,
     onExit: () -> Unit = {}
 ) {
-    val playersPrRow = 3
     val pitchSize = sharedPitchData.size
-
-    if (!compactView) {
-        if (players.isNotEmpty()) {
-            val rows = ceil(players.size/playersPrRow.toFloat()).toInt()
-            for (y in 0 until rows) {
-                Row(
+    for (rowStart in players.indices step PLAYERS_PR_ROW) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.jdp)
+                .onPointerEvent(PointerEventType.Exit) { onExit() }
+            ,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            repeat(PLAYERS_PR_ROW) { column ->
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.jdp)
-                        .onPointerEvent(PointerEventType.Exit) { onExit() }
-                    ,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                        .aspectRatio(1f)
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    val modifier = Modifier.aspectRatio(1f)
-                    repeat(playersPrRow) { x ->
-                        Box(
-                            modifier = modifier.weight(1f),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            val index = y * playersPrRow + x
-                            val uiPlayer = if (index < players.size) players[index] else null
-                            if (uiPlayer != null) {
-                                val player = uiPlayer.player
-                                val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
-                                Player(
-                                    Modifier.pixelSize(playerSizePx),
-                                    screenModel,
-                                    player,
-                                    uiPlayer.transientData,
-                                    parentHandleClick = false,
-                                    contextMenuShowing = false
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } else {
-        for (index in players.indices step playersPrRow) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onPointerEvent(PointerEventType.Exit) { onExit() }
-                    .padding(horizontal = 24.jdp)
-                ,
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                val modifier = Modifier.aspectRatio(1f)
-                repeat(playersPrRow) { x ->
-                    Box(
-                        modifier = modifier.weight(1f),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (players.size > (index + x)) {
-                            val player = players[index + x]!!.player
-                            val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
-                            Player(
-                                modifier.pixelSize(playerSizePx),
-                                screenModel,
-                                player,
-                                players[index + x]!!.transientData,
-                                parentHandleClick = false,
-                                contextMenuShowing = false
-                            )
-                        }
+                    val uiPlayer = players.getOrNull(rowStart + column)
+                    if (uiPlayer != null) {
+                        val player = uiPlayer.player
+                        val playerSizePx = pitchSize.getPlayerSquareSize(player.size)
+                        Player(
+                            Modifier.pixelSize(playerSizePx),
+                            screenModel,
+                            player,
+                            uiPlayer.transientData,
+                            parentHandleClick = false,
+                            contextMenuShowing = false
+                        )
                     }
                 }
             }
