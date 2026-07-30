@@ -17,6 +17,7 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -130,7 +131,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,
             logo = teamLogo,
-            teamData = team
+            teamData = ModelRef(team.id, team)
         )
     }
 
@@ -204,9 +205,9 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
 
     private fun initializeGameModel() {
         val rules = networkAdapter.rules!!
-        val homeTeam = networkAdapter.homeTeam.value!!
+        val homeTeam = networkAdapter.homeTeam.value!!.model
         homeTeam.coach = networkAdapter.homeCoach.value!!
-        val awayTeam = networkAdapter.awayTeam.value!!
+        val awayTeam = networkAdapter.awayTeam.value!!.model
         awayTeam.coach = networkAdapter.awayCoach.value!!
         val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, networkAdapter.initialActions)
@@ -264,7 +265,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
 
     private fun prepareTeamSelection() {
         selectTeamModel.initializeTeamList(networkAdapter.rules!!)
-        networkAdapter.homeTeam.value?.id?.let { teamSelectedByOtherCoach ->
+        networkAdapter.homeTeam.value?.model?.id?.let { teamSelectedByOtherCoach ->
             selectTeamModel.markTeamUnavailable(teamSelectedByOtherCoach)
         }
     }

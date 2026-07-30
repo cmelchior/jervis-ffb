@@ -50,6 +50,7 @@ import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
@@ -132,7 +133,7 @@ fun RandomCommandBar(
 @Composable
 fun Dialogs(vm: DialogsViewModel) {
     val dialogData: UserInputDialog? by vm.dialogData.collectAsState(null)
-    val contextMenuData: Player? by vm.contextMenu.collectAsState(null)
+    val contextMenuData: ModelRef<Player>? by vm.contextMenu.collectAsState(null)
     when (dialogData) {
         is SingleChoiceInputDialog -> {
             val dialog = dialogData as SingleChoiceInputDialog

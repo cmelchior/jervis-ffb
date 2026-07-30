@@ -65,6 +65,7 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiKeywordData
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSkillData
@@ -116,13 +117,13 @@ fun PlayerEditorCard(
 }
 
 @Composable
-fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skillData: UiSkillData) -> Skill<*>? {
+fun rememberSkillSelectorOverlay(): suspend (player: ModelRef<Player>, title: String, skillData: UiSkillData) -> Skill<*>? {
     var visible by remember { mutableStateOf(false) }
-    var currentPlayer by remember { mutableStateOf<Player?>(null) }
+    var currentPlayer by remember { mutableStateOf<ModelRef<Player>?>(null) }
     var currentTitle by remember { mutableStateOf("") }
     var currentOptions: UiSkillData? by remember { mutableStateOf(null) }
     var resume: ((Skill<*>?) -> Unit)? by remember { mutableStateOf(null) }
-    val color = when (currentPlayer?.isOnHomeTeam() == true) {
+    val color = when (currentPlayer?.model?.isOnHomeTeam() == true) {
         true -> JervisTheme.homeTeamColor
         false -> JervisTheme.awayTeamColor
     }
@@ -152,7 +153,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                                 SkillValueButton(
                                     text = value.toString(),
                                     onClick = { resume?.invoke(
-                                        currentOptions!!.factory.createSkill(currentPlayer!!, SkillValue.IntTarget(value), Duration.PERMANENT)
+                                        currentOptions!!.factory.createSkill(currentPlayer!!.model, SkillValue.IntTarget(value), Duration.PERMANENT)
                                     ) },
                                     color = color
                                 )
@@ -163,7 +164,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                                 SkillValueButton(
                                     text = value.toString(),
                                     onClick = { resume?.invoke(
-                                        currentOptions!!.factory.createSkill(currentPlayer!!, SkillValue.IntAdjustment(value), Duration.PERMANENT)
+                                        currentOptions!!.factory.createSkill(currentPlayer!!.model, SkillValue.IntAdjustment(value), Duration.PERMANENT)
                                     ) },
                                     color = color
                                 )
@@ -174,7 +175,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                                 SkillValueButton(
                                     text = keyword.description,
                                     onClick = { resume?.invoke(
-                                        currentOptions!!.factory.createSkill(currentPlayer!!, SkillValue.Keyword(keyword), Duration.PERMANENT)
+                                        currentOptions!!.factory.createSkill(currentPlayer!!.model, SkillValue.Keyword(keyword), Duration.PERMANENT)
                                     )},
                                     color
                                 )
@@ -199,7 +200,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
     }
 
     return remember {
-        { player: Player, title, options->
+        { player: ModelRef<Player>, title, options->
             kotlinx.coroutines.suspendCancellableCoroutine { cont ->
                 currentPlayer = player
                 currentTitle = title
@@ -301,7 +302,7 @@ private fun PlayerEditor(
 
 @Composable
 private fun SkillSelectorTab(
-    player: UiPlayerCard,
+    playerData: UiPlayerCard,
     updateTrigger: Int,
     borderSize: Dp,
     handleAction: (GameAction) -> Unit,
@@ -309,9 +310,10 @@ private fun SkillSelectorTab(
 ) {
     val scope = rememberCoroutineScope()
     val showSkillOptionsSelector = rememberSkillSelectorOverlay()
-    val skillSections = remember(player, updateTrigger) {
-        player.getSkillSections()
+    val skillSections = remember(playerData, updateTrigger) {
+        playerData.getSkillSections()
     }
+    val player = remember(playerData) { playerData.player.model }
     Column(
         modifier = Modifier
             .padding(borderSize)
@@ -323,7 +325,7 @@ private fun SkillSelectorTab(
                 Column(
                     modifier = Modifier.padding(bottom = 16.dp)
                 ) {
-                    CategoryHeader(category, if (player.model.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor)
+                    CategoryHeader(category, if (player.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor)
                     Spacer(modifier = Modifier.height(8.dp))
                     FlowRow(
                         modifier = Modifier
@@ -333,11 +335,11 @@ private fun SkillSelectorTab(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         skills.forEach { skill ->
-                            SelectSkillButton(player.model, skill, handleAction) { data, onNewSkill ->
+                            SelectSkillButton(playerData.player, skill, handleAction) { data, onNewSkill ->
                                 scope.launch {
                                     onValueSelectorShown(true)
                                     val selected = showSkillOptionsSelector(
-                                        player.model,
+                                        playerData.player,
                                         "Select value for ${data.factory.name}",
                                         data
                                     )
@@ -572,7 +574,7 @@ private fun KeywordsSelectorTab(
             ) {
                 val color = if (player.model.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
                 keywordsList.forEach { keyword ->
-                    SelectKeywordButton(player.model, keyword, color, handleAction)
+                    SelectKeywordButton(player.player, keyword, color, handleAction)
                 }
             }
         }
@@ -582,13 +584,13 @@ private fun KeywordsSelectorTab(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SelectSkillButton(
-    player: Player,
+    player: ModelRef<Player>,
     skill: UiSkillData,
     handleAction: (GameAction) -> Unit,
     selectSkillOption: (data: UiSkillData, onNewSkill: (Skill<*>?) -> Unit) -> Unit
 ) {
     val shape = RoundedCornerShape(0.dp)
-    val teamColor = if (player.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
+    val teamColor = if (player.model.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
     var skillLabel by remember(skill) { mutableStateOf(skill.name) }
     var isHover by remember { mutableStateOf(false) }
     var isActive by remember(skill) { mutableStateOf(skill.isEnabled) }
@@ -606,7 +608,7 @@ fun SelectSkillButton(
             when (isActive) {
                 true -> {
                     skill.existingSkill?.let { existingSkill ->
-                        val action = RemovePlayerSkill(player.id, existingSkill.skillId)
+                        val action = RemovePlayerSkill(player.model.id, existingSkill.skillId)
                         skillLabel = skill.factory.name
                         isActive = !isActive
                         handleAction(action)
@@ -617,7 +619,7 @@ fun SelectSkillButton(
                     if (skill.options?.options?.isNotEmpty() == true) {
                         selectSkillOption(skill) { generatedSkill ->
                             if (generatedSkill != null) {
-                                val action = AddPlayerSkill(player.id, generatedSkill.skillId)
+                                val action = AddPlayerSkill(player.model.id, generatedSkill.skillId)
                                 skillLabel = generatedSkill.name
                                 skill.existingSkill = generatedSkill
                                 isActive = !isActive
@@ -625,8 +627,8 @@ fun SelectSkillButton(
                             }
                         }
                     } else {
-                        val skill = skill.factory.createSkill(player, null, Duration.PERMANENT)
-                        val action = AddPlayerSkill(player.id, skill.skillId)
+                        val skill = skill.factory.createSkill(player.model, null, Duration.PERMANENT)
+                        val action = AddPlayerSkill(player.model.id, skill.skillId)
                         isActive = !isActive
                         handleAction(action)
                     }
@@ -664,7 +666,7 @@ fun SelectSkillButton(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SelectKeywordButton(player: Player, keyword: UiKeywordData, color: Color, handleAction: (GameAction) -> Unit) {
+private fun SelectKeywordButton(player: ModelRef<Player>, keyword: UiKeywordData, color: Color, handleAction: (GameAction) -> Unit) {
     val shape = RoundedCornerShape(0.dp)
     var isHover by remember { mutableStateOf(false) }
     var isActive by remember(keyword) { mutableStateOf(keyword.isEnabled) }
@@ -680,8 +682,8 @@ private fun SelectKeywordButton(player: Player, keyword: UiKeywordData, color: C
     val onClick = remember(keyword) {
         {
             val action = when (isActive) {
-                true -> RemovePlayerKeyword(player.id, keyword.keyword)
-                false -> AddPlayerKeyword(player.id, keyword.keyword)
+                true -> RemovePlayerKeyword(player.model.id, keyword.keyword)
+                false -> AddPlayerKeyword(player.model.id, keyword.keyword)
             }
             isActive = !isActive
             handleAction(action)

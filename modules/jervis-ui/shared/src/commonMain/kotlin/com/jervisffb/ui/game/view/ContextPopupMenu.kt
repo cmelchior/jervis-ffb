@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -22,20 +26,22 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.UiAction
 
 /**
  * Interface representing each entry in a context menu.
  */
+@Stable
 sealed interface ContextMenuOption {
     val title: String
-    val command: () -> Unit
+    val command: UiAction
     val icon: ActionIcon
 }
 
 // Context menus that does not carry state, but just trigger a simple effect.
 data class SimpleContextMenuOption(
     override val title: String,
-    override val command: () -> Unit,
+    override val command: UiAction,
     override val icon: ActionIcon,
 ) : ContextMenuOption
 
@@ -45,12 +51,16 @@ class ToggleContextMenuOption(
     initial: ContextData,
     private val calculateStateFunc: () -> ContextData,
 ): ContextMenuOption {
-    data class ContextData(val title: String, val icon: ActionIcon, val command: () -> Unit)
-    private var data = initial
+    data class ContextData(val title: String, val icon: ActionIcon, val command: UiAction)
+
+    // Snapshot state rather than a plain `var`, so that flipping the option notifies
+    // composition. Without that, the `@Immutable` promise on the enclosing UiPitchSquare
+    // would be a lie: the square would compare equal while displaying a stale title/icon.
+    private var data: ContextData by mutableStateOf(initial)
 
     override val title: String
         get() = data.title
-    override val command: () -> Unit
+    override val command: UiAction
         get() = data.command
     override val icon: ActionIcon
         get() = data.icon
@@ -58,6 +68,13 @@ class ToggleContextMenuOption(
     fun recalculateState() {
         data = calculateStateFunc()
     }
+
+    // [calculateStateFunc] is deliberately excluded: it is a raw lambda, so including it would
+    // make `equals` always false. Two options with equal [data] have interchangeable
+    // rules in practice, because the rule is keyed to the same player as the commands it hands
+    // back.
+    override fun equals(other: Any?): Boolean = (other is ToggleContextMenuOption && data == other.data)
+    override fun hashCode(): Int = data.hashCode()
 }
 
 @Composable

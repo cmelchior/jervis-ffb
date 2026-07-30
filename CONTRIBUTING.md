@@ -127,6 +127,28 @@ To only verify without modifying files:
 ./gradlew ktlintCheck
 ```
 
+## Compose Compatibility
+
+To improve the performance of Compose, types must be marked "Stable" where 
+possible. In modules, like `jervis-ui`, this is done automatically by applying 
+the Compose Compiler Plugin.
+
+`jervis-engine` does not apply this by design, so there we need to manually list
+these types. This is done in `modules/jervis-engine/compose-stability.conf`.
+
+When adding a new interface or sealed hierarchy to `jervis-engine`, check if 
+it can be added to this file. More information is available there.
+
+The status of stability can be checked by running this command:
+
+```shell
+./gradlew :modules:jervis-ui:shared:compileKotlinJvm -PcomposeReports=true --rerun
+```
+
+The reports are found in `modules/jervis-ui/shared/build/compose_compiler/`
+See `com_jervisffb:shared-composables.txt` and check for `unstable` properties
+or classes
+
 ## Updating Gradle Wrapper
 The project uses Gradle to manage dependencies and the build processes. To
 update the Gradle Wrapper to the latest version, run the following command:

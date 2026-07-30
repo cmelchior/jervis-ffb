@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
@@ -128,7 +129,7 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
                     contextMenuOptions = it.contextMenuOptions.add(
                         SimpleContextMenuOption(
                             title,
-                            { actionProvider.userActionSelected(Cancel) },
+                            UiAction(Cancel) { actionProvider.userActionSelected(Cancel) },
                             ActionIcon.CANCEL
                         )
                     )

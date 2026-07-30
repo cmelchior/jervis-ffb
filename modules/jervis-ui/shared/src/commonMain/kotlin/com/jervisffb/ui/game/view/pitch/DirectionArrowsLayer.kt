@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,31 +34,39 @@ fun DirectionArrowsLayer(
     val pitchDataFlow = remember { vm.observePitch() }
     val pitchData: Map<PitchCoordinate, Pair<UiPitchSquare, UiPitchPlayer?>> by pitchDataFlow.collectAsState(emptyMap())
 
-    pitchData.filter { it.value.first.hasDirectionArrow() }.forEach {
-        val square = it.value.first
-        val coordinate = it.key
-        var isHover by remember { mutableStateOf(false) }
-        Box(
-            modifier = Modifier
-                .jervisSquare(pitchSizeData, coordinate)
-                .jervisPointerEvent(SquarePointerEventType.EnterSquare, coordinate) {
-                    isHover = true
+    // Filtering all ~390 squares is not free, so only redo it when the pitch actually changes.
+    val arrowSquares = remember(pitchData) {
+        pitchData.filter { it.value.first.hasDirectionArrow() }
+    }
+
+    arrowSquares.forEach { (coordinate, squareAndPlayer) ->
+        // The set of arrow squares changes during a pushback. Keying on the coordinate keeps
+        // `isHover` tied to its own square instead of to whatever now sits in that slot.
+        key(coordinate) {
+            val square = squareAndPlayer.first
+            var isHover by remember { mutableStateOf(false) }
+            Box(
+                modifier = Modifier
+                    .jervisSquare(pitchSizeData, coordinate)
+                    .jervisPointerEvent(SquarePointerEventType.EnterSquare, coordinate) {
+                        isHover = true
+                    }
+                    .jervisPointerEvent(SquarePointerEventType.ExitSquare, coordinate) {
+                        isHover = false
+                    }
+            ) {
+                val image = when {
+                    square.directionSelected != null -> IconFactory.getDirection(square.directionSelected, true)
+                    square.selectableDirection != null -> IconFactory.getDirection(square.selectableDirection, isHover)
+                    else -> null
                 }
-                .jervisPointerEvent(SquarePointerEventType.ExitSquare, coordinate) {
-                    isHover = false
+                if (image != null) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = painterResource(image),
+                        contentDescription = null,
+                    )
                 }
-        ) {
-            val image = when {
-                square.directionSelected != null -> IconFactory.getDirection(square.directionSelected, true)
-                square.selectableDirection != null -> IconFactory.getDirection(square.selectableDirection, isHover)
-                else -> null
-            }
-            if (image != null) {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(image),
-                    contentDescription = null,
-                )
             }
         }
     }

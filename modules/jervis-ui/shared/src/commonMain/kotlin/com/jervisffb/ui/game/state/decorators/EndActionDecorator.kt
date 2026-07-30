@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
@@ -24,7 +25,7 @@ object EndActionDecorator: PitchActionDecorator<EndActionWhenReady> {
                 it.copy(contextMenuOptions = it.contextMenuOptions.add(0,
                     SimpleContextMenuOption(
                         "End action",
-                        { actionProvider.userActionSelected(EndAction) },
+                        UiAction(EndAction) { actionProvider.userActionSelected(EndAction) },
                         ActionIcon.END_TURN
                     )
                 ))

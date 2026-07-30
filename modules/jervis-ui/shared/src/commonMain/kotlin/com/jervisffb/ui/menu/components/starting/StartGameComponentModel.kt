@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu.components.starting
 
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import kotlinx.coroutines.flow.Flow
@@ -12,8 +13,8 @@ import kotlinx.coroutines.flow.Flow
  * @see [StartGameComponent]
  */
 class StartGameComponentModel(
-    val homeTeam: Flow<Team?>,
-    val awayTeam: Flow<Team?>,
+    val homeTeam: Flow<ModelRef<Team>?>,
+    val awayTeam: Flow<ModelRef<Team>?>,
     private val menuViewModel: MenuViewModel,
 ) : JervisScreenModel {
 }

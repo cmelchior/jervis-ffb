@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.TextUnit
@@ -26,6 +27,11 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.UiPathFinderData
 import com.jervisffb.ui.utils.jsp
+
+/**
+ * Stand-in for a coordinate that is missing from the pitch data.
+ */
+private val EMPTY_SQUARE = UiPitchSquare(PitchCoordinate.UNKNOWN)
 
 /**
  * Layer 4: Pitch Actions and Underlays:
@@ -54,7 +60,7 @@ fun PitchActionsAndUnderlaysLayers(
         SquareHighlightAndAction(
             modifier,
             vm,
-            squareData ?: UiPitchSquare(PitchCoordinate.UNKNOWN),
+            squareData ?: EMPTY_SQUARE,
             playerData,
             pathFinderData?.let { it[coordinate] },
         )
@@ -72,10 +78,8 @@ private fun SquareHighlightAndAction(
     fontSize: TextUnit = 16.jsp // Size of PathFinder and "Moves Used" indicators
 ) {
     val sharedPitchData = vm.sharedPitchData
-    val isActionWheelVisible by sharedPitchData.isActionWheelVisible
-    val bgColor = remember(isActionWheelVisible, square, player) {
+    val bgColor = remember(square, player) {
         when {
-            isActionWheelVisible -> Color.Transparent
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
@@ -88,7 +92,16 @@ private fun SquareHighlightAndAction(
     // Setup onHover events
     val modifier = boxModifier
         .fillMaxSize()
-        .background(color = bgColor)
+        // Deferred read - the Action Wheel's visibility is a single piece of global state, but this
+        // composable runs once per square, so reading it during composition subscribed all ~390 of
+        // them and every show/hide of the wheel recomposed the whole pitch. Reading it inside
+        // `drawBehind` moves the subscription to the draw phase: a toggle now repaints the squares
+        // instead of recomposing them. Do not reintroduce a `by`/`.value` read in the function body.
+        .drawBehind {
+            if (bgColor != Color.Transparent && !sharedPitchData.isActionWheelVisible.value) {
+                drawRect(bgColor)
+            }
+        }
         .jervisPointerEvent(SquarePointerEventType.EnterSquare, square.coordinates) {
             vm.triggerHoverEnter(square.coordinates)
         }
@@ -126,9 +139,14 @@ private fun SquareHighlightAndAction(
                 }
             }
     ) {
-        val contentMenuVisible by sharedPitchData.isActionWheelVisible
+        // `isActionWheelVisible` is read inline rather than hoisted into a local, and the cheap
+        // per-square conditions are tested first, so that `&&` short-circuits before the read
+        // happens. `Box` with content is inline, so a read here lands in this composable's own
+        // restart scope - hoisting it would subscribe all ~390 squares to the wheel's visibility
+        // and undo the deferral above. `useActionWheel` is a constant `true`, so the branch below
+        // never runs and never subscribes; only squares showing a pathfinder distance do.
         // TODO Move this to the Dialog Layer?
-        if (contentMenuVisible && !square.useActionWheel) {
+        if (!square.useActionWheel && sharedPitchData.isActionWheelVisible.value) {
             ContextPopupMenu(
                 hidePopup = { dismissed ->
                     sharedPitchData.setContextActionWheelVisibility(false)
@@ -151,7 +169,7 @@ private fun SquareHighlightAndAction(
                     contentDescription = "Ball left pitch at ${square.coordinates}",
                 )
             }
-        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty() && !contentMenuVisible) {
+        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty() && !sharedPitchData.isActionWheelVisible.value) {
             val moveValue = pathfinderData.futureMoveDistance.toString()
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(

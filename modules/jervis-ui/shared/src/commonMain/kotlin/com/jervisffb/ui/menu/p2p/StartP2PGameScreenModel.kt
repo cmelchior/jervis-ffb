@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu.p2p
 
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +14,8 @@ class StartP2PGameScreenModel(
     private val menuViewModel: MenuViewModel,
 ) : JervisScreenModel {
 
-    val homeTeam: StateFlow<Team?> = networkAdapter.homeTeam
-    val awayTeam: StateFlow<Team?> = networkAdapter.awayTeam
+    val homeTeam: StateFlow<ModelRef<Team>?> = networkAdapter.homeTeam
+    val awayTeam: StateFlow<ModelRef<Team>?> = networkAdapter.awayTeam
 
     fun reset() {
         // Nothing to reset

@@ -17,6 +17,7 @@ import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -139,7 +140,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
                 gameName = setupGameModel.gameName.value,
                 rules = setupGameModel.createRules(),
                 hostCoach = CoachId("host-coach"), // TODO figure out what to do here
-                hostTeam = selectedTeam.value?.teamData!!,
+                hostTeam = selectedTeam.value?.teamData!!.model,
                 clientCoach = null,
                 clientTeam = null,
                 initialActions = emptyList(),
@@ -152,7 +153,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
             coachName = setupGameModel.coachSetupModel.coachName.value,
             coachType = setupGameModel.coachSetupModel.coachType.value,
             gameId = GameId(setupGameModel.gameName.value),
-            teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
+            teamIfHost = selectedTeam.value?.teamData?.model ?: error("Missing team"),
             handler = object : AbstractClintNetworkMessageHandler() { /* No op */ }
         )
         networkAdapter.teamSelected(selectedTeam.value!!)
@@ -240,10 +241,10 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     private fun initializeGameModel() {
         val rules = networkAdapter.rules!!
         val homeTeam = networkAdapter.homeTeam.value!!
-        homeTeam.coach = networkAdapter.homeCoach.value!!
+        homeTeam.model.coach = networkAdapter.homeCoach.value!!
         val awayTeam = networkAdapter.awayTeam.value!!
-        awayTeam.coach = networkAdapter.awayCoach.value!!
-        val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
+        awayTeam.model.coach = networkAdapter.awayCoach.value!!
+        val game = Game(rules, homeTeam.model, awayTeam.model, Pitch.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
         val homeActionProvider = when (setupGameModel.coachSetupModel.coachType.value) {
@@ -322,7 +323,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
             teamValue = homeTeam.teamValue,
             rerolls = homeTeam.rerolls.size,
             logo = homeTeamLogo,
-            teamData = homeTeam
+            teamData = ModelRef(homeTeam.id, homeTeam)
         )
     }
 

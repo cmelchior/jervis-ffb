@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.state.ReplayController
@@ -52,6 +53,7 @@ data class SidebarSection(
  * TODO We might want to show injured players in the order it happened rather
  *  than by their player number. This will require extra metadata in the model.
  */
+@ConsistentCopyVisibility
 data class UiSidebarData private constructor(
     val players: ImmutableList<UiSidebarPlayer?>,
 ): ImmutableList<UiSidebarPlayer?> by players {
@@ -146,9 +148,11 @@ class SidebarViewModel(
                 UiSidebarPlayer(
                     it,
                     UiPlayerTransientData(
-                        onHover = { hoverOver(player) },
-                        onHoverExit = { hoverExit() },
-                        onSecondaryClick = { gameViewModel.showPlayerContextMenu(player.id) }
+                        onHover = UiAction(Pair("onHover", player.id)) { hoverOver(player) },
+                        onHoverExit = UiAction(Pair("onHoverExit", player.id)) { hoverExit() },
+                        onSecondaryClick = UiAction(Pair("onSecondaryClick", player.id)) {
+                            gameViewModel.showPlayerContextMenu(player.id)
+                        }
                     )
                 )
             } ?: error("Cannot find player: $player.id}")

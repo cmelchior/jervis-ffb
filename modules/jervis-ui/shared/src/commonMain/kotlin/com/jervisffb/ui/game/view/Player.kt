@@ -77,9 +77,10 @@ fun Player(
     parentHandleClick: Boolean,
     contextMenuShowing: Boolean,
 ) {
-    val isUsingFumblerooski by screenModel.uiState.uiDecorations.fumblerooskiEnabled
-        .map { it?.id == player.id }
-        .collectAsState(false)
+    val isUsingFumblerooskiFlow = remember(player.id) {
+        screenModel.uiState.uiDecorations.fumblerooskiEnabled.map { it?.id == player.id }
+    }
+    val isUsingFumblerooski by isUsingFumblerooskiFlow.collectAsState(false)
     val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
     val ballImage = IconFactory.getHeldBallOverlay(isUsingFumblerooski)
     var isTempSelected by player.isTemporarySelected

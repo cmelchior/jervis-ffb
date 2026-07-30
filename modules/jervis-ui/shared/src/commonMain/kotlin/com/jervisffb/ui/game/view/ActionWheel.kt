@@ -132,15 +132,15 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.milliseconds
 
-data class ItemAnimatable(
+class ItemAnimatable(
     // Used for position around the wheel
-    val angleDegree : Animatable<Float, *>,
+    val angleDegree: Animatable<Float, *>,
     val alpha: Animatable<Float, *> = Animatable(0f),
     // Only use for dice roll animations
-    var isAnimating: MutableState<Boolean> = mutableStateOf(false),
-    val yOffset: Animatable<Float, *> = Animatable(0f), //  = remember(startingValue, endValue) { Animatable(0f) }
-    val rotation: Animatable<Float, *> = Animatable(0f), //  = remember(startingValue, endValue) { Animatable(0f) }
-    var displayFace: MutableState<DieResult?> = mutableStateOf(null) //  by remember(startingValue, endValue) { mutableStateOf(startingValue) }
+    val isAnimating: MutableState<Boolean> = mutableStateOf(false),
+    val yOffset: Animatable<Float, *> = Animatable(0f),
+    val rotation: Animatable<Float, *> = Animatable(0f),
+    val displayFace: MutableState<DieResult?> = mutableStateOf(null),
 )
 
 /**

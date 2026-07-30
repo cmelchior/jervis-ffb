@@ -3,6 +3,9 @@ package com.jervisffb.engine.model.inducements.settings
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.teams.THE_BLACK_GOBBO
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
 
 /**
@@ -13,7 +16,7 @@ import kotlinx.serialization.Serializable
 data class StarPlayersInducementList(
     override val max: Int = 2,
     override val enabled: Boolean = true,
-    override val items: List<StarPlayerInducement> = listOf(
+    override val items: ImmutableList<StarPlayerInducement> = persistentListOf(
         StarPlayerInducement(
             THE_BLACK_GOBBO,
             1,
@@ -35,7 +38,7 @@ data class StarPlayersInducementList(
         override var enabled: Boolean = inducement.enabled
         var starPlayers: List<StarPlayerInducement.Builder> = inducement.items.map { it.toBuilder() }.toMutableList()
 
-        override fun build() = StarPlayersInducementList(max, enabled, starPlayers.map { it.build()})
+        override fun build() = StarPlayersInducementList(max, enabled, starPlayers.map { it.build()}.toImmutableList())
     }
 }
 

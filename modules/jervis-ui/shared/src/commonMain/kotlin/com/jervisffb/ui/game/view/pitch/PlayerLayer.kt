@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.unit.IntOffset
@@ -55,33 +55,38 @@ fun PlayerLayer(
         snapshot!!.players.forEach { (id, player) ->
             if (player.location !is PitchCoordinate) return@forEach
 
-            val playerSize = pitchSizeData.getPlayerSquareSize(player.size)
-            val coordinates = player.location
-            val xDiff = playerSize.width - pitchSizeData.squareSize.width
-            val yDiff = playerSize.height - pitchSizeData.squareSize.height
+            // Players leaving the pitch change how many children this loop emits, so without a
+            // key every player after the gap would move to a different composition slot and
+            // throw away its remembered icons/indicators.
+            key(id) {
+                val playerSize = pitchSizeData.getPlayerSquareSize(player.size)
+                val coordinates = player.location
+                val xDiff = playerSize.width - pitchSizeData.squareSize.width
+                val yDiff = playerSize.height - pitchSizeData.squareSize.height
 
-            // We want players at the bottom-right to be above players on the top-left.
-            // So we can just enumerate the zIndexes using the player coordinates.
-            val zIndex = (coordinates.x + 1) * coordinates.y
-            Box(
-                modifier = Modifier
-                    .zIndex(zIndex.toFloat())
-                    .pixelSize(playerSize)
-                    .offset {
-                        IntOffset(
-                            x = (coordinates.x * pitchSizeData.squareSize.width - xDiff / 2f).roundToInt(),
-                            y = (coordinates.y * pitchSizeData.squareSize.height - yDiff / 2f).roundToInt()
+                // We want players at the bottom-right to be above players on the top-left.
+                // So we can just enumerate the zIndexes using the player coordinates.
+                val zIndex = (coordinates.x + 1) * coordinates.y
+                Box(
+                    modifier = Modifier
+                        .zIndex(zIndex.toFloat())
+                        .pixelSize(playerSize)
+                        .offset {
+                            IntOffset(
+                                x = (coordinates.x * pitchSizeData.squareSize.width - xDiff / 2f).roundToInt(),
+                                y = (coordinates.y * pitchSizeData.squareSize.height - yDiff / 2f).roundToInt()
+                            )
+                        }
+                ) {
+                    if (coordinates.isOnPitch(snapshot!!.game.rules)) {
+                        PlayerWithIndicators(
+                            vm.screenModel,
+                            Modifier,
+                            snapshot!!.squares[coordinates]!!,
+                            player,
+                            null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
                         )
                     }
-            ) {
-                if (coordinates.isOnPitch(snapshot!!.game.rules)) {
-                    PlayerWithIndicators(
-                        vm.screenModel,
-                        Modifier,
-                        snapshot!!.squares[coordinates]!!,
-                        player,
-                        null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
-                    )
                 }
             }
         }
@@ -131,7 +136,6 @@ fun PlayerLayer(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PlayerWithIndicators(
     screenModel: GameScreenModel,
@@ -140,9 +144,7 @@ private fun PlayerWithIndicators(
     player: UiPitchPlayer? = null,
     playerTransientData: UiPlayerTransientData? = null,
 ) {
-    val modifier = boxModifier.fillMaxSize()
-
-    Box(modifier = modifier) {
+    Box {
         player?.let {
             Player(
                 boxModifier,

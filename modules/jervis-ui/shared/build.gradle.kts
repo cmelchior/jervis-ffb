@@ -18,6 +18,36 @@ group = "com.jervisffb"
 @Suppress("UNCHECKED_CAST")
 version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
+composeCompiler {
+    // Configure Stable value types from `jervis-engine`, so we can optimize
+    // skippability in the UI. `jervis-ui` cannot detect these automatically as
+    // it requires the Compose Compiler Plugin to be added to `jervis-engine`,
+    // which we want to avoid. The file lives with the engine because that is
+    // where the promise has to be kept; see its header before adding anything
+    // to it.
+    stabilityConfigurationFiles.add(
+        layout.settingsDirectory.file("modules/jervis-engine/compose-stability.conf")
+    )
+
+    // Compose compiler stability/skippability reports. Off by default, but can
+    // be enabled with `-PcomposeReports=true`. Output and read the output in
+    // `build/compose_compiler/com_jervisffb:shared-composables.txt` (skippable
+    // status + parameter stability) and `com_jervisffb:shared-classes.txt`
+    // (class/property stability).
+    //
+    // Note that the `.txt` reports are written flat, so in this multiplatform
+    // module whichever target compiled last overwrites them - and the targets
+    // do not agree on stability. Compile single target when comparing reports
+    // (`:compileKotlinJvm --rerun`), otherwise the diff is jvm-against-wasmJs
+    // rather than before-against-after. The `-module.json` metrics do not have
+    // this problem; they are nested per target (`compose_compiler/jvm/main/`).
+    if (providers.gradleProperty("composeReports").orNull == "true") {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
+}
+
+
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm()

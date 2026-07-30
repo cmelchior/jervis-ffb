@@ -24,6 +24,7 @@ import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.SpectatorState
 import com.jervisffb.net.messages.TeamData
 import com.jervisffb.net.messages.UnknownServerError
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
@@ -67,8 +68,8 @@ class P2PClientNetworkAdapter(
     var initialActions: List<GameAction> = emptyList()
     val homeCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val awayCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
-    val homeTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
-    val awayTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
+    val homeTeam: MutableStateFlow<ModelRef<Team>?> = MutableStateFlow(null)
+    val awayTeam: MutableStateFlow<ModelRef<Team>?> = MutableStateFlow(null)
     val spectators = mutableListOf<Spectator>()
 
     init {
@@ -181,10 +182,10 @@ class P2PClientNetworkAdapter(
         override fun onTeamSelected(team: Team, homeTeam: Boolean) {
             if (homeTeam) {
                 team.coach = homeCoach.value!!
-                this@P2PClientNetworkAdapter.homeTeam.value = team
+                this@P2PClientNetworkAdapter.homeTeam.value = ModelRef(team.id, team)
             } else {
                 team.coach = awayCoach.value!!
-                awayTeam.value = team
+                awayTeam.value = ModelRef(team.id, team)
             }
         }
 
@@ -235,8 +236,14 @@ class P2PClientNetworkAdapter(
             rules = message.rules
             homeCoach.value = message.coaches.firstOrNull()
             awayCoach.value = message.coaches.getOrNull(1)
-            homeTeam.value = message.homeTeam?.let { SerializedTeam.deserialize(message.rules, it, homeCoach.value!!) }
-            awayTeam.value = message.awayTeam?.let { SerializedTeam.deserialize(message.rules, it, awayCoach.value!!) }
+            homeTeam.value = message.homeTeam?.let {
+                val team = SerializedTeam.deserialize(message.rules, it, homeCoach.value!!)
+                ModelRef(team.id, team)
+            }
+            awayTeam.value = message.awayTeam?.let {
+                val team = SerializedTeam.deserialize(message.rules, it, awayCoach.value!!)
+                ModelRef(team.id, team)
+            }
             clientState.value = message.clientState
         }
 

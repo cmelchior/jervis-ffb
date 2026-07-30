@@ -33,7 +33,7 @@ val DEFAULT_INDUCEMENTS_BB2025 = mapOf<InducementType, Inducement<*>>(
     InducementType.PLAGUE_DOCTOR to SimpleInducement(InducementType.PLAGUE_DOCTOR, "Plague Doctor", 1, 100_000, true, requirements = setOf(TeamSpecialRule.FAVOURED_OF_NURGLE)),
     InducementType.RIOTOUS_ROOKIE to SimpleInducement(InducementType.RIOTOUS_ROOKIE, "Riotous Rookies", 1, 150_000, true, requirements = setOf(TeamSpecialRule.LOW_COST_LINEMEN)),
     InducementType.WANDERING_APOTHECARY to SimpleInducement(InducementType.WANDERING_APOTHECARY, "Wandering Apothecaries", 2, 100_000, true),
-    InducementType.HALFLING_MASTER_CHEF to SimpleInducement(InducementType.HALFLING_MASTER_CHEF, "Hafling Master Chef", 1, 300_000, true, specialRulesModifier = emptyMap(), teamNameModifier = listOf("^Hafling$".toRegex().toString() to 1/3f)),
+    InducementType.HALFLING_MASTER_CHEF to SimpleInducement(InducementType.HALFLING_MASTER_CHEF, "Hafling Master Chef", 1, 300_000, true, specialRulesModifier = mapOf(), teamNameModifier = listOf("^Hafling$".toRegex().toString() to 1/3f)),
     InducementType.BIASED_REFEREE to BiasedRefereesInducementList(max = 1, enabled = true),
     InducementType.INFAMOUS_COACHING_STAFF to InfamousCoachingStaffsInducementList(max = 1, enabled = true),
     InducementType.STANDARD_MERCENARY_PLAYERS to StandardMercenaryInducement(enabled = true),

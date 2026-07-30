@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +26,6 @@ import com.jervisffb.ui.game.viewmodel.PitchViewModel
  */
 @Composable
 fun ActionWheelLayer(vm: PitchViewModel) {
-    val pitchData by vm.pitchViewData.collectAsState()
     var currentState by remember { mutableStateOf<ActionWheelUiState>(NoActionWheel) }
     var hideWhenClickOutside by remember(vm.actionWheelViewModel.hideOnClickedOutside) { vm.actionWheelViewModel.hideOnClickedOutside }
     LaunchedEffect(vm) {
@@ -67,7 +65,8 @@ fun ActionWheelLayer(vm: PitchViewModel) {
         ActionWheelDialog(
             currentState,
             vm,
-            pitchData,
+            // Optimize Compose skipp by using a deferred read: `pitchViewData` is written during the pitch layout phase.
+            pitchDataProvider = { vm.pitchViewData.value },
             isPrimary = true,
         )
     }

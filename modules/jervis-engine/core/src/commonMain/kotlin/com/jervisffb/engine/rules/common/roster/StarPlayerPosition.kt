@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
  * or other things that add temporary affects to players
  */
 @Serializable
-class StarPlayerPosition(
+data class StarPlayerPosition(
     override val id: PositionId,
     override val title: String,
     override val shortHand: String,
@@ -32,7 +32,7 @@ class StarPlayerPosition(
     override val strength: Int,
     override val agility: Int,
     override val passing: Int?,
-    override var armorValue: Int,
+    override val armorValue: Int,
     override val skills: List<SkillId>,
     override val specialRules: List<PlayerSpecialRule>,
     override val keywords: List<PlayerKeyword>,

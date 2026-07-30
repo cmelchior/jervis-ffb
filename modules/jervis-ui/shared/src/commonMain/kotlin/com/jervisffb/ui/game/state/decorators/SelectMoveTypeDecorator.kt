@@ -21,6 +21,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
@@ -57,6 +58,11 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         }
     }
 
+    private fun moveTypeAction(actionProvider: ManualActionProvider, type: MoveType): UiAction {
+        val action = MoveTypeSelected(type)
+        return UiAction(action) { actionProvider.userActionSelected(action) }
+    }
+
     private fun handleType(actionProvider: ManualActionProvider, state: Game, acc: UiSnapshotAccumulator, type: MoveType) {
         val player = state.activePlayer ?: error("No active player")
         val activeLocation = player.location as PitchCoordinate
@@ -71,7 +77,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Jump",
-                                { actionProvider.userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                                moveTypeAction(actionProvider, MoveType.JUMP),
                                 ActionIcon.JUMP
                             )
                         )
@@ -85,7 +91,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Leap",
-                                { actionProvider.userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
+                                moveTypeAction(actionProvider, MoveType.LEAP),
                                 ActionIcon.LEAP
                             )
                         )
@@ -99,7 +105,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Pogo",
-                                { actionProvider.userActionSelected(MoveTypeSelected(MoveType.POGO)) },
+                                moveTypeAction(actionProvider, MoveType.POGO),
                                 ActionIcon.LEAP
                             )
                         )
@@ -126,18 +132,15 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                 activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
                     .filter { state.pitch[it].isUnoccupied() }
                     .forEach { loc ->
+                        val action = CompositeGameAction(
+                            listOf(
+                                MoveTypeSelected(MoveType.STANDARD),
+                                PitchSquareSelected(loc),
+                            )
+                        )
                         acc.updateSquare(loc) {
                             it.copy(
-                                selectedAction = {
-                                    actionProvider.userActionSelected(
-                                        CompositeGameAction(
-                                            listOf(
-                                                MoveTypeSelected(MoveType.STANDARD),
-                                                PitchSquareSelected(loc),
-                                            )
-                                        )
-                                    )
-                                },
+                                selectedAction = UiAction(action) { actionProvider.userActionSelected(action) },
                                 requiresRoll = requiresDodge || requiresRush
                             )
                         }
@@ -146,17 +149,27 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                 if (player.isSkillAvailable(SkillType.FUMBLEROOSKI) && player.hasBall()) {
                     // If player has Fumblerooski, they can enable it before-hand here
                     acc.updateSquare(player.coordinates) {
-                        val useFumblerooski = ToggleContextMenuOption.ContextData("Use Fumblerooski when moving next", ActionIcon.FUMBLEROOSKI_USE) {
-                            val uiController = acc.uiController
-                            // We need to reset the UI decoration at the correct place when Undo'ing actions
-                            uiController.uiDecorations.registerUndo(uiController.gameController.currentActionIndex()) {
-                                actionProvider.nextFumblerooskiCommand(player, null)
-                            }
-                            actionProvider.nextFumblerooskiCommand(player, Confirm)
-                        }
-                        val cancelFumblerooski = ToggleContextMenuOption.ContextData("Cancel Fumblerooski on next move", ActionIcon.FUMBLEROOSKI_CANCEL) {
-                            actionProvider.nextFumblerooskiCommand(player, Cancel)
-                        }
+                        // Both commands only vary with which player is toggling Fumblerooski;
+                        // everything else they touch is read live at click time. See [UiAction].
+                        val useFumblerooski = ToggleContextMenuOption.ContextData(
+                            "Use Fumblerooski when moving next",
+                            ActionIcon.FUMBLEROOSKI_USE,
+                            UiAction(Pair("useFumblerooski", player.id)) {
+                                val uiController = acc.uiController
+                                // We need to reset the UI decoration at the correct place when Undo'ing actions
+                                uiController.uiDecorations.registerUndo(uiController.gameController.currentActionIndex()) {
+                                    actionProvider.nextFumblerooskiCommand(player, null)
+                                }
+                                actionProvider.nextFumblerooskiCommand(player, Confirm)
+                            },
+                        )
+                        val cancelFumblerooski = ToggleContextMenuOption.ContextData(
+                            "Cancel Fumblerooski on next move",
+                            ActionIcon.FUMBLEROOSKI_CANCEL,
+                            UiAction(Pair("cancelFumblerooski", player.id)) {
+                                actionProvider.nextFumblerooskiCommand(player, Cancel)
+                            },
+                        )
                         it.copy(
                             contextMenuOptions = it.contextMenuOptions.add(
                                 ToggleContextMenuOption(
@@ -181,7 +194,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Stand-Up",
-                                { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
+                                moveTypeAction(actionProvider, MoveType.STAND_UP),
                                 ActionIcon.STAND_UP
                             )
                         )
@@ -242,7 +255,8 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
             .forEach { loc ->
                 acc.updateSquare(loc) {
                     it.copy(
-                        selectedAction = {
+                        // The body only varies with `loc`, so that is the whole key. See [UiAction].
+                        selectedAction = UiAction(Pair("standUpThenMoveTo", loc)) {
                             actionProvider.registerQueuedActionGenerator { controller ->
                                 val availableActions = controller.getAvailableActions()
                                 val canMove = availableActions.contains(MoveType.STANDARD)

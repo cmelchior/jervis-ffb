@@ -25,6 +25,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.dialogs.PrimaryActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -53,9 +54,9 @@ data class PitchLayoutCoordinates(
  *  find a way to remove this.
  */
 data class UiPlayerTransientData(
-    val onHover: (() -> Unit)?,
-    val onHoverExit: (() -> Unit)?,
-    val onSecondaryClick: (() -> Unit)? = null,
+    val onHover: UiAction?,
+    val onHoverExit: UiAction?,
+    val onSecondaryClick: UiAction? = null,
 )
 
 /**
@@ -67,7 +68,7 @@ data class UiPathFinderData(
     // This number will override `moveUsed` if present
     val futureMoveDistance: Int,
     // Action triggered if this square is selected.
-    val hoverAction: () -> Unit,
+    val hoverAction: UiAction,
 )
 
 /**
@@ -167,7 +168,7 @@ class PitchViewModel(
                     }
 
                     // Create the action triggered if clicking the mouse-over square.
-                    val action = {
+                    val action = UiAction(Triple(path, requiresStandingUp, activePlayer.id)) {
                         val actionProvider = (uiState.actionProvider)
                         fun getQueuedActionsForPath(): QueuedActionsResult {
                             // If the player is using Fumblerooski we have disabled the Pathfinder
@@ -236,8 +237,18 @@ class PitchViewModel(
 
     fun observeSnapshot(): Flow<UiGameSnapshot>  = uiState.uiStateFlow
 
+    /**
+     * The state of every square on the pitch, paired with the player standing
+     * on it (if any).
+     *
+     * Deliberately does not depend on [highlights]: hover state changes on
+     * every mouse-square crossing, and combining it in here would re-emit a
+     * new 390-entry map each time. Layers that do need hover collect
+     * [highlights] directly.
+     * See [com.jervisffb.ui.game.view.pitch.PitchHoverUnderlayLayer]
+     */
     fun observePitch(): Flow<Map<PitchCoordinate, Pair<UiPitchSquare, UiPitchPlayer?>>> {
-        return combine(highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
+        return uiState.uiStateFlow.map { uiSnapshot ->
             uiSnapshot.squares.map {
                 it.key to Pair(it.value, uiSnapshot.players[it.value.player])
             }.toMap()

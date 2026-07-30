@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.starting.StartGameComponent
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +21,8 @@ import kotlinx.coroutines.flow.Flow
  */
 @Composable
 fun StartP2PGamePage(
-    homeTeam: Flow<Team?>,
-    awayTeam: Flow<Team?>,
+    homeTeam: Flow<ModelRef<Team>?>,
+    awayTeam: Flow<ModelRef<Team>?>,
     onAcceptGame: (Boolean) -> Unit,
 ) {
     Column(

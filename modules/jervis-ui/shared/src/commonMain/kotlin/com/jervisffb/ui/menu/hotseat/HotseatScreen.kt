@@ -91,7 +91,9 @@ fun PageContent(viewModel: HotseatScreenModel) {
                 1 -> SelectHotseatTeamScreen(viewModel.selectHomeTeamModel)
                 2 -> SelectHotseatTeamScreen(viewModel.selectAwayTeamModel)
                 3 -> StartHotseatGamePage(
-                    viewModel.selectedHomeTeam.map { it?.teamData },
+                    viewModel.selectedHomeTeam.map {
+                        it?.teamData
+                    },
                     viewModel.selectedAwayTeam.map { it?.teamData },
                     onAcceptGame = { acceptedGame ->
                         viewModel.startGame()

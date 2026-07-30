@@ -25,9 +25,9 @@ import com.jervisffb.ui.menu.GameScreenModel
 @Composable
 fun PlayerContextMenuDialog(
     vm: GameScreenModel,
-    player: UiPlayerCard
+    playerData: UiPlayerCard
 ) {
-    val borderColor = when (player.model.isOnHomeTeam()) {
+    val borderColor = when (playerData.player.model.isOnHomeTeam()) {
         true -> JervisTheme.homeTeamColor
         false -> JervisTheme.awayTeamColor
     }
@@ -43,7 +43,7 @@ fun PlayerContextMenuDialog(
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
-            PlayerEditorCard(vm, player)
+            PlayerEditorCard(vm, playerData)
         }
     }
 }

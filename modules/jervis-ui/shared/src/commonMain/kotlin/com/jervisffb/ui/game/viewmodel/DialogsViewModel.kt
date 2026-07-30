@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,7 +24,7 @@ class DialogsViewModel(
         uiState.userSelectedAction(action)
     }
     val dialogData: Flow<UserInputDialog?> = uiState.uiStateFlow.map { it.dialogInput }
-    val contextMenu: Flow<Player?> = screenViewModel.contextMenuFlow.onEach {
+    val contextMenu: Flow<ModelRef<Player>?> = screenViewModel.contextMenuFlow.onEach {
         if (it != null) {
             screenViewModel.sharedPitchData.pointerBus.notifyExitPitch()
         }

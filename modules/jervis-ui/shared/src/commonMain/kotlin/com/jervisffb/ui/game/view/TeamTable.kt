@@ -56,6 +56,7 @@ import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
@@ -79,7 +80,8 @@ private val col12Width = 60.dp // Cost
 private val totalWidth = col1Width + col2Width + col3Width + col4Width + col5Width + col6Width + col7Width + col8Width + col9Width + col10Width + col11Width + col12Width
 
 @Composable
-fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
+fun TeamTable(width: Dp, team: ModelRef<Team>, isOnHomeTeam: Boolean) {
+    val team = remember(team) { team.model }
     Column(modifier = Modifier.width(width).background(Color.Transparent)) {
         TeamTableWrapper(team.name)
         TeamTableHeader()
@@ -87,34 +89,34 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
             TeamTableRow(
                 isOnHomeTeam = isOnHomeTeam,
                 rowNo = index,
-                player.number.value,
-                player,
-                listOf(player.name, player.position.titleSingular),
-                player.move,
-                player.strength,
-                player.agility,
-                player.passing,
-                player.armorValue,
-                listOf(player.positionSkills.map { it.name }, player.extraSkills.map { it.name }),
-                Pair(player.missNextGame, player.nigglingInjuries),
-                player.starPlayerPoints,
-                player.cost
+                no = player.number.value,
+                player = ModelRef(player.id, player),
+                nameAndPosition = listOf(player.name, player.position.titleSingular),
+                ma = player.move,
+                st = player.strength,
+                ag = player.agility,
+                pa = player.passing,
+                av = player.armorValue,
+                skills = listOf(player.positionSkills.map { it.name }, player.extraSkills.map { it.name }),
+                injury = Pair(player.missNextGame, player.nigglingInjuries),
+                spp = player.starPlayerPoints,
+                cost = player.cost
             )
         }
         TeamTableDivider()
         TeamInfoSection(
-            team.id,
-            team.coach.name,
-            team.roster.name,
-            team.rerolls.size,
-            team.dedicatedFans,
-            team.assistantCoaches,
-            team.cheerleaders,
-            team.apothecaries,
-            team.treasury,
-            team.teamValue,
-            team.currentTeamValue,
-            team.teamLogo ?: team.roster.logo
+            team = team.id,
+            coachName = team.coach.name,
+            roster = team.roster.name,
+            rerolls = team.rerolls.size,
+            dedicatedFanFactor = team.dedicatedFans,
+            assistantCoaches = team.assistantCoaches,
+            cheerleaders = team.cheerleaders,
+            apothecary = team.apothecaries,
+            treasury = team.treasury,
+            teamValue = team.teamValue,
+            currentTeamValue = team.currentTeamValue,
+            icon = team.teamLogo ?: team.roster.logo
         )
         Spacer(modifier = Modifier.height(3.dp))
         SpecialRulesSection(
@@ -272,7 +274,7 @@ private fun TeamTableRow(
     isOnHomeTeam: Boolean,
     rowNo: Int,
     no: Int,
-    player: Player,
+    player: ModelRef<Player>,
     nameAndPosition: List<String>,
     ma: Int,
     st: Int,
@@ -495,12 +497,12 @@ private fun TeamTableCellText(text: String, width: Dp, center: Boolean = true) {
 }
 
 @Composable
-private fun TeamTableCellIcon(player: Player, isOnHomeTeam: Boolean, width: Dp, center: Boolean = true) {
+private fun TeamTableCellIcon(player: ModelRef<Player>, isOnHomeTeam: Boolean, width: Dp, center: Boolean = true) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(player) {
         scope.launch {
-            imageBitmap = IconFactory.loadPlayerSprite(player, isOnHomeTeam).default
+            imageBitmap = IconFactory.loadPlayerSprite(player.model, isOnHomeTeam).default
         }
     }
     Box(
@@ -511,7 +513,7 @@ private fun TeamTableCellIcon(player: Player, isOnHomeTeam: Boolean, width: Dp, 
                 // TODO Need to check this on a non-retina screen
                 modifier = Modifier.aspectRatio(1f).fillMaxSize().graphicsLayer(scaleX = 2f, scaleY = 2f),
                 bitmap = imageBitmap!!,
-                contentDescription = player.name,
+                contentDescription = player.model.name,
                 contentScale = ContentScale.None,
             )
         }

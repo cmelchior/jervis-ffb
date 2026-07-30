@@ -11,6 +11,7 @@ import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.model.UiPitchPlayer
+import com.jervisffb.ui.game.model.UiPlayerAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 import com.jervisffb.ui.menu.GameScreenModel
@@ -24,8 +25,9 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
-            val selectedAction = { screenModel: GameScreenModel, player: UiPitchPlayer ->
-                actionProvider.userActionSelected(PlayerSelected(playerId))
+            val action = PlayerSelected(playerId)
+            val selectedAction = UiPlayerAction(action) { _: GameScreenModel, _: UiPitchPlayer ->
+                actionProvider.userActionSelected(action)
             }
 
             val playerLocation = state.getPlayerById(playerId).location

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.TeamTable
 import com.jervisffb.ui.game.view.utils.TitleBorder
@@ -41,11 +42,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ColumnScope.StartGameComponent(
-    homeTeam: Flow<Team?>,
-    awayTeam: Flow<Team?>,
+    homeTeam: Flow<ModelRef<Team>?>,
+    awayTeam: Flow<ModelRef<Team>?>,
 ) {
-    val homeTeam: Team? by homeTeam.collectAsState(null)
-    val awayTeam: Team? by awayTeam.collectAsState(null)
+    val homeTeam by homeTeam.collectAsState(null)
+    val awayTeam by awayTeam.collectAsState(null)
 
     val pagerStateTop = rememberPagerState(0) { 2 }
     val tabs = listOf("Home Team", "Away Team")
@@ -111,7 +112,7 @@ fun ColumnScope.StartGameComponent(
 }
 
 @Composable
-private fun PagerScope.TeamData(team: Team?, isOnHomeTeam: Boolean = true) {
+private fun PagerScope.TeamData(team: ModelRef<Team>?, isOnHomeTeam: Boolean = true) {
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,

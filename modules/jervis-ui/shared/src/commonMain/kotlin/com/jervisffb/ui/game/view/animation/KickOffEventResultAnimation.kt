@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -79,10 +78,14 @@ fun KickOffEventResultAnimation(vm: PitchViewModel, animation: KickOffEventAnima
             .fillMaxSize()
             .padding(64.dp)
             .graphicsLayer {
+                // Alpha is set here rather than with `Modifier.alpha` so the fade-out only
+                // invalidates the draw phase. `clip` reproduces `Modifier.alpha`, which clips
+                // implicitly whenever it creates a compositing layer.
                 scaleX = scale
                 scaleY = scale
                 this.translationY = translationY
+                this.alpha = alpha
+                clip = alpha != 1f
             }
-            .alpha(alpha)
     )
 }

@@ -193,4 +193,7 @@ fresh clone usually resolve after the first successful build.
 - When modeling concepts in the `core` module, we strive to only use interfaces
   with their actual implementations being in the `rules-*` modules. This way
   it is easier to add or remove new variants.
-
+- UI callbacks created outside a @Composable function be wrapped in an 
+  UiAction to improve compose skipping.
+- Classes used in Compose should wrap model `Team` and `Player` references in a
+  `ModelRef` wrapper to improve compose skipping.

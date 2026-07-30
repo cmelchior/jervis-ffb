@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
 object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
@@ -28,9 +29,10 @@ object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
             acc.addUnknownAction(DirectionSelected(outOfBounds))
         } else {
             descriptor.directions.forEach { direction ->
+                val action = DirectionSelected(direction)
                 acc.updateSquare(origin.move(direction, 1)) {
                     it.copy(
-                        selectedAction = { actionProvider.userActionSelected(DirectionSelected(direction)) },
+                        selectedAction = UiAction(action) { actionProvider.userActionSelected(action) },
                         selectableDirection = direction
                     )
                 }

@@ -121,7 +121,14 @@ fun FanFactorResultAnimation(
         modifier = Modifier
             .fillMaxSize()
             .padding(64.dp)
-            .alpha(alpha),
+            .graphicsLayer {
+                // All the animated alphas below are set inside `graphicsLayer` rather than with
+                // `Modifier.alpha`, so that animating them only invalidates the draw phase. `clip`
+                // reproduces `Modifier.alpha`, which clips implicitly whenever it creates a
+                // compositing layer.
+                this.alpha = alpha
+                clip = alpha != 1f
+            },
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -129,7 +136,10 @@ fun FanFactorResultAnimation(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .alpha(nameAlpha),
+                    .graphicsLayer {
+                        this.alpha = nameAlpha
+                        clip = nameAlpha != 1f
+                    },
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -155,8 +165,11 @@ fun FanFactorResultAnimation(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(modifier = Modifier
-                    .graphicsLayer { translationX = homeFansOffsetX }
-                    .alpha(homeFansAlpha)
+                    .graphicsLayer {
+                        translationX = homeFansOffsetX
+                        this.alpha = homeFansAlpha
+                        clip = homeFansAlpha != 1f
+                    }
                     .background(JervisTheme.black)
                     .padding(16.jdp)
                 ) {
@@ -169,8 +182,11 @@ fun FanFactorResultAnimation(
                     modifier = Modifier.alpha(0f).padding(horizontal = 64.jdp).alpha(0f), text = "VS", size = 48.jsp
                 )
                 Box(modifier = Modifier
-                    .graphicsLayer { translationX = awayFansOffsetX }
-                    .alpha(awayFansAlpha)
+                    .graphicsLayer {
+                        translationX = awayFansOffsetX
+                        this.alpha = awayFansAlpha
+                        clip = awayFansAlpha != 1f
+                    }
                     .background(JervisTheme.black)
                     .padding(16.jdp)
                 ) {

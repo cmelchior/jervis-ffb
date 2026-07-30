@@ -30,9 +30,12 @@ data class UiKeywordData(
 )
 
 class UiPlayerCard(
-    val model: Player
+    val player: ModelRef<Player>
 ) {
-    val color = when (model.isOnHomeTeam()) {
+    val model: Player
+        get() = player.model
+
+    val color = when (player.model.isOnHomeTeam()) {
         true -> JervisTheme.homeTeamColor
         false -> JervisTheme.awayTeamColor
     }
@@ -48,8 +51,8 @@ class UiPlayerCard(
         return skillSettings.getAvailableSkills(category)
             .sortedBy { it.name }
             .flatMap { factory ->
-                val rosterSkill = model.positionSkills.filter { it.type == factory.type }
-                val extraSkill = model.extraSkills.filter { it.type == factory.type }
+                val rosterSkill = player.model.positionSkills.filter { it.type == factory.type }
+                val extraSkill = player.model.extraSkills.filter { it.type == factory.type }
                 val options = when (factory) {
                     is IntAdjustmentSkillFactory -> IntAdjustmentOptions((1..6).toList())
                     is IntTargetSkillFactory -> IntTargetOptions((1..6).toList())
@@ -110,17 +113,17 @@ class UiPlayerCard(
             SkillCategory.SPECIAL_RULES,
         )
         // Skills that are unavailble according to the rules, but we still want to have the option of selecting them
-        val unavailableSkills = categoryList.minus((model.position.primary + model.position.secondary).toSet())
-        val skillSettings = model.team.game.rules.skillSettings
+        val unavailableSkills = categoryList.minus((player.model.position.primary + player.model.position.secondary).toSet())
+        val skillSettings = player.model.team.game.rules.skillSettings
         val skillList = buildList {
-            val primarySkills = model.position.primary.map { skillCategory ->
+            val primarySkills = player.model.position.primary.map { skillCategory ->
                 val description = skillCategory.description + " (Primary)"
                 val skills = getSkills(skillSettings, skillCategory)
                 description to skills
             }
             addAll(primarySkills)
 
-            val secondarySkills = model.position.secondary.map { skillCategory ->
+            val secondarySkills = player.model.position.secondary.map { skillCategory ->
                 val description = skillCategory.description + " (Secondary)"
                 val skills = getSkills(skillSettings, skillCategory)
                 description to skills
@@ -142,7 +145,7 @@ class UiPlayerCard(
             UiKeywordData(
                 name = it.description,
                 keyword = it,
-                isEnabled = model.keywords.contains(it)
+                isEnabled = player.model.keywords.contains(it)
             )
         }
     }

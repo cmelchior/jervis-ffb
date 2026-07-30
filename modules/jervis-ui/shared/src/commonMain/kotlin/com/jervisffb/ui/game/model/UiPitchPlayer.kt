@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.model
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Player
@@ -20,7 +21,13 @@ import com.jervisffb.ui.menu.GameScreenModel
  * Squares themselves are represented by [UiPitchSquare].
  *
  * Right now, this class is used for both On-Pitch and Off-Pitch players.
+ *
+ * See [UiPitchSquare] for why the stability annotation is needed. [Stable]
+ * rather than `@Immutable` because of [isTemporarySelected], which is genuinely
+ * mutable - but it is a snapshot state, so mutating it notifies composition,
+ * and being a body property it stays out of `equals`.
  */
+@Stable
 data class UiPitchPlayer(
     val id: PlayerId,
     val location: Location,
@@ -61,7 +68,7 @@ data class UiPitchPlayer(
         ),
         hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnPitch(model.team.game.rules)
     )
-    val isTemporarySelected = mutableStateOf<Boolean>(false)
+    val isTemporarySelected = mutableStateOf(false)
     val isSelectable = (selectedAction != null)
     val isProne: Boolean = (state == PlayerPitchState.PRONE)
     val isStunned: Boolean = (state == PlayerPitchState.STUNNED || state == PlayerPitchState.STUNNED_OWN_TURN)

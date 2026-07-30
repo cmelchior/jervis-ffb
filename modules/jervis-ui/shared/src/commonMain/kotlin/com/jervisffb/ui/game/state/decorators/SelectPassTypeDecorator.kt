@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.actions.punt.PuntAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
@@ -55,12 +56,13 @@ object SelectPassTypeDecorator : PitchActionDecorator<SelectPassType> {
                 PassType.HAIL_MARY_PASS -> "Throw a Hail Mary" to ActionIcon.HAIL_MARY_PASS
                 PassType.PUNT -> "Punt Ball" to ActionIcon.PUNT
             }
+            val action = PassTypeSelected(passType)
             acc.updateSquare(coordinates) {
                 it.copy(
                     contextMenuOptions = it.contextMenuOptions.add(
                         SimpleContextMenuOption(
                             title,
-                            { actionProvider.userActionSelected(PassTypeSelected(passType)) },
+                            UiAction(action) { actionProvider.userActionSelected(action) },
                             icon
                         )
                     )

@@ -34,6 +34,7 @@ import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.view.JervisTheme
@@ -145,7 +146,12 @@ class GameScreenModel(
     val awayTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
     val awayTeamData: LoadingTeamInfo
     private val _contextMenuFlow  = MutableSharedFlow<PlayerId?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val contextMenuFlow: Flow<Player?> = _contextMenuFlow.map { it?.let { uiState.state.getPlayerById(it) } }
+    val contextMenuFlow: Flow<ModelRef<Player>?> = _contextMenuFlow.map {
+        it?.let { playerId ->
+            val player = uiState.state.getPlayerById(playerId)
+            ModelRef(playerId, player)
+        }
+    }
     val uiState: UiGameController = UiGameController(
         uiClientType,
         uiMode,
@@ -240,7 +246,11 @@ class GameScreenModel(
                 if (team.isHomeTeam()) homeSidePlayer else awaySidePlayer
             }
             .distinctUntilChanged { oldPlayer, newPlayer -> oldPlayer?.id == newPlayer?.id }
-            .map { player -> player?.let(::UiPlayerCard) }
+            .map { player ->
+                player?.let {
+                    UiPlayerCard(player = ModelRef(it.id, it))
+                }
+            }
 
     fun dismissPlayerStatCard() {
         playerStatCardDismissed.value = true

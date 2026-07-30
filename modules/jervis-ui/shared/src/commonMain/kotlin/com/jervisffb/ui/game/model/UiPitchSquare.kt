@@ -13,6 +13,14 @@ import kotlinx.collections.immutable.persistentListOf
 /**
  * Represents all information needed to render a single square on the pitch.
  * Note, players are represented by [UiPitchPlayer].
+ *
+ * WARNING when modifying this class.
+ * A fresh instance of every square is built for each game snapshot, so Compose
+ * has to be able to compare two of them by value to skip the ~390 squares that
+ * did not change. This means:
+ *
+ * - every property must stay a `val`, and every update must go through [copy].
+ * - action handlers must be [UiAction]s, not raw lambdas.
  */
 data class UiPitchSquare(
     val coordinates: PitchCoordinate,
@@ -26,12 +34,12 @@ data class UiPitchSquare(
     val directionSelected: Direction? = null, // Show a direction arrow in its selected state
     // If negative, it means the defender has more strength. If positive, it means the attacker has more strength.
     val requiresRoll: Boolean = false, // onSelected is not-null but will result in dice being rolled
-    val selectedAction: (() -> Unit)? = null, // Action if square is selected
-    val onMenuHidden: (() -> Unit)? = null, // Action if the context menu is hidden
+    val selectedAction: UiAction? = null, // Action if square is selected
+    val onMenuHidden: UiAction? = null, // Action if the context menu is hidden
     val isActionWheelFocus: Boolean = false,
     val canHideContextMenu: Boolean = false,
-    var showContextMenu: Boolean = false, // The context menu is automatically opened
-    var contextMenuOptions: PersistentList<ContextMenuOption> = persistentListOf() // The options inside the context menu
+    val showContextMenu: Boolean = false, // The context menu is automatically opened
+    val contextMenuOptions: PersistentList<ContextMenuOption> = persistentListOf() // The options inside the context menu
 ) {
     val useActionWheel = true // Whether to use a Context Menu or Action Wheel for the context items
     fun isEmpty() = !isBallOnGround && player == null

@@ -135,7 +135,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         val teamInfo = if (team.teamData == null) {
             HostedTeamInfo(team.teamId)
         } else {
-            P2PTeamInfo(SerializedTeam.serialize(team.teamData))
+            P2PTeamInfo(SerializedTeam.serialize(team.teamData.model))
         }
         send(TeamSelectedMessage(teamInfo))
     }

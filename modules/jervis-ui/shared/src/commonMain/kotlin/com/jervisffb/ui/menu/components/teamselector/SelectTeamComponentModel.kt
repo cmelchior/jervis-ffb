@@ -13,6 +13,7 @@ import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.components.TeamInfo
@@ -98,7 +99,7 @@ class SelectTeamComponentModel(
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,
             logo = logo,
-            teamData = team
+            teamData = ModelRef(team.id, team)
         )
     }
 
@@ -108,7 +109,7 @@ class SelectTeamComponentModel(
             onTeamSelected(null)
         } else {
             selectedTeam.value = team.also {
-                it.teamData?.coach = getCoach()
+                it.teamData?.model?.coach = getCoach()
             }
             onTeamSelected(team)
         }

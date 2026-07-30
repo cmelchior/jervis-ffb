@@ -17,6 +17,7 @@ import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -137,7 +138,7 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
                     teamValue = homeTeam.teamValue,
                     rerolls = homeTeam.rerolls.size,
                     logo = homeTeamLogo,
-                    teamData = homeTeam
+                    teamData = ModelRef(homeTeam.id, homeTeam)
                 )
                 selectedAwayTeam.value = TeamInfo(
                     teamId = awayTeam.id,
@@ -148,7 +149,7 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
                     teamValue = awayTeam.teamValue,
                     rerolls = awayTeam.rerolls.size,
                     logo = awayTeamLogo,
-                    teamData = awayTeam
+                    teamData = ModelRef(awayTeam.id, awayTeam)
                 )
                 sidebarEntries[0] = sidebarEntries[0].copy(state = SideBarEntryState.DONE_AVAILABLE, onClick = { goBackToPage(0) })
                 sidebarEntries[1] = sidebarEntries[1].copy(state = SideBarEntryState.NOT_READY)
@@ -203,9 +204,9 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
         val rules = setupGameModel.createRules()
         val homeCoachType = selectHomeTeamModel.setupCoachModel.coachType.value
         val awayCoachType = selectAwayTeamModel.setupCoachModel.coachType.value
-        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value, homeCoachType)
-        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value, awayCoachType)
-        val game = Game(rules, homeTeam, awayTeam, Pitch.Companion.createForRuleset(rules))
+        homeTeam.model.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value, homeCoachType)
+        awayTeam.model.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value, awayCoachType)
+        val game = Game(rules, homeTeam.model, awayTeam.model, Pitch.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, saveGameData?.actions ?: emptyList())
 
         val homeActionProvider = when (homeCoachType) {

@@ -258,7 +258,13 @@ fun MultipleSelectUserActionDialog(
 fun ActionWheelDialog(
     uiState: ActionWheelUiState,
     pitchVm: PitchViewModel,
-    pitchData: PitchViewData,
+    // Passed as a provider rather than a value: the pitch layout is measured in
+    // `Pitch`, which writes the result back during the layout phase. Reading it
+    // in composition would mean layout back-writes into composition, scheduling
+    // an extra pass of every action wheel layer on each pitch layout. It is
+    // only ever needed inside `offsetDelegate`, which runs from an effect, so
+    // the read can safely be deferred to there.
+    pitchDataProvider: () -> PitchViewData,
     // We need to know the "primary wheel" as only the primary wheel are allowed
     // to send `notifyUiHandledActionWheelEvent` events back to the ViewModel.
     // This boolean is an ugly way of doing it, but it works for now.
@@ -297,6 +303,7 @@ fun ActionWheelDialog(
                     if (state?.ringAnimationMode.isHiding()) {
                         return@ActionWheel
                     }
+                    val pitchData = pitchDataProvider()
                     val center = uiState.center
                     if (center == null) {
                         offset = IntOffset(

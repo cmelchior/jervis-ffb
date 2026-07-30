@@ -28,7 +28,7 @@ data class RosterPosition(
     override val strength: Int,
     override val agility: Int,
     override val passing: Int?,
-    override var armorValue: Int,
+    override val armorValue: Int,
     override val skills: List<SkillId>,
     override val primary: List<SkillCategory>,
     override val secondary: List<SkillCategory>,

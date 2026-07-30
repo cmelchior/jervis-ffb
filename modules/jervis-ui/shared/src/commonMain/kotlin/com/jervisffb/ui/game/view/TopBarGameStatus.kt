@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
@@ -212,7 +213,18 @@ fun GameStatusMessage(viewModel: GameStatusViewModel) {
     // Message box with a "brush" background
     // Attempt to align it so it looks on the line with the team features row
     Box(
-        modifier = Modifier.fillMaxWidth().height(145.jdp).alpha(alpha.value),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(145.jdp)
+            .graphicsLayer {
+                // Alpha is set here rather than with `Modifier.alpha` so the fade only invalidates the
+                // draw phase - otherwise every frame would rebuild the chalk `ShaderBrush` and the fade
+                // `drawWithContent` below. `clip` reproduces `Modifier.alpha`, which clips implicitly
+                // whenever it creates a compositing layer.
+                this.alpha = alpha.value
+                clip = alpha.value != 1f
+            }
+        ,
         contentAlignment = Alignment.BottomCenter
     ) {
         val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)

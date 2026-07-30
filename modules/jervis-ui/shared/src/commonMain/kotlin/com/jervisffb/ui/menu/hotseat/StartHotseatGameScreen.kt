@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.starting.StartGameComponent
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun StartHotseatGamePage(
-    homeTeam: Flow<Team?>,
-    awayTeam: Flow<Team?>,
+    homeTeam: Flow<ModelRef<Team>?>,
+    awayTeam: Flow<ModelRef<Team>?>,
     onAcceptGame: (Boolean) -> Unit,
 ) {
     Column(
