@@ -1,5 +1,6 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -15,6 +16,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType.LONER
 import com.jervisffb.engine.rules.common.skills.SkillType.MIGHTY_BLOW
 import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.rules.common.skills.SkillType.PREHENSILE_TAIL
+import com.jervisffb.engine.rules.common.skills.SkillType.STAB
+import com.jervisffb.engine.rules.common.skills.SkillType.STRIP_BALL
 import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
 import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.sprites.SingleSprite
@@ -33,10 +36,10 @@ val SKAVEN_LINEMAN =
         50_000,
         7, 3, 3, 4, 8,
         emptyList(),
-        listOf(SkillCategory.GENERAL),
+        listOf(SkillCategory.GENERAL, SkillCategory.DEVIOUS),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.SKAVEN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_lineman.png", 9),
         SingleSprite.ini("${portraitRootPath}/skaven_lineman.png")
@@ -53,9 +56,9 @@ val SKAVEN_THROWER =
         7, 3, 3, 2, 8,
         listOf(PASS.id(), SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
-        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.DEVIOUS, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.SKAVEN, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_thrower.png", 2),
         SingleSprite.ini("${portraitRootPath}/skaven_thrower.png")
@@ -63,17 +66,17 @@ val SKAVEN_THROWER =
 val GUTTER_RUNNER =
     RosterPosition(
         PositionId("skaven-gutter-runner"),
-        4,
+        2,
         "Gutter Runners",
         "Gutter Runner",
         "Gr",
         85_000,
         9, 2, 2, 4, 8,
-        listOf(DODGE.id()),
-        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
-        listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        listOf(DODGE.id(), STAB.id()),
+        listOf(SkillCategory.AGILITY, SkillCategory.DEVIOUS, SkillCategory.GENERAL),
+        listOf(SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.SKAVEN, PlayerKeyword.RUNNER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_gutterrunner.png", 4),
         SingleSprite.ini("${portraitRootPath}/skaven_gutterrunner.png")
@@ -81,17 +84,17 @@ val GUTTER_RUNNER =
 val SKAVEN_BLITZER =
     RosterPosition(
         PositionId("skaven-blitzer"),
-        4,
+        2,
         "Blitzers",
         "Blitzer",
         "B",
         90_000,
-        7, 3, 3, 5, 9,
-        listOf(BLOCK.id()),
+        8, 3, 3, 4, 9,
+        listOf(BLOCK.id(), STRIP_BALL.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
-        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
+        listOf(SkillCategory.AGILITY, SkillCategory.DEVIOUS, SkillCategory.MUTATIONS),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.SKAVEN, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/skaven_blitzer.png", 2),
         SingleSprite.ini("${portraitRootPath}/skaven_blitzer.png")
@@ -104,7 +107,7 @@ val RAT_OGRE =
         "Rat Ogre",
         "Ros",
         150_000,
-        6, 5, 4, null, 9,
+        6, 5, 4, 6, 9,
         listOf(
             ANIMAL_SAVAGERY.id(),
             FRENZY.id(),
@@ -115,18 +118,17 @@ val RAT_OGRE =
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.SKAVEN, PlayerKeyword.BIG_GUY),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/skaven_ratogre.png", 1),
         SingleSprite.ini("${portraitRootPath}/skaven_ratogre.png")
     )
 
-// Page 116 in the rulebook
 @Serializable
 val SKAVEN_TEAM_BB2025 = Roster(
     id = RosterId("jervis-skaven"),
     name = "Skaven Team",
-    tier = 1,
+    tier = 2,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
