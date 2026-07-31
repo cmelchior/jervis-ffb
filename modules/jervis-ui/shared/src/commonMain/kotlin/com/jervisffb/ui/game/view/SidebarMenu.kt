@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.menu.SidebarEntry
 
-enum class SideBarEntryState {
+enum class SidebarEntryState {
     NOT_READY, // Not available4
     DONE_NOT_AVAILABLE, // Is "done"
     DONE_AVAILABLE,
@@ -21,28 +21,28 @@ enum class SideBarEntryState {
 
 data class SidebarEntry(
     val name: String,
-    val state: SideBarEntryState = SideBarEntryState.NOT_READY,
+    val state: SidebarEntryState = SidebarEntryState.NOT_READY,
+    val alternativeBackground: Boolean = false,
     val onClick: (() -> Unit),
 )
 
 @Composable
 fun SidebarMenu(
     entries: SnapshotStateList<SidebarEntry>,
-    currentPage: Int,
 ) {
     Column(
-        modifier = Modifier.paperBackgroundWithLine(JervisTheme.rulebookBlue)
-            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp),
+        modifier = Modifier
+            .paperBackgroundWithLine(JervisTheme.rulebookBlue)
+            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp)
+        ,
     ) {
         Spacer(modifier = Modifier.fillMaxHeight(0.2f))
         Spacer(modifier = Modifier.height(16.dp))
-        entries.forEachIndexed { index, entry ->
-            val selected = (index == currentPage)
-            val isPrevious = (index < currentPage)
-            // val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
+        entries.forEach { entry ->
             SidebarEntry(
                 text = entry.name.uppercase(),
                 state = entry.state,
+                alternativeBackground = entry.alternativeBackground,
                 onClick = entry.onClick,
             )
         }

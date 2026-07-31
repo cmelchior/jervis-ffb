@@ -166,3 +166,4 @@ List of other Blood Bowl resources that inspired this project.
 - [Fantasy Football (FUMBBL)](https://github.com/christerk/ffb)
 - [FUMBBL Datasets](https://github.com/gsverhoeven/fumbbl_datasets)
 - [BotBowl](https://njustesen.github.io/botbowl/)
+- [Blood Bowl Challenges](https://bbtactics.com/strategy/articles/challenges/)

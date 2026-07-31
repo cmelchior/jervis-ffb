@@ -98,7 +98,7 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
                     }
                     isAutoUpdateAvailable -> {
                         JervisButton(
-                            text = "Check for Update",
+                            text = "Check for Updates",
                             enabled = !isCheckForUpdateInProgress,
                             onClick = {
                                 isCheckForUpdateInProgress = true
@@ -207,6 +207,18 @@ private fun ColumnScope.CreditDialogContent(
         }
         Row {
             CreditLabel(
+                "Contributors:",
+                "",
+                textColor
+            )
+            Spacer(modifier = Modifier.width(columnSpace))
+            CreditText(
+                data.jervisDevelopers.joinToString(", "),
+                textColor
+            )
+        }
+        Row {
+            CreditLabel(
                 "Disclaimer:",
                 "",
                 textColor
@@ -243,8 +255,20 @@ private fun ColumnScope.CreditDialogContent(
         }
         Row {
             CreditLabel(
+                "Trophy Icon Credits:",
+                "Original icons modified by Ilios.",
+                textColor
+            )
+            Spacer(modifier = Modifier.width(columnSpace))
+            CreditText(
+                "\"Pixel Art Trophies for Competition\", by Lugon Studio. Published on https://www.vecteezy.com/ under the Vecteezy Free License.",
+                textColor
+            )
+        }
+        Row {
+            CreditLabel(
                 "Material Design Icons",
-                "Several icons used in the UI come from the Material Design Icons: Arrows, Back, Copy, Folder, Settings, Undo, Open Lock, Closed Lock.",
+                "Several icons used in the UI come from the Material Design Icons: Arrows, Back, Copy, Folder, Settings, Undo, Open Lock, Closed Lock, Thumbs Up.",
                 textColor
             )
             Spacer(modifier = Modifier.width(columnSpace))

@@ -241,7 +241,7 @@ private fun ColumnScope.FrontpageMenu(viewModel: FrontpageScreenModel, navigator
                 }
                 Spacer(modifier = Modifier.weight(1f/17f))
                 Column(Modifier.weight(8f/17f)) {
-                    FrontpageMenuEntry("Challenges", { /* Not supported yet */ }, enabled = false)
+                    FrontpageMenuEntry("Challenges", { viewModel.gotoChallengesScreen(navigator) })
                 }
             }
         }

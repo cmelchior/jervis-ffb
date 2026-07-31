@@ -54,7 +54,7 @@ class FumbblScreen(private val menuViewModel: MenuViewModel, private val viewMod
 fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modifier: Modifier) {
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
-        title = "FUMBBL (Static)",
+        title = "FUMBBL (Prototype)",
         icon = Res.drawable.jervis_frontpage_mummy,
         topMenuLeftContent = {
 
@@ -118,11 +118,18 @@ fun SidebarBoxHeader(text: String, color: Color = JervisTheme.rulebookOrange) {
 }
 
 @Composable
-fun MenuSidebarButton(text: String, onClick: () -> Unit) {
+fun MenuSidebarButton(
+    text: String,
+    selected: Boolean = false,
+    onClick: () -> Unit = { }
+) {
+    val backgroundColor = if (selected) JervisTheme.white.copy(alpha = 0.3f) else JervisTheme.white.copy(alpha = 0.1f)
+    val textColor = JervisTheme.white
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(JervisTheme.white.copy(alpha = 0.1f)).clickable { onClick() }
+            .background(backgroundColor)
+            .clickable { onClick() }
             .padding(8.dp)
     ) {
         Text(
@@ -130,7 +137,7 @@ fun MenuSidebarButton(text: String, onClick: () -> Unit) {
             text = text.uppercase(),
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            color = JervisTheme.white
+            color = textColor
         )
     }
 }

@@ -47,7 +47,6 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val view
                     val currentPage by viewModel.currentPage.collectAsState()
                     SidebarMenu(
                         entries = sidebarEntries,
-                        currentPage = currentPage,
                     )
                 }
             ) {

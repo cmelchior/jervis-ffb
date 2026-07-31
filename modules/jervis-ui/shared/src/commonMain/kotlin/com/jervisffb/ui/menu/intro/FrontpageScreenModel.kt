@@ -11,6 +11,8 @@ import com.jervisffb.ui.menu.DevScreenViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.StandAloneScreen
 import com.jervisffb.ui.menu.StandAloneScreenModel
+import com.jervisffb.ui.menu.challenges.ChallengesListScreen
+import com.jervisffb.ui.menu.challenges.ChallengesListScreenModel
 import com.jervisffb.ui.menu.fumbbl.FumbblScreen
 import com.jervisffb.ui.menu.fumbbl.FumbblScreenModel
 import com.jervisffb.utils.AppUpdater
@@ -34,6 +36,9 @@ data class CreditData(
     val title: String = "Jervis Fantasy Football",
     val mainDeveloper: String = "Ilios",
     val mainDeveloperDescription: String = "",
+    val jervisDevelopers: List<String> = listOf(
+        "@michaelbaudino"
+    ),
     val clientVersion: String = BuildConfig.releaseVersion,
     val gitCommit: String = BuildConfig.gitHash,
     val fumbblDevelopers: List<String> = listOf(
@@ -41,6 +46,7 @@ data class CreditData(
         "Christer",
         "Kalimar",
         "Candlejack",
+        "Garcangel",
         "BattleLore",
         "WhatBall",
         "Garion",
@@ -136,6 +142,13 @@ class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScr
             navigator.push(StandAloneScreen(menuViewModel, viewModel))
         }
 
+    }
+
+    fun gotoChallengesScreen(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            val viewModel = ChallengesListScreenModel(menuViewModel)
+            navigator.push(ChallengesListScreen(menuViewModel, viewModel))
+        }
     }
 
     fun gotoDevModeScreen(navigator: Navigator) {

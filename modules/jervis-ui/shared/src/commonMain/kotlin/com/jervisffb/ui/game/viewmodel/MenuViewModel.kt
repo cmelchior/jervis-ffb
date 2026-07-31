@@ -145,6 +145,9 @@ class MenuViewModel {
     val isReportIssueDialogVisible: StateFlow<ReportIssueDialogData>
         field = MutableStateFlow(ReportIssueDialogData.HIDDEN)
 
+    val isNotImplementedYetDialogVisible: StateFlow<Pair<String, Boolean>>
+        field = MutableStateFlow(Pair("", false))
+
     val creditData: CreditData = CreditData()
 
     // Scope for lauching tasks directly related to navigating the UI
@@ -217,6 +220,10 @@ class MenuViewModel {
 
     fun openSettings(bool: Boolean = true) {
         isSettingsDialogVisible.value = bool
+    }
+
+    fun openNotImplementedYet(title: String, visible: Boolean = true) {
+        isNotImplementedYetDialogVisible.value = Pair(title, visible)
     }
 
     fun serializeGameState(includeDebugState: Boolean): String {

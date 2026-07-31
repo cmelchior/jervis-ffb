@@ -67,7 +67,6 @@ class P2PHostScreen(private val menuViewModel: MenuViewModel, private val viewMo
                     val currentPage by viewModel.currentPage.collectAsState()
                     SidebarMenu(
                         entries = sidebarEntries,
-                        currentPage = currentPage,
                     )
                 }
             ) {

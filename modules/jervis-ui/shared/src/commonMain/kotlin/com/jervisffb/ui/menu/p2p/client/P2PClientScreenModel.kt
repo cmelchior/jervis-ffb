@@ -22,8 +22,8 @@ import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.RemoteActionProvider
-import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.SidebarEntry
+import com.jervisffb.ui.game.view.SidebarEntryState
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
@@ -186,19 +186,19 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
     private fun gotoNextPage(nextPage: Int) {
         val currentPage = currentPage.value
         if (currentPage == 0 && nextPage == 2) {
-            sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(state = SideBarEntryState.DONE_AVAILABLE)
-            sidebarEntries[1] = sidebarEntries[1].copy(state = SideBarEntryState.DONE_NOT_AVAILABLE)
+            sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(state = SidebarEntryState.DONE_AVAILABLE)
+            sidebarEntries[1] = sidebarEntries[1].copy(state = SidebarEntryState.DONE_NOT_AVAILABLE)
         } else {
-            sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(state = SideBarEntryState.DONE_AVAILABLE)
+            sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(state = SidebarEntryState.DONE_AVAILABLE)
         }
-        sidebarEntries[nextPage] = sidebarEntries[nextPage].copy(state = SideBarEntryState.ACTIVE)
+        sidebarEntries[nextPage] = sidebarEntries[nextPage].copy(state = SidebarEntryState.ACTIVE)
         this.currentPage.value = nextPage
     }
 
     private fun goBackToPage(previousPage: Int) {
-        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(state = SideBarEntryState.ACTIVE)
+        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(state = SidebarEntryState.ACTIVE)
         for (index in previousPage + 1..currentPage.value) {
-            sidebarEntries[index] = sidebarEntries[index].copy(state = SideBarEntryState.NOT_READY)
+            sidebarEntries[index] = sidebarEntries[index].copy(state = SidebarEntryState.NOT_READY)
         }
         currentPage.value = previousPage
     }
@@ -384,7 +384,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
             return listOf(
                 SidebarEntry(
                     name = "1. Join Host",
-                    state = SideBarEntryState.ACTIVE,
+                    state = SidebarEntryState.ACTIVE,
                     onClick = { workflow.handleClientStateChange(P2PClientState.JOIN_SERVER) },
                 ),
                 SidebarEntry(

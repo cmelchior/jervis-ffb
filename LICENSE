@@ -3,6 +3,7 @@ TABLE OF CONTENTS
 1. Apache License version 2.0
 2. FFB Graphics and Sounds Components
 3. D6 Dice Icons
+4. Trophy Icons
 
 
 1. -- Apache License version 2.0 -----------------------------------------------
@@ -222,9 +223,9 @@ TABLE OF CONTENTS
 
    This includes the following:
 
-   - All images in "/modules/jervis-ui/src/commonMain/composeResources/drawable"
+   - All images in "/modules/jervis-ui/shared/src/commonMain/composeResources/drawable"
      that does not start with "jervis_".
-   - All files in "/modules/jervis-ui/src/commonMain/composeResources/files/fumbbl".
+   - All files in "/modules/jervis-ui/shared/src/commonMain/composeResources/files/fumbbl".
 
    All other assets are covered by the general Apache 2 License for the Jervis
    project.
@@ -237,5 +238,15 @@ TABLE OF CONTENTS
 
     The original brown dice icons and their color variants are covered by this
     license. This is all files found in
-    "/modules/jervis-ui/src/commonMain/composeResources/files/jervis/dice"
+    "/modules/jervis-ui/shared/src/commonMain/composeResources/files/jervis/dice"
     with a filename that starts with "d6_".
+
+ 4. -- Trophy Icons ---------------------------------------
+
+    "Pixel Art Trophies for Competition", by Lugon Studio. Published at
+    https://www.vecteezy.com/vector-art/75206528-pixel-art-trophies-for-competition
+    under the Vecteezy Free License.
+
+    This icon and its variants are found in
+    "/modules/jervis-ui/shared/src/commonMain/composeResources/drawable/" under
+    the names "jervis_icon_trophy*.png".

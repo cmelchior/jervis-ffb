@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -57,8 +60,7 @@ import com.jervisffb.shared.generated.resources.jervis_frontpage_wall_player
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_back
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.JervisTheme.fontFamily
-import com.jervisffb.ui.game.view.SideBarEntryState
+import com.jervisffb.ui.game.view.SidebarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -66,6 +68,8 @@ import com.jervisffb.ui.menu.components.JervisTooltipArea
 import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
+import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -92,10 +96,12 @@ class Line(private val p1: Point, private val p2: Point) {
 fun MenuScreenWithSidebarAndTitle(
     menuViewModel: MenuViewModel,
     title: String,
-    icon: DrawableResource,
+    icon: DrawableResource?,
+    // Content at the top, next to the "Back" arrow on the left side
     topMenuLeftContent: (@Composable RowScope.() -> Unit)? = null,
+    // Content at the top, next to the "Setting" icon on the right side
     topMenuRightContent: (@Composable RowScope.() -> Unit)? = null,
-    sidebarContent: @Composable BoxScope.() -> Unit,
+    sidebarContent: @Composable () -> Unit,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
@@ -168,6 +174,7 @@ fun MenuScreenWithSidebarAndTitle(
                     contentScale = ContentScale.FillWidth,
                 )
             }
+            null -> { /* Show nothing */ }
         }
     }
 }
@@ -242,13 +249,17 @@ fun TopbarButton(title: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable BoxScope.() -> Unit, topMenuLeftContent: @Composable (RowScope.() -> Unit)?) {
+fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable () -> Unit, topMenuLeftContent: @Composable (RowScope.() -> Unit)?) {
     Box(modifier = Modifier
         .padding(start = 16.dp)
         .width(250.dp)
         .fillMaxHeight(1f)
     ) {
-        sidebarContent()
+        Column(
+            modifier = Modifier.fillMaxHeight(0.95f)
+        ) {
+            sidebarContent()
+        }
         Row(modifier = Modifier.padding(start = 0.dp, top = 4.dp)) {
             TopbarButton(Res.drawable.jervis_icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
             topMenuLeftContent?.let { it(this) }
@@ -257,18 +268,34 @@ fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable BoxSco
 }
 
 @Composable
-fun SidebarEntry(text: String, state: SideBarEntryState, onClick: (() -> Unit)) {
-    val activeBarAlpha = if (state == SideBarEntryState.ACTIVE) 1f else 0f
-    val fontColor = when (state) {
-        SideBarEntryState.NOT_READY -> JervisTheme.white.copy(alpha = 0.7f)
-        SideBarEntryState.DONE_NOT_AVAILABLE -> JervisTheme.white
-        SideBarEntryState.DONE_AVAILABLE -> JervisTheme.white
-        SideBarEntryState.ACTIVE -> JervisTheme.rulebookOrange
+fun SidebarEntry(
+    text: String,
+    state: SidebarEntryState,
+    alternativeBackground: Boolean = false,
+    onClick: (() -> Unit)
+) {
+    val activeBarAlpha = if (state == SidebarEntryState.ACTIVE) 1f else 0f
+    val backgroundColor = when (alternativeBackground) {
+        true -> JervisTheme.rulebookBlue.darken(0.05f)
+        false -> Color.Transparent
     }
-    Column() {
+    val fontColor = when (state) {
+        SidebarEntryState.NOT_READY -> JervisTheme.white.copy(alpha = 0.7f)
+        SidebarEntryState.DONE_NOT_AVAILABLE -> JervisTheme.white
+        SidebarEntryState.DONE_AVAILABLE -> JervisTheme.white
+        SidebarEntryState.ACTIVE -> JervisTheme.rulebookOrange
+    }
+    Column {
         OrangeTitleBorder(alpha = activeBarAlpha)
         Box(
-            modifier = Modifier.fillMaxWidth().height(36.dp).let { if (state == SideBarEntryState.ACTIVE || state == SideBarEntryState.DONE_AVAILABLE) it.clickable { onClick() } else it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 36.dp)
+                .background(backgroundColor)
+                .applyIf(state == SidebarEntryState.ACTIVE || state == SidebarEntryState.DONE_AVAILABLE) {
+                    clickable { onClick() }
+                }
+            ,
             contentAlignment = Alignment.CenterStart,
         ) {
             Text(
