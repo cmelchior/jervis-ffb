@@ -1,5 +1,6 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -8,11 +9,13 @@ import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
+import com.jervisffb.engine.rules.common.skills.SkillCategory.DEVIOUS
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
 import com.jervisffb.engine.rules.common.skills.SkillType.ALWAYS_HUNGRY
 import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.common.skills.SkillType.BREAK_TACKLE
 import com.jervisffb.engine.rules.common.skills.SkillType.DODGE
 import com.jervisffb.engine.rules.common.skills.SkillType.LONER
 import com.jervisffb.engine.rules.common.skills.SkillType.MIGHTY_BLOW
@@ -23,7 +26,10 @@ import com.jervisffb.engine.rules.common.skills.SkillType.REGENERATION
 import com.jervisffb.engine.rules.common.skills.SkillType.RIGHT_STUFF
 import com.jervisffb.engine.rules.common.skills.SkillType.STUNTY
 import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
+import com.jervisffb.engine.rules.common.skills.SkillType.TAUNT
+import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
+import com.jervisffb.engine.rules.common.skills.SkillType.UNSTEADY
 import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.engine.sprites.SpriteSheet
@@ -44,34 +50,32 @@ val ORC_LINEMEN =
         "L",
         50_000,
         5, 3, 3, 4, 10,
-        emptyList(/* Animosity */),
-        listOf(GENERAL),
-        listOf(AGILITY, STRENGTH),
         emptyList(),
+        listOf(GENERAL, STRENGTH),
+        listOf(AGILITY, DEVIOUS),
         emptyList(),
+        listOf(PlayerKeyword.ORC, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_lineman.png",6),
         SingleSprite.ini("${portraitRootPath}/orc_lineman.png")
-
     )
 val ORC_THROWER =
     RosterPosition(
         PositionId("orc-thrower"),
         2,
-        "Throwers",
-        "Thrower",
+        "Orc Throwers",
+        "Orc Thrower",
         "Tr",
-        65_000,
-        5, 3, 3, 3, 9,
+        75_000,
+        6, 3, 3, 3, 9,
         listOf(
-            /* Animosity */
             PASS.id(),
             SURE_HANDS.id()
         ),
         listOf(GENERAL, PASSING),
-        listOf(AGILITY, STRENGTH),
+        listOf(AGILITY, STRENGTH, DEVIOUS),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.ORC, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_thrower.png",2),
         SingleSprite.ini("${portraitRootPath}/orc_thrower.png")
@@ -79,20 +83,20 @@ val ORC_THROWER =
 val ORC_BLITZER =
     RosterPosition(
         PositionId("orc-blitzer"),
-        4,
-        "Blitzers",
-        "Blitzer",
+        2,
+        "Orc Blitzers",
+        "Orc Blitzer",
         "B",
-        80_000,
+        85_000,
         6, 3, 3, 4, 10,
         listOf(
-            /* Animosity */
             BLOCK.id(),
+            BREAK_TACKLE.id()
         ),
-        listOf(AGILITY, GENERAL),
-        listOf(STRENGTH, PASSING),
+        listOf(GENERAL, STRENGTH),
+        listOf(AGILITY, DEVIOUS),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.ORC, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_blitzer.png", 4),
         SingleSprite.ini("${portraitRootPath}/orc_blitzer.png")
@@ -100,29 +104,32 @@ val ORC_BLITZER =
 val BIG_UN_BLOCKERS =
     RosterPosition(
         PositionId("orc-bigunblocker"),
-        4,
+        2,
         "Big Un Blockers",
         "Big Un Blocker",
         "Bu",
-        90_000,
-        5, 4, 4, null, 10,
+        95_000,
+        5, 4, 4, 6, 10,
         listOf(
-            /* Animosity */
+            MIGHTY_BLOW.idAdjustment(1),
+            THICK_SKULL.id(),
+            TAUNT.id(),
+            UNSTEADY.id()
         ),
         listOf(GENERAL, STRENGTH),
-        listOf(AGILITY),
+        listOf(AGILITY, DEVIOUS),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.ORC, PlayerKeyword.BLOCKER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_bigunblocker.png", 4),
         SingleSprite.ini("${portraitRootPath}/orc_bigunblocker.png")
     )
-val GOBLIN =
+val GOBLIN_LINEMEN =
     RosterPosition(
         PositionId("orc-goblin"),
         4,
-        "Goblins",
-        "Goblin",
+        "Goblin Linemen",
+        "Goblin Lineman",
         "G",
         40_000,
         6, 2, 3, 4, 8,
@@ -131,10 +138,10 @@ val GOBLIN =
             RIGHT_STUFF.id(),
             STUNTY.id()
         ),
-        listOf(AGILITY),
-        listOf(GENERAL, STRENGTH),
+        listOf(AGILITY, DEVIOUS),
+        listOf(GENERAL, STRENGTH, PASSING),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.GOBLIN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/orc_goblin.png", 4),
         SingleSprite.ini("${portraitRootPath}/orc_goblin.png")
@@ -160,7 +167,7 @@ val UNTRAINED_TROLL =
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL, PASSING),
         emptyList(),
-        emptyList(),
+        listOf(PlayerKeyword.TROLL, PlayerKeyword.BIG_GUY),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/orc_troll.png", 1),
         SingleSprite.ini("${portraitRootPath}/orc_troll.png")
@@ -170,7 +177,7 @@ val UNTRAINED_TROLL =
 val ORC_TEAM_BB2025 = Roster(
     id = RosterId("jervis-orc"),
     name = "Orc",
-    tier = 1,
+    tier = 2,
     numberOfRerolls = 8,
     rerollCost = 60_000,
     allowApothecary = true,
@@ -179,7 +186,7 @@ val ORC_TEAM_BB2025 = Roster(
         ORC_THROWER,
         ORC_BLITZER,
         BIG_UN_BLOCKERS,
-        GOBLIN,
+        GOBLIN_LINEMEN,
         UNTRAINED_TROLL,
     ),
     leagues = listOf(RegionalSpecialRule.BADLANDS_BRAWL),
