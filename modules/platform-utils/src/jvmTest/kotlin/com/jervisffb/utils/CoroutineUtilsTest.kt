@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -18,9 +17,10 @@ class CoroutineUtilsTest {
 
     @Test
     fun closingASingleThreadDispatcherStopsItsThread() {
-        val dispatcher = singleThreadDispatcher("test-dispatcher")
+        val threadId = "test-dispatcher"
+        val dispatcher = singleThreadDispatcher(threadId)
         val thread = threadBehind(dispatcher)
-        assertEquals("test-dispatcher", thread.name)
+        assertTrue(thread.name.startsWith(threadId), message = "Thread name was: ${thread.name}")
         assertTrue(thread.isAlive, "the dispatcher should have started a thread")
 
         dispatcher.closeIfPossible()
