@@ -13,7 +13,6 @@ import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
@@ -222,7 +221,7 @@ class NetworkFuzzTester {
         random: Random,
     ) {
         // Setup Game state and start local game loop
-        val game = Game(hostRules, hostHomeTeam, hostAwayTeam, Pitch.createForRuleset(hostRules))
+        val game = Game(hostRules, hostHomeTeam, hostAwayTeam)
         val controller = GameEngineController(game)
         controller.startManualMode(logAvailableActions = false)
         conn.send(GameStartedMessage(gameId))
@@ -257,7 +256,7 @@ class NetworkFuzzTester {
         random: Random,
     ) {
         // Setup Game state and start local game loop
-        val game = Game(clientRules, clientHomeTeam, clientAwayTeam, Pitch.createForRuleset(clientRules))
+        val game = Game(clientRules, clientHomeTeam, clientAwayTeam)
         val controller = GameEngineController(game)
         controller.startManualMode(logAvailableActions = false)
         conn.send(GameStartedMessage(gameId))

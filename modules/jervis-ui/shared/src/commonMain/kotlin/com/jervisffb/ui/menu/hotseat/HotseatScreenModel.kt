@@ -11,7 +11,6 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.ui.game.UiGameClientType
@@ -206,7 +205,7 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
         val awayCoachType = selectAwayTeamModel.setupCoachModel.coachType.value
         homeTeam.model.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value, homeCoachType)
         awayTeam.model.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value, awayCoachType)
-        val game = Game(rules, homeTeam.model, awayTeam.model, Pitch.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam.model, awayTeam.model)
         val gameController = GameEngineController(game, saveGameData?.actions ?: emptyList())
 
         val homeActionProvider = when (homeCoachType) {

@@ -69,6 +69,7 @@ import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.containsBelowBaselineChars
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.DrawableResource
@@ -351,8 +352,11 @@ fun TitleBarWithSidebar(
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
-        val padding = 16.dp.toPx()
-
+        val xPadding = 16.dp.toPx()
+        val yPadding = when (title.containsBelowBaselineChars()) {
+            true -> (16 * 1.5f).dp.toPx()
+            false -> xPadding
+        }
         val line = Line(Point(0f, size.height), Point(size.width, (size.height * (160f/280f))))
 
         drawContext.canvas.skiaCanvas.apply {
@@ -360,7 +364,7 @@ fun TitleBarWithSidebar(
             translate(0f + 282.dp.toPx(), line.getY(316.dp.toPx())) // TODO. How to translate across the line?
             rotate(-angleDegrees)
             skew(skewX, skewY)
-            this.drawTextLine(TextLine.make(title, skiaFont), padding, -padding, nativePaint)
+            this.drawTextLine(TextLine.make(title, skiaFont), xPadding, -yPadding, nativePaint)
             restore()
         }
     }

@@ -5,9 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -22,16 +24,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.utils.scalePixels
+import com.jervisffb.ui.utils.toImageBitmap
 import com.jervisffb.utils.runBlocking
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
@@ -57,21 +58,24 @@ private fun main() = singleWindowApplication {
         rules,
         createDefaultBB2020HomeTeam(rules),
         createDefaultBB2020AwayTeam(rules),
-        Pitch.createForRuleset(rules),
     )
     runBlocking {
         IconFactory.initializeFumbblMapping()
         IconFactory.initialize(density, game.homeTeam, game.awayTeam)
     }
     Box(
-        modifier = Modifier.size(48.dp).background(JervisTheme.diceBackground)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(JervisTheme.diceBackground)
+        ,
+        contentAlignment = Alignment.Center
     ) {
 
 //        PixelatedImage(
 //            painter = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
 //        )
 //        PixelatedImage(
-//            image = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
+//            image = IconFactory.getTestIcon(),
 //            size = 48.dp,
 //            scaleFactor = 2f
 //        )
@@ -212,7 +216,7 @@ fun PixelatedImage(
                 (this.size.height - scaleFactor*height/2f).roundToInt()
             ),
             dstSize = IntSize(width, height),
-            filterQuality = FilterQuality.None
+            filterQuality = FilterQuality.None,
         )
     }
 }

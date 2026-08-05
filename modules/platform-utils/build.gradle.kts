@@ -10,7 +10,11 @@ version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
-    jvm()
+    jvm {
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
 
     iosArm64()
     iosSimulatorArm64()
@@ -48,6 +52,13 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.reflections)
                 implementation(libs.conveyor.control)
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.coroutines)
             }
         }
 

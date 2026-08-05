@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -37,6 +38,7 @@ import org.jetbrains.skia.ISize
 import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
+import org.jetbrains.skia.Shader
 import org.pushingpixels.artemis.drawTextOnPath
 
 
@@ -82,7 +84,7 @@ fun GrayscaleNoise(modifier: Modifier = Modifier) {
         // Add Noise
         drawRect(
             size = size,
-            brush = ShaderBrush(grayscaleShader),
+            brush = ShaderBrush(grayscaleShader.asComposeShader()),
             alpha = 0.3f,
         )
         // Re-add background color to make the noise blend more into the background

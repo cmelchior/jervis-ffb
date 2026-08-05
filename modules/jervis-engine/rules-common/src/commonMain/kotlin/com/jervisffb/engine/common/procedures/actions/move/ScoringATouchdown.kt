@@ -140,7 +140,7 @@ object ScoringATouchdown : Procedure() {
                 // increased until your next real turn, but this has some problematic
                 // side effects for the end of the half. So we do it immediately instead.
                 // See rules-faq.md (page 64) for a discussion on this.
-                AddTouchdown(context.player.team, 1),
+                AddTouchdown(context.player, 1),
                 ReportTouchdown(state, context),
                 SetTurnOver(turnover),
                 GotoNode(InformOfTouchdown)

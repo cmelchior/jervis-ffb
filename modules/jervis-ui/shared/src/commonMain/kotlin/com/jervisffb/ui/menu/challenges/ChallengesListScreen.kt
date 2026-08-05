@@ -30,11 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.engine.challenge.ChallengeCategory
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_frontpage_mummy
 import com.jervisffb.shared.generated.resources.jervis_icon_thumps_up_small_selected
@@ -44,76 +43,12 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
-import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
+import com.jervisffb.ui.menu.challenges.data.ChallengeRow
 import com.jervisffb.ui.menu.components.JervisSwitch
 import com.jervisffb.ui.menu.fumbbl.MenuSidebarButton
 import com.jervisffb.ui.utils.applyIf
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-
-/**
- * A challenge together with the current user's state for it, ready to render as a list row.
- */
-data class ChallengeRow(
-    val challenge: Challenge,
-    val userState: ChallengeUserState,
-)
-
-class ChallengesListScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
-
-    private val allChallenges = SampleChallenges.all
-
-    init {
-        // Populate the store with any persisted favorite/solved/vote state before the flows below emit.
-        ChallengeStore.load(allChallenges)
-    }
-
-    val activeCategories = MutableStateFlow(ChallengeCategory.entries.toSet())
-    val hideSolved = MutableStateFlow(false)
-    val showOnlyFavorites = MutableStateFlow(false)
-
-    /** The filtered list of challenges, kept in sync with the filters and the shared [ChallengeStore]. */
-    val visibleChallenges: StateFlow<List<ChallengeRow>> =
-        combine(activeCategories, hideSolved, showOnlyFavorites, ChallengeStore.state) { categories, hideSolved, showOnlyFavorites, states ->
-            allChallenges
-                .asSequence()
-                .filter { it.category in categories }
-                .map { ChallengeRow(it, states[it.id] ?: ChallengeUserState()) }
-                .filter { !(hideSolved && it.userState.solved != ChallengeUserState.SolvedState.UNSOLVED) }
-                .filter { !showOnlyFavorites || it.userState.favorite }
-                .sortedByDescending { it.challenge.communityScore }
-                .toList()
-        }.stateIn(screenModelScope, SharingStarted.Eagerly, emptyList())
-
-    fun toggleCategory(category: ChallengeCategory) {
-        val updated = activeCategories.value.toMutableSet()
-        if (!updated.add(category)) updated.remove(category)
-        activeCategories.value = updated
-    }
-
-    fun setHideSolved(value: Boolean) {
-        hideSolved.value = value
-    }
-
-    fun setShowOnlyFavorites(value: Boolean) {
-        showOnlyFavorites.value = value
-    }
-
-    fun toggleFavorite(id: ChallengeId) = ChallengeStore.toggleFavorite(id)
-
-    fun openChallenge(navigator: Navigator, challenge: ChallengeRow) {
-        menuViewModel.navigatorContext.launch {
-            val viewModel = ChallengeDetailScreenModel(challenge, visibleChallenges.value)
-            navigator.push(ChallengeDetailScreen(menuViewModel, viewModel))
-        }
-    }
-}
 
 class ChallengesListScreen(
     private val menuViewModel: MenuViewModel,
@@ -173,7 +108,7 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
     ) {
         Column(
             modifier = Modifier
-                .width(875.dp)
+                .fillMaxWidth(0.85f)
                 .fillMaxHeight()
         ) {
             FlowRow(
@@ -203,28 +138,20 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                 ) {
                     itemsIndexed(
                         items = rows,
-                        key = { index: Int, row: ChallengeRow -> row.challenge.id.value },
+                        key = { index: Int, row: ChallengeRow -> row.data.id.value },
                         contentType = { index: Int, row: ChallengeRow -> null },
                     ) { index: Int, row: ChallengeRow ->
                         ChallengeListRow(
                             row = row,
                             alternateRow = (index % 2 == 1),
                             onOpen = { viewModel.openChallenge(navigator, row) },
-                            onToggleFavorite = { viewModel.toggleFavorite(row.challenge.id) },
+                            onToggleFavorite = { viewModel.toggleFavorite(row.data.id, !row.userState.favorite) },
                         )
                     }
                 }
             }
         }
     }
-
-//    MenuScreenWithTitle(menuViewModel, title = "Challenges (Prototype)", pageImage = {}) {
-//        Column(
-//            modifier = Modifier.fillMaxHeight().fillMaxWidth(0.7f).padding(vertical = 16.dp),
-//        ) {
-//
-//        }
-//    }
 }
 
 @Composable
@@ -246,7 +173,7 @@ private fun ChallengeListRow(
     subTextColor: Color = JervisTheme.contentTextColor.copy(alpha = 0.6f),
     subTextSize: TextUnit = 12.sp
 ) {
-    val votes = row.challenge.communityScore
+    val votes = row.votes
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -269,7 +196,7 @@ private fun ChallengeListRow(
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = row.challenge.name,
+                text = row.data.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = headerTextSize,
                 color = JervisTheme.contentTextColor,
@@ -278,7 +205,7 @@ private fun ChallengeListRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "by ${row.challenge.author}",
+                    text = "by ${row.data.author.name}",
                     fontSize = subTextSize,
                     color = subTextColor,
                 )
@@ -325,7 +252,7 @@ private fun ChallengeListRow(
                 //    )
             }
         }
-        CategoryChip(row.challenge.category)
+        CategoryChip(row.data.category)
         SolvedTrophy(state = row.userState)
     }
 }

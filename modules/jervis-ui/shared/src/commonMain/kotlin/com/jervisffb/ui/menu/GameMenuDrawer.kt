@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,13 +75,21 @@ private sealed interface DrawerSecondLevelContent
 private data class GeneratedSection(val section: MenuSection) : DrawerSecondLevelContent
 private data object DiceColorSection : DrawerSecondLevelContent
 
+/**
+ * The challenge-specific actions in the game menu.
+ */
+data class ChallengeMenuActions(
+    val onReset: () -> Unit,
+    val onExit: () -> Unit,
+)
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun GameMenuDrawer(
     drawerState: DrawerState,
     menuViewModel: MenuViewModel,
-    showExitDialog: (Boolean) -> Unit,
     showMenuDrawer: (Boolean) -> Unit,
+    actionButtons: List<GameDrawerActionButton>,
 ) {
     val uiState: UiGameSnapshot? by menuViewModel.uiState.uiStateFlow.collectAsState(null)
     var secondLevelItems: DrawerSecondLevelContent? by remember { mutableStateOf(null) }
@@ -254,15 +263,20 @@ fun GameMenuDrawer(
                     },
                 )
             }
-            Box(modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)) {
-                JervisButton(
-                    "Exit Game",
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        showMenuDrawer(false)
-                        showExitDialog(true)
-                    }
-                )
+            Column(
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                actionButtons.forEach { button ->
+                    JervisButton(
+                        button.label,
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            showMenuDrawer(false)
+                            button.onClick()
+                        }
+                    )
+                }
             }
         }
 

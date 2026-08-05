@@ -7,10 +7,12 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
+import com.jervisffb.utils.closeIfPossible
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 
@@ -40,9 +42,11 @@ abstract class UiActionProvider {
     }
 
     // Must be single threaded so we can guarantee the order of events in it.
+    // `stopHandler` must close this dispatcher to not leak it.
+    private val actionDispatcher = singleThreadDispatcher("ActionProviderDispatcher@${this::hashCode}")
     protected val actionScope = CoroutineScope(
         CoroutineName("ActionSelectorScope")
-            + singleThreadDispatcher("ActionScope@${this::hashCode}")
+            + actionDispatcher
             + errorHandler
     )
 
@@ -52,6 +56,19 @@ abstract class UiActionProvider {
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 
     abstract fun startHandler()
+
+    /**
+     * Counterpart to [startHandler]. It releases everything this provider owns.
+     *
+     * Must be called when the game it feeds is released, or its dispatcher
+     * thread stays alive for the rest of the session. Providers that wrap
+     * others should cascade before calling `super`.
+     */
+    open fun stopHandler() {
+        actionScope.cancel()
+        actionDispatcher.closeIfPossible()
+    }
+
     abstract fun actionHandled(team: Team?, action: GameAction)
     // Called after setting up the UI and before starting the game loop.
     // This allows Compose and UI controller to share data that cross across a lot of responsibilities.

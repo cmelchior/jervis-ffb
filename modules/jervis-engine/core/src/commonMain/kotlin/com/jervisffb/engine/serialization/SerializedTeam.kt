@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
  * This class represents the team state before starting a game.
  */
 @Serializable
-class SerializedTeam(
+data class SerializedTeam(
     val id: TeamId,
     val name: String,
     val version: GameVersion,

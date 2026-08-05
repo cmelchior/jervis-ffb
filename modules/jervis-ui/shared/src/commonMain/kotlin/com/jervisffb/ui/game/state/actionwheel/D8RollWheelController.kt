@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -28,6 +29,11 @@ import kotlin.time.ExperimentalTime
 
 abstract class D8RollWheelController: ActionWheelDialogController() {
 
+    // Returns all D8 options in the order that reflect the outcome on the field
+    // This method excepts that the first value is listed Top and goes
+    // Clockwise.
+    private val allUiOptions = listOf(2, 3, 5, 8, 7, 6, 4, 1).map { it.d8 }
+
     abstract val buttonIdPrefix: String
     abstract val rollDiceNode: Node
     abstract val diceRollType: DiceRollType
@@ -41,7 +47,7 @@ abstract class D8RollWheelController: ActionWheelDialogController() {
         sharedData: LocalPitchDataWrapper,
     ) {
         if (nodes.contains(acc.stack.currentNode())) {
-            val buttons = D8Result.allOptions(startWith = 2).map { d8Option ->
+            val buttons = allUiOptions.map { d8Option ->
                 DieButtonData(
                     id = ButtonId("$buttonIdPrefix-${d8Option.value}"),
                     label = { null },

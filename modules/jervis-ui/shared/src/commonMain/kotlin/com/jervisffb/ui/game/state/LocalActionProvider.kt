@@ -41,6 +41,13 @@ class LocalActionProvider(
         awayProvider.startHandler()
     }
 
+    override fun stopHandler() {
+        homeProvider.stopHandler()
+        awayProvider.stopHandler()
+        actionJob?.cancel()
+        super.stopHandler()
+    }
+
     override fun actionHandled(team: Team?, action: GameAction) {
         homeProvider.actionHandled(team, action)
         awayProvider.actionHandled(team, action)

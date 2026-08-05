@@ -64,11 +64,11 @@ fun LoadingScreen(
     //  while developing.
     val minimumLoadingTime = 0.seconds
     val isReadyToStart by viewModel.isReadyToStartGame.collectAsState()
-    var showGameScreen by remember { mutableStateOf(false) }
+    var showGameScreen by remember(viewModel) { mutableStateOf(false) }
 
     if (isReadyToStart) {
         val density = LocalDensity.current
-        LaunchedEffect(Unit) {
+        LaunchedEffect(viewModel) {
             try {
                 viewModel.initialize(density)
             } catch (ex: Exception) {
@@ -82,7 +82,7 @@ fun LoadingScreen(
             }
         }
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         val startTime = Clock.System.now()
         viewModel.isLoaded.collect { isLoaded ->
             if (isLoaded) {

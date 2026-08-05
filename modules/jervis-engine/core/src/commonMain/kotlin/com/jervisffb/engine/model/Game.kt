@@ -32,7 +32,6 @@ class Game(
     val rules: Rules,
     val homeTeam: Team,
     val awayTeam: Team,
-    val pitch: Pitch,
 ) {
     init {
         // The Game State doesn't support the same team playing against itself.
@@ -67,6 +66,8 @@ class Game(
     val logs: MutableList<LogEntry> = mutableListOf()
     // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
     val logChanges: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
+
+    val pitch = Pitch.createForRuleset(rules)
 
     // Weather conditions for the pitch
     var weather: Weather = Weather.PERFECT_CONDITIONS
@@ -239,5 +240,13 @@ class Game(
 
     fun setCurrentNode(nextState: Node) {
         stack.peepOrNull()!!.setCurrentNode(nextState)
+    }
+
+    fun getTeam(id: TeamId): Team {
+        return when {
+            homeTeam.id == id -> homeTeam
+            awayTeam.id == id -> awayTeam
+            else -> INVALID_GAME_STATE("Team with $id not found")
+        }
     }
 }

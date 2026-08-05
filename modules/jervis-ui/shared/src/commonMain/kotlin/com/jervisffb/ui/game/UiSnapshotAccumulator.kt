@@ -146,6 +146,7 @@ class UiSnapshotAccumulator(
         val freeBalls  = squares.filter { it.value.isBallOnGround }
         return UiGameSnapshot(
             actionOwner = uiController.gameController.getAvailableActions().team,
+            delta = uiController.gameController.getDelta(),
             game = game,
             squares = squares.build(),
             players = playersBuilder.build(),

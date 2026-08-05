@@ -118,22 +118,18 @@ fun JervisDialog(
     val focusRequester = remember { FocusRequester() }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: PitchViewData? by centerOnPitch?.pitchViewData?.collectAsState() ?: MutableStateFlow<PitchViewData?>(null).collectAsState()
-    var popupOffset: IntOffset by remember(fieldViewInfo) {
-        fieldViewInfo?.let { fvd ->
-            mutableStateOf(
-                IntOffset(
-                    x = ((fvd.pitchSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.pitchOffset.x,
-                    y = ((fvd.pitchSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.pitchOffset.y,
-                )
-            )
-        } ?: mutableStateOf(IntOffset.Zero)
-    }
+    var popupOffset: IntOffset by remember { mutableStateOf(IntOffset.Zero) }
     // Keep popup hidden until first layout pass
     var alpha by remember { mutableStateOf(0f) }
     // Needed to make room for the drop shadow
     val dialogPadding = 8.dp
     // Needed to adjust center of dialog
     val paddingPx = with(LocalDensity.current) { dialogPadding.roundToPx() }
+
+    // Reset dialog to the center of the screen after a resize.
+    LaunchedEffect(fieldViewInfo) {
+        popupOffset = recalculateOffset(fieldViewInfo, popupSize, paddingPx)
+    }
 
     val textColor = JervisTheme.contentTextColor
     val buttonTextColor = JervisTheme.white

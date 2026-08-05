@@ -15,14 +15,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -30,109 +35,27 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.engine.challenge.ChallengeGoal
+import com.jervisffb.engine.challenge.ChallengeRule
+import com.jervisffb.engine.challenge.ChallengeScore
+import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_thumps_up_small_selected
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.SidebarEntryState
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
-import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
-import com.jervisffb.ui.menu.challenges.ChallengeStore.userState
+import com.jervisffb.ui.menu.challenges.data.ChallengeUserState
+import com.jervisffb.ui.menu.challenges.data.ChallengeUserState.SolvedState
+import com.jervisffb.ui.menu.challenges.data.ScoreboardEntry
 import com.jervisffb.ui.menu.components.SmallHeader
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import org.jetbrains.compose.resources.painterResource
-import kotlin.math.roundToInt
-import kotlin.text.get
-
-class ChallengeDetailScreenModel(
-    challenge: ChallengeRow,
-    allRows: List<ChallengeRow>
-) : JervisScreenModel {
-
-    val currentChallengeData = mutableStateOf(challenge)
-    val allChallenges = mutableStateListOf<ChallengeSidebarEntry>()
-    val currentIndex: StateFlow<Int>
-        field = MutableStateFlow(0)
-
-    init {
-        ChallengeStore.load(listOf(challenge.challenge))
-        allRows
-            .mapIndexed { index, challengeData ->
-                val activeChallenge = (challengeData == challenge)
-                if (activeChallenge) {
-                    currentIndex.value = index
-                }
-                ChallengeSidebarEntry(
-                    // name = "${index + 1}. ${challengeData.challenge.name}${if (challengeData.userState.isSolved()) " (✓)" else ""} ",
-                    name = "${if (challengeData.userState.isSolved()) "(✓) " else ""}${challengeData.challenge.name}",
-                    state = when (activeChallenge) {
-                        true -> SidebarEntryState.ACTIVE
-                        false -> SidebarEntryState.DONE_AVAILABLE
-                    },
-                    alternativeBackground = false, // !activeChallenge && (index % 2 == 1),
-                    challenge = challengeData,
-                    onClick = { setActiveChallenge(index) }
-                )
-            }
-            .let { allChallenges.addAll(it) }
-    }
-
-    val userState: StateFlow<ChallengeUserState> =
-        combine(currentIndex, ChallengeStore.state) { index, state ->
-            val id = allChallenges[index].challenge.challenge.id
-            state[id] ?: ChallengeUserState()
-        }
-            .stateIn(screenModelScope, SharingStarted.Eagerly, ChallengeStore.userState(challenge.challenge.id))
-
-    fun toggleFavorite() {
-        val index = currentIndex.value
-        allChallenges[index] = allChallenges[index].let {
-            val challengeRow = it.challenge
-            val updatedChallenge = challengeRow.copy(
-                userState = challengeRow.userState.copy(
-                    favorite = !challengeRow.userState.favorite
-                )
-            )
-            it.copy(challenge = updatedChallenge)
-        }
-        // setActiveChallenge(index)
-        currentChallengeData.value = allChallenges[index].challenge
-        ChallengeStore.toggleFavorite(currentChallengeData.value.challenge.id)
-    }
-
-    fun setVote(voted: Boolean) {
-        val index = currentIndex.value
-        allChallenges[index] = allChallenges[index].let {
-            val updatedChallenge = it.challenge.copy(
-                userState = it.challenge.userState.copy(
-                    voted = voted
-                )
-            )
-            it.copy(challenge = updatedChallenge)
-        }
-        // setActiveChallenge(index)
-        currentChallengeData.value = allChallenges[index].challenge
-        ChallengeStore.setVote(currentChallengeData.value.challenge.id, voted)
-    }
-
-    fun setActiveChallenge(index: Int) {
-        val oldIndex = currentIndex.value
-        allChallenges[oldIndex] = allChallenges[oldIndex].copy(state = SidebarEntryState.DONE_AVAILABLE)
-        allChallenges[index] = allChallenges[index].copy(state = SidebarEntryState.ACTIVE)
-        currentIndex.value = index
-        currentChallengeData.value = allChallenges[index].challenge
-    }
-}
 
 class ChallengeDetailScreen(
     private val menuViewModel: MenuViewModel,
@@ -153,14 +76,25 @@ private fun ChallengeDetailContent(
     creditFontSize: TextUnit = 14.sp,
     creditContentColor: Color = JervisTheme.contentTextColor.copy(alpha = 0.7f)
 ) {
-    val challengeRow by viewModel.currentChallengeData
-    val userState by viewModel.userState.collectAsState()
-    val challenge = challengeRow.challenge
-    val votes = challenge.communityScore + if (userState.voted) 1 else 0
+    val navigator = LocalNavigator.currentOrThrow
+    val details by viewModel.activeChallenge.collectAsState()
+    val votes = details.votes
+
+    // Rebuild the preview whenever another challenge is selected and release
+    // the running one when the page goes away. A preview is a real game, so
+    // leaving it behind would leak both it and its threads.
+    val density = LocalDensity.current
+    LaunchedEffect(details.data.id, details.data.version) {
+        viewModel.loadPreview(menuViewModel, details.data, density)
+    }
+    DisposableEffect(Unit) {
+        onDispose { viewModel.releasePreview() }
+    }
+    val preview by viewModel.preview.collectAsState()
 
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
-        title = challenge.name,
+        title = details.data.name,
         icon = null,
         topMenuLeftContent = {
 
@@ -169,7 +103,8 @@ private fun ChallengeDetailContent(
             // Login button
         },
         sidebarContent = {
-            val currentPage by viewModel.currentIndex.collectAsState()
+            val flow =  remember(viewModel) { viewModel.allChallenges }
+            val rows by flow.collectAsState(emptyList())
             Column(
                 modifier = Modifier
                     .paperBackgroundWithLine(JervisTheme.rulebookBlue)
@@ -179,7 +114,7 @@ private fun ChallengeDetailContent(
                 Spacer(modifier = Modifier.height(16.dp))
                 ChallengeSidebarMenu(
                     modifier = Modifier,
-                    entries = viewModel.allChallenges,
+                    entries = rows,
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Spacer(modifier = Modifier.fillMaxHeight(0.20f))
@@ -189,7 +124,7 @@ private fun ChallengeDetailContent(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.6f)
+                .fillMaxWidth(0.7f)
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 16.dp)
             ,
@@ -199,13 +134,13 @@ private fun ChallengeDetailContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                CategoryChip(challenge.category)
+                CategoryChip(details.data.category)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 2.dp),
-                        text = "by ${challenge.author}",
+                        text = "by ${details.data.author.name}",
                         fontSize = creditFontSize,
                         lineHeight = 1.em,
                         color = creditContentColor,
@@ -232,45 +167,58 @@ private fun ChallengeDetailContent(
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                RatingControl(
-                    voted = userState.voted,
+                VoteControl(
+                    voted = details.userState.voted,
                     communityScore = votes,
                     onVote = viewModel::setVote,
                     contentColor = creditContentColor,
                 )
-                FavoriteStar(isFavorite = userState.favorite, onToggle = viewModel::toggleFavorite)
-                SolvedTrophy(state = userState)
+                FavoriteStar(isFavorite = details.userState.favorite, onToggle = viewModel::toggleFavorite)
+                SolvedTrophy(state = details.userState)
                 Spacer(modifier = Modifier.width(4.dp))
                 JervisButton(
                     text = "Play Challenge",
-                    onClick = { /* Not supported yet - future work */ },
-                    enabled = false,
+                    onClick = { viewModel.playChallenge(navigator, menuViewModel) },
+                    enabled = details.isPlayable,
                 )
             }
 
-            ChallengeScreenshot()
+            ChallengeScreenshot(preview)
 
             Section("Description", topPadding = 0.dp) {
-                Text(text = challenge.description, color = JervisTheme.contentTextColor)
+                Text(text = details.data.description, color = JervisTheme.contentTextColor)
             }
 
             Section("Goal") {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    challenge.rules.forEach { rule ->
-                        Text(text = "•  $rule", color = JervisTheme.contentTextColor)
-                    }
+                    Text(text = formatGoal(details.data.goal), color = JervisTheme.contentTextColor)
                 }
             }
             Section("Rules") {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    challenge.rules.forEach { rule ->
-                        Text(text = "•  $rule", color = JervisTheme.contentTextColor)
+                    if (details.data.rules.isEmpty()) {
+                        Text(
+                            text = "No extra rules",
+                            color = JervisTheme.contentTextColor.copy(alpha = 0.6f),
+                        )
+                    }
+                    if (details.data.rules.isNotEmpty()) {
+                        Text(text = formatRules(details.data.rules), color = JervisTheme.contentTextColor)
                     }
                 }
             }
-
-            Section("Scoreboard") {
-                Scoreboard(challenge.scoreboard)
+            Section("Scoring") {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(text = formatScoring(details.data.scoring), color = JervisTheme.contentTextColor)
+                    if (details.userState.isSolved()) {
+                        Text(text = formatUserScore(details.userState), color = JervisTheme.contentTextColor)
+                    }
+                }
+            }
+            if (details.data.scoring != ChallengeScoring.CompletionOnly) {
+                Section("Scoreboard") {
+                    Scoreboard(details.scoreboard)
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -315,17 +263,65 @@ private fun Scoreboard(entries: List<ScoreboardEntry>) {
             )
         }
         TitleBorder()
-        entries.sortedByDescending { it.successChance }.forEachIndexed { index, entry ->
+        entries.forEachIndexed { index, entry ->
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Text("${index + 1}", modifier = Modifier.width(32.dp), color = JervisTheme.contentTextColor)
-                Text(entry.coachName, modifier = Modifier.weight(1f), color = JervisTheme.contentTextColor)
+                Text(entry.coach.name, modifier = Modifier.weight(1f), color = JervisTheme.contentTextColor)
                 Text(
-                    text = "${(entry.successChance * 100).roundToInt()}%",
+                    text = entry.getFormattedScore(),
                     modifier = Modifier.width(80.dp),
                     color = JervisTheme.contentTextColor,
                     textAlign = TextAlign.End,
                 )
             }
         }
+    }
+}
+
+private fun formatGoal(goal: ChallengeGoal): String {
+    return buildString {
+        append("•  ")
+        append(goal.description)
+        if (goal.modifiers.isNotEmpty()) {
+            append("\n")
+            val modifiers = goal.modifiers.joinToString(separator = "\n") {
+                "    •  ${it.description}"
+            }
+            append(modifiers)
+        }
+    }
+}
+
+private fun formatRules(rules: List<ChallengeRule>): String {
+    return rules.joinToString(separator = "\n") {
+        "•  ${it.description}"
+    }
+}
+
+private fun formatScoring(scoring: ChallengeScoring<*>): String {
+    return buildString {
+        append("•  ")
+        append(scoring.description)
+    }
+}
+
+private fun formatUserScore(userState: ChallengeUserState): AnnotatedString {
+    return buildAnnotatedString {
+        append("•  ")
+        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+        append("Completed")
+        when (userState.score) {
+            is ChallengeScore.CompletionOnly -> {
+                append(" ${userState.getFormattedDate()}")
+            }
+            is ChallengeScore.JervisRiskScore -> {
+                append(" ${userState.getFormattedDate()} with ${userState.getFormattedScore()}")
+            }
+            null -> error("Should not be called with no score")
+        }
+        if (userState.solved == SolvedState.BEST_IN_CLASS && userState.score !is ChallengeScore.CompletionOnly) {
+            append(" (Best in Class)")
+        }
+        pop()
     }
 }

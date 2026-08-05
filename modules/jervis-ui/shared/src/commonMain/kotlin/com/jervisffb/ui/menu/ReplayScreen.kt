@@ -23,7 +23,6 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialization.GameFileData
@@ -74,7 +73,6 @@ class ReplayScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
                 rules = rules,
                 homeTeam = file.game.state.homeTeam,
                 awayTeam = file.game.state.awayTeam,
-                pitch = Pitch.createForRuleset(rules),
             ),
             initialActions = emptyList(), // Start at the very beginning of the game
         )

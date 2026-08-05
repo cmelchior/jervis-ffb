@@ -38,9 +38,12 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SamplingMode
+import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.roundToLong
 
 /**
  * Helper [Modifier] that is conditionally applied only if the condition is `true`
@@ -200,6 +203,27 @@ fun Modifier.onClickWithSmallDragControl(
     }
 }
 
+// Work-around for Kotlin Multiplatform not having a format() method.
+// This returns a nice representation of a double, with a max number of decimals.
+fun Double.toFixed(decimals: Int, padding: Boolean = false): String {
+    require(decimals in 0..9)
+
+    if (!isFinite()) return toString()
+
+    val factor = 10.0.pow(decimals).roundToLong()
+    val scaled = (abs(this) * factor).roundToLong()
+
+    val whole = scaled / factor
+    val fraction = scaled % factor
+    val sign = if (this < 0.0 && scaled != 0L) "-" else ""
+
+    return if (decimals == 0) {
+        "$sign$whole"
+    } else {
+        "$sign$whole.${fraction.toString().run { if (padding) padStart(decimals, '0') else this }}"
+    }
+}
+
 /**
  * Modifier that sets the size of the Composable using pixel values.
  */
@@ -208,6 +232,24 @@ fun Modifier.pixelSize(size: IntSize) =
         val placeable = measurable.measure(Constraints.fixed(size.width, size.height))
         layout(size.width, size.height) { placeable.place(0, 0) }
     }
+
+
+/**
+ * Returns `true` if the string contains any characters that are below the baseline.
+ * This can affect how to place screen titles so it looks best.
+ */
+fun String.containsBelowBaselineChars(): Boolean {
+    return this.any {
+        when (it) {
+            'g',
+            'j',
+            'p',
+            'q',
+            'y' -> true
+            else -> false
+        }
+    }
+}
 
 // Copy from ChatGPT, so requires a more thorough review
 private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {

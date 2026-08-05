@@ -1,31 +1,46 @@
 package com.jervisffb.ui.menu.challenges
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.challenge.ChallengeCategory
+import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.shared.generated.resources.Res
+import com.jervisffb.shared.generated.resources.challenge_default_pitch
 import com.jervisffb.shared.generated.resources.jervis_icon_thumbs_up_large
 import com.jervisffb.shared.generated.resources.jervis_icon_thumbs_up_large_selected
 import com.jervisffb.shared.generated.resources.jervis_icon_trophy
@@ -34,13 +49,23 @@ import com.jervisffb.shared.generated.resources.jervis_icon_trophy_disabled
 import com.jervisffb.shared.generated.resources.jervis_star_selected
 import com.jervisffb.shared.generated.resources.jervis_star_unselected
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.menu.challenges.ChallengeUserState.SolvedState.*
+import com.jervisffb.ui.game.view.pitch.Pitch
+import com.jervisffb.ui.game.view.pitch.calculatePitchSizeData
+import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.challenges.data.ChallengeUserState
 import com.jervisffb.ui.menu.utils.JervisTooltip
+import com.jervisffb.ui.utils.pixelSize
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.roundToInt
 
 /**
- * A star used to mark a challenge as a favorite. Filled + orange when favorite,
- * dimmed outline otherwise.
+ * This file contains various Compose components used across the Challenge List
+ * and Challenge Detail screens.
+ */
+
+/**
+ * A star used to mark a challenge as a favorite. Colored when selected, grayed out when not.
  */
 @Composable
 fun FavoriteStar(
@@ -78,23 +103,26 @@ fun SolvedTrophy(
 ) {
     val alpha by animateFloatAsState(if (state.isSolved()) 1f else 0.4f)
     val icon = when (state.solved) {
-        UNSOLVED -> Res.drawable.jervis_icon_trophy_disabled
-        SOLVED -> Res.drawable.jervis_icon_trophy
-        BEST_IN_CLASS -> Res.drawable.jervis_icon_trophy_1st
+        ChallengeUserState.SolvedState.UNSOLVED -> Res.drawable.jervis_icon_trophy_disabled
+        ChallengeUserState.SolvedState.SOLVED -> Res.drawable.jervis_icon_trophy
+        ChallengeUserState.SolvedState.BEST_IN_CLASS -> Res.drawable.jervis_icon_trophy_1st
     }
     val description = when (state.solved) {
-        UNSOLVED -> "Unsolved"
-        SOLVED -> buildString {
-            append("Solved")
-            if (state.solvedDate != null) {
+        ChallengeUserState.SolvedState.UNSOLVED -> "Not Completed"
+        ChallengeUserState.SolvedState.SOLVED -> buildString {
+            append("Completed")
+            if (state.score != null) {
                 append(" ")
                 append(state.getFormattedDate())
             }
         }
-        BEST_IN_CLASS -> buildString {
-            append("Solved as Best in Class")
-            if (state.solvedDate != null) {
-                append("  ")
+        ChallengeUserState.SolvedState.BEST_IN_CLASS -> buildString {
+            when (state.score is ChallengeScore.CompletionOnly) {
+                true -> append("Completed")
+                false -> append("Completed as Best in Class")
+            }
+            if (state.score != null) {
+                append(" ")
                 append(state.getFormattedDate())
             }
         }
@@ -117,13 +145,11 @@ fun SolvedTrophy(
 }
 
 /**
- * Control
- * An up/down rating control. The community score is shown between the two buttons and the button
- * matching the user's current vote is highlighted. Tapping the highlighted direction again clears
- * the vote (handled by [ChallengeStore.setVote]).
+ * A "thumbs up" used to control voting. Will use a colored icon when selected, a more dimmed one
+ * when not.
  */
 @Composable
-fun RatingControl(
+fun VoteControl(
     voted: Boolean,
     communityScore: Int,
     onVote: (Boolean) -> Unit,
@@ -180,30 +206,152 @@ fun CategoryChip(category: ChallengeCategory, modifier: Modifier = Modifier) {
     )
 }
 
+
 /**
- * Show the starting state of the challenge on the pitch
+ * Show the starting state of the challenge on the pitch.
+ *
+ * [screenModel] is a game built only to be looked at, and is null while one is
+ * still being put together. Building it can mean reading a position off disk,
+ * hence the placeholder.
+ *
+ * [pitchWidth] and [pitchHeight] have to be known before the game is, because
+ * the frame is sized to the pitch that is coming rather than to an aspect
+ * ratio. Every challenge so far uses the standard pitch; a ruleset with a
+ * different one (BB7) would need to say so up front to avoid a jump.
+ *
+ * Only the pitch is drawn; dugouts are a separate part of the game screen.
  */
 @Composable
-fun ChallengeScreenshot() {
-    Box(
+fun ChallengeScreenshot(
+    screenModel: GameScreenModel?,
+    pitchWidth: Int = 26,
+    pitchHeight: Int = 15,
+    // How long the pitch takes to fade in once it has something to show.
+    previewFadeInMs: Int = 300,
+    // Border drawn around the pitch, and the chalk margin inside it. Has to match
+    // what is handed to `Pitch` below, or the placeholder and the real pitch end up
+    // different sizes.
+    previewBorder: Dp = 2.dp
+) {
+    BoxWithConstraints(
         modifier = Modifier
-            .padding(bottom = 16.dp)
-            .aspectRatio(26/15f)
             .fillMaxWidth()
-            .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
-            .border(2.dp, Color.Black)
+            .padding(bottom = 16.dp)
         ,
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Challenge Screenshot",
-            color = JervisTheme.contentTextColor
-        )
+        // Pitch squares are whole pixels, so the pitch is a little narrower than
+        // the space it is given and its height does not follow from the aspect
+        // ratio. Sizing the frame with the same calculation the pitch uses is
+        // what stops it resizing when the real one arrives.
+        val density = LocalDensity.current
+        val pitchSize = remember(maxWidth, density, pitchWidth, pitchHeight) {
+            calculatePitchSizeData(
+                availableWidth = maxWidth,
+                density = density,
+                pitchWidth = pitchWidth,
+                pitchHeight = pitchHeight,
+                borderBrushSize = previewBorder,
+                // Matches PitchDetails.NICE, which is what the pitch falls back
+                // to until the game reports the weather.
+                drawPitchMarkers = true,
+            )
+        }
 
+        // Whole-pixel squares leave the pitch a little narrower than the space
+        // available. Rather than change the grid, draw it at its natural size
+        // and scale the result up to close the gap. The factor is at most a few
+        // percent, and exactly 1 whenever the width happens to divide evenly.
+        val availableWidthPx = with(density) { maxWidth.roundToPx() }
+        val scale = availableWidthPx.toFloat() / pitchSize.totalPitchWidthPx
+        val scaledHeightPx = (pitchSize.totalPitchHeightPx * scale).roundToInt()
+
+        Box(
+            modifier = Modifier
+                // Background and border live out here so they are not scaled;
+                // the border stays a crisp PREVIEW_BORDER at the true full width.
+                .pixelSize(IntSize(availableWidthPx, scaledHeightPx))
+                .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
+                .border(previewBorder, Color.Black)
+            ,
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    // Measured at the exact pitch size, so `Pitch` below still floors
+                    // to the same square size the placeholder was laid out for, then
+                    // scaled about its centre to cover the frame.
+                    .pixelSize(IntSize(pitchSize.totalPitchWidthPx, pitchSize.totalPitchHeightPx))
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                ,
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = painterResource(Res.drawable.challenge_default_pitch),
+                    contentDescription = "Pitch acting as placeholder while game state is loading",
+                    // Same scaling as BackgroundImageLayer, which is what draws this
+                    // very image once the game is running. The pitch is wider than
+                    // the artwork, so stretching to fit would squash it vertically.
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                )
+                when (screenModel) {
+                    null -> { /* Do nothing */ } //CircularProgressIndicator(color = JervisTheme.rulebookRed)
+                    else -> {
+                        val pitchViewModel = remember(screenModel) {
+                            PitchViewModel(screenModel, screenModel.uiState, screenModel.hoverPlayerFlow)
+                        }
+
+                        // The game is handed over as soon as it has been started, which
+                        // is before its loop has produced anything to draw. Waiting for
+                        // the first snapshot means the fade starts on a pitch that
+                        // already has its players, rather than on an empty field with
+                        // everyone appearing halfway through.
+                        val snapshot by remember(pitchViewModel) { pitchViewModel.observeSnapshot() }
+                            .collectAsState(null)
+                        val pitchAlpha by animateFloatAsState(
+                            targetValue = if (snapshot != null) 1f else 0f,
+                            animationSpec = tween(previewFadeInMs),
+                        )
+                        // Not sure if it is worth having a loader. For short loading times it just looks like flicker
+                        //    if (pitchAlpha < 1f) {
+                        //        CircularProgressIndicator(
+                        //            modifier = Modifier.alpha(1f - pitchAlpha),
+                        //            color = JervisTheme.rulebookRed,
+                        //        )
+                        //    }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .alpha(pitchAlpha)
+                                // The pitch is a live game underneath. Intercept all non-scroll events
+                                // to prevent accidentally triggering in-game events.
+                                .pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                                            if (event.type != PointerEventType.Scroll) {
+                                                event.changes.forEach { it.consume() }
+                                            }
+                                        }
+                                    }
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Pitch(Modifier, pitchViewModel, borderBrushSize = previewBorder)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-fun categoryColor(category: ChallengeCategory): Color = when (category) {
+private fun categoryColor(category: ChallengeCategory): Color = when (category) {
     ChallengeCategory.CROWD_SURFING -> JervisTheme.rulebookRed
     ChallengeCategory.BLOCKING -> JervisTheme.rulebookBlue
     ChallengeCategory.SCORING -> JervisTheme.rulebookGreen
@@ -211,7 +359,7 @@ fun categoryColor(category: ChallengeCategory): Color = when (category) {
     ChallengeCategory.ONE_TURN_TOUCHDOWNS -> JervisTheme.rulebookPurple
 }
 
-fun categoryTextColor(category: ChallengeCategory): Color {
+private fun categoryTextColor(category: ChallengeCategory): Color {
     return when (category) {
         ChallengeCategory.BLOCKING,
         ChallengeCategory.CROWD_SURFING,

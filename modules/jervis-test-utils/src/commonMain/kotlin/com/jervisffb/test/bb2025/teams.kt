@@ -7,7 +7,6 @@ import com.jervisffb.engine.common.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
@@ -196,8 +195,7 @@ fun createDefaultGameStateBB2025(
     homeTeam: Team = createDefaultHomeTeamBB2025(rules),
     awayTeam: Team = humanTeamAwayBB2025(rules)
 ): Game {
-    val pitch = Pitch.createForRuleset(rules)
-    return Game(rules, homeTeam, awayTeam, pitch)
+    return Game(rules, homeTeam, awayTeam)
 }
 
 /**

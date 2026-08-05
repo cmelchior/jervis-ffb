@@ -33,7 +33,7 @@ class LoadFileComponentModel(initialRulesBuilder: RulesParameterBuilder, private
                     .onSuccess { fileContent ->
                         // Just silently ignore `null` values as it indicates the dialog was closed
                         if (path != null) {
-                            JervisSerialization.loadFromFileContent(fileContent)
+                            JervisSerialization.loadFromJsonContent(fileContent)
                                 .onSuccess { gameFile ->
                                     this@LoadFileComponentModel.gameFile = gameFile
                                     isSetupValid.value = true

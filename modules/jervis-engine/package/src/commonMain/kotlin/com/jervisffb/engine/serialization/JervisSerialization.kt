@@ -9,7 +9,6 @@ import com.jervisffb.engine.bb2025.serialization.bb2025SerializerModule
 import com.jervisffb.engine.common.serialization.commonSerializerModule
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.utils.getBuildType
@@ -44,7 +43,6 @@ data class GameFileData(
                 rules = rules,
                 homeTeam = game.state.homeTeam,
                 awayTeam = game.state.awayTeam,
-                pitch = Pitch.createForRuleset(rules)
             ),
             initialActions = actions
         )
@@ -140,7 +138,7 @@ object JervisSerialization {
         return JervisDebugInfo(platformInfo, clientInfo, gitCommit, errors)
     }
 
-    fun loadFromFileContent(json: String): Result<GameFileData> {
+    fun loadFromJsonContent(json: String): Result<GameFileData> {
         try {
             val fileData = jsonFormat.decodeFromString<JervisGameFile>(json)
             val rules = fileData.configuration.rules
@@ -149,7 +147,7 @@ object JervisSerialization {
             val homeTeam = SerializedTeam.deserialize(rules, serializedHomeTeam, unknownCoach)
             val serializedAwayTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.awayTeam)
             val awayTeam = SerializedTeam.deserialize(rules, serializedAwayTeam, unknownCoach)
-            val state = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
+            val state = Game(rules, homeTeam, awayTeam)
             val controller = GameEngineController(state, fileData.game.actions)
             val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
             return Result.success(gameData)
@@ -167,7 +165,7 @@ object JervisSerialization {
                 platformFileSystem.source(file).use { fileSource ->
                     fileSource.buffer().readUtf8()
                 }
-            return loadFromFileContent(fileContent)
+            return loadFromJsonContent(fileContent)
         } catch (ex: Exception) {
             return Result.failure(ex)
         }

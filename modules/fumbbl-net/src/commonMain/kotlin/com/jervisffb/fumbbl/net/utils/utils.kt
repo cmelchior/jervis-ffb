@@ -38,8 +38,7 @@ typealias FumbblCoordinate = com.jervisffb.fumbbl.net.model.FieldCoordinate
 fun Game.Companion.fromFumbblState(rules: Rules, game: FumbblGame): Game {
     val homeTeam = extractTeam(rules, game.teamHome)
     val awayTeam = extractTeam(rules, game.teamAway)
-    val pitch: Pitch = extractField(game.fieldModel)
-    return Game(rules, homeTeam, awayTeam, pitch)
+    return Game(rules, homeTeam, awayTeam)
 }
 
 private fun extractTeam(rules: Rules, team: FumbblTeam): Team {

@@ -41,6 +41,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialization.SerializedTeam
+import com.jervisffb.engine.serialization.SerializedTeam.Companion.LOG
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.InvalidGameStateException
@@ -59,21 +60,27 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * has been agreed upon. This should be the responsibility of a specific
  * [GameRunner]
  *
- * @param initialActions Actions to run as soon as the controller is started using [startManualMode]
- * or [startTestMode]
- * @param validateActions If `true`, all actions will be validated against [getAvailableActions]
- * before [ActionNode.applyAction] is called. Illegal or invalid actions will throw an
- * [InvalidActionException].
- * @param cacheActionDescriptor If `true`, the result of [getAvailableActions] will be cached
- * and reused for subsequent calls to [getAvailableActions]. This can be useful if
- * [getAvailableActions] is called frequently, but the result is not expected to change.
- * This should be `false` during unit tests as they are expected to modify the result.
+ * - [initialActions] Actions to run as soon as the controller is started using [startManualMode]
+ *   or [startTestMode]
+ *
+ * - [validateActions] If `true`, all actions will be validated against [getAvailableActions]
+ *   before [ActionNode.applyAction] is called. Illegal or invalid actions will throw an
+ *   [InvalidActionException].
+ *
+ * - [cacheActionDescriptor] If `true`, the result of [getAvailableActions] will be cached
+ *   and reused for subsequent calls to [getAvailableActions]. This can be useful if
+ *   [getAvailableActions] is called frequently, but the result is not expected to change.
+ *   It is most commonly `false` during unit tests as they are expected to modify the result.
  */
 class GameEngineController(
     state: Game,
     private val initialActions: List<GameAction> = emptyList(),
     private val validateActions: Boolean = true,
     private val cacheActionDescriptor: Boolean = false,
+    // If `true`, initial actions cannot be undone.
+    private val protectInitialActions: Boolean = false,
+    // Called when the controller is started.
+    private val onStarted: (GameEngineController) -> Unit = { controller -> /* Do nothing */ }
 ) {
 
     companion object {
@@ -104,6 +111,11 @@ class GameEngineController(
     // is removed from history, reversed and put in `lastActionIfUndo`
     private val _history: MutableList<GameDelta> = mutableListOf()
     val history: List<GameDelta> = _history
+
+    // Point in `history` that calling Undo cannot move past.
+    // Stays 0 unless `protectInitialActions` is set.
+    private var undoFloor: Int = 0
+
     private var lastGameActionId: GameActionId = GameActionId(0)
     private var deltaBuilder = DeltaBuilder(lastGameActionId + 1)
     private var cachedActionRequest: ActionRequest? = null
@@ -185,7 +197,8 @@ class GameEngineController(
                 }
                 is Revert -> {
                     // If Revert is sent, we assume the user knows what they are doing
-                    // and just apply it without restrictions.
+                    // and just apply it without restrictions. This also includes
+                    // ignoring `undoFloor`.
                     undoLastAction(revertActionId = true)
                 }
                 is DevModeGameAction -> processDevAction(action)
@@ -241,6 +254,8 @@ class GameEngineController(
         initialActions.forEach {
             handleAction(it)
         }
+        lockInitialActions()
+        onStarted(this)
     }
 
     fun startTestMode(start: Procedure, logAvailableActions: Boolean = true) {
@@ -251,6 +266,19 @@ class GameEngineController(
         initialActions.forEach {
             handleAction(it)
         }
+        lockInitialActions()
+        onStarted(this)
+    }
+
+    /**
+     * If [protectInitialActions] was set. This will mark the point in history
+     * from where [Undo] or [Revert] no longer has any effect.
+     */
+    private fun lockInitialActions() {
+        if (!protectInitialActions) return
+        // Measured from history because a CompositeGameAction is split into
+        // one delta per step.
+        undoFloor = _history.size
     }
 
     fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
@@ -272,7 +300,7 @@ class GameEngineController(
      * given team also created the game action.
      */
     fun isUndoAvailable(team: TeamId? = null): Boolean {
-        if (_history.isEmpty()) return false
+        if (_history.size <= undoFloor) return false
         if (rules.undoActionBehavior == UndoActionBehavior.NOT_ALLOWED) return false
 
         // Since CompositeGameActions are split into separate GameDeltas, it should be safe

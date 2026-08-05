@@ -21,6 +21,8 @@ import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
@@ -28,6 +30,7 @@ import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.game.view.GameScreen
 import com.jervisffb.ui.game.view.LoadingScreen
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
+import com.jervisffb.ui.game.viewmodel.ChallengeSessionViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
@@ -37,7 +40,14 @@ import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.menu.challenges.ChallengeGameFactory
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+
+data class GameDrawerActionButton(
+    val label: String,
+    val onClick: () -> Unit,
+)
 
 class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenModel) : Screen {
     override val key: ScreenKey = "GameScreen"
@@ -51,6 +61,38 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
                 val drawerScope = rememberCoroutineScope()
                 var showExitDialog by remember { mutableStateOf(false) }
+
+                // Reset and exit live up here rather than with the rest of the
+                // challenge UI, because the game menu drawer offers them too.
+                val navigator = LocalNavigator.currentOrThrow
+                val challengeMode = viewModel.mode as? ChallengeGame
+
+                // Configure "action"-buttons displayed at the bottom of the game menu drawer.
+                val (drawerActionButtons, challengeActionButtons) = remember(viewModel, challengeMode, navigator) {
+                    when (challengeMode != null) {
+                        true -> {
+                            val onReset: () -> Unit = {
+                                viewModel.onDispose()
+                                ChallengeGameFactory.restart(navigator, menuViewModel, challengeMode.challenge)
+                            }
+                            val onExit: () -> Unit = {
+                                viewModel.onDispose()
+                                navigator.pop()
+                            }
+                            listOf(
+                                GameDrawerActionButton("Reset Challenge", onReset),
+                                GameDrawerActionButton("Exit Challenge", onExit)
+                            ) to ChallengeMenuActions(onReset = onReset, onExit = onExit)
+                        }
+                        false -> {
+                            listOf(
+                                GameDrawerActionButton("Exit Game") {
+                                    showExitDialog = true
+                                },
+                            ) to null
+                        }
+                    }
+                }
 
                 LifecycleEffectOnce {
                     val callback = object : OnBackPress {
@@ -80,14 +122,12 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                         GameMenuDrawer(
                             drawerState = drawerState,
                             menuViewModel = menuViewModel,
-                            showExitDialog = { visible ->
-                                showExitDialog = visible
-                            },
                             showMenuDrawer = { visible ->
                                 drawerScope.launch {
                                     drawerState.snapTo(if (visible) DrawerValue.Open else DrawerValue.Closed)
                                 }
-                            }
+                            },
+                            actionButtons = drawerActionButtons,
                         )
                     }
                 ) {
@@ -111,15 +151,21 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                         )
-                        GameScreenContent(viewModel, {
-                            drawerScope.launch {
-                                if (drawerState.isOpen) {
-                                    drawerState.close()
-                                } else {
-                                    drawerState.open()
+                        GameScreenContent(
+                            menuViewModel,
+                            viewModel,
+                            onSettingsClick = {
+                                drawerScope.launch {
+                                    if (drawerState.isOpen) {
+                                        drawerState.close()
+                                    } else {
+                                        drawerState.open()
+                                    }
                                 }
-                            }
-                        })
+                            },
+                            challengeMode = challengeMode,
+                            challengeActions = challengeActionButtons,
+                        )
                     }
                 }
 
@@ -132,8 +178,13 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
 }
 
 @Composable
-private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () -> Unit) {
-
+private fun GameScreenContent(
+    menuViewModel: MenuViewModel,
+    viewModel: GameScreenModel,
+    onSettingsClick: () -> Unit,
+    challengeMode: ChallengeGame?,
+    challengeActions: ChallengeMenuActions?,
+) {
     val pitchViewModel = remember(viewModel) {
         PitchViewModel(
             viewModel,
@@ -142,12 +193,32 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
         )
     }
 
+    // Only present while playing a challenge; drives the challenge panel and
+    // the outcome box.
+    val challengeSession = remember(viewModel, challengeMode) {
+        challengeMode?.let {
+            ChallengeSessionViewModel(viewModel, it.challenge)
+        }
+    }
+
     LaunchedEffect(pitchViewModel) {
         launch {
             pitchViewModel.actionWheelViewModel.start()
         }
         launch {
             pitchViewModel.contextActionWheelViewModel.start()
+        }
+    }
+
+    if (challengeSession != null) {
+        LaunchedEffect(challengeSession) {
+            viewModel.uiState.uiStateFlow
+                .distinctUntilChanged { old, new ->
+                    old.delta?.id == new.delta?.id
+                }
+                .collect { snapshot ->
+                    challengeSession.onSnapshot(snapshot.game, snapshot.delta!!)
+                }
         }
     }
 
@@ -176,6 +247,9 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
         ActionSelectorViewModel(viewModel.uiState),
         LogViewModel(viewModel.uiState),
         DialogsViewModel(viewModel, viewModel.uiState),
-        onSettingsClick
+        onSettingsClick,
+        challengeSession = challengeSession,
+        onChallengeReset = challengeActions?.onReset ?: {},
+        onChallengeExit = challengeActions?.onExit ?: {},
     )
 }

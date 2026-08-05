@@ -31,6 +31,8 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.menu.challenges.ChallengeRepository
+import com.jervisffb.ui.menu.challenges.InMemoryChallengesRepository
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.utils.saveFile
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_MESSAGE
@@ -127,6 +129,10 @@ class MenuViewModel {
 
     // Expose a flow
     val setupAvailable: MutableStateFlow<GameType?> = MutableStateFlow(null)
+
+    // Only used when running challenges, but is very light-weight until
+    // `.initialize()` is called.
+    val challengesRepository: ChallengeRepository = InMemoryChallengesRepository()
 
     var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
@@ -342,6 +348,14 @@ class MenuViewModel {
     // Called by the UiGameController whenever a new snapshot is created. This can be used to determine
     // which menu actions should be enabled/disabled.
     fun updateUiState(uiSnapshot: UiGameSnapshot) {
+        // Not every running game is the one being played: the pitch preview on
+        // the challenge details page is a real game too, and it deliberately
+        // never attaches itself to the menu. Ignore snapshots from anything but
+        // the attached game, or the menu ends up describing the wrong one.
+        if (!this::uiState.isInitialized || uiSnapshot.game !== uiState.state) {
+            return
+        }
+
         // Enable/Disable Setup options
         val setupKickingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupKickingTeam)
         val setupReceivingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupReceivingTeam)

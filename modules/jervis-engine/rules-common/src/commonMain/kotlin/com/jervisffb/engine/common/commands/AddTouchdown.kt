@@ -2,9 +2,10 @@ package com.jervisffb.engine.common.commands
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.Player
 
-class AddTouchdown(private val team: Team, private val touchdowns: Int) : Command {
+class AddTouchdown(val player: Player, private val touchdowns: Int) : Command {
+    private val team = player.team
     private var originalValue: Int = -1
     override fun execute(state: Game) {
         if (team.isHomeTeam()) {

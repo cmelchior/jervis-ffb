@@ -40,7 +40,14 @@ object TestDummy {
         Manual(TeamActionMode.ALL_TEAMS),
         menuViewModel,
     )
-    val uiController = UiGameController(TeamActionMode.ALL_TEAMS, controller, actionProvider, menuViewModel, emptyList())
+    val uiController = UiGameController(
+        UiGameClientType.HOTSEAT,
+        TeamActionMode.ALL_TEAMS,
+        controller,
+        actionProvider,
+        menuViewModel,
+        emptyList()
+    )
     val dummyPitchWrapper = LocalPitchDataWrapper(uiController)
     val pitchViewModel by lazy { PitchViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {

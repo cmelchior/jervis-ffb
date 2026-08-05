@@ -54,6 +54,7 @@ import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_undo
 import com.jervisffb.ui.game.view.pitch.Pitch
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
+import com.jervisffb.ui.game.viewmodel.ChallengeSessionViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
@@ -86,6 +87,9 @@ fun GameScreen(
     logs: LogViewModel,
     dialogsViewModel: DialogsViewModel,
     onSettingsClick: () -> Unit,
+    challengeSession: ChallengeSessionViewModel? = null,
+    onChallengeReset: () -> Unit = {},
+    onChallengeExit: () -> Unit = {},
 ) {
     //val aspectRation = (145f+145f+782f)/452f
     val aspectRation = (550f+550f+2354f)/1362f
@@ -137,7 +141,6 @@ fun GameScreen(
                             pitch,
                             borderBrushSize = 3.dp
                         )
-                        // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
                     }
                     Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
                         Sidebar(rightDugout, Modifier)
@@ -215,16 +218,31 @@ fun GameScreen(
             ) {
                 // Mirror the weight(1f) split from the bottom Row:
                 val logPanelWidth = (gameScreenWidth - 4 * 24.jdp - 48.dp) / 2
-                // During replay, the transport controls take the place of the action panel.
-                when (replayActionsBar != null) {
-                    true -> {
+
+                // The behavior of the right-side panel changes dependning on game type:
+                // - Hosted games: Chat Window (not implemented yet) + Extra Actions
+                // - Hotseat games: Extra Actions
+                // - Spectator games: Spectator Chat Window (not implemented yet)
+                // - Replay: Replay Controls
+                // - Challenge: Show Challenge Info + Extra Actions
+                when {
+                    challengeSession != null -> {
+                        ExpandableChallengePanel(
+                            challengeSession,
+                            unknownActions,
+                            panelBackground,
+                            bottomRowHeight,
+                            Modifier.width(logPanelWidth),
+                        )
+                    }
+                    replayActionsBar != null -> {
                         ReplayControllerPanel(
                             replayActionsBar,
                             panelBackground,
                             Modifier.width(logPanelWidth).height(bottomRowHeight)
                         )
                     }
-                    false -> {
+                    else -> {
                         ExpandableActionPanel(
                             unknownActions,
                             panelBackground,
@@ -237,8 +255,15 @@ fun GameScreen(
         }
     }
     Dialogs(dialogsViewModel)
+    if (challengeSession != null) {
+        ChallengeOutcomeDialog(
+            session = challengeSession,
+            screenModel = screenModel,
+            onTryAgain = onChallengeReset,
+            onExit = onChallengeExit,
+        )
+    }
 }
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -400,7 +425,12 @@ private fun ExpandableActionPanel(
         // LogViewer must stay in composition permanently, so its LazyListState is never reset
         // as this causes crashes. The Box height constrains it to 0 when collapsed.
         Box(modifier = Modifier.height(animatedHeight)) {
-            ActionSelector(inputs, modifier = Modifier.fillMaxSize(), scrollState) { action ->
+            ActionSelector(
+                actions = inputs,
+                modifier = Modifier.fillMaxSize(),
+                showEmptyMessage = false,
+                scrollState = scrollState
+            ) { action ->
                 actions.actionSelected(action)
             }
         }
@@ -427,7 +457,3 @@ private fun ExpandableActionPanel(
         }
     }
 }
-
-
-
-

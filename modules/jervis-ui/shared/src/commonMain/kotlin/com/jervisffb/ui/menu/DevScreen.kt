@@ -35,8 +35,8 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
@@ -85,6 +85,7 @@ sealed interface GameMode
 data object Random : GameMode
 data class Manual(val actionMode: TeamActionMode) : GameMode
 data class Replay(val file: Path) : GameMode
+data class ChallengeGame(val challenge: Challenge) : GameMode
 
 class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
@@ -149,7 +150,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             GameVersion.BB2020 -> createDefaultBB2020AwayTeam(rules)
             GameVersion.BB2025 -> createDefaultBB2025AwayTeam(rules)
         }
-        val game = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam)
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {
@@ -210,7 +211,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
         val homeTeam = createDefaultBB7HomeTeam(rules)
         val awayTeam = createDefaultBB7AwayTeam(rules)
-        val game = Game(rules, homeTeam, awayTeam, Pitch.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam)
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {
@@ -349,7 +350,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
                     .onSuccess { fileContent ->
                         // Just silently ignore `null` values as it indicates the dialog was closed
                         if (path != null) {
-                            JervisSerialization.loadFromFileContent(fileContent)
+                            JervisSerialization.loadFromJsonContent(fileContent)
                                 .onSuccess { gameFile ->
                                     val viewModel = createLoadedGameScreenModel(menuViewModel, gameFile)
                                     navigator.push(GameScreen(menuViewModel, viewModel))

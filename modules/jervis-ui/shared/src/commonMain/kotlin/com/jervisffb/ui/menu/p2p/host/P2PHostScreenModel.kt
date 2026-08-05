@@ -8,7 +8,6 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.net.GameId
@@ -244,7 +243,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         homeTeam.model.coach = networkAdapter.homeCoach.value!!
         val awayTeam = networkAdapter.awayTeam.value!!
         awayTeam.model.coach = networkAdapter.awayCoach.value!!
-        val game = Game(rules, homeTeam.model, awayTeam.model, Pitch.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam.model, awayTeam.model)
         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
         val homeActionProvider = when (setupGameModel.coachSetupModel.coachType.value) {

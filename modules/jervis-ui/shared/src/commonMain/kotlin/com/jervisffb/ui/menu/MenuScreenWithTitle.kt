@@ -31,6 +31,7 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
+import com.jervisffb.ui.utils.containsBelowBaselineChars
 import com.jervisffb.ui.utils.jsp
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
@@ -128,7 +129,10 @@ fun MenuTitleBar(
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
         val paddingX = textPaddingLeft.toPx()
-        val paddingY = 16.dp.toPx()
+        val paddingY = when (title.containsBelowBaselineChars()) {
+            true -> (16 * 1.5f).dp.toPx()
+            false -> 16.dp.toPx()
+        }
 
         drawContext.canvas.skiaCanvas.apply {
             save()

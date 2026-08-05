@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game
 
 import androidx.compose.runtime.Immutable
+import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
@@ -26,6 +27,7 @@ import kotlinx.collections.immutable.PersistentMap
 @Immutable
 data class UiGameSnapshot(
     val actionOwner: Team?,
+    val delta: GameDelta?,
     val game: Game, // We should try to remove this since it is mutable
     val squares: PersistentMap<PitchCoordinate, UiPitchSquare>,
     val players: PersistentMap<PlayerId, UiPitchPlayer>,

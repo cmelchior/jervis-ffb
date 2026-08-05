@@ -177,6 +177,7 @@ import com.jervisffb.ui.game.view.NoContextMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.FrameRateAverager
+import com.jervisffb.utils.closeIfPossible
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.collections.immutable.persistentListOf
@@ -186,6 +187,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -387,7 +389,11 @@ class UiGameController(
         ChooseKickingTeamWheelController
     )
 
-    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
+    // Dispatcher is held separately from the scope because cancelling a scope does not release the
+    // thread behind its dispatcher. It must be closed manually in `stopGameEventLoop()`
+    private val animationDispatcher = singleThreadDispatcher("AnimationDispatcher")
+    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + animationDispatcher)
+
     val gameScope = CoroutineScope(
         Job()
             + CoroutineName("GameLoopScope")
@@ -397,6 +403,11 @@ class UiGameController(
             //  in the background and then offload it all to the Main Thread for rendering
             + Dispatchers.Main
     )
+
+    // Once set, the game loop stops consuming actions. One-way on purpose: an
+    // attempt that is over stays over, and "Try Again" builds a whole new game
+    // with a new controller, so nothing ever needs to unfreeze this one.
+    private var actionsFrozen = false
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
@@ -455,6 +466,15 @@ class UiGameController(
     }
 
     /**
+     * Stops the game loop from processing any further actions.
+     * This can e.g., be used when displaying End-of-Game or End-of-Challenge
+     * dialogs.
+     */
+    fun freezeActions(freeze: Boolean = true) {
+        actionsFrozen = freeze
+    }
+
+    /**
      * Start the main game loop.
      *
      * This will start executing the game by setting up receiving updates from
@@ -491,6 +511,7 @@ class UiGameController(
             // Run main game loop
             var lastUiState = UiGameSnapshot(
                 actionOwner = null,
+                delta = null,
                 game = controller.state,
                 squares = persistentMapOf(),
                 players = persistentMapOf(),
@@ -559,21 +580,25 @@ class UiGameController(
                     // this should fix the immediate problem of these actions not showing up
                     // in the save file. The downside is that we risk the UI being slightly out
                     // of sync until the next "real" action
-                    tailrec suspend fun getNextNonDevAction(): GameAction {
+                    tailrec suspend fun getNextAcceptedAction(): GameAction {
                         val action = actionProvider.getAction()
-                        return if (action is DevModeGameAction) {
-                            try {
-                                gameController.handleAction(action)
-                                devActionHandled.emit(Unit)
-                            } catch (ex: InvalidActionException) {
-                                reportInvalidAction(ex)
+                        return when {
+                            // When actions are frozen, we still accept them from the UI
+                            // but silently drop them, leaving the UI and board state untouched.
+                            actionsFrozen -> getNextAcceptedAction()
+                            action is DevModeGameAction -> {
+                                try {
+                                    gameController.handleAction(action)
+                                    devActionHandled.emit(Unit)
+                                } catch (ex: InvalidActionException) {
+                                    reportInvalidAction(ex)
+                                }
+                                getNextAcceptedAction()
                             }
-                            getNextNonDevAction()
-                        } else {
-                            action
+                            else -> action
                         }
                     }
-                    getNextNonDevAction()
+                    getNextAcceptedAction()
                 }
 
                 // After an action was selected, run all decorators that modify
@@ -619,6 +644,17 @@ class UiGameController(
                 throw it
             }
         }
+    }
+
+    /**
+     * Counterpart to [startGameEventLoop]. It must be called when a game is
+     * stopped to release all resources.
+     */
+    fun stopGameEventLoop() {
+        gameScope.cancel()
+        animationScope.cancel()
+        animationDispatcher.closeIfPossible()
+        actionProvider.stopHandler()
     }
 
     fun checkHideActionWheelImmediately(gameController: GameEngineController, lastWheelLocation: PitchCoordinate?): Boolean {

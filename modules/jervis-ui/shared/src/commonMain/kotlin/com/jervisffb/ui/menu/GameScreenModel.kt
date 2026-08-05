@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
@@ -44,6 +43,11 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.PanelBackground
 import com.jervisffb.ui.game.viewmodel.PitchDetails
 import com.jervisffb.ui.game.viewmodel.PitchViewData
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -119,6 +123,17 @@ class GameScreenModel(
     private val onEngineInitialized: () -> Unit = { },
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
+
+    // Scope for everything that observes this game for as long as it exists.
+    // Deliberately not Voyager's `screenModelScope`. GameScreenModels are always
+    // constructed directly rather than through `rememberScreenModel`, and for an
+    // unregistered model Voyager falls back to the key of whichever screen was
+    // registered last. Every game in the process would share one scope, owned by
+    // an unrelated screen and cancelled with none of them, which kept every game
+    // ever built reachable. This is also why `onDispose must be called manually.
+    private val modelScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Main + CoroutineName("GameScreenModel")
+    )
 
     val pitchViewData: MutableStateFlow<PitchViewData> = MutableStateFlow(
         PitchViewData(
@@ -238,7 +253,7 @@ class GameScreenModel(
             computePlayerStatCard(fixedPlayer, hoveredPlayer, forHomeSide = true),
             computePlayerStatCard(fixedPlayer, hoveredPlayer, forHomeSide = false)
         )
-    }.shareIn(screenModelScope, SharingStarted.Eagerly, 1)
+    }.shareIn(modelScope, SharingStarted.Eagerly, 1)
 
     fun playerStatCardFlowFor(team: Team): Flow<UiPlayerCard?> =
         playerStatCardFlow
@@ -313,7 +328,7 @@ class GameScreenModel(
             awayTeam.roster.name,
             formatCurrency(awayTeam.teamValue)
         )
-        screenModelScope.launch {
+        modelScope.launch {
             uiState.uiStateFlow.collect {
                 isGameStatusBoxEnabled.value = it.status.centerBadgeEnabled
                 gameStatusBoxTitle.value = it.status.centerBadgeText
@@ -325,7 +340,7 @@ class GameScreenModel(
             .map { snapshot -> snapshot.game.activePlayer }
             .distinctUntilChanged()
             .onEach { playerStatCardDismissed.value = false }
-            .launchIn(screenModelScope)
+            .launchIn(modelScope)
     }
 
     /**
@@ -350,21 +365,42 @@ class GameScreenModel(
 
     /**
      * Initialize game icons and other assets.
+     *
+     * [attachToMenu] should only be `false` for a game that exists to be looked
+     * at rather than played, such as the preview on the challenge details page.
+     * Those must not become "the current game" as far as the menu is concerned,
+     * or undo and the game menu keep pointing at them once they are discarded.
      */
-    suspend fun initialize(density: Density) {
+    suspend fun initialize(density: Density, attachToMenu: Boolean = true) {
         loadingMessages.value = "Initializing icons"
         IconFactory.initialize(density, homeTeam, awayTeam)
         loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
-        menuViewModel.uiState = uiState
+        if (attachToMenu) {
+            menuViewModel.uiState = uiState
+        }
+        // Also starts the rules engine, so the controller must not have been
+        // started beforehand.
         uiState.startGameEventLoop()
-        onEngineInitialized()
+        if (attachToMenu) {
+            onEngineInitialized()
+        }
         loadingMessages.value = "Starting game"
         isLoaded.value = true
     }
 
-    fun stopGame() {
+    /**
+     * Releases the game and everything observing it.
+     *
+     * Voyager never calls this as the model is not registered with a `Screen`, so
+     * whoever built the game has to.
+     *
+     * Safe to call more than once.
+     */
+    override fun onDispose() {
         onGameStopped()
+        uiState.stopGameEventLoop()
+        modelScope.cancel()
     }
 
     fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates, borderSize: Float) {

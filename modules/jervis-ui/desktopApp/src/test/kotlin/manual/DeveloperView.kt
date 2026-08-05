@@ -43,7 +43,6 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
@@ -77,7 +76,6 @@ fun mainTeamTable() {
         rules,
         createDefaultBB2020HomeTeam(rules),
         createDefaultBB2020AwayTeam(rules),
-        Pitch.createForRuleset(rules),
     )
 
     application {

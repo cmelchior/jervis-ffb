@@ -1,5 +1,6 @@
 package com.jervisffb.engine.serialization
 
+import com.jervisffb.engine.challenge.ChallengeScore
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -15,6 +16,10 @@ import kotlinx.serialization.modules.subclass
  * [JervisSerialization].
  */
 val coreSerializerModule = SerializersModule {
+    polymorphic(ChallengeScore::class) {
+        subclass(com.jervisffb.engine.challenge.ChallengeScore.CompletionOnly::class)
+        subclass(com.jervisffb.engine.challenge.ChallengeScore.JervisRiskScore::class)
+    }
     polymorphic(com.jervisffb.engine.rules.builder.BallSelectorRule::class) {
         subclass(com.jervisffb.engine.rules.builder.RollOnUnusualBallTable::class)
         subclass(com.jervisffb.engine.rules.builder.SpecificUnusualBall::class)

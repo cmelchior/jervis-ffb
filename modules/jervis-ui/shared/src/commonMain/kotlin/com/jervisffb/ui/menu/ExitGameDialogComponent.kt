@@ -73,7 +73,7 @@ fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> 
             JervisButton(
                 text = "Exit",
                 onClick = {
-                    viewModel.stopGame()
+                    viewModel.onDispose()
                     navigator.pop()
                 },
                 buttonColor = JervisTheme.rulebookBlue,

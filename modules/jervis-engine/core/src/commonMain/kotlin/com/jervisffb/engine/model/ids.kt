@@ -25,7 +25,13 @@ value class CoachId(val value: String)
 
 @Serializable
 @JvmInline
-value class SpectatorId(val value: String)
+value class ChallengeId(val value: String)
+
+@Serializable
+@JvmInline
+value class ChallengeScoringId(val value: String)
+
+
 
 /**
  * ID that identities a single die.
@@ -114,6 +120,10 @@ value class RosterId(val id: String)
 @Serializable
 @JvmInline
 value class SetupId(val value: String)
+
+@Serializable
+@JvmInline
+value class SpectatorId(val value: String)
 
 @Serializable
 @JvmInline

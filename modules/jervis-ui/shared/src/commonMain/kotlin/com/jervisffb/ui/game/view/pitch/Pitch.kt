@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -87,7 +86,6 @@ val LocalPitchData = staticCompositionLocalOf<LocalPitchDataWrapper> {
  * it will look good? Also, corner cases might surface while implementing features that require
  * us to rework them.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Pitch(
     modifier: Modifier,
@@ -106,17 +104,13 @@ fun Pitch(
     ) {
         val localDensity = LocalDensity.current
         val pitchDataSize = remember(maxWidth, maxHeight) {
-            // Calculate maximum square size based on maximum width
-            // If we need to render pitch markers, we add padding for it, so we can
-            // draw the borders without them interacting with pitch squares or the end zone.
-            val borderBrushPx = if (pitch.drawPitchMarkers) with(localDensity) { borderBrushSize.toPx().toInt() } else 0
-            val maxWidthPx = with(localDensity) { maxWidth.toPx() }
-            val squareSize = ((maxWidthPx - borderBrushPx*2) / vm.rules.pitchWidth).toInt() // Must be smaller than maxWidth
-            PitchSizeData(
-                borderBrushSizePx = borderBrushPx,
-                squareSize = IntSize(squareSize, squareSize),
-                squaresPrRow = vm.rules.pitchWidth,
-                squaresPrColumn = vm.rules.pitchHeight,
+            calculatePitchSizeData(
+                availableWidth = maxWidth,
+                density = localDensity,
+                pitchWidth = vm.rules.pitchWidth,
+                pitchHeight = vm.rules.pitchHeight,
+                borderBrushSize = borderBrushSize,
+                drawPitchMarkers = pitch.drawPitchMarkers,
             )
         }
         LaunchedEffect(pitchDataSize) {

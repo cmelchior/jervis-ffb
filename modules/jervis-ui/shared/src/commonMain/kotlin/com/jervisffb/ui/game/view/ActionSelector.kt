@@ -4,6 +4,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -11,6 +12,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.actions.BlockTypeSelected
@@ -52,6 +55,7 @@ fun ActionSelector(
     actions: List<GameAction>,
     modifier: Modifier,
     scrollState: ScrollState,
+    showEmptyMessage: Boolean,
     onActionSelected: (GameAction) -> Unit,
 ) {
     Column(modifier = modifier.padding(8.dp)) {
@@ -62,6 +66,16 @@ fun ActionSelector(
                     .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
+            if (showEmptyMessage && actions.isEmpty()) {
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    textAlign = TextAlign.Center,
+                    fontStyle = FontStyle.Italic,
+                    text = "No Extra Actions Available",
+                    fontSize = 14.sp,
+                    color = JervisTheme.white
+                )
+            }
             actions.forEach { action ->
                 Button(
                     modifier = Modifier.padding(0.dp),

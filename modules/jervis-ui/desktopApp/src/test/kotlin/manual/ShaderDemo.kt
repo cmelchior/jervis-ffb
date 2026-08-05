@@ -16,9 +16,11 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.skiaShader
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
@@ -29,10 +31,9 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.shared.generated.resources.Res
-import com.jervisffb.shared.generated.resources.icons_actions_jump
+import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.icons.IconFactory
 import org.intellij.lang.annotations.Language
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 import kotlin.math.min
@@ -64,9 +65,8 @@ fun app() {
             onCloseRequest = ::exitApplication,
         ) {
             val density = LocalDensity.current // OR, for example, Density(1f, 1f)
-            val image = painterResource(Res.drawable.icons_actions_jump)
-            val size = image.intrinsicSize
-            ImageShaderExample(image.toImageBitmap(size, density))
+            val image = IconFactory.getActionIcon(ActionIcon.MOVE)
+            ImageShaderExample(image)
         }
     }
 
@@ -92,7 +92,7 @@ fun ImageShaderExample(bitmap: ImageBitmap) {
     @Language("GLSL")
     val shaderCode = """
 uniform shader image;
-uniform vec2 resolution; // [widthPx, heightPx] 
+uniform vec2 resolution; // [widthPx, heightPx]
 uniform vec2 scaleFactor; // [xScale, yScale]
 // uniform float blurRadius;
 
@@ -106,16 +106,16 @@ vec4 blur(vec2 uv) {
         for (float y = -blurRadius; y <= blurRadius; y++) {
             vec2 offset = vec2(x, y);
             vec4 sample = image.eval(uv + offset);
-            
+
             // Use alpha or brightness as the mask source
             float maskValue = sample.a * 5; // Use sample.r for brightness-based masking
             float weight = exp(-0.5 * (x * x + y * y) / (blurRadius * blurRadius));
-            
+
             sum += vec4(maskValue) * weight;
             total += weight;
         }
     }
-    
+
     return sum / total;
 }
 
@@ -132,7 +132,7 @@ half4 main(vec2 fragCoord) {
 }
     """.trimIndent()
 
-    val imageShader = ImageShader(bitmap, TileMode.Decal, TileMode.Decal)
+    val imageShader = ImageShader(bitmap, TileMode.Decal, TileMode.Decal).skiaShader
     val runtimeEffect = RuntimeEffect.makeForShader(shaderCode)
 
     BoxWithConstraints(
@@ -156,7 +156,7 @@ half4 main(vec2 fragCoord) {
                     uniform("resolution", size.width / 2.0f, size.height / 2.0f)
                     uniform("scaleFactor", scaleX, scaleY)
                 }.makeShader()
-                val brush = ShaderBrush(shader)
+                val brush = ShaderBrush(shader.asComposeShader())
 
                 // Apply transformation
                 onDrawBehind {

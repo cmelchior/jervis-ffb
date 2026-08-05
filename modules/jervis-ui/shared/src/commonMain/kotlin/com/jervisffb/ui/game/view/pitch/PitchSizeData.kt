@@ -1,11 +1,44 @@
 package com.jervisffb.ui.game.view.pitch
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.fumbbl.net.model.FieldCoordinate
 import kotlin.math.round
 import kotlin.math.roundToInt
+
+/**
+ * Works out how big a pitch will be when drawn into [availableWidth].
+ *
+ * To preserve the pixelated style that FUMBBL assets have, while avoiding too
+ * many rendering artifacts, squares are whole pixels. This means the final
+ * total width is normally a little narrower than the space offered. Anything
+ * that needs to match the pitch exactly, such as a Challenge placeholder image
+ * shown while a game loads, has to go through here rather than approximating
+ * it.
+ */
+fun calculatePitchSizeData(
+    availableWidth: Dp,
+    density: Density,
+    pitchWidth: Int,
+    pitchHeight: Int,
+    borderBrushSize: Dp,
+    drawPitchMarkers: Boolean,
+): PitchSizeData {
+    // If we need to render pitch markers, we add padding for it, so we can
+    // draw the borders without them interacting with pitch squares or the end zone.
+    val borderBrushPx = if (drawPitchMarkers) with(density) { borderBrushSize.toPx().toInt() } else 0
+    val maxWidthPx = with(density) { availableWidth.toPx() }
+    val squareSize = ((maxWidthPx - borderBrushPx * 2) / pitchWidth).toInt() // Must be smaller than maxWidth
+    return PitchSizeData(
+        borderBrushSizePx = borderBrushPx,
+        squareSize = IntSize(squareSize, squareSize),
+        squaresPrRow = pitchWidth,
+        squaresPrColumn = pitchHeight,
+    )
+}
 
 // This includes the border (if any)
 data class PitchSizeData(
