@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.statistics.probability.Surprisal
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SamplingMode
@@ -203,6 +204,8 @@ fun Modifier.onClickWithSmallDragControl(
     }
 }
 
+fun Surprisal.toFixed(decimals: Int, padding: Boolean = false): String = value.toFixed(decimals, padding)
+
 // Work-around for Kotlin Multiplatform not having a format() method.
 // This returns a nice representation of a double, with a max number of decimals.
 fun Double.toFixed(decimals: Int, padding: Boolean = false): String {
@@ -248,6 +251,18 @@ fun String.containsBelowBaselineChars(): Boolean {
             'y' -> true
             else -> false
         }
+    }
+}
+
+/**
+ * Helper method to zip a sequence with its previous element or `null` if no previous element exists.
+ */
+fun <T> List<T>.withPrevious(): Sequence<Pair<T?, T>> = sequence {
+    var previous: T? = null
+
+    for (current in this@withPrevious) {
+        yield(previous to current)
+        previous = current
     }
 }
 

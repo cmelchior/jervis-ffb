@@ -102,6 +102,8 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.Surprisal
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -312,6 +314,11 @@ fun List<D6DieRoll>.sum(): Int = this.sumOf { it.result.value }
 
 @JvmName("sumOfStatModifiers")
 fun List<StatModifier>.sum(): Int = this.sumOf { it.modifier }
+
+@JvmName("sumOfSurprisals")
+fun Collection<Surprisal>.sum(): Surprisal = Surprisal(this.sumOf { it.value })
+@JvmName("sumOfProbabilities")
+fun Collection<Probability>.sum(): Probability = Probability(this.sumOf { it.value })
 
 class InvalidActionException(message: String) : RuntimeException(message)
 

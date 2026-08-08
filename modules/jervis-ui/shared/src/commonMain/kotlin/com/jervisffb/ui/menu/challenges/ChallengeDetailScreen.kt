@@ -217,7 +217,7 @@ private fun ChallengeDetailContent(
             }
             if (details.data.scoring != ChallengeScoring.CompletionOnly) {
                 Section("Scoreboard") {
-                    Scoreboard(details.scoreboard)
+                    Scoreboard(details.scoreboard, "Jervis Probability Score")
                 }
             }
 
@@ -242,7 +242,7 @@ private fun Section(
 }
 
 @Composable
-private fun Scoreboard(entries: List<ScoreboardEntry>) {
+private fun Scoreboard(entries: List<ScoreboardEntry>, scoreLabel: String) {
     if (entries.isEmpty()) {
         Text(
             text = "No solutions submitted yet.",
@@ -255,8 +255,8 @@ private fun Scoreboard(entries: List<ScoreboardEntry>) {
             Text("#", modifier = Modifier.width(32.dp), fontWeight = FontWeight.Bold, color = JervisTheme.contentTextColor)
             Text("Coach", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, color = JervisTheme.contentTextColor)
             Text(
-                text = "Success",
-                modifier = Modifier.width(80.dp),
+                text = scoreLabel,
+                modifier = Modifier.width(220.dp),
                 fontWeight = FontWeight.Bold,
                 color = JervisTheme.contentTextColor,
                 textAlign = TextAlign.End,
@@ -314,7 +314,7 @@ private fun formatUserScore(userState: ChallengeUserState): AnnotatedString {
             is ChallengeScore.CompletionOnly -> {
                 append(" ${userState.getFormattedDate()}")
             }
-            is ChallengeScore.JervisRiskScore -> {
+            is ChallengeScore.ProbabilityScore -> {
                 append(" ${userState.getFormattedDate()} with ${userState.getFormattedScore()}")
             }
             null -> error("Should not be called with no score")

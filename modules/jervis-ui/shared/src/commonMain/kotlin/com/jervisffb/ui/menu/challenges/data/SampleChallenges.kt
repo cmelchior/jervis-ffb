@@ -14,7 +14,6 @@ import com.jervisffb.engine.challenge.ChallengeCategory
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.engine.challenge.GoalTarget
-import com.jervisffb.engine.challenge.probability.JervisRiskScore
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
@@ -85,8 +84,8 @@ object SampleChallenges {
                     category = ChallengeCategory.ONE_TURN_TOUCHDOWNS
                     description = "The classic. Score a touchdown in a single turn using a hand-off and a " +
                         "blitz to clear the final defender."
-                    scoring = ChallengeScoring.JervisRiskScoring
                     addSampleTeam(positionJson)
+                    scoring = ChallengeScoring.ProbabilityScoring(homeTeam!!.id)
                     goal = ScoreTouchdownGoalBuilder()
                         .addModifier(PerformedByPlayer(homeTeam!!.first()))
                         .build()
@@ -97,10 +96,6 @@ object SampleChallenges {
                 }.build(),
                 communityVotes = 63,
                 userVote = true,
-                otherScores = setOf(
-                    jrsEntry("Ilios", 0.98),
-                    jrsEntry("Nuffle", 0.1),
-                ),
             ),
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("two-heads-are-better")).apply {
@@ -110,19 +105,17 @@ object SampleChallenges {
                     description = "A lone Black Orc stands between your Blitzer and a clear run at the " +
                         "end zone. Knock him down and stay on your feet, without rolling a single skull."
                     addSampleTeam(positionJson)
+                    scoring = ChallengeScoring.ProbabilityScoring(homeTeam!!.id)
                     goal = BlockGoalBuilder(homeTeam!!, GoalTarget.AnyPlayers(count = 1, sameTeam = false))
                         .addModifier(BlockDiceRequired(2))
                         .build()
-                    addRule(TeamRerollsAvailable(0))
+                    addRule(TeamRerollsAvailable(1))
                     addRule(TurnLimit(1))
                 }.build(),
                 communityVotes = 42,
                 userVote = false,
-                userScore = ChallengeScore.CompletionOnly(Clock.System.now()),
-                otherScores = setOf(
-                    completionEntry("GrimIronjaw", Clock.System.now()),
-                    completionEntry("Nuffle", Clock.System.now()),
-                ),
+                userScore = null,
+                otherScores = emptySet(),
             ),
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("threading-the-needle")).apply {
@@ -300,17 +293,6 @@ object SampleChallenges {
         return ScoreboardEntry(
             coach = coach,
             score = ChallengeScore.CompletionOnly(date)
-        )
-    }
-
-    private fun jrsEntry(coachName: String, value: Double): ScoreboardEntry {
-        val coach = coachName.toSampleCoach()
-        return ScoreboardEntry(
-            coach = coach,
-            score = ChallengeScore.JervisRiskScore(
-                Clock.System.now(),
-                JervisRiskScore(baseRisk = value, benefitBySource = emptyMap())
-            )
         )
     }
 

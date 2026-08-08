@@ -8,6 +8,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.SerializedTeam
+import com.jervisffb.engine.statistics.GameStatistics
 
 /**
  * This class describes a single challenge.
@@ -58,6 +59,7 @@ data class Challenge(
             initialActions = setup,
             validateActions = true,
             protectInitialActions = true, // Actions provided by challenge authors cannot be modified.
+            statistics = if (scoring is ChallengeScoring.ProbabilityScoring) GameStatistics() else null,
             onStarted = { controller ->
                 rules.forEach { rule -> rule.applyToGame(controller.state) }
             }

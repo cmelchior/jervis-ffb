@@ -43,6 +43,15 @@ class Kick(
 
     override fun canReroll(state: Game, type: DiceRollType, dicePool: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         if (rerollUsed) return false
+        return isApplicableTo(state, type, dicePool, wasSuccess)
+    }
+
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
         val context = state.getContextOrNull<PuntContext>() ?: return false
         if (player != context.punter) return false
         return when (type) {

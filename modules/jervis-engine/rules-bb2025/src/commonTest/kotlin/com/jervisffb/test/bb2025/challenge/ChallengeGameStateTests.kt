@@ -7,12 +7,15 @@ import com.jervisffb.engine.bb2025.procedures.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.challenge.ChallengeBuilder
 import com.jervisffb.engine.challenge.ChallengeCategory
+import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.test.bb2025.createDefaultHomeTeamBB2025
 import com.jervisffb.test.bb2025.humanTeamAwayBB2025
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotSame
+import kotlin.test.assertTrue
 
 /**
  * Tests that a challenge hands every game its own teams.
@@ -21,7 +24,7 @@ import kotlin.test.assertNotSame
  * team re-rolls piling up, because a Leader re-roll is added at every start of
  * half and nothing reset the list between games.
  */
-class ChallengeGameStateTest {
+class ChallengeGameStateTests {
 
     private fun buildChallenge(rerolls: Int = 0): Challenge {
         val rules = StandardBB2025Rules()
@@ -87,5 +90,21 @@ class ChallengeGameStateTest {
             this.startManualMode()
             this.state.homeTeam.availableRerollCount
         })
+        buildChallenge(rerolls = 2).createGame().run {
+            startManualMode()
+            assertTrue(state.homeTeam.rerolls.all { it.teamId == state.homeTeam.id })
+            assertTrue(state.awayTeam.rerolls.all { it.teamId == state.awayTeam.id })
+        }
+    }
+
+    @Test
+    fun riskTrackingStartsAfterProtectedSetup() {
+        val base = buildChallenge()
+        val challenge = base.copy(scoring = ChallengeScoring.ProbabilityScoring(base.homeTeam.id))
+        val controller = challenge.createGame()
+
+        assertFalse(controller.state.collectChanceData)
+        controller.startManualMode()
+        assertTrue(controller.state.collectChanceData)
     }
 }

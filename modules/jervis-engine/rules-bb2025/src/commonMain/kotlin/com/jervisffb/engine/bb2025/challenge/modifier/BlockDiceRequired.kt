@@ -1,14 +1,15 @@
 package com.jervisffb.engine.bb2025.challenge.modifier
 
 import com.jervisffb.engine.GameDelta
-import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.challenge.ChallengeContext
 import com.jervisffb.engine.challenge.ChallengeContextHolder
 import com.jervisffb.engine.challenge.GoalModifier
 import com.jervisffb.engine.challenge.GoalStatus
 import com.jervisffb.engine.challenge.ModifierProgress
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.MAX_BLOCK_DICE
 
 /**
@@ -42,7 +43,10 @@ data class BlockDiceRequired(val count: Int) : GoalModifier {
     ): ModifierProgress {
         val requiredDiceUsed = delta.steps.any { step ->
             when (step.node == SingleStandardBlockRollDice.RollDice) {
-                true -> ((step.action as? DiceRollResults)?.size ?: 0) >= count
+                true -> {
+                    val dice = state.getContext<BlockContext>().calculateNoOfBlockDice()
+                    dice >= count
+                }
                 false -> false
             }
         }

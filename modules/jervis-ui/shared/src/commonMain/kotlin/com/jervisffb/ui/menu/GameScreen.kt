@@ -214,7 +214,7 @@ private fun GameScreenContent(
         LaunchedEffect(challengeSession) {
             viewModel.uiState.uiStateFlow
                 .distinctUntilChanged { old, new ->
-                    old.delta?.id == new.delta?.id
+                    old.delta?.id == new.delta?.id && old.delta?.reversed == new.delta?.reversed
                 }
                 .collect { snapshot ->
                     challengeSession.onSnapshot(snapshot.game, snapshot.delta!!)

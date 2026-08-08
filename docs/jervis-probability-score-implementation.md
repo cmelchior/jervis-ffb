@@ -1,0 +1,330 @@
+# Jervis Probability Score
+
+The Jervis Probability Score (JPS) is a way to compare completed solutions to a
+Jervis Challenge. It answers a deliberately narrow question:
+
+> How risky was the sequence of dice results that this solution chose,
+> including rerolls available along this path.
+
+It is not a measure of how clever the solution was, how difficult it was to
+find, or how optimal it is. In particular, it says nothing about the state of 
+the pitch, how many players are in tackle zones, or whether the opponent can 
+score next turn.
+
+The score is 0.0–100% and higher is better.
+
+## The idea in plain language
+
+Every chance event (dice roll) in the sequence contributes some chance of 
+success.
+
+JPBS combines those chances into one number. A solution with many risky
+rolls will generally score worse than a solution that reaches the same goal
+with safer rolls.
+
+The existing dice interface is intentionally unchanged. JPS uses the die value 
+selected by the coach as the evidence of how demanding that event was. It 
+does not ask the coach to select a separate “this is what I wanted the
+roll to do” option.
+
+Example: If the coach selects a 5 where a 3+ is enough. JPS treats this as a 
+5+ roll.
+
+This has two consequences:
+
+1) If a coach intentionally or accidentally selects a wrong value, the score 
+   will be lower than it could be. E.g., if a 4 was selected on a dodge roll 
+   that only required 3+. This will force players to learn the underlying rules
+   and improve their understanding of the game to know what they need to roll.
+
+2) It handles modifier skills cleanly as JPS expects the coach to take these 
+   into account when selecting the dice value. This approach has the 
+   advantage that it can re-use the existing dice UI rather than invent a new 
+   one just for challenges.
+
+### Blocks
+
+Blocks use the face that the coach actually selected. This avoids asking which
+block result the coach considered a success. A face that appears on more than
+one side of a block die is naturally more likely than a face with only one
+side. With several dice, the scorer uses the chance that the selected face is
+available in the pool (or that every die shows it when the opponent chooses
+the result).
+
+This means that the chance for a successful block is generally 
+pessimistic as it doesn't take into account e.g., Tackle overriding Dodge.
+
+### Rerolls
+
+Rerolls are part of the probability, but they are handled by a fixed, 
+predictable policy rather than by trying to search every possible variation.
+
+The policy gives priority to:
+
+1. A standard skill reroll.
+2. A team reroll that does not need to pass a Loner roll.
+3. Pro or a Loner-gated reroll, depending on which has the better chance
+   of being activated. Pro wins an exact tie.
+
+If Pro or Loner fails their activation roll, it stops there. The policy does
+not attempt to recover from it by using a team reroll on the activation roll.
+
+There are two ways (or modes) a challenge can record rerolls
+
+The challenge’s configured scoring policy determines which of the modes is
+used. Scores from different modes or policy versions cannot be compared against
+each other.
+
+The modes are:
+
+#### Fixed-Reroll scoring
+
+This is the simplest mode. An initial roll and a reroll used in the 
+sequence are treated as one logical event, using the final selected die value. 
+The probability calculator then applies the fixed reroll policy to the 
+alternative branch of that event. This makes the result independent of which 
+reroll button happened to be clicked during the game.
+
+#### Actual-Reroll-Choice scoring
+
+This hybrid mode also records the actual (physical) choices made by the coach, 
+and is the default mode:
+
+- The initial die and the final reroll are separate events.
+- The exact reroll selected by the coach is consumed.
+- A fresh die that was accepted without a reroll can still receive the fixed
+  policy’s hypothetical recovery chance.
+- A die that was actually rerolled cannot receive another hypothetical
+  recovery.
+- Activation rolls, such as Pro and Loner, are recorded in chronological order.
+
+This means that a questionable reroll choice is visible in the score. For
+example, choosing a 2 and then rerolling it produces two physical events. A
+selected natural 1 contributes no dice risk, but it still consumes the chosen
+reroll, affecting future rolls. 
+
+Similarly, choosing a 2, where a 3 is required, is a failure in the eyes of 
+the rules, but the value will be used as success when scoring the sequence.
+
+Actual rerolls are consumed even when their activation fails. If an earlier
+hypothetical branch spends a reroll that a later demonstrated reroll needs,
+that branch ends at the later reroll.
+
+Some examples where this behavior might be counter-intuitive:
+
+Consider three logical 3+ tests by the solving team, with one team reroll
+available. The recorded physical results are:
+
+1. Roll a 2, use the team reroll, and roll a 3.
+2. Roll a 3 and accept it.
+3. Roll a 3 and accept it.
+
+There are four physical D6 results here, but only three logical tests. Under
+Actual-Reroll-Choice scoring, the first test contributes both physical dice.
+For a real 3+ test, a success is 3–6 (4/6) and a failure is 1–2 (2/6).
+
+The three scoring interpretations are:
+
+1. **Fixed-Reroll scoring**
+
+   The first roll and its reroll are collapsed into one logical test using the
+   final value, 3. All three logical tests are therefore treated as 3+ tests.
+   With no failure, the chance is `(4/6) × (4/6) × (4/6) = 8/27`.
+
+   One failure can be recovered. There are three possible positions for that
+   failure, giving `3 × (2/6) × (4/6) × (4/6) × (4/6) = 8/27`.
+
+   **Total: `8/27 + 8/27 = 16/27 = 59.26%`.**
+
+2. **Hybrid-Reroll scoring with the optimistic selected-value mapping**
+
+   This is the current hybrid convention. It scores the selected initial 2
+   as if it represented a 2+ success, so that result contributes 5/6. The
+   rerolled 3 and the two later 3s each contribute 4/6.
+
+   **Total: `(5/6) × (4/6) × (4/6) × (4/6) = 20/81 = 24.69%`.**
+
+   This is an approximation, not the real probability of the failed 3+ roll.
+   The team reroll was actually used, so it is consumed, and neither later
+   test can receive a hypothetical recovery.
+
+3. **Hybrid-Reroll scoring with the real success/failure mapping**
+
+   For the literal physical trace, the initial 2 belongs to the real failure
+   range, 1–2, and therefore contributes 2/6. The rerolled 3 and the two later
+   3s are successes in the 3–6 range and each contributes 4/6.
+
+   **Total: `(2/6) × (4/6) × (4/6) × (4/6) = 8/81 = 9.88%`.**
+
+The totals are therefore:
+
+| Scoring interpretation | Total probability |
+|---|---:|
+| Fixed reroll | **16/27 = 59.26%** |
+| Hybrid reroll, optimistic 2+ mapping | **20/81 = 24.69%** |
+| Hybrid reroll, real 1–2 failure mapping | **8/81 = 9.88%** |
+
+This difference is by design, as the coach can choose the same sequence as
+"Fixed" for a better score. The optimistic 2+ mapping is used for UX reasons, as
+using the real failure mapping would require massive UI changes compared to a 
+real game, which is undesirable. Also, since the optimistic mapping will always
+result in a lower value than the optimal case, it being in-accurate is 
+acceptable.
+
+
+## How solutions are ranked
+
+The final Probability Score is the total probability of the entire recorded 
+sequence. 
+
+An unsupported or incomplete chance event makes the result unscored rather
+than silently assigning it an optimistic estimate.
+
+-----
+
+## Statistical reference
+
+This section describes the implementation for readers who want the exact
+definition.
+
+### Surprisal and JBS
+
+For a line with final assigned probability $P$, the score is its surprisal:
+
+\[
+\mathrm{JPS} = -\log_2(P)
+\]
+
+Equivalently, a score of $r$ bits corresponds to probability
+
+\[
+P = 2^{-r}.
+\]
+
+For independent events, surprisal is additive. The scorer nevertheless uses a
+forward resource-state calculation, because reroll resources can be shared
+by multiple events.
+
+For a successful D6 event, the selected value is read as follows:
+
+| Selected value | Assigned chance | Surprisal
+|---:|---:|---:|
+| 1 | 6/6 | 0.0 bits |
+| 2 | 5/6 | 0.26 bits |
+| 3 | 4/6 | 0.58 bits |
+| 4 | 3/6 | 1.00 bit |
+| 5 | 2/6 | 1.58 bits |
+| 6 | 1/6 | 2.58 bits |
+
+
+### Event probabilities
+
+For the fixed-reroll scorer, let $v$ be the final selected D6 value and
+let $s$ indicate whether the engine observed the event as a success:
+
+\[
+p(v,s) =
+\begin{cases}
+(7-v)/6 & \text{if } s=\text{success}\\
+v/6 & \text{if } s=\text{failure}
+\end{cases}
+\]
+
+For the hybrid actual-choice scorer, every physical selected D6 value uses:
+
+\[
+p(v) = (7-v)/6
+\]
+
+regardless of whether the rules engine classified that particular die as a
+success or failure. This is the convention that makes the selected value the
+sole D6 difficulty signal. Activation dice and physical reroll dice contribute
+to the demonstrated physical probability; only primary dice contribute to the
+hybrid primary probability.
+
+For a block face with single-die probability $f$ and a pool of $n$ dice:
+
+\[
+p_{\text{block}} =
+\begin{cases}
+1-(1-f)^n & \text{when the rolling coach selects the result}\\
+f^n & \text{when the opponent selects the result.}
+\end{cases}
+\]
+
+The selected face is the result being scored, not a reconstructed tactical
+intent.
+
+### Risk breakdown
+
+The hybrid scorer exposes three related probabilities:
+
+- **Primary probability**: primary D6 events and block events only.
+- **Demonstrated probability**: all physical D6 events and block events,
+  before hypothetical recovery.
+- **Final probability**: the result after actual reroll consumption and
+  hypothetical recovery branches.
+
+The displayed risk components are:
+
+\[
+R_{\text{primary}}=-\log_2(P_{\text{primary}})
+\]
+
+\[
+R_{\text{actual}}=-\log_2(P_{\text{demonstrated}})-R_{\text{primary}}
+\]
+
+\[
+R_{\text{hypothetical}}=-\log_2(P_{\text{final}})
+ -[-\log_2(P_{\text{demonstrated}})]
+\]
+
+\[
+\mathrm{JPS}=R_{\text{primary}}+R_{\text{actual}}+R_{\text{hypothetical}}
+\]
+
+In fixed-recovery mode, primary and demonstrated probability are the same,
+so the actual-roll adjustment is zero. The recovery adjustment is the change
+from the base line probability to the fixed-policy final probability.
+
+### Recovery recurrence
+
+For a solving-team event with demonstrated probability $p$, alternative
+probability $1-p$, recovery activation probability $a$, and a recovery
+resource that is available, the fixed policy contributes:
+
+- $p$ without spending the resource;
+- $(1-p)ap$ when the alternative branch occurs, the recovery activates, and
+  the reroll returns to the demonstrated branch.
+
+An activation failure is terminal for that recovery in version 1. There is no
+fallback recovery after a failed Pro activation.
+
+For an opponent-owned event, the fixed policy treats recovery adversarially:
+the opponent may spend the selected recovery on the demonstrated branch. The
+surviving factor is:
+
+\[
+p((1-a)+ap)
+\]
+
+The first term is activation failure retaining the demonstrated result; the
+second is successful activation followed by another demonstrated result.
+
+### Resource state and scope
+
+The scorer’s dynamic-programming state tracks resources that can affect later
+events. Each physical team-reroll token is distinct. Skill and other resources
+are keyed by their reset scope: action, activation, turn, drive, half, or game.
+Reusable resources do not add a consumed key.
+
+The rules setting controlling multiple team rerolls per turn is applied
+separately from token identity. When the setting disallows multiple team
+rerolls, using one also marks that team turn as used. When it allows multiple
+rerolls, separate available tokens may be used later in the same turn.
+
+After each event, state keys that no later event can use are removed before
+equal states are merged. This keeps the calculation bounded without changing
+the result. If the configured state ceiling is exceeded, the challenge can
+still be completed, but its score is returned as unranked.

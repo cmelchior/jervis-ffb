@@ -40,6 +40,9 @@ class ChallengeSessionViewModel(
     val score: ChallengeScore<*>?
         get() = tracker?.score
 
+    val undosPerformed: Int
+        get() = tracker?.undosPerformed ?: 0
+
     val outcome: StateFlow<ChallengeOutcome>
         field = MutableStateFlow(ChallengeOutcome.IN_PROGRESS)
 
@@ -61,7 +64,8 @@ class ChallengeSessionViewModel(
         val initialSnapshot = (tracker == null)
         val activeTracker = tracker ?: run {
             ChallengeTracker(this@ChallengeSessionViewModel.challenge).also {
-                it.initialize(state)
+                val gameStats = screenModel.uiState.gameController.statistics ?: error("Missing game statistics")
+                it.initialize(state, gameStats)
                 startedAt = TimeSource.Monotonic.markNow()
             }
         }

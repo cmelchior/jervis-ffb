@@ -17,6 +17,7 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.statistics.GameStatistics
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.bb2025.createDefaultGameStateBB2025
 import com.jervisffb.test.ext.rollForward
@@ -35,9 +36,12 @@ class GameEngineControllerTests {
 
     private lateinit var controller: GameEngineController
 
-    private fun createGameController(rules: Rules): GameEngineController {
+    private fun createGameController(rules: Rules, collectStatistics: Boolean = false): GameEngineController {
         val state = createDefaultGameStateBB2025(rules)
-        controller = GameEngineController(state)
+        controller = GameEngineController(
+            state = state,
+            statistics = if (collectStatistics) GameStatistics() else null,
+        )
         controller.startTestMode(FullGame)
         return controller
     }

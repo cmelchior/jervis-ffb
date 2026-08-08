@@ -2,10 +2,17 @@ package com.jervisffb.ui.menu.challenges
 
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.challenge.Challenge
+import com.jervisffb.engine.challenge.ChallengeRerollSelectionPolicy
 import com.jervisffb.engine.challenge.ChallengeScore
+import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.statistics.probability.FixedRerollUsagePolicy
+import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.menu.challenges.data.ChallengeDetails
 import com.jervisffb.ui.menu.challenges.data.ChallengePresentation
@@ -81,7 +88,9 @@ class InMemoryChallengesRepository(
             val challenges = dataSource()
             communityVotes = challenges.associate { it.challenge.id to it.communityVotes }
             otherScores = challenges.associate { presentation ->
-                presentation.challenge.id to presentation.otherScores.sortedBy { it.score.rankKey() }
+                presentation.challenge.id to presentation.otherScores
+                    .filter { it.score.isRanked(presentation.challenge.scoring) }
+                    .sortedWith { first, second -> compareScores(first.score, second.score) }
             }
             rows.value = challenges.associate { presentation ->
                 val id = presentation.challenge.id
@@ -89,7 +98,7 @@ class InMemoryChallengesRepository(
                     data = presentation.challenge,
                     votes = presentation.communityVotes + if (presentation.userVote) 1 else 0,
                     userState = ChallengeUserState(
-                        solved = solvedState(id, presentation.userScore),
+                        solved = solvedState(presentation.challenge, presentation.userScore),
                         score = presentation.userScore,
                         voted = presentation.userVote,
                     ),
@@ -129,7 +138,7 @@ class InMemoryChallengesRepository(
             updateRow(id) { userState ->
                 val best = bestOf(userState.score, score)
                 userState.copy(
-                    solved = solvedState(id, best),
+                    solved = solvedState(rows.value.getValue(id).data, best),
                     score = best
                 )
             }
@@ -163,23 +172,30 @@ class InMemoryChallengesRepository(
             data = data,
             userState = userState,
             votes = votes,
-            scoreboard = scoreboard(data.id, userState),
+            scoreboard = scoreboard(data, userState),
         )
     }
 
     // The scoreboard as the coach sees it: everyone else's runs plus their own, best first.
-    private fun scoreboard(id: ChallengeId, userState: ChallengeUserState): List<ScoreboardEntry> {
-        val others = otherScores[id] ?: emptyList()
-        val ownScore = userState.score ?: return others
-        return (others + ScoreboardEntry(localCoach, ownScore)).sortedBy { it.score.rankKey() }
+    private fun scoreboard(challenge: Challenge, userState: ChallengeUserState): List<ScoreboardEntry> {
+        val others = otherScores[challenge.id] ?: emptyList()
+        val ownScore = userState.score?.takeIf { it.isRanked(challenge.scoring) } ?: return others
+        return (others + ScoreboardEntry(localCoach, ownScore)).sortedWith { first, second ->
+            compareScores(first.score, second.score)
+        }
     }
 
-    private fun solvedState(id: ChallengeId, score: ChallengeScore<*>?): SolvedState {
+    private fun solvedState(
+        challenge: Challenge,
+        score: ChallengeScore<*>?,
+    ): SolvedState {
         if (score == null) return SolvedState.UNSOLVED
-        val bestOther = otherScores[id]
-            ?.filter { it.score::class == score::class }
-            ?.minOfOrNull { it.score.rankKey() }
-        return when (bestOther == null || score.rankKey() <= bestOther) {
+        if (!score.isRanked(challenge.scoring)) return SolvedState.SOLVED
+        val bestOther = otherScores[challenge.id]
+            ?.filter { scoresAreComparable(it.score, score) }
+            ?.minWithOrNull { first, second -> compareScores(first.score, second.score) }
+            ?.score
+        return when (bestOther == null || compareScores(score, bestOther) <= 0) {
             true -> SolvedState.BEST_IN_CLASS
             false -> SolvedState.SOLVED
         }
@@ -191,16 +207,51 @@ class InMemoryChallengesRepository(
      * with it.
      */
     private fun bestOf(current: ChallengeScore<*>?, candidate: ChallengeScore<*>): ChallengeScore<*> {
-        if (current == null || current::class != candidate::class) return candidate
-        return if (candidate.rankKey() <= current.rankKey()) candidate else current
+        if (current == null || !scoresAreComparable(current, candidate)) return candidate
+        return if (compareScores(candidate, current) <= 0) candidate else current
     }
 
-    /**
-     * The single number a score is ranked on. Ascending is better for every
-     * scoring type, whichever direction the metric reads to a human.
-     */
-    private fun ChallengeScore<*>.rankKey(): Double = when (this) {
-        is ChallengeScore.CompletionOnly -> 0.0 // Completion-only has no rank.
-        is ChallengeScore.JervisRiskScore -> score.effectiveRisk
+    private fun compareScores(first: ChallengeScore<*>, second: ChallengeScore<*>): Int {
+        return when (first) {
+            is ChallengeScore.CompletionOnly if second is ChallengeScore.CompletionOnly -> {
+                first.compareTo(second)
+            }
+
+            is ChallengeScore.ProbabilityScore if second is ChallengeScore.ProbabilityScore -> {
+                first.compareTo(second)
+            }
+            else -> {
+                LOG.w { "Challenge Scores are mixed for challenge: $first and $second" }
+                first::class.toString().compareTo(second::class.toString())
+            }
+        }
+    }
+
+    private fun scoresAreComparable(first: ChallengeScore<*>, second: ChallengeScore<*>): Boolean {
+        if (first::class != second::class) return false
+        if (first is ChallengeScore.ProbabilityScore && second is ChallengeScore.ProbabilityScore) {
+            return first.result.algorithmId == second.result.algorithmId &&
+                first.result.policyId == second.result.policyId
+        }
+        return true
+    }
+
+    private fun ChallengeScore<*>.usesCurrentScoringVersion(scoring: ChallengeScoring<*>): Boolean = when (this) {
+        is ChallengeScore.CompletionOnly -> scoring == ChallengeScoring.CompletionOnly
+        is ChallengeScore.ProbabilityScore -> when (val policy = (scoring as? ChallengeScoring.ProbabilityScoring)?.policy) {
+            is ChallengeRerollSelectionPolicy.LogicalRerollSelection ->
+                result.algorithmId == LogicalActionPathScorer.ALGORITHM_ID
+                    && result.policyId == FixedRerollUsagePolicy.POLICY_ID
+            is ChallengeRerollSelectionPolicy.PhysicalRerollSelection ->
+                result.algorithmId == PhysicalActionPathScorer.ALGORITHM_ID
+                    && result.policyId == PhysicalActionPathScorer.POLICY_ID
+            null -> false
+        }
+    }
+
+    private fun ChallengeScore<*>.isRanked(scoring: ChallengeScoring<*>): Boolean = when (this) {
+        is ChallengeScore.CompletionOnly -> false
+        is ChallengeScore.ProbabilityScore ->
+            result is ProbabilityScoreResult.Scored && usesCurrentScoringVersion(scoring)
     }
 }

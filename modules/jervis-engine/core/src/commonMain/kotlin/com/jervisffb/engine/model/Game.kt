@@ -67,6 +67,14 @@ class Game(
     // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
     val logChanges: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
 
+    // Switch used by procedures to avoid creating expensive chance metadata if not required.
+    var collectChanceData: Boolean = false
+    // Number of chance observations emitted so far.
+    // Used to create indexes into the stream (creating two chance command
+    // objects within the same action will break this counter)
+    // TODO Find a way to make this safe.
+    var chanceObservationSequence: Int = 0
+
     val pitch = Pitch.createForRuleset(rules)
 
     // Weather conditions for the pitch

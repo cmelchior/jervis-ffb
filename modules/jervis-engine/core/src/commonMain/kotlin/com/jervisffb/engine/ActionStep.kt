@@ -6,6 +6,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
+import com.jervisffb.engine.statistics.probability.ChanceObservationChange
 
 /**
  * Class encapsulating changes to the model state happening due to a single
@@ -25,6 +26,8 @@ data class ActionStep(
     val intermediateNodes: List<NodeStep>, // All nodes from [node] to the next action node
     // Commands are flattened, i.e., a hierarchy of CompositeCommands is unrolled into a single long list.
     val commands: List<Command>,
+    // Chance metadata collected for this step. Only populated if enabled by the controller.
+    val chanceMetadata: List<ChanceObservationChange> = emptyList(),
 ) {
     val logs: List<LogEntry> = commands.filterIsInstance<LogEntry>()
     val gameProgress: List<LogEntry> = commands

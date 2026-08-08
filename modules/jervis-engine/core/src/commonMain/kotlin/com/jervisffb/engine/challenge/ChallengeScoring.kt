@@ -1,10 +1,12 @@
 package com.jervisffb.engine.challenge
 
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.challenge.probability.JervisRiskScore
 import com.jervisffb.engine.model.ChallengeScoringId
 import com.jervisffb.engine.model.Game
-import kotlin.random.Random
+import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.statistics.GameStatistics
+import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
 import kotlin.time.Clock
 
 /**
@@ -17,40 +19,64 @@ sealed interface ChallengeScoring<T: ChallengeScore<T>> {
     val description: String
 
     // Returns the score for a given game
-    fun scoreGame(state: Game, actions: List<GameAction>): ChallengeScore<T>
+    fun scoreGame(
+        state: Game,
+        actions: List<GameAction>,
+        statistics: GameStatistics? = null
+    ): ChallengeScore<T>
 
-    /** A challenge with no ranking, i.e., different attempts cannot be ranked */
+    /** A challenge with no ranking, we only count completion or not. This also mean that
+     * different attempts cannot be ranked
+     */
     data object CompletionOnly : ChallengeScoring<ChallengeScore.CompletionOnly> {
         override val id = ChallengeScoringId("completion-only")
         override val description: String = "Solutions are not ranked"
 
         override fun scoreGame(
             state: Game,
-            actions: List<GameAction>
+            actions: List<GameAction>,
+            statistics: GameStatistics?,
         ): ChallengeScore<ChallengeScore.CompletionOnly> {
             return ChallengeScore.CompletionOnly(Clock.System.now())
         }
     }
 
     /**
-     * Solutions are ranked by their Jervis Risk Score, lower is better.
-     * See [JervisRiskScore] for more information.
+     * Solutions are ranked by their probability of success, higher is better.
+     *
+     * Since calculating the probability is not straight-forward and require
+     * trade-offs. The exact policy for doing this is determined by [policy]
+     *
+     * Scores are only comparable if they use the same policy.
      */
-    data object JervisRiskScoring : ChallengeScoring<ChallengeScore.JervisRiskScore> {
-        override val id = ChallengeScoringId("jervis-risk-score")
-        override val description: String = "Jervis Risk Score: Lower is better"
+    data class ProbabilityScoring(
+        val solvingTeamId: TeamId,
+        val policy: ChallengeRerollSelectionPolicy = ChallengeRerollSelectionPolicy.PhysicalRerollSelection(),
+    ) : ChallengeScoring<ChallengeScore.ProbabilityScore> {
+        override val id = ChallengeScoringId("jervis-probability-score")
+        override val description: String = "Jervis Probability Score: Higher is better"
 
         override fun scoreGame(
             state: Game,
-            actions: List<GameAction>
-        ): ChallengeScore<ChallengeScore.JervisRiskScore> {
-            // TODO Implement proper score calculation
-            val score = JervisRiskScore(
-                baseRisk = Random.nextDouble(10.0),
-                benefitBySource = emptyMap()
-            )
-            val now = Clock.System.now()
-            return ChallengeScore.JervisRiskScore(now, score)
+            actions: List<GameAction>,
+            statistics: GameStatistics?,
+        ): ChallengeScore.ProbabilityScore {
+            val events = statistics?.diceProbabilities?.observations ?: error("Missing statistics")
+            val result = when (val selectedPolicy = policy) {
+                is ChallengeRerollSelectionPolicy.LogicalRerollSelection -> LogicalActionPathScorer.score(
+                    observations = events.toList(),
+                    solvingTeamId = solvingTeamId,
+                    allowMultipleTeamRerollsPerTurn = state.rules.allowMultipleTeamRerollsPrTurn,
+                    stateCeiling = selectedPolicy.stateCeiling,
+                )
+                is ChallengeRerollSelectionPolicy.PhysicalRerollSelection -> PhysicalActionPathScorer.score(
+                    observations = events.toList(),
+                    solvingTeamId = solvingTeamId,
+                    allowMultipleTeamRerollsPerTurn = state.rules.allowMultipleTeamRerollsPrTurn,
+                    stateCeiling = selectedPolicy.stateCeiling,
+                )
+            }
+            return ChallengeScore.ProbabilityScore(Clock.System.now(), result)
         }
     }
 }

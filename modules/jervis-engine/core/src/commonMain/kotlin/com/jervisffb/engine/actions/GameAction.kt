@@ -1,7 +1,6 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -42,8 +41,10 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.statistics.probability.Probability
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
+import kotlin.math.pow
 import kotlin.random.Random
 
 
@@ -220,14 +221,24 @@ data class D6Result(override val value: Int) : DieResult() {
     fun toD3(): D3Result = ceil(value / 2f).toInt().d3
 
     companion object {
+        private val SIDES = 6
+
         fun allOptions(): List<D6Result> {
-            return (1..6).map { D6Result(it) }
+            return (1..SIDES).map { D6Result(it) }
         }
         fun random(random: Random = Random): D6Result {
-            return random.nextInt(1, 7).d6
+            return random.nextInt(1, SIDES + 1).d6
         }
         fun randomExcept(except: D6Result): D6Result {
             return allOptions().filter { it == except }.random()
+        }
+
+        /**
+         * Calculate the probability of rolling a D6 result that is greater than
+         * or equal to the given target. Returned probability is [0.0, 1.0]
+         */
+        fun successProbability(target: D6Result): Probability {
+            return Probability((SIDES + 1 - target.value).toDouble() / SIDES)
         }
     }
 }
@@ -332,12 +343,42 @@ data class DBlockResult(override val value: Int) : DieResult() {
     val blockResult: BlockDice = BlockDice.fromD6(D6Result(value))
 
     companion object {
+        private val SIDES = 6
+
         fun allOptions(): List<DBlockResult> {
-            return (1..6).map { DBlockResult(it) }
+            return (1..SIDES).map { DBlockResult(it) }
         }
         fun random(random: Random = Random): DBlockResult {
-            return random.nextInt(1, 7).dblock
+            return random.nextInt(1, SIDES + 1).dblock
         }
+
+        /**
+         * Probability of a single block die showing [face].
+         */
+        fun faceProbability(face: BlockDice): Probability {
+            val sides = if (face == BlockDice.PUSH_BACK) 2 else 1
+            return Probability(sides.toDouble() / SIDES)
+        }
+
+        /**
+         * Probability that a block pool of [diceCount] dice yields [face].
+         *
+         * When the coach picks the die, any one of them showing [face] is
+         * enough. When the opponent picks, every die has to show it.
+         */
+        fun successProbability(
+            face: BlockDice,
+            diceCount: Int,
+            opponentChooses: Boolean = false,
+        ): Probability {
+            require(diceCount >= 1) { "A block needs at least one die: $diceCount" }
+            val faceProbability = faceProbability(face)
+            return when (opponentChooses) {
+                true -> faceProbability.pow(diceCount)
+                false -> Probability(1.0 - (1.0 - faceProbability.value).pow(diceCount))
+            }
+        }
+
     }
 }
 

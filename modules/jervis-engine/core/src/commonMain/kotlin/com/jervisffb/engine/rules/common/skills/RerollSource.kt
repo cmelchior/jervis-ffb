@@ -36,6 +36,17 @@ interface RerollSource {
     ): Boolean
 
     /**
+     * Whether this source applies to a roll without considering its current
+     * [rerollUsed] state.
+     */
+    fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean? = null,
+    ): Boolean = canReroll(state, type, dicePool, wasSuccess)
+
+    /**
      * This method should only be called if [canReroll] returns true.
      * If this source can reroll one or more dice in the dice pool. All reroll
      * options should be returned.

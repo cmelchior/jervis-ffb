@@ -54,6 +54,16 @@ class LoneFouler(
     ): Boolean {
         if (type != DiceRollType.ARMOUR) return false
         if (rerollUsed) return false
+        return isApplicableTo(state, type, dicePool, wasSuccess)
+    }
+
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
+        if (type != DiceRollType.ARMOUR) return false
         return state.getContextOrNull<RiskingInjuryContext>()?.let { context ->
             val armourBroken = context.armourBroken
             val hasDefensiveAssists = context.armourModifiers.any { it is DefensiveAssistsArmourModifier }

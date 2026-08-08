@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.challenges.data
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
 import com.jervisffb.ui.utils.toFixed
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -46,8 +47,8 @@ data class ScoreboardEntry(
                 val tz = TimeZone.currentSystemDefault()
                 scoringTimeFormatter.format(score.date.toLocalDateTime(tz))
             }
-            is ChallengeScore.JervisRiskScore -> {
-                score.score.effectiveRisk.toFixed(3)
+            is ChallengeScore.ProbabilityScore -> {
+                score.result.formattedSuccessProbability()
             }
         }
     }
@@ -100,8 +101,8 @@ data class ChallengeUserState(
                 val tz = TimeZone.currentSystemDefault()
                 scoringTimeFormatter.format(score.date.toLocalDateTime(tz))
             }
-            is ChallengeScore.JervisRiskScore -> {
-                score.score.effectiveRisk.toFixed(3)
+            is ChallengeScore.ProbabilityScore -> {
+                score.result.formattedSuccessProbability()
             }
             null -> ""
         }
@@ -126,6 +127,17 @@ data class ChallengeUserState(
             second()
         }
     }
+}
+
+private fun ProbabilityScoreResult.formattedSuccessProbability(): String = when (this) {
+    is ProbabilityScoreResult.Scored -> "${(successProbability.value * 100.0).toFixed(2)}%"
+    is ProbabilityScoreResult.Unsupported -> "Unranked"
+}
+
+
+private fun ProbabilityScoreResult.formattedRisk(): String = when (this) {
+    is ProbabilityScoreResult.Scored -> surprisal.toFixed(3)
+    is ProbabilityScoreResult.Unsupported -> "Unranked"
 }
 
 // Data required to display a challenge in a list for a single user

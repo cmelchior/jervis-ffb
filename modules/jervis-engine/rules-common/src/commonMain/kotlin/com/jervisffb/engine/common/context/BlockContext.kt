@@ -31,6 +31,7 @@ data class BlockContext(
         get() = roll[resultIndex].result
 
     // Helper method to share logic between roll and reroll
+    // x < 0 means the defender is selecting the result
     fun calculateNoOfBlockDice(): Int {
         return calculateBlockDiceToRoll(
             attacker.strength,

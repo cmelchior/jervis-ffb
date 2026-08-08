@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.common.skills
 import com.jervisffb.engine.model.inducements.InducementEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.StatModifier
+import kotlinx.serialization.Serializable
 
 /**
  * Enum for descripting the duration of [Skill], [StatModifier],
@@ -16,6 +17,7 @@ import com.jervisffb.engine.model.modifiers.StatModifier
  * `MultipleBlockContext` to track the lifetime of relevant skills during
  * a Multiple Block.
  */
+@Serializable
 enum class Duration {
     IMMEDIATE, // The effect expires immediately.
     START_OF_ACTIVATION, // The effect expires when the player is activated

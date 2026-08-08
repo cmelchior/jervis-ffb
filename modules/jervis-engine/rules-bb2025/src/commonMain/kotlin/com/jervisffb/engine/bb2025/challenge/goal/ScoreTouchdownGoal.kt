@@ -10,11 +10,11 @@ import com.jervisffb.engine.challenge.GoalModifier
 import com.jervisffb.engine.challenge.GoalStatus
 import com.jervisffb.engine.common.commands.AddTouchdown
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import kotlinx.collections.immutable.PersistentSet
 
 data class ScoreGoalContext(
-    val potentialPlayers: PersistentSet<Player>,
+    val potentialPlayers: PersistentSet<PlayerId>,
 ): ChallengeContext
 
 /**

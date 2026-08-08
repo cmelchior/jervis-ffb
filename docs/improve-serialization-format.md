@@ -117,7 +117,7 @@ keeping the wire value.
 
 ## Step 3 — Two-phase load + migration scaffold
 
-In `loadFromFileContent` (`JervisSerialization.kt`):
+In `loadFromJsonContent` (`JervisSerialization.kt`):
 1. `Json.parseToJsonElement(text)`; decode just `root["metadata"]` with a **bare** `Json`
    (no module — `JervisMetaData` is a plain class) to read `fileFormat` + `gameVersion`.
 2. Migration ladder (empty at v2, but present):

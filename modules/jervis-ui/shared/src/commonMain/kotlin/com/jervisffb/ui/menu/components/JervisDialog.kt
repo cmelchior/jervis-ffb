@@ -115,6 +115,43 @@ fun JervisDialog(
     buttons: (@Composable RowScope.() -> Unit)? = null,
     onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
 ) {
+    JervisDialog(
+        title = { JervisDialogHeader(title, dialogColor) },
+        icon = icon,
+        width = width,
+        minHeight = minHeight,
+        draggable = draggable,
+        backgroundScrim = backgroundScrim,
+        centerOnPitch = centerOnPitch,
+        fallbackAlignment = fallbackAlignment,
+        dialogColor = dialogColor,
+        content = content,
+        buttons = buttons,
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+/**
+ * JervisDialog with configurable header content
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun JervisDialog(
+    title: @Composable () -> Unit,
+    icon: @Composable () -> Unit = { },
+    width: Dp = DialogSize.MEDIUM,
+    minHeight: Dp = 230.dp,
+    draggable: Boolean = false,
+    backgroundScrim: Boolean = false,
+    // If set, will be used to center the popup over the pitch
+    centerOnPitch: GameScreenModel? = null,
+    // If `centerOnPitch` is `null`. This alignment is used instead.
+    fallbackAlignment: Alignment = Alignment.Center,
+    dialogColor: Color = JervisTheme.rulebookRed,
+    content: @Composable ColumnScope.(@Composable (String) -> TextFieldColors, Color) -> Unit = { _, _  -> /* Do nothing */  },
+    buttons: (@Composable RowScope.() -> Unit)? = null,
+    onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
+) {
     val focusRequester = remember { FocusRequester() }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: PitchViewData? by centerOnPitch?.pitchViewData?.collectAsState() ?: MutableStateFlow<PitchViewData?>(null).collectAsState()
@@ -316,14 +353,14 @@ fun NotImplementYetDialog(title: String, onDismissRequest: () -> Unit) {
 
 @Composable
 private fun ColumnScope.JervisDialogContent(
-    title: String,
+    title: @Composable () -> Unit,
     dialogColor: Color,
     textColor: Color,
     inputDialogColors: @Composable (String) -> TextFieldColors,
     content: @Composable ColumnScope.() -> Unit = { /* Do nothing */ },
     buttons: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    JervisDialogHeader(title, dialogColor)
+    title()
     TitleBorder(dialogColor)
     Column(modifier = Modifier.weight(1f).fillMaxSize().padding(top = 8.dp)) {
         content()

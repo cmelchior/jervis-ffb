@@ -11,6 +11,8 @@ inside Jervis FFB.
 - Introduce newer players to more advanced concepts.
 - Aspirational content for single-player play.
 - Something that can bring the community together.
+- Should not require extensive changes to the UI. It should still feel like 
+  you are playing a normal game of blood bowl (minor changes would be fine)
 
 ## Technical Foundation
 
@@ -25,6 +27,25 @@ as extra information to the user. Currently, these values are not exposed
 from the engine and will need to be added somehow. This will require some 
 experimentation to figure out the best way to do this. This is not critical
 to shipping an MVP of this feature.
+
+### Terminology
+
+- Action Path: The sequence of game actions that make up a solution to a 
+  challenge. Any setup actions (for bringing the game to the starting state)
+  are not counted in this.
+- Chance Event/Observation: A game action that contains an element of chance. 
+  E.g., dice roll or coin flip. 
+- Structured data/event/obeservation: A Chance Observation that contains 
+  information so we can reason about its success or not.
+- Unstructured data/event/observation: A Chance Observation, where the only 
+  thing we know is the value rolled.
+- Finalized Roll: A roll are finalized when the outcome is accepted, either
+  directly or after using a reroll.
+- Unfinalized Roll: A roll that are not "done" yet, e.g. the outcome still 
+  needs to be selected or dice rerolled.
+- Physical die: A die that has been rolled by the coach (or the value chosen)
+- Logical die: A die that has not been rolled but its result determined by a 
+  probability policy.  
 
 ## UI 
 
@@ -54,11 +75,25 @@ At a high level it should behave like this:
 
 ### Game UI
 
-For the Game UI, if we want to calculate probabilities for each roll we most 
-likely cannot reuse the existing dice wheels, instead we need to show 
-"outcome"-buttons. E.g. for Armour it should be ["Break", "Not Break"], for 
-blocks it becomes ["Attacker Down", "Opponent Down", "Opponent Pushed", 
-"Opponent Pushed + Down"]. This needs to be investigated further.
+In an ideal world, we should not have to change the UI much when playing 
+puzzles. However, depending on the exact implementation. Some changes might 
+be required.
+
+#### UI for Calculating Probabilities
+
+In the case, we want to calculate the exact probability for a sequence there 
+is no way around UI changes as we need to know the "intent" of every action 
+as we must be able to determine "success". This is especially problematic 
+for Block rolls, where the sides map to outcomes in unpredictable ways 
+depending on which skills are being used. It probably also means that we 
+cannot show actual dice rolls anywhere for the same reason. Since these 
+changes would be very invasive, this approach is probably not suitable to 
+pursue.
+
+See "Blood Bowl Difficulty Rating" below for the way around this. That design
+is still probability-based and needs the same per-roll inputs, but it sidesteps
+the intent problem for Blocks by scoring the face the coach actually used
+rather than asking what they were aiming for. That needs no UI change.
 
 ### Editor UI
 
@@ -174,6 +209,15 @@ bit more detail, we should keep challenges defined by code, rather than a UI
 - Push X players off the pitch.
   - a) Push specific player(s) off the pitch
 
+A more generalized goal api consist of a Goal + Modifiers:
+
+
+<Action> against <TargetPlayer>
+    - By X
+    - (for block) Dice required 1/2/3
+    - (offensive assists required) for block/foul
+    - (defensive assists required) for block/foul
+
 ### Puzzle Types
 
 - Maximize Probability: Roll values are selected. The aim is to reach the 
@@ -200,6 +244,9 @@ modify the dice roll. Most likely it will require changes to the UI as just
 selecting dice values (as during normal games), might not provide enough 
 information to calculate "success"-state. This needs further investigation.
 
+This is the option we are pursuing. See "Blood Bowl Difficulty Rating" below,
+which answers the block dice and reroll questions raised here.
+
 3. Number of dice rolls
 
 Counting the number of dice rolls, lower is better.
@@ -218,6 +265,7 @@ on actual gameplay.
 
 5. Time-to-completion
 
+This requires a server to be the final authority.
 
 6. Date-of-completion
 
@@ -230,479 +278,421 @@ Against: Does not facilitate thingin
 
 - https://fumbbl.com/help:OTTTestingInClient
 - https://bbtactics.com/strategy/articles/challenges/
+- https://www.reddit.com/r/bloodbowl/comments/kl3fe4/blood_bowl_puzzles_can_you_find_the_solutions/
+- https://github.com/BloodBowlDave/BloodBowlActionCalculator
 
+# Challenge system: Postgres schema (Supabase)
 
-# Design Suggestion 1
+First draft: Needs more work
 
-Lets rephrase the problem a little bit.
+## Context
 
+The challenge system exists in the engine but has no persistence: `Challenge` is built locally
+from `SampleChallenges`, and per-user state lives in `multiplatform-settings` key-value prefs via
+`ChallengeStore`. `SupabaseChallengesRepository` is a stub. We need real entities before challenges
+can be shared, voted on, or ranked.
 
-What I want is the probability of success given the _current_ chain of events.
+The proposed split was three entities — `Challenge`, `ChallengeUserData` (vote / favourite /
+highscore), `ChallengeAttempt` (scoreboard data). The open question was how to store high scores
+when scoring mechanisms will keep changing.
 
-The chain of events are a dice roll type + the wanted outcome (e.g. success/failure).
+That question is already half-answered by the code:
 
-Modifiers exists for all of these rolls. Some modifiers can reroll all dice types, some modifers can only reroll a single type, others can reroll all rolls of a given type and finally some modifers can either add +1 or -1 to the roll affecting the chance of success.
+- `ChallengeScoring` (`core/.../challenge/ChallengeScoring.kt`) is **deliberately not sealed** — an
+  extension point, so `rules-bb2025` can add scoring types.
+- `ChallengeScore` (`core/.../challenge/ScoringType.kt`) is a polymorphic hierarchy where each
+  variant carries a *different payload shape* and its own `compareTo`.
+- `ProbabilityScore` exists precisely because "ratings produced by different versions
+  are not comparable".
+- `docs/challenges-design.md:494` — *"Store the ledger, not just the score… This is cheap now and
+  very expensive to retrofit."*
 
-What would the best approach be to show "chance of success" for the sequence
+So the schema must not try to model scores relationally. It should **index the one scalar it ranks
+on and treat everything else as an opaque Kotlin-owned payload**.
 
+Decisions taken: **Supabase (PostgREST + RLS)**, **revisioned challenges**, **client submits the
+full replay**.
 
-Worked for 54s
+---
 
-The best approach is to model the sequence as a dynamic program over rolls and remaining modifier resources.
+## Verdict on the three proposed entities
 
-You cannot generally calculate each roll independently and multiply the results, because shared modifiers couple the rolls: using a reroll now changes the probability of later rolls.
+| Proposed | Verdict |
+|---|---|
+| `Challenge` | Split into **three**: identity (`challenge`), immutable versioned definition (`challenge_revision`), hot counters (`challenge_stats`). Definition is multi-KB and TOASTed; counters change on every play. One row means every play rewrites the blob. |
+| `ChallengeUserData` | Keep for vote + favourite. **Remove `highscore`.** Its natural key is `(challenge, revision, scoring_type, algorithm_version, user)` — five parts, of which a `(challenge, user)` row has two. It cannot be a column. Also remove `solved`: `SolvedState.BEST_IN_CLASS` is a *global* fact (nobody beat you), not user data — it is `position = 1` on the leaderboard. |
+| `ChallengeAttempt` | Split into **the fact** (`challenge_attempt`) and **the interpretation** (`challenge_score`). An attempt is immutable history. A score is one algorithm version's opinion of it, and there will be several over time. Columns on the attempt would make re-scoring a destructive `UPDATE` over the whole table. |
 
-1. Represent each event
+`ChallengeUserState` in `ChallengeStore.kt` is a good **DTO** and a bad **table**. It should come
+back as a view (`my_challenge_state` below).
 
-Each event describes the roll and what outcome the sequence requires:
+---
 
-data class RollEvent(
-val type: RollType,
-val outcomes: List<RollOutcome>,
-val wanted: (RollOutcome) -> Boolean,
-)
+## The core idea: the rank-key contract
 
-For a d6 target roll:
+The database cannot run Kotlin, so it cannot call `ChallengeScore.compareTo`. Every score therefore
+projects itself onto one number:
 
-val dodge = RollEvent(
-type = RollType.DODGE,
-outcomes = (1..6).map { RollOutcome(it, 1.0 / 6.0) },
-wanted = { it.value >= 3 },
-)
+```kotlin
+@Serializable
+sealed interface ChallengeScore : Comparable<ChallengeScore> {
+    val date: Instant
+    val description: String
 
-A wanted failure simply reverses the predicate:
+    /** Matches `scoring_algorithm.scoring_type`. */
+    val scoringType: String
 
-wanted = { it.value < 3 }
-2. Represent modifiers uniformly
+    /** Matches `scoring_algorithm.algorithm_version`. */
+    val algorithmVersion: Int
 
-Each modifier needs:
+    /**
+     * The one number the database ranks on. Ascending is always better, for
+     * every scoring type, forever — regardless of which direction the metric
+     * reads to a human.
+     *
+     * Invariant: for two scores of the same [scoringType] and
+     * [algorithmVersion], `a.compareTo(b).sign == a.rankKey.compareTo(b.rankKey).sign`.
+     */
+    val rankKey: Double
 
-Which roll types it applies to.
-Its effect.
-When it can be used.
-Its usage scope.
-sealed interface ModifierEffect {
-data object Reroll : ModifierEffect
-data class Adjust(val amount: Int) : ModifierEffect
+    /** Applied when [rankKey] ties. Ascending. `docs/challenges-design.md:488`. */
+    val tiebreak: Double
 }
-
-enum class UsageScope {
-ONCE_PER_SEQUENCE,
-ONCE_PER_ROLL,
-UNLIMITED,
-}
-
-data class Modifier(
-val id: ModifierId,
-val applicableTypes: Set<RollType>?,
-val effect: ModifierEffect,
-val scope: UsageScope,
-)
-
-Examples:
-
-Modifier(
-id = ModifierId.TEAM_REROLL,
-applicableTypes = null, // All types
-effect = ModifierEffect.Reroll,
-scope = UsageScope.ONCE_PER_SEQUENCE,
-)
-
-Modifier(
-id = ModifierId.DODGE_REROLL,
-applicableTypes = setOf(RollType.DODGE),
-effect = ModifierEffect.Reroll,
-scope = UsageScope.ONCE_PER_ROLL,
-)
-
-Modifier(
-id = ModifierId.BREAK_TACKLE,
-applicableTypes = setOf(RollType.DODGE),
-effect = ModifierEffect.Adjust(+1),
-scope = UsageScope.ONCE_PER_SEQUENCE,
-)
-
-Here, ONCE_PER_ROLL represents something available on every applicable roll but usable only once on that individual roll.
-
-3. Track the calculation state
-   data class State(
-   val eventIndex: Int,
-   val remainingUses: Map<ModifierId, Int>,
-   val usedOnCurrentRoll: Set<ModifierId>,
-   )
-
-When moving to the next event:
-
-fun State.nextEvent() = copy(
-eventIndex = eventIndex + 1,
-usedOnCurrentRoll = emptySet(),
-)
-
-Consumable modifiers are stored in remainingUses. Reusable per-roll modifiers only need to be tracked in usedOnCurrentRoll.
-
-4. Evaluate before and after the roll
-
-You need two functions:
-
-beforeRoll: enumerate possible die results.
-afterRoll: choose the best legal response to a result.
-
-Conceptually:
-
-V(i,R)=
-d
-∑
-​
-
-P
-i
-​
-
-(d)D(i,d,R)
-
-Where D evaluates the available decisions after rolling d.
-
-For a given result:
-
-D(i,d,R)=max
-⎩
-⎨
-⎧
-​
-
-accept the result
-apply a modifier
-reroll
-​
-
-Accepting
-accept(i,d,R)={
-V(i+1,R),
-0,
-​
-
-if d is wanted
-otherwise
-​
-
-Rerolling
-
-A reroll returns to the same event with the modifier consumed or marked used:
-
-reroll(i,R,m)=V(i,consume(R,m))
-Applying +1 or -1
-
-The modifier changes the result and reevaluates it:
-
-adjust(i,d,R,m)=D(i,d+Δ
-m
-​
-
-,consume(R,m))
-5. Kotlin-shaped implementation
-   fun evaluateSequence(
-   events: List<RollEvent>,
-   modifiers: List<Modifier>,
-   initialResources: Resources,
-   ): Double {
-   val cache = mutableMapOf<EvaluationState, Double>()
-
-   fun beforeRoll(
-   eventIndex: Int,
-   resources: Resources,
-   usedThisRoll: Set<ModifierId>,
-   ): Double {
-   if (eventIndex == events.size) return 1.0
-
-        val state = EvaluationState.BeforeRoll(
-            eventIndex,
-            resources,
-            usedThisRoll,
-        )
-
-        return cache.getOrPut(state) {
-            val event = events[eventIndex]
-
-            event.outcomes.sumOf { outcome ->
-                outcome.probability * afterRoll(
-                    eventIndex = eventIndex,
-                    outcome = outcome,
-                    resources = resources,
-                    usedThisRoll = usedThisRoll,
-                )
-            }
-        }
-   }
-
-   fun afterRoll(
-   eventIndex: Int,
-   outcome: RollOutcome,
-   resources: Resources,
-   usedThisRoll: Set<ModifierId>,
-   ): Double {
-   val state = EvaluationState.AfterRoll(
-   eventIndex,
-   outcome,
-   resources,
-   usedThisRoll,
-   )
-
-        return cache.getOrPut(state) {
-            val event = events[eventIndex]
-
-            var best = if (event.wanted(outcome)) {
-                beforeRoll(
-                    eventIndex = eventIndex + 1,
-                    resources = resources,
-                    usedThisRoll = emptySet(),
-                )
-            } else {
-                0.0
-            }
-
-            for (modifier in legalModifiers(
-                event,
-                outcome,
-                modifiers,
-                resources,
-                usedThisRoll,
-            )) {
-                val nextResources = resources.consumeIfNeeded(modifier)
-                val nextUsed = usedThisRoll + modifier.id
-
-                val candidate = when (val effect = modifier.effect) {
-                    ModifierEffect.Reroll ->
-                        beforeRoll(
-                            eventIndex = eventIndex,
-                            resources = nextResources,
-                            usedThisRoll = nextUsed,
-                        )
-
-                    is ModifierEffect.Adjust ->
-                        afterRoll(
-                            eventIndex = eventIndex,
-                            outcome = outcome.adjust(effect.amount),
-                            resources = nextResources,
-                            usedThisRoll = nextUsed,
-                        )
-                }
-
-                best = maxOf(best, candidate)
-            }
-
-            best
-        }
-   }
-
-   return beforeRoll(
-   eventIndex = 0,
-   resources = initialResources,
-   usedThisRoll = emptySet(),
-   )
-   }
-
-In real code, beforeRoll and afterRoll would usually be local mutually recursive functions or methods on an evaluator.
-
-What the displayed percentage means
-
-Using maxOf(...) means the displayed result is:
-
-The maximum probability of completing the sequence, assuming modifiers are used optimally after every observed result.
-
-That is probably the most useful “chance of success” value.
-
-You may also want to display:
-
-Base chance: no optional modifiers.
-Optimal chance: modifiers used optimally.
-Recommended action: for the current result, which modifier produces the highest continuation probability.
-Important distinction
-
-Modifiers that always apply and require no decision can be folded directly into the roll:
-
-effectiveResult = rawResult + passiveModifiers.sum()
-
-Modifiers that are optional, consumable, or shared must remain in the DP state.
-
-Only when every roll has completely independent, dedicated modifiers can you reduce the calculation to:
-
-P(sequence)=
-i
-∏
-​
-
-P(wanted outcome for roll i)
-
-With shared rerolls or once-per-turn modifiers, use the state-based calculation.
-
-How expensive is the DP algorithm?
-
-Let:
-
-N: number of events in the sequence.
-F: maximum number of distinct outcomes per roll, typically 6.
-M: number of modifier types.
-u
-j
-​
-
-: remaining uses of consumable modifier j.
-K: number of reusable modifiers that may each be used once on the current roll.
-
-The number of resource configurations is:
-
-R=
-j
-∏
-​
-
-(u
-j
-​
-
-+1)
-
-If every consumable modifier is simply available/unavailable, this becomes:
-
-R=2
-C
-
-where C is the number of distinct consumable modifiers.
-
-Tracking which reusable modifiers have already been used on the current roll adds up to:
-
-2
-K
-
-configurations.
-
-Therefore, the approximate number of memoized states is:
-
-O(N⋅F⋅
-j
-∏
-​
-
-(u
-j
-​
-
-+1)⋅2
-K
-)
-​
-
-
-Each state may inspect up to M legal modifier actions, giving time complexity:
-
-O(N⋅F⋅M⋅
-j
-∏
-​
-
-(u
-j
-​
-
-+1)⋅2
-K
-)
-​
-
-
-Memory complexity is approximately:
-
-O(N⋅F⋅
-j
-∏
-​
-
-(u
-j
-​
-
-+1)⋅2
-K
-)
-​
-
-Typical case
-
-Suppose you have:
-
-10 rolls.
-6 outcomes per roll.
-3 single-use shared modifiers.
-2 reusable once-per-roll modifiers.
-5 possible modifier actions.
-
-Then:
-
-10⋅6⋅2
-3
-⋅2
-2
-=1,920
-
-memoized states, with at most five actions checked per state. That is very small.
-
-Even:
-
-20 rolls.
-10 single-use modifier flags.
-4 per-roll modifier flags.
-
-produces approximately:
-
-20⋅6⋅2
-10
-⋅2
-4
-≈2000000
-
-states. That is more significant, especially if recalculated continuously in the UI.
-
-The main source of cost
-
-The sequence length is not normally the problem. The exponential factor comes from the number of independently tracked modifier states:
-
-2
-C+K
-
-For example, ten independent one-use skills create 1,024 possible availability combinations.
-
-Important optimization: group equivalent resources
-
-If you have three identical team rerolls, do not track three booleans:
-
-teamReroll1Available
-teamReroll2Available
-teamReroll3Available
-
-Track one count:
-
-teamRerollsRemaining: Int // 0..3
-
-This produces four states instead of eight:
-
-3+1=4
-
-rather than:
-
-2
-3
-=8
-
-In general, identical resources with u uses contribute u+1, not 2
-u
-.
-
-Other optimizations
-
-Only include a modifier in the state if its availability can affect a future decision. Passive modifiers do not belong in the resource state.
-
-Canonicalize resources so that equivalent modifier configurations produce identical cache keys. Also filter modifiers by roll type before evaluating actions, and cache the result for the entire current chain until the chain or available resources change.
-
-Because rerolls consume or mark a resource before returning to the same roll, the state continually moves toward fewer available actions. This prevents infinite recursion and makes the calculation effectively a directed acyclic state graph.
-
-For a Blood Bowl-style sequence with perhaps 5–20 rolls and a handful of shared rerolls and once-per-turn skills, exact DP should normally be practical. The difficult cases arise when many independent modifiers can be combined in arbitrary orders.
+```
+
+- `CompletionOnly` → `rankKey = date.toEpochMilliseconds().toDouble()`, `tiebreak = 0.0`
+- `ProbabilityScore` → `rankKey = score.effectiveRisk`, `tiebreak = rolls.size.toDouble()`
+
+Everything else about the score — `benefitBySource`, the roll ledger, whatever a future mechanism
+needs — goes into a `jsonb` payload the DB never reads. **Adding a scoring mechanism is a new
+`ChallengeScore` subtype plus a row in `scoring_algorithm`. It is never a migration.**
+
+Drop the `ChallengeScore<T : ChallengeScore<T>>` self-type parameter while doing this. It is used
+raw in five places and does not compile (`ChallengeStore.kt:31`, `userScore`,
+`ChallengeTracker.score`, `ChallengeSessionViewModel.score`, `ChallengeDetailScreen.formatUserScore`),
+and cross-type comparison is meaningless anyway — the DB filters on `scoring_type` before it ever
+orders.
+
+---
+
+## Schema
+
+### Identity and definition
+
+```sql
+create table coach_profile (
+    user_id      uuid primary key references auth.users on delete cascade,
+    coach_id     text not null unique,          -- CoachId.value used inside the engine
+    display_name text not null,                 -- shown on the scoreboard
+    created_at   timestamptz not null default now()
+);
+
+-- One row per challenge, ever. Votes, favourites and stats hang off this,
+-- not off a revision: you favourite a challenge, not a version of it.
+create table challenge (
+    id         text primary key,                -- ChallengeId.value
+    author_id  uuid not null references coach_profile(user_id),
+    visibility text not null default 'draft'
+               check (visibility in ('draft','unlisted','public')),
+    created_at timestamptz not null default now()
+);
+
+-- The immutable definition. A new revision is cut whenever a published
+-- challenge is edited, so old leaderboards stay meaningful.
+create table challenge_revision (
+    challenge_id text not null references challenge(id) on delete cascade,
+    revision     int  not null,
+    is_current   boolean not null default false,
+
+    -- lifted out of the blob only because the list screen filters/sorts on them
+    name         text not null,
+    description  text not null,
+    category     text not null,     -- ChallengeCategory.name
+    scoring_type text not null,     -- @SerialName of the ChallengeScoring impl
+    game_version text not null,     -- BB2020 / BB2025 -> selects the serializer module
+    file_format  int  not null,     -- JervisMetaData.fileFormat
+
+    definition     text  not null,  -- goal, rules, teams, gameRules, setup: engine JSON, verbatim
+    definition_sha bytea not null,  -- sha256(definition); what an attempt pins to
+
+    published_at timestamptz,
+    created_at   timestamptz not null default now(),
+    primary key (challenge_id, revision)
+);
+create unique index challenge_revision_current
+    on challenge_revision (challenge_id) where is_current;
+```
+
+`definition` is `text`, not `jsonb`, on purpose: `jsonb` reorders keys and drops duplicates, so it is
+not byte-stable and `definition_sha` would not survive a round trip. We never query inside it. The
+cost is that PostgREST returns it as an escaped string the client must parse — acceptable, and the
+score payloads below are `jsonb` where poking inside genuinely helps.
+
+### Hot counters, split off the wide row
+
+```sql
+create table challenge_stats (
+    challenge_id     text primary key references challenge(id) on delete cascade,
+    plays            bigint not null default 0,
+    solves           bigint not null default 0,
+    distinct_solvers bigint not null default 0,
+    votes            bigint not null default 0,   -- vote is a Boolean upvote today
+    favourites       bigint not null default 0,
+    updated_at       timestamptz not null default now()
+);
+```
+
+Maintained by `security definer` triggers on `challenge_user_state` and `challenge_score`.
+
+### Per-user preferences
+
+```sql
+create table challenge_user_state (
+    challenge_id text not null references challenge(id) on delete cascade,
+    user_id      uuid not null references coach_profile(user_id) default auth.uid(),
+    favourite    boolean not null default false,
+    voted        boolean not null default false,
+    updated_at   timestamptz not null default now(),
+    primary key (challenge_id, user_id)
+);
+create index on challenge_user_state (user_id) where favourite;
+```
+
+No `score`, no `solved`. Both are derived.
+
+### The fact
+
+```sql
+create table challenge_attempt (
+    id             bigint generated always as identity primary key,
+    challenge_id   text not null,
+    revision       int  not null,
+    definition_sha bytea not null,     -- what the client actually played against
+    user_id        uuid not null references coach_profile(user_id) default auth.uid(),
+    outcome        text not null check (outcome in ('COMPLETED','FAILED')),
+    submitted_at   timestamptz not null default now(),
+    engine_version text not null,      -- BuildConfig.releaseVersion + git hash
+    file_format    int  not null,
+    actions        text  not null,     -- List<GameAction> played after setup
+    claimed_score  jsonb,              -- what the client said; stored, never ranked
+    foreign key (challenge_id, revision)
+        references challenge_revision (challenge_id, revision)
+);
+create index on challenge_attempt (challenge_id, revision, outcome);
+create index on challenge_attempt (user_id, submitted_at desc);
+```
+
+Append-only. `claimed_score` makes the trust boundary visible in the schema: it is kept for
+telemetry and never feeds a leaderboard. The client uploads `COMPLETED` attempts only; the `FAILED`
+value is allowed so failures can be collected later without DDL.
+
+`actions` reuses exactly what `JervisSerialization.serializeGameStateToJson` already does — flatten
+`controller.history` into a `List<GameAction>`, re-packing multi-step `GameDelta`s as
+`CompositeGameAction`. Replaying it through `GameEngineController(initialActions = …)` reconstructs
+everything, which is what makes any future metric computable from stored data.
+
+### The interpretation
+
+```sql
+create table scoring_algorithm (
+    scoring_type      text not null,   -- 'CompletionOnly', 'JervisRiskScore', …
+    algorithm_version int  not null,   -- DifficultyRating.ALGORITHM_VERSION
+    is_current        boolean not null default false,
+    label             text not null,   -- ChallengeScoring.description
+    higher_is_better  boolean not null default false,  -- display only; rank_key is always ASC
+    primary key (scoring_type, algorithm_version)
+);
+create unique index on scoring_algorithm (scoring_type) where is_current;
+
+create table challenge_score (
+    attempt_id        bigint not null references challenge_attempt(id) on delete cascade,
+    scoring_type      text   not null,
+    algorithm_version int    not null,
+
+    -- denormalised from the attempt; every one of these is immutable there,
+    -- so it can never drift, and the leaderboard becomes a single-table scan
+    challenge_id text not null,
+    revision     int  not null,
+    user_id      uuid not null,
+
+    rank_key    double precision not null,
+    tiebreak    double precision not null,
+    achieved_at timestamptz      not null,
+    payload     jsonb            not null,   -- the serialized ChallengeScore, incl. the roll ledger
+
+    verified_at  timestamptz not null default now(),
+    scorer_build text not null,
+
+    primary key (attempt_id, scoring_type, algorithm_version),
+    foreign key (scoring_type, algorithm_version)
+        references scoring_algorithm (scoring_type, algorithm_version),
+    -- Postgres sorts NaN last in ASC rather than erroring, so a bad rank key
+    -- would silently sink instead of failing loudly.
+    constraint rank_key_finite check (
+        rank_key = rank_key
+        and rank_key <> 'infinity'::float8
+        and rank_key <> '-infinity'::float8
+    )
+);
+
+create index challenge_score_board on challenge_score
+    (challenge_id, revision, scoring_type, algorithm_version,
+     user_id, rank_key, tiebreak, achieved_at);
+```
+
+One attempt can hold several score rows — one per algorithm version — so a v2 rollout is pure
+`INSERT` next to live v1 traffic, and rollback is flipping `is_current` back.
+
+---
+
+## Trust model (RLS)
+
+Supabase has no Kotlin, so the engine cannot run inside the database. The client computes a score
+and cannot be trusted with it. The schema makes that structural rather than procedural:
+
+```sql
+alter table challenge_score enable row level security;
+create policy read_scores on challenge_score for select using (true);
+-- no insert/update/delete policy at all: unreachable from any client key
+
+alter table challenge_attempt enable row level security;
+create policy insert_own_attempt on challenge_attempt for insert
+    with check (user_id = auth.uid());
+create policy read_attempts on challenge_attempt for select using (true);
+-- no update, no delete: attempts are facts
+
+alter table challenge_user_state enable row level security;
+create policy own_state on challenge_user_state for all
+    using (user_id = auth.uid()) with check (user_id = auth.uid());
+```
+
+Only the scorer worker, holding the service-role key, writes `challenge_score`. A trigger on
+`challenge_revision` rejects `UPDATE` once `published_at is not null`.
+
+---
+
+## Views (the client's read model)
+
+```sql
+-- Best row per coach under the current algorithm, ranked.
+create view challenge_leaderboard as
+select s.*,
+       rank() over (
+           partition by s.challenge_id, s.revision, s.scoring_type, s.algorithm_version
+           order by s.rank_key, s.tiebreak, s.achieved_at
+       ) as position
+from (
+    select distinct on (c.challenge_id, c.revision, c.scoring_type, c.algorithm_version, c.user_id) c.*
+    from challenge_score c
+    join scoring_algorithm a using (scoring_type, algorithm_version)
+    where a.is_current
+    order by c.challenge_id, c.revision, c.scoring_type, c.algorithm_version, c.user_id,
+             c.rank_key, c.tiebreak, c.achieved_at
+) s;
+```
+
+Filtering on `challenge_id` / `revision` pushes through the window function because both are
+`PARTITION BY` columns — keep it that way, or the plan degrades to a full scan. If it ever does,
+replace with a PostgREST RPC function or a `challenge_personal_best` table maintained on insert.
+
+```sql
+-- ChallengeUserState, reassembled at read time.
+create view my_challenge_state as
+select c.id as challenge_id,
+       coalesce(u.favourite, false) as favourite,
+       coalesce(u.voted, false)     as voted,
+       b.attempt_id, b.rank_key, b.payload, b.achieved_at,
+       b.position = 1 as best_in_class
+from challenge c
+left join challenge_user_state u
+       on u.challenge_id = c.id and u.user_id = auth.uid()
+left join challenge_revision r
+       on r.challenge_id = c.id and r.is_current
+left join challenge_leaderboard b
+       on b.challenge_id = c.id and b.revision = r.revision and b.user_id = auth.uid();
+```
+
+---
+
+## Kotlin work
+
+**`core/.../challenge/ScoringType.kt`** — add `scoringType`, `algorithmVersion`, `rankKey`,
+`tiebreak` to `ChallengeScore`; drop the self-type parameter; give each subtype a frozen
+`@SerialName`. Extend `ProbabilityScore` to carry the ledger
+(`rolls: List<RollRisk>`, `rerolls: List<RerollResource>`) per `docs/challenges-design.md:494` —
+that supplies the `tiebreak` and the UI breakdown, and makes the separate ledger column unnecessary.
+
+While there: `CompletionOnly.compareTo` has a `when (scoreCompare == 0)` whose branches are
+identical. Since `rank_key` must mirror `compareTo` exactly, collapse it to `date.compareTo(other.date)`.
+
+**New test** `core/src/commonTest/.../probability/RankKeyTest.kt` — the invariant that makes the whole
+schema safe:
+
+```kotlin
+assertEquals(a.compareTo(b).sign, a.rankKey.compareTo(b.rankKey).sign)
+```
+
+over generated pairs per subtype, plus `rankKey.isFinite()`.
+
+**New module `modules/challenge-scorer`** (JVM, Clikt, same shape as `modules/fumbbl-cli`). This is
+the only thing that may write `challenge_score`:
+
+1. Find attempts with no score row for the current `(scoring_type, algorithm_version)`.
+2. Load the revision, verify `definition_sha`, decode `Challenge` and the replay.
+3. `challenge.createGame()`, feed the replay, run `ChallengeTracker` alongside, require
+   `outcome == COMPLETED` — this is the anti-cheat pass, not just a scoring pass.
+4. Score, insert.
+
+**Client** — replace `ChallengeStore`'s settings keys with `SupabaseChallengesRepository` reading
+`my_challenge_state` and `challenge_leaderboard`. `ChallengeStore.setSolved` becomes "insert an
+attempt"; it currently is not called from anywhere even though success detection already exists in
+`ChallengeSessionViewModel`.
+
+---
+
+## Blocking prerequisites
+
+1. **`docs/improve-serialization-format.md` must land first.** Polymorphic tokens are fully-qualified
+   class names today (no `@SerialName` anywhere in the engine). A `.jrg` file on disk that breaks is
+   an annoyance; a `definition` or `actions` column that breaks is unrecoverable data loss across
+   every user. Renaming one package after go-live bricks every stored challenge and replay. This is
+   the single hardest thing here to retrofit.
+2. **`Challenge` and its extension points are not `@Serializable` at all** — only `ChallengeScore` is.
+   `Challenge`, `ChallengeGoal`, `ChallengeRule`, `GoalModifier`, `ChallengeScoring` and the
+   `rules-bb2025` implementations all need registering in the serializer module (already flagged in
+   `docs/challenge-builder.md`). Nothing can be stored until this exists.
+3. The working tree does not compile — `entities` vs `ScoreboardEntry` (~20 call sites),
+   `ChallengeRepository.kt` is not valid Kotlin, both challenge test files target a deleted API, and
+   `SampleChallenges` hard-codes `/Users/christian.melchior/first-turn.jrg`.
+
+---
+
+## Adding a new scoring mechanism, end to end
+
+The design is only worth it if this is cheap. It is:
+
+1. New `ChallengeScore` subtype with a frozen `@SerialName`, `rankKey`, `tiebreak`; register it.
+2. `insert into scoring_algorithm values ('FewestActions', 1, false, 'Fewest actions', false);`
+3. Run the scorer's backfill — it re-simulates stored replays and inserts score rows.
+4. `update scoring_algorithm set is_current = true where …` — leaderboards switch atomically.
+
+Same for bumping `DifficultyRating.ALGORITHM_VERSION` to the v2 exact DP. **No DDL, no downtime, and
+v1 rows stay queryable for comparison.**
+
+---
+
+## Verification
+
+- `./gradlew :modules:jervis-engine:core:jvmTest` — the `rankKey`/`compareTo` invariant test.
+- Golden-token test from `improve-serialization-format.md` step 5, extended to the challenge types:
+  dump the serializer module, assert no token contains `.`, assert exact match against a committed
+  registry. This is the guardrail that keeps stored rows readable.
+- Round-trip test: build a `Challenge`, serialize, insert into a local Supabase
+  (`supabase start`), read back, `createGame()`, replay a recorded solution, assert
+  `ChallengeOutcome.COMPLETED` and a stable `ProbabilityScore`.
+- Trust test: with an `anon` key, attempt `insert into challenge_score` and assert it is rejected by
+  RLS; attempt `insert into challenge_attempt` with a forged `user_id` and assert rejection.
+- Re-score test: insert a second `scoring_algorithm` row, run the backfill, assert both versions
+  coexist on the same attempt and that flipping `is_current` changes `challenge_leaderboard` with no
+  writes to `challenge_attempt`.
+- `./gradlew ktlintFormat && ./gradlew jvmTest` — the `CONTRIBUTING.md` checklist.

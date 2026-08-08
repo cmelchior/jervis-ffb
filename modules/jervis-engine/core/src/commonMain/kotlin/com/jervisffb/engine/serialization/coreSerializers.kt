@@ -18,7 +18,7 @@ import kotlinx.serialization.modules.subclass
 val coreSerializerModule = SerializersModule {
     polymorphic(ChallengeScore::class) {
         subclass(com.jervisffb.engine.challenge.ChallengeScore.CompletionOnly::class)
-        subclass(com.jervisffb.engine.challenge.ChallengeScore.JervisRiskScore::class)
+        subclass(com.jervisffb.engine.challenge.ChallengeScore.ProbabilityScore::class)
     }
     polymorphic(com.jervisffb.engine.rules.builder.BallSelectorRule::class) {
         subclass(com.jervisffb.engine.rules.builder.RollOnUnusualBallTable::class)

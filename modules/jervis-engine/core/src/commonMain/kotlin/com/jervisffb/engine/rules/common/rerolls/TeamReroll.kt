@@ -30,11 +30,22 @@ interface TeamReroll : RerollSource {
         dicePool: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        if (rerollUsed || !enabled) return false
-        if (state.activeTeam?.id != teamId) return false
+        if (!isApplicableTo(state, type, dicePool, wasSuccess)) return false
+        if (rerollUsed) return false
         if (state.activeTeam?.usedRerollThisTurn == true && !state.rules.allowMultipleTeamRerollsPrTurn) return false
-        if (state.rules.canBeRerolledByTeamReroll(type)) return false
         return dicePool.all { it.rerollSource == null }
+    }
+
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
+        if (!enabled) return false
+        if (state.activeTeam?.id != teamId) return false
+        if (!state.canUseTeamRerolls) return false
+        return state.rules.canBeRerolledByTeamReroll(type)
     }
 
     override fun calculateRerollOptions(

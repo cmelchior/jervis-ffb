@@ -2,8 +2,8 @@ package com.jervisffb.engine.challenge
 
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.statistics.GameStatistics
 
 /**
  * Class responsible for tracking the progress of a [challenge] attempt.
@@ -19,6 +19,7 @@ class ChallengeTracker(
     private val challenge: Challenge,
 ) {
     private var initialized = false
+    private lateinit var gameStats: GameStatistics
     private val progress = mutableListOf<ChallengeStep>()
 
     // List of game actions performed during the challenge
@@ -47,11 +48,12 @@ class ChallengeTracker(
      * Called when starting the challenge. Allows goals and modifiers to
      * record any state they need to evaluate any following states.
      */
-    fun initialize(state: Game) {
+    fun initialize(state: Game, stats: GameStatistics) {
         val goalContexts = challenge.goal.initialize(state)
         val rulesContexts = challenge.rules.map {
             it.initialize(state)
         }
+        gameStats = stats
         val initialHolder = ChallengeContextHolder(goalContexts + rulesContexts)
         progress.add(ChallengeStep(ChallengeOutcome.IN_PROGRESS, initialHolder))
         initialized = true
@@ -64,25 +66,28 @@ class ChallengeTracker(
     fun evaluate(state: Game, delta: GameDelta): ChallengeOutcome {
         require(initialized) { "ChallengeTracker must be initialized first" }
 
-        // Track game actions used
-        delta.steps.forEach { step ->
-            val action = step.action
-            when (action != Undo) {
-                true -> gameActions.add(action)
-                false -> undosPerformed++
-            }
-        }
-
-        // For Undo, we can just remove the last recorded ChallengeStep
-        if (delta.steps.lastOrNull() == Undo) {
+        // Undo returns the original delta with its steps and commands reversed;
+        // it does not contain an Undo action, but the original action.\
+        if (delta.reversed) {
             // Only the initializing step is left, so this Undo is reaching into
             // the starting position. The game engine should refuse those (see
             // `GameEngineController.protectInitialActions`), so getting here means
             // something bypassed it, which is not allowed.
             if (progress.size == 1) error("Reached start of challenge. Undo not allowed")
+            delta.steps.forEach { step ->
+                val removed = gameActions.removeLastOrNull() ?: error("Challenge action history was empty while undoing ${step.action}")
+                check(removed == step.action) {
+                    "Challenge action history diverged while undoing. Expected ${step.action}, found $removed"
+                }
+            }
             progress.removeLast()
+            undosPerformed++
+            score = null
             return progress.lastOrNull()?.status ?: ChallengeOutcome.IN_PROGRESS
         }
+
+        // Track all user and automatic actions belonging to this forward delta.
+        delta.steps.forEach { step -> gameActions.add(step.action) }
 
         // Otherwise, run evaluation through the configured goal its modifiers
         val stepProgress = challenge.goal.evaluate(state, delta, progress.last().contexts)
@@ -106,7 +111,7 @@ class ChallengeTracker(
         val step = ChallengeStep(outcome, updatedHolder)
 
         if (outcome == ChallengeOutcome.COMPLETED) {
-            score = challenge.scoring.scoreGame(state, gameActions)
+            score = challenge.scoring.scoreGame(state, gameActions, gameStats)
         }
 
         progress.add(step)

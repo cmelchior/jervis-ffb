@@ -5,6 +5,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.statistics.probability.ChanceObservation
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 /**
  * Wrap the choice of the reroll type used and whether it can be used to
@@ -42,6 +45,22 @@ data class UseRerollContext(
     // The reroll was aborted by the user, the original roll stands, and the
     // reroll is not marked as used after all.
     val rerollAborted: Boolean = false,
+
+    //
+    // These properties are only used to track Chance Metadata
+    //
+
+    // Index of the initial physical roll owning this.
+    val chanceRollIndex: Int? = null,
+    // ID of the outer roll whose reroll flow caused this nested context.
+    // Example:
+    // Dodge roll: 10
+    // └─ Pro activation roll: 11
+    val chanceEnclosingRollIndex: Int? = null,
+    // Physical observations emitted while the [UseRerollContext] is active.
+    // Keeping these here lets [UpdateChanceObservation] remain metadata-only
+    // instead of requiring a ledger in [Game].
+    val chanceObservations: PersistentList<ChanceObservation.DiceRoll> = persistentListOf(),
 ) : ProcedureContext {
     constructor(type: DiceRollType, roll: List<DieRoll<*>>, player: Player) : this(type, roll, player.team, player)
     constructor(type: DiceRollType, roll: List<DieRoll<*>>, player: Player, source: RerollSource) : this(type, roll, player.team, player)

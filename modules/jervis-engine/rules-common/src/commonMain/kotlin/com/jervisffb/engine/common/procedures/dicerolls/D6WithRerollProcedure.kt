@@ -20,6 +20,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportRerollUsed
 import com.jervisffb.engine.common.utils.calculateAvailableRerollsForPlayer
@@ -34,11 +35,14 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.collections.immutable.toPersistentList
 
 /**
  * Shared logic for Procedures that are handling a single D6 roll with
@@ -55,11 +59,11 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * procedure implements the same nodes as found here, so any changes should
  * be mirrored there.
  */
-abstract class D6WithRerollProcedure: Procedure() {
+abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
     // Roll initial dice
     abstract val RollDie: ActionNode
     // Select re-roll source or no reroll to keep result
-    abstract val ChooseReRollSource: ActionNode
+    abstract val ChooseReRollSource: AbstractChooseRerollSource
     // Use and Choose any potential reroll type.
     // Implementation Note: Use `lazy` to work around initialization order issues.
     open val UseRerollSource: ParentNode by lazy { CommonUseRerollSource(ReRollDie) }
@@ -79,12 +83,14 @@ abstract class D6WithRerollProcedure: Procedure() {
     final override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val owner = getActionOwner(state)
         val rollContextCommands = onEnterRollProcedure(state, rules)
+        val enclosingRollSequence = state.getContextOrNull<UseRerollContext>()?.chanceRollIndex
         val rerollContextCommand = AddContext(
             UseRerollContext(
                 type = rollType,
                 originalRoll = emptyList(), // Will be set later
                 team = owner.team,
-                player = owner
+                player = owner,
+                chanceRollIndex = enclosingRollSequence,
             )
         )
         return compositeCommandOf(
@@ -99,9 +105,15 @@ abstract class D6WithRerollProcedure: Procedure() {
         if (rerollContext.type != rollType) {
             INVALID_GAME_STATE("UseRerollContext's are in an inconsistent state. Received: $rerollContext")
         }
+        val chanceCommand = finalizeD6ChanceObservations(
+            state = state,
+            data = ChooseReRollSource.getRerollData(state, rules),
+            rerollContext = rerollContext,
+        )
         return compositeCommandOf(
             RemoveContext(rerollContext),
-            rollContextCommands
+            rollContextCommands,
+            chanceCommand,
         )
     }
 
@@ -120,8 +132,26 @@ abstract class D6WithRerollProcedure: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateContext(state, rules, d6)
+                val rerollContext = state.getContext<UseRerollContext>()
+                val chanceObservation = createD6ChanceObservation(
+                    state = state,
+                    rollType = rollType,
+                    player = getActionOwner(state),
+                    result = d6,
+                    rerollContext = rerollContext,
+                )
+                val chanceCommand = chanceObservation?.let { observation ->
+                    UpdateContext(
+                        rerollContext.copy(
+                            chanceRollIndex = observation.index,
+                            chanceObservations = rerollContext.chanceObservations.add(observation),
+                        )
+                    )
+                }
                 return compositeCommandOf(
                     UpdateContext(updatedContext),
+                    chanceCommand,
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportDiceRoll(rollType, d6),
                     GotoNode(nextNode),
                 )
@@ -159,23 +189,48 @@ abstract class D6WithRerollProcedure: Procedure() {
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val rollData = getRerollData(state, rules)
+            val rerollContext = state.getRerollContext()
+            if (rerollContext.type != rollType) {
+                INVALID_GAME_STATE("Reroll type mismatch: expected $rollType, got $rerollContext")
+            }
+            val selectedSource = (action as? RerollOptionSelected)?.getRerollSource(state)
+            val observationUpdate = updateD6ChanceDecision(
+                state = state,
+                rules = rules,
+                rollType = rollType,
+                data = rollData,
+                rerollContext = rerollContext,
+                selectedSource = selectedSource,
+            )
+            val contextWithObservation = observationUpdate?.let { update ->
+                rerollContext.copy(
+                    chanceObservations = rerollContext.chanceObservations.map { observation ->
+                        if (observation.index == update.previous.index) update.updated else observation
+                    }.toPersistentList(),
+                )
+            } ?: rerollContext
             return when (action) {
-                Continue -> rerollNotAvailableCommand()
-                is NoRerollSelected -> noRerollSelectedCommand()
+                Continue -> compositeCommandOf(
+                    observationUpdate?.command,
+                    observationUpdate?.let { UpdateContext(contextWithObservation) },
+                    rerollNotAvailableCommand(),
+                )
+                is NoRerollSelected -> compositeCommandOf(
+                    observationUpdate?.command,
+                    observationUpdate?.let { UpdateContext(contextWithObservation) },
+                    noRerollSelectedCommand(),
+                )
                 is RerollOptionSelected -> {
-                    val rollData = getRerollData(state, rules)
-                    val rerollContext = state.getRerollContext()
-                    if (rerollContext.type != rollType) {
-                        INVALID_GAME_STATE("Reroll type mismatch: expected $rollType, got $rerollContext")
-                    }
-                    val updatedContext = rerollContext.copy(
+                    val updatedContext = contextWithObservation.copy(
                         originalRoll = listOf(rollData.roll),
-                        source = action.getRerollSource(state),
+                        source = selectedSource,
                         rerollDice = action.getRerollDice(),
                     )
                     compositeCommandOf(
+                        observationUpdate?.command,
                         UpdateContext(updatedContext),
-                        ReportRerollUsed(action.getRerollSource(state)),
+                        ReportRerollUsed(selectedSource!!),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -202,8 +257,27 @@ abstract class D6WithRerollProcedure: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateContext(state, rules, d6)
+                val rerollContext = state.getContext<UseRerollContext>()
+                val chanceObservation = rerollContext.chanceRollIndex?.let { rootSequence ->
+                    createD6ChanceObservation(
+                        state = state,
+                        rollType = rollType,
+                        player = getActionOwner(state),
+                        result = d6,
+                        rerollContext = rerollContext,
+                        rerolledRollId = rootSequence,
+                    )
+                }
                 return compositeCommandOf(
                     UpdateContext(updatedContext),
+                    chanceObservation?.let { observation ->
+                        UpdateContext(
+                            rerollContext.copy(
+                                chanceObservations = rerollContext.chanceObservations.add(observation),
+                            ),
+                        )
+                    },
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportDiceRoll(rollType, d6),
                     nextNodeCommand()
                 )

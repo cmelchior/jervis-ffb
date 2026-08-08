@@ -48,6 +48,13 @@ class ChallengeBuilder(val id: ChallengeId) {
         require(homeTeam != null) { "Home team is missing" }
         require(awayTeam != null) { "Away team is missing" }
 
+        val scoring = scoring
+        if (scoring is ChallengeScoring.ProbabilityScoring) {
+            require(scoring.solvingTeamId == homeTeam!!.id || scoring.solvingTeamId == awayTeam!!.id) {
+                "The Jervis Probability Score solving team is not part of '$name': ${scoring.solvingTeamId}"
+            }
+        }
+
         val goal = this.goal ?: throw IllegalArgumentException("'$name' needs a goal.")
         goal.validateModifiers()
 
@@ -74,4 +81,3 @@ class ChallengeBuilder(val id: ChallengeId) {
         )
     }
 }
-

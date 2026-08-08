@@ -59,6 +59,16 @@ class Brawler(
         if (type != DiceRollType.BLOCK) return false
         if (rerollUsed) return false
         if (dicePool.anyRerollUsed() && !state.rules.canUseMultipleRerollsOnDicePools) return false
+        return isApplicableTo(state, type, dicePool, wasSuccess)
+    }
+
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
+        if (type != DiceRollType.BLOCK) return false
 
         @Suppress("UNCHECKED_CAST")
         val diceRolls = dicePool as List<DieRoll<DBlockResult>>

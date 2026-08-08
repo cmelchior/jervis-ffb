@@ -9,7 +9,10 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.procedures.dicerolls.chanceScope
+import com.jervisffb.engine.common.procedures.dicerolls.createChanceDiceResults
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -21,6 +24,8 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.ChanceObservation
+import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.assert
 import kotlin.collections.forEachIndexed
@@ -28,7 +33,7 @@ import kotlin.collections.forEachIndexed
 /**
  * Use a reroll and then reroll the block dice (if allowed).
  */
-object SingleStandardBlockRerollDice: Procedure() {
+object SingleStandardBlockRerollDice: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = ReRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -61,9 +66,33 @@ object SingleStandardBlockRerollDice: Procedure() {
                         rerolledResult = blockRoll
                     )
                 }
+                val observation = rerollContext.chanceRollIndex?.let { rootSequence ->
+                    if (!state.collectChanceData) return@let null
+                    val sequence = state.chanceObservationSequence
+                    ChanceObservation.DiceRoll(
+                        index = sequence,
+                        rollType = DiceRollType.BLOCK,
+                        teamId = blockContext.attacker.team.id,
+                        playerId = blockContext.attacker.id,
+                        dice = createChanceDiceResults(
+                            sequence,
+                            rerolls.mapIndexed { index, result -> rerollOptionDice[index].id to result },
+                        ),
+                        scope = chanceScope(state, blockContext.attacker),
+                        rerolledRollId = rootSequence,
+                    )
+                }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BLOCK, rerolls),
                     UpdateContext(blockContext.copy(roll = updatedRoll)),
+                    observation?.let { raw ->
+                        UpdateContext(
+                            rerollContext.copy(
+                                chanceObservations = rerollContext.chanceObservations.add(raw),
+                            ),
+                        )
+                    },
+                    observation?.let(::AddChanceObservation),
                     ExitProcedure(),
                 )
             }

@@ -6,10 +6,13 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.CompositeCommand
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
+import com.jervisffb.engine.commands.probabiliy.UpdateChanceObservation
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogEntry
+import com.jervisffb.engine.statistics.probability.ChanceObservationChange
 import kotlin.reflect.KClass
 
 /**
@@ -39,6 +42,10 @@ data class GameDelta(
         return steps.flatMap { it.commands }
     }
 
+    // All chance metadata collected while processing this delta
+    val chanceObservations: List<ChanceObservationChange>
+        get() = steps.flatMap { it.chanceMetadata }
+
     fun containsCommand(predicate: (Command) -> Boolean): Boolean {
         return steps.any { it.commands.any(predicate) }
     }
@@ -50,8 +57,20 @@ data class GameDelta(
     fun reverse(): GameDelta {
         return GameDelta(
             id = id,
-            steps = steps.reversed().map {
-                it.copy(commands = it.commands.reversed())
+            steps = steps.reversed().map { step ->
+                step.copy(
+                    commands = step.commands.reversed(),
+                    chanceMetadata = step.chanceMetadata.reversed().map { change ->
+                        // Undo changes to the chance observation stream.
+                        // We cannot use Command.undo() for this as the stream is owned by the ProbabilityTracker.
+                        when (change) {
+                            is ChanceObservationChange.Recorded -> ChanceObservationChange.Removed(change.observation)
+                            is ChanceObservationChange.Updated -> ChanceObservationChange.Restored(change.previous)
+                            is ChanceObservationChange.Removed -> ChanceObservationChange.Recorded(change.observation)
+                            is ChanceObservationChange.Restored -> error("A reversed chance observation cannot be reversed again")
+                        }
+                    },
+                )
             },
             owner = owner,
             reversed = true
@@ -65,7 +84,11 @@ data class NodeStep(val procedure: Procedure, val clazz: KClass<out Node>) {
     }
 }
 
-internal class DeltaBuilder(val actionId: GameActionId, val actionOwner: TeamId? = null) {
+internal class DeltaBuilder(
+    val actionId: GameActionId,
+    val actionOwner: TeamId? = null,
+    private val collectMetadata: Boolean = false,
+) {
 
     private val steps = mutableListOf<ActionStep>()
 
@@ -74,6 +97,7 @@ internal class DeltaBuilder(val actionId: GameActionId, val actionOwner: TeamId?
     private var startingNode: Node? = null
     private var intermediateNodes = mutableListOf<NodeStep>()
     private val commands: MutableList<Command> = mutableListOf()
+    private val chanceObservations = mutableListOf<ChanceObservationChange>()
     private val logs: MutableList<LogEntry> = mutableListOf()
 
     // For now treat everything between public actions as one step, even if it might involve multiple node
@@ -88,6 +112,7 @@ internal class DeltaBuilder(val actionId: GameActionId, val actionOwner: TeamId?
         startingNode = node
         intermediateNodes.clear()
         commands.clear()
+        chanceObservations.clear()
     }
 
     // As the GameAction is processed, we might transfer control across multiple nodes.
@@ -109,12 +134,30 @@ internal class DeltaBuilder(val actionId: GameActionId, val actionOwner: TeamId?
     }
 
     fun endAction() {
+        if (collectMetadata) {
+            commands.forEach { command ->
+                when (command) {
+                    is AddChanceObservation -> {
+                        chanceObservations.add(ChanceObservationChange.Recorded(command.observation))
+                    }
+                    is UpdateChanceObservation -> {
+                        chanceObservations.add(
+                            ChanceObservationChange.Updated(
+                                command.updated,
+                                command.previous,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
         val newStep = ActionStep(
             currentAction!!,
             startingProcedure!!,
             startingNode!!,
             intermediateNodes.toList(), // Copy list
-            commands.toList() // Copy list
+            commands.toList(), // Copy list
+            chanceObservations.toList(), // Copy list
         )
         steps.add(newStep)
         currentAction = null

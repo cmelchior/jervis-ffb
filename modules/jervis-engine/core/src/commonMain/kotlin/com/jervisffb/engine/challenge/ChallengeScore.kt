@@ -1,6 +1,8 @@
 package com.jervisffb.engine.challenge
 
+import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
 import kotlinx.serialization.Serializable
+import kotlin.text.compareTo
 import kotlin.time.Instant
 
 /**
@@ -12,6 +14,7 @@ sealed interface ChallengeScore<T: ChallengeScore<T>>: Comparable<T> {
     val date: Instant
     override fun compareTo(other: T): Int
 
+    // The challenge isn't "scored", Instead we only track if it is completed or not.
     @Serializable
     data class CompletionOnly(
         override val date: Instant
@@ -26,14 +29,35 @@ sealed interface ChallengeScore<T: ChallengeScore<T>>: Comparable<T> {
         }
     }
 
+    // The challenge is scored based on the probability of success.
     @Serializable
-    data class JervisRiskScore(
+    data class ProbabilityScore(
         override val date: Instant,
-        val score: com.jervisffb.engine.challenge.probability.JervisRiskScore
-    ) : ChallengeScore<JervisRiskScore> {
+        val result: ProbabilityScoreResult,
+    ) : ChallengeScore<ProbabilityScore> {
 
-        override fun compareTo(other: JervisRiskScore): Int {
-            return score.compareTo(other.score)
+        override fun compareTo(other: ProbabilityScore): Int {
+            val thisResult = result
+            val otherResult = other.result
+            require(
+                thisResult.algorithmId == otherResult.algorithmId &&
+                    thisResult.policyId == otherResult.policyId
+            ) {
+                "Probability Scores from different algorithm or policy versions cannot be compared."
+            }
+
+            // If scores are equal, we fall back to dates as a tiebreaker
+            if (thisResult is ProbabilityScoreResult.Scored && otherResult is ProbabilityScoreResult.Scored) {
+                val value = thisResult.compareTo(otherResult)
+                return if (value != 0) value else date.compareTo(other.date)
+            }
+
+            // If only one is scored, this treated as before an unscored one
+            return when {
+                thisResult is ProbabilityScoreResult.Scored -> -1
+                otherResult is ProbabilityScoreResult.Scored -> 1
+                else -> date.compareTo(other.date)
+            }
         }
     }
 }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
@@ -45,7 +44,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.menu.challenges.data.ChallengeRow
-import com.jervisffb.ui.menu.components.JervisSwitch
+import com.jervisffb.ui.menu.components.CompactSwitch
 import com.jervisffb.ui.menu.fumbbl.MenuSidebarButton
 import com.jervisffb.ui.utils.applyIf
 import org.jetbrains.compose.resources.painterResource
@@ -117,10 +116,10 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 ChallengeCategory.entries.forEach { category ->
-                    FilterSwitch(category.label, category in activeCategories) { viewModel.toggleCategory(category) }
+                    CompactSwitch(category.label, category in activeCategories) { viewModel.toggleCategory(category) }
                 }
-                FilterSwitch("Hide solved", hideSolved) { viewModel.setHideSolved(it) }
-                FilterSwitch("Only Favorites", showOnlyFavorites) { viewModel.setShowOnlyFavorites(it) }
+                CompactSwitch("Hide solved", hideSolved) { viewModel.setHideSolved(it) }
+                CompactSwitch("Only Favorites", showOnlyFavorites) { viewModel.setShowOnlyFavorites(it) }
             }
             TitleBorder()
             if (rows.isEmpty()) {
@@ -151,15 +150,6 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun FilterSwitch(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = label, fontSize = 14.sp, color = JervisTheme.contentTextColor)
-        Spacer(modifier = Modifier.width(4.dp))
-        JervisSwitch(enabled = true, checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 

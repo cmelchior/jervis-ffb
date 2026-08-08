@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.statistics.GameStatistics
 import com.jervisffb.test.bb2020.advancedHumanTeamAway
 import com.jervisffb.test.bb2020.createAdvancedHomeTeam
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
@@ -50,13 +51,26 @@ abstract class JervisGameBB2025Test {
         )
     }
 
-    fun setupDefaultGame() {
+    fun setupDefaultGame(
+        initialActions: List<GameAction> = emptyList(),
+        protectInitialActions: Boolean = false,
+        collectProbabilityData: Boolean = false
+    ) {
         homeTeam = createDefaultHomeTeamBB2025(rules)
         awayTeam = humanTeamAwayBB2025(rules)
         state = createDefaultGameStateBB2025(rules, homeTeam, awayTeam)
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
-        controller = GameEngineController(state, cacheActionDescriptor = false)
+        controller = GameEngineController(
+            state = state,
+            initialActions = initialActions,
+            protectInitialActions = protectInitialActions,
+            cacheActionDescriptor = false,
+            statistics = when (collectProbabilityData) {
+                true -> GameStatistics()
+                else -> null
+            },
+        )
         controller.startTestMode(FullGame)
     }
 

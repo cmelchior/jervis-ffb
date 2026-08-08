@@ -47,6 +47,15 @@ class Pass(
         wasSuccess: Boolean?
     ): Boolean {
         if (rerollUsed) return false
+        return isApplicableTo(state, type, dicePool, wasSuccess)
+    }
+
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
         val isPass = (state.stack.currentProcedure()?.procedure == PassAccuracyRoll)
         return isPass && (type == DiceRollType.ACCURACY)
     }

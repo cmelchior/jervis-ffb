@@ -58,6 +58,17 @@ class Pro(
         return true
     }
 
+    override fun isApplicableTo(
+        state: Game,
+        type: DiceRollType,
+        dicePool: List<DieRoll<*>>,
+        wasSuccess: Boolean?,
+    ): Boolean {
+        if (state.activePlayer != player) return false
+        if (type == DiceRollType.TEAM_CAPTAIN || type == DiceRollType.TEAM_MASCOT) return false
+        return state.rules.canBeRerolledByTeamReroll(type)
+    }
+
     override fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): List<DiceRerollOption> {
         return value
             .filter { it.rerollSource == null }

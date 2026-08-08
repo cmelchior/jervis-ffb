@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.DevModeGameAction
+import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.RemovePlayerKeyword
@@ -20,6 +22,7 @@ import com.jervisffb.engine.commands.EnterProcedure
 import com.jervisffb.engine.commands.ModifyPlayerBaseStat
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.MutableProcedureStack
@@ -41,7 +44,9 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialization.SerializedTeam
-import com.jervisffb.engine.serialization.SerializedTeam.Companion.LOG
+import com.jervisffb.engine.statistics.GameStatistics
+import com.jervisffb.engine.statistics.probability.ChanceObservation
+import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.InvalidGameStateException
@@ -80,7 +85,10 @@ class GameEngineController(
     // If `true`, initial actions cannot be undone.
     private val protectInitialActions: Boolean = false,
     // Called when the controller is started.
-    private val onStarted: (GameEngineController) -> Unit = { controller -> /* Do nothing */ }
+    // If set, the controller will collect statistics about the game while it
+    // is running.
+    val statistics: GameStatistics? = null,
+    private val onStarted: (GameEngineController) -> Unit = { controller -> /* Do nothing */ },
 ) {
 
     companion object {
@@ -111,13 +119,15 @@ class GameEngineController(
     // is removed from history, reversed and put in `lastActionIfUndo`
     private val _history: MutableList<GameDelta> = mutableListOf()
     val history: List<GameDelta> = _history
+    private val collectStatistics: Boolean = (statistics != null)
 
     // Point in `history` that calling Undo cannot move past.
     // Stays 0 unless `protectInitialActions` is set.
     private var undoFloor: Int = 0
 
+
     private var lastGameActionId: GameActionId = GameActionId(0)
-    private var deltaBuilder = DeltaBuilder(lastGameActionId + 1)
+    private var deltaBuilder = DeltaBuilder(lastGameActionId + 1, collectMetadata = collectStatistics)
     private var cachedActionRequest: ActionRequest? = null
     val state: Game = state
     val stack: MutableProcedureStack = state.stack // Shortcut for accessing the stack
@@ -190,7 +200,7 @@ class GameEngineController(
             when (action) {
                 is Undo -> {
                     if (isUndoAvailable(null)) {
-                        undoLastAction(revertActionId = false)
+                        undoLastAction(action, revertActionId = false)
                     } else {
                         INVALID_ACTION(Undo, "Undo is not available for the current game state or rule setup.")
                     }
@@ -199,7 +209,7 @@ class GameEngineController(
                     // If Revert is sent, we assume the user knows what they are doing
                     // and just apply it without restrictions. This also includes
                     // ignoring `undoFloor`.
-                    undoLastAction(revertActionId = true)
+                    undoLastAction(action, revertActionId = true)
                 }
                 is DevModeGameAction -> processDevAction(action)
                 else -> processForwardAction(action)
@@ -255,6 +265,7 @@ class GameEngineController(
             handleAction(it)
         }
         lockInitialActions()
+        state.collectChanceData = collectStatistics
         onStarted(this)
     }
 
@@ -267,6 +278,7 @@ class GameEngineController(
             handleAction(it)
         }
         lockInitialActions()
+        state.collectChanceData = collectStatistics
         onStarted(this)
     }
 
@@ -336,7 +348,7 @@ class GameEngineController(
         return lastGameActionId + 1
     }
 
-    private fun undoLastAction(revertActionId: Boolean) {
+    private fun undoLastAction(action: GameAction, revertActionId: Boolean) {
         if (replayMode) {
             throw IllegalStateException(
                 "Controller is in replay mode. `revert` is only available in manual mode.",
@@ -357,6 +369,7 @@ class GameEngineController(
         } else {
             (lastGameActionId + 1)
         }
+        statistics?.handleAction(action, delta)
     }
 
     private fun processDevAction(action: DevModeGameAction) {
@@ -369,11 +382,12 @@ class GameEngineController(
         }
         lastActionIfUndo = null
         val newDeltaId = (lastGameActionId + 1)
-        deltaBuilder = DeltaBuilder(newDeltaId, null)
+        deltaBuilder = DeltaBuilder(newDeltaId, null, collectStatistics)
         processSingleDevAction(deltaBuilder, action)
         val delta = deltaBuilder.build()
         _history.add(delta)
         lastGameActionId = newDeltaId
+        statistics?.handleAction(action, delta)
     }
 
     // Any change here might need to be replicated in [processDevAction]
@@ -387,7 +401,7 @@ class GameEngineController(
             }
         }
         val newDeltaId = (lastGameActionId + 1)
-        deltaBuilder = DeltaBuilder(newDeltaId, actionOwner)
+        deltaBuilder = DeltaBuilder(newDeltaId, actionOwner, collectStatistics)
         when (userAction) {
             is Undo -> error("Invalid action: $userAction")
             is CompositeGameAction -> userAction.actionList.forEach { actionElement ->
@@ -398,6 +412,7 @@ class GameEngineController(
         val delta = deltaBuilder.build()
         _history.add(delta)
         lastGameActionId = newDeltaId
+        statistics?.handleAction(userAction, delta)
     }
 
     private fun processSingleAction(deltaBuilder: DeltaBuilder, userAction: GameAction) {
@@ -411,7 +426,33 @@ class GameEngineController(
         if (validateActions) {
             validateAction(userAction)
         }
-        val command = currentNode.applyAction(userAction, state, rules)
+
+        // If a procedure not a `ChanceObservationHandler` still requires a
+        // chance event, we do not know how to interpret and can only report
+        // it as an unstructured action. As it is not handle anywhere else, we
+        // need to detect it here.
+        val unstructuredChanceEvent = when {
+            !state.collectChanceData -> null
+            !userAction.isRandomAction() -> null
+            // Classes implementing the `ChanceObservationHandler` interface promises
+            // to add structured data themselves.
+            currentProcedure.procedure is ChanceObservationHandler -> null
+            else -> AddChanceObservation(
+                ChanceObservation.UnstructuredAction(
+                    index = state.chanceObservationSequence,
+                    nodeDescription = stack.stateToPrettyString(),
+                    actionName = userAction::class.simpleName ?: "UnknownGameAction",
+                    dice = when (userAction) {
+                        is DieResult -> listOf(userAction)
+                        is DiceRollResults -> userAction.rolls
+                        else -> emptyList()
+                    },
+                ),
+            )
+        }
+        val actionCommand = currentNode.applyAction(userAction, state, rules)
+
+        val command = compositeCommandOf(actionCommand, unstructuredChanceEvent)
         executeCommand(command)
         rollForwardToNextActionNode()
         if (logAvailableActions) {

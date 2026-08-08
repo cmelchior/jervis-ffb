@@ -38,7 +38,7 @@ data class TeamRerollsAvailable(val count: Int) : ChallengeRule {
         state.awayTeam.rerolls.apply {
             clear()
             repeat(count) { i ->
-                add(StandardTeamReroll(state.homeTeam.id, i))
+                add(StandardTeamReroll(state.awayTeam.id, i))
             }
         }
     }
