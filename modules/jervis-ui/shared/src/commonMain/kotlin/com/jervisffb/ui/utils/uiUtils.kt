@@ -70,6 +70,15 @@ fun pixelsToDp(px: Float): Dp {
     return with(density) { (this.density * px).toDp() }
 }
 
+@Composable
+fun Dp.toPx(): Float {
+    val density = LocalDensity.current
+    return with(density) {
+        val px = roundToPx()
+        px.toFloat()
+    }
+}
+
 /**
  * Converts a [Painter] to a Compose [ImageBitmap], making it easier to process further.
  */

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
@@ -62,6 +64,7 @@ import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.SidebarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
+import com.jervisffb.ui.game.view.utils.PixelatedImage
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisTooltipArea
@@ -168,12 +171,27 @@ fun MenuScreenWithSidebarAndTitle(
                 )
             }
             Res.drawable.jervis_frontpage_mummy -> {
-                Image(
-                    modifier = Modifier.align(Alignment.BottomStart).width(340.dp).offset(x = -0.dp /*-40.dp*/, y = 0.dp /*15.dp*/),
+
+                val painter = painterResource(Res.drawable.jervis_frontpage_mummy)
+                val painterAspectRatio = painter.intrinsicSize.width / painter.intrinsicSize.height
+                PixelatedImage(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .width(340.dp)
+                        .aspectRatio(painterAspectRatio)
+                        .offset(x = -0.dp /*-40.dp*/, y = 0.dp /*15.dp*/)
+                    ,
                     painter = painterResource(Res.drawable.jervis_frontpage_mummy),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
+                    outlineColor = JervisTheme.black.copy(alpha = 1f),
+                    outlineRadius = 1f,
+                    shadowOffset = Offset(3f, 3f),
+                    shadowColor = JervisTheme.black.copy(alpha = 0.7f),
                 )
+//                Image(
+//                    painter = painterResource(Res.drawable.jervis_frontpage_mummy),
+//                    contentDescription = null,
+//                    contentScale = ContentScale.FillWidth,
+//                )
             }
             null -> { /* Show nothing */ }
         }

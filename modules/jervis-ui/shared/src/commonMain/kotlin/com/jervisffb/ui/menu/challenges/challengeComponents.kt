@@ -200,8 +200,9 @@ fun CategoryChip(category: ChallengeCategory, modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp, vertical = 3.dp),
         text = category.label.uppercase(),
         lineHeight = 1.em,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.Medium,
+        fontSize = 13.sp,
+        fontFamily = JervisTheme.pixelFontBodyFamily(),
+        fontWeight = FontWeight.Normal,
         color = categoryTextColor(category),
     )
 }

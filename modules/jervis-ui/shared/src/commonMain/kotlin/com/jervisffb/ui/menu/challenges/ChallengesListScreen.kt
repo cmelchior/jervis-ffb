@@ -18,14 +18,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -38,6 +41,8 @@ import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_frontpage_mummy
 import com.jervisffb.shared.generated.resources.jervis_icon_thumps_up_small_selected
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.view.JervisTheme.fontFamily
+import com.jervisffb.ui.game.view.utils.BorderText
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.view.utils.paperBackgroundWithLine
@@ -48,6 +53,8 @@ import com.jervisffb.ui.menu.challenges.data.ChallengeRow
 import com.jervisffb.ui.menu.components.JervisSwitch
 import com.jervisffb.ui.menu.fumbbl.MenuSidebarButton
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.toPx
 import org.jetbrains.compose.resources.painterResource
 
 class ChallengesListScreen(
@@ -169,9 +176,9 @@ private fun ChallengeListRow(
     alternateRow: Boolean,
     onOpen: () -> Unit,
     onToggleFavorite: () -> Unit,
-    headerTextSize: TextUnit = 16.sp,
+    headerTextSize: TextUnit = 20.sp,
     subTextColor: Color = JervisTheme.contentTextColor.copy(alpha = 0.6f),
-    subTextSize: TextUnit = 12.sp
+    subTextSize: TextUnit = 15.sp
 ) {
     val votes = row.votes
     Row(
@@ -195,11 +202,22 @@ private fun ChallengeListRow(
             }
         }
         Column(modifier = Modifier.weight(1f)) {
+//            BorderText(
+//                modifier = Modifier.padding(16.jdp),
+//                text = row.data.name.uppercase(),
+//                fontSize = headerTextSize,
+//                fontWeight = FontWeight.Bold,
+//                color = JervisTheme.rulebookOrange,
+//                fontFamily = JervisTheme.pixelFontButtonFamily(),
+//                borderThickness = 2.dp.toPx(),
+//                shadowOffset = 1.dp.toPx(),
+//            )
             Text(
                 text = row.data.name,
                 fontWeight = FontWeight.Bold,
+                fontFamily = JervisTheme.pixelFontBodyFamily(),
                 fontSize = headerTextSize,
-                color = JervisTheme.contentTextColor,
+                color = JervisTheme.contentTextColor.copy(alpha = 0.8f),
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -207,17 +225,20 @@ private fun ChallengeListRow(
                 Text(
                     text = "by ${row.data.author.name}",
                     fontSize = subTextSize,
+                    fontFamily = JervisTheme.pixelFontBodyFamily(),
                     color = subTextColor,
                 )
                 if (votes > 0) {
                     Text(
                         text = " • ",
                         fontSize = subTextSize,
+                        fontFamily = JervisTheme.pixelFontBodyFamily(),
                         color = subTextColor,
                     )
                     Text(
                         text = votes.toString(),
                         fontSize = subTextSize,
+                        fontFamily = JervisTheme.pixelFontBodyFamily(),
                         color = subTextColor,
                     )
                     Image(

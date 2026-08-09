@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.theme.NotoSansSymbols
 import com.jervisffb.ui.theme.NotoSansSymbols2
+import com.jervisffb.ui.theme.PixelCode
+import com.jervisffb.ui.theme.PixelOperator
+import com.jervisffb.ui.theme.Pixellari
 import com.jervisffb.ui.theme.TrumpTownPro
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -61,6 +64,27 @@ object JervisTheme {
     @Composable
     fun extendedDefaultFontFamily() = NotoSansSymbols2()
 
+    //    Page titles	Pixellari Bold or custom title font
+//    Large buttons	Pixellari, uppercase
+//    Challenge names	Pixellari
+//    Authors and metadata	Geist Pixel
+//    Logs and counters	Pixel Code
+//    Tiny version text	Pixel Code or Tiny5
+
+    @Composable
+    fun pixelFontTitleFamily() = TrumpTownPro()
+    @Composable
+    fun pixelFontButtonFamily() = Pixellari()
+    @Composable
+    fun pixelFontHeaderFamily() = Pixellari()
+    @Composable
+    fun pixelFontBodyFamily() = PixelOperator()
+    @Composable
+    fun pixelFontFootnoteFamily() = PixelCode()
+
+
+
+
     /**
      * Update this theme with the current window size. This will also trigger an update
      * of all [jsp] and [jdp] values.
@@ -74,7 +98,7 @@ object JervisTheme {
     val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)
     val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
     val rulebookRedLight = Color(0xFFC60000) // Color(0xFF991612)
-    val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
+    val rulebookOrange = Color(0xFFFCCD1A) // Color(0xFFFFBE26) //Color(0xFFeca316)
     val rulebookPurple = Color(0xFFBE26FF) //Color(0xFFeca316)
     val rulebookOrangeContrast = Color(0xFF765912)
     val rulebookGreen = Color(0xFF388235)
