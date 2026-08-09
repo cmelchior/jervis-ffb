@@ -505,6 +505,7 @@ abstract class AbstractRules(
             DiceRollType.BLITZ, // Kick-off Event
             DiceRollType.BRILLIANT_COACHING,
             DiceRollType.CHARGE,
+            DiceRollType.COIN_TOSS,
             DiceRollType.DEVIATE,
             DiceRollType.DODGY_SNACK_EFFECT,
             DiceRollType.DODGY_SNACK_ROLL_OFF,

@@ -1,5 +1,8 @@
 package com.jervisffb.test.probability
 
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.RerollSourceId
@@ -40,6 +43,31 @@ class LogicalActionPathScorerTests {
             val event = d6(sequence = 0, value = value, success = false)
             assertEquals(value / 6.0, event.observedOutcome.probability.value, EPSILON)
         }
+    }
+
+    @Test
+    fun standardDiceUseTheSameLogicalEventShape() {
+        val d3 = ActionPathEvent.Logical.die(
+            index = 0,
+            rollType = DiceRollType.CHARGE,
+            owner = HOME,
+            result = D3Result(2),
+            isSuccess = true,
+            scope = scope(),
+        )
+        val d8 = ActionPathEvent.Logical.die(
+            index = 1,
+            rollType = DiceRollType.SCATTER,
+            owner = HOME,
+            result = D8Result(5),
+            isSuccess = true,
+            scope = scope(),
+        )
+
+        assertEquals(OutcomeRatio(2, 3), d3.observedOutcome)
+        assertEquals(OutcomeRatio(4, 8), d8.observedOutcome)
+        assertIs<ActionPathEvent.Resolution.Dice>(d3.resolution)
+        assertIs<ActionPathEvent.Resolution.Dice>(d8.resolution)
     }
 
     @Test
@@ -267,12 +295,12 @@ class LogicalActionPathScorerTests {
         recoveries: List<RerollOption> = emptyList(),
         eventScope: ActionPathEventScope = scope(),
         owner: TeamId = HOME,
-    ) = ActionPathEvent.D6(
+    ) = ActionPathEvent.Logical.die(
         index = sequence,
         rollType = DiceRollType.DODGE,
         owner = owner,
-        selectedValue = value,
-        observedSuccess = success,
+        result = D6Result(value),
+        isSuccess = success,
         scope = eventScope,
         recoveries = recoveries,
     )

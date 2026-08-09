@@ -3,13 +3,26 @@
 The Jervis Probability Score (JPS) is a way to compare completed solutions to a
 Jervis Challenge. It answers a deliberately narrow question:
 
-> How risky was the sequence of dice results that this solution chose,
-> including rerolls available along this path.
+> How likely is it to achieve, at least, the chosen action sequence, 
+> including rerolls available along this path?
 
-It is not a measure of how clever the solution was, how difficult it was to
-find, or how optimal it is. In particular, it says nothing about the state of 
-the pitch, how many players are in tackle zones, or whether the opponent can 
-score next turn.
+In particular, it does not measure "outcome", nor how clever the solution was, 
+how difficult it was to find, or how optimal it is. It says nothing about the 
+state of the pitch, how many players are in tackle zones, or whether the 
+opponent can score next turn.
+
+> Example:
+> 
+> Goal: Player X must catch a thrown ball this turn.
+> 
+> Solution: An action sequence demonstrating Player Y throwing an inaccurate 
+> pass that scatters 3 times and still ends up landing on the target player 
+> who catches it. 
+
+JBS will only calculate the demonstrated sequence and not include the 
+probability of an accurate pass that was caught directly. So JBS tells you 
+nothing about the probability of the outcome, just the probability of reaching
+the outcome using the given sequence.
 
 The score is 0.0–100% and higher is better.
 
@@ -52,7 +65,23 @@ available in the pool (or that every die shows it when the opponent chooses
 the result).
 
 This means that the chance for a successful block is generally 
-pessimistic as it doesn't take into account e.g., Tackle overriding Dodge.
+pessimistic as it doesn't take into account e.g., Tackle overriding Dodge, which
+would make Stumble equal to POW, or if not, equal to "Push Back".
+
+### Pass / Throw Team-mate
+
+Rolls which outcome doesn't succeed / fail, like Accuracy rolls, are still 
+scored as X+ rolls. E.g. If a player wanted an inaccurate pass as the 
+"success" criteria, JPS will include the "probability for in-accurate + 
+probability for accurate", but this is not a valid in-game state, as 
+accurate throws behave differently than in-accurate ones.
+
+This means that trying to calculate the probability for this definition of 
+success is not possible and the reported value will the higher than the 
+actual probability.
+
+This is only a problem for targets that aim to land in a bracket below the 
+"best". Accurate rolls will score using the correct probability.
 
 ### Rerolls
 

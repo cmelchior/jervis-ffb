@@ -8,7 +8,7 @@ import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
 import com.jervisffb.engine.statistics.probability.event.ActivationFailureBehavior
 import com.jervisffb.engine.statistics.probability.event.ChanceBranch
-import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.PhysicalRollRole
 import com.jervisffb.engine.statistics.probability.event.RerollCategory
 import com.jervisffb.engine.statistics.probability.event.RerollResource
 import com.jervisffb.engine.statistics.probability.event.RerollUsage
@@ -52,23 +52,21 @@ object PhysicalActionPathScorer: ActionPathScorer {
 
         val primaryProbability = events.fold(Probability.ALWAYS) { probability, event ->
             when (event) {
-                is ActionPathEvent.Block -> probability * event.observedOutcomeProbability
-                is ActionPathEvent.PhysicalD6 -> when (event.role) {
-                    PhysicalD6Role.PRIMARY -> probability * event.observedOutcome.probability
-                    PhysicalD6Role.ACTIVATION,
-                    PhysicalD6Role.REROLL,
+                is ActionPathEvent.Physical -> when (event.role) {
+                    PhysicalRollRole.PRIMARY -> probability * event.observedOutcome.probability
+                    PhysicalRollRole.ACTIVATION,
+                    PhysicalRollRole.REROLL,
                     -> probability
                 }
-                is ActionPathEvent.D6,
+                is ActionPathEvent.Logical,
                 is ActionPathEvent.Unsupported,
                 -> probability
             }
         }
         val demonstratedProbability = events.fold(Probability.ALWAYS) { probability, event ->
             when (event) {
-                is ActionPathEvent.Block -> probability * event.observedOutcomeProbability
-                is ActionPathEvent.PhysicalD6 -> probability * event.observedOutcome.probability
-                is ActionPathEvent.D6,
+                is ActionPathEvent.Physical -> probability * event.observedOutcome.probability
+                is ActionPathEvent.Logical,
                 is ActionPathEvent.Unsupported,
                 -> probability
             }
@@ -83,7 +81,7 @@ object PhysicalActionPathScorer: ActionPathScorer {
             val next = mutableMapOf<ResourceState, Probability>()
             states.forEach { (resourceState, lineProbability) ->
                 when (event) {
-                    is ActionPathEvent.Block -> expandHypothetical(
+                    is ActionPathEvent.Physical -> expandPhysical(
                         event,
                         solvingTeamId,
                         allowMultipleTeamRerollsPerTurn,
@@ -91,15 +89,7 @@ object PhysicalActionPathScorer: ActionPathScorer {
                         lineProbability,
                         next,
                     )
-                    is ActionPathEvent.PhysicalD6 -> expandPhysical(
-                        event,
-                        solvingTeamId,
-                        allowMultipleTeamRerollsPerTurn,
-                        resourceState,
-                        lineProbability,
-                        next,
-                    )
-                    is ActionPathEvent.D6,
+                    is ActionPathEvent.Logical,
                     is ActionPathEvent.Unsupported,
                     -> Unit // Rejected during validation.
                 }
@@ -143,9 +133,9 @@ object PhysicalActionPathScorer: ActionPathScorer {
         )
     }
 
-    /** Expands a physical D6, respecting any reroll actually chosen in the trace. */
+    /** Expands a physical roll, respecting any reroll actually chosen in the trace. */
     private fun expandPhysical(
-        event: ActionPathEvent.PhysicalD6,
+        event: ActionPathEvent.Physical,
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
         resourceState: ResourceState,
@@ -225,18 +215,16 @@ object PhysicalActionPathScorer: ActionPathScorer {
         events.forEachIndexed { index, event ->
             if (event.index != index) add("Expected event sequence $index but found ${event.index}.")
             when (event) {
-                is ActionPathEvent.D6 -> add("Logical D6 event $index belongs to the fixed-recovery scorer.")
+                is ActionPathEvent.Logical -> add(
+                    "Logical chance event $index belongs to the fixed-recovery scorer.",
+                )
                 is ActionPathEvent.Unsupported -> add(
                     listOfNotNull(event.rollType?.description, event.reason).joinToString(": "),
                 )
-                is ActionPathEvent.PhysicalD6 -> {
-                    if (!event.finalized) add("Physical D6 event $index was not finalized.")
-                    if (event.canUseHypotheticalRecovery && event.observedSuccess == null) {
-                        add("Physical D6 event $index is missing its observed branch.")
-                    }
+                is ActionPathEvent.Physical -> {
+                    if (!event.finalized) add("Physical chance event $index was not finalized.")
                     event.actualRecovery?.let { use -> validateResource(use.resource, event, index) }
                 }
-                is ActionPathEvent.Block -> Unit
             }
             event.recoveries.forEach { option ->
                 validateResource(option.resource, event, index)
@@ -284,7 +272,7 @@ object PhysicalActionPathScorer: ActionPathScorer {
             val next = result[index + 1]
             val resources = buildList {
                 addAll(event.recoveries.map { it.resource })
-                if (event is ActionPathEvent.PhysicalD6) event.actualRecovery?.resource?.let(::add)
+                if (event is ActionPathEvent.Physical) event.actualRecovery?.resource?.let(::add)
             }
             result[index] = RelevantResourceState(
                 consumedResources = next.consumedResources + resources.mapNotNull { usageScope(it, event.scope) },

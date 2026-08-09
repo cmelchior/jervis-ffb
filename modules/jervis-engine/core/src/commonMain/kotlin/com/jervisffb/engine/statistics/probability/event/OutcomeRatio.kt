@@ -2,12 +2,14 @@ package com.jervisffb.engine.statistics.probability.event
 
 import com.jervisffb.engine.statistics.probability.Probability
 import kotlinx.serialization.Serializable
-
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.scorer.ActionPathScorer
 /**
- * An exact ratio retained by probability scorers.
+ * An exact ratio retained used when converting [ChanceObservation]
+ * to [ActionPathEvent]
  *
  * Ratios are retained in the ledger so selected dice values do not acquire
- * rounding errors. The dynamic program converts them to [Probability] only
+ * rounding errors. [ActionPathScorer] converts them to [Probability] only
  * while evaluating the complete action path.
  */
 @Serializable
@@ -25,8 +27,11 @@ data class OutcomeRatio(
     val probability: Probability
         get() = Probability(favorableOutcomes.toDouble() / possibleOutcomes)
 
+    // The probability of the complementary outcome in the same sample space.
+    val complement: OutcomeRatio
+        get() = OutcomeRatio(possibleOutcomes - favorableOutcomes, possibleOutcomes)
+
     companion object {
         val CERTAIN = OutcomeRatio(1, 1)
     }
 }
-

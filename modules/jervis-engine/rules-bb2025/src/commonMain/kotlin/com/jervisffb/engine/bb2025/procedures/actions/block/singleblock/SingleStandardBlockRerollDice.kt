@@ -68,7 +68,7 @@ object SingleStandardBlockRerollDice: Procedure(), ChanceObservationHandler {
                 }
                 val observation = rerollContext.chanceRollIndex?.let { rootSequence ->
                     if (!state.collectChanceData) return@let null
-                    val sequence = state.chanceObservationSequence
+                    val sequence = state.nextAvailableChanceObservationIndex
                     ChanceObservation.DiceRoll(
                         index = sequence,
                         rollType = DiceRollType.BLOCK,
@@ -79,7 +79,7 @@ object SingleStandardBlockRerollDice: Procedure(), ChanceObservationHandler {
                             rerolls.mapIndexed { index, result -> rerollOptionDice[index].id to result },
                         ),
                         scope = chanceScope(state, blockContext.attacker),
-                        rerolledRollId = rootSequence,
+                        rerolledRollIndex = rootSequence,
                     )
                 }
                 compositeCommandOf(

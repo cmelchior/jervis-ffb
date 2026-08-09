@@ -17,7 +17,7 @@ object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
     override fun normalize(observations: List<ChanceObservation>): List<ActionPathEvent> {
         val scoreableObservations = observations.withoutTerminalUnfinalizedRollFamily()
         val diceRolls = scoreableObservations.filterIsInstance<ChanceObservation.DiceRoll>()
-        val replacements = diceRolls.groupBy { it.rerolledRollId }
+        val replacements = diceRolls.groupBy { it.rerolledRollIndex }
         val normalized = buildList {
             scoreableObservations.forEach { observation ->
                 when (observation) {
@@ -28,22 +28,28 @@ object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
                         ),
                     )
                     is ChanceObservation.DiceRoll -> when {
-                        observation.rerolledRollId != null -> Unit
-                        observation.enclosingRollId != null -> Unit
+                        observation.rerolledRollIndex != null -> Unit
+                        observation.enclosingRollIndex != null -> Unit
                         observation.rollType in ignoredD6Rolls -> Unit
                         observation.rollType in activationD6Rolls -> Unit
+                        observation.outcome != null -> add(
+                            normalizeLogicalOutcome(
+                                root = observation,
+                                finalRoll = finalReplacement(observation, replacements),
+                            ),
+                        )
                         observation.rollType in supportedPrimaryD6Rolls -> add(
                             normalizeLogicalD6(observation, replacements),
                         )
                         observation.rollType == DiceRollType.BLOCK -> add(
-                            normalizeBlock(observation, diceRolls, replacements),
+                            normalizeLogicalBlock(observation, replacements),
                         )
                         else -> add(unsupported(observation, "Roll type is not supported by fixed-line scoring."))
                     }
                 }
             }
         }
-        return normalized.resequence()
+        return normalized.reindex()
     }
 
     private fun normalizeLogicalD6(
@@ -64,12 +70,12 @@ object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
         }
         val recoveryResult = recoveries(root.rerollOptions, success)
         recoveryResult.reason?.let { return unsupported(root, it) }
-        return ActionPathEvent.D6(
+        return ActionPathEvent.Logical.die(
             index = root.index,
             rollType = root.rollType,
             owner = root.teamId,
-            selectedValue = result.value,
-            observedSuccess = success,
+            result = result,
+            isSuccess = success,
             scope = root.scope.toFixedLineScope(),
             recoveries = recoveryResult.options,
         )

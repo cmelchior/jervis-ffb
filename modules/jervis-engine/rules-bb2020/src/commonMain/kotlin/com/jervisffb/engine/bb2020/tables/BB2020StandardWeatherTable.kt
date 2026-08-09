@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 object BB2020StandardWeatherTable: WeatherTable() {
     override val name: String = "Standard Weather Table"
-    private val table: Map<Int, Weather> =
+    override val entries: Map<Int, Weather> =
         mapOf(
             2 to Weather.SWELTERING_HEAT,
             3 to Weather.VERY_SUNNY,
@@ -35,7 +35,7 @@ object BB2020StandardWeatherTable: WeatherTable() {
         secondD6: D6Result,
     ): Weather {
         val result = firstD6.value + secondD6.value
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Weather Table.")
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Weather Table.")
     }
 }
 
@@ -44,6 +44,7 @@ object BB2020StandardWeatherTable: WeatherTable() {
  */
 @Serializable
 object SpringWeatherTable: WeatherTable() {
+    override val entries: Map<Int, Weather> = emptyMap()
     override val name: String = "Spring Weather Table"
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
         // Not implemented yet
@@ -56,6 +57,7 @@ object SpringWeatherTable: WeatherTable() {
  */
 @Serializable
 object SummerWeatherTable: WeatherTable() {
+    override val entries: Map<Int, Weather> = emptyMap()
     override val name: String = "Summer Weather Table"
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
         // Not implemented yet
@@ -69,6 +71,7 @@ object SummerWeatherTable: WeatherTable() {
 @Serializable
 object AutumnWeatherTable: WeatherTable() {
     override val name: String = "Autumn Weather Table"
+    override val entries: Map<Int, Weather> = emptyMap()
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
         // Not implemented yet
         return Weather.PERFECT_CONDITIONS
@@ -80,6 +83,7 @@ object AutumnWeatherTable: WeatherTable() {
  */
 @Serializable
 object WinterWeatherTable: WeatherTable() {
+    override val entries: Map<Int, Weather> = emptyMap()
     override val name: String
         get() = TODO("Not yet implemented")
 

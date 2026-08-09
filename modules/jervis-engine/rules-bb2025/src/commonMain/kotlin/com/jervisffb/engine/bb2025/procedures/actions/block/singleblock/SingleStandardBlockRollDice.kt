@@ -61,7 +61,7 @@ object SingleStandardBlockRollDice: Procedure(), ChanceObservationHandler {
                     }
                 val rerollContext = state.getRerollContext()
                 val observation = if (state.collectChanceData) {
-                    val sequence = state.chanceObservationSequence
+                    val sequence = state.nextAvailableChanceObservationIndex
                     ChanceObservation.DiceRoll(
                         index = sequence,
                         rollType = DiceRollType.BLOCK,

@@ -265,7 +265,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
                         player = getActionOwner(state),
                         result = d6,
                         rerollContext = rerollContext,
-                        rerolledRollId = rootSequence,
+                        rerolledRollIndex = rootSequence,
                     )
                 }
                 return compositeCommandOf(

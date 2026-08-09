@@ -73,7 +73,7 @@ class Game(
     // Used to create indexes into the stream (creating two chance command
     // objects within the same action will break this counter)
     // TODO Find a way to make this safe.
-    var chanceObservationSequence: Int = 0
+    var nextAvailableChanceObservationIndex: Int = 0
 
     val pitch = Pitch.createForRuleset(rules)
 

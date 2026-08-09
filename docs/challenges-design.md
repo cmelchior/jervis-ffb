@@ -46,6 +46,8 @@ to shipping an MVP of this feature.
 - Physical die: A die that has been rolled by the coach (or the value chosen)
 - Logical die: A die that has not been rolled but its result determined by a 
   probability policy.  
+- Demonstrated Path: The game actions in a sequence that describes a certain 
+  path through the game state.
 
 ## UI 
 

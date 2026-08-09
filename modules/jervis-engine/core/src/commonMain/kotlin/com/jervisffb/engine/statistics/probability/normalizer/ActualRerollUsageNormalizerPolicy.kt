@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActualRerollUse
-import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.PhysicalRollRole
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 
 /**
@@ -19,8 +19,8 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
     override fun normalize(observations: List<ChanceObservation>): List<ActionPathEvent> {
         val scoreableObservations = observations.withoutTerminalUnfinalizedRollFamily()
         val diceRolls = scoreableObservations.filterIsInstance<ChanceObservation.DiceRoll>()
-        val byId = diceRolls.associateBy { it.index }
-        val replacements = diceRolls.groupBy { it.rerolledRollId }
+        val byIndex = diceRolls.associateBy { it.index }
+        val replacements = diceRolls.groupBy { it.rerolledRollIndex }
         val normalized = buildList {
             scoreableObservations.forEach { observation ->
                 when (observation) {
@@ -31,22 +31,25 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
                         ),
                     )
                     is ChanceObservation.DiceRoll -> when {
-                        observation.rollType == DiceRollType.BLOCK && observation.rerolledRollId == null -> add(
-                            normalizeBlock(observation, diceRolls, replacements),
+                        observation.rollType == DiceRollType.BLOCK && observation.rerolledRollIndex == null -> add(
+                            normalizePhysicalBlock(observation, replacements),
                         )
                         observation.rollType == DiceRollType.BLOCK -> Unit
                         observation.rollType in ignoredD6Rolls -> Unit
+                        observation.outcome != null -> add(
+                            normalizePhysicalOutcome(observation, byIndex),
+                        )
                         observation.rollType in supportedPrimaryD6Rolls ||
                             observation.rollType in activationD6Rolls -> add(
-                            normalizePhysicalD6(observation, byId),
+                            normalizePhysicalD6(observation, byIndex),
                         )
-                        observation.rerolledRollId != null -> Unit
+                        observation.rerolledRollIndex != null -> Unit
                         else -> add(unsupported(observation, "Roll type is not supported by hybrid scoring."))
                     }
                 }
             }
         }
-        return normalized.resequence()
+        return normalized.reindex()
     }
 
     private fun normalizePhysicalD6(
@@ -56,6 +59,8 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
         val result = roll.dice.singleOrNull()?.result as? D6Result
             ?: return unsupported(roll, "Expected one physical D6 result.")
         if (!roll.finalized) return unsupported(roll, "Physical D6 roll was not finalized.")
+        val isSuccess = roll.success
+            ?: return unsupported(roll, "Physical D6 roll does not expose a factual success result.")
 
         val selectedSource = roll.selectedReroll?.takeUnless { it.aborted }?.let { selection ->
             roll.rerollOptions.firstOrNull { it.source.id == selection.sourceId }?.source
@@ -67,38 +72,27 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
             ActualRerollUse(sourceResult!!.resource!!, source.description)
         }
         val recoveryResult = when (actualRecovery) {
-            null -> recoveries(roll.rerollOptions, roll.success)
+            null -> recoveries(roll.rerollOptions, isSuccess)
             else -> RecoveryConversion(emptyList())
         }
         recoveryResult.reason?.let { return unsupported(roll, it) }
 
-        return ActionPathEvent.PhysicalD6(
+        return ActionPathEvent.Physical.die(
             index = roll.index,
-            traceRootSequence = traceRoot(roll, observations),
+            traceRootIndex = traceRoot(roll, observations),
             rollType = roll.rollType,
             owner = roll.teamId,
-            selectedValue = result,
+            result = result,
             role = when {
-                roll.rerolledRollId != null -> PhysicalD6Role.REROLL
-                roll.rollType in activationD6Rolls -> PhysicalD6Role.ACTIVATION
-                else -> PhysicalD6Role.PRIMARY
+                roll.rerolledRollIndex != null -> PhysicalRollRole.REROLL
+                roll.rollType in activationD6Rolls -> PhysicalRollRole.ACTIVATION
+                else -> PhysicalRollRole.PRIMARY
             },
             scope = roll.scope.toFixedLineScope(),
-            observedSuccess = if (actualRecovery == null) roll.success else null,
+            isSuccess = isSuccess,
             actualRecovery = actualRecovery,
             recoveries = recoveryResult.options,
             finalized = true,
         )
-    }
-
-    private fun traceRoot(
-        roll: ChanceObservation.DiceRoll,
-        observations: Map<Int, ChanceObservation.DiceRoll>,
-    ): Int {
-        var current = roll
-        while (current.rerolledRollId != null) {
-            current = observations[current.rerolledRollId] ?: break
-        }
-        return current.index
     }
 }

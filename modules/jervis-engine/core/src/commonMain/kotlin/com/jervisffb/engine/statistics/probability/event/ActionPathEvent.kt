@@ -1,185 +1,309 @@
 package com.jervisffb.engine.statistics.probability.event
 
 import com.jervisffb.engine.actions.BlockDice
-import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.statistics.probability.Probability
 import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
-import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import kotlinx.serialization.Serializable
 
 /**
- * This file contains classes related to tracking dice rolls and their
- * reroll choices across a single, chosen "Action Path".
+ * A normalized chance event in one chosen action path.
  *
- * I.e., a user will select the game actions performed, and these classes
- * track rolls and rerolls that were encountered during that path. This can be
- * used to calculate the total probability of success for a given path, while
- * taking account into account available reroll possibilities.
- *
- * Note; it is assumed that the action path under consideration is successful,
- * for the definition of success needed in the context. These events provide no
- * useful information if a path is unsuccessful.
- *
- * The primary use case is challenges, where the Action Path is the actions
- * selected by the coach to complete the challenge.
- *
- * This also means that these classes are only usable for Action Paths that, at
- * most, span 1 team turn.
- */
-
-/**
- * These classes describe a chance event recorded while the action path is
- * played.
- *
- * They are created by the [ChanceNormalizer] will run through the list of
- * [com.jervisffb.engine.statistics.probability.observation.ChanceObservation]'s provided by the game engine and normalize them
- * into a list of [ActionPathEvent] that can be processed by one of the
- * `<X>Scorer` algorithms to provide a single score for the action path.
+ * Raw engine observations are converted by [ChanceNormalizer] into either one
+ * logical event with replacement rolls collapsed, or the individual physical
+ * rolls that occurred.
  */
 @Serializable
 sealed class ActionPathEvent {
-    // Index of this event in the list of events recorded.
-    // Once placed, an event never moves, so storing it here is fine and makes
-    // it easier to find its position in the list.
     abstract val index: Int
 
-    /**
-     * A D6 test for a single roll, collapsing any reroll into it.
-     *
-     * A binary D6 test scored from the dice value selected.
-     * I.e., if a value `v` is selected, the probability of success is
-     * `(7-v)/6`.
-     *
-     * Example, if a 2 is selected, the chance of success i `5/6`.
-     *
-     * Note; this event makes no attempt to be "correct", it assumes that the
-     * user will select the optimal value by taking account into account
-     * any skills or modifiers that might apply for the result to turn into
-     * a success. This has the advantage that an optimal score requires
-     * knowledge about stats and skills and thus prompts users towards learning
-     * these things.
-     *
-     * A suboptimal choice is still allowed, but will just result in a lower
-     * score.
-     *
-     * Since these probabilities are mostly used during challenges, we know
-     * that a correct value was chosen, albeit it might not be perfect.
-     *
-     * Example:
-     * -A Dodge test starts with a D6 result of 1.
-     * - The player uses Dodge and rolls again, getting 5.
-     * - These are two physical dice, but one logical Dodge roll. [D6]
-     *   represents that single test using its final selected result.
-     */
+    /** How the demonstrated action path interprets the selected result(s). */
     @Serializable
-    data class D6(
+    sealed interface Resolution {
+        val isSuccess: Boolean
+
+        /** A conventional single-die threshold test. */
+        @Serializable
+        data class Dice(
+            override val isSuccess: Boolean,
+        ) : Resolution
+
+        /** A procedure-supplied interpretation such as an at-least or target-set objective. */
+        @Serializable
+        data class Outcome(
+            val category: ChanceOutcomeCategory,
+            override val isSuccess: Boolean,
+        ) : Resolution
+
+        /** A selected face from a pool of block dice. */
+        @Serializable
+        data class Block(
+            val selectedFace: BlockDice,
+            val opponentChooses: Boolean,
+        ) : Resolution {
+            override val isSuccess: Boolean = true
+        }
+    }
+
+    /** One logical chance event, with any replacement rolls collapsed into it. */
+    @Serializable
+    data class Logical(
         override val index: Int,
         val rollType: DiceRollType,
         val owner: TeamId,
-        val selectedValue: Int,
-        val observedSuccess: Boolean,
+        val results: List<DieResult>,
+        val resolution: Resolution,
+        val observedOutcome: OutcomeRatio,
         val scope: ActionPathEventScope,
         val recoveries: List<RerollOption> = emptyList(),
     ) : ActionPathEvent() {
         init {
-            val legalValues = if (observedSuccess) 2..6 else 1..5
-            require(selectedValue in legalValues) {
-                "A selected D6 ${if (observedSuccess) "success" else "failure"} must be in $legalValues: " +
-                    selectedValue
-            }
+            validateResults(results, resolution)
         }
 
-        val observedOutcome: OutcomeRatio
-            get() = when (observedSuccess) {
-                true -> OutcomeRatio(7 - selectedValue, 6)
-                false -> OutcomeRatio(selectedValue, 6)
-            }
+        companion object {
+            /** Creates a conventional single-die threshold event. */
+            fun die(
+                index: Int,
+                rollType: DiceRollType,
+                owner: TeamId,
+                result: DieResult,
+                isSuccess: Boolean,
+                scope: ActionPathEventScope,
+                recoveries: List<RerollOption> = emptyList(),
+            ) = Logical(
+                index = index,
+                rollType = rollType,
+                owner = owner,
+                results = listOf(result),
+                resolution = Resolution.Dice(isSuccess),
+                observedOutcome = thresholdOutcome(result, isSuccess),
+                scope = scope,
+                recoveries = recoveries,
+            )
+
+            /** Creates an event whose probability is supplied by its rule procedure. */
+            fun outcome(
+                index: Int,
+                rollType: DiceRollType,
+                owner: TeamId,
+                results: List<DieResult>,
+                category: ChanceOutcomeCategory,
+                isSuccess: Boolean,
+                successProbability: OutcomeRatio,
+                scope: ActionPathEventScope,
+                recoveries: List<RerollOption> = emptyList(),
+            ) = Logical(
+                index = index,
+                rollType = rollType,
+                owner = owner,
+                results = results,
+                resolution = Resolution.Outcome(category, isSuccess),
+                observedOutcome = successProbability.observedBranch(isSuccess),
+                scope = scope,
+                recoveries = recoveries,
+            )
+
+            /** Creates a selected block-face event from the final block-dice pool. */
+            fun block(
+                index: Int,
+                owner: TeamId,
+                results: List<DBlockResult>,
+                selectedFace: BlockDice,
+                opponentChooses: Boolean,
+                scope: ActionPathEventScope,
+                recoveries: List<RerollOption> = emptyList(),
+            ) = Logical(
+                index = index,
+                rollType = DiceRollType.BLOCK,
+                owner = owner,
+                results = results,
+                resolution = Resolution.Block(selectedFace, opponentChooses),
+                observedOutcome = blockOutcome(selectedFace, results.size, opponentChooses),
+                scope = scope,
+                recoveries = recoveries,
+            )
+        }
     }
 
-    /**
-     * One "physical" D6 selected by the coach.
-     *
-     * [PhysicalActionPathScorer] deliberately maps every selected value
-     * `v` as `success`, even when the game engine treated that die as a failed
-     * test.
-     *
-     * This approach allows us to keep the game UI largely the same (by showing
-     * reroll options), but using them will penalize the final score.
-     *
-     * A natural 1 is a zero-risk event, but it remains visible in the
-     * ledger and triggers a reroll source to be marked as used, which can
-     * negatively affect the success chance of future rolls.
-     *
-     * This is by design as coaches can see the impact of using reroll options
-     * in their final probability score.
-     */
+    /** One physical roll selected by the coach, preserving actual reroll usage. */
     @Serializable
-    data class PhysicalD6(
+    data class Physical(
         override val index: Int,
-        // Index of the root event, e.g. a Dodge Reroll will point back to the first roll
-        val traceRootSequence: Int,
+        val traceRootIndex: Int,
         val rollType: DiceRollType,
         val owner: TeamId,
-        val selectedValue: D6Result,
-        val role: PhysicalD6Role,
+        val results: List<DieResult>,
+        val resolution: Resolution,
+        val role: PhysicalRollRole,
         val scope: ActionPathEventScope,
-        val observedSuccess: Boolean? = null,
+        val observedOutcome: OutcomeRatio,
         val actualRecovery: ActualRerollUse? = null,
         val recoveries: List<RerollOption> = emptyList(),
         val finalized: Boolean = false,
     ) : ActionPathEvent() {
         init {
-            require(traceRootSequence <= index) {
-                "A physical D6 cannot precede its trace root: $traceRootSequence > $index"
+            require(traceRootIndex <= index) {
+                "A physical chance event cannot precede its trace root: $traceRootIndex > $index"
             }
+            validateResults(results, resolution)
         }
 
-        val observedOutcome: OutcomeRatio
-            get() {
-                val sides = selectedValue.max.toInt()
-                return OutcomeRatio((sides + 1) - selectedValue.value, sides)
-            }
-
-        // Returns `true` if a reroll was theoretically possible (regardless of it existing or not)
         val canUseHypotheticalRecovery: Boolean
-            get() = finalized && role != PhysicalD6Role.REROLL && actualRecovery == null
-    }
+            get() = finalized && role != PhysicalRollRole.REROLL && actualRecovery == null
 
-    /**
-     * A standard block scored from the face selected in the chosen action path.
-     *
-     * TODO Rerolling Blocks are not supported right now.
-     */
-    @Serializable
-    data class Block(
-        override val index: Int,
-        val owner: TeamId,
-        val selectedFace: BlockDice,
-        val diceCount: Int,
-        val opponentChooses: Boolean,
-        val scope: ActionPathEventScope,
-        val recoveries: List<RerollOption> = emptyList(),
-    ) : ActionPathEvent() {
-        init {
-            require(diceCount > 0) { "A block must roll at least one die: $diceCount" }
+        companion object {
+            /** Creates a conventional physical single-die threshold event. */
+            fun die(
+                index: Int,
+                traceRootIndex: Int,
+                rollType: DiceRollType,
+                owner: TeamId,
+                result: DieResult,
+                role: PhysicalRollRole,
+                scope: ActionPathEventScope,
+                isSuccess: Boolean,
+                actualRecovery: ActualRerollUse? = null,
+                recoveries: List<RerollOption> = emptyList(),
+                finalized: Boolean = false,
+            ) = Physical(
+                index = index,
+                traceRootIndex = traceRootIndex,
+                rollType = rollType,
+                owner = owner,
+                results = listOf(result),
+                resolution = Resolution.Dice(isSuccess),
+                role = role,
+                scope = scope,
+                observedOutcome = thresholdOutcome(result, isSuccess = true),
+                actualRecovery = actualRecovery,
+                recoveries = recoveries,
+                finalized = finalized,
+            )
+
+            /** Creates a physical event whose probability is supplied by its rule procedure. */
+            fun outcome(
+                index: Int,
+                traceRootIndex: Int,
+                rollType: DiceRollType,
+                owner: TeamId,
+                results: List<DieResult>,
+                category: ChanceOutcomeCategory,
+                role: PhysicalRollRole,
+                scope: ActionPathEventScope,
+                isSuccess: Boolean,
+                successProbability: OutcomeRatio,
+                actualRecovery: ActualRerollUse? = null,
+                recoveries: List<RerollOption> = emptyList(),
+                finalized: Boolean = false,
+            ) = Physical(
+                index = index,
+                traceRootIndex = traceRootIndex,
+                rollType = rollType,
+                owner = owner,
+                results = results,
+                resolution = Resolution.Outcome(category, isSuccess),
+                role = role,
+                scope = scope,
+                observedOutcome = successProbability.observedBranch(isSuccess),
+                actualRecovery = actualRecovery,
+                recoveries = recoveries,
+                finalized = finalized,
+            )
+
+            /** Creates a physical selected block-face event from the final dice pool. */
+            fun block(
+                index: Int,
+                traceRootIndex: Int,
+                owner: TeamId,
+                results: List<DBlockResult>,
+                selectedFace: BlockDice,
+                opponentChooses: Boolean,
+                role: PhysicalRollRole,
+                scope: ActionPathEventScope,
+                actualRecovery: ActualRerollUse? = null,
+                recoveries: List<RerollOption> = emptyList(),
+                finalized: Boolean = false,
+            ) = Physical(
+                index = index,
+                traceRootIndex = traceRootIndex,
+                rollType = DiceRollType.BLOCK,
+                owner = owner,
+                results = results,
+                resolution = Resolution.Block(selectedFace, opponentChooses),
+                role = role,
+                scope = scope,
+                observedOutcome = blockOutcome(selectedFace, results.size, opponentChooses),
+                actualRecovery = actualRecovery,
+                recoveries = recoveries,
+                finalized = finalized,
+            )
         }
-
-        val observedOutcomeProbability: Probability
-            get() = DBlockResult.successProbability(selectedFace, diceCount, opponentChooses)
     }
 
-    /**
-     * Dice roll that the algorithm cannot categorize and score without
-     * guessing. If we hit this, we should refuse to score the action path and
-     * instead report the problematic roll(s), so support can be added for them.
-     */
+    /** A chance observation that cannot be scored without guessing. */
     @Serializable
     data class Unsupported(
         override val index: Int,
         val rollType: DiceRollType? = null,
         val reason: String,
     ) : ActionPathEvent()
+}
+
+private fun validateResults(
+    results: List<DieResult>,
+    resolution: ActionPathEvent.Resolution,
+) {
+    require(results.isNotEmpty()) { "A chance event must contain at least one result." }
+    when (resolution) {
+        is ActionPathEvent.Resolution.Dice -> require(results.size == 1 && results.single() !is DBlockResult) {
+            "A conventional die resolution must contain exactly one non-block result."
+        }
+        is ActionPathEvent.Resolution.Outcome -> Unit
+        is ActionPathEvent.Resolution.Block -> {
+            require(results.all { it is DBlockResult }) {
+                "A block resolution must contain only block-die results."
+            }
+            require(results.filterIsInstance<DBlockResult>().any { it.blockResult == resolution.selectedFace }) {
+                "The selected block face must occur in the final block-dice pool."
+            }
+        }
+    }
+}
+
+private fun thresholdOutcome(result: DieResult, isSuccess: Boolean): OutcomeRatio {
+    val possibleOutcomes = result.max - result.min + 1
+    val favorableOutcomes = when (isSuccess) {
+        true -> result.max - result.value + 1
+        false -> result.value - result.min + 1
+    }
+    return OutcomeRatio(favorableOutcomes, possibleOutcomes)
+}
+
+private fun OutcomeRatio.observedBranch(success: Boolean): OutcomeRatio = if (success) this else complement
+
+private fun blockOutcome(
+    selectedFace: BlockDice,
+    diceCount: Int,
+    opponentChooses: Boolean,
+): OutcomeRatio {
+    require(diceCount > 0) { "A block needs at least one die: $diceCount" }
+    val favorableFaces = if (selectedFace == BlockDice.PUSH_BACK) 2L else 1L
+    val possibleOutcomes = integerPower(6L, diceCount)
+    val favorableOutcomes = when (opponentChooses) {
+        true -> integerPower(favorableFaces, diceCount)
+        false -> possibleOutcomes - integerPower(6L - favorableFaces, diceCount)
+    }
+    require(possibleOutcomes <= Int.MAX_VALUE && favorableOutcomes <= Int.MAX_VALUE) {
+        "Block dice pool is too large to represent as an exact outcome ratio: $diceCount"
+    }
+    return OutcomeRatio(favorableOutcomes.toInt(), possibleOutcomes.toInt())
+}
+
+private fun integerPower(base: Long, exponent: Int): Long {
+    var result = 1L
+    repeat(exponent) { result *= base }
+    return result
 }

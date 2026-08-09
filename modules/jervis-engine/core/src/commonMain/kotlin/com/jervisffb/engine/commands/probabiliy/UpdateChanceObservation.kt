@@ -16,16 +16,16 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
  * a [GameDelta].
  */
 class UpdateChanceObservation(
-    private val sequence: Int,
-    internal val previous: ChanceObservation,
-    internal val updated: ChanceObservation,
+    private val index: Int,
+    val previous: ChanceObservation,
+    val updated: ChanceObservation,
 ) : Command {
     init {
-        require(previous.index == sequence) {
-            "Previous observation sequence ${previous.index} does not match slot $sequence."
+        require(previous.index == index) {
+            "Previous observation sequence ${previous.index} does not match slot $index."
         }
-        require(updated.index == sequence) {
-            "Updated observation sequence ${updated.index} does not match slot $sequence."
+        require(updated.index == index) {
+            "Updated observation sequence ${updated.index} does not match slot $index."
         }
     }
 

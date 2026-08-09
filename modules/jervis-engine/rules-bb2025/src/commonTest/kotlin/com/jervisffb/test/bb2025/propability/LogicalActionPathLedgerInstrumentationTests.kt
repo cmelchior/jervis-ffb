@@ -24,7 +24,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.statistics.probability.ProbabilityTracker
 import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
-import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.PhysicalRollRole
 import com.jervisffb.engine.statistics.probability.event.RerollCategory
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSourceKind
@@ -46,7 +46,7 @@ import kotlin.test.assertTrue
 class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
     @BeforeTest
     override fun setUp() {
-        setupDefaultGame(collectProbabilityData = true)
+        setupDefaultGame(collectMetadata = true)
         state.collectChanceData = false
         startDefaultGame()
         state.collectChanceData = true
@@ -83,14 +83,14 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
         val reroll = observations[1]
         assertEquals(DiceRollType.DODGE, initial.rollType)
         assertEquals(1, (initial.dice.single().result as D6Result).value)
-        assertEquals(initial.index, reroll.rerolledRollId)
+        assertEquals(initial.index, reroll.rerolledRollIndex)
         assertEquals(4, (reroll.dice.single().result as D6Result).value)
         assertTrue(reroll.success == true)
         assertTrue(initial.rerollOptions.any { it.source.kind == ChanceRerollSourceKind.TEAM_REROLL })
 
-        val event = assertIs<ActionPathEvent.D6>(logicalScore().events.single())
-        assertEquals(4, event.selectedValue)
-        assertTrue(event.observedSuccess)
+        val event = assertIs<ActionPathEvent.Logical>(logicalScore().events.single())
+        assertEquals(4, assertIs<D6Result>(event.results.single()).value)
+        assertTrue(assertIs<ActionPathEvent.Resolution.Dice>(event.resolution).isSuccess)
         assertTrue(event.recoveries.any { it.resource.category == RerollCategory.TEAM_REROLL })
 
         controller.handleAction(Undo)
@@ -114,9 +114,10 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
         assertEquals(1, observation.dice.size)
         assertEquals(observation.dice.single().id, observation.selectedResultIds.single())
 
-        val event = assertIs<ActionPathEvent.Block>(logicalScore().events.single())
-        assertEquals(BlockDice.STUMBLE, event.selectedFace)
-        assertEquals(1, event.diceCount)
+        val event = assertIs<ActionPathEvent.Logical>(logicalScore().events.single())
+        val resolution = assertIs<ActionPathEvent.Resolution.Block>(event.resolution)
+        assertEquals(BlockDice.STUMBLE, resolution.selectedFace)
+        assertEquals(1, event.results.size)
         assertEquals(attacker.team.id, event.owner)
     }
 
@@ -164,13 +165,13 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
         )
 
         val raw = trackedDiceRolls().single()
-        assertEquals(null, raw.rerolledRollId)
+        assertEquals(null, raw.rerolledRollIndex)
         assertEquals(null, raw.selectedReroll)
         assertTrue(raw.finalized)
 
-        val event = assertIs<ActionPathEvent.PhysicalD6>(physicalScore().events.single())
-        assertEquals(2, event.selectedValue.value)
-        assertEquals(PhysicalD6Role.PRIMARY, event.role)
+        val event = assertIs<ActionPathEvent.Physical>(physicalScore().events.single())
+        assertEquals(2, assertIs<D6Result>(event.results.single()).value)
+        assertEquals(PhysicalRollRole.PRIMARY, event.role)
         assertEquals(null, event.actualRecovery)
         assertTrue(event.recoveries.any { it.resource.category == RerollCategory.TEAM_REROLL })
     }
@@ -188,14 +189,14 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
 
         val events = physicalScore().events
         assertEquals(2, events.size)
-        val initial = assertIs<ActionPathEvent.PhysicalD6>(events[0])
-        val reroll = assertIs<ActionPathEvent.PhysicalD6>(events[1])
-        assertEquals(2, initial.selectedValue.value)
+        val initial = assertIs<ActionPathEvent.Physical>(events[0])
+        val reroll = assertIs<ActionPathEvent.Physical>(events[1])
+        assertEquals(2, assertIs<D6Result>(initial.results.single()).value)
         assertEquals(RerollCategory.TEAM_REROLL, initial.actualRecovery?.resource?.category)
         assertTrue(initial.recoveries.isEmpty())
-        assertEquals(4, reroll.selectedValue.value)
-        assertEquals(PhysicalD6Role.REROLL, reroll.role)
-        assertEquals(initial.index, reroll.traceRootSequence)
+        assertEquals(4, assertIs<D6Result>(reroll.results.single()).value)
+        assertEquals(PhysicalRollRole.REROLL, reroll.role)
+        assertEquals(initial.index, reroll.traceRootIndex)
     }
 
     private fun logicalScore(): ProbabilityScoreResult.Scored = assertIs(

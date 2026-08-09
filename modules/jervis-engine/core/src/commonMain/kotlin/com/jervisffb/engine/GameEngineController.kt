@@ -439,7 +439,7 @@ class GameEngineController(
             currentProcedure.procedure is ChanceObservationHandler -> null
             else -> AddChanceObservation(
                 ChanceObservation.UnstructuredAction(
-                    index = state.chanceObservationSequence,
+                    index = state.nextAvailableChanceObservationIndex,
                     nodeDescription = stack.stateToPrettyString(),
                     actionName = userAction::class.simpleName ?: "UnknownGameAction",
                     dice = when (userAction) {

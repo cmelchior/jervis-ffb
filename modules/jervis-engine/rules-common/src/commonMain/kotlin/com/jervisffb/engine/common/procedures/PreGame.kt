@@ -92,8 +92,7 @@ object PreGame : Procedure() {
     }
 
     object DetermineKickingTeam : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) =
-            DetermineKickingTeamStep
+        override fun getChildProcedure(state: Game, rules: Rules) = DetermineKickingTeamStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

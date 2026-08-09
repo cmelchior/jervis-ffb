@@ -27,6 +27,8 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
+import com.jervisffb.engine.commands.probabiliy.UpdateChanceObservation
 import com.jervisffb.engine.common.commands.ResetAvailableTeamActions
 import com.jervisffb.engine.common.commands.SetActiveTeam
 import com.jervisffb.engine.common.commands.SetCanUseTeamRerolls
@@ -63,6 +65,14 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
+import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
+import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
+import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.math.min
@@ -137,7 +147,7 @@ import kotlin.math.min
  * - You are not forced to activate or forego activation on all players.
  *   This is entirely optional.
  */
-object Charge : Procedure() {
+object Charge : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollForPlayers
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
@@ -183,9 +193,20 @@ object Charge : Procedure() {
                 val maxPlayers = roll.value + 3
                 val availablePlayers = state.kickingTeam.filter { rules.isOpen(it) }
                 val playersToSelect = min(availablePlayers.size, maxPlayers)
+                val chanceObservation = createChanceObservation(state, roll)
                 buildCompositeCommand {
                     add(ReportDiceRoll(DiceRollType.CHARGE, roll))
+                    chanceObservation?.let { add(AddChanceObservation(it)) }
                     if (availablePlayers.isEmpty()) {
+                        chanceObservation?.let {
+                            add(
+                                finalizeChanceObservation(
+                                    roll = roll,
+                                    observation = it,
+                                    selectedCount = 0,
+                                ),
+                            )
+                        }
                         addAll(
                             ReportEndingCharge(state.kickingTeam, turnOver = null, noPlayers = true),
                             ExitProcedure(),
@@ -196,6 +217,7 @@ object Charge : Procedure() {
                                 ChargeContext(
                                     roll = roll,
                                     playersToSelect = playersToSelect,
+                                    chanceObservationIndex = chanceObservation?.index,
                                 )
                             ),
                             GotoNode(SelectPlayersToActivate),
@@ -224,17 +246,77 @@ object Charge : Procedure() {
                 is PlayersSelected -> {
                     val context = state.getContext<ChargeContext>()
                     compositeCommandOf(
+                        updateChanceObservation(state, context, action.players.size),
                         UpdateContext(context.copy(selectedPlayers = action.getPlayers(state).toSet())),
                         GotoNode(SelectPlayerOrEndTurn),
                     )
                 }
                 Continue,
                 Cancel -> {
-                    GotoNode(ResolveEndOfTurn)
+                    val context = state.getContext<ChargeContext>()
+                    compositeCommandOf(
+                        updateChanceObservation(state, context, selectedCount = 0),
+                        GotoNode(ResolveEndOfTurn),
+                    )
                 }
                 else -> INVALID_ACTION(action)
             }
         }
+    }
+
+    private fun createChanceObservation(
+        state: Game,
+        roll: D3Result,
+    ): ChanceObservation.DiceRoll? {
+        if (!state.collectChanceData) return null
+        val index = state.nextAvailableChanceObservationIndex
+        return ChanceObservation.DiceRoll(
+            index = index,
+            rollType = DiceRollType.CHARGE,
+            teamId = state.kickingTeam.id,
+            dice = listOf(ChanceDieResult(ChanceResultId(index, 0), roll)),
+            scope = ChanceObservationScope.fromState(state, state.kickingTeam),
+        )
+    }
+
+    private fun updateChanceObservation(
+        state: Game,
+        context: ChargeContext,
+        selectedCount: Int,
+    ): Command? {
+        val index = context.chanceObservationIndex ?: return null
+        val previous = createChanceObservation(state, context.roll)?.copy(index = index)
+            ?: return null
+        return finalizeChanceObservation(
+            roll = context.roll,
+            observation = previous,
+            selectedCount = selectedCount,
+        )
+    }
+
+    private fun finalizeChanceObservation(
+        roll: D3Result,
+        observation: ChanceObservation.DiceRoll,
+        selectedCount: Int,
+    ): Command {
+        val outcome = chargeOutcome(selectedCount)
+        return UpdateChanceObservation(
+            index = observation.index,
+            previous = observation,
+            updated = observation.copy(
+                success = roll.value + 3 >= selectedCount,
+                outcome = outcome,
+                finalized = true,
+            ),
+        )
+    }
+
+    private fun chargeOutcome(selectedCount: Int): ChanceOutcome {
+        val favorable = (1..3).count { it + 3 >= selectedCount }
+        return ChanceOutcome(
+            category = ChanceOutcomeCategory.AT_LEAST,
+            successProbability = OutcomeRatio(favorable, 3),
+        )
     }
 
     object SelectPlayerOrEndTurn : ActionNode() {

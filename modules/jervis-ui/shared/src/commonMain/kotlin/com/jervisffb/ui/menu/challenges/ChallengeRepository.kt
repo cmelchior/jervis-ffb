@@ -238,13 +238,15 @@ class InMemoryChallengesRepository(
 
     private fun ChallengeScore<*>.usesCurrentScoringVersion(scoring: ChallengeScoring<*>): Boolean = when (this) {
         is ChallengeScore.CompletionOnly -> scoring == ChallengeScoring.CompletionOnly
-        is ChallengeScore.ProbabilityScore -> when (val policy = (scoring as? ChallengeScoring.ProbabilityScoring)?.policy) {
-            is ChallengeRerollSelectionPolicy.LogicalRerollSelection ->
+        is ChallengeScore.ProbabilityScore -> when ((scoring as? ChallengeScoring.ProbabilityScoring)?.policy) {
+            is ChallengeRerollSelectionPolicy.LogicalRerollSelection -> {
                 result.algorithmId == LogicalActionPathScorer.algorithmId
                     && result.rerollPolicyId == PriorityListRerollUsagePolicy.id
-            is ChallengeRerollSelectionPolicy.PhysicalRerollSelection ->
+            }
+            is ChallengeRerollSelectionPolicy.PhysicalRerollSelection -> {
                 result.algorithmId == PhysicalActionPathScorer.algorithmId
                     && result.rerollPolicyId == PhysicalActionPathScorer.rerollUsagePolicy.id
+            }
             null -> false
         }
     }

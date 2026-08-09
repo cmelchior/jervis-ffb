@@ -179,8 +179,8 @@ object LogicalActionPathScorer: ActionPathScorer {
             if (event is ActionPathEvent.Unsupported) {
                 add(listOfNotNull(event.rollType?.description, event.reason).joinToString(": "))
             }
-            if (event is ActionPathEvent.PhysicalD6) {
-                add("Physical D6 event $index belongs to the hybrid actual-choice scorer.")
+            if (event is ActionPathEvent.Physical) {
+                add("Physical chance event $index belongs to the hybrid actual-choice scorer.")
             }
             event.recoveries.forEach { option ->
                 if (option.resource.usage == RerollUsage.UNSUPPORTED) {

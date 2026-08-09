@@ -12,7 +12,7 @@ import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
 import com.jervisffb.engine.statistics.probability.event.ActualRerollUse
 import com.jervisffb.engine.statistics.probability.event.ChanceBranch
 import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.PhysicalRollRole
 import com.jervisffb.engine.statistics.probability.event.RerollCategory
 import com.jervisffb.engine.statistics.probability.event.RerollOption
 import com.jervisffb.engine.statistics.probability.event.RerollResource
@@ -37,7 +37,7 @@ class PhysicalActionPathScorerTests {
         val teamReroll = resource("team", RerollCategory.TEAM_REROLL)
         val events = listOf(
             physical(0, 2.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
-            physical(1, 4.d6, role = PhysicalD6Role.REROLL, root = 0),
+            physical(1, 4.d6, role = PhysicalRollRole.REROLL, root = 0),
         )
 
         val result = score(events)
@@ -55,7 +55,7 @@ class PhysicalActionPathScorerTests {
         val result = score(
             listOf(
                 physical(0, 1.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
-                physical(1, 4.d6, role = PhysicalD6Role.REROLL, root = 0),
+                physical(1, 4.d6, role = PhysicalRollRole.REROLL, root = 0),
             ),
         )
 
@@ -80,7 +80,7 @@ class PhysicalActionPathScorerTests {
         val events = listOf(
             physical(0, 4.d6, success = true, recoveries = listOf(option(teamReroll))),
             physical(1, 4.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
-            physical(2, 1.d6, role = PhysicalD6Role.REROLL, root = 1),
+            physical(2, 1.d6, role = PhysicalRollRole.REROLL, root = 1),
         )
 
         val result = score(events)
@@ -94,7 +94,7 @@ class PhysicalActionPathScorerTests {
     fun anActualRerollDieNeverReceivesAnotherHypotheticalRecovery() {
         val recovery = option(resource("dodge", RerollCategory.STANDARD_SKILL))
         val result = score(
-            listOf(physical(0, 4.d6, role = PhysicalD6Role.REROLL, recoveries = listOf(recovery))),
+            listOf(physical(0, 4.d6, role = PhysicalRollRole.REROLL, recoveries = listOf(recovery))),
         )
 
         assertEquals(0.5, result.successProbability.value, HYBRID_EPSILON)
@@ -109,12 +109,12 @@ class PhysicalActionPathScorerTests {
             physical(
                 1,
                 3.d6,
-                role = PhysicalD6Role.ACTIVATION,
+                role = PhysicalRollRole.ACTIVATION,
                 actualRecovery = ActualRerollUse(proReroll, "Pro reroll"),
                 root = 1,
             ),
-            physical(2, 4.d6, role = PhysicalD6Role.REROLL, root = 1),
-            physical(3, 5.d6, role = PhysicalD6Role.REROLL, root = 0),
+            physical(2, 4.d6, role = PhysicalRollRole.REROLL, root = 1),
+            physical(3, 5.d6, role = PhysicalRollRole.REROLL, root = 0),
         )
 
         val result = score(events)
@@ -141,20 +141,20 @@ class PhysicalActionPathScorerTests {
     private fun physical(
         sequence: Int,
         value: D6Result,
-        role: PhysicalD6Role = PhysicalD6Role.PRIMARY,
-        success: Boolean? = null,
+        role: PhysicalRollRole = PhysicalRollRole.PRIMARY,
+        success: Boolean = true,
         actualRecovery: ActualRerollUse? = null,
         recoveries: List<RerollOption> = emptyList(),
         root: Int = sequence,
-    ) = ActionPathEvent.PhysicalD6(
+    ) = ActionPathEvent.Physical.die(
         index = sequence,
-        traceRootSequence = root,
+        traceRootIndex = root,
         rollType = DiceRollType.DODGE,
         owner = HYBRID_HOME,
-        selectedValue = value,
+        result = value,
         role = role,
         scope = scope(),
-        observedSuccess = success,
+        isSuccess = success,
         actualRecovery = actualRecovery,
         recoveries = recoveries,
         finalized = true,

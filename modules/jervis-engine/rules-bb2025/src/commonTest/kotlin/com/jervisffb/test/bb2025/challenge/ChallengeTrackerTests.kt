@@ -48,7 +48,7 @@ class ChallengeTrackerTests : JervisGameBB2025Test() {
                 *defaultKickOffHomeTeam(),
             ).filterNotNull().toList(),
             protectInitialActions = true,
-            collectProbabilityData = true
+            collectMetadata = true
         )
     }
 

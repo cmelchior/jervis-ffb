@@ -6,12 +6,15 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
+import com.jervisffb.engine.statistics.probability.event.ActualRerollUse
 import com.jervisffb.engine.statistics.probability.event.ChanceBranch
 import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
+import com.jervisffb.engine.statistics.probability.event.PhysicalRollRole
 import com.jervisffb.engine.statistics.probability.event.RerollCategory
 import com.jervisffb.engine.statistics.probability.event.RerollOption
 import com.jervisffb.engine.statistics.probability.event.RerollResource
 import com.jervisffb.engine.statistics.probability.event.RerollUsage
+import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
 import com.jervisffb.engine.statistics.probability.observation.ChanceRerollOption
@@ -37,25 +40,37 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
     protected val activationD6Rolls = setOf(DiceRollType.PRO, DiceRollType.LONER)
     protected val ignoredD6Rolls = setOf(DiceRollType.REGENERATION, DiceRollType.TEAM_CAPTAIN)
 
-    protected fun normalizeBlock(
+    protected fun normalizeLogicalBlock(
         root: ChanceObservation.DiceRoll,
-        diceRolls: List<ChanceObservation.DiceRoll>,
         replacements: Map<Int?, List<ChanceObservation.DiceRoll>>,
+    ): ActionPathEvent = normalizeBlock(root, replacements, physical = false)
+
+    protected fun normalizePhysicalBlock(
+        root: ChanceObservation.DiceRoll,
+        replacements: Map<Int?, List<ChanceObservation.DiceRoll>>,
+    ): ActionPathEvent = normalizeBlock(root, replacements, physical = true)
+
+    private fun normalizeBlock(
+        root: ChanceObservation.DiceRoll,
+        replacements: Map<Int?, List<ChanceObservation.DiceRoll>>,
+        physical: Boolean,
     ): ActionPathEvent {
         if (!root.finalized) return unsupported(root, "Block roll was not finalized.")
-        if (replacements[root.index].orEmpty().isNotEmpty()) {
-            return unsupported(root, "Demonstrated block rerolls are not supported by chance scoring v1.")
-        }
         if (root.selectedResultIds.size != 1) {
             return unsupported(root, "A block must identify exactly one selected result.")
         }
-        val resultId = root.selectedResultIds.single()
-        val selected = diceRolls
-            .asSequence()
-            .flatMap { it.dice.asSequence() }
-            .firstOrNull { it.id == resultId }
-            ?.result as? DBlockResult
+        val finalDice = finalBlockDice(root, replacements)
+        val selectedResultId = root.selectedResultIds.single()
+        val selectedLogicalDieId = root.dice.firstOrNull { it.id == selectedResultId }?.dieId
+        val selected = (
+            finalDice.firstOrNull { it.id == selectedResultId }
+                ?: finalDice.firstOrNull { it.dieId == selectedLogicalDieId }
+        )?.result as? DBlockResult
             ?: return unsupported(root, "The selected block result was not found.")
+        val blockResults = finalDice.map { die ->
+            die.result as? DBlockResult
+                ?: return unsupported(root, "A block observation contained a non-block result.")
+        }
 
         val nonTeamSource = root.rerollOptions.firstOrNull {
             it.source.kind != ChanceRerollSourceKind.TEAM_REROLL
@@ -69,15 +84,138 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
         }
         val recoveryResult = recoveries(root.rerollOptions, observedSuccess = null)
         recoveryResult.reason?.let { return unsupported(root, it) }
-        return ActionPathEvent.Block(
+        val opponentChooses = root.selectedBy != null && root.selectedBy != root.teamId
+        return when (physical) {
+            false -> ActionPathEvent.Logical.block(
+                index = root.index,
+                owner = root.teamId,
+                results = blockResults,
+                selectedFace = selected.blockResult,
+                opponentChooses = opponentChooses,
+                scope = root.scope.toFixedLineScope(),
+                recoveries = recoveryResult.options,
+            )
+            true -> ActionPathEvent.Physical.block(
+                index = root.index,
+                traceRootIndex = root.index,
+                owner = root.teamId,
+                results = blockResults,
+                selectedFace = selected.blockResult,
+                opponentChooses = opponentChooses,
+                role = PhysicalRollRole.PRIMARY,
+                scope = root.scope.toFixedLineScope(),
+                recoveries = recoveryResult.options,
+                finalized = true,
+            )
+        }
+    }
+
+    protected fun normalizeLogicalOutcome(
+        root: ChanceObservation.DiceRoll,
+        finalRoll: ChanceObservation.DiceRoll,
+    ): ActionPathEvent {
+        val outcome = finalRoll.outcome ?: root.outcome
+            ?: return unsupported(root, "The roll does not expose a structured outcome interpretation.")
+        val success = finalRoll.success
+            ?: return unsupported(root, "The roll does not expose a factual success result.")
+        if (!root.finalized || !finalRoll.finalized) {
+            return unsupported(root, "Outcome roll was not finalized.")
+        }
+        val recoveryResult = recoveries(root.rerollOptions, success)
+        recoveryResult.reason?.let { return unsupported(root, it) }
+        return ActionPathEvent.Logical.outcome(
             index = root.index,
+            rollType = root.rollType,
             owner = root.teamId,
-            selectedFace = selected.blockResult,
-            diceCount = root.dice.size,
-            opponentChooses = root.selectedBy != null && root.selectedBy != root.teamId,
+            results = finalRoll.dice.map { it.result },
+            category = outcome.category,
+            isSuccess = success,
+            successProbability = outcome.successProbability,
             scope = root.scope.toFixedLineScope(),
             recoveries = recoveryResult.options,
         )
+    }
+
+    protected fun normalizePhysicalOutcome(
+        roll: ChanceObservation.DiceRoll,
+        observations: Map<Int, ChanceObservation.DiceRoll>,
+    ): ActionPathEvent {
+        val outcome = roll.outcome
+            ?: return unsupported(roll, "The roll does not expose a structured outcome interpretation.")
+        val success = roll.success
+            ?: return unsupported(roll, "The roll does not expose a factual success result.")
+        if (!roll.finalized) return unsupported(roll, "Outcome roll was not finalized.")
+
+        val selectedSource = roll.selectedReroll?.takeUnless { it.aborted }?.let { selection ->
+            roll.rerollOptions.firstOrNull { it.source.id == selection.sourceId }?.source
+                ?: return unsupported(roll, "Selected reroll source ${selection.sourceId.id} was not snapshotted.")
+        }
+        val sourceResult = selectedSource?.toRecoveryResource()
+        sourceResult?.reason?.let { return unsupported(roll, it) }
+        val actualRecovery = selectedSource?.let { source ->
+            ActualRerollUse(sourceResult!!.resource!!, source.description)
+        }
+        val recoveryResult = when (actualRecovery) {
+            null -> recoveries(roll.rerollOptions, success)
+            else -> RecoveryConversion(emptyList())
+        }
+        recoveryResult.reason?.let { return unsupported(roll, it) }
+
+        return ActionPathEvent.Physical.outcome(
+            index = roll.index,
+            traceRootIndex = traceRoot(roll, observations),
+            rollType = roll.rollType,
+            owner = roll.teamId,
+            results = roll.dice.map { it.result },
+            category = outcome.category,
+            role = when {
+                roll.rerolledRollIndex != null -> PhysicalRollRole.REROLL
+                roll.rollType in activationD6Rolls -> PhysicalRollRole.ACTIVATION
+                else -> PhysicalRollRole.PRIMARY
+            },
+            scope = roll.scope.toFixedLineScope(),
+            isSuccess = success,
+            successProbability = outcome.successProbability,
+            actualRecovery = actualRecovery,
+            recoveries = recoveryResult.options,
+            finalized = true,
+        )
+    }
+
+    protected fun traceRoot(
+        roll: ChanceObservation.DiceRoll,
+        observations: Map<Int, ChanceObservation.DiceRoll>,
+    ): Int {
+        var current = roll
+        while (current.rerolledRollIndex != null) {
+            current = observations[current.rerolledRollIndex] ?: break
+        }
+        return current.index
+    }
+
+    /**
+     * Replaces the original result for each logical block die with its latest
+     * physical result. A block reroll may replace one die or the whole pool.
+     */
+    private fun finalBlockDice(
+        root: ChanceObservation.DiceRoll,
+        replacements: Map<Int?, List<ChanceObservation.DiceRoll>>,
+    ): List<ChanceDieResult> {
+        val diceByLogicalId = root.dice
+            .mapNotNull { die -> die.dieId?.let { it to die } }
+            .toMap()
+            .toMutableMap()
+        var current = root
+        val seen = mutableSetOf(root.index)
+        while (true) {
+            val replacement = replacements[current.index].orEmpty().maxByOrNull { it.index } ?: break
+            if (!seen.add(replacement.index)) break
+            replacement.dice.forEach { die ->
+                if (die.dieId != null) diceByLogicalId[die.dieId] = die
+            }
+            current = replacement
+        }
+        return root.dice.map { die -> die.dieId?.let(diceByLogicalId::get) ?: die }
     }
 
     /**
@@ -87,34 +225,34 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
      * terminal observation family.
      */
     protected fun List<ChanceObservation>.withoutTerminalUnfinalizedRollFamily(): List<ChanceObservation> {
-        val rollsById = filterIsInstance<ChanceObservation.DiceRoll>().associateBy { it.index }
+        val rollsByIndex = filterIsInstance<ChanceObservation.DiceRoll>().associateBy { it.index }
         val newestUnfinalized = asReversed()
             .filterIsInstance<ChanceObservation.DiceRoll>()
             .firstOrNull { !it.finalized }
             ?: return this
 
-        fun ancestorIds(roll: ChanceObservation.DiceRoll): Set<Int> {
+        fun ancestorIndexes(roll: ChanceObservation.DiceRoll): Set<Int> {
             val ancestors = mutableSetOf<Int>()
             val pending = ArrayDeque<ChanceObservation.DiceRoll>()
             pending.add(roll)
             while (pending.isNotEmpty()) {
                 val current = pending.removeLast()
                 if (!ancestors.add(current.index)) continue
-                listOfNotNull(current.enclosingRollId, current.rerolledRollId)
-                    .mapNotNull(rollsById::get)
+                listOfNotNull(current.enclosingRollIndex, current.rerolledRollIndex)
+                    .mapNotNull(rollsByIndex::get)
                     .forEach(pending::add)
             }
             return ancestors
         }
 
-        val familyRootId = ancestorIds(newestUnfinalized).minOrNull() ?: return this
-        val familyRoot = rollsById[familyRootId] ?: return this
+        val familyRootIndex = ancestorIndexes(newestUnfinalized).minOrNull() ?: return this
+        val familyRoot = rollsByIndex[familyRootIndex] ?: return this
         if (familyRoot.finalized) return this
-        val familyStart = indexOfFirst { it.index == familyRootId }
+        val familyStart = indexOfFirst { it.index == familyRootIndex }
         if (familyStart == -1) return this
 
         val terminalFamily = drop(familyStart).all { observation ->
-            observation is ChanceObservation.DiceRoll && familyRootId in ancestorIds(observation)
+            observation is ChanceObservation.DiceRoll && familyRootIndex in ancestorIndexes(observation)
         }
         return if (terminalFamily) take(familyStart) else this
     }
@@ -231,17 +369,16 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
         player = player,
     )
 
-    protected fun List<ActionPathEvent>.resequence(): List<ActionPathEvent> {
-        val sequenceMap = associate { it.index to 0 }.toMutableMap()
-        forEachIndexed { index, event -> sequenceMap[event.index] = index }
+    protected fun List<ActionPathEvent>.reindex(): List<ActionPathEvent> {
+        val newIndexByOldIndex = associate { it.index to 0 }.toMutableMap()
+        forEachIndexed { index, event -> newIndexByOldIndex[event.index] = index }
         return mapIndexed { index, event ->
             when (event) {
-                is ActionPathEvent.D6 -> event.copy(index = index)
-                is ActionPathEvent.Block -> event.copy(index = index)
+                is ActionPathEvent.Logical -> event.copy(index = index)
                 is ActionPathEvent.Unsupported -> event.copy(index = index)
-                is ActionPathEvent.PhysicalD6 -> event.copy(
+                is ActionPathEvent.Physical -> event.copy(
                     index = index,
-                    traceRootSequence = sequenceMap[event.traceRootSequence] ?: index,
+                    traceRootIndex = newIndexByOldIndex[event.traceRootIndex] ?: index,
                 )
             }
         }

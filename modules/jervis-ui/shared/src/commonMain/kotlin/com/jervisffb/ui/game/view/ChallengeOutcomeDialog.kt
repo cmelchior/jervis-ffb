@@ -145,14 +145,20 @@ fun ChallengeOutcomeDialog(
     val diceRolls = (session.score as? ChallengeScore.ProbabilityScore)
         ?.result
         ?.events
-        ?.filterIsInstance<ActionPathEvent.PhysicalD6>()
+        ?.filterIsInstance<ActionPathEvent.Physical>()
+        ?.mapNotNull { event ->
+            val result = event.results.singleOrNull() as? D6Result ?: return@mapNotNull null
+            if (event.resolution !is ActionPathEvent.Resolution.Dice) return@mapNotNull null
+            event to result
+        }
         ?.withPrevious()
-        ?.mapIndexed { index, (lastEvent, event) ->
+        ?.mapIndexed { index, (lastEntry, entry) ->
+            val (event, result) = entry
             val probability = event.observedOutcome.probability
-            val rerollSource = lastEvent?.actualRecovery?.description.orEmpty()
+            val rerollSource = lastEntry?.first?.actualRecovery?.description.orEmpty()
             DiceRollStat(
                 index = index + 1,
-                target = event.selectedValue,
+                target = result,
                 type = event.rollType.description,
                 probability = event.observedOutcome.probability,
                 rerollSource = rerollSource,

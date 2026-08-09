@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 object BB2025StandardWeatherTable: WeatherTable() {
     override val name: String = "Standard Weather Table"
-    private val table: Map<Int, Weather> =
+    override val entries: Map<Int, Weather> =
         mapOf(
             2 to Weather.SWELTERING_HEAT,
             3 to Weather.VERY_SUNNY,
@@ -37,6 +37,6 @@ object BB2025StandardWeatherTable: WeatherTable() {
         secondD6: D6Result,
     ): Weather {
         val result = firstD6.value + secondD6.value
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Weather Table.")
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Weather Table.")
     }
 }

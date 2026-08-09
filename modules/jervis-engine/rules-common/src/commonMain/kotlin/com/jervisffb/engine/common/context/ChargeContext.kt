@@ -9,7 +9,7 @@ import kotlinx.collections.immutable.persistentSetOf
 data class ChargeContext(
     val roll: D3Result,
     val playersToSelect: Int,
+    val chanceObservationIndex: Int? = null,
     val selectedPlayers: Set<Player> = emptySet(),
     val activatedPlayers: PersistentSet<Player> = persistentSetOf(),
 ): ProcedureContext
-

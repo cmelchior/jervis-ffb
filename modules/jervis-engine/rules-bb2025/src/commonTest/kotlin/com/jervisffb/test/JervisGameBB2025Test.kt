@@ -54,7 +54,7 @@ abstract class JervisGameBB2025Test {
     fun setupDefaultGame(
         initialActions: List<GameAction> = emptyList(),
         protectInitialActions: Boolean = false,
-        collectProbabilityData: Boolean = false
+        collectMetadata: Boolean = false
     ) {
         homeTeam = createDefaultHomeTeamBB2025(rules)
         awayTeam = humanTeamAwayBB2025(rules)
@@ -66,7 +66,7 @@ abstract class JervisGameBB2025Test {
             initialActions = initialActions,
             protectInitialActions = protectInitialActions,
             cacheActionDescriptor = false,
-            statistics = when (collectProbabilityData) {
+            statistics = when (collectMetadata) {
                 true -> GameStatistics()
                 else -> null
             },

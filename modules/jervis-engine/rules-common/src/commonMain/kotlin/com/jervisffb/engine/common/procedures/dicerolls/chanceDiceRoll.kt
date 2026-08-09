@@ -62,10 +62,10 @@ internal fun createD6ChanceObservation(
     player: Player,
     result: D6Result,
     rerollContext: UseRerollContext,
-    rerolledRollId: Int? = null,
+    rerolledRollIndex: Int? = null,
 ): ChanceObservation.DiceRoll? {
     if (!state.collectChanceData) return null
-    val sequence = state.chanceObservationSequence
+    val sequence = state.nextAvailableChanceObservationIndex
     return ChanceObservation.DiceRoll(
         index = sequence,
         rollType = rollType,
@@ -78,8 +78,8 @@ internal fun createD6ChanceObservation(
             ),
         ),
         scope = chanceScope(state, player),
-        enclosingRollId = rerollContext.chanceEnclosingRollIndex,
-        rerolledRollId = rerolledRollId,
+        enclosingRollIndex = rerollContext.chanceEnclosingRollIndex,
+        rerolledRollIndex = rerolledRollIndex,
     )
 }
 

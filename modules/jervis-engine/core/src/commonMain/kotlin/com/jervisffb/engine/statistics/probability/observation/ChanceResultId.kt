@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 /** Identifies one result within one physical dice roll. */
 @Serializable
 data class ChanceResultId(
-    val rollId: Int,
-    val index: Int,
+    val rollIndex: Int,
+    val resultIndex: Int,
 )

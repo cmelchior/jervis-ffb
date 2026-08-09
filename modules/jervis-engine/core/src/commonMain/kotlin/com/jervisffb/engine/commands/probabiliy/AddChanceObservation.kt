@@ -16,21 +16,21 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
  * a [GameDelta].
  */
 class AddChanceObservation(
-    internal val observation: ChanceObservation,
+    val observation: ChanceObservation,
 ) : Command {
     val observationIndex = observation.index
 
     override fun execute(state: Game) {
-        require(observationIndex == state.chanceObservationSequence) {
-            "Chance observation sequence diverged: expected ${state.chanceObservationSequence}, found $observationIndex"
+        require(observationIndex == state.nextAvailableChanceObservationIndex) {
+            "Chance observation sequence diverged: expected ${state.nextAvailableChanceObservationIndex}, found $observationIndex"
         }
-        state.chanceObservationSequence++
+        state.nextAvailableChanceObservationIndex++
     }
 
     override fun undo(state: Game) {
-        require(state.chanceObservationSequence == observationIndex + 1) {
+        require(state.nextAvailableChanceObservationIndex == observationIndex + 1) {
             "Chance observation sequence could not be undone: $observationIndex"
         }
-        state.chanceObservationSequence--
+        state.nextAvailableChanceObservationIndex--
     }
 }
