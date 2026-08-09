@@ -1,13 +1,29 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.scorer
 
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.statistics.probability.AlgorithmId
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
+import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
+import com.jervisffb.engine.statistics.probability.event.ActivationFailureBehavior
+import com.jervisffb.engine.statistics.probability.event.ChanceBranch
+import com.jervisffb.engine.statistics.probability.event.RerollCategory
+import com.jervisffb.engine.statistics.probability.event.RerollResource
+import com.jervisffb.engine.statistics.probability.event.RerollUsage
+import com.jervisffb.engine.statistics.probability.event.observedOutcomeProbability
+import com.jervisffb.engine.statistics.probability.event.owner
+import com.jervisffb.engine.statistics.probability.event.recoveries
+import com.jervisffb.engine.statistics.probability.event.scope
+import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
+import com.jervisffb.engine.statistics.probability.normalizer.FixedRerollUsageNormalizerPolicy
 import com.jervisffb.engine.utils.sum
 
 /**
- * Evaluates a selected Action Path using [FixedRerollUsagePolicy]. This means
- * that if rerolls were selected during the action path, that reroll is ignored
- * when calculating the final score and instead only the final die result is
- * used.
+ * Evaluates and scores a given Action Path using [PriorityListRerollUsagePolicy]. This
+ * means that if rerolls were selected during the action path, that reroll is
+ * ignored when calculating the final score and instead only the final die
+ * result is used.
  *
  * Instead, we use forward dynamic program to calculate the optimal use of
  * reroll types to maximize the chance of success. It does not replay alternate
@@ -17,29 +33,19 @@ import com.jervisffb.engine.utils.sum
  *  will be missing from future rolls, which means it will be missing from the
  *  chance observation. Double-check this.
  */
-object LogicalActionPathScorer {
-    val ALGORITHM_ID = AlgorithmId("logical-path-bb2025-v1")
-    const val DEFAULT_STATE_CEILING: Int = 100_000
+object LogicalActionPathScorer: ActionPathScorer {
+    override val algorithmId = AlgorithmId("logical-path-bb2025-v1")
+    override val rerollUsagePolicy = PriorityListRerollUsagePolicy
+    override val normalizer = ChanceNormalizer(FixedRerollUsageNormalizerPolicy)
 
-    /** Normalizes observations and scores the resulting demonstrated action path. */
-    fun score(
-        observations: List<ChanceObservation>,
-        solvingTeamId: TeamId,
-        allowMultipleTeamRerollsPerTurn: Boolean,
-        stateCeiling: Int = DEFAULT_STATE_CEILING,
-    ): ProbabilityScoreResult = scoreNormalized(
-        events = ChanceNormalizer.fixed(observations),
-        solvingTeamId = solvingTeamId,
-        allowMultipleTeamRerollsPerTurn = allowMultipleTeamRerollsPerTurn,
-        stateCeiling = stateCeiling,
-    )
-
-    /** Scores an already normalized action path without repeating normalization. */
-    internal fun scoreNormalized(
+    /**
+     *  Scores an already normalized action path without repeating normalization.
+     */
+    override fun scoreNormalized(
         events: List<ActionPathEvent>,
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
-        stateCeiling: Int = DEFAULT_STATE_CEILING,
+        stateCeiling: Int,
     ): ProbabilityScoreResult {
         require(stateCeiling > 0) { "State ceiling must be positive: $stateCeiling" }
 
@@ -91,8 +97,8 @@ object LogicalActionPathScorer {
         val baseRisk = baseProbability.toSurprisal()
         val finalRisk = successProbability.toSurprisal()
         return ProbabilityScoreResult.Scored(
-            algorithmId = ALGORITHM_ID,
-            policyId = FixedRerollUsagePolicy.POLICY_ID,
+            algorithmId = algorithmId,
+            rerollPolicyId = rerollUsagePolicy.id,
             events = events,
             baseProbability = baseProbability,
             demonstratedProbability = baseProbability,
@@ -121,7 +127,7 @@ object LogicalActionPathScorer {
             true -> ChanceBranch.ALTERNATIVE
             false -> ChanceBranch.SELECTED
         }
-        val recovery = FixedRerollUsagePolicy.select(
+        val recovery = PriorityListRerollUsagePolicy.select(
             event.recoveries.filter { option ->
                 recoveryBranch in option.appliesTo &&
                     resourceState.isAvailable(option.resource, event, allowMultipleTeamRerollsPerTurn)
@@ -198,8 +204,8 @@ object LogicalActionPathScorer {
     /** Builds a result explaining why the action path could not be scored. */
     private fun unsupported(events: List<ActionPathEvent>, reasons: List<String>) =
         ProbabilityScoreResult.Unsupported(
-            algorithmId = ALGORITHM_ID,
-            policyId = FixedRerollUsagePolicy.POLICY_ID,
+            algorithmId = algorithmId,
+            rerollPolicyId = rerollUsagePolicy.id,
             events = events,
             reasons = reasons,
         )
@@ -239,7 +245,7 @@ object LogicalActionPathScorer {
     ) {
         /** Returns whether [resource] may be consumed for [event] in this state. */
         fun isAvailable(
-            resource: RecoveryResource,
+            resource: RerollResource,
             event: ActionPathEvent,
             allowMultipleTeamRerollsPerTurn: Boolean,
         ): Boolean {
@@ -254,7 +260,7 @@ object LogicalActionPathScorer {
 
         /** Returns the state after consuming [resource] for [event]. */
         fun consume(
-            resource: RecoveryResource,
+            resource: RerollResource,
             event: ActionPathEvent,
             trackTeamTurn: Boolean,
         ): ResourceState {
@@ -290,7 +296,7 @@ object LogicalActionPathScorer {
     }
 
     /** Resolves a resource's lifetime into the key used by the DP state. */
-    private fun usageScope(resource: RecoveryResource, scope: ActionPathEventScope?): String? {
+    private fun usageScope(resource: RerollResource, scope: ActionPathEventScope?): String? {
         val resourceKey = "${resource.owner.value}:${resource.id.id}"
         return when (resource.usage) {
             RerollUsage.REUSABLE -> null
@@ -305,6 +311,6 @@ object LogicalActionPathScorer {
     }
 
     /** Returns the key used to enforce one team reroll per team turn. */
-    private fun teamTurnScope(resource: RecoveryResource, scope: ActionPathEventScope): String =
+    private fun teamTurnScope(resource: RerollResource, scope: ActionPathEventScope): String =
         "${resource.owner.value}:${scope.turn}"
 }

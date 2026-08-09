@@ -24,8 +24,8 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.statistics.probability.ChanceObservation
-import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.assert
 import kotlin.collections.forEachIndexed

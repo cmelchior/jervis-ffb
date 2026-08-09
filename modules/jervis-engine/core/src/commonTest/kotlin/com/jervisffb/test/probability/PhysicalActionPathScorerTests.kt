@@ -7,18 +7,18 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.statistics.probability.ActionPathEvent
-import com.jervisffb.engine.statistics.probability.ActionPathEventScope
-import com.jervisffb.engine.statistics.probability.ActualRecoveryUse
-import com.jervisffb.engine.statistics.probability.ChanceBranch
-import com.jervisffb.engine.statistics.probability.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.PhysicalD6Role
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
-import com.jervisffb.engine.statistics.probability.RecoveryResource
-import com.jervisffb.engine.statistics.probability.RerollCategory
-import com.jervisffb.engine.statistics.probability.RerollOption
-import com.jervisffb.engine.statistics.probability.RerollUsage
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
+import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
+import com.jervisffb.engine.statistics.probability.event.ActualRerollUse
+import com.jervisffb.engine.statistics.probability.event.ChanceBranch
+import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
+import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.RerollCategory
+import com.jervisffb.engine.statistics.probability.event.RerollOption
+import com.jervisffb.engine.statistics.probability.event.RerollResource
+import com.jervisffb.engine.statistics.probability.event.RerollUsage
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,7 +36,7 @@ class PhysicalActionPathScorerTests {
     fun actualRerollScoresBothPhysicalDiceAndConsumesItsResource() {
         val teamReroll = resource("team", RerollCategory.TEAM_REROLL)
         val events = listOf(
-            physical(0, 2.d6, actualRecovery = ActualRecoveryUse(teamReroll, "Team reroll")),
+            physical(0, 2.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
             physical(1, 4.d6, role = PhysicalD6Role.REROLL, root = 0),
         )
 
@@ -54,7 +54,7 @@ class PhysicalActionPathScorerTests {
         val teamReroll = resource("team", RerollCategory.TEAM_REROLL)
         val result = score(
             listOf(
-                physical(0, 1.d6, actualRecovery = ActualRecoveryUse(teamReroll, "Team reroll")),
+                physical(0, 1.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
                 physical(1, 4.d6, role = PhysicalD6Role.REROLL, root = 0),
             ),
         )
@@ -79,7 +79,7 @@ class PhysicalActionPathScorerTests {
         val teamReroll = resource("team", RerollCategory.TEAM_REROLL)
         val events = listOf(
             physical(0, 4.d6, success = true, recoveries = listOf(option(teamReroll))),
-            physical(1, 4.d6, actualRecovery = ActualRecoveryUse(teamReroll, "Team reroll")),
+            physical(1, 4.d6, actualRecovery = ActualRerollUse(teamReroll, "Team reroll")),
             physical(2, 1.d6, role = PhysicalD6Role.REROLL, root = 1),
         )
 
@@ -105,12 +105,12 @@ class PhysicalActionPathScorerTests {
         val pro = resource("pro", RerollCategory.PRO)
         val proReroll = resource("pro-reroll", RerollCategory.STANDARD_SKILL)
         val events = listOf(
-            physical(0, 2.d6, actualRecovery = ActualRecoveryUse(pro, "Pro")),
+            physical(0, 2.d6, actualRecovery = ActualRerollUse(pro, "Pro")),
             physical(
                 1,
                 3.d6,
                 role = PhysicalD6Role.ACTIVATION,
-                actualRecovery = ActualRecoveryUse(proReroll, "Pro reroll"),
+                actualRecovery = ActualRerollUse(proReroll, "Pro reroll"),
                 root = 1,
             ),
             physical(2, 4.d6, role = PhysicalD6Role.REROLL, root = 1),
@@ -143,7 +143,7 @@ class PhysicalActionPathScorerTests {
         value: D6Result,
         role: PhysicalD6Role = PhysicalD6Role.PRIMARY,
         success: Boolean? = null,
-        actualRecovery: ActualRecoveryUse? = null,
+        actualRecovery: ActualRerollUse? = null,
         recoveries: List<RerollOption> = emptyList(),
         root: Int = sequence,
     ) = ActionPathEvent.PhysicalD6(
@@ -160,14 +160,14 @@ class PhysicalActionPathScorerTests {
         finalized = true,
     )
 
-    private fun resource(id: String, category: RerollCategory) = RecoveryResource(
+    private fun resource(id: String, category: RerollCategory) = RerollResource(
         id = RerollSourceId(id),
         owner = HYBRID_HOME,
         category = category,
         usage = RerollUsage.ONCE_PER_TURN,
     )
 
-    private fun option(resource: RecoveryResource) = RerollOption(
+    private fun option(resource: RerollResource) = RerollOption(
         resource = resource,
         activation = OutcomeRatio.CERTAIN,
         appliesTo = setOf(ChanceBranch.SELECTED, ChanceBranch.ALTERNATIVE),

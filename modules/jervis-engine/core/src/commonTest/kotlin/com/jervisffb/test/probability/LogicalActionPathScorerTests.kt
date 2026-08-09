@@ -5,17 +5,17 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.statistics.probability.ActionPathEvent
-import com.jervisffb.engine.statistics.probability.ActionPathEventScope
-import com.jervisffb.engine.statistics.probability.ChanceBranch
-import com.jervisffb.engine.statistics.probability.FixedRerollUsagePolicy
-import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
-import com.jervisffb.engine.statistics.probability.RecoveryResource
-import com.jervisffb.engine.statistics.probability.RerollCategory
-import com.jervisffb.engine.statistics.probability.RerollOption
-import com.jervisffb.engine.statistics.probability.RerollUsage
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
+import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
+import com.jervisffb.engine.statistics.probability.event.ChanceBranch
+import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
+import com.jervisffb.engine.statistics.probability.event.RerollCategory
+import com.jervisffb.engine.statistics.probability.event.RerollOption
+import com.jervisffb.engine.statistics.probability.event.RerollResource
+import com.jervisffb.engine.statistics.probability.event.RerollUsage
+import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.PriorityListRerollUsagePolicy
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -51,11 +51,11 @@ class LogicalActionPathScorerTests {
         val lonerTwoPlus = recovery("better-loner-team", RerollCategory.TEAM_REROLL, 5, 6)
         val tiedTeam = recovery("tied-team", RerollCategory.TEAM_REROLL, 4, 6)
 
-        assertEquals(skill, FixedRerollUsagePolicy.select(listOf(pro, guaranteedTeam, skill)))
-        assertEquals(guaranteedTeam, FixedRerollUsagePolicy.select(listOf(pro, guaranteedTeam)))
-        assertEquals(pro, FixedRerollUsagePolicy.select(listOf(lonerFourPlus, pro)))
-        assertEquals(lonerTwoPlus, FixedRerollUsagePolicy.select(listOf(lonerTwoPlus, pro)))
-        assertEquals(pro, FixedRerollUsagePolicy.select(listOf(tiedTeam, pro)))
+        assertEquals(skill, PriorityListRerollUsagePolicy.select(listOf(pro, guaranteedTeam, skill)))
+        assertEquals(guaranteedTeam, PriorityListRerollUsagePolicy.select(listOf(pro, guaranteedTeam)))
+        assertEquals(pro, PriorityListRerollUsagePolicy.select(listOf(lonerFourPlus, pro)))
+        assertEquals(lonerTwoPlus, PriorityListRerollUsagePolicy.select(listOf(lonerTwoPlus, pro)))
+        assertEquals(pro, PriorityListRerollUsagePolicy.select(listOf(tiedTeam, pro)))
     }
 
     @Test
@@ -285,7 +285,7 @@ class LogicalActionPathScorerTests {
         usage: RerollUsage = RerollUsage.ONCE_PER_HALF,
         owner: TeamId = HOME,
     ) = RerollOption(
-        resource = RecoveryResource(RerollSourceId(id), owner, category, usage),
+        resource = RerollResource(RerollSourceId(id), owner, category, usage),
         activation = OutcomeRatio(activationNumerator, activationDenominator),
         appliesTo = setOf(ChanceBranch.SELECTED, ChanceBranch.ALTERNATIVE),
     )

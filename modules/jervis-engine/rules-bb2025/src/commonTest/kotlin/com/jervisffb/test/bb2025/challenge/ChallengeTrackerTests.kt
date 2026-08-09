@@ -19,7 +19,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultKickOffHomeTeam

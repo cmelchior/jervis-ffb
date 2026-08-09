@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
-import com.jervisffb.engine.statistics.probability.ChanceRerollSelection
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSelection
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.collections.immutable.toPersistentList

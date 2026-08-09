@@ -9,10 +9,10 @@ import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.statistics.probability.FixedRerollUsagePolicy
-import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
+import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.PriorityListRerollUsagePolicy
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.menu.challenges.data.ChallengeDetails
 import com.jervisffb.ui.menu.challenges.data.ChallengePresentation
@@ -231,7 +231,7 @@ class InMemoryChallengesRepository(
         if (first::class != second::class) return false
         if (first is ChallengeScore.ProbabilityScore && second is ChallengeScore.ProbabilityScore) {
             return first.result.algorithmId == second.result.algorithmId &&
-                first.result.policyId == second.result.policyId
+                first.result.rerollPolicyId == second.result.rerollPolicyId
         }
         return true
     }
@@ -240,11 +240,11 @@ class InMemoryChallengesRepository(
         is ChallengeScore.CompletionOnly -> scoring == ChallengeScoring.CompletionOnly
         is ChallengeScore.ProbabilityScore -> when (val policy = (scoring as? ChallengeScoring.ProbabilityScoring)?.policy) {
             is ChallengeRerollSelectionPolicy.LogicalRerollSelection ->
-                result.algorithmId == LogicalActionPathScorer.ALGORITHM_ID
-                    && result.policyId == FixedRerollUsagePolicy.POLICY_ID
+                result.algorithmId == LogicalActionPathScorer.algorithmId
+                    && result.rerollPolicyId == PriorityListRerollUsagePolicy.id
             is ChallengeRerollSelectionPolicy.PhysicalRerollSelection ->
-                result.algorithmId == PhysicalActionPathScorer.ALGORITHM_ID
-                    && result.policyId == PhysicalActionPathScorer.POLICY_ID
+                result.algorithmId == PhysicalActionPathScorer.algorithmId
+                    && result.rerollPolicyId == PhysicalActionPathScorer.rerollUsagePolicy.id
             null -> false
         }
     }

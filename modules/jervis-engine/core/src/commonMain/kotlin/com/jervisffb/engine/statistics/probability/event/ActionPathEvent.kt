@@ -1,12 +1,13 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.event
 
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DBlockResult
-import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import kotlinx.serialization.Serializable
 
 /**
@@ -34,7 +35,7 @@ import kotlinx.serialization.Serializable
  * played.
  *
  * They are created by the [ChanceNormalizer] will run through the list of
- * [ChanceObservation]'s provided by the game engine and normalize them
+ * [com.jervisffb.engine.statistics.probability.observation.ChanceObservation]'s provided by the game engine and normalize them
  * into a list of [ActionPathEvent] that can be processed by one of the
  * `<X>Scorer` algorithms to provide a single score for the action path.
  */
@@ -126,7 +127,7 @@ sealed class ActionPathEvent {
         val role: PhysicalD6Role,
         val scope: ActionPathEventScope,
         val observedSuccess: Boolean? = null,
-        val actualRecovery: ActualRecoveryUse? = null,
+        val actualRecovery: ActualRerollUse? = null,
         val recoveries: List<RerollOption> = emptyList(),
         val finalized: Boolean = false,
     ) : ActionPathEvent() {
@@ -182,171 +183,3 @@ sealed class ActionPathEvent {
         val reason: String,
     ) : ActionPathEvent()
 }
-
-internal val ActionPathEvent.owner: TeamId?
-    get() = when (this) {
-        is ActionPathEvent.Block -> owner
-        is ActionPathEvent.D6 -> owner
-        is ActionPathEvent.PhysicalD6 -> owner
-        is ActionPathEvent.Unsupported -> null
-    }
-
-internal val ActionPathEvent.scope: ActionPathEventScope?
-    get() = when (this) {
-        is ActionPathEvent.Block -> scope
-        is ActionPathEvent.D6 -> scope
-        is ActionPathEvent.PhysicalD6 -> scope
-        is ActionPathEvent.Unsupported -> null
-    }
-
-internal val ActionPathEvent.recoveries: List<RerollOption>
-    get() = when (this) {
-        is ActionPathEvent.Block -> recoveries
-        is ActionPathEvent.D6 -> recoveries
-        is ActionPathEvent.PhysicalD6 -> recoveries
-        is ActionPathEvent.Unsupported -> emptyList()
-    }
-
-internal val ActionPathEvent.observedOutcomeProbability: Probability
-    get() = when (this) {
-        is ActionPathEvent.Block -> observedOutcomeProbability
-        is ActionPathEvent.D6 -> observedOutcome.probability
-        is ActionPathEvent.PhysicalD6 -> observedOutcome.probability
-        is ActionPathEvent.Unsupported -> error("Unsupported observations have no probability")
-    }
-
-/**
- * An exact ratio retained by probability scorers.
- *
- * Ratios are retained in the ledger so selected dice values do not acquire
- * rounding errors. The dynamic program converts them to [Probability] only
- * while evaluating the complete action path.
- */
-@Serializable
-data class OutcomeRatio(
-    val favorableOutcomes: Int,
-    val possibleOutcomes: Int,
-) {
-    init {
-        require(possibleOutcomes > 0) { "The number of possible outcomes must be positive." }
-        require(favorableOutcomes in 0..possibleOutcomes) {
-            "Favorable outcomes must be between 0 and $possibleOutcomes: $favorableOutcomes"
-        }
-    }
-
-    val probability: Probability
-        get() = Probability(favorableOutcomes.toDouble() / possibleOutcomes)
-
-    companion object {
-        val CERTAIN = OutcomeRatio(1, 1)
-    }
-}
-
-/**
- * ID used to identify the resource-reset boundaries containing a chance event.
- */
-@Serializable
-data class ActionPathEventScope(
-    val half: Int,
-    val drive: Int,
-    val turn: Int,
-    val player: PlayerId? = null,
-)
-
-/**
- * The two possible branches of a binary event.
- */
-@Serializable
-enum class ChanceBranch {
-    /**
-     * The branch selected by the coaching when running the action path.
-     * Example: Selecting a 4 on a 3+ Dodge turns it into selecting the
-     * "success" branch.
-     */
-    SELECTED,
-
-    /**
-     * The other branch, which breaks the selected action path.
-     * Example: If a 4 was selected on a 3+ Dodge, the alternative branch would
-     * be the 1 and 2 values that result in a failure.
-     */
-    ALTERNATIVE,
-}
-
-/**
- * [RecoveryResource] are grouped into categories, allowing policies to
- * order them based on the category. This makes it possible to create heuristics
- * for choosing the optimal reroll, which is far cheaper than using Dynamic
- * Programming to find them.
- *
- * TODO Expand these categories to cover the categories we care about.
- */
-@Serializable
-enum class RerollCategory {
-    STANDARD_SKILL, // "free" skill rerolls (that might only apply to a single dice roll type)
-    PRO, // Pro is special because it provides a flexible reroll that is guarded by its own roll
-    TEAM_REROLL, // A team reroll that applies to the curren team turn
-}
-
-/** How often a [RerollResource] can be consumed. */
-@Serializable
-enum class RerollUsage {
-    REUSABLE, // The source is available independently for every event.
-    ONCE_PER_ACTION,
-    ONCE_PER_ACTIVATION,
-    ONCE_PER_TURN,
-    ONCE_PER_DRIVE,
-    ONCE_PER_HALF,
-    ONCE_PER_GAME,
-    UNSUPPORTED, // The source cannot be represented safely by the current state model.
-}
-
-/** A stable, consumable recovery resource referenced by one or more events. */
-@Serializable
-data class RecoveryResource(
-    val id: RerollSourceId,
-    val owner: TeamId,
-    val category: RerollCategory,
-    val usage: RerollUsage,
-)
-
-/** A recovery source the coach demonstrably attempted to use. */
-@Serializable
-data class ActualRecoveryUse(
-    val resource: RecoveryResource,
-    val description: String,
-)
-
-/** Why a physical D6 exists in an actual-choice trace. */
-@Serializable
-enum class PhysicalD6Role {
-    PRIMARY,
-    ACTIVATION,
-    REROLL,
-}
-
-/** What happens when a recovery's activation roll fails. */
-@Serializable
-enum class ActivationFailureBehavior {
-    /** Keep the original result and do not try another recovery. */
-    STOP,
-
-    /** Reserved for mechanics that v1 deliberately refuses to approximate. */
-    UNSUPPORTED,
-}
-
-/**
- * A reroll option that can be selected for a particular [ActionPathEvent].
- *
- * [appliesTo] is expressed relative to the demonstrated branch. This matters
- * for skills such as Catch, which can reroll a failed roll but not a successful
- * one. The activation chance belongs to the edge rather than the resource: a
- * team reroll can be guaranteed for one player and Loner-gated for another.
- */
-@Serializable
-data class RerollOption(
-    val resource: RecoveryResource,
-    val activation: OutcomeRatio = OutcomeRatio.CERTAIN,
-    val appliesTo: Set<ChanceBranch>,
-    val activationFailure: ActivationFailureBehavior = ActivationFailureBehavior.STOP,
-)

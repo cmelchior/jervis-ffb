@@ -3,7 +3,7 @@ package com.jervisffb.ui.menu.challenges.data
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.ui.utils.toFixed
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime

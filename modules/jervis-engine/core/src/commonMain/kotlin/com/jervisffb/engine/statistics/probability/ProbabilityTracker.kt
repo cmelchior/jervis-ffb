@@ -2,6 +2,8 @@ package com.jervisffb.engine.statistics.probability
 
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.statistics.GameStatistics
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationChange
 
 /**
  * Tracks probability data for dice rolls performed during a game.

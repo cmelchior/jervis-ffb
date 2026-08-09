@@ -1,4 +1,4 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.observation
 
 /**
  * A reversible change to the chance-observation stream.

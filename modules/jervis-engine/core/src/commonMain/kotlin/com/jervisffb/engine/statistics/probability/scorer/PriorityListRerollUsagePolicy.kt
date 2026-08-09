@@ -1,4 +1,11 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.scorer
+
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.RerollUsagePolicyId
+import com.jervisffb.engine.statistics.probability.event.ActivationFailureBehavior
+import com.jervisffb.engine.statistics.probability.event.RerollCategory
+import com.jervisffb.engine.statistics.probability.event.RerollOption
+import com.jervisffb.engine.statistics.probability.event.RerollUsage
 
 /**
  * This reroll policy is used by [LogicalActionPathScorer].
@@ -14,18 +21,17 @@ package com.jervisffb.engine.statistics.probability
  * 3. If a player has both Pro and Loner, the activation value is compared. If
  *    equal, Pro is preferred.
  *
- *    Example 1: Pro (3+) and Loner (3+). Pro is used.
- *    Example 2: Pro (4+) and Loner (3+). Loner is used.
+ * Example 1: Pro (3+) and Loner (3+). Pro is used.
+ * Example 2: Pro (4+) and Loner (3+). Loner is used.
  *
- *    Important: Rerolls with activation rolls like Pro or Loner Team Rerolls never
- *    use team rerolls in an attempt to recover if the activation roll fails.
- *
+ * Important: Rerolls with activation rolls like Pro or Loner Team Rerolls never
+ * use team rerolls in an attempt to recover if the activation roll fails.
  */
-object FixedRerollUsagePolicy {
-    val POLICY_ID = RerollUsagePolicyId("fixed-reroll-priotity-v1")
+object PriorityListRerollUsagePolicy: RerollUsagePolicy {
 
-    // Select the reroll option to attempt from the rerolls currently available.
-    fun select(options: List<RerollOption>): RerollOption? {
+    override val id = RerollUsagePolicyId("fixed-reroll-priority-list-v1")
+
+    override fun select(options: List<RerollOption>): RerollOption? {
         if (options.isEmpty()) return null
 
         options.firstOrNull { it.activationFailure == ActivationFailureBehavior.UNSUPPORTED }?.let {

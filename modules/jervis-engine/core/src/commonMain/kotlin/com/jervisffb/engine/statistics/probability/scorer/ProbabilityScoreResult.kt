@@ -1,5 +1,11 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.scorer
 
+import com.jervisffb.engine.statistics.probability.AlgorithmId
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.RerollUsagePolicyId
+import com.jervisffb.engine.statistics.probability.Surprisal
+import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,13 +16,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface ProbabilityScoreResult {
     val algorithmId: AlgorithmId
-    val policyId: RerollUsagePolicyId
+    val rerollPolicyId: RerollUsagePolicyId
     val events: List<ActionPathEvent>
 
     @Serializable
     data class Scored(
         override val algorithmId: AlgorithmId,
-        override val policyId: RerollUsagePolicyId,
+        override val rerollPolicyId: RerollUsagePolicyId,
         override val events: List<ActionPathEvent>,
         val baseProbability: Probability,
         // Probability of the demonstrated physical trace before hypothetical recovery.
@@ -46,7 +52,7 @@ sealed interface ProbabilityScoreResult {
     @Serializable
     data class Unsupported(
         override val algorithmId: AlgorithmId,
-        override val policyId: RerollUsagePolicyId,
+        override val rerollPolicyId: RerollUsagePolicyId,
         override val events: List<ActionPathEvent>,
         val reasons: List<String>,
     ) : ProbabilityScoreResult

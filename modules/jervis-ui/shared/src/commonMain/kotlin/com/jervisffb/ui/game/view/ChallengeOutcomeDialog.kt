@@ -34,13 +34,13 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.challenge.ChallengeOutcome
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.challenge.ChallengeScoring
-import com.jervisffb.engine.statistics.probability.ActionPathEvent
-import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.Probability
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
 import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
+import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_trophy
 import com.jervisffb.ui.game.dialogs.DialogSize
@@ -112,14 +112,14 @@ fun ChallengeOutcomeDialog(
                     is ProbabilityScoreResult.Scored -> {
                         add("Algorithm" to result.algorithmId.value)
                         when (val id = result.algorithmId) {
-                            PhysicalActionPathScorer.ALGORITHM_ID -> {
+                            PhysicalActionPathScorer.algorithmId -> {
                                 add("Base Difficulty" to "${result.baseSurprisal.toFixed(3)} bits")
                                 add("Actual extra-roll adjustment" to "${result.actualExtraRollAdjustment.toSigned(3)} bits")
                                 add("Hypothetical reroll adjustment" to "${result.hypotheticalRecoveryAdjustment.toSigned(3)} bits")
                                 add("Adjusted Difficulty" to "${result.surprisal.toFixed(3)} bits")
                                 add("Dice Rolls" to result.eventCount.toString())
                             }
-                            LogicalActionPathScorer.ALGORITHM_ID -> {
+                            LogicalActionPathScorer.algorithmId -> {
                                 add("Base Difficulty" to "${result.baseSurprisal.toFixed(3)} bits")
                                 add("Recovery adjustment" to "${result.rerollAdjustment.toSigned(3)} bits")
                                 add("Adjusted Risk" to "${result.surprisal.toFixed(3)} bits")

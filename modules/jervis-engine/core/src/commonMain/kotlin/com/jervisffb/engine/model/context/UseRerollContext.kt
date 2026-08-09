@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.RerollSource
-import com.jervisffb.engine.statistics.probability.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 

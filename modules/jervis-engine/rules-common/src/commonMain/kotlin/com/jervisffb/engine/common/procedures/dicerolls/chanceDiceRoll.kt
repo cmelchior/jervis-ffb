@@ -19,16 +19,16 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.statistics.probability.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.ChanceObservation
-import com.jervisffb.engine.statistics.probability.ChanceObservationScope
-import com.jervisffb.engine.statistics.probability.ChanceRerollOption
-import com.jervisffb.engine.statistics.probability.ChanceRerollSelection
-import com.jervisffb.engine.statistics.probability.ChanceRerollSource
-import com.jervisffb.engine.statistics.probability.ChanceRerollSourceKind
-import com.jervisffb.engine.statistics.probability.ChanceRerollTest
-import com.jervisffb.engine.statistics.probability.ChanceRerollTestEffect
-import com.jervisffb.engine.statistics.probability.ChanceResultId
+import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollOption
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSelection
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSource
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSourceKind
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTest
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTestEffect
+import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 
 /**
  * Describes a pending replacement of a dice-roll observation, e.g. if either

@@ -45,8 +45,8 @@ import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.statistics.GameStatistics
-import com.jervisffb.engine.statistics.probability.ChanceObservation
-import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.InvalidGameStateException

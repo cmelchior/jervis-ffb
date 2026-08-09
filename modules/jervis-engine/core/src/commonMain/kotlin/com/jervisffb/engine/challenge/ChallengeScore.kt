@@ -1,8 +1,7 @@
 package com.jervisffb.engine.challenge
 
-import com.jervisffb.engine.statistics.probability.ProbabilityScoreResult
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import kotlinx.serialization.Serializable
-import kotlin.text.compareTo
 import kotlin.time.Instant
 
 /**
@@ -41,7 +40,7 @@ sealed interface ChallengeScore<T: ChallengeScore<T>>: Comparable<T> {
             val otherResult = other.result
             require(
                 thisResult.algorithmId == otherResult.algorithmId &&
-                    thisResult.policyId == otherResult.policyId
+                    thisResult.rerollPolicyId == otherResult.rerollPolicyId
             ) {
                 "Probability Scores from different algorithm or policy versions cannot be compared."
             }

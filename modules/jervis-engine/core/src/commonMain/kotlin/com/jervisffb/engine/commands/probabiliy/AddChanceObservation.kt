@@ -4,7 +4,7 @@ import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.statistics.probability.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 
 /**
  * Records structured data for one chance event in

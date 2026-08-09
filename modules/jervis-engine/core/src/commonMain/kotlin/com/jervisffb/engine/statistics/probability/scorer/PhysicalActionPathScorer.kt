@@ -1,6 +1,23 @@
-package com.jervisffb.engine.statistics.probability
+package com.jervisffb.engine.statistics.probability.scorer
 
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.statistics.probability.AlgorithmId
+import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
+import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
+import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
+import com.jervisffb.engine.statistics.probability.event.ActivationFailureBehavior
+import com.jervisffb.engine.statistics.probability.event.ChanceBranch
+import com.jervisffb.engine.statistics.probability.event.PhysicalD6Role
+import com.jervisffb.engine.statistics.probability.event.RerollCategory
+import com.jervisffb.engine.statistics.probability.event.RerollResource
+import com.jervisffb.engine.statistics.probability.event.RerollUsage
+import com.jervisffb.engine.statistics.probability.event.observedOutcomeProbability
+import com.jervisffb.engine.statistics.probability.event.owner
+import com.jervisffb.engine.statistics.probability.event.recoveries
+import com.jervisffb.engine.statistics.probability.event.scope
+import com.jervisffb.engine.statistics.probability.normalizer.ActualRerollUsageNormalizerPolicy
+import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
 import com.jervisffb.engine.utils.sum
 
 /**
@@ -16,29 +33,17 @@ import com.jervisffb.engine.utils.sum
  * penalized. Rolls caused by a reroll are marked as such, allowing coaches to
  * figure out how to improve.
  */
-object PhysicalActionPathScorer {
-    val ALGORITHM_ID = AlgorithmId("physical-path-bb2025-v1")
-    val POLICY_ID = RerollUsagePolicyId("selected-then-fixed-rerolls-v1")
-
-    /** Normalizes observations and scores an action path while preserving actual reroll choices. */
-    fun score(
-        observations: List<ChanceObservation>,
-        solvingTeamId: TeamId,
-        allowMultipleTeamRerollsPerTurn: Boolean,
-        stateCeiling: Int = LogicalActionPathScorer.DEFAULT_STATE_CEILING,
-    ): ProbabilityScoreResult = scoreNormalized(
-        events = ChanceNormalizer.hybrid(observations),
-        solvingTeamId = solvingTeamId,
-        allowMultipleTeamRerollsPerTurn = allowMultipleTeamRerollsPerTurn,
-        stateCeiling = stateCeiling,
-    )
+object PhysicalActionPathScorer: ActionPathScorer {
+    override val algorithmId = AlgorithmId("physical-path-bb2025-v1")
+    override val rerollUsagePolicy = PriorityListRerollUsagePolicy
+    override val normalizer = ChanceNormalizer(ActualRerollUsageNormalizerPolicy)
 
     /** Scores an already normalized action path without repeating normalization. */
-    internal fun scoreNormalized(
+    override fun scoreNormalized(
         events: List<ActionPathEvent>,
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
-        stateCeiling: Int = LogicalActionPathScorer.DEFAULT_STATE_CEILING,
+        stateCeiling: Int,
     ): ProbabilityScoreResult {
         require(stateCeiling > 0) { "State ceiling must be positive: $stateCeiling" }
 
@@ -124,8 +129,8 @@ object PhysicalActionPathScorer {
         val actualAdjustment = SurprisalAdjustment.from(baseRisk, demonstratedRisk)
         val hypotheticalAdjustment = SurprisalAdjustment.from(demonstratedRisk, finalRisk)
         return ProbabilityScoreResult.Scored(
-            algorithmId = ALGORITHM_ID,
-            policyId = POLICY_ID,
+            algorithmId = algorithmId,
+            rerollPolicyId = rerollUsagePolicy.id,
             events = events,
             baseProbability = primaryProbability,
             demonstratedProbability = demonstratedProbability,
@@ -183,7 +188,7 @@ object PhysicalActionPathScorer {
         val alternativeProbability = Probability.ALWAYS - observedProbability
         val ownerIsSolvingTeam = event.owner == solvingTeamId
         val recoveryBranch = if (ownerIsSolvingTeam) ChanceBranch.ALTERNATIVE else ChanceBranch.SELECTED
-        val recovery = FixedRerollUsagePolicy.select(
+        val recovery = PriorityListRerollUsagePolicy.select(
             event.recoveries.filter { option ->
                 recoveryBranch in option.appliesTo &&
                     resourceState.isAvailable(option.resource, event, allowMultipleTeamRerollsPerTurn)
@@ -244,7 +249,7 @@ object PhysicalActionPathScorer {
 
     /** Adds validation errors for a recovery resource attached to an event. */
     private fun MutableList<String>.validateResource(
-        resource: RecoveryResource,
+        resource: RerollResource,
         event: ActionPathEvent,
         index: Int,
     ) {
@@ -261,7 +266,7 @@ object PhysicalActionPathScorer {
 
     /** Builds a result explaining why the action path could not be scored. */
     private fun unsupported(events: List<ActionPathEvent>, reasons: List<String>) =
-        ProbabilityScoreResult.Unsupported(ALGORITHM_ID, POLICY_ID, events, reasons)
+        ProbabilityScoreResult.Unsupported(algorithmId, rerollUsagePolicy.id, events, reasons)
 
     private data class RelevantResourceState(
         val consumedResources: Set<String> = emptySet(),
@@ -300,7 +305,7 @@ object PhysicalActionPathScorer {
     ) {
         /** Returns whether [resource] may be consumed for [event] in this state. */
         fun isAvailable(
-            resource: RecoveryResource,
+            resource: RerollResource,
             event: ActionPathEvent,
             allowMultipleTeamRerollsPerTurn: Boolean,
         ): Boolean {
@@ -315,7 +320,7 @@ object PhysicalActionPathScorer {
 
         /** Returns the state after consuming [resource] for [event]. */
         fun consume(
-            resource: RecoveryResource,
+            resource: RerollResource,
             event: ActionPathEvent,
             trackTeamTurn: Boolean,
         ): ResourceState {
@@ -345,7 +350,7 @@ object PhysicalActionPathScorer {
     }
 
     /** Resolves a resource's lifetime into the key used by the DP state. */
-    private fun usageScope(resource: RecoveryResource, scope: ActionPathEventScope?): String? {
+    private fun usageScope(resource: RerollResource, scope: ActionPathEventScope?): String? {
         val resourceKey = "${resource.owner.value}:${resource.id.id}"
         return when (resource.usage) {
             RerollUsage.REUSABLE -> null
@@ -360,6 +365,6 @@ object PhysicalActionPathScorer {
     }
 
     /** Returns the key used to enforce one team reroll per team turn. */
-    private fun teamTurnScope(resource: RecoveryResource, scope: ActionPathEventScope): String =
+    private fun teamTurnScope(resource: RerollResource, scope: ActionPathEventScope): String =
         "${resource.owner.value}:${scope.turn}"
 }

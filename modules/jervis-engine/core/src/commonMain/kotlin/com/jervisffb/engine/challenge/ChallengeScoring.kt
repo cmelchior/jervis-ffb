@@ -5,8 +5,8 @@ import com.jervisffb.engine.model.ChallengeScoringId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.statistics.GameStatistics
-import com.jervisffb.engine.statistics.probability.LogicalActionPathScorer
-import com.jervisffb.engine.statistics.probability.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import kotlin.time.Clock
 
 /**

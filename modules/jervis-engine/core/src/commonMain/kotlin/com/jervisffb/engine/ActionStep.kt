@@ -6,7 +6,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
-import com.jervisffb.engine.statistics.probability.ChanceObservationChange
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationChange
 
 /**
  * Class encapsulating changes to the model state happening due to a single

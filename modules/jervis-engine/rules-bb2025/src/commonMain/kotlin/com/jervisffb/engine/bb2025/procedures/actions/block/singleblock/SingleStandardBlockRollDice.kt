@@ -26,8 +26,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
-import com.jervisffb.engine.statistics.probability.ChanceObservation
-import com.jervisffb.engine.statistics.probability.ChanceObservationHandler
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.math.absoluteValue
 
