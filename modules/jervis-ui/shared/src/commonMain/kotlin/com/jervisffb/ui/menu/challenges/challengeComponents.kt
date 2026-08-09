@@ -1,24 +1,32 @@
 package com.jervisffb.ui.menu.challenges
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -56,8 +64,14 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.challenges.data.ChallengeUserState
 import com.jervisffb.ui.menu.utils.JervisTooltip
 import com.jervisffb.ui.utils.pixelSize
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * This file contains various Compose components used across the Challenge List
@@ -231,7 +245,12 @@ fun ChallengeScreenshot(
     // Border drawn around the pitch, and the chalk margin inside it. Has to match
     // what is handed to `Pitch` below, or the placeholder and the real pitch end up
     // different sizes.
-    previewBorder: Dp = 2.dp
+    previewBorder: Dp = 2.dp,
+    // The minimum amount of time the loading indicator is shown for, regardless
+    // of when it was shown.
+    minimumShowTime: Duration = 1.seconds,
+    // When shown, the Progress Indicator will fade in over this duration.
+    progressFadeIn: Duration = 300.milliseconds,
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -300,7 +319,7 @@ fun ChallengeScreenshot(
                     alignment = Alignment.Center,
                 )
                 when (screenModel) {
-                    null -> { /* Do nothing */ } //CircularProgressIndicator(color = JervisTheme.rulebookRed)
+                    null -> { /* Keep showing the placeholder pitch. */ }
                     else -> {
                         val pitchViewModel = remember(screenModel) {
                             PitchViewModel(screenModel, screenModel.uiState, screenModel.hoverPlayerFlow)
@@ -311,8 +330,7 @@ fun ChallengeScreenshot(
                         // the first snapshot means the fade starts on a pitch that
                         // already has its players, rather than on an empty field with
                         // everyone appearing halfway through.
-                        val snapshot by remember(pitchViewModel) { pitchViewModel.observeSnapshot() }
-                            .collectAsState(null)
+                        val snapshot by remember(pitchViewModel) { pitchViewModel.observeSnapshot() }.collectAsState(null)
                         val pitchAlpha by animateFloatAsState(
                             targetValue = if (snapshot != null) 1f else 0f,
                             animationSpec = tween(previewFadeInMs),
@@ -346,8 +364,70 @@ fun ChallengeScreenshot(
                         }
                     }
                 }
+                DelayedChallengeLoadingIndicator(
+                    isLoading = screenModel == null,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    minimumShowTime = minimumShowTime,
+                    progressFadeIn = progressFadeIn,
+                ) {
+                    LoadingIndicator()
+                }
             }
         }
+    }
+}
+
+@Composable
+fun DelayedChallengeLoadingIndicator(
+    isLoading: Boolean,
+    modifier: Modifier = Modifier,
+    minimumShowTime: Duration = 1.seconds,
+    progressFadeIn: Duration = 300.milliseconds,
+    content: @Composable () -> Unit,
+) {
+    var showLoadingIndicator by remember { mutableStateOf(false) }
+    var loadingIndicatorShownAt by remember { mutableStateOf<TimeMark?>(null) }
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            delay(400.milliseconds)
+            showLoadingIndicator = true
+            loadingIndicatorShownAt = TimeSource.Monotonic.markNow()
+        } else if (showLoadingIndicator) {
+            val elapsed = loadingIndicatorShownAt?.elapsedNow() ?: minimumShowTime
+            val remaining = (minimumShowTime - elapsed).coerceAtLeast(0.milliseconds)
+            delay(remaining)
+            showLoadingIndicator = false
+            loadingIndicatorShownAt = null
+        }
+    }
+    AnimatedVisibility(
+        visible = showLoadingIndicator,
+        modifier = modifier,
+        enter = fadeIn(animationSpec = tween(progressFadeIn.inWholeMilliseconds.toInt())),
+        exit = ExitTransition.None,
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.End,
+    ) {
+        Text(
+            text = "Loading...",
+            color = JervisTheme.white,
+            fontSize = 12.sp,
+        )
+        LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth(),
+            color = JervisTheme.white,
+            trackColor = JervisTheme.white.copy(alpha = 0.25f),
+        )
     }
 }
 

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,6 +49,7 @@ import com.jervisffb.ui.menu.components.CompactSwitch
 import com.jervisffb.ui.menu.fumbbl.MenuSidebarButton
 import com.jervisffb.ui.utils.applyIf
 import org.jetbrains.compose.resources.painterResource
+import kotlin.time.Duration.Companion.milliseconds
 
 class ChallengesListScreen(
     private val menuViewModel: MenuViewModel,
@@ -65,6 +67,7 @@ class ChallengesListScreen(
 private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: ChallengesListScreenModel) {
     val navigator = LocalNavigator.currentOrThrow
     val rows by viewModel.visibleChallenges.collectAsState()
+    val isInitializing by viewModel.isInitializing.collectAsState()
     val activeCategories by viewModel.activeCategories.collectAsState()
     val hideSolved by viewModel.hideSolved.collectAsState()
     val showOnlyFavorites by viewModel.showOnlyFavorites.collectAsState()
@@ -122,30 +125,48 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                 CompactSwitch("Only Favorites", showOnlyFavorites) { viewModel.setShowOnlyFavorites(it) }
             }
             TitleBorder()
-            if (rows.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.padding(top = 16.dp).fillMaxWidth()) {
+                DelayedChallengeLoadingIndicator(
+                    isLoading = isInitializing,
+                    modifier = Modifier.align(Alignment.Center),
+                    minimumShowTime = 500.milliseconds
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        val loadColor = JervisTheme.contentTextColor.copy(alpha = 0.8f)
+                        CircularProgressIndicator(color = loadColor)
+                        Text(
+                            text = "Fetching Challenges...",
+                            color = loadColor,
+                        )
+                    }
+                }
+                if (!isInitializing && rows.isEmpty()) {
                     Text(
                         text = "No challenges match the selected filters.",
+                        modifier = Modifier.align(Alignment.Center),
                         color = JervisTheme.contentTextColor.copy(alpha = 0.6f),
                     )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                ) {
-                    itemsIndexed(
-                        items = rows,
-                        key = { index: Int, row: ChallengeRow -> row.data.id.value },
-                        contentType = { index: Int, row: ChallengeRow -> null },
-                    ) { index: Int, row: ChallengeRow ->
-                        ChallengeListRow(
-                            row = row,
-                            alternateRow = (index % 2 == 1),
-                            onOpen = { viewModel.openChallenge(navigator, row) },
-                            onToggleFavorite = { viewModel.toggleFavorite(row.data.id, !row.userState.favorite) },
-                        )
+                } else if (!isInitializing) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                    ) {
+                        itemsIndexed(
+                            items = rows,
+                            key = { index: Int, row: ChallengeRow -> row.data.id.value },
+                            contentType = { index: Int, row: ChallengeRow -> null },
+                        ) { index: Int, row: ChallengeRow ->
+                            ChallengeListRow(
+                                row = row,
+                                alternateRow = (index % 2 == 1),
+                                onOpen = { viewModel.openChallenge(navigator, row) },
+                                onToggleFavorite = { viewModel.toggleFavorite(row.data.id, !row.userState.favorite) },
+                            )
+                        }
                     }
                 }
             }

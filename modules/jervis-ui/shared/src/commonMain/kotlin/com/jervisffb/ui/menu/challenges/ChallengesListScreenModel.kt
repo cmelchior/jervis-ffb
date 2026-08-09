@@ -19,12 +19,17 @@ import kotlinx.coroutines.launch
 class ChallengesListScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
 
     private val repository = menuViewModel.challengesRepository
+    val isInitializing = MutableStateFlow(true)
 
     init {
         // Loading reads the challenge positions off the disk. It should be
         // cached, so only the first hit is expensive.
         menuViewModel.backgroundContext.launch {
-            repository.initialize()
+            try {
+                repository.initialize()
+            } finally {
+                isInitializing.value = false
+            }
         }
     }
 
