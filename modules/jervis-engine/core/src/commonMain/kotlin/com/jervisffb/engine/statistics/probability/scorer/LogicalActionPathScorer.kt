@@ -37,7 +37,7 @@ import com.jervisffb.engine.utils.sum
 object LogicalActionPathScorer: ActionPathScorer {
     override val algorithmId = AlgorithmId("logical-path-bb2025-v1")
     override val rerollUsagePolicy = PriorityListRerollUsagePolicy
-    override val normalizer = ChanceNormalizer(FixedRerollUsageNormalizerPolicy)
+    override val normalizer = ChanceNormalizer(FixedRerollUsageNormalizerPolicy.DEFAULT)
 
     /**
      *  Scores an already normalized action path without repeating normalization.

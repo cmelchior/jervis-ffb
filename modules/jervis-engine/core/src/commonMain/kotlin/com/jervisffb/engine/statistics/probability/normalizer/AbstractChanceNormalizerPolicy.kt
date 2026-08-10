@@ -28,21 +28,30 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTestE
  */
 abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
 
-    override val activationRollTypes = setOf(
-        DiceRollType.LONER,
-        DiceRollType.PRO,
-    )
-    override val ignoredRollTypes = setOf(
-        DiceRollType.ARMOUR,
-        DiceRollType.REGENERATION,
-        DiceRollType.TEAM_CAPTAIN
-    )
-    override val primaryRollTypes = buildSet {
-        // Assume that all rolls that do not have a narrower category should always be
-        // included in the scoring.
-        addAll(DiceRollType.entries.toSet())
-        removeAll(activationRollTypes)
-        removeAll(ignoredRollTypes)
+    companion object {
+        val DEFAULT_ACTIVATION_ROLL_TYPES = setOf(
+            DiceRollType.LONER,
+            DiceRollType.PRO,
+            DiceRollType.TEAM_MASCOT
+        )
+        val DEFAULT_IGNORED_ROLL_TYPES = setOf(
+            DiceRollType.ARMOUR,
+            DiceRollType.INJURY,
+            DiceRollType.CASUALTY,
+            DiceRollType.LASTING_INJURY,
+            DiceRollType.REGENERATION
+        )
+    }
+    abstract override val activationRollTypes: Set<DiceRollType>
+    abstract override val ignoredRollTypes: Set<DiceRollType>
+    override val primaryRollTypes: Set<DiceRollType> by lazy {
+        buildSet {
+            // Assume that all rolls that do not have a narrower category should always be
+            // included in the scoring.
+            addAll(DiceRollType.entries.toSet())
+            removeAll(activationRollTypes)
+            removeAll(ignoredRollTypes)
+        }
     }
 
     protected fun normalizeLogicalBlock(

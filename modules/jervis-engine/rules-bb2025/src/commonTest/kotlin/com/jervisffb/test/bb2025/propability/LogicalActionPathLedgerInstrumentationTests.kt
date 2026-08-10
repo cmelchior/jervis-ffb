@@ -1,7 +1,9 @@
 package com.jervisffb.test.bb2025.propability
 
 import com.jervisffb.engine.actions.BlockDice
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -21,6 +23,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.ProbabilityTracker
 import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
@@ -32,11 +35,13 @@ import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScore
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.TeamRerollSelected
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -97,6 +102,94 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
         val rewound = trackedDiceRolls().single()
         assertEquals(1, (rewound.dice.single().result as D6Result).value)
         assertTrue(!rewound.finalized)
+    }
+
+    @Test
+    fun acceptedArmourRollRecordsAndFinalizesEntireDicePool() {
+        val target = state.getPlayerById("H1".playerId)
+        target.putProne()
+
+        controller.rollForward(
+            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected(target),
+            DiceRollResults(2.d6, 2.d6),
+        )
+
+        val observation = trackedDiceRolls().single { it.rollType == DiceRollType.ARMOUR }
+        assertEquals(listOf(2, 2), observation.dice.map { assertIs<D6Result>(it.result).value })
+        assertTrue(observation.dice.all { it.dieId != null })
+        assertEquals(false, observation.success)
+        assertTrue(observation.rerollOptions.isEmpty())
+        assertTrue(observation.finalized)
+    }
+
+    @Test
+    fun successfulArmourRollSnapshotsLoneFoulerForAlternativeFailureBranch() {
+        val fouler = state.getPlayerById("A6".playerId)
+        fouler.addSkill(SkillType.LONE_FOULER)
+        val target = state.getPlayerById("H1".playerId)
+        target.putProne()
+
+        controller.rollForward(
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected(target),
+            DiceRollResults(4.d6, 5.d6),
+        )
+
+        val observation = trackedDiceRolls().single { it.rollType == DiceRollType.ARMOUR }
+        assertEquals(true, observation.success)
+        val loneFoulerOption = observation.rerollOptions.single {
+            it.source.skillId?.type == SkillType.LONE_FOULER
+        }
+        assertTrue(!loneFoulerOption.appliesOnSuccess)
+        assertTrue(loneFoulerOption.appliesOnFailure)
+        assertTrue(!loneFoulerOption.currentlyAvailable)
+        assertEquals(null, observation.selectedReroll)
+        assertTrue(observation.finalized)
+    }
+
+    @Test
+    fun loneFoulerRecordsFailureOnlyPoolRerollAndReplacementRoll() {
+        val fouler = state.getPlayerById("A6".playerId)
+        fouler.addSkill(SkillType.LONE_FOULER)
+        val target = state.getPlayerById("H1".playerId)
+        target.putProne()
+
+        controller.rollForward(
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected(target),
+            DiceRollResults(2.d6, 2.d6),
+            Confirm,
+            DiceRollResults(5.d6, 6.d6),
+        )
+
+        val observations = trackedDiceRolls().filter { it.rollType == DiceRollType.ARMOUR }
+        assertEquals(2, observations.size)
+        val initial = observations[0]
+        val reroll = observations[1]
+
+        assertEquals(listOf(2, 2), initial.dice.map { assertIs<D6Result>(it.result).value })
+        assertEquals(false, initial.success)
+        assertTrue(initial.finalized)
+        val loneFoulerOption = initial.rerollOptions.single {
+            it.source.skillId?.type == SkillType.LONE_FOULER
+        }
+        assertTrue(!loneFoulerOption.appliesOnSuccess)
+        assertTrue(loneFoulerOption.appliesOnFailure)
+        assertTrue(loneFoulerOption.currentlyAvailable)
+        assertEquals(initial.dice.map { it.id }.toSet(), loneFoulerOption.resultIds.toSet())
+        assertEquals(loneFoulerOption.source.id, initial.selectedReroll?.sourceId)
+        assertEquals(initial.dice.map { it.id }.toSet(), initial.selectedReroll?.resultIds?.toSet())
+        assertEquals(true, initial.selectedReroll?.allowed)
+
+        assertEquals(initial.index, reroll.rerolledRollIndex)
+        assertEquals(listOf(5, 6), reroll.dice.map { assertIs<D6Result>(it.result).value })
+        assertEquals(initial.dice.map { it.dieId }, reroll.dice.map { it.dieId })
+        assertEquals(true, reroll.success)
+        assertTrue(reroll.finalized)
     }
 
     @Test

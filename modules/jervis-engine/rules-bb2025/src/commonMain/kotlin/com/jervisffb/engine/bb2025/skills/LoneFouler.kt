@@ -64,8 +64,9 @@ class LoneFouler(
         wasSuccess: Boolean?,
     ): Boolean {
         if (type != DiceRollType.ARMOUR) return false
+        if (wasSuccess == true) return false
         return state.getContextOrNull<RiskingInjuryContext>()?.let { context ->
-            val armourBroken = context.armourBroken
+            val armourBroken = wasSuccess ?: context.armourBroken
             val hasDefensiveAssists = context.armourModifiers.any { it is DefensiveAssistsArmourModifier }
             val hasOffensiveAssists = context.armourModifiers.any { it is OffensiveAssistArmourModifier }
             !armourBroken && !hasDefensiveAssists && !hasOffensiveAssists

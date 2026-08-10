@@ -23,6 +23,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.AnimalSavageryContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChainsawContext
@@ -31,6 +32,9 @@ import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.modifiers.ArmourModifier
 import com.jervisffb.engine.common.modifiers.MightyBlowArmourModifier
+import com.jervisffb.engine.common.procedures.dicerolls.createRerollableChanceObservation
+import com.jervisffb.engine.common.procedures.dicerolls.finalizeRerollableChanceObservations
+import com.jervisffb.engine.common.procedures.dicerolls.updateRerollableChanceDecision
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -40,6 +44,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
@@ -54,6 +59,10 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
+import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
@@ -96,7 +105,7 @@ import kotlinx.collections.immutable.toPersistentList
  * Fall Over:
  * 1. Arm Bar (If in the middle of a Dodge, Jump or Leap)
  */
-object ArmourRoll: Procedure() {
+object ArmourRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<RiskingInjuryContext>()
@@ -110,7 +119,7 @@ object ArmourRoll: Procedure() {
             type = DiceRollType.ARMOUR,
             originalRoll = emptyList(),  // Not used here as Lone Fouler is the only reroll and handled independently
             team = team,
-            player = player
+            player = player,
         )
         return AddContext(rerollContext)
     }
@@ -119,7 +128,16 @@ object ArmourRoll: Procedure() {
         if (rerollContext.type != DiceRollType.ARMOUR) {
             INVALID_GAME_STATE("Invalid reroll context type: $rerollContext")
         }
-        return RemoveContext(rerollContext)
+        val context = state.getContext<RiskingInjuryContext>()
+        val chanceCommand = finalizeRerollableChanceObservations(
+            state = state,
+            isSuccess = context.armourBroken,
+            rerollContext = rerollContext,
+        )
+        return compositeCommandOf(
+            RemoveContext(rerollContext),
+            chanceCommand,
+        )
     }
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()
@@ -134,15 +152,35 @@ object ArmourRoll: Procedure() {
                 // All skills that can modify an armour roll can be used both before and after the roll,
                 // but since there is no advantage to using them before, we will only apply them after.
                 val roll = listOf(die1, die2)
-                val updatedContext = state.getContext<RiskingInjuryContext>().copy(
-                    armourRoll = persistentListOf(
-                        D6DieRoll.create(die1, indexInPool = 0),
-                        D6DieRoll.create(die2, indexInPool = 1),
-                    ),
+                val context = state.getContext<RiskingInjuryContext>()
+                val updatedRoll = persistentListOf(
+                    D6DieRoll.create(die1, indexInPool = 0),
+                    D6DieRoll.create(die2, indexInPool = 1),
                 )
+                val updatedContext = context.copy(armourRoll = updatedRoll)
+                val rerollContext = state.getRerollContext()
+
+                // Start a RerollableChanceObservation since Lone Fouler might be used later
+                val chanceObservation = createRerollableChanceObservation(
+                    state = state,
+                    rollType = DiceRollType.ARMOUR,
+                    team = context.player.team.otherTeam(),
+                    player = context.causedBy,
+                    dicePool = updatedRoll,
+                    rerollContext = rerollContext,
+                    outcome = chanceOutcome(context),
+                )
+                val updatedRerollContext = rerollContext.copy(
+                    originalRoll = updatedRoll,
+                    chanceRollIndex = chanceObservation?.index,
+                    chanceObservations = chanceObservation?.let(rerollContext.chanceObservations::add) ?: rerollContext.chanceObservations,
+                )
+
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
                     UpdateContext(updatedContext),
+                    UpdateContext(updatedRerollContext),
+                    chanceObservation?.let(::AddChanceObservation),
                     GotoNode(ChooseToUseIronHardSkin)
                 )
             }
@@ -163,20 +201,36 @@ object ArmourRoll: Procedure() {
                 val reroll = state.getRerollContext()
                 val originalRoll = context.armourRoll
                 val updatedD1 = originalRoll.first().copyReroll(
-                    reroll.source,
-                    die1
+                    rerollSource = reroll.source,
+                    rerolledResult = die1
                 )
                 val updatedD2 = originalRoll.last().copyReroll(
-                    reroll.source,
-                    die2
+                    rerollSource = reroll.source,
+                    rerolledResult = die2
                 )
                 val updatedContext = context.copy(
                     armourRoll = persistentListOf(updatedD1, updatedD2)
                 )
                 val roll = listOf(die1, die2)
+                val chanceObservation = reroll.chanceRollIndex?.let { rootRollIndex ->
+                    createRerollableChanceObservation(
+                        state = state,
+                        rollType = DiceRollType.ARMOUR,
+                        team = context.player.team.otherTeam(),
+                        player = context.causedBy,
+                        dicePool = updatedContext.armourRoll,
+                        rerollContext = reroll,
+                        rerolledRollIndex = rootRollIndex,
+                        outcome = chanceOutcome(context),
+                    )
+                }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
                     UpdateContext(updatedContext),
+                    chanceObservation?.let { observation ->
+                        UpdateContext(reroll.copy(chanceObservations = reroll.chanceObservations.add(observation)))
+                    },
+                    chanceObservation?.let(::AddChanceObservation),
                     GotoNode(ChooseToUseIronHardSkin)
                 )
             }
@@ -524,6 +578,12 @@ object ArmourRoll: Procedure() {
 
     // Only on Fouls
     object ChooseToUseLoneFouler: ActionNode() {
+        private fun loneFoulerIsAvailable(fouler: Player, context: RiskingInjuryContext): Boolean {
+            val state = fouler.team.game
+            val loneFoulerRerollSource = state.rules.getLoneFoulerRerollSource(fouler)
+            val isLoneFoulerRerollAvailable = loneFoulerRerollSource?.canReroll(state, DiceRollType.ARMOUR, context.armourRoll, null) == true
+            return isLoneFoulerRerollAvailable
+        }
         override fun actionOwner(state: Game, rules: Rules): Team {
             val context = state.getContext<RiskingInjuryContext>()
             return context.causedBy?.team ?: error("Missing causedBy: $context")
@@ -531,9 +591,7 @@ object ArmourRoll: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             val fouler = context.causedBy ?: error("Missing fouler: $context")
-            val loneFoulerRerollSource = rules.getLoneFoulerRerollSource(fouler)
-            val isLoneFoulerRerollAvailable = loneFoulerRerollSource
-                ?.canReroll(state, DiceRollType.ARMOUR, context.armourRoll, null) == true
+            val isLoneFoulerRerollAvailable = loneFoulerIsAvailable(fouler, context)
             return when (isLoneFoulerRerollAvailable) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -543,16 +601,44 @@ object ArmourRoll: Procedure() {
             val context = state.getContext<RiskingInjuryContext>()
             val useLoneFouler = (action is Confirm)
             val fouler = context.causedBy ?: error("Missing fouler: $context")
+            val selectedSource = when (useLoneFouler) {
+                true -> rules.getLoneFoulerRerollSource(fouler) ?: error("Lone Fouler is not available in ${rules.name}")
+                false -> null
+            }
+
+            // Update Chance Observation (only Lone Fouler is a possible reroll)
+            val rerollContext = state.getRerollContext()
+            val observationUpdate = when (rerollContext.rerollDice == null) {
+                true -> {
+                    updateRerollableChanceDecision(
+                        state = state,
+                        rules = rules,
+                        rollType = DiceRollType.ARMOUR,
+                        player = fouler,
+                        dicePool = context.armourRoll,
+                        isSuccess = context.armourBroken,
+                        rerollContext = rerollContext,
+                        selectedSource = selectedSource,
+                    )
+                }
+                false -> null
+            }
+            val contextWithObservation = observationUpdate?.let { update ->
+                rerollContext.copy(
+                    chanceObservations = rerollContext.chanceObservations.map { observation ->
+                        if (observation.index == update.previous.index) update.updated else observation
+                    }.toPersistentList(),
+                )
+            } ?: rerollContext
             return when (useLoneFouler) {
                 true -> {
-                    val rerollSource = rules.getLoneFoulerRerollSource(fouler)
-                        ?: error("Lone Fouler is not available in ${rules.name}")
+                    val rerollSource = selectedSource ?: error("Missing Lone Fouler reroll source")
                     val rerollOption = rerollSource.calculateRerollOptions(
                         DiceRollType.ARMOUR,
                         context.armourRoll,
                         wasSuccess = false // Lone Fouler can only be used on failures
                     ).singleOrNull() ?: error("Lone Fouler returned more than one re-roll option")
-                    val rerollContext = state.getRerollContext().copy(
+                    val updatedRerollContext = contextWithObservation.copy(
                         source = rerollSource,
                         rerollDice = rerollOption.dice,
                         rerollAllowed = true
@@ -560,12 +646,17 @@ object ArmourRoll: Procedure() {
                     compositeCommandOf(
                         ReportSkillUsed(fouler, SkillType.LONE_FOULER),
                         SetSkillRerollUsed(rerollSource, true),
-                        UpdateContext(rerollContext),
+                        observationUpdate?.command,
+                        UpdateContext(updatedRerollContext),
                         UpdateContext(context.copy(armourModifiers = context.armourModifiers.filter { it != ArmourModifier.DIRTY_PLAYER }.toPersistentList())),
                         GotoNode(ReRollDice)
                     )
                 }
-                false -> ExitProcedure()
+                false -> compositeCommandOf(
+                    observationUpdate?.command,
+                    observationUpdate?.let { UpdateContext(contextWithObservation) },
+                    ExitProcedure(),
+                )
             }
         }
     }
@@ -716,5 +807,19 @@ object ArmourRoll: Procedure() {
         return roll < target
             && (roll + potentialModifiers.sum() >= target)
             && !context.usedIronHardSkin
+    }
+
+    private fun chanceOutcome(context: RiskingInjuryContext): ChanceOutcome {
+        val target = context.player.armorValue - context.armourModifiers.sum()
+        val favorableOutcomes = (1..D6Result.SIDES).sumOf { first ->
+            (1..D6Result.SIDES).count { second -> first + second >= target }
+        }
+        return ChanceOutcome(
+            category = ChanceOutcomeCategory.TARGET_SET,
+            successProbability = OutcomeRatio(
+                favorableOutcomes = favorableOutcomes,
+                possibleOutcomes = D6Result.SIDES * D6Result.SIDES,
+            ),
+        )
     }
 }

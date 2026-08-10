@@ -254,7 +254,7 @@ data class D6Result(override val value: Int) : DieResult() {
          * When rolling [dice], return how many dice combinations exist, where
          * the sum of the dice is equal or above [total].
          */
-        fun combinationsEqualToTotalOrAbove(dice: Int, total: Int): Int {
+        fun combinationsAtLeastTotal(dice: Int, total: Int): Int {
             return combinations(dice, total, includeAbove = true)
         }
 

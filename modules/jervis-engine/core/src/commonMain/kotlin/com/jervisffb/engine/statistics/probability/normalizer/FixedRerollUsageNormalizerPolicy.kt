@@ -12,7 +12,14 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
  * This allows a scorer to distribute rerolls more optimally than what
  * was actually done during the game.
  */
-object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
+class FixedRerollUsageNormalizerPolicy(
+    override val activationRollTypes: Set<DiceRollType> = DEFAULT_ACTIVATION_ROLL_TYPES,
+    override val ignoredRollTypes: Set<DiceRollType> = DEFAULT_IGNORED_ROLL_TYPES,
+) : AbstractChanceNormalizerPolicy() {
+
+    companion object {
+        val DEFAULT = FixedRerollUsageNormalizerPolicy()
+    }
 
     override fun normalize(observations: List<ChanceObservation>): List<ActionPathEvent> {
         val scoreableObservations = observations.withoutTerminalUnfinalizedRollFamily()

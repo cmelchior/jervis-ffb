@@ -8,6 +8,7 @@ import com.jervisffb.engine.commands.probabiliy.UpdateChanceObservation
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -21,6 +22,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceRerollOption
 import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSelection
 import com.jervisffb.engine.statistics.probability.observation.ChanceRerollSource
@@ -70,20 +72,64 @@ internal fun createRerollableChanceObservation(
     rerollContext: UseRerollContext,
     rerolledRollIndex: Int? = null,
 ): ChanceObservation.DiceRoll? {
+    return createRerollableChanceObservationFromResults(
+        state = state,
+        rollType = rollType,
+        team = player.team,
+        player = player,
+        results = listOf(null to result),
+        rerollContext = rerollContext,
+        rerolledRollIndex = rerolledRollIndex,
+    )
+}
+
+/**
+ * Creates an unfinalized observation for a physical pool of dice in an active
+ * reroll flow. Logical die IDs are retained so reroll options can identify
+ * exactly which results they replace.
+ */
+internal fun createRerollableChanceObservation(
+    state: Game,
+    rollType: DiceRollType,
+    team: Team,
+    player: Player?,
+    dicePool: List<DieRoll<*>>,
+    rerollContext: UseRerollContext,
+    rerolledRollIndex: Int? = null,
+    outcome: ChanceOutcome? = null,
+): ChanceObservation.DiceRoll? {
+    return createRerollableChanceObservationFromResults(
+        state = state,
+        rollType = rollType,
+        team = team,
+        player = player,
+        results = dicePool.map { it.id to it.result },
+        rerollContext = rerollContext,
+        rerolledRollIndex = rerolledRollIndex,
+        outcome = outcome,
+    )
+}
+
+private fun createRerollableChanceObservationFromResults(
+    state: Game,
+    rollType: DiceRollType,
+    team: Team,
+    player: Player?,
+    results: List<Pair<DieId?, DieResult>>,
+    rerollContext: UseRerollContext,
+    rerolledRollIndex: Int?,
+    outcome: ChanceOutcome? = null,
+): ChanceObservation.DiceRoll? {
     if (!state.collectChanceData) return null
     val sequence = state.nextAvailableChanceObservationIndex
     return ChanceObservation.DiceRoll(
         index = sequence,
         rollType = rollType,
-        team = player.team.id,
-        player = player.id,
-        dice = listOf(
-            ChanceDieResult(
-                id = ChanceResultId(sequence, 0),
-                result = result,
-            ),
-        ),
-        scope = chanceScope(state, player),
+        team = team.id,
+        player = player?.id,
+        dice = createChanceDiceResults(sequence, results),
+        scope = player?.let { chanceScope(state, it) } ?: ChanceObservationScope.fromState(state, team),
+        outcome = outcome,
         enclosingRollIndex = rerollContext.chanceEnclosingRollIndex,
         rerolledRollIndex = rerolledRollIndex,
     )
@@ -109,26 +155,58 @@ internal fun updateRerollableChanceDecision(
     rerollContext: UseRerollContext,
     selectedSource: RerollSource? = null,
 ): ChanceObservationUpdate? {
-    if (!state.collectChanceData) return null
-    val rootSequence = rerollContext.chanceRollIndex ?: return null
-    val root = rerollContext.chanceObservations.firstOrNull { it.index == rootSequence } ?: return null
-    val resultId = root.dice.single().id
-    val options = captureChanceRerollOptions(
+    return updateRerollableChanceDecision(
         state = state,
         rules = rules,
         rollType = rollType,
         player = data.player,
         dicePool = listOf(data.roll),
-        resultIdsByDieId = mapOf(data.roll.id to resultId),
-        observedSuccess = data.isSuccess,
+        isSuccess = data.isSuccess,
+        rerollContext = rerollContext,
+        selectedSource = selectedSource,
+    )
+}
+
+/** Records a reroll decision for one physical pool of dice. */
+internal fun updateRerollableChanceDecision(
+    state: Game,
+    rules: Rules,
+    rollType: DiceRollType,
+    player: Player,
+    dicePool: List<DieRoll<*>>,
+    isSuccess: Boolean?,
+    rerollContext: UseRerollContext,
+    selectedSource: RerollSource? = null,
+): ChanceObservationUpdate? {
+    if (!state.collectChanceData) return null
+    val rootSequence = rerollContext.chanceRollIndex ?: return null
+    val root = rerollContext.chanceObservations.firstOrNull { it.index == rootSequence } ?: return null
+    require(root.dice.size == dicePool.size) {
+        "The observed dice pool has ${root.dice.size} results, but reroll data has ${dicePool.size} dice."
+    }
+    val resultIdsByDieId = root.dice.mapIndexed { index, result ->
+        (result.dieId ?: dicePool[index].id) to result.id
+    }.toMap()
+    val options = captureChanceRerollOptions(
+        state = state,
+        rules = rules,
+        rollType = rollType,
+        player = player,
+        dicePool = dicePool,
+        resultIdsByDieId = resultIdsByDieId,
+        observedSuccess = isSuccess,
     )
     val updated = root.copy(
-        success = data.isSuccess,
+        success = isSuccess,
         rerollOptions = options,
         selectedReroll = selectedSource?.let { source ->
+            val selectedResultIds = options
+                .filter { it.source.id == source.id && it.currentlyAvailable }
+                .flatMap { it.resultIds }
+                .distinct()
             ChanceRerollSelection(
                 sourceId = source.id,
-                resultIds = listOf(resultId),
+                resultIds = selectedResultIds,
             )
         },
     )
@@ -151,6 +229,19 @@ internal fun finalizeRerollableChanceObservations(
     data: RerollData,
     rerollContext: UseRerollContext,
 ): Command? {
+    return finalizeRerollableChanceObservations(
+        state = state,
+        isSuccess = data.isSuccess,
+        rerollContext = rerollContext,
+    )
+}
+
+/** Finalizes all physical observations belonging to one rerollable dice pool. */
+internal fun finalizeRerollableChanceObservations(
+    state: Game,
+    isSuccess: Boolean?,
+    rerollContext: UseRerollContext,
+): Command? {
     if (!state.collectChanceData) return null
     val rootSequence = rerollContext.chanceRollIndex ?: return null
     val localObservations = rerollContext.chanceObservations
@@ -167,7 +258,7 @@ internal fun finalizeRerollableChanceObservations(
                 observation.selectedReroll
             }
             val updated = observation.copy(
-                success = if (observation.index == finalRollSequence) data.isSuccess else observation.success,
+                success = if (observation.index == finalRollSequence) isSuccess else observation.success,
                 selectedReroll = selectedReroll,
                 finalized = true,
             )

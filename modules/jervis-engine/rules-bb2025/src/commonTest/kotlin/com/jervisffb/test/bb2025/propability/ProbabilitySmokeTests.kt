@@ -1,21 +1,28 @@
 package com.jervisffb.test.bb2025.propability
 
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.statistics.probability.normalizer.ActualRerollUsageNormalizerPolicy
+import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.SmartMoveTo
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultDetermineKickingTeam
 import com.jervisffb.test.defaultFanFactor
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.TeamRerollSelected
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -99,6 +106,62 @@ class ProbabilitySmokeTests: JervisGameBB2025Test() {
         assertEquals(4, result.eventCount)
         // Fan Factor + Weather + Coin Toss: 1.d3, 2.d3, [ 4.d6, 4.d6 ], 1/2
         assertEquals((3 / 3.0) * (2 / 3.0) * (7 / 11.0) * (1 / 2.0), result.successProbability.value, 1e-9)
+    }
+
+    /**
+     * Goal: Player Y (with Lone Fouler) must foul Player X without any assists and Stun them.
+     * Sequence:
+     *   0. Player is put Prone.
+     *   1. Player Y selects foul.
+     *   2. Player Y move to stand next to Player X without any assists.
+     *   3. Player Y fouls Player X.
+     *   4. Roll Armour, that doesn't break armour.
+     *   5. Use Lone Fouler and reroll the Armour Roll that now breaks armour.
+     *   6. Roll 6 (below 7) to stun Player X.
+     */
+    @Test
+    fun loneFoulerToStunPlayer() {
+        val fouler = awayTeam["A6".playerId]
+        fouler.addSkill(SkillType.LONE_FOULER)
+        val target = homeTeam["H1".playerId]
+        target.putProne()
+
+        controller.rollForward(
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected(target),
+            DiceRollResults(2.d6, 2.d6), // AV Roll
+            Confirm, // Use Lone Fouler
+            DiceRollResults(5.d6, 6.d6), // AV Reroll
+            DiceRollResults(1.d6, 5.d6), // Injury Roll
+        )
+
+        val policy = ActualRerollUsageNormalizerPolicy(
+            ignoredRollTypes = ActualRerollUsageNormalizerPolicy.DEFAULT.ignoredRollTypes - setOf(
+                DiceRollType.ARMOUR,
+                DiceRollType.INJURY,
+            ),
+        )
+        val scored = assertIs<ProbabilityScoreResult.Scored>(
+            PhysicalActionPathScorer.scoreNormalized(
+                rules = state.rules,
+                events = ChanceNormalizer(policy).normalize(
+                    controller.statistics!!.diceProbabilities.observations,
+                ),
+                solvingTeamId = awayTeam.id,
+            ),
+        )
+
+        assertEquals(3, scored.eventCount)
+        // This is the probability of the demonstrated physical sequence:
+        //  - Armour fails against AV9: 26 of 36 2D6 combinations total less than 9.
+        //  - Lone Fouler reroll breaks AV9: 10 of 36 combinations total at least 9.
+        //  - Injury totals at least 6: 26 of 36 combinations. The selected 6 gives a Stunned.
+        assertEquals(
+            (26.0 / 36.0) * (10.0 / 36.0) * (26.0 / 36.0),
+            scored.successProbability.value,
+            1e-9,
+        )
     }
 
     private fun scoreActions(): ProbabilityScoreResult.Scored = assertIs<ProbabilityScoreResult.Scored>(

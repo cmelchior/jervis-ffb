@@ -53,11 +53,11 @@ class ProbabilityTests {
 
     @Test
     fun d6CombinationsEqualOrAbove() {
-        assertEquals(3, D6Result.combinationsEqualToTotalOrAbove(dice = 1, total = 4))
-        assertEquals(1, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 12))
-        assertEquals(21, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 7))
-        assertEquals(36, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 2))
-        assertEquals(135, D6Result.combinationsEqualToTotalOrAbove(dice = 3, total = 10))
+        assertEquals(3, D6Result.combinationsAtLeastTotal(dice = 1, total = 4))
+        assertEquals(1, D6Result.combinationsAtLeastTotal(dice = 2, total = 12))
+        assertEquals(21, D6Result.combinationsAtLeastTotal(dice = 2, total = 7))
+        assertEquals(36, D6Result.combinationsAtLeastTotal(dice = 2, total = 2))
+        assertEquals(135, D6Result.combinationsAtLeastTotal(dice = 3, total = 10))
     }
 
     @Test

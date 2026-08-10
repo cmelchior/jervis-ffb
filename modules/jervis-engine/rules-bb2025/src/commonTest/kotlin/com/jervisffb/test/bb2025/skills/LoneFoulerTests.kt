@@ -40,6 +40,27 @@ class LoneFoulerTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun doesNotWorkOnSuccessfulArmourBroken() {
+        val fouler = awayTeam["A6".playerId]
+        fouler.apply {
+            addSkill(SkillType.LONE_FOULER)
+        }
+        val target = homeTeam["H1".playerId]
+        target.putProne()
+        assertEquals(9, target.armorValue)
+        controller.rollForward(
+            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            SmartMoveTo(13, 4),
+            PlayerSelected("H1".playerId), // Start foul
+            DiceRollResults(6.d6, 3.d6),
+            DiceRollResults(1.d6, 2.d6),
+        )
+        assertNull(state.activePlayer)
+        fouler.assertStanding()
+        target.assertStunned()
+    }
+
+    @Test
     fun failedRollsTakeIntoAccountDirtyPlayer() {
         val fouler = awayTeam["A6".playerId]
         fouler.apply {

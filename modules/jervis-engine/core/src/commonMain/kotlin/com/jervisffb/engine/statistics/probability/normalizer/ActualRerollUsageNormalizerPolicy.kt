@@ -14,7 +14,14 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
  * While more accurate, it also always results in a worse score if this was
  * collapsed into a single event.
  */
-object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
+class ActualRerollUsageNormalizerPolicy(
+    override val activationRollTypes: Set<DiceRollType> = DEFAULT_ACTIVATION_ROLL_TYPES,
+    override val ignoredRollTypes: Set<DiceRollType> = DEFAULT_IGNORED_ROLL_TYPES,
+) : AbstractChanceNormalizerPolicy() {
+
+    companion object {
+        val DEFAULT = ActualRerollUsageNormalizerPolicy()
+    }
 
     override fun normalize(observations: List<ChanceObservation>): List<ActionPathEvent> {
         val scoreableObservations = observations.withoutTerminalUnfinalizedRollFamily()

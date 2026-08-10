@@ -115,18 +115,16 @@ object InjuryRoll: Procedure(), ChanceObservationHandler {
                 val table = rules.injuryTable
                 val modifiers = context.injuryModifiers.sum()
                 val result = table.roll(die1, die2, modifiers)
+
+                // Since Injury modifiers are applied after the roll, we cannot treat this as a
+                // table lookup; instead we need to treat it as an X+ roll, even though it is too
+                // optimistic.
                 val chanceObservation = createFinalTableLookupObservation(
                     state = state,
                     team = context.player.team.otherTeam(),
                     rollType = DiceRollType.INJURY,
                     dice = listOf(die1, die2),
-                    favorableOutcomes = table.entries.count { (value, injury) ->
-                        // A result less than `minRoll + modifiers` can never be rolled, so is ignored here.
-                        when (value >= 2 + modifiers) {
-                            true -> injury == result
-                            false -> false
-                        }
-                    },
+                    favorableOutcomes = D6Result.combinationsAtLeastTotal(dice = 2, total = roll.sum()),
                     possibleOutcomes = D6Result.SIDES * D6Result.SIDES,
                 )
                 val updatedContext = context.copy(
