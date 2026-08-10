@@ -2,12 +2,16 @@ package com.jervisffb.test.bb2025.propability
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.actions.PassTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.ext.d6
+import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.normalizer.ActualRerollUsageNormalizerPolicy
@@ -17,10 +21,13 @@ import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.catch
 import com.jervisffb.test.defaultDetermineKickingTeam
 import com.jervisffb.test.defaultFanFactor
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.pickup
+import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
@@ -86,10 +93,24 @@ class ProbabilitySmokeTests: JervisGameBB2025Test() {
      *   3. Scatter the ball 3 times, still ending up on Player Y.
      *   4. Player Y catches it.
      */
-    @Ignore // Scatter not supported yet
     @Test
     fun catchInaccuratePass() {
-        TODO()
+        controller.rollForward(
+            *activatePlayer("A10", PlayerStandardActionType.PASS),
+            *moveTo(17, 7),
+            *pickup(4.d6),
+            SmartMoveTo(14, 4),
+            PassTypeSelected(PassType.STANDARD),
+            PitchSquareSelected(14, 1),
+            *throwBall(3.d6),
+            DiceRollResults(2.d8, 8.d8, 4.d8),
+            *catch(4.d6),
+        )
+
+        val result = scoreActions()
+        assertEquals(4, result.eventCount)
+        // Scatter has 24 favorable ordered outcomes out of 8³; the catch roll succeeds on 4+.
+        assertEquals((24.0 / 512.0) * (3.0 / 6.0), result.successProbability.value, 1e-9)
     }
 
     @Test

@@ -120,8 +120,11 @@ fun runBB2025Standard(seed: Long, enableStatistics: Boolean) {
     // If statistics are enabled. Check that we can calculate a scor
     if (stats != null) {
         val probabilities = stats.diceProbabilities
-        val score = PhysicalActionPathScorer.score(probabilities.observations, state.homeTeam.id, state.rules.allowMultipleTeamRerollsPrTurn)
-        if (score !is ProbabilityScoreResult.Scored) error("Could not calculate score for game")
+        val score = PhysicalActionPathScorer.score(state.rules, probabilities.observations, state.homeTeam.id)
+        if (score !is ProbabilityScoreResult.Scored) {
+            val unscored = score as ProbabilityScoreResult.Unsupported
+            error("Could not calculate score for game: ${unscored.reasons.joinToString()}")
+        }
     }
 
     if (!state.contexts.isEmpty()) {

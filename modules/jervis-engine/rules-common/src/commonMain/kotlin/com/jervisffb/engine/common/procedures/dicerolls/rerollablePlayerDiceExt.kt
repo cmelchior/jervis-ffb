@@ -217,9 +217,11 @@ internal fun updateRerollableChanceDecision(
  * Builds a command that finalizes every die observation collected by
  * [rerollContext].
  *
- * The final physical roll receives the resolved success value. The initial
- * roll's selected reroll is also annotated with whether its use was allowed or
- * aborted. All observations are then marked as finalized.
+ * The final physical roll receives the resolved success value. Rolls without a
+ * gameplay success concept use `true`, since the observed action path itself is
+ * the successful path for scoring the probability. The initial roll's selected
+ * reroll is also annotated with whether its use was allowed or aborted. All
+ * observations are then marked as finalized.
  *
  * Returns the command to finalize the dice, or `null` when chance-data
  * collection is disabled or the context contains no observations to finalize.
@@ -236,7 +238,9 @@ internal fun finalizeRerollableChanceObservations(
     )
 }
 
-/** Finalizes all physical observations belonging to one rerollable dice pool. */
+/**
+ * Finalizes all physical observations belonging to one rerollable dice pool.
+ */
 internal fun finalizeRerollableChanceObservations(
     state: Game,
     isSuccess: Boolean?,
@@ -258,7 +262,10 @@ internal fun finalizeRerollableChanceObservations(
                 observation.selectedReroll
             }
             val updated = observation.copy(
-                success = if (observation.index == finalRollSequence) isSuccess else observation.success,
+                // When finalizing rolls, any `null` success is converted to `true`, because that
+                // just mean the rules didn't have a concept of it, like Pass, or Throw-In, where
+                // every roll is a success when scoring the roll.
+                success = if (observation.index == finalRollSequence) (isSuccess ?: true) else observation.success,
                 selectedReroll = selectedReroll,
                 finalized = true,
             )

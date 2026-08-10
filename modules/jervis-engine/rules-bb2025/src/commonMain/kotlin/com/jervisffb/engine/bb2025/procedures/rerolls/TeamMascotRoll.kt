@@ -94,8 +94,21 @@ object TeamMascotRoll: Procedure(), ChanceObservationHandler {
         return AddContext(rerollContext)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getRerollContext()
-        return RemoveContext(context)
+        val mascotContext = state.getContext<MascotRollContext>()
+        val rerollContext = state.getRerollContext()
+        val chanceCommand = finalizeRerollableChanceObservations(
+            state = state,
+            data = TeamRerollData(
+                team = mascotContext.team,
+                roll = mascotContext.roll!!,
+                isSuccess = mascotContext.isSuccess,
+            ),
+            rerollContext = rerollContext,
+        )
+        return compositeCommandOf(
+            chanceCommand,
+            RemoveContext(rerollContext),
+        )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<MascotRollContext>()
 
@@ -375,7 +388,7 @@ object TeamMascotRoll: Procedure(), ChanceObservationHandler {
                     observation.selectedReroll
                 }
                 val updated = observation.copy(
-                    success = if (observation.index == finalRollSequence) data.isSuccess else observation.success,
+                    success = if (observation.index == finalRollSequence) data.isSuccess ?: true else observation.success,
                     selectedReroll = selectedReroll,
                     finalized = true,
                 )
