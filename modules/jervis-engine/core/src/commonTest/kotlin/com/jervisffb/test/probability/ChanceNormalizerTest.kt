@@ -117,19 +117,27 @@ class ChanceNormalizerTest {
         assertEquals(physical.first().index, physical.last().traceRootIndex)
     }
 
+    // If a list of chance observations includes rolls, that are ignored. They should be removed
+    // before trying to score the action sequence.
     @Test
-    fun ignoredAndUnsupportedRollTypesAreScorerDecisions() {
+    fun ignoredRollsDoesNotPreventScoring() {
         val raw = listOf(
             d6(0, DiceRollType.REGENERATION, 4, success = true),
             d6(1, DiceRollType.ARMOUR, 6, success = true),
         )
-
-        val result = assertIs<ProbabilityScoreResult.Unsupported>(
+        assertIs<ProbabilityScoreResult.Scored>(
             LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
+    }
 
-        assertEquals(1, result.events.size)
-        assertTrue(result.reasons.single().contains("Armour"))
+    @Test
+    fun invalidChanceObservationsWillPreventScoring() {
+        val raw = listOf(
+            d6(0, DiceRollType.DODGE, 4, success = null),
+        )
+        assertIs<ProbabilityScoreResult.Unsupported>(
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
+        )
     }
 
     @Test
@@ -342,7 +350,7 @@ class ChanceNormalizerTest {
         sequence: Int,
         type: DiceRollType,
         value: Int,
-        success: Boolean,
+        success: Boolean?,
         enclosingRollIndex: Int? = null,
         rerolledRollIndex: Int? = null,
         rerollOptions: List<ChanceRerollOption> = emptyList(),

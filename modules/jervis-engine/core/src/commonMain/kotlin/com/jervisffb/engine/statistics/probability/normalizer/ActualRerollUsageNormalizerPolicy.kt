@@ -35,12 +35,12 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
                             normalizePhysicalBlock(observation, replacements),
                         )
                         observation.rollType == DiceRollType.BLOCK -> Unit
-                        observation.rollType in ignoredD6Rolls -> Unit
+                        observation.rollType in ignoredRollTypes -> Unit
                         observation.outcome != null -> add(
                             normalizePhysicalOutcome(observation, byIndex),
                         )
-                        observation.rollType in supportedPrimaryD6Rolls ||
-                            observation.rollType in activationD6Rolls -> add(
+                        observation.rollType in primaryRollTypes ||
+                            observation.rollType in activationRollTypes -> add(
                             normalizePhysicalD6(observation, byIndex),
                         )
                         observation.rerolledRollIndex != null -> Unit
@@ -85,7 +85,7 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
             result = result,
             role = when {
                 roll.rerolledRollIndex != null -> PhysicalRollRole.REROLL
-                roll.rollType in activationD6Rolls -> PhysicalRollRole.ACTIVATION
+                roll.rollType in activationRollTypes -> PhysicalRollRole.ACTIVATION
                 else -> PhysicalRollRole.PRIMARY
             },
             scope = roll.scope.toFixedLineScope(),

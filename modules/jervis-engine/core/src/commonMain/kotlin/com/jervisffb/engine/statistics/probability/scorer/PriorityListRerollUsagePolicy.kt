@@ -29,7 +29,7 @@ import com.jervisffb.engine.statistics.probability.event.RerollUsage
  */
 object PriorityListRerollUsagePolicy: RerollUsagePolicy {
 
-    override val id = RerollUsagePolicyId("fixed-reroll-priority-list-v1")
+    override val id = RerollUsagePolicyId("fixed-priority-list-v1")
 
     override fun select(options: List<RerollOption>): RerollOption? {
         if (options.isEmpty()) return null

@@ -6,8 +6,8 @@ import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import kotlinx.serialization.Serializable
-
 /**
  * A normalized chance event in one chosen action path.
  *
@@ -243,7 +243,17 @@ sealed class ActionPathEvent {
         }
     }
 
-    /** A chance observation that cannot be scored without guessing. */
+    /**
+     * A chance observation that cannot be normalized without guessing.
+     *
+     * Reasons include:
+     * - Incomplete or unfinalized rolls
+     * - No information about success state
+     * - Malformed Block data
+     *
+     * Hitting this indicates a bug during the creation of the
+     * [ChanceObservation] object.
+     */
     @Serializable
     data class Unsupported(
         override val index: Int,

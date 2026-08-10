@@ -242,7 +242,13 @@ in multiple places:
    calculated JPS value as a `ProbabilityScoreResult.Scored` or 
    `ProbabilityScoreResult.Unscored` if the value could not be calculated.
 
-Example:
+   Available rerolls are treated as a shared resource that is distributed 
+   optimally using dynamic programming. To avoid this step being to costly, 
+   the normalizer will choose which reroll to use at each step using a 
+   pre-configured priority list, rather than calculating the optimal choice each
+   time.
+
+Usage Example:
 
 ```kotlin 
 // Start game

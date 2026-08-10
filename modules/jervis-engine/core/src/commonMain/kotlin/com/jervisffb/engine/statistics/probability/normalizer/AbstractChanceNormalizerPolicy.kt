@@ -28,17 +28,22 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTestE
  */
 abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
 
-    // TODO This list is not complete
-    protected val supportedPrimaryD6Rolls = setOf(
-        DiceRollType.CATCH,
-        DiceRollType.PICKUP,
-        DiceRollType.DODGE,
-        DiceRollType.JUMP,
-        DiceRollType.RUSH,
-        DiceRollType.LEAP,
+    override val activationRollTypes = setOf(
+        DiceRollType.LONER,
+        DiceRollType.PRO,
     )
-    protected val activationD6Rolls = setOf(DiceRollType.PRO, DiceRollType.LONER)
-    protected val ignoredD6Rolls = setOf(DiceRollType.REGENERATION, DiceRollType.TEAM_CAPTAIN)
+    override val ignoredRollTypes = setOf(
+        DiceRollType.ARMOUR,
+        DiceRollType.REGENERATION,
+        DiceRollType.TEAM_CAPTAIN
+    )
+    override val primaryRollTypes = buildSet {
+        // Assume that all rolls that do not have a narrower category should always be
+        // included in the scoring.
+        addAll(DiceRollType.entries.toSet())
+        removeAll(activationRollTypes)
+        removeAll(ignoredRollTypes)
+    }
 
     protected fun normalizeLogicalBlock(
         root: ChanceObservation.DiceRoll,
@@ -170,7 +175,7 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
             category = outcome.category,
             role = when {
                 roll.rerolledRollIndex != null -> PhysicalRollRole.REROLL
-                roll.rollType in activationD6Rolls -> PhysicalRollRole.ACTIVATION
+                roll.rollType in activationRollTypes -> PhysicalRollRole.ACTIVATION
                 else -> PhysicalRollRole.PRIMARY
             },
             scope = roll.scope.toFixedLineScope(),
@@ -342,19 +347,16 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
     private fun Duration.toRecoveryUsage(): RerollUsage = when (this) {
         Duration.PERMANENT -> RerollUsage.REUSABLE
         Duration.START_OF_ACTIVATION,
-        Duration.END_OF_ACTIVATION,
-        -> RerollUsage.ONCE_PER_ACTIVATION
+        Duration.END_OF_ACTIVATION -> RerollUsage.ONCE_PER_ACTIVATION
         Duration.END_OF_ACTION -> RerollUsage.ONCE_PER_ACTION
         Duration.END_OF_TURN,
-        Duration.END_OF_OWN_TEAM_TURN,
-        -> RerollUsage.ONCE_PER_TURN
+        Duration.END_OF_OWN_TEAM_TURN -> RerollUsage.ONCE_PER_TURN
         Duration.END_OF_DRIVE -> RerollUsage.ONCE_PER_DRIVE
         Duration.END_OF_HALF -> RerollUsage.ONCE_PER_HALF
         Duration.END_OF_GAME -> RerollUsage.ONCE_PER_GAME
         Duration.IMMEDIATE,
         Duration.SPECIAL,
-        Duration.STANDING_UP,
-        -> RerollUsage.UNSUPPORTED
+        Duration.STANDING_UP -> RerollUsage.UNSUPPORTED
     }
 
     protected fun unsupported(

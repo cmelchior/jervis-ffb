@@ -30,19 +30,17 @@ object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
                     is ChanceObservation.DiceRoll -> when {
                         observation.rerolledRollIndex != null -> Unit
                         observation.enclosingRollIndex != null -> Unit
-                        observation.rollType in ignoredD6Rolls -> Unit
-                        observation.rollType in activationD6Rolls -> Unit
+                        observation.rollType in ignoredRollTypes -> Unit
+                        observation.rollType == DiceRollType.BLOCK -> add(normalizeLogicalBlock(observation, replacements))
+                        observation.rollType in activationRollTypes -> Unit
                         observation.outcome != null -> add(
                             normalizeLogicalOutcome(
                                 root = observation,
                                 finalRoll = finalReplacement(observation, replacements),
                             ),
                         )
-                        observation.rollType in supportedPrimaryD6Rolls -> add(
+                        observation.rollType in primaryRollTypes -> add(
                             normalizeLogicalD6(observation, replacements),
-                        )
-                        observation.rollType == DiceRollType.BLOCK -> add(
-                            normalizeLogicalBlock(observation, replacements),
                         )
                         else -> add(unsupported(observation, "Roll type is not supported by fixed-line scoring."))
                     }
