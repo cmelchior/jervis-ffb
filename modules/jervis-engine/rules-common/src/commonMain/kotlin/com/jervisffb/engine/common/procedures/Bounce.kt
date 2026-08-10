@@ -13,8 +13,10 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.CatchContext
 import com.jervisffb.engine.common.context.ThrowInContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportBounce
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
@@ -30,6 +32,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -39,7 +42,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * See page 25 in the BB2020 rulebook.
  * See page 34 in the BB2025 rulebook.
  */
-object Bounce : Procedure() {
+object Bounce : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDirection
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -61,6 +64,14 @@ object Bounce : Procedure() {
                 val direction: Direction = rules.direction(d8)
                 val ball = state.currentBall()
                 val newLocation: PitchCoordinate = ball.coordinates.move(direction, 1)
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = state.activeTeam ?: state.kickingTeam,
+                    rollType = DiceRollType.BOUNCE,
+                    dice = listOf(d8),
+                    favorableOutcomes = 1,
+                    possibleOutcomes = D8Result.SIDES,
+                )
 
                 // Out of bounds is normally just outside the pitch, but during kick-off we need to
                 // consider the case where the ball bounces back to the kicking teams side.
@@ -96,6 +107,7 @@ object Bounce : Procedure() {
 
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BOUNCE, d8),
+                    chanceObservation?.let(::AddChanceObservation),
                     SetBallLocation(ball, newLocation),
                     ReportBounce(
                         bounceLocation = newLocation,

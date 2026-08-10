@@ -5,6 +5,7 @@ import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.JumpUpRoll
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.bb2025.procedures.actions.pass.InterceptionRoll
@@ -103,9 +104,13 @@ class SupportedDiceRollTests {
             DiceRollType.ALWAYS_HUNGRY,
             DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT,
             DiceRollType.ANIMAL_SAVAGERY,
+            DiceRollType.ARGUE_THE_CALL,
             DiceRollType.ARMOUR,
             DiceRollType.BAD_HABITS,
+            DiceRollType.BB7_APOTHECARY,
+            DiceRollType.BLOCK,
             DiceRollType.BONE_HEAD,
+            DiceRollType.BOUNCE,
             DiceRollType.BREATHE_FIRE,
             DiceRollType.BRIBE,
             DiceRollType.BRILLIANT_COACHING,
@@ -171,12 +176,8 @@ class SupportedDiceRollTests {
             DiceRollType.UNCHANNELLED_FURY,
             DiceRollType.WEATHER -> true
 
-            DiceRollType.ARGUE_THE_CALL,
-            DiceRollType.BB7_APOTHECARY,
-            DiceRollType.BLOCK,
             DiceRollType.BLITZ,
             DiceRollType.BLOODLUST,
-            DiceRollType.BOUNCE,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.PASSING_INTERFERENCE,
             DiceRollType.QUALITY -> false
@@ -194,6 +195,7 @@ class SupportedDiceRollTests {
             DiceRollType.BAD_HABITS -> BadHabits
             DiceRollType.BB7_APOTHECARY -> UseBB7Apothecary
             DiceRollType.BLITZ -> Blitz
+            DiceRollType.BLOCK -> SingleStandardBlockRollDice // TODO This doesn't cover all the procedures. We probably need to handle block specifically
             DiceRollType.BLOODLUST -> BloodLustRoll
             DiceRollType.BONE_HEAD -> BoneHeadRoll
             DiceRollType.BOUNCE -> Bounce
@@ -262,7 +264,6 @@ class SupportedDiceRollTests {
             DiceRollType.UNCHANNELLED_FURY -> UnchannelledFuryRoll
             DiceRollType.WEATHER -> WeatherRoll
 
-            DiceRollType.BLOCK,
             DiceRollType.BLOODLUST,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.PASSING_INTERFERENCE, // Not supported in BB2025

@@ -14,7 +14,9 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.ext.d6
@@ -30,6 +32,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -39,7 +42,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * The result is stored in [com.jervisffb.engine.common.context.BeingSentOffContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object ArgueTheCallRoll: Procedure() {
+object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -51,9 +54,18 @@ object ArgueTheCallRoll: Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val table = rules.argueTheCallTable
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<BeingSentOffContext>()
-                val result = rules.argueTheCallTable.roll(d6)
+                val result = table.roll(d6)
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = context.player.team,
+                    rollType = DiceRollType.ARGUE_THE_CALL,
+                    dice = listOf(d6),
+                    favorableOutcomes = table.entries.count { it.value == result },
+                    possibleOutcomes = table.entries.size
+                )
 
                 // While weirdly worded "Friends with the Ref" just means that roll 5
                 // can be changed to "Well, When You Put It Like That..."
@@ -72,6 +84,7 @@ object ArgueTheCallRoll: Procedure() {
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARGUE_THE_CALL, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(updatedContext),
                     nextNodeCommand
                 )

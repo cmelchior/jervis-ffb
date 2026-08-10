@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 object BB2025ArgueTheCallTable: ArgueTheCallTable {
-    private val table: Map<Int, ArgueTheCallResult> =
+    override val entries: Map<Int, ArgueTheCallResult> =
         mapOf(
             1 to ArgueTheCallResult.YOURE_OUTTA_HERE,
             2 to ArgueTheCallResult.I_DONT_CARE,
@@ -27,6 +27,6 @@ object BB2025ArgueTheCallTable: ArgueTheCallTable {
         d6: D6Result,
     ): ArgueTheCallResult {
         val result = d6.value
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Argue the Call Table.")
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Argue the Call Table.")
     }
 }

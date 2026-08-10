@@ -8,6 +8,9 @@ import com.jervisffb.engine.actions.D6Result
  * See page 61 in the BB2020 rulebook.
  */
 interface ArgueTheCallTable {
+
+    val entries: Map<Int, ArgueTheCallResult>
+
     /**
      * Roll on the Argue the Call table and return the result.
      */

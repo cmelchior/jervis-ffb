@@ -17,9 +17,11 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetApothecaryUsed
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.inducements.StandardApothecary
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportApothecaryUsed
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
@@ -34,6 +36,7 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.InjuryResult
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -44,7 +47,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * This procedure has a lot of overlap with the [UseBB11Apothecary] procedure.
  * There might be a better way to keep them in sync; for now, it is a manual process.
  */
-object UseBB7Apothecary: Procedure() {
+object UseBB7Apothecary: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = ChooseToUseApothecary
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -102,8 +105,15 @@ object UseBB7Apothecary: Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RiskingInjuryContext>()
                 val success = (d6.value >= 4)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = context.player.team,
+                    rollType = DiceRollType.BB7_APOTHECARY,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BB7_APOTHECARY, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(
                         apothecaryInjuryRoll = d6,
                         apothecaryInjuryRollSuccess = success
