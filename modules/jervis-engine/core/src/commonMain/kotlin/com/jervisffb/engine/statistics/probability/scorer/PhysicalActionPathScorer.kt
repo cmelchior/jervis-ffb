@@ -1,6 +1,7 @@
 package com.jervisffb.engine.statistics.probability.scorer
 
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.AlgorithmId
 import com.jervisffb.engine.statistics.probability.Probability
 import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
@@ -40,9 +41,9 @@ object PhysicalActionPathScorer: ActionPathScorer {
 
     /** Scores an already normalized action path without repeating normalization. */
     override fun scoreNormalized(
+        rules: Rules,
         events: List<ActionPathEvent>,
         solvingTeamId: TeamId,
-        allowMultipleTeamRerollsPerTurn: Boolean,
         stateCeiling: Int,
     ): ProbabilityScoreResult {
         require(stateCeiling > 0) { "State ceiling must be positive: $stateCeiling" }
@@ -75,6 +76,7 @@ object PhysicalActionPathScorer: ActionPathScorer {
             return unsupported(events, listOf("The demonstrated line probability underflowed to zero."))
         }
 
+        val allowMultipleTeamRerollsPerTurn = rules.allowMultipleTeamRerollsPrTurn
         val relevantStates = relevantResourceStates(events, allowMultipleTeamRerollsPerTurn)
         var states: Map<ResourceState, Probability> = mapOf(ResourceState() to Probability.ALWAYS)
         events.forEachIndexed { eventIndex, event ->

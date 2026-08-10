@@ -19,6 +19,7 @@ import com.jervisffb.engine.statistics.probability.event.RerollUsage
 import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.PriorityListRerollUsagePolicy
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
+import com.jervisffb.test.AbstractTestRules
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,6 +32,10 @@ class LogicalActionPathScorerTests {
         private val EPSILON = 1e-9
         private val HOME = TeamId("home")
         private val AWAY = TeamId("away")
+    }
+
+    val rules = object: AbstractTestRules() {
+        override val allowMultipleTeamRerollsPrTurn: Boolean = true
     }
 
     @Test
@@ -98,7 +103,7 @@ class LogicalActionPathScorerTests {
             ),
         )
 
-        val result = score(listOf(event))
+        val result = score(listOf(event),)
 
         // 1/2 succeeds directly. Of the other half, Pro activates 4/6 and
         // rerolls another 1/2. Failed Pro does not fall through to Loner.
@@ -121,7 +126,7 @@ class LogicalActionPathScorerTests {
             d6(1, 4, true, listOf(pro, lonerTeam)),
         )
 
-        val result = score(events)
+        val result = score(events,)
 
         assertEquals(16.0 / 27.0, result.successProbability.value, EPSILON)
     }
@@ -139,8 +144,8 @@ class LogicalActionPathScorerTests {
         )
         val second = first.copy(index = 1)
 
-        val multiple = score(listOf(first, second), allowMultipleTeamRerollsPerTurn = true)
-        val single = score(listOf(first, second), allowMultipleTeamRerollsPerTurn = false)
+        val multiple = score(listOf(first, second), multipleRerollsPerTurn = true)
+        val single = score(listOf(first, second), multipleRerollsPerTurn = false)
 
         assertEquals(9.0 / 16.0, multiple.successProbability.value, EPSILON)
         assertEquals(1.0 / 2.0, single.successProbability.value, EPSILON)
@@ -159,8 +164,8 @@ class LogicalActionPathScorerTests {
         val sameTurn = d6(1, 4, true, listOf(dodge), scope(turn = 1))
         val nextTurn = d6(1, 4, true, listOf(dodge), scope(turn = 2))
 
-        assertEquals(1.0 / 2.0, score(listOf(first, sameTurn)).successProbability.value, EPSILON)
-        assertEquals(9.0 / 16.0, score(listOf(first, nextTurn)).successProbability.value, EPSILON)
+        assertEquals(1.0 / 2.0, score(listOf(first, sameTurn),).successProbability.value, EPSILON)
+        assertEquals(9.0 / 16.0, score(listOf(first, nextTurn),).successProbability.value, EPSILON)
     }
 
     @Test
@@ -175,7 +180,7 @@ class LogicalActionPathScorerTests {
             ),
         )
 
-        val result = score(listOf(event))
+        val result = score(listOf(event),)
 
         // The demonstrated branch first occurs on 1/2. The opponent rerolls it,
         // and only another demonstrated result (1/2) preserves the line.
@@ -203,7 +208,7 @@ class LogicalActionPathScorerTests {
             ),
         )
 
-        val result = score(listOf(homeEvent, awayEvent))
+        val result = score(listOf(homeEvent, awayEvent),)
 
         assertEquals(3.0 / 16.0, result.successProbability.value, EPSILON)
     }
@@ -211,9 +216,9 @@ class LogicalActionPathScorerTests {
     @Test
     fun unsupportedChanceProducesAnUnrankedResult() {
         val result = LogicalActionPathScorer.scoreNormalized(
+            rules = rules,
             events = listOf(ActionPathEvent.Unsupported(0, DiceRollType.ARMOUR, "Multi-outcome table roll")),
             solvingTeamId = HOME,
-            allowMultipleTeamRerollsPerTurn = true,
         )
 
         assertIs<ProbabilityScoreResult.Unsupported>(result)
@@ -230,9 +235,9 @@ class LogicalActionPathScorerTests {
         val laterEvent = event.copy(index = 1)
 
         val result = LogicalActionPathScorer.scoreNormalized(
+            rules = rules,
             events = listOf(event, laterEvent),
             solvingTeamId = HOME,
-            allowMultipleTeamRerollsPerTurn = true,
             stateCeiling = 1,
         )
 
@@ -261,9 +266,9 @@ class LogicalActionPathScorerTests {
         }
 
         val result = LogicalActionPathScorer.scoreNormalized(
+            rules = rules,
             events = events,
             solvingTeamId = HOME,
-            allowMultipleTeamRerollsPerTurn = true,
             stateCeiling = 1,
         )
 
@@ -272,7 +277,7 @@ class LogicalActionPathScorerTests {
 
     @Test
     fun challengeScoreRoundTripsWithNormalizedLedger() {
-        val result = score(listOf(d6(0, 3, true)))
+        val result = score(listOf(d6(0, 3, true)),)
         val original = ChallengeScore.ProbabilityScore(Instant.fromEpochMilliseconds(1234), result)
 
         val encoded = Json.encodeToString(ChallengeScore.ProbabilityScore.serializer(), original)
@@ -283,10 +288,15 @@ class LogicalActionPathScorerTests {
 
     private fun score(
         events: List<ActionPathEvent>,
-        allowMultipleTeamRerollsPerTurn: Boolean = true,
-    ): ProbabilityScoreResult.Scored = assertIs(
-        LogicalActionPathScorer.scoreNormalized(events, HOME, allowMultipleTeamRerollsPerTurn),
-    )
+        multipleRerollsPerTurn: Boolean = true,
+    ): ProbabilityScoreResult.Scored {
+        val rules = object: AbstractTestRules() {
+            override val allowMultipleTeamRerollsPrTurn: Boolean = multipleRerollsPerTurn
+        }
+        return assertIs(
+            LogicalActionPathScorer.scoreNormalized(rules, events, HOME),
+        )
+    }
 
     private fun d6(
         sequence: Int,

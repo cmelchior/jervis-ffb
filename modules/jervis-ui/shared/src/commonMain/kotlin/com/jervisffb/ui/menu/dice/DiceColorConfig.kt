@@ -60,7 +60,7 @@ object BB2025DiceColorConfig : DiceColorConfig() {
     private val block = DBlockResult.allOptions().first()
 
     // Order of list will also be used by the game interface, so keep these in alphabetical order.
-    override val entries: List<DiceRollTypeConfig> = DiceRollType.entries.map { rollType ->
+    override val entries: List<DiceRollTypeConfig> = DiceRollType.entries.mapNotNull { rollType ->
         when (rollType) {
             DiceRollType.ACCURACY -> DiceRollTypeConfig(rollType, "Accuracy", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.ALWAYS_HUNGRY -> DiceRollTypeConfig(rollType, "Animal Savagery", d6, d6Colors, DiceColor.DEFAULT)
@@ -84,6 +84,7 @@ object BB2025DiceColorConfig : DiceColorConfig() {
             DiceRollType.CHARGE -> DiceRollTypeConfig(rollType, "Charge", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.CHEERING_FANS -> DiceRollTypeConfig(rollType, "Cheering Fans", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.CHOMP -> DiceRollTypeConfig(rollType, "Chomp", d6, d6Colors, DiceColor.DEFAULT)
+            DiceRollType.COIN_TOSS -> null // Coin Toss is not really a dice roll, so do not show it here
             DiceRollType.CROWD_TAKES_ACTION -> DiceRollTypeConfig(rollType, "Cheering Fans", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.DAUNTLESS -> DiceRollTypeConfig(rollType, "Dauntless", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.DEVIATE -> DiceRollTypeConfig(rollType, "Deviate", d8, singleColor, DiceColor.DEFAULT)

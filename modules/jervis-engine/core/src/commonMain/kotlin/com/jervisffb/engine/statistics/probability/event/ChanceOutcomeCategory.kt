@@ -1,7 +1,7 @@
 package com.jervisffb.engine.statistics.probability.event
 
-import kotlinx.serialization.Serializable
 import com.jervisffb.engine.rules.DiceRollType
+import kotlinx.serialization.Serializable
 
 /**
  * Describes what the demonstrated action path needs from a chance event.
@@ -20,7 +20,8 @@ enum class ChanceOutcomeCategory {
     AT_LEAST,
 
     /**
-     * The demonstrated path needs one of a finite set of outcomes.
+     * The demonstrated path needs one of a finite set of outcomes where the
+     * outcomes are not linear.
      *
      * Example: Rolling Push Back on a Block die.
      * Example: Rolling a 1 on a Scatter die.

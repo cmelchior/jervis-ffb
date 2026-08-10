@@ -19,8 +19,10 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.AddPlayerStatModifier
 import com.jervisffb.engine.common.modifiers.KickoffStatModifier
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ActionNode
@@ -38,6 +40,8 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
+
 
 /**
  * Procedure for handling the Kick-Off Event: "Dodgy Snack" as described on page
@@ -48,7 +52,7 @@ import com.jervisffb.engine.rules.Rules
  * have just decided on the receiving team (it shouldn't matter either, since
  * there is currently no way to affect the rolls).
  */
-object DodgySnack : Procedure() {
+object DodgySnack : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = KickingTeamRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<DodgySnackContext>()
@@ -60,8 +64,15 @@ object DodgySnack : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.DODGY_SNACK_ROLL_OFF,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_ROLL_OFF, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} ]"),
                     AddContext(
                         DodgySnackContext(kickingTeamRoll = d6)
@@ -80,10 +91,18 @@ object DodgySnack : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
+                val context = state.getContext<DodgySnackContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.DODGY_SNACK_ROLL_OFF,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_ROLL_OFF, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportGameProgress("${state.receivingTeam.name} rolled [ ${d6.value} ]"),
-                    UpdateContext(state.getContext<DodgySnackContext>().copy(
+                    UpdateContext(context.copy(
                         receivingTeamRoll = d6,
                     )),
                     GotoNode(SelectPlayerFromReceivingTeam),
@@ -140,8 +159,15 @@ object DodgySnack : Procedure() {
             val context = state.getContext<DodgySnackContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.kickingTeamPlayerSelected!!
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.DODGY_SNACK_EFFECT,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_EFFECT, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     createPlayerChangeCommands(player, d6),
                     UpdateContext(context.copy(kickingTeamSnackRoll = d6)),
                     GotoNode(SelectPlayerFromKickingTeam)
@@ -198,8 +224,15 @@ object DodgySnack : Procedure() {
             val context = state.getContext<DodgySnackContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.receivingTeamPlayerSelected!!
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.DODGY_SNACK_EFFECT,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGY_SNACK_EFFECT, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     createPlayerChangeCommands(player, d6),
                     UpdateContext(context.copy(receivingTeamSnackRoll = d6)),
                     ExitProcedure()

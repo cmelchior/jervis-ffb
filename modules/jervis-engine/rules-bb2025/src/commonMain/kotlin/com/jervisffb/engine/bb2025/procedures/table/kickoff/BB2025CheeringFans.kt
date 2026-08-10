@@ -13,10 +13,12 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.AddTeamFeature
 import com.jervisffb.engine.common.context.CheeringFansContext
 import com.jervisffb.engine.common.modifiers.CheeringFansModifiers
 import com.jervisffb.engine.common.modifiers.CheerleadersModifiers
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportCheeringFansResult
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
@@ -32,6 +34,7 @@ import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 
@@ -39,7 +42,7 @@ import com.jervisffb.engine.utils.sum
  * Procedure for handling the Kick-Off Event: "Cheering Fans" as described on
  * page 48 of the BB2025 rulebook.
  */
-object BB2025CheeringFans : Procedure() {
+object BB2025CheeringFans : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = DetermineModifiers
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<CheeringFansContext>()
@@ -80,8 +83,15 @@ object BB2025CheeringFans : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.CHEERING_FANS,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(kickingTeamRoll = d6)),
                     GotoNode(ReceivingTeamRollDie),
                 )
@@ -95,10 +105,18 @@ object BB2025CheeringFans : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<CheeringFansContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.CHEERING_FANS,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
-                    UpdateContext(state.getContext<CheeringFansContext>().copy(receivingTeamRoll = d6)),
+                    chanceObservation?.let(::AddChanceObservation),
+                    UpdateContext(context.copy(receivingTeamRoll = d6)),
                     GotoNode(ResolveCheeringFans),
                 )
             }

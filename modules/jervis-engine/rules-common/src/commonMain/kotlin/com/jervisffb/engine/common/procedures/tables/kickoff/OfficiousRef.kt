@@ -18,7 +18,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.OfficiousRefContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ActionNode
@@ -35,6 +37,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
+
 
 /**
  * Procedure for handling the Kick-Off Event: "Officious Ref" as described on page 41
@@ -48,7 +52,7 @@ import com.jervisffb.engine.rules.Rules
  * Also, each team and roll has gotten its own node, since all the permutations created a pretty big
  * mess in fewer nodes.
  */
-object OfficiousRef : Procedure() {
+object OfficiousRef : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = KickingTeamRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<OfficiousRefContext>()
@@ -63,8 +67,15 @@ object OfficiousRef : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
                 val result =  d6.value + fanFactor
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
                     AddContext(
                         OfficiousRefContext(
@@ -87,12 +98,20 @@ object OfficiousRef : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
+                val context = state.getContext<OfficiousRefContext>()
                 val fanFactor = state.receivingTeam.fanFactor
-                val result =  d6.value + fanFactor
+                val result = d6.value + fanFactor
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     ReportGameProgress("${state.receivingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
-                    UpdateContext(state.getContext<OfficiousRefContext>().copy(
+                    UpdateContext(context.copy(
                         receivingTeamRoll = d6,
                         receivingTeamFanFactor = fanFactor,
                         receivingTeamResult = result
@@ -143,8 +162,15 @@ object OfficiousRef : Procedure() {
             val context = state.getContext<OfficiousRefContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.kickingTeamPlayerSelected!!
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.OFFICIOUS_REF_REFEREE,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     createPlayerChangeCommands(player, d6),
                     UpdateContext(context.copy(kickingTeamRefereeRoll = d6)),
                     GotoNode(SelectPlayerFromKickingTeam)
@@ -199,8 +225,15 @@ object OfficiousRef : Procedure() {
             val context = state.getContext<OfficiousRefContext>()
             return castDiceRoll<D6Result>(action) { d6 ->
                 val player = context.receivingTeamPlayerSelected!!
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.OFFICIOUS_REF_REFEREE,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_REFEREE, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     createPlayerChangeCommands(player, d6),
                     UpdateContext(context.copy(receivingTeamRefereeRoll = d6)),
                     ExitProcedure()

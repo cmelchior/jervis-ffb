@@ -8,11 +8,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.tables.Weather
-import com.jervisffb.engine.statistics.probability.ProbabilityTracker
-import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
-import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
@@ -108,9 +103,9 @@ class ProbabilitySmokeTests: JervisGameBB2025Test() {
 
     private fun scoreActions(): ProbabilityScoreResult.Scored = assertIs<ProbabilityScoreResult.Scored>(
         PhysicalActionPathScorer.score(
+            state.rules,
             controller.statistics!!.diceProbabilities.observations,
             awayTeam.id,
-            state.rules.allowMultipleTeamRerollsPrTurn,
         ),
     )
 }

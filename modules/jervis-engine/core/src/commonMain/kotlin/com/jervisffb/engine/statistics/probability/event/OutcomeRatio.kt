@@ -1,9 +1,9 @@
 package com.jervisffb.engine.statistics.probability.event
 
 import com.jervisffb.engine.statistics.probability.Probability
-import kotlinx.serialization.Serializable
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.scorer.ActionPathScorer
+import kotlinx.serialization.Serializable
 /**
  * An exact ratio retained used when converting [ChanceObservation]
  * to [ActionPathEvent]

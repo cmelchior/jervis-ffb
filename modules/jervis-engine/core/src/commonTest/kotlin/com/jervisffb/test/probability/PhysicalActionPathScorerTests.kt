@@ -19,6 +19,7 @@ import com.jervisffb.engine.statistics.probability.event.RerollResource
 import com.jervisffb.engine.statistics.probability.event.RerollUsage
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
+import com.jervisffb.test.AbstractTestRules
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,6 +31,10 @@ class PhysicalActionPathScorerTests {
     companion object {
         private const val HYBRID_EPSILON = 1e-9
         private val HYBRID_HOME = TeamId("home")
+    }
+
+    val rules = object: AbstractTestRules() {
+        override val allowMultipleTeamRerollsPrTurn: Boolean = true
     }
 
     @Test
@@ -135,7 +140,7 @@ class PhysicalActionPathScorerTests {
     }
 
     private fun score(events: List<ActionPathEvent>): ProbabilityScoreResult.Scored = assertIs(
-        PhysicalActionPathScorer.scoreNormalized(events, HYBRID_HOME, allowMultipleTeamRerollsPerTurn = true),
+        PhysicalActionPathScorer.scoreNormalized(rules, events, HYBRID_HOME),
     )
 
     private fun physical(

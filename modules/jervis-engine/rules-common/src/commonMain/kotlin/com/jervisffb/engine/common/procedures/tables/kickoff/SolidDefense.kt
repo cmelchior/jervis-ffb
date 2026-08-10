@@ -21,7 +21,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.SolidDefenseContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.common.tables.KickOffEventResult
@@ -37,8 +39,10 @@ import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+
 
 /**
  * Procedure for handling the Kick-Off Event: "Solid Defense".
@@ -60,7 +64,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * move to a new location (after which they can move as many times as the coach
  * would like).
  */
-object SolidDefense : Procedure() {
+object SolidDefense : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<SolidDefenseContext>()
@@ -74,8 +78,15 @@ object SolidDefense : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val extraPlayerCount = getExtraPlayersCount(state)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.SOLID_DEFENSE,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SOLID_DEFENSE, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(SolidDefenseContext(roll = d3)),
                     ReportGameProgress("Solid Defense: ${state.kickingTeam.name} may move [${d3.value} + $extraPlayerCount = ${d3.value + extraPlayerCount}] players"),
                     GotoNode(SelectPlayerOrEndSetup),

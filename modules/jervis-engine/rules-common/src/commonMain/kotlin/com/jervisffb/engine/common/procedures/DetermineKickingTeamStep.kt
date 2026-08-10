@@ -6,7 +6,6 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
-import com.jervisffb.engine.actions.D2Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.TossCoin
@@ -20,14 +19,13 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetKickingTeam
 import com.jervisffb.engine.common.context.CoinTossContext
-import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportKickingTeamResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
@@ -35,10 +33,10 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
 import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
 import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 import com.jervisffb.engine.utils.INVALID_ACTION
 

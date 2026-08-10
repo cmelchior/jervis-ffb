@@ -46,6 +46,7 @@ sealed interface ChanceObservation {
         val selectedResultIds: List<ChanceResultId> = emptyList(),
         val selectedBy: TeamId? = null,
         // Factual result when resolved; null while unresolved or when the roll has no binary interpretation.
+        // Success here just means "rolled the intended result", not the outcome of the action.
         val success: Boolean? = null,
         // How the demonstrated action path evaluates this roll, when known.
         val outcome: ChanceOutcome? = null,

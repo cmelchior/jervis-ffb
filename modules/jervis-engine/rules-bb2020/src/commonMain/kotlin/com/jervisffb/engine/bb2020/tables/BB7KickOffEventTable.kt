@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 object BB7KickOffEventTable: KickOffTable {
     override val name: String = "BB7 Kick-Off Table"
-    private val table =
+    override val entries: Map<Int, KickOffEventResult> =
         mapOf(
             2 to KickOffEventResult.GET_THE_REF,
             3 to KickOffEventResult.TIME_OUT_BB7,
@@ -32,6 +32,6 @@ object BB7KickOffEventTable: KickOffTable {
         die2: D6Result,
     ): KickOffEventResult {
         val result = die1.value + die2.value
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
     }
 }

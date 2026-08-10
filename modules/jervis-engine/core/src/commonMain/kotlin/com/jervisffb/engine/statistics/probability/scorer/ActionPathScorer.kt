@@ -1,6 +1,7 @@
 package com.jervisffb.engine.statistics.probability.scorer
 
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.AlgorithmId
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
@@ -27,14 +28,14 @@ interface ActionPathScorer {
      * Normalizes observations and scores the resulting action path.
      */
     fun score(
+        rules: Rules,
         observations: List<ChanceObservation>,
         solvingTeamId: TeamId,
-        allowMultipleTeamRerollsPerTurn: Boolean,
         stateCeiling: Int = DEFAULT_STATE_CEILING,
     ): ProbabilityScoreResult = scoreNormalized(
+        rules = rules,
         events = normalizer.normalize(observations),
         solvingTeamId = solvingTeamId,
-        allowMultipleTeamRerollsPerTurn = allowMultipleTeamRerollsPerTurn,
         stateCeiling = stateCeiling,
     )
 
@@ -42,9 +43,9 @@ interface ActionPathScorer {
      *  Scores an already normalized action path without repeating normalization.
      */
     fun scoreNormalized(
+        rules: Rules,
         events: List<ActionPathEvent>,
         solvingTeamId: TeamId,
-        allowMultipleTeamRerollsPerTurn: Boolean,
         stateCeiling: Int = DEFAULT_STATE_CEILING,
     ): ProbabilityScoreResult
 

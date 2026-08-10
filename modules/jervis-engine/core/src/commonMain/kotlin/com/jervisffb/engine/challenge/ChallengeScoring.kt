@@ -64,15 +64,15 @@ sealed interface ChallengeScoring<T: ChallengeScore<T>> {
             val events = statistics?.diceProbabilities?.observations ?: error("Missing statistics")
             val result = when (val selectedPolicy = policy) {
                 is ChallengeRerollSelectionPolicy.LogicalRerollSelection -> LogicalActionPathScorer.score(
+                    rules = state.rules,
                     observations = events.toList(),
                     solvingTeamId = solvingTeamId,
-                    allowMultipleTeamRerollsPerTurn = state.rules.allowMultipleTeamRerollsPrTurn,
                     stateCeiling = selectedPolicy.stateCeiling,
                 )
                 is ChallengeRerollSelectionPolicy.PhysicalRerollSelection -> PhysicalActionPathScorer.score(
+                    rules = state.rules,
                     observations = events.toList(),
                     solvingTeamId = solvingTeamId,
-                    allowMultipleTeamRerollsPerTurn = state.rules.allowMultipleTeamRerollsPrTurn,
                     stateCeiling = selectedPolicy.stateCeiling,
                 )
             }

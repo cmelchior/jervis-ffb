@@ -24,12 +24,11 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
 import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
 import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
-import kotlin.text.Typography.half
 
 /**
  * This procedure controls rolling for "The Fans".

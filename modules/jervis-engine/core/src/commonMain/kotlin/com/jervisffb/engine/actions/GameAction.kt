@@ -206,7 +206,7 @@ data class D4Result(override val value: Int) : DieResult() {
 data class D6Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
-    override val max: Short = 6
+    override val max: Short = SIDES.toShort()
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D6Result> {
@@ -221,8 +221,7 @@ data class D6Result(override val value: Int) : DieResult() {
     fun toD3(): D3Result = ceil(value / 2f).toInt().d3
 
     companion object {
-        private val SIDES = 6
-
+        val SIDES = 6
         fun allOptions(): List<D6Result> {
             return (1..SIDES).map { D6Result(it) }
         }

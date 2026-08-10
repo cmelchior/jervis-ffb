@@ -34,6 +34,7 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 import com.jervisffb.engine.statistics.probability.scorer.LogicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
+import com.jervisffb.test.AbstractTestRules
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,6 +49,10 @@ class ChanceNormalizerTest {
     companion object {
         private val NORMALIZER_TEAM = TeamId("home")
         private val NORMALIZER_PLAYER = PlayerId("player-1")
+    }
+
+    val rules = object: AbstractTestRules() {
+        override val allowMultipleTeamRerollsPrTurn: Boolean = true
     }
 
     @Test
@@ -94,14 +99,14 @@ class ChanceNormalizerTest {
         )
 
         val fixed = assertIs<ProbabilityScoreResult.Scored>(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
         val logical = assertIs<ActionPathEvent.Logical>(fixed.events.single())
         assertEquals(5, assertIs<D6Result>(logical.results.single()).value)
         assertEquals(RerollCategory.TEAM_REROLL, logical.recoveries.single().resource.category)
 
         val hybrid = assertIs<ProbabilityScoreResult.Scored>(
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
         val physical = hybrid.events.map { assertIs<ActionPathEvent.Physical>(it) }
         assertEquals(
@@ -120,7 +125,7 @@ class ChanceNormalizerTest {
         )
 
         val result = assertIs<ProbabilityScoreResult.Unsupported>(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
 
         assertEquals(1, result.events.size)
@@ -143,10 +148,10 @@ class ChanceNormalizerTest {
         )
 
         val fixed = assertIs<ProbabilityScoreResult.Scored>(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules,raw, NORMALIZER_TEAM),
         )
         val hybrid = assertIs<ProbabilityScoreResult.Scored>(
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            PhysicalActionPathScorer.score(rules,raw, NORMALIZER_TEAM),
         )
 
         assertEquals(DiceRollType.DODGE, assertIs<ActionPathEvent.Logical>(fixed.events.single()).rollType)
@@ -160,8 +165,8 @@ class ChanceNormalizerTest {
         val raw = listOf(block(sequence = 0, finalized = false))
 
         listOf(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules,raw, NORMALIZER_TEAM),
+            PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         ).forEach { result ->
             val score = assertIs<ProbabilityScoreResult.Scored>(result)
             assertTrue(score.events.isEmpty())
@@ -178,8 +183,8 @@ class ChanceNormalizerTest {
         )
 
         listOf(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
+            PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         ).forEach { result ->
             val unsupported = assertIs<ProbabilityScoreResult.Unsupported>(result)
             assertTrue(unsupported.reasons.any { it.contains("not finalized") })
@@ -193,8 +198,8 @@ class ChanceNormalizerTest {
         )
 
         listOf(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules,raw, NORMALIZER_TEAM),
+            PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         ).forEach { result ->
             val unsupported = assertIs<ProbabilityScoreResult.Unsupported>(result)
             assertTrue(unsupported.reasons.any { it.contains("factual success") })
@@ -233,9 +238,9 @@ class ChanceNormalizerTest {
 
         val result = assertIs<ProbabilityScoreResult.Scored>(
             LogicalActionPathScorer.score(
+                rules,
                 listOf(root, reroll),
                 NORMALIZER_TEAM,
-                allowMultipleTeamRerollsPerTurn = true,
             ),
         )
         val event = assertIs<ActionPathEvent.Logical>(result.events.single())
@@ -246,9 +251,9 @@ class ChanceNormalizerTest {
 
         val physicalResult = assertIs<ProbabilityScoreResult.Scored>(
             PhysicalActionPathScorer.score(
+                rules,
                 listOf(root, reroll),
                 NORMALIZER_TEAM,
-                allowMultipleTeamRerollsPerTurn = true,
             ),
         )
         val physicalEvent = assertIs<ActionPathEvent.Physical>(physicalResult.events.single())
@@ -269,14 +274,14 @@ class ChanceNormalizerTest {
         )
 
         val logical = assertIs<ProbabilityScoreResult.Scored>(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
         val logicalEvent = assertIs<ActionPathEvent.Logical>(logical.events.single())
         assertIs<D3Result>(logicalEvent.results.single())
         assertEquals(OutcomeRatio(2, 3), logicalEvent.observedOutcome)
 
         val physical = assertIs<ProbabilityScoreResult.Scored>(
-            PhysicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
         val physicalEvent = assertIs<ActionPathEvent.Physical>(physical.events.single())
         val resolution = assertIs<ActionPathEvent.Resolution.Outcome>(physicalEvent.resolution)
@@ -297,7 +302,7 @@ class ChanceNormalizerTest {
         )
 
         val result = assertIs<ProbabilityScoreResult.Scored>(
-            LogicalActionPathScorer.score(raw, NORMALIZER_TEAM, allowMultipleTeamRerollsPerTurn = true),
+            LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
         val event = assertIs<ActionPathEvent.Logical>(result.events.single())
         val resolution = assertIs<ActionPathEvent.Resolution.Outcome>(event.resolution)
@@ -321,9 +326,9 @@ class ChanceNormalizerTest {
         val event = assertIs<ActionPathEvent.Physical>(
             assertIs<ProbabilityScoreResult.Scored>(
                 PhysicalActionPathScorer.score(
+                    rules,
                     raw,
                     NORMALIZER_TEAM,
-                    allowMultipleTeamRerollsPerTurn = true,
                 ),
             ).events.single(),
         )

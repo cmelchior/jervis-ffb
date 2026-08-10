@@ -201,17 +201,17 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
 
     private fun logicalScore(): ProbabilityScoreResult.Scored = assertIs(
         LogicalActionPathScorer.score(
+            state.rules,
             trackedObservations(),
             state.awayTeam.id,
-            state.rules.allowMultipleTeamRerollsPrTurn,
         ),
     )
 
     private fun physicalScore(): ProbabilityScoreResult.Scored = assertIs(
         PhysicalActionPathScorer.score(
+            state.rules,
             trackedObservations(),
             state.awayTeam.id,
-            state.rules.allowMultipleTeamRerollsPrTurn,
         ),
     )
 

@@ -211,6 +211,66 @@ than silently assigning it an optimistic estimate.
 
 -----
 
+## Technical Highlevel Architecture
+
+The statistical information required to calculate JPS is gathered and processed
+in multiple places:
+
+1. `GameController.statistics` must be configured with a `GameStatistics()` 
+   class. This class is responsible for keeping all statistical data gathered
+   during a game.
+
+2. When running a game, all "chance events" (dice rolls, coin toss) must create
+   a `ChanceObservation`. This class contains all the metadata needed to reason
+   about the roll, including success probability and available rerolls. 
+   
+   This information is saved using `AddChanceObservation` or 
+   `UpdateChanceObservation` commands.
+
+3. The list of observations can be accessed from 
+   `GameStatistics.diceProbabilities`. 
+
+4. Before scoring a list of actions, the observations must be normalized 
+   (collapsing roll and rerolls). This is done using the `ChanceNormalizer`.
+   The normalizer can be configured to use different policies with regard to 
+   how it interprets available rerolls. The normalizer will turn the list of 
+   observations into a list of `ActionPathEvent`.
+
+5. This normalized list can be scored using an `ActionPathScorer`, which again
+   can have different policies configured with regard to how the probabilities
+   are calculated. Calling `ActionPathScorer.score()` will return the final
+   calculated JPS value as a `ProbabilityScoreResult.Scored` or 
+   `ProbabilityScoreResult.Unscored` if the value could not be calculated.
+
+Example:
+
+```kotlin 
+// Start game
+val stats = GameStatistics()
+val controller = GameEngineController(state = gameState, statistics = stats)
+// ... Run actions through controller.handleAction()
+
+// Score current state using default configured normalizer
+val score: ProbabilityScoreResult.Scored = PhysicalActionPathScorer.score(
+    rules = gameState.rules,
+    observations = stats.diceProbabilities.observations,
+    solvingTeam = gameState.homeTeam
+)
+println(score.successProbability)
+
+// Score current state using a custom normalizer
+val normalizer = ChanceNormalizer(FixedRerollUsageNormalizerPolicy)
+val actionEvents = normalizer.normalize(stats.diceProbabilities.observations)
+val score: ProbabilityScoreResult.Scored = PhysicalActionPathScorer.scoreNormalized(
+    rules = gameState.rules,
+    events = actionEvents,
+    solvingTeam = gameState.homeTeam
+)
+println(score.successProbability)
+```
+
+-----
+
 ## Statistical reference
 
 This section describes the implementation for readers who want the exact

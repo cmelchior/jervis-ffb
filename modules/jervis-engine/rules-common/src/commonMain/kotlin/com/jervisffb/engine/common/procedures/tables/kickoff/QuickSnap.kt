@@ -19,7 +19,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportQuickSnapResult
 import com.jervisffb.engine.common.tables.KickOffEventResult
@@ -37,7 +39,9 @@ import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+
 
 /**
  * Procedure for handling the Kick-Off Event: "Quick Snap".
@@ -48,7 +52,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * Also supports the BB7 variant of the event, which is described on page 94 in
  * Death Zone (2020).
  */
-object QuickSnap : Procedure() {
+object QuickSnap : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<QuickSnapContext>()
@@ -61,8 +65,15 @@ object QuickSnap : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val extraPlayerCount = getExtraPlayersCount(state)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.QUICK_SNAP,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUICK_SNAP, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(QuickSnapContext(roll = d3)),
                     ReportQuickSnapResult(state.receivingTeam, d3, extraPlayerCount),
                     GotoNode(SelectPlayerOrEndSetup),

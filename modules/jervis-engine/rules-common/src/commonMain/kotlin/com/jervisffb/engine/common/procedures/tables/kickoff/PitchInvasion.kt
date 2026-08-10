@@ -18,7 +18,9 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.PitchInvasionContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.common.reports.ReportPitchInvasionRoll
@@ -33,6 +35,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.math.min
 
@@ -47,7 +50,7 @@ import kotlin.math.min
  * decided on the receiving team (it shouldn't matter either, since there is currently no
  * way to affect the rolls)
  */
-object PitchInvasion : Procedure() {
+object PitchInvasion : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollForKickingTeamFans
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<PitchInvasionContext>()
@@ -58,8 +61,15 @@ object PitchInvasion : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.PITCH_INVASION_FAN_FACTOR,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_FAN_FACTOR, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(PitchInvasionContext(kickingRoll = d6, kickingResult = d6.value + fanFactor)),
                     ReportPitchInvasionRoll(state.kickingTeam, d6, fanFactor),
                     GotoNode(RollForReceivingTeamFans),
@@ -76,14 +86,22 @@ object PitchInvasion : Procedure() {
                 val context = state.getContext<PitchInvasionContext>()
                 val fanFactor = state.receivingTeam.fanFactor
                 val result = d6.value + fanFactor
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.PITCH_INVASION_FAN_FACTOR,
+                    die = d6,
+                )
 
                 val nextNode = when {
                     context.kickingResult >= result -> GotoNode(RollForReceivingTeamStuns)
                     context.kickingResult < result -> GotoNode(RollForKickingTeamStuns)
                     else -> INVALID_GAME_STATE("Unsupported state: $result, $context")
                 }
+
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_FAN_FACTOR, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(receivingRoll = d6, receivingResult = result)),
                     ReportPitchInvasionRoll(state.receivingTeam, d6, fanFactor),
                     nextNode,
@@ -98,8 +116,15 @@ object PitchInvasion : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(receivingPlayersAffected = d3.value)),
                     GotoNode(SelectReceivingTeamAffectedPlayers),
                 )
@@ -147,8 +172,15 @@ object PitchInvasion : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(kickingPlayersAffected = d3.value)),
                     GotoNode(SelectKickingTeamAffectedPlayers),
                 )
@@ -163,7 +195,6 @@ object PitchInvasion : Procedure() {
             return selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<PitchInvasionContext>()
             return when (action) {
                 is Continue -> {
                     compositeCommandOf(

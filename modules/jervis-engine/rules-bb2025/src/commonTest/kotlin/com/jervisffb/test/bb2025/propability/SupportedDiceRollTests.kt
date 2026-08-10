@@ -28,8 +28,8 @@ import com.jervisffb.engine.common.procedures.BloodLustRoll
 import com.jervisffb.engine.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.CatchRoll
-import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
+import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.PickupRoll
 import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
@@ -39,6 +39,7 @@ import com.jervisffb.engine.common.procedures.RegenerationRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.SuddenDeath
 import com.jervisffb.engine.common.procedures.TakeRootRoll
+import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.common.procedures.ThrowIn
 import com.jervisffb.engine.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.common.procedures.WeatherRoll
@@ -63,6 +64,7 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.Blitz
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
+import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
@@ -112,18 +114,28 @@ class SupportedDiceRollTests {
             DiceRollType.DODGE,
             DiceRollType.FOUL_APPEARANCE,
             DiceRollType.FAN_FACTOR,
+            DiceRollType.CHEERING_FANS,
+            DiceRollType.BRILLIANT_COACHING,
+            DiceRollType.DODGY_SNACK_ROLL_OFF,
+            DiceRollType.DODGY_SNACK_EFFECT,
             DiceRollType.HYPNOTIC_GAZE,
             DiceRollType.INTERCEPTION,
             DiceRollType.JUMP,
             DiceRollType.JUMP_UP,
+            DiceRollType.KICK_OFF_TABLE,
             DiceRollType.LANDING,
             DiceRollType.LEAP,
             DiceRollType.LONER,
+            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+            DiceRollType.OFFICIOUS_REF_REFEREE,
             DiceRollType.PICKUP,
             DiceRollType.POGO,
+            DiceRollType.PITCH_INVASION_FAN_FACTOR,
+            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
             DiceRollType.PRO,
             DiceRollType.PROJECTILE_VOMIT,
             DiceRollType.PUNT_DISTANCE,
+            DiceRollType.QUICK_SNAP,
             DiceRollType.REALLY_STUPID,
             DiceRollType.REGENERATION,
             DiceRollType.RUSH,
@@ -132,6 +144,7 @@ class SupportedDiceRollTests {
             DiceRollType.STANDING_UP,
             DiceRollType.STEADY_FOOTING,
             DiceRollType.SWOOP_DISTANCE,
+            DiceRollType.SOLID_DEFENSE,
             DiceRollType.TAKE_ROOT,
             DiceRollType.TEAM_CAPTAIN,
             DiceRollType.TENTACLES,
@@ -147,39 +160,28 @@ class SupportedDiceRollTests {
             DiceRollType.BLOODLUST,
             DiceRollType.BOUNCE,
             DiceRollType.BRIBE,
-            DiceRollType.BRILLIANT_COACHING,
             DiceRollType.CASUALTY,
-            DiceRollType.CHEERING_FANS,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.FOUL_APPEARANCE,
-            DiceRollType.DODGY_SNACK_ROLL_OFF,
-            DiceRollType.DODGY_SNACK_EFFECT,
             DiceRollType.DEVIATE,
             DiceRollType.INJURY,
             DiceRollType.INTERCEPTION,
             DiceRollType.JUMP_UP,
-            DiceRollType.KICK_OFF_TABLE,
             DiceRollType.LANDING,
             DiceRollType.LASTING_INJURY,
             DiceRollType.LONER,
-            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
-            DiceRollType.OFFICIOUS_REF_REFEREE,
             DiceRollType.PASS,
             DiceRollType.PASSING_INTERFERENCE,
-            DiceRollType.PITCH_INVASION_FAN_FACTOR,
-            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
             DiceRollType.POGO,
             DiceRollType.PRO,
             DiceRollType.PRAYERS_TO_NUFFLE,
             DiceRollType.REALLY_STUPID,
             DiceRollType.REGENERATION,
             DiceRollType.QUALITY,
-            DiceRollType.QUICK_SNAP,
             DiceRollType.RECOVER_PLAYER,
             DiceRollType.SCATTER,
             DiceRollType.SECURE_THE_BALL,
             DiceRollType.SHADOWING,
-            DiceRollType.SOLID_DEFENSE,
             DiceRollType.SUDDEN_DEATH,
             DiceRollType.STANDING_UP,
             DiceRollType.STEADY_FOOTING,
@@ -238,6 +240,7 @@ class SupportedDiceRollTests {
             DiceRollType.CHEERING_FANS -> BB2025CheeringFans
             DiceRollType.CHARGE -> Charge
             DiceRollType.COIN_TOSS -> DetermineKickingTeamStep
+            DiceRollType.KICK_OFF_TABLE -> TheKickOffEvent
             DiceRollType.FAN_FACTOR -> FanFactorRolls
             DiceRollType.LASTING_INJURY -> LastingInjuryRoll
             DiceRollType.PICKUP -> PickupRoll
@@ -253,6 +256,8 @@ class SupportedDiceRollTests {
             DiceRollType.SHADOWING -> ShadowingRoll
             DiceRollType.PITCH_INVASION_FAN_FACTOR,
             DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED -> PitchInvasion
+            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+            DiceRollType.OFFICIOUS_REF_REFEREE -> OfficiousRef
             DiceRollType.STANDING_UP -> StandingUpRoll
             DiceRollType.STEADY_FOOTING -> SteadyFootingRoll
             DiceRollType.PRAYERS_TO_NUFFLE -> PrayersToNuffleRoll

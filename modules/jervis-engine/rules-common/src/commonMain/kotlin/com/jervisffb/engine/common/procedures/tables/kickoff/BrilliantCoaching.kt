@@ -12,8 +12,10 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.AddTeamReroll
 import com.jervisffb.engine.common.context.BrilliantCoachingContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportBrilliantCoachingResult
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
@@ -26,8 +28,10 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
+
 
 /**
  * Procedure for handling the Kick-Off Event: "Brilliant Coaching".
@@ -35,7 +39,7 @@ import com.jervisffb.engine.utils.sum
  * See page 41 in the BB2020 rulebook.
  * See page 48 in the BB2025 rulebook.
  */
-object BrilliantCoaching : Procedure() {
+object BrilliantCoaching : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = KickingTeamRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<BrilliantCoachingContext>()
@@ -47,8 +51,15 @@ object BrilliantCoaching : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.BRILLIANT_COACHING,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(BrilliantCoachingContext(d6, state.kickingTeam.brilliantCoachingModifiers)),
                     GotoNode(ReceivingTeamRollDie),
                 )
@@ -64,8 +75,15 @@ object BrilliantCoaching : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<BrilliantCoachingContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.receivingTeam,
+                    rollType = DiceRollType.BRILLIANT_COACHING,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(
                         receivingTeamRoll = d6,
                         receivingTeamModifiers = state.receivingTeam.brilliantCoachingModifiers)

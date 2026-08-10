@@ -9,6 +9,11 @@ import com.jervisffb.engine.actions.D6Result
  */
 interface KickOffTable {
     /**
+     * All table entries by the sum of the dice.
+     */
+    val entries: Map<Int, KickOffEvent>
+
+    /**
      * Name of the table.
      */
     val name: String

@@ -13,8 +13,10 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetAbortIfBallOutOfBounds
 import com.jervisffb.engine.common.context.ScatterRollContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -31,7 +33,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.tables.TableResult
+import com.jervisffb.engine.rules.common.tables.KickOffEvent
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 
 /**
  * Run the Kick-Off Event as well as the results of the ball coming back down
@@ -40,7 +44,7 @@ import com.jervisffb.engine.rules.common.tables.TableResult
  * See page 41 in the BB2020 rulebook.
  * See page 47 in the BB2025 rulebook.
  */
-object TheKickOffEvent : Procedure() {
+object TheKickOffEvent : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollForKickOffEvent
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
@@ -56,9 +60,11 @@ object TheKickOffEvent : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
-                val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
+                val result = rules.kickOffEventTable.roll(firstD6, secondD6)
+                val chanceObservation = createKickoffChanceObservation(state, result, listOf(firstD6, secondD6))
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.KICK_OFF_TABLE, listOf(firstD6, secondD6)),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(KickOffEventContext(roll = DiceRollResults(firstD6, secondD6), result = result)),
                     GotoNode(ResolveKickOffTableEvent),
                 )
@@ -196,6 +202,18 @@ object TheKickOffEvent : Procedure() {
         }
     }
 
+    private fun createKickoffChanceObservation(state: Game, kickoffResult: KickOffEvent, roll: List<D6Result>): ChanceObservation? {
+        if (!state.collectChanceData) return null
+        val possibleOutcomes = roll.size * D6Result.SIDES
+        val favorableOutcomes = state.rules.kickOffEventTable.entries.values.count { it == kickoffResult }
+        return createFinalTableLookupObservation(
+            state = state,
+            team = state.kickingTeam,
+            rollType = DiceRollType.KICK_OFF_TABLE,
+            dice = roll,
+            favorableOutcomes = favorableOutcomes,
+            possibleOutcomes = possibleOutcomes,
+        )
+    }
+
 }
-
-

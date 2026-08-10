@@ -24,10 +24,10 @@ import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
 import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
 import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
+import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
 import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 
 /**
