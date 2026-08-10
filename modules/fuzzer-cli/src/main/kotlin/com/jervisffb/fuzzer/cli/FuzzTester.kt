@@ -32,6 +32,9 @@ import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.sprites.RosterLogo
+import com.jervisffb.engine.statistics.GameStatistics
+import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
+import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
@@ -77,13 +80,17 @@ fun runFuzzTest(
     }
 }
 
-fun runBB2020Standard(seed: Long) {
+fun runBB2020Standard(seed: Long, enableStatistics: Boolean) {
     val random = Random(seed)
     val rules = StandardBB2020Rules().update {
         undoActionBehavior = UndoActionBehavior.ALLOWED
     }
     val state = createDefaultGameStateBB2020(rules)
-    val controller = GameEngineController(state, validateActions = false)
+    val stats = when (enableStatistics) {
+        true -> GameStatistics()
+        false -> null
+    }
+    val controller = GameEngineController(state, validateActions = false, statistics = stats)
     controller.startManualMode(logAvailableActions = false)
     while (controller.stack.isNotEmpty()) {
         val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)
@@ -91,7 +98,7 @@ fun runBB2020Standard(seed: Long) {
     }
 }
 
-fun runBB2025Standard(seed: Long) {
+fun runBB2025Standard(seed: Long, enableStatistics: Boolean) {
     val random = Random(seed)
     val rules = StandardBB2025Rules().update {
         undoActionBehavior = UndoActionBehavior.ALLOWED
@@ -99,26 +106,42 @@ fun runBB2025Standard(seed: Long) {
     val homeTeam = createRandomTeamBB2025(rules, random, "H")
     val awayTeam = createRandomTeamBB2025(rules, random, "A")
     val state = createDefaultGameStateBB2025(rules, homeTeam, awayTeam)
-    val controller = GameEngineController(state, validateActions = false)
+    val stats = when (enableStatistics) {
+        true -> GameStatistics()
+        false -> null
+    }
+    val controller = GameEngineController(state, validateActions = false, statistics = stats)
     controller.startManualMode(logAvailableActions = false)
     while (controller.stack.isNotEmpty()) {
         val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)
         controller.handleAction(userAction)
     }
+
+    // If statistics are enabled. Check that we can calculate a scor
+    if (stats != null) {
+        val probabilities = stats.diceProbabilities
+        val score = PhysicalActionPathScorer.score(probabilities.observations, state.homeTeam.id, state.rules.allowMultipleTeamRerollsPrTurn)
+        if (score !is ProbabilityScoreResult.Scored) error("Could not calculate score for game")
+    }
+
     if (!state.contexts.isEmpty()) {
         error("Some procedure contexts are still present after finishing a game")
     }
 }
 
 @Suppress("UNUSED_PARAMETER")
-fun runBB2020BB7(gameNo: Int, seed: Long) {
+fun runBB2020BB7(gameNo: Int, seed: Long, enableStatistics: Boolean) {
     val random = Random(seed)
     val rules = BB72020Rules().toBuilder().run {
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
     }
     val state = createDefaultGameStateBB2020(rules)
-    val controller = GameEngineController(state)
+    val stats = when (enableStatistics) {
+        true -> GameStatistics()
+        false -> null
+    }
+    val controller = GameEngineController(state, validateActions = false, statistics = stats)
     controller.startManualMode(logAvailableActions = false)
     while (controller.stack.isNotEmpty()) {
         val userAction = getSetupAction(controller) ?: createRandomAction(controller, random, canUndo = true)

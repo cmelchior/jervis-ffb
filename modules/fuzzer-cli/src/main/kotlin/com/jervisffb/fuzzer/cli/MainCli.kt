@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.arguments.help
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.long
@@ -46,6 +47,10 @@ class FuzzerCLI : CliktCommand(name = "fuzzer-cli") {
         .default(8)
         .help("Size of the parallel worker pool. Default: 8")
 
+    private val statistics: Boolean by option("--statistics").boolean()
+        .default(false)
+        .help("Enable statistics collector when running games.")
+
 
     override fun run() {
         // Force the Kermit min severity down to Assert before any fuzz work starts. Touch
@@ -54,14 +59,14 @@ class FuzzerCLI : CliktCommand(name = "fuzzer-cli") {
         loggerInstance
         Logger.setMinSeverity(Severity.Assert)
 
-        echo("Running fuzz test '$fuzzerConfiguration' (games=$games, batchSize=$batchSize, threads=$threads, seed=${seed ?: "random"})")
+        echo("Running fuzz test '$fuzzerConfiguration' (games=$games, batchSize=$batchSize, threads=$threads, seed=${seed ?: "random"}, statistics=$statistics)")
 
         val failureCount = AtomicInteger(0)
         runFuzzTest(games, batchSize, seed, threads, failureCount) { gameNo, gameSeed ->
             when (fuzzerConfiguration) {
-                TEST_BB2020_STANDARD -> runBB2020Standard(gameSeed)
-                TEST_BB2025_STANDARD -> runBB2025Standard(gameSeed)
-                TEST_BB2020_BB7 -> runBB2020BB7(gameNo, gameSeed)
+                TEST_BB2020_STANDARD -> runBB2020Standard(gameSeed, statistics)
+                TEST_BB2025_STANDARD -> runBB2025Standard(gameSeed, statistics)
+                TEST_BB2020_BB7 -> runBB2020BB7(gameNo, gameSeed, statistics)
                 else -> error("Unknown test: $fuzzerConfiguration")
             }
         }
