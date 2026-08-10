@@ -10,6 +10,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetWeather
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportWeatherResult
 import com.jervisffb.engine.fsm.ActionNode
@@ -21,14 +22,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
-import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
-import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
-import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 
 /**
  * This procedure controls rolling for the weather.
@@ -52,7 +47,7 @@ object WeatherRoll : Procedure(), ChanceObservationHandler {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
                 val weather: Weather = rules.weatherTable.roll(firstD6, secondD6)
-                val chanceObservation = createChanceObservation(state, rules, firstD6, secondD6, weather)
+                val chanceObservation = createChanceObservation(state, weather, listOf(firstD6, secondD6))
                 // We just store the weather type and let affected procedures handle the
                 // effect of it.
                 return compositeCommandOf(
@@ -68,37 +63,19 @@ object WeatherRoll : Procedure(), ChanceObservationHandler {
 
     private fun createChanceObservation(
         state: Game,
-        rules: Rules,
-        firstD6: D6Result,
-        secondD6: D6Result,
-        weather: Weather,
+        weatherResult: Weather,
+        roll: List<D6Result>,
     ): ChanceObservation.DiceRoll? {
         if (!state.collectChanceData) return null
-
-        val index = state.nextAvailableChanceObservationIndex
-        val team = state.homeTeam
-        val favorableOutcomes = (1..6).sumOf { first ->
-            (1..6).count { second ->
-                rules.weatherTable.entries[first + second] == weather
-            }
-        }
-        return ChanceObservation.DiceRoll(
-            index = index,
+        val possibleOutcomes = roll.size * D6Result.SIDES
+        val favorableOutcomes = state.rules.weatherTable.entries.values.count { it == weatherResult }
+        return createFinalTableLookupObservation(
+            state = state,
+            team = state.homeTeam,
             rollType = DiceRollType.WEATHER,
-            teamId = team.id,
-            dice = listOf(firstD6, secondD6).mapIndexed { resultIndex, result ->
-                ChanceDieResult(
-                    id = ChanceResultId(index, resultIndex),
-                    result = result,
-                )
-            },
-            scope = ChanceObservationScope.fromState(state, team),
-            success = true,
-            outcome = ChanceOutcome(
-                category = ChanceOutcomeCategory.TARGET_SET,
-                successProbability = OutcomeRatio(favorableOutcomes, 36),
-            ),
-            finalized = true,
+            dice = roll,
+            favorableOutcomes = favorableOutcomes,
+            possibleOutcomes = possibleOutcomes,
         )
     }
 }

@@ -11,6 +11,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetFairWeatherFans
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportFanFactor
 import com.jervisffb.engine.fsm.ActionNode
@@ -21,14 +22,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
-import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
-import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 
 /**
  * This procedure controls rolling for "The Fans".
@@ -50,12 +44,17 @@ object FanFactorRolls : Procedure(), ChanceObservationHandler {
             val team = state.homeTeam
             return castDiceRoll<D3Result>(action) { d3 ->
                 val dedicatedFans = team.dedicatedFans
-                val chanceObservation = createChanceObservation(state, team, d3)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.homeTeam,
+                    rollType = DiceRollType.FAN_FACTOR,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.FAN_FACTOR, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     SetFairWeatherFans(team, d3.value),
                     ReportFanFactor(team, d3.value, dedicatedFans),
-                    chanceObservation?.let(::AddChanceObservation),
                     GotoNode(SetFanFactorForAwayTeam),
                 )
             }
@@ -71,43 +70,20 @@ object FanFactorRolls : Procedure(), ChanceObservationHandler {
             val team = state.awayTeam
             val dedicatedFans = team.dedicatedFans
             return castDiceRoll<D3Result>(action) { d3 ->
-                val chanceObservation = createChanceObservation(state, team, d3)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.awayTeam,
+                    rollType = DiceRollType.FAN_FACTOR,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.FAN_FACTOR, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     SetFairWeatherFans(team, d3.value),
                     ReportFanFactor(team, d3.value, dedicatedFans),
-                    chanceObservation?.let(::AddChanceObservation),
                     ExitProcedure(),
                 )
             }
         }
-    }
-
-    private fun createChanceObservation(
-        state: Game,
-        team: Team,
-        d3: D3Result,
-    ): ChanceObservation.DiceRoll? {
-        if (!state.collectChanceData) return null
-
-        val index = state.nextAvailableChanceObservationIndex
-        return ChanceObservation.DiceRoll(
-            index = index,
-            rollType = DiceRollType.FAN_FACTOR,
-            teamId = team.id,
-            dice = listOf(
-                ChanceDieResult(
-                    id = ChanceResultId(index, 0),
-                    result = d3,
-                ),
-            ),
-            scope = ChanceObservationScope.fromState(state, team),
-            success = true,
-            outcome = ChanceOutcome(
-                category = ChanceOutcomeCategory.AT_LEAST,
-                successProbability = OutcomeRatio(4 - d3.value, 3),
-            ),
-            finalized = true,
-        )
     }
 }

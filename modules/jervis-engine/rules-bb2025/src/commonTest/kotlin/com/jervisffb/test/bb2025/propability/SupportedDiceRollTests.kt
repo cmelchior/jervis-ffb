@@ -98,7 +98,6 @@ class SupportedDiceRollTests {
 
     private fun getExpectedSupport(type: DiceRollType): Boolean {
         return when (type) {
-
             DiceRollType.ACCURACY,
             DiceRollType.ALWAYS_HUNGRY,
             DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT,

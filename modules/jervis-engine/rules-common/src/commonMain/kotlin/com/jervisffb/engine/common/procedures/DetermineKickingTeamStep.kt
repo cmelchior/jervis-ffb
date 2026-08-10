@@ -19,25 +19,18 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetKickingTeam
 import com.jervisffb.engine.common.context.CoinTossContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportKickingTeamResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
-import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
-import com.jervisffb.engine.statistics.probability.event.OutcomeRatio
-import com.jervisffb.engine.statistics.probability.observation.ChanceDieResult
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
-import com.jervisffb.engine.statistics.probability.observation.ChanceObservationScope
-import com.jervisffb.engine.statistics.probability.observation.ChanceOutcome
-import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -74,7 +67,12 @@ object DetermineKickingTeamStep : Procedure(), ChanceObservationHandler {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<CoinTossResult>(action) { coinToss ->
                 val context = state.getContext<CoinTossContext>()
-                val chanceObservation = createChanceObservation(state, coinToss)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.kickingTeam,
+                    rollType = DiceRollType.COIN_TOSS,
+                    die = coinToss.result.d2,
+                )
                 // It was the receiving team that selected the excepted coin result,
                 // so if it lands there, they get to choose first.
                 val winner = if (context.sideSelected == coinToss.result) state.receivingTeam else state.kickingTeam
@@ -119,33 +117,5 @@ object DetermineKickingTeamStep : Procedure(), ChanceObservationHandler {
                 else -> INVALID_ACTION(action)
             }
         }
-    }
-
-    private fun createChanceObservation(
-        state: Game,
-        coinToss: CoinTossResult,
-    ): ChanceObservation.DiceRoll? {
-        if (!state.collectChanceData) return null
-
-        val index = state.nextAvailableChanceObservationIndex
-        val team = state.kickingTeam
-        return ChanceObservation.DiceRoll(
-            index = index,
-            rollType = DiceRollType.COIN_TOSS,
-            teamId = team.id,
-            dice = listOf(
-                ChanceDieResult(
-                    id = ChanceResultId(index, 0),
-                    result = coinToss.result.d2,
-                ),
-            ),
-            scope = ChanceObservationScope.fromState(state, team),
-            success = true,
-            outcome = ChanceOutcome(
-                category = ChanceOutcomeCategory.TARGET_SET,
-                successProbability = OutcomeRatio(1, Coin.entries.size),
-            ),
-            finalized = true,
-        )
     }
 }
