@@ -9,7 +9,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.RecoverKnockedOutPlayersContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -23,6 +25,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 
@@ -34,7 +37,7 @@ import com.jervisffb.engine.utils.sum
  * disallows it, and Pro only works during rolls that are done "on behalf" of the
  * player, which this is not.
  */
-object RecoverPlayerRoll: Procedure() {
+object RecoverPlayerRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -50,9 +53,17 @@ object RecoverPlayerRoll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RecoverKnockedOutPlayersContext>()
+                val team = context.selectedPlayer?.team ?: INVALID_GAME_STATE("Missing player")
                 val modifiers = emptyList<DiceModifier>() // Blitzer's Keg will go here
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = team,
+                    rollType = DiceRollType.RECOVER_PLAYER,
+                    die = d6,
+                )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RECOVER_PLAYER, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(
                         recoverRoll = D6DieRoll.create(d6),
                         modifiers = modifiers,

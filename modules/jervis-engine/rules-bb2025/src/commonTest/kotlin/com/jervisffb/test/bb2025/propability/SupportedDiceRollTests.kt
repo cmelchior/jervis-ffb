@@ -158,7 +158,10 @@ class SupportedDiceRollTests {
             DiceRollType.THROW_A_ROCK,
             DiceRollType.THROWIN_DIRECTION,
             DiceRollType.THROWIN_DISTANCE,
-            DiceRollType.WEATHER -> true
+            DiceRollType.WEATHER,
+            DiceRollType.LASTING_INJURY,
+            DiceRollType.PRAYERS_TO_NUFFLE,
+            DiceRollType.RECOVER_PLAYER -> true
 
             DiceRollType.ARGUE_THE_CALL,
             DiceRollType.ARMOUR,
@@ -173,11 +176,8 @@ class SupportedDiceRollTests {
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.DEVIATE,
             DiceRollType.INJURY,
-            DiceRollType.LASTING_INJURY,
             DiceRollType.PASSING_INTERFERENCE,
-            DiceRollType.PRAYERS_TO_NUFFLE,
             DiceRollType.QUALITY,
-            DiceRollType.RECOVER_PLAYER,
             DiceRollType.SCATTER,
             DiceRollType.SUDDEN_DEATH -> false
         }

@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 object BB2025StandardPrayersToNuffleTable: PrayersToNuffleTable {
-    private val table =
+    override val entries =
         mapOf(
             1 to PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR,
             2 to PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF,
@@ -44,7 +44,7 @@ object BB2025StandardPrayersToNuffleTable: PrayersToNuffleTable {
      */
     override fun roll(die: DieResult): PrayerToNuffleTableResult {
         if (die !is D16Result) INVALID_ACTION(die, "Wrong die type: ${die::class}")
-        return table[die.value] ?: INVALID_GAME_STATE("${die.value} was not found in the Prayers To Nuffle table")
+        return entries[die.value] ?: INVALID_GAME_STATE("${die.value} was not found in the Prayers To Nuffle table")
     }
 }
 

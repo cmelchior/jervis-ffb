@@ -323,9 +323,9 @@ data class D12Result(override val value: Int) : DieResult() {
 
 @Serializable
 data class D16Result(override val value: Int) : DieResult() {
-    constructor() : this(Random.nextInt(1, 17)) // Fix issues with serialization not serializing `result`. Figure out why
+    constructor() : this(Random.nextInt(1, SIDES + 1)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
-    override val max: Short = 16
+    override val max: Short = SIDES.toShort()
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D16Result> {
@@ -335,8 +335,9 @@ data class D16Result(override val value: Int) : DieResult() {
     }
 
     companion object {
+        val SIDES: Int = 16
         fun allOptions(): List<D16Result> {
-            return (1..16).map { D16Result(it) }
+            return (1..SIDES).map { D16Result(it) }
         }
     }
 }

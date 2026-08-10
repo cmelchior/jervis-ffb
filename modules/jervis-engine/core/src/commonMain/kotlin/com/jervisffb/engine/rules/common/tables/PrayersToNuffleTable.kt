@@ -10,6 +10,9 @@ import com.jervisffb.engine.actions.DieResult
  */
 interface PrayersToNuffleTable {
     val die: Dice // Which die is used to roll the table
+
+    val entries: Map<Int, PrayerToNuffleEvent>
+
     /**
      * Roll on the table. Should throw an [com.jervisffb.engine.utils.INVALID_ACTION]
      * exception if the die does not match [die].

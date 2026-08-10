@@ -9,6 +9,9 @@ import com.jervisffb.engine.actions.D6Result
  * See page 67 in the BB2025 rulebook.
  */
 interface LastingInjuryTable {
+
+    val entries: Map<Int, LastingInjuryResult>
+
     /**
      * Roll on the Lasting Injury table and return the result.
      */
