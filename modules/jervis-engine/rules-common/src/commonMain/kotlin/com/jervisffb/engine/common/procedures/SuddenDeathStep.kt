@@ -11,8 +11,10 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetSuddenDeathTouchdowns
 import com.jervisffb.engine.common.context.SuddenDeathContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -25,12 +27,13 @@ import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Procedure responsible for handling Sudden Death as described on page 67 in the rulebook.
  */
-object SuddenDeathStep : Procedure() {
+object SuddenDeathStep : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = HomeTeamRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         return AddContext(SuddenDeathContext())
@@ -45,8 +48,15 @@ object SuddenDeathStep : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<SuddenDeathContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.homeTeam,
+                    rollType = DiceRollType.SUDDEN_DEATH,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SUDDEN_DEATH, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(homeRolls = context.homeRolls + d6)),
                     GotoNode(AwayTeamRoll)
                 )
@@ -63,6 +73,12 @@ object SuddenDeathStep : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<SuddenDeathContext>()
                 val homeResult = context.homeRolls.last()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = state.awayTeam,
+                    rollType = DiceRollType.SUDDEN_DEATH,
+                    die = d6,
+                )
                 val rollOffs = context.rollOffs + if (homeResult != d6) 1 else 0
                 val (rollOffWinner, touchdowns) = when {
                     homeResult == d6 -> null to 0
@@ -72,6 +88,7 @@ object SuddenDeathStep : Procedure() {
                 }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SUDDEN_DEATH, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     if (rollOffWinner == null) SimpleLogEntry("Roll-off is a draw", category = LogCategory.GAME_PROGRESS) else null,
                     if (rollOffWinner != null) SimpleLogEntry("${rollOffWinner.name} wins ${rollOffs}. roll-off", category = LogCategory.GAME_PROGRESS) else null,
                     if (rollOffWinner != null) SetSuddenDeathTouchdowns(rollOffWinner, touchdowns) else null,

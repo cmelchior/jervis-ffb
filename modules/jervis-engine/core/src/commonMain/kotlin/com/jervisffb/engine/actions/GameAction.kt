@@ -1,7 +1,6 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -224,6 +223,7 @@ data class D6Result(override val value: Int) : DieResult() {
 
     companion object {
         const val SIDES = 6
+
         fun allOptions(): List<D6Result> {
             return (1..SIDES).map { D6Result(it) }
         }
@@ -243,10 +243,22 @@ data class D6Result(override val value: Int) : DieResult() {
         }
 
         /**
-         * When rolling [dice], return how many dice combinations exists, where
-         * the sum of the dice are equal or above [total].
+         * When rolling [dice], return how many dice combinations exist, where
+         * the sum of the dice is equal to [total].
          */
-        fun combinationsEqualOrAbove(dice: Int, total: Int): Int {
+        fun combinationsEqualToTotal(dice: Int, total: Int): Int {
+            return combinations(dice, total, includeAbove = false)
+        }
+
+        /**
+         * When rolling [dice], return how many dice combinations exist, where
+         * the sum of the dice is equal or above [total].
+         */
+        fun combinationsEqualToTotalOrAbove(dice: Int, total: Int): Int {
+            return combinations(dice, total, includeAbove = true)
+        }
+
+        private fun combinations(dice: Int, total: Int, includeAbove: Boolean): Int {
             require(dice > 0) { "At least one D6 is required: $dice" }
 
             var possibleOutcomes = 1
@@ -258,8 +270,8 @@ data class D6Result(override val value: Int) : DieResult() {
             }
 
             val maximumTotal = dice * SIDES
-            if (total <= dice) return possibleOutcomes
-            if (total > maximumTotal) return 0
+            if (total < dice) error("`total` is less than the possible range of values: $total < $dice")
+            if (total > maximumTotal) error("`total` is greater than the possible range of values: $total > $maximumTotal")
 
             var combinationsByTotal = intArrayOf(1)
             repeat(dice) {
@@ -272,31 +284,37 @@ data class D6Result(override val value: Int) : DieResult() {
                 combinationsByTotal = nextCombinationsByTotal
             }
 
-            return (total..maximumTotal).sumOf { combinationsByTotal[it] }
+            return when (includeAbove) {
+                true -> (total..maximumTotal).sumOf { combinationsByTotal[it] }
+                false -> combinationsByTotal[total]
+            }
         }
+
+
     }
 }
 
 @Serializable
 data class D8Result(override val value: Int) : DieResult() {
-    constructor() : this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
+    constructor() : this(Random.nextInt(1, SIDES + 1)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
-    override val max: Short = 8
+    override val max: Short = SIDES.toShort()
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D8Result> {
-        return D8Result.Companion.allOptions().toMutableList().apply {
+        return D8Result.allOptions().toMutableList().apply {
             removeAll(except.toList())
         }
     }
 
     companion object {
+        const val SIDES = 8
         fun allOptions(startWith: Int = 1): List<D8Result> {
-            require(startWith in 1..8) { "startWith must be in 1..8, was $startWith" }
-            return (0 until 8).map { D8Result(((startWith - 1 + it) % 8) + 1) }
+            require(startWith in 1..SIDES) { "startWith must be in 1..8, was $startWith" }
+            return (0 until SIDES).map { D8Result(((startWith - 1 + it) % SIDES) + 1) }
         }
         fun random(random: Random = Random): D8Result {
-            return random.nextInt(1, 8).d8
+            return random.nextInt(1, SIDES).d8
         }
     }
 }

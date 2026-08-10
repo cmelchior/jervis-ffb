@@ -13,6 +13,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 abstract class InjuryTable {
 
+    abstract val entries: Map<Int, InjuryResult>
+
     protected fun rollDices(firstD6: D6Result, secondD6: D6Result, modifier: Int): Int {
         return (firstD6.value + secondD6.value + modifier).coerceIn(2, 12)
     }

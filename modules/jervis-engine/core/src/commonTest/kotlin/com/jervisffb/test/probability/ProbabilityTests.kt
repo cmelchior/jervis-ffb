@@ -53,11 +53,18 @@ class ProbabilityTests {
 
     @Test
     fun d6CombinationsEqualOrAbove() {
-        assertEquals(3, D6Result.combinationsEqualOrAbove(dice = 1, total = 4))
-        assertEquals(36, D6Result.combinationsEqualOrAbove(dice = 2, total = 1))
-        assertEquals(1, D6Result.combinationsEqualOrAbove(dice = 2, total = 12))
-        assertEquals(21, D6Result.combinationsEqualOrAbove(dice = 2, total = 7))
-        assertEquals(36, D6Result.combinationsEqualOrAbove(dice = 2, total = 2))
-        assertEquals(135, D6Result.combinationsEqualOrAbove(dice = 3, total = 10))
+        assertEquals(3, D6Result.combinationsEqualToTotalOrAbove(dice = 1, total = 4))
+        assertEquals(1, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 12))
+        assertEquals(21, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 7))
+        assertEquals(36, D6Result.combinationsEqualToTotalOrAbove(dice = 2, total = 2))
+        assertEquals(135, D6Result.combinationsEqualToTotalOrAbove(dice = 3, total = 10))
+    }
+
+    @Test
+    fun d6CombinationsEqual() {
+        assertEquals(1, D6Result.combinationsEqualToTotal(dice = 2, total = 12))
+        assertEquals(6, D6Result.combinationsEqualToTotal(dice = 2, total = 7))
+        assertEquals(1, D6Result.combinationsEqualToTotal(dice = 2, total = 2))
+        assertEquals(27, D6Result.combinationsEqualToTotal(dice = 3, total = 10))
     }
 }

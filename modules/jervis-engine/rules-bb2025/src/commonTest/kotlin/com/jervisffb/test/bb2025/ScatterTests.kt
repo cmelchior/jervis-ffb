@@ -3,6 +3,7 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.common.context.CatchContext
+import com.jervisffb.engine.common.procedures.ScatterCache
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
@@ -25,6 +26,36 @@ import kotlin.test.assertTrue
  * Tests for "scatter" as described on page 25 in the rulebook.
  */
 class ScatterTests: JervisGameBB2025Test() {
+
+    @Test
+    fun scatterCountsCombinationsThatReachTheSameLandingSquare() {
+        val start = PitchCoordinate(10, 7)
+
+        assertEquals(
+            27,
+            ScatterCache.getCombinations(
+                start = start,
+                landingAt = PitchCoordinate(9, 6),
+                outOfBoundsAt = null,
+                rules = rules,
+            )
+        )
+    }
+
+    @Test
+    fun scatterCountsCombinationsThatLeaveFromTheSameSquare() {
+        val start = PitchCoordinate(0, 0)
+
+        assertEquals(
+            335,
+            ScatterCache.getCombinations(
+                start = start,
+                landingAt = PitchCoordinate(-1, -1),
+                outOfBoundsAt = start,
+                rules = rules,
+            )
+        )
+    }
 
     @Test
     fun moveInRandomDirection3Times() {

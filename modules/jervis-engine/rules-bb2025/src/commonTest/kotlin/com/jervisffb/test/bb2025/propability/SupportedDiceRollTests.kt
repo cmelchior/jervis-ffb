@@ -161,7 +161,10 @@ class SupportedDiceRollTests {
             DiceRollType.WEATHER,
             DiceRollType.LASTING_INJURY,
             DiceRollType.PRAYERS_TO_NUFFLE,
-            DiceRollType.RECOVER_PLAYER -> true
+            DiceRollType.RECOVER_PLAYER,
+            DiceRollType.INJURY,
+            DiceRollType.SCATTER,
+            DiceRollType.SUDDEN_DEATH -> true
 
             DiceRollType.ARGUE_THE_CALL,
             DiceRollType.ARMOUR,
@@ -175,11 +178,8 @@ class SupportedDiceRollTests {
             DiceRollType.CASUALTY,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.DEVIATE,
-            DiceRollType.INJURY,
             DiceRollType.PASSING_INTERFERENCE,
-            DiceRollType.QUALITY,
-            DiceRollType.SCATTER,
-            DiceRollType.SUDDEN_DEATH -> false
+            DiceRollType.QUALITY -> false
         }
     }
 

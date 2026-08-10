@@ -83,6 +83,33 @@ actual probability.
 This is only a problem for targets that aim to land in a bracket below the 
 "best". Accurate rolls will score using the correct probability.
 
+### Scatter, Throw-in
+
+These are scored based on the probability of hitting the target location. 
+This means:
+
+- Scatter: The dice selected, determine the landing spot. JPS will treat all
+  combinations of scatter dice hitting the same target as success. If the ball
+  ends up out-of-bounds, only rolls that leave the pitch from the same square
+  as the selected sequence.
+
+- Throw-in: The dice selected, determine the landing spot. JPS will treat all
+  combinations of throw-in dice hitting the same target as success. Going 
+  shorter or longer is a failure.
+
+### Injury Rolls
+
+Injury rolls are a 2D6 roll that includes modifiers and the result is a 
+non-linear set of outcomes. This makes it hard for JPS to determine the 
+probability.
+
+Similarly to Accuracy rolls, we just treat the selected value as a minimum 
+ value, and a higher values will also be considered a success. This also means 
+that the score for Injury rolls is higher than the "real" value.
+
+However, the default behavior for JPS is to ignore these rolls in the 
+scoring, so it only matters in scenarios where it is explicitely enabled.
+
 ### Rerolls
 
 Rerolls are part of the probability, but they are handled by a fixed, 

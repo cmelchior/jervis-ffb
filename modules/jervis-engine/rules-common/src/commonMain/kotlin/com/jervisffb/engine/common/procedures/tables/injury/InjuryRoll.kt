@@ -20,6 +20,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.FoulContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
@@ -27,6 +28,7 @@ import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.modifiers.ArmourModifier
 import com.jervisffb.engine.common.modifiers.InjuryModifier
 import com.jervisffb.engine.common.modifiers.MightyBlowInjuryModifier
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -46,6 +48,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.InjuryResult
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
@@ -86,7 +89,7 @@ import kotlinx.collections.immutable.persistentListOf
  * Fall Over:
  * 1. Arm Bar
  */
-object InjuryRoll: Procedure() {
+object InjuryRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
@@ -109,7 +112,23 @@ object InjuryRoll: Procedure() {
                 // Determine result of injury roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow and others.
                 val roll = persistentListOf(die1, die2)
-                val result = rules.injuryTable.roll(die1, die2, context.injuryModifiers.sum())
+                val table = rules.injuryTable
+                val modifiers = context.injuryModifiers.sum()
+                val result = table.roll(die1, die2, modifiers)
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = context.player.team.otherTeam(),
+                    rollType = DiceRollType.INJURY,
+                    dice = listOf(die1, die2),
+                    favorableOutcomes = table.entries.count { (value, injury) ->
+                        // A result less than `minRoll + modifiers` can never be rolled, so is ignored here.
+                        when (value >= 2 + modifiers) {
+                            true -> injury == result
+                            false -> false
+                        }
+                    },
+                    possibleOutcomes = D6Result.SIDES * D6Result.SIDES,
+                )
                 val updatedContext = context.copy(
                     injuryRoll = roll,
                     injuryResult = result,
@@ -117,6 +136,7 @@ object InjuryRoll: Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.INJURY, roll),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(updatedContext),
                     GotoNode(CheckIfMultipleBlowIsApplicable),
                 )

@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 object BB2025StandardInjuryTable: InjuryTable() {
-    private val table: Map<Int, InjuryResult> =
+    override val entries: Map<Int, InjuryResult> =
         mapOf(
             2 to InjuryResult.STUNNED,
             3 to InjuryResult.STUNNED,
@@ -34,6 +34,6 @@ object BB2025StandardInjuryTable: InjuryTable() {
         modifier: Int,
     ): InjuryResult {
         val result = rollDices(firstD6, secondD6, modifier)
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Injury Table.")
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Injury Table.")
     }
 }

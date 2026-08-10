@@ -136,7 +136,7 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
                     team = observationTeam(state),
                     rollType = DiceRollType.THROWIN_DISTANCE,
                     dice = dice,
-                    favorableOutcomes = D6Result.combinationsEqualOrAbove(dice = dice.size, total = diceDistance),
+                    favorableOutcomes = D6Result.combinationsEqualToTotal(dice = dice.size, total = diceDistance),
                     possibleOutcomes = dice.size * D6Result.SIDES,
                 )
 
