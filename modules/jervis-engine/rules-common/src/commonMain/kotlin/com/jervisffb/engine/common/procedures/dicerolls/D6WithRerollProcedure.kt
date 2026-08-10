@@ -105,7 +105,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
         if (rerollContext.type != rollType) {
             INVALID_GAME_STATE("UseRerollContext's are in an inconsistent state. Received: $rerollContext")
         }
-        val chanceCommand = finalizeD6ChanceObservations(
+        val chanceCommand = finalizeRerollableChanceObservations(
             state = state,
             data = ChooseReRollSource.getRerollData(state, rules),
             rerollContext = rerollContext,
@@ -133,7 +133,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updateContext(state, rules, d6)
                 val rerollContext = state.getContext<UseRerollContext>()
-                val chanceObservation = createD6ChanceObservation(
+                val chanceObservation = createRerollableChanceObservation(
                     state = state,
                     rollType = rollType,
                     player = getActionOwner(state),
@@ -195,7 +195,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
                 INVALID_GAME_STATE("Reroll type mismatch: expected $rollType, got $rerollContext")
             }
             val selectedSource = (action as? RerollOptionSelected)?.getRerollSource(state)
-            val observationUpdate = updateD6ChanceDecision(
+            val observationUpdate = updateRerollableChanceDecision(
                 state = state,
                 rules = rules,
                 rollType = rollType,
@@ -259,7 +259,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
                 val updatedContext = updateContext(state, rules, d6)
                 val rerollContext = state.getContext<UseRerollContext>()
                 val chanceObservation = rerollContext.chanceRollIndex?.let { rootSequence ->
-                    createD6ChanceObservation(
+                    createRerollableChanceObservation(
                         state = state,
                         rollType = rollType,
                         player = getActionOwner(state),

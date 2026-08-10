@@ -13,11 +13,13 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.Bounce
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
@@ -41,6 +43,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 
 
 /**
@@ -67,7 +70,7 @@ import com.jervisffb.engine.rules.Rules
  * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
  * TODO Not sure the above is still relevant
  */
-object MovePlayerIntoSquare : Procedure() {
+object MovePlayerIntoSquare : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = MoveIntoSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -148,8 +151,15 @@ object MovePlayerIntoSquare : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<MovePlayerIntoSquareContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    player = context.player,
+                    rollType = DiceRollType.TREACHEROUS_TRAPDOOR,
+                    die = d6,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     if (d6.value != 1) ReportGameProgress("${context.player.name} narrowly avoided the trapdoor") else null,
                     if (d6.value == 1) GotoNode(ResolveFallingThroughTrapdoor) else ExitProcedure()
                 )

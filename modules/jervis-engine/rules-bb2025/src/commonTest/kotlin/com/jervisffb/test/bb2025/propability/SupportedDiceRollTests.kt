@@ -37,7 +37,7 @@ import com.jervisffb.engine.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.common.procedures.RecoverPlayerRoll
 import com.jervisffb.engine.common.procedures.RegenerationRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
-import com.jervisffb.engine.common.procedures.SuddenDeath
+import com.jervisffb.engine.common.procedures.SuddenDeathStep
 import com.jervisffb.engine.common.procedures.TakeRootRoll
 import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.common.procedures.ThrowIn
@@ -68,6 +68,7 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.common.procedures.tables.weather.SwelteringHeat
 import com.jervisffb.engine.fsm.Procedure
@@ -133,6 +134,8 @@ class SupportedDiceRollTests {
             DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
             DiceRollType.PRO,
             DiceRollType.PROJECTILE_VOMIT,
+            DiceRollType.PASS,
+            DiceRollType.PUNT_DIRECTION,
             DiceRollType.PUNT_DISTANCE,
             DiceRollType.QUICK_SNAP,
             DiceRollType.REALLY_STUPID,
@@ -147,7 +150,9 @@ class SupportedDiceRollTests {
             DiceRollType.TAKE_ROOT,
             DiceRollType.TEAM_CAPTAIN,
             DiceRollType.TENTACLES,
+            DiceRollType.TREACHEROUS_TRAPDOOR,
             DiceRollType.UNCHANNELLED_FURY,
+            DiceRollType.SWOOP_DIRECTION,
             DiceRollType.WEATHER -> true
 
             DiceRollType.ARGUE_THE_CALL,
@@ -161,44 +166,20 @@ class SupportedDiceRollTests {
             DiceRollType.BRIBE,
             DiceRollType.CASUALTY,
             DiceRollType.CROWD_TAKES_ACTION,
-            DiceRollType.FOUL_APPEARANCE,
             DiceRollType.DEVIATE,
             DiceRollType.INJURY,
-            DiceRollType.INTERCEPTION,
-            DiceRollType.JUMP_UP,
-            DiceRollType.LANDING,
             DiceRollType.LASTING_INJURY,
-            DiceRollType.LONER,
-            DiceRollType.PASS,
             DiceRollType.PASSING_INTERFERENCE,
-            DiceRollType.POGO,
-            DiceRollType.PRO,
             DiceRollType.PRAYERS_TO_NUFFLE,
-            DiceRollType.REALLY_STUPID,
-            DiceRollType.REGENERATION,
             DiceRollType.QUALITY,
             DiceRollType.RECOVER_PLAYER,
             DiceRollType.SCATTER,
-            DiceRollType.SECURE_THE_BALL,
-            DiceRollType.SHADOWING,
             DiceRollType.SUDDEN_DEATH,
-            DiceRollType.STANDING_UP,
-            DiceRollType.STEADY_FOOTING,
             DiceRollType.SWELTERING_HEAT,
-            DiceRollType.SWOOP_DIRECTION,
-            DiceRollType.SWOOP_DISTANCE,
-            DiceRollType.TAKE_ROOT,
-            DiceRollType.TEAM_CAPTAIN,
             DiceRollType.TEAM_MASCOT,
-            DiceRollType.TENTACLES,
             DiceRollType.THROW_A_ROCK,
             DiceRollType.THROWIN_DIRECTION,
-            DiceRollType.THROWIN_DISTANCE,
-            DiceRollType.TREACHEROUS_TRAPDOOR,
-            DiceRollType.UNCHANNELLED_FURY,
-            DiceRollType.PROJECTILE_VOMIT,
-            DiceRollType.PUNT_DIRECTION,
-            DiceRollType.PUNT_DISTANCE -> false
+            DiceRollType.THROWIN_DISTANCE -> false
         }
     }
 
@@ -210,61 +191,63 @@ class SupportedDiceRollTests {
             DiceRollType.ANIMAL_SAVAGERY -> AnimalSavageryRoll
             DiceRollType.ARGUE_THE_CALL -> ArgueTheCallRoll
             DiceRollType.ARMOUR -> ArmourRoll
-            DiceRollType.BONE_HEAD -> BoneHeadRoll
-            DiceRollType.BREATHE_FIRE -> BreatheFireRoll
+            DiceRollType.BAD_HABITS -> BadHabits
             DiceRollType.BB7_APOTHECARY -> UseBB7Apothecary
             DiceRollType.BLITZ -> Blitz
             DiceRollType.BLOODLUST -> BloodLustRoll
+            DiceRollType.BONE_HEAD -> BoneHeadRoll
             DiceRollType.BOUNCE -> Bounce
+            DiceRollType.BREATHE_FIRE -> BreatheFireRoll
             DiceRollType.BRIBE -> BribeRoll
             DiceRollType.BRILLIANT_COACHING -> BrilliantCoaching
+            DiceRollType.CASUALTY -> CasualtyRoll
             DiceRollType.CATCH -> CatchRoll
             DiceRollType.CHAINSAW -> ChainsawRoll
+            DiceRollType.CHARGE -> Charge
+            DiceRollType.CHEERING_FANS -> BB2025CheeringFans
             DiceRollType.CHOMP -> ChompRoll
+            DiceRollType.COIN_TOSS -> DetermineKickingTeamStep
             DiceRollType.DAUNTLESS -> DauntlessRoll
-            DiceRollType.DODGE -> DodgeRoll
-            DiceRollType.DODGY_SNACK_ROLL_OFF,
-            DiceRollType.DODGY_SNACK_EFFECT -> DodgySnack
             DiceRollType.DEVIATE -> DeviateRoll
+            DiceRollType.DODGE -> DodgeRoll
+            DiceRollType.DODGY_SNACK_EFFECT -> DodgySnack
+            DiceRollType.DODGY_SNACK_ROLL_OFF -> DodgySnack
+            DiceRollType.FAN_FACTOR -> FanFactorRolls
             DiceRollType.FOUL_APPEARANCE -> FoulAppearanceRoll
             DiceRollType.HYPNOTIC_GAZE -> HypnoticGazeRoll
-            DiceRollType.INTERCEPTION -> InterceptionRoll
             DiceRollType.INJURY -> InjuryRoll
+            DiceRollType.INTERCEPTION -> InterceptionRoll
             DiceRollType.JUMP -> JumpRoll
             DiceRollType.JUMP_UP -> JumpUpRoll
-            DiceRollType.LEAP -> LeapRoll
-            DiceRollType.LANDING -> LandingRoll
-            DiceRollType.LONER -> LonerRoll
-            DiceRollType.CASUALTY -> CasualtyRoll
-            DiceRollType.CHEERING_FANS -> BB2025CheeringFans
-            DiceRollType.CHARGE -> Charge
-            DiceRollType.COIN_TOSS -> DetermineKickingTeamStep
             DiceRollType.KICK_OFF_TABLE -> TheKickOffEvent
-            DiceRollType.FAN_FACTOR -> FanFactorRolls
+            DiceRollType.LANDING -> LandingRoll
             DiceRollType.LASTING_INJURY -> LastingInjuryRoll
+            DiceRollType.LEAP -> LeapRoll
+            DiceRollType.LONER -> LonerRoll
+            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
+            DiceRollType.OFFICIOUS_REF_REFEREE -> OfficiousRef
+            DiceRollType.PASS -> PassAccuracyRoll
             DiceRollType.PICKUP -> PickupRoll
+            DiceRollType.PITCH_INVASION_FAN_FACTOR,
+            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED -> PitchInvasion
             DiceRollType.POGO -> PogoRoll
+            DiceRollType.PRAYERS_TO_NUFFLE -> PrayersToNuffleRoll
             DiceRollType.PRO -> ProRoll
             DiceRollType.PROJECTILE_VOMIT -> ProjectileVomitRoll
             DiceRollType.PUNT_DIRECTION -> PuntDirectionRoll
             DiceRollType.PUNT_DISTANCE -> PuntDistanceRoll
+            DiceRollType.QUICK_SNAP -> QuickSnap
             DiceRollType.REALLY_STUPID -> ReallyStupidRoll
+            DiceRollType.RECOVER_PLAYER -> RecoverPlayerRoll
             DiceRollType.REGENERATION -> RegenerationRoll
             DiceRollType.RUSH -> RushRoll
+            DiceRollType.SCATTER -> ScatterRoll
             DiceRollType.SECURE_THE_BALL -> SecureTheBallRoll
             DiceRollType.SHADOWING -> ShadowingRoll
-            DiceRollType.PITCH_INVASION_FAN_FACTOR,
-            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED -> PitchInvasion
-            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
-            DiceRollType.OFFICIOUS_REF_REFEREE -> OfficiousRef
+            DiceRollType.SOLID_DEFENSE -> SolidDefense
             DiceRollType.STANDING_UP -> StandingUpRoll
             DiceRollType.STEADY_FOOTING -> SteadyFootingRoll
-            DiceRollType.PRAYERS_TO_NUFFLE -> PrayersToNuffleRoll
-            DiceRollType.QUICK_SNAP -> QuickSnap
-            DiceRollType.RECOVER_PLAYER -> RecoverPlayerRoll
-            DiceRollType.SCATTER -> ScatterRoll
-            DiceRollType.SOLID_DEFENSE -> SolidDefense
-            DiceRollType.SUDDEN_DEATH -> SuddenDeath
+            DiceRollType.SUDDEN_DEATH -> SuddenDeathStep
             DiceRollType.SWELTERING_HEAT -> SwelteringHeat
             DiceRollType.SWOOP_DIRECTION -> SwoopDirectionRoll
             DiceRollType.SWOOP_DISTANCE -> SwoopDistanceRoll
@@ -272,56 +255,18 @@ class SupportedDiceRollTests {
             DiceRollType.TEAM_CAPTAIN -> TeamCaptainRoll
             DiceRollType.TEAM_MASCOT -> TeamMascotRoll
             DiceRollType.TENTACLES -> TentaclesRoll
-            DiceRollType.UNCHANNELLED_FURY -> UnchannelledFuryRoll
-            DiceRollType.THROW_A_ROCK -> ResolveThrowARock
             DiceRollType.THROWIN_DIRECTION,
             DiceRollType.THROWIN_DISTANCE -> ThrowIn
+            DiceRollType.THROW_A_ROCK -> ResolveThrowARock
             DiceRollType.TREACHEROUS_TRAPDOOR -> MovePlayerIntoSquare
+            DiceRollType.UNCHANNELLED_FURY -> UnchannelledFuryRoll
             DiceRollType.WEATHER -> WeatherRoll
 
-            DiceRollType.ARGUE_THE_CALL,
-            DiceRollType.ARMOUR,
-            DiceRollType.BAD_HABITS,
-            DiceRollType.BB7_APOTHECARY,
             DiceRollType.BLOCK,
-            DiceRollType.BLITZ,
             DiceRollType.BLOODLUST,
-            DiceRollType.BOUNCE,
-            DiceRollType.BRIBE,
-            DiceRollType.BRILLIANT_COACHING,
-            DiceRollType.CASUALTY,
-            DiceRollType.CHARGE,
-            DiceRollType.CHEERING_FANS,
             DiceRollType.CROWD_TAKES_ACTION,
-            DiceRollType.FAN_FACTOR,
-            DiceRollType.DAUNTLESS,
-            DiceRollType.DODGY_SNACK_ROLL_OFF,
-            DiceRollType.DODGY_SNACK_EFFECT,
-            DiceRollType.DEVIATE,
-            DiceRollType.INJURY,
-            DiceRollType.INTERCEPTION,
-            DiceRollType.KICK_OFF_TABLE,
-            DiceRollType.LASTING_INJURY,
-            DiceRollType.OFFICIOUS_REF_FAN_FACTOR,
-            DiceRollType.OFFICIOUS_REF_REFEREE,
-            DiceRollType.PASS,
-            DiceRollType.PASSING_INTERFERENCE,
-            DiceRollType.PITCH_INVASION_FAN_FACTOR,
-            DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
-            DiceRollType.PRAYERS_TO_NUFFLE,
-            DiceRollType.QUALITY,
-            DiceRollType.QUICK_SNAP,
-            DiceRollType.RECOVER_PLAYER,
-            DiceRollType.SCATTER,
-            DiceRollType.SOLID_DEFENSE,
-            DiceRollType.SUDDEN_DEATH,
-            DiceRollType.SWELTERING_HEAT,
-            DiceRollType.TEAM_MASCOT,
-            DiceRollType.THROW_A_ROCK,
-            DiceRollType.THROWIN_DIRECTION,
-            DiceRollType.THROWIN_DISTANCE,
-            DiceRollType.TREACHEROUS_TRAPDOOR,
-            DiceRollType.WEATHER -> null
+            DiceRollType.PASSING_INTERFERENCE, // Not supported in BB2025
+            DiceRollType.QUALITY -> null // Not supported in BB2025
         }
     }
 }

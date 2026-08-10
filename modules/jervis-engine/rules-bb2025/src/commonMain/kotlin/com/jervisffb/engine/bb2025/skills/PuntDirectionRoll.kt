@@ -41,7 +41,7 @@ object PuntDirectionRoll : D3WithRerollProcedure() {
         }
     }
 
-    override val ChooseReRollSource: ActionNode = object : AbstractChooseRerollSource() {
+    override val ChooseReRollSource = object : AbstractChooseRerollSource() {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val ctx = state.getContext<PuntContext>()
             return RerollData(player = ctx.punter, roll = ctx.directionRoll!!, isSuccess = null)

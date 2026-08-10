@@ -30,7 +30,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Procedure responsible for handling Sudden Death as described on page 67 in the rulebook.
  */
-object SuddenDeath : Procedure() {
+object SuddenDeathStep : Procedure() {
     override val initialNode: Node = HomeTeamRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         return AddContext(SuddenDeathContext())

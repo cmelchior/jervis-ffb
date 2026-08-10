@@ -65,8 +65,8 @@ object SingleStandardBlockRollDice: Procedure(), ChanceObservationHandler {
                     ChanceObservation.DiceRoll(
                         index = sequence,
                         rollType = DiceRollType.BLOCK,
-                        teamId = state.getContext<BlockContext>().attacker.team.id,
-                        playerId = state.getContext<BlockContext>().attacker.id,
+                        team = state.getContext<BlockContext>().attacker.team.id,
+                        player = state.getContext<BlockContext>().attacker.id,
                         dice = createChanceDiceResults(sequence, roll.map { die -> die.id to die.result }),
                         scope = chanceScope(state, state.getContext<BlockContext>().attacker),
                     )

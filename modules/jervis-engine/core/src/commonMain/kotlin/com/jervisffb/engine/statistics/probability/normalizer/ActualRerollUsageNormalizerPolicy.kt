@@ -81,7 +81,7 @@ object ActualRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
             index = roll.index,
             traceRootIndex = traceRoot(roll, observations),
             rollType = roll.rollType,
-            owner = roll.teamId,
+            owner = roll.team,
             result = result,
             role = when {
                 roll.rerolledRollIndex != null -> PhysicalRollRole.REROLL

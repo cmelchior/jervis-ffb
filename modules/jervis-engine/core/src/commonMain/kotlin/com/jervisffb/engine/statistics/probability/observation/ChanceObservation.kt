@@ -30,9 +30,9 @@ sealed interface ChanceObservation {
         // Which type of dice were rolled.
         val rollType: DiceRollType,
         // Which team was rolling the dice.
-        val teamId: TeamId,
+        val team: TeamId,
         // Which player, if any, was rolling the dice.
-        val playerId: PlayerId? = null,
+        val player: PlayerId? = null,
         // The physical results in this roll. Result IDs are unique within the observation stream;
         // the optional logical DieId can occur again when that die is rerolled.
         val dice: List<ChanceDieResult>,

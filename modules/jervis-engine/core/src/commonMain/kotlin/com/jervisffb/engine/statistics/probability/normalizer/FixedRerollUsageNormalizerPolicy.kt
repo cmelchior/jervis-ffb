@@ -71,7 +71,7 @@ object FixedRerollUsageNormalizerPolicy : AbstractChanceNormalizerPolicy() {
         return ActionPathEvent.Logical.die(
             index = root.index,
             rollType = root.rollType,
-            owner = root.teamId,
+            owner = root.team,
             result = result,
             isSuccess = success,
             scope = root.scope.toFixedLineScope(),

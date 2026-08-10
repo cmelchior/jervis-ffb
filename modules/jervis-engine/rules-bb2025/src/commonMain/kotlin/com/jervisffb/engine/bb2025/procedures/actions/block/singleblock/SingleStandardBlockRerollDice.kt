@@ -72,8 +72,8 @@ object SingleStandardBlockRerollDice: Procedure(), ChanceObservationHandler {
                     ChanceObservation.DiceRoll(
                         index = sequence,
                         rollType = DiceRollType.BLOCK,
-                        teamId = blockContext.attacker.team.id,
-                        playerId = blockContext.attacker.id,
+                        team = blockContext.attacker.team.id,
+                        player = blockContext.attacker.id,
                         dice = createChanceDiceResults(
                             sequence,
                             rerolls.mapIndexed { index, result -> rerollOptionDice[index].id to result },

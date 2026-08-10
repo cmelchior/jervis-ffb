@@ -1,7 +1,6 @@
 package com.jervisffb.engine.common.procedures.dicerolls
 
 import com.jervisffb.engine.GameDelta
-import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -31,6 +30,13 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTestE
 import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
 
 /**
+ * This file contains various helper methods for creating or updating
+ * [ChanceObservation] objects.
+ *
+ * Primarily used by [D6WithRerollProcedure] or [D3WithRerollProcedure].
+ */
+
+/**
  * Describes a pending replacement of a dice-roll observation, e.g. if either
  * a reroll is used or the rolled die is accepted.
  *
@@ -46,7 +52,7 @@ internal data class ChanceObservationUpdate(
 }
 
 /**
- * Creates an unfinalized observation for a physical D6 roll in a player's
+ * Creates an unfinalized observation for a physical die roll in a player's
  * active reroll flow.
  *
  * The observation receives the next global sequence number and retains links
@@ -56,11 +62,11 @@ internal data class ChanceObservationUpdate(
  * Returns the new observation, or `null` when chance-data collection is
  * disabled.
  */
-internal fun createD6ChanceObservation(
+internal fun createRerollableChanceObservation(
     state: Game,
     rollType: DiceRollType,
     player: Player,
-    result: D6Result,
+    result: DieResult,
     rerollContext: UseRerollContext,
     rerolledRollIndex: Int? = null,
 ): ChanceObservation.DiceRoll? {
@@ -69,8 +75,8 @@ internal fun createD6ChanceObservation(
     return ChanceObservation.DiceRoll(
         index = sequence,
         rollType = rollType,
-        teamId = player.team.id,
-        playerId = player.id,
+        team = player.team.id,
+        player = player.id,
         dice = listOf(
             ChanceDieResult(
                 id = ChanceResultId(sequence, 0),
@@ -84,7 +90,7 @@ internal fun createD6ChanceObservation(
 }
 
 /**
- * Records the result of the reroll decision for the initial D6 observation in
+ * Records the result of the reroll decision for the initial die observation in
  * [rerollContext].
  *
  * The update captures whether the roll succeeded, every reroll option that
@@ -95,7 +101,7 @@ internal fun createD6ChanceObservation(
  * Returns the pending update, or `null` when chance-data collection is
  * disabled or the context does not contain its initial observation.
  */
-internal fun updateD6ChanceDecision(
+internal fun updateRerollableChanceDecision(
     state: Game,
     rules: Rules,
     rollType: DiceRollType,
@@ -130,7 +136,7 @@ internal fun updateD6ChanceDecision(
 }
 
 /**
- * Builds a command that finalizes every D6 observation collected by
+ * Builds a command that finalizes every die observation collected by
  * [rerollContext].
  *
  * The final physical roll receives the resolved success value. The initial
@@ -140,7 +146,7 @@ internal fun updateD6ChanceDecision(
  * Returns the command to finalize the dice, or `null` when chance-data
  * collection is disabled or the context contains no observations to finalize.
  */
-internal fun finalizeD6ChanceObservations(
+internal fun finalizeRerollableChanceObservations(
     state: Game,
     data: RerollData,
     rerollContext: UseRerollContext,

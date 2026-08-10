@@ -114,8 +114,7 @@ object ExtraTime : Procedure() {
     }
 
     object SuddenDeath : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            com.jervisffb.engine.common.procedures.SuddenDeath
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = SuddenDeathStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 ReportGameResult(state, extraTime = true, suddenDeath = true),

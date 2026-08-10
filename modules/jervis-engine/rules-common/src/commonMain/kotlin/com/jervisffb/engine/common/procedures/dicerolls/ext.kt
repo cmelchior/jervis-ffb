@@ -2,6 +2,7 @@ package com.jervisffb.engine.common.procedures.dicerolls
 
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.statistics.probability.event.ChanceOutcomeCategory
@@ -34,7 +35,7 @@ fun createFinalTableLookupObservation(
     return ChanceObservation.DiceRoll(
         index = index,
         rollType = rollType,
-        teamId = team.id,
+        team = team.id,
         dice = dice.mapIndexed { resultIndex, result ->
             ChanceDieResult(
                 id = ChanceResultId(index, resultIndex),
@@ -63,6 +64,7 @@ fun createFinalTableLookupObservation(
 fun createFinalAtLeastObservation(
     state: Game,
     team: Team,
+    player: Player?,
     rollType: DiceRollType,
     die: DieResult,
     target: Int = die.value,
@@ -71,12 +73,13 @@ fun createFinalAtLeastObservation(
     val index = state.nextAvailableChanceObservationIndex
     val success: Boolean = die.value >= target
     val possibleOutcomes = (die.max - die.min + 1)
-    val favorableOutcomes = (possibleOutcomes - die.value) + 1
+    val favorableOutcomes = (possibleOutcomes - target) + 1
 
     return ChanceObservation.DiceRoll(
         index = index,
         rollType = rollType,
-        teamId = team.id,
+        team = team.id,
+        player = player?.id,
         dice = listOf(die).mapIndexed { resultIndex, result ->
             ChanceDieResult(
                 id = ChanceResultId(index, resultIndex),
@@ -92,3 +95,40 @@ fun createFinalAtLeastObservation(
         finalized = true,
     )
 }
+
+// Overload helper
+fun createFinalAtLeastObservation(
+    state: Game,
+    player: Player,
+    rollType: DiceRollType,
+    die: DieResult,
+    target: Int = die.value,
+): ChanceObservation.DiceRoll? {
+    return createFinalAtLeastObservation(
+        state = state,
+        team = player.team,
+        player = player,
+        rollType = rollType,
+        die = die,
+        target = target,
+    )
+}
+
+// Overload helper
+fun createFinalAtLeastObservation(
+    state: Game,
+    team: Team,
+    rollType: DiceRollType,
+    die: DieResult,
+    target: Int = die.value,
+): ChanceObservation.DiceRoll? {
+    return createFinalAtLeastObservation(
+        state = state,
+        team = team,
+        player = null,
+        rollType = rollType,
+        die = die,
+        target = target,
+    )
+}
+

@@ -359,8 +359,8 @@ class ChanceNormalizerTest {
     ) = ChanceObservation.DiceRoll(
         index = sequence,
         rollType = type,
-        teamId = NORMALIZER_TEAM,
-        playerId = NORMALIZER_PLAYER,
+        team = NORMALIZER_TEAM,
+        player = NORMALIZER_PLAYER,
         dice = listOf(ChanceDieResult(ChanceResultId(sequence, 0), D6Result(value))),
         scope = ChanceObservationScope(
             half = 1,
@@ -387,8 +387,8 @@ class ChanceNormalizerTest {
     ) = ChanceObservation.DiceRoll(
         index = sequence,
         rollType = type,
-        teamId = NORMALIZER_TEAM,
-        playerId = NORMALIZER_PLAYER,
+        team = NORMALIZER_TEAM,
+        player = NORMALIZER_PLAYER,
         dice = values.mapIndexed { index, result ->
             ChanceDieResult(ChanceResultId(sequence, index), result)
         },
@@ -414,8 +414,8 @@ class ChanceNormalizerTest {
     ) = ChanceObservation.DiceRoll(
         index = sequence,
         rollType = DiceRollType.BLOCK,
-        teamId = NORMALIZER_TEAM,
-        playerId = NORMALIZER_PLAYER,
+        team = NORMALIZER_TEAM,
+        player = NORMALIZER_PLAYER,
         dice = dice,
         scope = ChanceObservationScope(
             half = 1,

@@ -89,11 +89,11 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
         }
         val recoveryResult = recoveries(root.rerollOptions, observedSuccess = null)
         recoveryResult.reason?.let { return unsupported(root, it) }
-        val opponentChooses = root.selectedBy != null && root.selectedBy != root.teamId
+        val opponentChooses = root.selectedBy != null && root.selectedBy != root.team
         return when (physical) {
             false -> ActionPathEvent.Logical.block(
                 index = root.index,
-                owner = root.teamId,
+                owner = root.team,
                 results = blockResults,
                 selectedFace = selected.blockResult,
                 opponentChooses = opponentChooses,
@@ -103,7 +103,7 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
             true -> ActionPathEvent.Physical.block(
                 index = root.index,
                 traceRootIndex = root.index,
-                owner = root.teamId,
+                owner = root.team,
                 results = blockResults,
                 selectedFace = selected.blockResult,
                 opponentChooses = opponentChooses,
@@ -131,7 +131,7 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
         return ActionPathEvent.Logical.outcome(
             index = root.index,
             rollType = root.rollType,
-            owner = root.teamId,
+            owner = root.team,
             results = finalRoll.dice.map { it.result },
             category = outcome.category,
             isSuccess = success,
@@ -170,7 +170,7 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
             index = roll.index,
             traceRootIndex = traceRoot(roll, observations),
             rollType = roll.rollType,
-            owner = roll.teamId,
+            owner = roll.team,
             results = roll.dice.map { it.result },
             category = outcome.category,
             role = when {
