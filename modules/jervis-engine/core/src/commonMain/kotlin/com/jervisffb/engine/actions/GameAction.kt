@@ -141,9 +141,9 @@ data class CoinTossResult(val result: Coin) : GameAction {
 
 @Serializable
 data class D2Result(override val value: Int) : DieResult() {
-    constructor() : this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
+    constructor() : this(Random.nextInt(1, SIDES + 1)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
-    override val max: Short = 2
+    override val max: Short = SIDES.toShort()
     init { checkRange() }
 
     override fun allOptions(vararg except: DieResult): List<D2Result> {
@@ -153,8 +153,9 @@ data class D2Result(override val value: Int) : DieResult() {
     }
 
     companion object {
+        const val SIDES = 2
         fun allOptions(): List<D2Result> {
-            return (1..2).map { D2Result(it) }
+            return (1..SIDES).map { D2Result(it) }
         }
     }
 }
@@ -204,7 +205,7 @@ data class D4Result(override val value: Int) : DieResult() {
 
 @Serializable
 data class D6Result(override val value: Int) : DieResult() {
-    constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
+    constructor() : this(Random.nextInt(1, SIDES + 1)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = SIDES.toShort()
     init { checkRange() }
@@ -221,7 +222,7 @@ data class D6Result(override val value: Int) : DieResult() {
     fun toD3(): D3Result = ceil(value / 2f).toInt().d3
 
     companion object {
-        val SIDES = 6
+        const val SIDES = 6
         fun allOptions(): List<D6Result> {
             return (1..SIDES).map { D6Result(it) }
         }

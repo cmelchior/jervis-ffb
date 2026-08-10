@@ -19,6 +19,7 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
  * rolling a die also sets the target to that die.
  *
  * Examples: Rolling on the Kick-off or Weather table.
+ * Example: Coin Toss can be seen as a table lookup with 2 entries.
  */
 fun createFinalTableLookupObservation(
     state: Game,

@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.D2Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.TossCoin
@@ -20,6 +21,7 @@ import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetKickingTeam
 import com.jervisffb.engine.common.context.CoinTossContext
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportKickingTeamResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -67,11 +69,13 @@ object DetermineKickingTeamStep : Procedure(), ChanceObservationHandler {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<CoinTossResult>(action) { coinToss ->
                 val context = state.getContext<CoinTossContext>()
-                val chanceObservation = createFinalAtLeastObservation(
+                val chanceObservation = createFinalTableLookupObservation(
                     state = state,
                     team = state.kickingTeam,
                     rollType = DiceRollType.COIN_TOSS,
-                    die = coinToss.result.d2,
+                    dice = listOf(coinToss.result.d2),
+                    favorableOutcomes = 1,
+                    possibleOutcomes = D2Result.SIDES
                 )
                 // It was the receiving team that selected the excepted coin result,
                 // so if it lands there, they get to choose first.

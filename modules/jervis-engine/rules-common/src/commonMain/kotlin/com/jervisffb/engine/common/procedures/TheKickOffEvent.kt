@@ -204,7 +204,7 @@ object TheKickOffEvent : Procedure(), ChanceObservationHandler {
 
     private fun createKickoffChanceObservation(state: Game, kickoffResult: KickOffEvent, roll: List<D6Result>): ChanceObservation? {
         if (!state.collectChanceData) return null
-        val possibleOutcomes = roll.size * D6Result.SIDES
+        val possibleOutcomes = state.rules.kickOffEventTable.entries.size
         val favorableOutcomes = state.rules.kickOffEventTable.entries.values.count { it == kickoffResult }
         return createFinalTableLookupObservation(
             state = state,

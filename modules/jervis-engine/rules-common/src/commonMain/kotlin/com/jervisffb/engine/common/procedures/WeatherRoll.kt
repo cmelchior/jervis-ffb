@@ -67,7 +67,7 @@ object WeatherRoll : Procedure(), ChanceObservationHandler {
         roll: List<D6Result>,
     ): ChanceObservation.DiceRoll? {
         if (!state.collectChanceData) return null
-        val possibleOutcomes = roll.size * D6Result.SIDES
+        val possibleOutcomes = state.rules.weatherTable.entries.size
         val favorableOutcomes = state.rules.weatherTable.entries.values.count { it == weatherResult }
         return createFinalTableLookupObservation(
             state = state,

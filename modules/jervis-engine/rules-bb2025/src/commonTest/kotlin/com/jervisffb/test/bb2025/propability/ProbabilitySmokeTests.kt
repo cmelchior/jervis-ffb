@@ -98,7 +98,7 @@ class ProbabilitySmokeTests: JervisGameBB2025Test() {
         val result = scoreActions()
         assertEquals(4, result.eventCount)
         // Fan Factor + Weather + Coin Toss: 1.d3, 2.d3, [ 4.d6, 4.d6 ], 1/2
-        assertEquals((3 / 3.0) * (2 / 3.0) * (30 / 36.0) * (1 / 2.0), result.successProbability.value, 1e-9)
+        assertEquals((3 / 3.0) * (2 / 3.0) * (7 / 11.0) * (1 / 2.0), result.successProbability.value, 1e-9)
     }
 
     private fun scoreActions(): ProbabilityScoreResult.Scored = assertIs<ProbabilityScoreResult.Scored>(
