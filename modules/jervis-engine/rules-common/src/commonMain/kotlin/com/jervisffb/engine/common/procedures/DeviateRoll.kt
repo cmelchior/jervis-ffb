@@ -10,7 +10,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.DeviateRollContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -23,6 +25,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 
 /**
  * Resolve a Deviate Roll.
@@ -33,7 +36,7 @@ import com.jervisffb.engine.rules.Rules
  *
  * See page 25 in the rulebook.
  */
-object DeviateRoll : Procedure() {
+object DeviateRoll : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -51,6 +54,14 @@ object DeviateRoll : Procedure() {
                 val context = state.getContext<DeviateRollContext>()
                 val direction = rules.direction(d8)
                 val distance = d6.value
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = state.homeTeam,
+                    rollType = DiceRollType.DEVIATE,
+                    dice = listOf(d8, d6),
+                    favorableOutcomes = 1,
+                    possibleOutcomes = D8Result.SIDES * D6Result.SIDES,
+                )
 
                 // Move the ball one at a time and check for out of bounds at every move
                 var currentLocation = context.from
@@ -66,6 +77,7 @@ object DeviateRoll : Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DEVIATE, listOf(d8, d6), showDiceType = true),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(
                         deviateRoll = listOf(d8, d6),
                         landsAt = currentLocation,

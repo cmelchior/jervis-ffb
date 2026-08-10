@@ -9,7 +9,9 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -22,6 +24,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 
 /**
  * Implement the Bribe roll. The result is stored in [com.jervisffb.engine.common.context.BeingSentOffContext] and
@@ -33,7 +36,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  *
  * See page 144 in the BB20205 rulebook.
  */
-object BribeRoll: Procedure() {
+object BribeRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -47,8 +50,15 @@ object BribeRoll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<BeingSentOffContext>()
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = context.player.team,
+                    rollType = DiceRollType.BRIBE,
+                    die = d6,
+                )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRIBE, d6),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(bribeRoll = D6DieRoll.create(d6))),
                     ExitProcedure()
                 )

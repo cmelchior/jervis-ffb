@@ -17,8 +17,11 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BadHabitsContext
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ActionNode
@@ -37,6 +40,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import kotlin.math.min
 
 /**
@@ -45,7 +49,7 @@ import kotlin.math.min
  * See page 39 in the BB2020 rulebook.
  * See page 143 in the BB2025 rulebook.
  */
-object BadHabits : Procedure() {
+object BadHabits : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -67,8 +71,15 @@ object BadHabits : Procedure() {
                 // Use the lower of the dice roll or number of players available
                 val prayerContext = state.getContext<PrayersToNuffleRollContext>()
                 val availablePlayers = getEligiblePlayers(prayerContext, rules)
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    team = prayerContext.team,
+                    rollType = DiceRollType.BAD_HABITS,
+                    die = d3,
+                )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BAD_HABITS, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     AddContext(BadHabitsContext(roll = d3, mustSelectPlayers = min(availablePlayers.size, d3.value))),
                     GotoNode(SelectPlayers)
                 )
