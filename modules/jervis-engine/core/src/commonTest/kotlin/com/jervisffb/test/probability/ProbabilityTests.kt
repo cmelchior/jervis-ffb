@@ -1,6 +1,7 @@
 package com.jervisffb.test.probability
 
 import com.jervisffb.engine.actions.BlockDice
+import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DBlockResult
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,5 +49,15 @@ class ProbabilityTests {
             DBlockResult.successProbability(BlockDice.PUSH_BACK, 2, opponentChooses = true).value,
             EPSILON,
         )
+    }
+
+    @Test
+    fun d6CombinationsEqualOrAbove() {
+        assertEquals(3, D6Result.combinationsEqualOrAbove(dice = 1, total = 4))
+        assertEquals(36, D6Result.combinationsEqualOrAbove(dice = 2, total = 1))
+        assertEquals(1, D6Result.combinationsEqualOrAbove(dice = 2, total = 12))
+        assertEquals(21, D6Result.combinationsEqualOrAbove(dice = 2, total = 7))
+        assertEquals(36, D6Result.combinationsEqualOrAbove(dice = 2, total = 2))
+        assertEquals(135, D6Result.combinationsEqualOrAbove(dice = 3, total = 10))
     }
 }

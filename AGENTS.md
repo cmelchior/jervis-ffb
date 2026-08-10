@@ -197,3 +197,5 @@ fresh clone usually resolve after the first successful build.
   UiAction to improve compose skipping.
 - Classes used in Compose should wrap model `Team` and `Player` references in a
   `ModelRef` wrapper to improve compose skipping.
+- When adding a new conditional reroll, `RerollSource.toChanceSnapshot` must 
+  also be updated.

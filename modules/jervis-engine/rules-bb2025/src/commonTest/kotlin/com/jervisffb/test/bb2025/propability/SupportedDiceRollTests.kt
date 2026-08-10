@@ -153,6 +153,11 @@ class SupportedDiceRollTests {
             DiceRollType.TREACHEROUS_TRAPDOOR,
             DiceRollType.UNCHANNELLED_FURY,
             DiceRollType.SWOOP_DIRECTION,
+            DiceRollType.SWELTERING_HEAT,
+            DiceRollType.TEAM_MASCOT,
+            DiceRollType.THROW_A_ROCK,
+            DiceRollType.THROWIN_DIRECTION,
+            DiceRollType.THROWIN_DISTANCE,
             DiceRollType.WEATHER -> true
 
             DiceRollType.ARGUE_THE_CALL,
@@ -174,12 +179,7 @@ class SupportedDiceRollTests {
             DiceRollType.QUALITY,
             DiceRollType.RECOVER_PLAYER,
             DiceRollType.SCATTER,
-            DiceRollType.SUDDEN_DEATH,
-            DiceRollType.SWELTERING_HEAT,
-            DiceRollType.TEAM_MASCOT,
-            DiceRollType.THROW_A_ROCK,
-            DiceRollType.THROWIN_DIRECTION,
-            DiceRollType.THROWIN_DISTANCE -> false
+            DiceRollType.SUDDEN_DEATH -> false
         }
     }
 

@@ -18,6 +18,8 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportPlayerInjury
 import com.jervisffb.engine.fsm.ActionNode
@@ -34,6 +36,7 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.tables.weather.ReportNoSwelteringHeatRoll
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import kotlin.math.min
 
 /**
@@ -42,7 +45,7 @@ import kotlin.math.min
  * See page 37 in the BB2020 rulebook.
  * See page 46 in the BB2025 rulebook.
  */
-object SwelteringHeat : Procedure() {
+object SwelteringHeat : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollForHomeTeam
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         return AddContext(SwelteringHeatContext())
@@ -74,8 +77,15 @@ object SwelteringHeat : Procedure() {
 
                 else -> {
                     castDiceRoll<D3Result>(action) { d3 ->
+                        val chanceObservation = createFinalAtLeastObservation(
+                            state = state,
+                            team = state.homeTeam,
+                            rollType = DiceRollType.SWELTERING_HEAT,
+                            die = d3,
+                        )
                         compositeCommandOf(
                             ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
+                            chanceObservation?.let(::AddChanceObservation),
                             UpdateContext(state.getContext<SwelteringHeatContext>().copy(homeRoll = d3)),
                             GotoNode(SelectPlayersOnHomeTeam)
                         )
@@ -131,8 +141,15 @@ object SwelteringHeat : Procedure() {
                 }
                 else -> {
                     castDiceRoll<D3Result>(action) { d3 ->
+                        val chanceObservation = createFinalAtLeastObservation(
+                            state = state,
+                            team = state.awayTeam,
+                            rollType = DiceRollType.SWELTERING_HEAT,
+                            die = d3,
+                        )
                         compositeCommandOf(
                             ReportDiceRoll(DiceRollType.SWELTERING_HEAT, d3),
+                            chanceObservation?.let(::AddChanceObservation),
                             UpdateContext(state.getContext<SwelteringHeatContext>().copy(awayRoll = d3)),
                             GotoNode(SelectPlayersOnAwayTeam)
                         )

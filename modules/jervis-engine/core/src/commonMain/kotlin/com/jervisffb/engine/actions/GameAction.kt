@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.safeCast
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -239,6 +240,39 @@ data class D6Result(override val value: Int) : DieResult() {
          */
         fun successProbability(target: D6Result): Probability {
             return Probability((SIDES + 1 - target.value).toDouble() / SIDES)
+        }
+
+        /**
+         * When rolling [dice], return how many dice combinations exists, where
+         * the sum of the dice are equal or above [total].
+         */
+        fun combinationsEqualOrAbove(dice: Int, total: Int): Int {
+            require(dice > 0) { "At least one D6 is required: $dice" }
+
+            var possibleOutcomes = 1
+            repeat(dice) {
+                require(possibleOutcomes <= Int.MAX_VALUE / SIDES) {
+                    "The combinations for $dice D6 rolls cannot be represented as an Int"
+                }
+                possibleOutcomes *= SIDES
+            }
+
+            val maximumTotal = dice * SIDES
+            if (total <= dice) return possibleOutcomes
+            if (total > maximumTotal) return 0
+
+            var combinationsByTotal = intArrayOf(1)
+            repeat(dice) {
+                val nextCombinationsByTotal = IntArray(combinationsByTotal.size + SIDES)
+                for (currentTotal in combinationsByTotal.indices) {
+                    for (result in 1..SIDES) {
+                        nextCombinationsByTotal[currentTotal + result] += combinationsByTotal[currentTotal]
+                    }
+                }
+                combinationsByTotal = nextCombinationsByTotal
+            }
+
+            return (total..maximumTotal).sumOf { combinationsByTotal[it] }
         }
     }
 }

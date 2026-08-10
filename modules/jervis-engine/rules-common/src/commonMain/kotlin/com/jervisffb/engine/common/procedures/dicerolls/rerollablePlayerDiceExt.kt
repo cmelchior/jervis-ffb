@@ -44,7 +44,7 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
  * context with [updated] while applying the same reversible change to
  * [GameDelta.chanceObservations] with [command].
  */
-internal data class ChanceObservationUpdate(
+data class ChanceObservationUpdate(
     val previous: ChanceObservation.DiceRoll,
     val updated: ChanceObservation.DiceRoll,
 ) {
@@ -232,7 +232,7 @@ fun captureChanceRerollOptions(
  * Calculates this source's reroll choices for a hypothetical success or
  * failure, returning no choices when the source does not apply to that branch.
  */
-private fun RerollSource.optionsWhenApplicable(
+fun RerollSource.optionsWhenApplicable(
     state: Game,
     rollType: DiceRollType,
     dicePool: List<DieRoll<*>>,

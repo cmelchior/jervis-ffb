@@ -15,9 +15,11 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.PuntContext
 import com.jervisffb.engine.common.context.ThrowInContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -35,6 +37,7 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.assert
 import com.jervisffb.engine.utils.sum
 
@@ -67,7 +70,7 @@ import com.jervisffb.engine.utils.sum
  * follows the NAF interpretation of this and will bounce the
  * ball after a throw-in.
  */
-object ThrowIn : Procedure() {
+object ThrowIn : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDirection
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         // When punting, if the ball leaves the pitch for any reason, it is a turnover.
@@ -96,8 +99,17 @@ object ThrowIn : Procedure() {
                 val context = state.getContext<ThrowInContext>()
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
                 val ball = context.ball
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = observationTeam(state),
+                    rollType = DiceRollType.THROWIN_DIRECTION,
+                    dice = listOf(d3),
+                    favorableOutcomes = 1,
+                    possibleOutcomes = d3.max.toInt(),
+                )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.THROWIN_DIRECTION, d3),
+                    chanceObservation?.let(::AddChanceObservation),
                     UpdateContext(context.copy(
                         directionRoll =  d3,
                         direction = direction,
@@ -119,6 +131,14 @@ object ThrowIn : Procedure() {
                 assert(dice.size == 2)
                 val context = state.getContext<ThrowInContext>()
                 val diceDistance = dice.sum()
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = observationTeam(state),
+                    rollType = DiceRollType.THROWIN_DISTANCE,
+                    dice = dice,
+                    favorableOutcomes = D6Result.combinationsEqualOrAbove(dice = dice.size, total = diceDistance),
+                    possibleOutcomes = dice.size * D6Result.SIDES,
+                )
 
                 // Move the ball the entire distance until it either goes out of bounds again
                 // or hit an empty location
@@ -146,6 +166,7 @@ object ThrowIn : Procedure() {
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
+                        chanceObservation?.let(::AddChanceObservation),
                         UpdateContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         SetBallState.outOfBounds(ball, outOfBoundsAt),
@@ -154,6 +175,7 @@ object ThrowIn : Procedure() {
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROWIN_DISTANCE, dice),
+                        chanceObservation?.let(::AddChanceObservation),
                         UpdateContext(context.copy(distance = dice)),
                         SetBallLocation(ball, ballPosition),
                         GotoNode(ResolveLandOnPitch)
@@ -162,6 +184,8 @@ object ThrowIn : Procedure() {
             }
         }
     }
+
+    private fun observationTeam(state: Game): Team = state.activeTeam ?: state.kickingTeam
 
     object ResolveOutOfBounds : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {

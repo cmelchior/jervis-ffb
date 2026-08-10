@@ -18,9 +18,11 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.context.ThrowARockContext
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportDiceRoll
@@ -36,15 +38,17 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
+ * TODO Throw a rock behaves differently in BB2020 and BB2025. This procedure neds a refactor.
  * Procedure for handling the Prayer to Nuffle "Throw a Rock" at the end of a drive where it was active.
  *
  * Developer's Comments:
  * Does Throw a Rock also work in the dogout? For now we assume the answer is no.
  */
-object ResolveThrowARock : Procedure() {
+object ResolveThrowARock : Procedure(), ChanceObservationHandler {
     override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Check for stalling players on the team ending their turn. Any
@@ -104,9 +108,16 @@ object ResolveThrowARock : Procedure() {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<ThrowARockContext>()
                 val player = context.currentPlayer!!
+                val chanceObservation = createFinalAtLeastObservation(
+                    state = state,
+                    player = player,
+                    rollType = DiceRollType.THROW_A_ROCK,
+                    die = d6,
+                )
                 return if (d6.value >= 5) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
+                        chanceObservation?.let(::AddChanceObservation),
                         SetPlayerIntermediateState(player, PlayerIntermediateState.KNOCKED_DOWN),
                         ReportGameProgress("${state.activeTeamOrThrow()} hit ${player.name} with a rock"),
                         GotoNode(ResolveInjuryByRock),
@@ -114,6 +125,7 @@ object ResolveThrowARock : Procedure() {
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
+                        chanceObservation?.let(::AddChanceObservation),
                         ReportGameProgress("${state.activeTeamOrThrow()} ignores ${player.name}"),
                         GotoNode(SelectPlayer),
                     )

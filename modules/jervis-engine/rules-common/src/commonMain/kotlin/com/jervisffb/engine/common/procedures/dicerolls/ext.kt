@@ -53,15 +53,18 @@ fun createFinalTableLookupObservation(
 }
 
 /**
- * Creates a finalized observation for a dice roll that has an AT_LEAST outcome.
- * Generally we set the target to the value of the die rolled. This is on
- * purpose, as the Jervis Probability Score measures the probability of the
- * selected sequence and not the probability to reach an optimal outcome.
+ * Creates a finalized observation for a single die roll that has an AT_LEAST
+ * outcome.
+ *
+ * We set the target to the value of the die rolled. This is on purpose, as the
+ * Jervis Probability Score measures the probability of the selected sequence
+ * and not the probability to reach an optimal outcome. Thus, the rolled value
+ * becomes the target for "success".
  *
  * Used for all single D6 rolls that cannot be rerolled, like Kickoff Table
  * events (Cheering Fans, Dodgy Snack).
  */
-fun createFinalAtLeastObservation(
+private fun createFinalAtLeastObservation(
     state: Game,
     team: Team,
     player: Player?,
@@ -131,4 +134,3 @@ fun createFinalAtLeastObservation(
         target = target,
     )
 }
-
