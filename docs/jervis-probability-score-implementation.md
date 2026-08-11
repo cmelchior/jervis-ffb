@@ -163,9 +163,9 @@ reroll, affecting future rolls.
 Similarly, choosing a 2, where a 3 is required, is a failure in the eyes of 
 the rules, but the value will be used as success when scoring the sequence.
 
-Actual rerolls are consumed even when their activation fails. If an earlier
-hypothetical branch spends a reroll that a later demonstrated reroll needs,
-that branch ends at the later reroll.
+Actual rerolls are consumed even when their activation fails. Resources needed
+by later demonstrated rerolls are reserved from earlier hypothetical choices
+so the recorded physical trace remains scoreable.
 
 Some examples where this behavior might be counter-intuitive:
 

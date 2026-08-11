@@ -74,7 +74,7 @@ abstract class JervisGameBB2025Test {
         controller.startTestMode(FullGame)
     }
 
-    fun setupAndStartThrowTeamMateGame() {
+    fun setupAndStartThrowTeamMateGame(collectMetadata: Boolean = false) {
         // Create new teams that have the option to throw a team-mate.
         // Remove Bone Head from the ogre to make testing easier.
         homeTeam = createAdvancedHomeTeam(rules)
@@ -84,8 +84,12 @@ abstract class JervisGameBB2025Test {
         state = createDefaultGameStateBB2020(rules, homeTeam, awayTeam)
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
-        controller = GameEngineController(state)
+        controller = GameEngineController(
+            state = state,
+            statistics = if (collectMetadata) GameStatistics() else null,
+        )
         controller.startTestMode(FullGame)
+        state.collectChanceData = false
         controller.rollForward(
             *defaultPregame(),
             *arrayOf(*throwTeamMateHomeSetup(), *throwTeamMateAwaySetup()),
@@ -95,6 +99,7 @@ abstract class JervisGameBB2025Test {
                 bounce = 4.d8
             ),
         )
+        state.collectChanceData = true
     }
 
     private fun throwTeamMateHomeSetup(endSetup: Boolean = true): Array<GameAction> {

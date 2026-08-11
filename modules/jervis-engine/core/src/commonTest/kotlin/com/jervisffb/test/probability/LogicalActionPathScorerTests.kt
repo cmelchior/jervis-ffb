@@ -163,9 +163,11 @@ class LogicalActionPathScorerTests {
         val first = d6(0, 4, true, listOf(dodge), scope(turn = 1))
         val sameTurn = d6(1, 4, true, listOf(dodge), scope(turn = 1))
         val nextTurn = d6(1, 4, true, listOf(dodge), scope(turn = 2))
+        val nextHalf = d6(1, 4, true, listOf(dodge), scope(half = 2, turn = 1))
 
         assertEquals(1.0 / 2.0, score(listOf(first, sameTurn),).successProbability.value, EPSILON)
         assertEquals(9.0 / 16.0, score(listOf(first, nextTurn),).successProbability.value, EPSILON)
+        assertEquals(9.0 / 16.0, score(listOf(first, nextHalf),).successProbability.value, EPSILON)
     }
 
     @Test
@@ -185,7 +187,7 @@ class LogicalActionPathScorerTests {
         // The demonstrated branch first occurs on 1/2. The opponent rerolls it,
         // and only another demonstrated result (1/2) preserves the line.
         assertEquals(1.0 / 4.0, result.successProbability.value, EPSILON)
-        assertEquals(2.0, result.surprisal.value, EPSILON)
+        assertEquals(2.0, result.successSurprisal.value, EPSILON)
     }
 
     @Test
@@ -286,6 +288,17 @@ class LogicalActionPathScorerTests {
         assertEquals(original, decoded)
     }
 
+    @Test
+    fun longPathDoesNotUnderflowDuringScoring() {
+        val rollCount = 1_100
+        val result = score(
+            List(rollCount) { index -> d6(index, 4, success = true) },
+        )
+
+        assertEquals(rollCount.toDouble(), result.successSurprisal.value, EPSILON)
+        assertEquals(0.0, result.successProbability.value)
+    }
+
     private fun score(
         events: List<ActionPathEvent>,
         multipleRerollsPerTurn: Boolean = true,
@@ -328,9 +341,13 @@ class LogicalActionPathScorerTests {
         appliesTo = setOf(ChanceBranch.SELECTED, ChanceBranch.ALTERNATIVE),
     )
 
-    private fun scope(turn: Int = 1) = ActionPathEventScope(
-        half = 1,
-        drive = 1,
+    private fun scope(
+        half: Int = 1,
+        drive: Int = 1,
+        turn: Int = 1,
+    ) = ActionPathEventScope(
+        half = half,
+        drive = drive,
         turn = turn,
         player = "player-1".playerId,
     )

@@ -3,7 +3,7 @@ package com.jervisffb.engine.statistics.probability.scorer
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.AlgorithmId
-import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
@@ -18,11 +18,10 @@ import com.jervisffb.engine.statistics.probability.event.recoveries
 import com.jervisffb.engine.statistics.probability.event.scope
 import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
 import com.jervisffb.engine.statistics.probability.normalizer.FixedRerollUsageNormalizerPolicy
-import com.jervisffb.engine.utils.sum
 
 /**
- * Evaluates and scores a given Action Path using [PriorityListRerollUsagePolicy]. This
- * means that if rerolls were selected during the action path, that reroll is
+ * Evaluates and scores a given Action Path using [PriorityListRerollUsagePolicy].
+ * This means that if rerolls were selected during the action path, that reroll is
  * ignored when calculating the final score and instead only the final die
  * result is used.
  *
@@ -55,18 +54,18 @@ object LogicalActionPathScorer: ActionPathScorer {
             return unsupported(events, unsupportedReasons)
         }
 
-        val baseProbability = events.fold(Probability.ALWAYS) { probability, event ->
-            probability * event.observedOutcomeProbability
+        val baseSurprisal = events.fold(Surprisal.ZERO) { surprisal, event ->
+            surprisal + event.observedOutcomeProbability.toSurprisal()
         }
-        if (baseProbability == Probability.NEVER) {
+        if (baseSurprisal.value == Double.POSITIVE_INFINITY) {
             return unsupported(events, listOf("The base line probability underflowed to zero."))
         }
 
         val allowMultipleTeamRerollsPerTurn = rules.allowMultipleTeamRerollsPrTurn
         val relevantStates = relevantResourceStates(events, allowMultipleTeamRerollsPerTurn)
-        var states: Map<ResourceState, Probability> = mapOf(ResourceState() to Probability.ALWAYS)
+        var states: Map<ResourceState, Surprisal> = mapOf(ResourceState() to Surprisal.ZERO)
         events.forEachIndexed { eventIndex, event ->
-            val next = mutableMapOf<ResourceState, Probability>()
+            val next = mutableMapOf<ResourceState, Surprisal>()
             states.forEach { (resourceState, lineProbability) ->
                 expandEvent(
                     event = event,
@@ -78,7 +77,7 @@ object LogicalActionPathScorer: ActionPathScorer {
                 )
             }
             val relevantAfterEvent = relevantStates[eventIndex + 1]
-            val pruned = mutableMapOf<ResourceState, Probability>()
+            val pruned = mutableMapOf<ResourceState, Surprisal>()
             next.forEach { (state, probability) ->
                 pruned.add(state.retain(relevantAfterEvent), probability)
             }
@@ -91,25 +90,22 @@ object LogicalActionPathScorer: ActionPathScorer {
             states = pruned
         }
 
-        val successProbability = states.values.sum().coerceIn(Probability.NEVER, Probability.ALWAYS)
-        if (successProbability == Probability.NEVER) {
+        val successSurprisal = states.values.reduceOrNull(Surprisal::plusProbability) ?: Surprisal(Double.POSITIVE_INFINITY)
+        if (successSurprisal.value == Double.POSITIVE_INFINITY) {
             return unsupported(events, listOf("The fixed-policy probability underflowed to zero."))
         }
 
-        val baseRisk = baseProbability.toSurprisal()
-        val finalRisk = successProbability.toSurprisal()
+        val finalRisk = successSurprisal
         return ProbabilityScoreResult.Scored(
             algorithmId = algorithmId,
             rerollPolicyId = rerollUsagePolicy.id,
             events = events,
-            baseProbability = baseProbability,
-            demonstratedProbability = baseProbability,
-            successProbability = successProbability,
-            baseSurprisal = baseRisk,
+            baseSurprisal = baseSurprisal,
+            demonstratedSurprisal = baseSurprisal,
+            successSurprisal = finalRisk,
             actualExtraRollAdjustment = SurprisalAdjustment.ZERO,
-            hypotheticalRecoveryAdjustment = SurprisalAdjustment.from(baseRisk, finalRisk),
-            rerollAdjustment = SurprisalAdjustment.from(baseRisk, finalRisk),
-            surprisal = finalRisk,
+            hypotheticalRecoveryAdjustment = SurprisalAdjustment.from(baseSurprisal, finalRisk),
+            rerollAdjustment = SurprisalAdjustment.from(baseSurprisal, finalRisk),
         )
     }
 
@@ -119,11 +115,11 @@ object LogicalActionPathScorer: ActionPathScorer {
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
         resourceState: ResourceState,
-        lineProbability: Probability,
-        target: MutableMap<ResourceState, Probability>,
+        lineProbability: Surprisal,
+        target: MutableMap<ResourceState, Surprisal>,
     ) {
-        val observedProbability = event.observedOutcomeProbability
-        val alternativeProbability = observedProbability.inverse()
+        val observedProbability = event.observedOutcomeProbability.toSurprisal()
+        val alternativeProbability = (com.jervisffb.engine.statistics.probability.Probability.ALWAYS - event.observedOutcomeProbability).toSurprisal()
         val ownerIsSolvingTeam = event.owner == solvingTeamId
         val recoveryBranch = when (ownerIsSolvingTeam) {
             true -> ChanceBranch.ALTERNATIVE
@@ -138,7 +134,7 @@ object LogicalActionPathScorer: ActionPathScorer {
 
         if (ownerIsSolvingTeam) {
             // The demonstrated outcome needs no resource.
-            target.add(resourceState, lineProbability * observedProbability)
+            target.add(resourceState, lineProbability + observedProbability)
             if (recovery != null) {
                 val consumed = resourceState.consume(
                     recovery.resource,
@@ -147,16 +143,16 @@ object LogicalActionPathScorer: ActionPathScorer {
                 )
                 // STOP means an activation failure retains the line-breaking
                 // original result, so only an activated successful reroll lives.
-                val recovered = alternativeProbability *
-                    recovery.activation.probability *
+                val recovered = alternativeProbability +
+                    recovery.activation.probability.toSurprisal() +
                     observedProbability
-                target.add(consumed, lineProbability * recovered)
+                target.add(consumed, lineProbability + recovered)
             }
         } else {
             // The opponent accepts the alternative outcome, which breaks the
             // submitted line. Only the demonstrated branch can survive.
             if (recovery == null) {
-                target.add(resourceState, lineProbability * observedProbability)
+                target.add(resourceState, lineProbability + observedProbability)
             } else {
                 val consumed = resourceState.consume(
                     recovery.resource,
@@ -166,8 +162,9 @@ object LogicalActionPathScorer: ActionPathScorer {
                 val activation = recovery.activation.probability
                 // Failed activation retains the demonstrated result. When the
                 // recovery activates, only another demonstrated result survives.
-                val survivesRecovery = (Probability.ALWAYS - activation) + activation * observedProbability
-                target.add(consumed, lineProbability * observedProbability * survivesRecovery)
+                val survivesRecovery = (com.jervisffb.engine.statistics.probability.Probability.ALWAYS - activation).toSurprisal()
+                    .plusProbability(activation.toSurprisal() + observedProbability)
+                target.add(consumed, lineProbability + observedProbability + survivesRecovery)
             }
         }
     }
@@ -292,9 +289,9 @@ object LogicalActionPathScorer: ActionPathScorer {
     }
 
     /** Adds probability to a resource state while merging duplicate states. */
-    private fun MutableMap<ResourceState, Probability>.add(state: ResourceState, probability: Probability) {
-        if (probability == Probability.NEVER) return
-        this[state] = (this[state] ?: Probability.NEVER) + probability
+    private fun MutableMap<ResourceState, Surprisal>.add(state: ResourceState, probability: Surprisal) {
+        if (probability.value == Double.POSITIVE_INFINITY) return
+        this[state] = (this[state] ?: Surprisal(Double.POSITIVE_INFINITY)).plusProbability(probability)
     }
 
     /** Resolves a resource's lifetime into the key used by the DP state. */
@@ -302,10 +299,14 @@ object LogicalActionPathScorer: ActionPathScorer {
         val resourceKey = "${resource.owner.value}:${resource.id.id}"
         return when (resource.usage) {
             RerollUsage.REUSABLE -> null
-            RerollUsage.ONCE_PER_ACTION -> scope?.player?.let { "$resourceKey@action:$it" }
-            RerollUsage.ONCE_PER_ACTIVATION -> scope?.player?.let { "$resourceKey@activation:$it" }
-            RerollUsage.ONCE_PER_TURN -> scope?.turn?.let { "$resourceKey@turn:$it" }
-            RerollUsage.ONCE_PER_DRIVE -> scope?.drive?.let { "$resourceKey@drive:$it" }
+            RerollUsage.ONCE_PER_ACTION -> scope?.player?.let {
+                "$resourceKey@action:${scope.half}:${scope.drive}:${scope.turn}:$it"
+            }
+            RerollUsage.ONCE_PER_ACTIVATION -> scope?.player?.let {
+                "$resourceKey@activation:${scope.half}:${scope.drive}:${scope.turn}:$it"
+            }
+            RerollUsage.ONCE_PER_TURN -> scope?.let { "$resourceKey@turn:${it.half}:${it.drive}:${it.turn}" }
+            RerollUsage.ONCE_PER_DRIVE -> scope?.let { "$resourceKey@drive:${it.half}:${it.drive}" }
             RerollUsage.ONCE_PER_HALF -> scope?.half?.let { "$resourceKey@half:$it" }
             RerollUsage.ONCE_PER_GAME -> "$resourceKey@game"
             RerollUsage.UNSUPPORTED -> null
@@ -314,5 +315,5 @@ object LogicalActionPathScorer: ActionPathScorer {
 
     /** Returns the key used to enforce one team reroll per team turn. */
     private fun teamTurnScope(resource: RerollResource, scope: ActionPathEventScope): String =
-        "${resource.owner.value}:${scope.turn}"
+        "${resource.owner.value}:${scope.half}:${scope.drive}:${scope.turn}"
 }

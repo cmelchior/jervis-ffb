@@ -116,19 +116,19 @@ fun ChallengeOutcomeDialog(
                                 add("Base Difficulty" to "${result.baseSurprisal.toFixed(3)} bits")
                                 add("Actual extra-roll adjustment" to "${result.actualExtraRollAdjustment.toSigned(3)} bits")
                                 add("Hypothetical reroll adjustment" to "${result.hypotheticalRecoveryAdjustment.toSigned(3)} bits")
-                                add("Adjusted Difficulty" to "${result.surprisal.toFixed(3)} bits")
+                                add("Adjusted Difficulty" to "${result.successSurprisal.toFixed(3)} bits")
                                 add("Dice Rolls" to result.eventCount.toString())
                             }
                             LogicalActionPathScorer.algorithmId -> {
                                 add("Base Difficulty" to "${result.baseSurprisal.toFixed(3)} bits")
                                 add("Recovery adjustment" to "${result.rerollAdjustment.toSigned(3)} bits")
-                                add("Adjusted Risk" to "${result.surprisal.toFixed(3)} bits")
+                                add("Adjusted Risk" to "${result.successSurprisal.toFixed(3)} bits")
                                 add("Dice Rolls" to result.eventCount.toString())
                             }
                             else -> {
                                 add("Base Difficulty" to "${result.baseSurprisal.toFixed(3)} bits")
                                 add("Recovery adjustment" to "${result.rerollAdjustment.toSigned(3)} bits")
-                                add("Adjusted Difficulty" to "${result.surprisal.toFixed(3)} bits")
+                                add("Adjusted Difficulty" to "${result.successSurprisal.toFixed(3)} bits")
                                 add("Events" to result.eventCount.toString())
                             }
                         }

@@ -244,7 +244,7 @@ class LogicalActionPathLedgerInstrumentationTests : JervisGameBB2025Test() {
         val probabilityScore = assertIs<ProbabilityScoreResult.Scored>(challengeScore.result)
         assertTrue(probabilityScore.events.isEmpty())
         assertEquals(1.0, probabilityScore.successProbability.value)
-        assertEquals(Surprisal.ZERO, probabilityScore.surprisal)
+        assertEquals(Surprisal.ZERO, probabilityScore.successSurprisal)
     }
 
     @Test

@@ -136,7 +136,7 @@ private fun ProbabilityScoreResult.formattedSuccessProbability(): String = when 
 
 
 private fun ProbabilityScoreResult.formattedRisk(): String = when (this) {
-    is ProbabilityScoreResult.Scored -> surprisal.toFixed(3)
+    is ProbabilityScoreResult.Scored -> successSurprisal.toFixed(3)
     is ProbabilityScoreResult.Unsupported -> "Unranked"
 }
 

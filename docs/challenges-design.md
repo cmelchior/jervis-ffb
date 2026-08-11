@@ -33,6 +33,8 @@ to shipping an MVP of this feature.
 - Action Path: The sequence of game actions that make up a solution to a 
   challenge. Any setup actions (for bringing the game to the starting state)
   are not counted in this.
+- Scoring an Action Path: Calculating the probability of succcss for this path
+  to happen.
 - Chance Event/Observation: A game action that contains an element of chance. 
   E.g., dice roll or coin flip. 
 - Structured data/event/obeservation: A Chance Observation that contains 
@@ -48,6 +50,9 @@ to shipping an MVP of this feature.
   probability policy.  
 - Demonstrated Path: The game actions in a sequence that describes a certain 
   path through the game state.
+- Activation Dice: Some rolls are done to enable a reroll, like Pro or Loner.
+  These can be treated differently when scoring an action path.
+  
 
 ## UI 
 

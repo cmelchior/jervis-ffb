@@ -2,6 +2,7 @@ package com.jervisffb.engine.statistics.probability
 
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
 
@@ -34,6 +35,7 @@ value class Surprisal private constructor(val value: Double): Comparable<Surpris
         require(value >= 0.0) { "Surprisal must be >= 0: $value" }
     }
 
+    // This is equivalent to multiplying probabilities
     operator fun plus(other: Surprisal): Surprisal {
         return Surprisal(value + other.value)
     }
@@ -43,7 +45,20 @@ value class Surprisal private constructor(val value: Double): Comparable<Surpris
     }
 
     fun toProbability(): Probability {
-        return Probability(if (value == 0.0) 0.0 else 2.0.pow(-value))
+        return Probability(if (value == Double.POSITIVE_INFINITY) 0.0 else 2.0.pow(-value))
+    }
+
+    /**
+     * Returns the surprisal of the sum of the probabilities represented by both
+     * values.
+     */
+    fun plusProbability(other: Surprisal): Surprisal {
+        if (value == Double.POSITIVE_INFINITY) return other
+        if (other.value == Double.POSITIVE_INFINITY) return this
+        // Done in log space to avoid underflow.
+        val lower = minOf(value, other.value)
+        val difference = abs(value - other.value)
+        return Surprisal(lower - log2(1.0 + 2.0.pow(-difference)))
     }
 
     override fun compareTo(other: Surprisal): Int = other.value.compareTo(value)
@@ -116,7 +131,7 @@ value class Probability(val value: Double): Comparable<Probability> {
     }
 
     fun toSurprisal(): Surprisal {
-        return Surprisal(if (value == 0.0) 0.0 else -log2(value))
+        return Surprisal(if (value == 0.0) Double.POSITIVE_INFINITY else -log2(value))
     }
 
     // Returns the inverse probability of this probability, e.g. if it represents
@@ -135,4 +150,3 @@ value class Probability(val value: Double): Comparable<Probability> {
         }
     }
 }
-

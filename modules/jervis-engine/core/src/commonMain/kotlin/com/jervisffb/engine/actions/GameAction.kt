@@ -686,10 +686,12 @@ sealed class DieResult : Number(), GameAction {
     abstract val value: Int
     abstract val min: Short
     abstract val max: Short
+    val range: IntRange
+        get() = min..max
 
     protected fun checkRange() {
-        if (value !in min..max) {
-            throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
+        if (value !in range) {
+            throw IllegalArgumentException("Dice value outside range: $min <= $value <= $max")
         }
     }
 

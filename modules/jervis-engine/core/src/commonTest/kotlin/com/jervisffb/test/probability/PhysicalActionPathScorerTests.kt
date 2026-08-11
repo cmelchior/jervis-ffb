@@ -31,6 +31,7 @@ class PhysicalActionPathScorerTests {
     companion object {
         private const val HYBRID_EPSILON = 1e-9
         private val HYBRID_HOME = TeamId("home")
+        private val HYBRID_AWAY = TeamId("away")
     }
 
     val rules = object: AbstractTestRules() {
@@ -80,7 +81,7 @@ class PhysicalActionPathScorerTests {
     }
 
     @Test
-    fun earlierHypotheticalUseCanInvalidateALaterDemonstratedUse() {
+    fun futureActualUseReservesResourceFromEarlierHypotheticalUse() {
         val teamReroll = resource("team", RerollCategory.TEAM_REROLL)
         val events = listOf(
             physical(0, 4.d6, success = true, recoveries = listOf(option(teamReroll))),
@@ -90,8 +91,55 @@ class PhysicalActionPathScorerTests {
 
         val result = score(events)
 
-        // Only the direct first-roll branch retains the token required by the
-        // demonstrated use. The recovery branch terminates at event 1.
+        // The demonstrated use takes precedence over an earlier hypothetical use.
+        assertEquals(0.25, result.successProbability.value, HYBRID_EPSILON)
+    }
+
+    @Test
+    fun futureOpponentActualUseReservesResourceFromEarlierHypotheticalUse() {
+        val teamReroll = resource("team", RerollCategory.TEAM_REROLL, owner = HYBRID_AWAY)
+        val events = listOf(
+            physical(0, 4.d6, owner = HYBRID_AWAY, recoveries = listOf(option(teamReroll))),
+            physical(
+                1,
+                4.d6,
+                owner = HYBRID_AWAY,
+                actualRecovery = ActualRerollUse(teamReroll, "Team reroll"),
+            ),
+            physical(2, 1.d6, owner = HYBRID_AWAY, role = PhysicalRollRole.REROLL, root = 1),
+        )
+
+        val result = score(events)
+
+        assertEquals(0.25, result.successProbability.value, HYBRID_EPSILON)
+    }
+
+    @Test
+    fun actualRecoveryCanBeReusedAfterItsScopeResets() {
+        val pro = resource(
+            "pro",
+            RerollCategory.PRO,
+            usage = RerollUsage.ONCE_PER_ACTIVATION,
+        )
+        val events = listOf(
+            physical(
+                0,
+                4.d6,
+                actualRecovery = ActualRerollUse(pro, "Pro"),
+                eventScope = scope(half = 1, turn = 1),
+            ),
+            physical(1, 1.d6, role = PhysicalRollRole.REROLL, root = 0, eventScope = scope(half = 1, turn = 1)),
+            physical(
+                2,
+                4.d6,
+                actualRecovery = ActualRerollUse(pro, "Pro"),
+                eventScope = scope(half = 2, turn = 1),
+            ),
+            physical(3, 1.d6, role = PhysicalRollRole.REROLL, root = 2, eventScope = scope(half = 2, turn = 1)),
+        )
+
+        val result = score(events)
+
         assertEquals(0.25, result.successProbability.value, HYBRID_EPSILON)
     }
 
@@ -129,6 +177,20 @@ class PhysicalActionPathScorerTests {
     }
 
     @Test
+    fun longPathDoesNotUnderflowDuringScoring() {
+        val rollCount = 1_100
+        val result = score(
+            List(rollCount) { index -> physical(index, 4.d6) },
+        )
+
+        // 2^-1100 is below the smallest representable positive Double (2^-1074).
+        // The probability therefore underflows, while log-space scoring
+        // remains valid.
+        assertEquals(1100.0, result.successSurprisal.value)
+        assertEquals(0.0, result.successProbability.value)
+    }
+
+    @Test
     fun hybridResultRoundTripsWithItsPhysicalLedger() {
         val result = score(listOf(physical(0, 2.d6, success = true)))
         val original = ChallengeScore.ProbabilityScore(Instant.fromEpochMilliseconds(1234), result)
@@ -151,25 +213,32 @@ class PhysicalActionPathScorerTests {
         actualRecovery: ActualRerollUse? = null,
         recoveries: List<RerollOption> = emptyList(),
         root: Int = sequence,
+        owner: TeamId = HYBRID_HOME,
+        eventScope: ActionPathEventScope = scope(),
     ) = ActionPathEvent.Physical.die(
         index = sequence,
         traceRootIndex = root,
         rollType = DiceRollType.DODGE,
-        owner = HYBRID_HOME,
+        owner = owner,
         result = value,
         role = role,
-        scope = scope(),
+        scope = eventScope,
         isSuccess = success,
         actualRecovery = actualRecovery,
         recoveries = recoveries,
         finalized = true,
     )
 
-    private fun resource(id: String, category: RerollCategory) = RerollResource(
+    private fun resource(
+        id: String,
+        category: RerollCategory,
+        owner: TeamId = HYBRID_HOME,
+        usage: RerollUsage = RerollUsage.ONCE_PER_TURN,
+    ) = RerollResource(
         id = RerollSourceId(id),
-        owner = HYBRID_HOME,
+        owner = owner,
         category = category,
-        usage = RerollUsage.ONCE_PER_TURN,
+        usage = usage,
     )
 
     private fun option(resource: RerollResource) = RerollOption(
@@ -178,10 +247,14 @@ class PhysicalActionPathScorerTests {
         appliesTo = setOf(ChanceBranch.SELECTED, ChanceBranch.ALTERNATIVE),
     )
 
-    private fun scope() = ActionPathEventScope(
-        half = 1,
-        drive = 1,
-        turn = 1,
+    private fun scope(
+        half: Int = 1,
+        drive: Int = 1,
+        turn: Int = 1,
+    ) = ActionPathEventScope(
+        half = half,
+        drive = drive,
+        turn = turn,
         player = "player-1".playerId,
     )
 }

@@ -12,6 +12,7 @@ import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.Probability
 import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
@@ -131,11 +132,11 @@ class ChanceNormalizerTest {
     }
 
     @Test
-    fun invalidChanceObservationsWillPreventScoring() {
+    fun selectedD6WithoutFactualSuccessRemainsScoreable() {
         val raw = listOf(
             d6(0, DiceRollType.DODGE, 4, success = null),
         )
-        assertIs<ProbabilityScoreResult.Unsupported>(
+        assertIs<ProbabilityScoreResult.Scored>(
             LogicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         )
     }
@@ -179,7 +180,7 @@ class ChanceNormalizerTest {
             val score = assertIs<ProbabilityScoreResult.Scored>(result)
             assertTrue(score.events.isEmpty())
             assertEquals(Probability.ALWAYS, score.successProbability)
-            assertEquals(Surprisal.ZERO, score.surprisal,)
+            assertEquals(Surprisal.ZERO, score.successSurprisal)
         }
     }
 
@@ -200,7 +201,7 @@ class ChanceNormalizerTest {
     }
 
     @Test
-    fun finalizedD6WithoutSuccessRemainsUnsupported() {
+    fun finalizedD6WithoutSuccessUsesSelectedBranch() {
         val raw = listOf(
             d6(0, DiceRollType.DODGE, 4, success = true).copy(success = null),
         )
@@ -209,8 +210,7 @@ class ChanceNormalizerTest {
             LogicalActionPathScorer.score(rules,raw, NORMALIZER_TEAM),
             PhysicalActionPathScorer.score(rules, raw, NORMALIZER_TEAM),
         ).forEach { result ->
-            val unsupported = assertIs<ProbabilityScoreResult.Unsupported>(result)
-            assertTrue(unsupported.reasons.any { it.contains("factual success") })
+            assertIs<ProbabilityScoreResult.Scored>(result)
         }
     }
 
@@ -267,6 +267,51 @@ class ChanceNormalizerTest {
         val physicalEvent = assertIs<ActionPathEvent.Physical>(physicalResult.events.single())
         assertIs<ActionPathEvent.Resolution.Block>(physicalEvent.resolution)
         assertEquals(OutcomeRatio(11, 36), physicalEvent.observedOutcome)
+    }
+
+    @Test
+    fun partialBlockRerollRemainsScoreable() {
+        val firstDie = DieId("block-0")
+        val secondDie = DieId("block-1")
+        val brawler = ChanceRerollSource(
+            id = RerollSourceId("brawler"),
+            owner = NORMALIZER_TEAM,
+            kind = ChanceRerollSourceKind.SKILL,
+            description = "Brawler",
+            resetAt = Duration.END_OF_TURN,
+            skillId = com.jervisffb.engine.model.SkillId(SkillType.BRAWLER),
+        )
+        val root = block(
+            sequence = 0,
+            dice = listOf(
+                ChanceDieResult(ChanceResultId(0, 0), DBlockResult(1), firstDie),
+                ChanceDieResult(ChanceResultId(0, 1), DBlockResult(2), secondDie),
+            ),
+            selectedResultIds = listOf(ChanceResultId(0, 1)),
+            rerollOptions = listOf(
+                ChanceRerollOption(
+                    source = brawler,
+                    resultIds = listOf(ChanceResultId(0, 0)),
+                    appliesOnSuccess = true,
+                    appliesOnFailure = true,
+                    currentlyAvailable = true,
+                ),
+            ),
+            finalized = true,
+        )
+        val reroll = block(
+            sequence = 1,
+            dice = listOf(ChanceDieResult(ChanceResultId(1, 0), DBlockResult(6), firstDie)),
+            rerolledRollIndex = 0,
+            finalized = true,
+        )
+
+        assertIs<ProbabilityScoreResult.Scored>(
+            LogicalActionPathScorer.score(rules, listOf(root, reroll), NORMALIZER_TEAM),
+        )
+        assertIs<ProbabilityScoreResult.Scored>(
+            PhysicalActionPathScorer.score(rules, listOf(root, reroll), NORMALIZER_TEAM),
+        )
     }
 
     @Test
@@ -410,6 +455,7 @@ class ChanceNormalizerTest {
         rerolledRollIndex: Int? = null,
         dice: List<ChanceDieResult> = listOf(ChanceDieResult(ChanceResultId(sequence, 0), DBlockResult(5))),
         selectedResultIds: List<ChanceResultId> = emptyList(),
+        rerollOptions: List<ChanceRerollOption> = emptyList(),
         finalized: Boolean,
     ) = ChanceObservation.DiceRoll(
         index = sequence,
@@ -427,6 +473,7 @@ class ChanceNormalizerTest {
         enclosingRollIndex = enclosingRollIndex,
         rerolledRollIndex = rerolledRollIndex,
         selectedResultIds = selectedResultIds,
+        rerollOptions = rerollOptions,
         finalized = finalized,
     )
 }

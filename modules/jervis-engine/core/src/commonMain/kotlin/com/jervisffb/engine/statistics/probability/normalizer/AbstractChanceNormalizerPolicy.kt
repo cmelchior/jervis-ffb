@@ -86,17 +86,13 @@ abstract class AbstractChanceNormalizerPolicy : ChanceNormalizerPolicy {
                 ?: return unsupported(root, "A block observation contained a non-block result.")
         }
 
-        val nonTeamSource = root.rerollOptions.firstOrNull {
-            it.source.kind != ChanceRerollSourceKind.TEAM_REROLL
-        }
-        if (nonTeamSource != null) {
-            return unsupported(root, "Partial block-die rerolls are not supported by chance scoring v1.")
-        }
         val rootResultIds = root.dice.map { it.id }.toSet()
-        if (root.rerollOptions.any { it.resultIds.toSet() != rootResultIds }) {
-            return unsupported(root, "Partial block-die rerolls are not supported by chance scoring v1.")
-        }
-        val recoveryResult = recoveries(root.rerollOptions, observedSuccess = null)
+        // The event model can score the final block pool, but a reroll option that
+        // targets only some dice cannot be represented as a reroll for the pool as
+        // a whole. Keep those options out of hypothetical scoring; the replacement
+        // chain above still preserves the demonstrated final result.
+        val poolRerollOptions = root.rerollOptions.filter { it.resultIds.toSet() == rootResultIds }
+        val recoveryResult = recoveries(poolRerollOptions, observedSuccess = null)
         recoveryResult.reason?.let { return unsupported(root, it) }
         val opponentChooses = root.selectedBy != null && root.selectedBy != root.team
         return when (physical) {

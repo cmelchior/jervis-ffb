@@ -1,6 +1,5 @@
 package com.jervisffb.engine.statistics.probability.normalizer
 
-import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActualRerollUse
@@ -48,7 +47,7 @@ class ActualRerollUsageNormalizerPolicy(
                         )
                         observation.rollType in primaryRollTypes ||
                             observation.rollType in activationRollTypes -> add(
-                            normalizePhysicalD6(observation, byIndex),
+                            normalizePhysicalDie(observation, byIndex),
                         )
                         observation.rerolledRollIndex != null -> Unit
                         else -> add(unsupported(observation, "Roll type is not supported by hybrid scoring."))
@@ -59,15 +58,18 @@ class ActualRerollUsageNormalizerPolicy(
         return normalized.reindex()
     }
 
-    private fun normalizePhysicalD6(
+    private fun normalizePhysicalDie(
         roll: ChanceObservation.DiceRoll,
         observations: Map<Int, ChanceObservation.DiceRoll>,
     ): ActionPathEvent {
-        val result = roll.dice.singleOrNull()?.result as? D6Result
-            ?: return unsupported(roll, "Expected one physical D6 result.")
+        val result = roll.dice.singleOrNull()?.result
+            ?: return unsupported(roll, "Expected one physical die result.")
         if (!roll.finalized) return unsupported(roll, "Physical D6 roll was not finalized.")
-        val isSuccess = roll.success
-            ?: return unsupported(roll, "Physical D6 roll does not expose a factual success result.")
+        // A selected finalized roll is the successful branch for probability scoring.
+        // A null value is valid for rolls whose reroll rules do not distinguish
+        // success from failure; keep that null when converting recovery branches.
+        val observedSuccess = roll.success
+        val isSuccess = observedSuccess ?: true
 
         val selectedSource = roll.selectedReroll?.takeUnless { it.aborted }?.let { selection ->
             roll.rerollOptions.firstOrNull { it.source.id == selection.sourceId }?.source
@@ -79,7 +81,7 @@ class ActualRerollUsageNormalizerPolicy(
             ActualRerollUse(sourceResult!!.resource!!, source.description)
         }
         val recoveryResult = when (actualRecovery) {
-            null -> recoveries(roll.rerollOptions, isSuccess)
+            null -> recoveries(roll.rerollOptions, observedSuccess)
             else -> RecoveryConversion(emptyList())
         }
         recoveryResult.reason?.let { return unsupported(roll, it) }

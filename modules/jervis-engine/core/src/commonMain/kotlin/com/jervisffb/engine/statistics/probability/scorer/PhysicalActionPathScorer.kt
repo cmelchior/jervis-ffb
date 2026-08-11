@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.AlgorithmId
 import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.statistics.probability.Surprisal
 import com.jervisffb.engine.statistics.probability.SurprisalAdjustment
 import com.jervisffb.engine.statistics.probability.event.ActionPathEvent
 import com.jervisffb.engine.statistics.probability.event.ActionPathEventScope
@@ -19,7 +20,6 @@ import com.jervisffb.engine.statistics.probability.event.recoveries
 import com.jervisffb.engine.statistics.probability.event.scope
 import com.jervisffb.engine.statistics.probability.normalizer.ActualRerollUsageNormalizerPolicy
 import com.jervisffb.engine.statistics.probability.normalizer.ChanceNormalizer
-import com.jervisffb.engine.utils.sum
 
 /**
  * Variant of [LogicalActionPathScorer], but instead of always using fixed
@@ -51,10 +51,10 @@ object PhysicalActionPathScorer: ActionPathScorer {
         val unsupportedReasons = validate(events)
         if (unsupportedReasons.isNotEmpty()) return unsupported(events, unsupportedReasons)
 
-        val primaryProbability = events.fold(Probability.ALWAYS) { probability, event ->
+        val primarySurprisal = events.fold(Surprisal.ZERO) { probability, event ->
             when (event) {
                 is ActionPathEvent.Physical -> when (event.role) {
-                    PhysicalRollRole.PRIMARY -> probability * event.observedOutcome.probability
+                    PhysicalRollRole.PRIMARY -> probability + event.observedOutcome.probability.toSurprisal()
                     PhysicalRollRole.ACTIVATION,
                     PhysicalRollRole.REROLL,
                     -> probability
@@ -64,74 +64,76 @@ object PhysicalActionPathScorer: ActionPathScorer {
                 -> probability
             }
         }
-        val demonstratedProbability = events.fold(Probability.ALWAYS) { probability, event ->
+        val demonstratedSurprisal = events.fold(Surprisal.ZERO) { probability, event ->
             when (event) {
-                is ActionPathEvent.Physical -> probability * event.observedOutcome.probability
+                is ActionPathEvent.Physical -> probability + event.observedOutcome.probability.toSurprisal()
                 is ActionPathEvent.Logical,
                 is ActionPathEvent.Unsupported,
                 -> probability
             }
         }
-        if (primaryProbability == Probability.NEVER || demonstratedProbability == Probability.NEVER) {
+        if (primarySurprisal.value == Double.POSITIVE_INFINITY || demonstratedSurprisal.value == Double.POSITIVE_INFINITY) {
             return unsupported(events, listOf("The demonstrated line probability underflowed to zero."))
         }
 
         val allowMultipleTeamRerollsPerTurn = rules.allowMultipleTeamRerollsPrTurn
         val relevantStates = relevantResourceStates(events, allowMultipleTeamRerollsPerTurn)
-        var states: Map<ResourceState, Probability> = mapOf(ResourceState() to Probability.ALWAYS)
+        val actualRecoveryReservations = actualRecoveryReservations(events, allowMultipleTeamRerollsPerTurn)
+        var states: Map<ResourceState, Surprisal> = mapOf(ResourceState() to Surprisal.ZERO)
         events.forEachIndexed { eventIndex, event ->
-            val next = mutableMapOf<ResourceState, Probability>()
+            val next = mutableMapOf<ResourceState, Surprisal>()
             states.forEach { (resourceState, lineProbability) ->
                 when (event) {
                     is ActionPathEvent.Physical -> expandPhysical(
                         event,
                         solvingTeamId,
                         allowMultipleTeamRerollsPerTurn,
+                        actualRecoveryReservations[eventIndex + 1],
                         resourceState,
                         lineProbability,
                         next,
                     )
                     is ActionPathEvent.Logical,
-                    is ActionPathEvent.Unsupported,
-                    -> Unit // Rejected during validation.
+                    is ActionPathEvent.Unsupported -> Unit // Rejected during validation.
                 }
             }
             val relevantAfterEvent = relevantStates[eventIndex + 1]
-            val pruned = mutableMapOf<ResourceState, Probability>()
+            val pruned = mutableMapOf<ResourceState, Surprisal>()
             next.forEach { (state, probability) ->
                 pruned.add(state.retain(relevantAfterEvent), probability)
             }
             if (pruned.size > stateCeiling) {
                 return unsupported(
-                    events,
-                    listOf("State ceiling $stateCeiling exceeded after event $eventIndex (${pruned.size} states)."),
+                    events = events,
+                    reasons = listOf("State ceiling $stateCeiling exceeded after event $eventIndex (${pruned.size} states)."),
                 )
             }
             states = pruned
         }
 
-        val successProbability = states.values.sum()
-        if (successProbability == Probability.NEVER) {
-            return unsupported(events, listOf("The hybrid-policy probability underflowed to zero."))
+        if (states.isEmpty()) {
+            return unsupported(events, listOf("The hybrid-policy has no valid successful paths."))
         }
 
-        val baseRisk = primaryProbability.toSurprisal()
-        val demonstratedRisk = demonstratedProbability.toSurprisal()
-        val finalRisk = successProbability.toSurprisal()
+        val successSurprisal = states.values.reduce(Surprisal::plusProbability)
+        if (successSurprisal.value == Double.POSITIVE_INFINITY) {
+            return unsupported(events, listOf("The hybrid-policy probability underflowed to zero."))
+        }
+        val baseRisk = primarySurprisal
+        val demonstratedRisk = demonstratedSurprisal
+        val finalRisk = successSurprisal
         val actualAdjustment = SurprisalAdjustment.from(baseRisk, demonstratedRisk)
         val hypotheticalAdjustment = SurprisalAdjustment.from(demonstratedRisk, finalRisk)
         return ProbabilityScoreResult.Scored(
             algorithmId = algorithmId,
             rerollPolicyId = rerollUsagePolicy.id,
             events = events,
-            baseProbability = primaryProbability,
-            demonstratedProbability = demonstratedProbability,
-            successProbability = successProbability,
             baseSurprisal = baseRisk,
+            demonstratedSurprisal = demonstratedRisk,
+            successSurprisal = finalRisk,
             actualExtraRollAdjustment = actualAdjustment,
             hypotheticalRecoveryAdjustment = hypotheticalAdjustment,
             rerollAdjustment = actualAdjustment + hypotheticalAdjustment,
-            surprisal = finalRisk,
         )
     }
 
@@ -140,9 +142,10 @@ object PhysicalActionPathScorer: ActionPathScorer {
         event: ActionPathEvent.Physical,
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
+        futureActualRecoveries: ActualRecoveryReservations,
         resourceState: ResourceState,
-        lineProbability: Probability,
-        target: MutableMap<ResourceState, Probability>,
+        lineProbability: Surprisal,
+        target: MutableMap<ResourceState, Surprisal>,
     ) {
         val actualRecovery = event.actualRecovery
         if (actualRecovery != null) {
@@ -152,18 +155,19 @@ object PhysicalActionPathScorer: ActionPathScorer {
                 event,
                 trackTeamTurn = !allowMultipleTeamRerollsPerTurn,
             )
-            target.add(consumed, lineProbability * event.observedOutcome.probability)
+            target.add(consumed, lineProbability + event.observedOutcome.probability.toSurprisal())
         } else if (event.canUseHypotheticalRecovery) {
             expandHypothetical(
                 event,
                 solvingTeamId,
                 allowMultipleTeamRerollsPerTurn,
+                futureActualRecoveries,
                 resourceState,
                 lineProbability,
                 target,
             )
         } else {
-            target.add(resourceState, lineProbability * event.observedOutcome.probability)
+            target.add(resourceState, lineProbability + event.observedOutcome.probability.toSurprisal())
         }
     }
 
@@ -172,34 +176,36 @@ object PhysicalActionPathScorer: ActionPathScorer {
         event: ActionPathEvent,
         solvingTeamId: TeamId,
         allowMultipleTeamRerollsPerTurn: Boolean,
+        futureActualRecoveries: ActualRecoveryReservations,
         resourceState: ResourceState,
-        lineProbability: Probability,
-        target: MutableMap<ResourceState, Probability>,
+        lineProbability: Surprisal,
+        target: MutableMap<ResourceState, Surprisal>,
     ) {
-        val observedProbability = event.observedOutcomeProbability
-        val alternativeProbability = Probability.ALWAYS - observedProbability
+        val observedProbability = event.observedOutcomeProbability.toSurprisal()
+        val alternativeProbability = (Probability.ALWAYS - event.observedOutcomeProbability).toSurprisal()
         val ownerIsSolvingTeam = event.owner == solvingTeamId
         val recoveryBranch = if (ownerIsSolvingTeam) ChanceBranch.ALTERNATIVE else ChanceBranch.SELECTED
         val recovery = PriorityListRerollUsagePolicy.select(
             event.recoveries.filter { option ->
                 recoveryBranch in option.appliesTo &&
+                    !futureActualRecoveries.contains(option.resource, event, allowMultipleTeamRerollsPerTurn) &&
                     resourceState.isAvailable(option.resource, event, allowMultipleTeamRerollsPerTurn)
             },
         )
 
         if (ownerIsSolvingTeam) {
-            target.add(resourceState, lineProbability * observedProbability)
+            target.add(resourceState, lineProbability + observedProbability)
             if (recovery != null) {
                 val consumed = resourceState.consume(
                     recovery.resource,
                     event,
                     trackTeamTurn = !allowMultipleTeamRerollsPerTurn,
                 )
-                val recovered = alternativeProbability * recovery.activation.probability * observedProbability
-                target.add(consumed, lineProbability * recovered)
+                val recovered = alternativeProbability + recovery.activation.probability.toSurprisal() + observedProbability
+                target.add(consumed, lineProbability + recovered)
             }
         } else if (recovery == null) {
-            target.add(resourceState, lineProbability * observedProbability)
+            target.add(resourceState, lineProbability + observedProbability)
         } else {
             val consumed = resourceState.consume(
                 recovery.resource,
@@ -207,8 +213,9 @@ object PhysicalActionPathScorer: ActionPathScorer {
                 trackTeamTurn = !allowMultipleTeamRerollsPerTurn,
             )
             val activation = recovery.activation.probability
-            val survivesRecovery = (Probability.ALWAYS - activation) + activation * observedProbability
-            target.add(consumed, lineProbability * observedProbability * survivesRecovery)
+            val survivesRecovery = (Probability.ALWAYS - activation).toSurprisal()
+                .plusProbability(activation.toSurprisal() + observedProbability)
+            target.add(consumed, lineProbability + observedProbability + survivesRecovery)
         }
     }
 
@@ -262,6 +269,48 @@ object PhysicalActionPathScorer: ActionPathScorer {
         val consumedResources: Set<String> = emptySet(),
         val teamRerollTurns: Set<String> = emptySet(),
     )
+
+    private data class ActualRecoveryReservations(
+        val consumedResources: Set<String> = emptySet(),
+        val teamRerollTurns: Set<String> = emptySet(),
+    ) {
+        /** Returns whether consuming [resource] would invalidate a later demonstrated recovery. */
+        fun contains(
+            resource: RerollResource,
+            event: ActionPathEvent,
+            allowMultipleTeamRerollsPerTurn: Boolean,
+        ): Boolean {
+            val usage = usageScope(resource, event.scope)
+            if (usage != null && usage in consumedResources) return true
+            if (resource.category == RerollCategory.TEAM_REROLL && !allowMultipleTeamRerollsPerTurn) {
+                val turn = teamTurnScope(resource, event.scope ?: return false)
+                if (turn in teamRerollTurns) return true
+            }
+            return false
+        }
+    }
+
+    /** Reserves resources that a later physical event demonstrates were actually consumed. */
+    private fun actualRecoveryReservations(
+        events: List<ActionPathEvent>,
+        allowMultipleTeamRerollsPerTurn: Boolean,
+    ): List<ActualRecoveryReservations> {
+        val result = MutableList(events.size + 1) { ActualRecoveryReservations() }
+        for (index in events.indices.reversed()) {
+            val event = events[index]
+            val next = result[index + 1]
+            val resource = (event as? ActionPathEvent.Physical)?.actualRecovery?.resource
+            result[index] = ActualRecoveryReservations(
+                consumedResources = next.consumedResources + listOfNotNull(resource?.let { usageScope(it, event.scope) }),
+                teamRerollTurns = next.teamRerollTurns + when {
+                    allowMultipleTeamRerollsPerTurn -> emptyList()
+                    resource?.category != RerollCategory.TEAM_REROLL -> emptyList()
+                    else -> listOf(teamTurnScope(resource, event.scope))
+                },
+            )
+        }
+        return result
+    }
 
     /** Computes which consumed-resource keys can still affect each event position. */
     private fun relevantResourceStates(
@@ -334,9 +383,9 @@ object PhysicalActionPathScorer: ActionPathScorer {
     }
 
     /** Adds probability to a resource state while merging duplicate states. */
-    private fun MutableMap<ResourceState, Probability>.add(state: ResourceState, probability: Probability) {
-        if (probability == Probability.NEVER) return
-        this[state] = (this[state] ?: Probability.NEVER) + probability
+    private fun MutableMap<ResourceState, Surprisal>.add(state: ResourceState, probability: Surprisal) {
+        if (probability.value == Double.POSITIVE_INFINITY) return
+        this[state] = (this[state] ?: Surprisal(Double.POSITIVE_INFINITY)).plusProbability(probability)
     }
 
     /** Resolves a resource's lifetime into the key used by the DP state. */
@@ -344,10 +393,14 @@ object PhysicalActionPathScorer: ActionPathScorer {
         val resourceKey = "${resource.owner.value}:${resource.id.id}"
         return when (resource.usage) {
             RerollUsage.REUSABLE -> null
-            RerollUsage.ONCE_PER_ACTION -> scope?.player?.let { "$resourceKey@action:$it" }
-            RerollUsage.ONCE_PER_ACTIVATION -> scope?.player?.let { "$resourceKey@activation:$it" }
-            RerollUsage.ONCE_PER_TURN -> scope?.turn?.let { "$resourceKey@turn:$it" }
-            RerollUsage.ONCE_PER_DRIVE -> scope?.drive?.let { "$resourceKey@drive:$it" }
+            RerollUsage.ONCE_PER_ACTION -> scope?.player?.let {
+                "$resourceKey@action:${scope.half}:${scope.drive}:${scope.turn}:$it"
+            }
+            RerollUsage.ONCE_PER_ACTIVATION -> scope?.player?.let {
+                "$resourceKey@activation:${scope.half}:${scope.drive}:${scope.turn}:$it"
+            }
+            RerollUsage.ONCE_PER_TURN -> scope?.let { "$resourceKey@turn:${it.half}:${it.drive}:${it.turn}" }
+            RerollUsage.ONCE_PER_DRIVE -> scope?.let { "$resourceKey@drive:${it.half}:${it.drive}" }
             RerollUsage.ONCE_PER_HALF -> scope?.half?.let { "$resourceKey@half:$it" }
             RerollUsage.ONCE_PER_GAME -> "$resourceKey@game"
             RerollUsage.UNSUPPORTED -> null
@@ -356,5 +409,5 @@ object PhysicalActionPathScorer: ActionPathScorer {
 
     /** Returns the key used to enforce one team reroll per team turn. */
     private fun teamTurnScope(resource: RerollResource, scope: ActionPathEventScope): String =
-        "${resource.owner.value}:${scope.turn}"
+        "${resource.owner.value}:${scope.half}:${scope.drive}:${scope.turn}"
 }

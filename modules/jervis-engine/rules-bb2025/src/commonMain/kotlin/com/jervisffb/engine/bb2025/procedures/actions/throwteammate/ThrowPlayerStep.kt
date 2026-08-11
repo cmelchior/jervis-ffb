@@ -28,6 +28,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.RiskingInjuryContext
@@ -43,6 +44,7 @@ import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowPlayerResult
 import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowTeamMateAction
+import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportDiceRoll
@@ -75,6 +77,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
+import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -92,7 +95,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * bounce when landing. This concept was reduced in BB2025 to only apply when
  * landing on another player.
  */
-object ThrowPlayerStep: Procedure() {
+object ThrowPlayerStep: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = DeclareTargetSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -391,11 +394,20 @@ object ThrowPlayerStep: Procedure() {
             return castDiceRoll<D8Result>(action) { bounceRoll ->
                 val throwContext = state.getContext<ThrowTeamMateContext>()
                 val direction = rules.direction(bounceRoll)
+                val chanceObservation = createFinalTableLookupObservation(
+                    state = state,
+                    team = throwContext.thrower.team,
+                    rollType = DiceRollType.BOUNCE,
+                    dice = listOf(bounceRoll),
+                    favorableOutcomes = 1,
+                    possibleOutcomes = D8Result.SIDES,
+                )
                 val thrownPlayer = throwContext.thrownPlayer!!
                 val target = thrownPlayer.coordinates.move(direction, steps = 1)
                 val landingNode = getNextNodeWhenLanding(state, target)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BOUNCE, bounceRoll),
+                    chanceObservation?.let(::AddChanceObservation),
                     SetPlayerLocation(
                         player = thrownPlayer,
                         location = target,

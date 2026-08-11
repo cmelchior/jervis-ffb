@@ -47,7 +47,7 @@ class FixedRerollUsageNormalizerPolicy(
                             ),
                         )
                         observation.rollType in primaryRollTypes -> add(
-                            normalizeLogicalD6(observation, replacements),
+                            normalizeLogicalDie(observation, replacements),
                         )
                         else -> add(unsupported(observation, "Roll type is not supported by fixed-line scoring."))
                     }
@@ -57,7 +57,9 @@ class FixedRerollUsageNormalizerPolicy(
         return normalized.reindex()
     }
 
-    private fun normalizeLogicalD6(
+    // Normalize a single logical die roll.
+    // Will fail if multiple dice are present.
+    private fun normalizeLogicalDie(
         root: ChanceObservation.DiceRoll,
         replacements: Map<Int?, List<ChanceObservation.DiceRoll>>,
     ): ActionPathEvent {
@@ -65,15 +67,19 @@ class FixedRerollUsageNormalizerPolicy(
         if (!root.finalized || !finalRoll.finalized) {
             return unsupported(root, "D6 roll was not finalized.")
         }
-        val result = finalRoll.dice.singleOrNull()?.result as? D6Result
-            ?: return unsupported(root, "Expected one D6 result.")
-        val success = finalRoll.success
-            ?: return unsupported(root, "The roll does not expose a factual success result.")
-        val legalValues = if (success) 2..6 else 1..5
-        if (result.value !in legalValues) {
+        val result = finalRoll.dice.singleOrNull()?.result ?: return unsupported(root, "Expected one die result.")
+        // The selected finalized result is the successful branch for scoring.
+        // Keep the raw nullable value for reroll applicability below.
+        val observedSuccess = finalRoll.success
+        val success = observedSuccess ?: true
+
+        // For 1D6 rule tests, 1 is always a failure and 6 a success.
+        // Note that scoring will still treat 1 as a success target if that was selected.
+        val legalValues = if (result is D6Result) observedSuccess?.let { if (it) 2..6 else 1..5 } else null
+        if (legalValues != null && result.value !in legalValues) {
             return unsupported(root, "D6 value ${result.value} is inconsistent with success=$success.")
         }
-        val recoveryResult = recoveries(root.rerollOptions, success)
+        val recoveryResult = recoveries(root.rerollOptions, observedSuccess)
         recoveryResult.reason?.let { return unsupported(root, it) }
         return ActionPathEvent.Logical.die(
             index = root.index,

@@ -43,7 +43,7 @@ object ChainsawRoll: D6WithRerollProcedure() {
     override val ChooseReRollSource = object : AbstractChooseRerollSource() {
         override fun getRerollData(state: Game, rules: Rules): RerollData {
             val context = state.getContext<ChainsawContext>()
-            return RerollData(context.attacker, context.kickbackRoll!!, null)
+            return RerollData(context.attacker, context.kickbackRoll!!, context.isSuccess)
         }
     }
 
