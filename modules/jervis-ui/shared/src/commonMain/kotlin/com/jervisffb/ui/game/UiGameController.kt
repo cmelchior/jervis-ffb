@@ -4,7 +4,6 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
-import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -415,11 +414,6 @@ class UiGameController(
     val uiStateFlow: Flow<UiGameSnapshot>
         field = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    // Will trigger an event on this flow, every the Game Controller has handled a Dev Event.
-    // It would be nice if this was just part of the normal UI flow, but for now, this should be good enough.
-    val devActionHandled: Flow<Unit>
-        field = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-
     // While the Action Wheel is part of the UiState, its lifecycle is slightly different, so it  has
     // `replay` is only used to allow the UI to register itself after the game controller has started
     val uiActionWheelFlow: Flow<List<ActionWheelUiState>>
@@ -575,46 +569,12 @@ class UiGameController(
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
                 val userAction = run {
-                    // Until we can figure out how to better treat Dev Commands in the UI, we will
-                    // just execute them immediately without trying to update the UI. At least
-                    // this should fix the immediate problem of these actions not showing up
-                    // in the save file. The downside is that we risk the UI being slightly out
-                    // of sync until the next "real" action
                     tailrec suspend fun getNextAcceptedAction(): GameAction {
                         val action = actionProvider.getAction()
                         return when {
                             // When actions are frozen, we still accept them from the UI
                             // but silently drop them, leaving the UI and board state untouched.
                             actionsFrozen -> getNextAcceptedAction()
-                            action is DevModeGameAction -> {
-                                try {
-                                    gameController.handleAction(action)
-                                    val devState = controller.state
-                                    val devActions = controller.getAvailableActions()
-                                    val devAccumulator = UiSnapshotAccumulator(
-                                        uiStateFlow = uiStateFlow,
-                                        uiActionWheelFlow = uiActionWheelFlow,
-                                        uiContextWheelFlow = uiContextWheelFlow,
-                                        previousSnapshot = lastUiState,
-                                        uiController = this@UiGameController,
-                                    )
-                                    actionProvider.prepareForNextAction(controller, devActions)
-                                    addBaseGameStateChanges(
-                                        devState,
-                                        devActions,
-                                        controller.getDelta(),
-                                        devAccumulator,
-                                    )
-                                    applyUiIndicators(devActions, controller, devAccumulator)
-                                    actionProvider.decorateAvailableActions(devActions, devAccumulator)
-                                    devAccumulator.emitAllUpdates()
-                                    lastUiState = devAccumulator.build()
-                                    devActionHandled.emit(Unit)
-                                } catch (ex: InvalidActionException) {
-                                    reportInvalidAction(ex)
-                                }
-                                getNextAcceptedAction()
-                            }
                             else -> action
                         }
                     }

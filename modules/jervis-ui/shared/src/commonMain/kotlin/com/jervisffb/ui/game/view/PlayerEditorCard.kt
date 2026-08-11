@@ -105,8 +105,8 @@ fun PlayerEditorCard(
         }
     }
 
-    LaunchedEffect(gameModel.uiState.devActionHandled) {
-        gameModel.uiState.devActionHandled.collect {
+    LaunchedEffect(gameModel.uiState.uiStateFlow) {
+        gameModel.uiState.uiStateFlow.collect {
             updateTrigger += 1
         }
     }
@@ -388,8 +388,8 @@ private fun StatsSelectorTab(
     var basePassing by remember(player, updateTrigger) { mutableStateOf(player.model.basePassing?.let { "$it+" } ?: "-") }
     var baseArmour by remember(player, updateTrigger) { mutableStateOf("${player.model.baseArmorValue}+") }
 
-    LaunchedEffect(vm.uiState.devActionHandled) {
-        vm.uiState.devActionHandled.collect {
+    LaunchedEffect(vm.uiState.uiStateFlow) {
+        vm.uiState.uiStateFlow.collect {
             baseMove = player.model.baseMove.toString()
             baseStrength = player.model.baseStrength.toString()
             baseAgility = "${player.model.baseAgility}+"

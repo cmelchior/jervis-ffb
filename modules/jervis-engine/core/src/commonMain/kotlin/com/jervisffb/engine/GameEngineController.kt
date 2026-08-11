@@ -214,7 +214,6 @@ class GameEngineController(
                     // ignoring `undoFloor`.
                     undoLastAction(action, revertActionId = true)
                 }
-                is DevModeGameAction -> processDevAction(action)
                 else -> processForwardAction(action)
             }
         } catch (ex: InvalidActionException) {
@@ -376,25 +375,6 @@ class GameEngineController(
         statistics?.handleAction(action, delta)
     }
 
-    private fun processDevAction(action: DevModeGameAction) {
-        // For now, the Dev Actions only allow changes to players, revisit these
-        // checks and errors if it changes.
-        // For now, we also allow both coaches to emit Dev Commands, this should
-        // probably also change.
-        if (!rules.allowPlayerEditsDuringGame) {
-            error("Player edits are not allowed during this game.")
-        }
-        lastActionIfUndo = null
-        val newDeltaId = (lastGameActionId + 1)
-        deltaBuilder = DeltaBuilder(newDeltaId, null, collectStatistics)
-        processSingleDevAction(deltaBuilder, action)
-        val delta = deltaBuilder.build()
-        _history.add(delta)
-        lastGameActionId = newDeltaId
-        statistics?.handleAction(action, delta)
-    }
-
-    // Any change here might need to be replicated in [processDevAction]
     private fun processForwardAction(userAction: GameAction) {
         lastActionIfUndo = null
         val actionOwner = currentNode().let { node ->
@@ -427,7 +407,7 @@ class GameEngineController(
             currentProcedure.currentNode())
         logInternalEvent(ReportHandleAction(userAction))
         val currentNode: ActionNode = stack.currentNode() as ActionNode
-        if (validateActions) {
+        if (validateActions && userAction !is DevModeGameAction) {
             validateAction(userAction)
         }
 
@@ -454,7 +434,10 @@ class GameEngineController(
                 ),
             )
         }
-        val actionCommand = currentNode.applyAction(userAction, state, rules)
+        val actionCommand = when (userAction is DevModeGameAction) {
+            true -> processSingleDevAction(userAction)
+            false -> currentNode.applyAction(userAction, state, rules)
+        }
 
         val command = compositeCommandOf(actionCommand, unstructuredChanceEvent)
         executeCommand(command)
@@ -465,14 +448,10 @@ class GameEngineController(
         deltaBuilder.endAction()
     }
 
-    // This is a reduced version of [processSingleAction]
-    private fun processSingleDevAction(deltaBuilder: DeltaBuilder, action: DevModeGameAction) {
-        val currentProcedure = stack.peepOrNull()!!
-        deltaBuilder.beginAction(
-            action,
-            currentProcedure.procedure,
-            currentProcedure.currentNode())
-        logInternalEvent(ReportHandleAction(action))
+    private fun processSingleDevAction(action: DevModeGameAction): Command {
+        if (!rules.allowPlayerEditsDuringGame) {
+            INVALID_ACTION(action, "Player edits are not allowed during this game.")
+        }
         val command = when (action) {
             is AddPlayerSkill -> {
                 val player = action.getPlayer(state)
@@ -553,11 +532,7 @@ class GameEngineController(
                 }
             }
         }
-        executeCommand(command)
-        if (logAvailableActions) {
-            logInternalEvent(ReportAvailableActions(getAvailableActions()))
-        }
-        deltaBuilder.endAction()
+        return command
     }
 
     /**
