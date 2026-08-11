@@ -778,8 +778,8 @@ object IconFactory {
      */
     suspend fun loadRosterIcon(team: TeamId, logo: RosterLogo, size: LogoSize): ImageBitmap {
         val sprite = when (size) {
-            LogoSize.LARGE -> logo.large ?: SingleSprite.embedded("jervis/roster/logo/roster_logo_jervis_default_large.png")
-            LogoSize.SMALL -> logo.small ?: SingleSprite.embedded("jervis/roster/logo/roster_logo_jervis_default_small.png")
+            LogoSize.LARGE -> logo.large ?: SingleSprite.embedded("jervis/roster/logo_default_large.png")
+            LogoSize.SMALL -> logo.small ?: SingleSprite.embedded("jervis/roster/logo_default_small.png")
         }
         var cachedLogo = getLogoOrNull(team, size)
         if (cachedLogo == null) {
