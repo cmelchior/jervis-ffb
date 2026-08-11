@@ -28,6 +28,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -264,6 +271,30 @@ fun <T> List<T>.withPrevious(): Sequence<Pair<T?, T>> = sequence {
         yield(previous to current)
         previous = current
     }
+}
+
+private val urlRegex = Regex("""https?://[^\s]+""")
+fun String.withClickableLinks(): AnnotatedString = buildAnnotatedString {
+    var lastIndex = 0
+    urlRegex.findAll(this@withClickableLinks).forEach { match ->
+        append(this@withClickableLinks.substring(lastIndex, match.range.first))
+        withLink(
+            LinkAnnotation.Url(
+                url = match.value,
+                styles = TextLinkStyles(
+                    style = SpanStyle(
+                        color = Color.Unspecified,
+                        textDecoration = TextDecoration.Underline,
+                    )
+                ),
+            )
+        ) {
+            append(match.value)
+        }
+        lastIndex = match.range.last + 1
+    }
+
+    append(this@withClickableLinks.substring(lastIndex))
 }
 
 // Copy from ChatGPT, so requires a more thorough review

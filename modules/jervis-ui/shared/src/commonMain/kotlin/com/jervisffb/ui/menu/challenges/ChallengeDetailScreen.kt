@@ -55,6 +55,7 @@ import com.jervisffb.ui.menu.challenges.data.ChallengeUserState
 import com.jervisffb.ui.menu.challenges.data.ChallengeUserState.SolvedState
 import com.jervisffb.ui.menu.challenges.data.ScoreboardEntry
 import com.jervisffb.ui.menu.components.SmallHeader
+import com.jervisffb.ui.utils.withClickableLinks
 import org.jetbrains.compose.resources.painterResource
 
 class ChallengeDetailScreen(
@@ -186,7 +187,10 @@ private fun ChallengeDetailContent(
             ChallengeScreenshot(preview)
 
             Section("Description", topPadding = 0.dp) {
-                Text(text = details.data.description, color = JervisTheme.contentTextColor)
+                val linkText = remember(details.data.description) {
+                    details.data.description.withClickableLinks()
+                }
+                Text(text = linkText, color = JervisTheme.contentTextColor)
             }
 
             Section("Goal") {

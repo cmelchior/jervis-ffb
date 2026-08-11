@@ -40,6 +40,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.menu.utils.JervisLogo
+import com.jervisffb.ui.utils.withClickableLinks
 import com.jervisffb.utils.AppUpdater
 import com.jervisffb.utils.openUrlInBrowser
 
@@ -261,7 +262,7 @@ private fun ColumnScope.CreditDialogContent(
             )
             Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
-                "\"Pixel Art Trophies for Competition\", by Lugon Studio. Published on https://www.vecteezy.com/ under the Vecteezy Free License.",
+                "\"Pixel Art Trophies for Competition\", by Lugon Studio. Published on https://www.vecteezy.com/ under the Vecteezy Free License.".withClickableLinks(),
                 textColor
             )
         }
@@ -273,7 +274,7 @@ private fun ColumnScope.CreditDialogContent(
             )
             Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
-                "Published at https://fonts.google.com/icons under license Apache 2.0.",
+                "Published at https://fonts.google.com/icons under license Apache 2.0.".withClickableLinks(),
                 textColor
             )
         }
