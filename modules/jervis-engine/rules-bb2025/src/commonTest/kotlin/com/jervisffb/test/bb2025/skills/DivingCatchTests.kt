@@ -1,5 +1,6 @@
 package com.jervisffb.test.bb2025.skills
 
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
@@ -32,6 +33,9 @@ import com.jervisffb.test.moveTo
 import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.TeamRerollSelected
+import com.jervisffb.test.utils.assertActive
+import com.jervisffb.test.utils.assertActiveTeam
+import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -184,6 +188,28 @@ class DivingCatchTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         assertTrue(awayTeam["A1".playerId].hasBall())
+    }
+
+    @Test
+    fun failedCatchAfterDecliningDivingCatchStillBouncesBall() {
+        val thrower = awayTeam["A10".playerId]
+        awayTeam["A1".playerId].addSkill(SkillType.DIVING_CATCH)
+        controller.rollForward(
+            *activatePlayer(thrower, PlayerStandardActionType.PASS),
+            *moveTo(17, 7),
+            *pickup(4.d6),
+            PassTypeSelected(PassType.STANDARD),
+            PitchSquareSelected(14, 5),
+            *throwBall(6.d6),
+            Cancel, // Landing next to A1. Do not use Diving Catch
+            4.d8, // Bounce onto A1
+            Cancel, // Decline to use Diving Catch on the bouncing ball
+            *catch(1.d6), // Fail the ordinary catch
+            5.d8, // Resolve the resulting bounce
+        )
+        state.singleBall().assertCoordinates(14, 5)
+        assertEquals(BallState.ON_GROUND, state.singleBall().state)
+        homeTeam.assertActive()
     }
 
     @Test
@@ -375,4 +401,3 @@ class DivingCatchTests: JervisGameBB2025Test() {
         }
     }
 }
-

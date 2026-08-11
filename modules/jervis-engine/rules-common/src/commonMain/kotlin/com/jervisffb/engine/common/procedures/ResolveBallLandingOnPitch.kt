@@ -256,7 +256,17 @@ object ResolveBallLandingOnPitch: Procedure() {
     object BounceBall: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
-            return SetBallState.bouncing(ball)
+            return compositeCommandOf(
+                // Any remaining catch attempts are ordinary catches from the
+                // bounce, not Diving Catch attempts. Otherwise, Catch treats a
+                // failed catch as if it were still a selected Diving Catch and
+                // leaves the ball in BOUNCING state without resolving it.
+                when (state.getContextOrNull<DivingCatchContext>() != null) {
+                    true -> RemoveContext<DivingCatchContext>()
+                    false -> null
+                },
+                SetBallState.bouncing(ball),
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {

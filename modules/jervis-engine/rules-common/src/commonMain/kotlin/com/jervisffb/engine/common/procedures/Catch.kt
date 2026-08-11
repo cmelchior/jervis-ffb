@@ -161,10 +161,9 @@ object Catch : Procedure() {
             val player = context.catchingPlayer
             val useDivingCatch = (action == Confirm)
             return compositeCommandOf(
-                if (useDivingCatch) {
-                    ReportSkillUsed(player, SkillType.DIVING_CATCH)
-                } else {
-                    null
+                when (useDivingCatch) {
+                    true -> ReportSkillUsed(player, SkillType.DIVING_CATCH)
+                    false ->null
                 },
                 UpdateContext(context.copy(useDivingCatch = useDivingCatch)),
                 GotoNode(CalculateModifiers)
@@ -280,7 +279,7 @@ object Catch : Procedure() {
     }
 
     object CatchFailed : ParentNode() {
-        // If a catch failed while resolving Diving Catch Players, we should not handle the failure here,
+        // If a catch failed while resolving Diving Catch Players, we should not handle the failure here
         // but transfer control back, so other players with Diving Catch get a chance to catch it.
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val isResolvingDivingCatchPlayers = state.hasContext<DivingCatchContext>()
