@@ -19,6 +19,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.ProRollContext
 import com.jervisffb.engine.common.reports.ReportProResult
 import com.jervisffb.engine.common.reports.ReportSkillUsed
@@ -120,10 +121,14 @@ object UseProReroll : Procedure() {
             val rerollSource = rerollContext.source!!
             val player = rerollContext.player!!
             val rollContext = ProRollContext(player)
+            val activateContext = state.getContext<ActivatePlayerContext>()
             return compositeCommandOf(
                 ReportSkillUsed(player, SkillType.PRO),
                 SetSkillUsed(player, player.getSkill(SkillType.PRO), used = true),
                 SetSkillRerollUsed(rerollSource, used = true),
+                // Using Pro is irreversible even when its activation roll fails.
+                // Ensure the enclosing activation cannot be canceled and reused.
+                UpdateContext(activateContext.copyWithMarkedAction(true)),
                 AddContext(rollContext)
             )
         }

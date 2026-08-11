@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.Brawler
 import com.jervisffb.engine.bb2025.skills.Pro
+import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d6
@@ -41,6 +42,7 @@ import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.utils.TeamRerollSelected
+import com.jervisffb.test.utils.assertActive
 import com.jervisffb.test.utils.assertActiveTeam
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertFallenOver
@@ -106,6 +108,28 @@ class ProTests: JervisGameBB2025Test() {
         assertFalse(player.getSkill<Pro>().rerollUsed)
         player.assertProne()
         player.assertCoordinates(14, 5)
+    }
+
+    @Test
+    fun failedProMarksActivationAsUsed() {
+        val player = awayTeam["A1".playerId]
+        player.addSkill(SkillType.PRO)
+        controller.rollForward(
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+            *moveTo(14, 5),
+            2.d6, // Fail dodge
+            SelectSkillReroll(SkillType.PRO),
+            *proRoll(2.d6), // Fail Pro
+        )
+        // Pro is spent even though its roll failed, so the activation cannot be reused.
+        assertTrue(player.getSkill<Pro>().used)
+        assertTrue(player.getSkill<Pro>().rerollUsed)
+        assertTrue(state.getContext<ActivatePlayerContext>().markActionAsUsed)
+        controller.rollForward(
+            DiceRollResults(1.d6, 1.d6), // AV Roll
+        )
+        player.assertProne()
+        homeTeam.assertActive()
     }
 
     @Test
