@@ -20,8 +20,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,6 +75,13 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
     val activeCategories by viewModel.activeCategories.collectAsState()
     val hideSolved by viewModel.hideSolved.collectAsState()
     val showOnlyFavorites by viewModel.showOnlyFavorites.collectAsState()
+    var showContent by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isInitializing) {
+        if (isInitializing) {
+            showContent = false
+        }
+    }
 
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
@@ -129,7 +140,8 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                 DelayedChallengeLoadingIndicator(
                     isLoading = isInitializing,
                     modifier = Modifier.align(Alignment.Center),
-                    minimumShowTime = 500.milliseconds
+                    minimumShowTime = 500.milliseconds,
+                    onLoadingFinished = { showContent = true },
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,13 +155,13 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                         )
                     }
                 }
-                if (!isInitializing && rows.isEmpty()) {
+                if (showContent && rows.isEmpty()) {
                     Text(
                         text = "No challenges match the selected filters.",
                         modifier = Modifier.align(Alignment.Center),
                         color = JervisTheme.contentTextColor.copy(alpha = 0.6f),
                     )
-                } else if (!isInitializing) {
+                } else if (showContent) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 12.dp),

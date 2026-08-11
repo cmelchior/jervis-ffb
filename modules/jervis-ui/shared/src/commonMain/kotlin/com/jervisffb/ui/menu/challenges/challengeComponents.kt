@@ -381,15 +381,18 @@ fun ChallengeScreenshot(
 fun DelayedChallengeLoadingIndicator(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
+    // Time before we start showing the loading indicator
+    gracePeriod: Duration = 400.milliseconds,
     minimumShowTime: Duration = 1.seconds,
     progressFadeIn: Duration = 300.milliseconds,
+    onLoadingFinished: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     var showLoadingIndicator by remember { mutableStateOf(false) }
     var loadingIndicatorShownAt by remember { mutableStateOf<TimeMark?>(null) }
     LaunchedEffect(isLoading) {
         if (isLoading) {
-            delay(400.milliseconds)
+            delay(gracePeriod)
             showLoadingIndicator = true
             loadingIndicatorShownAt = TimeSource.Monotonic.markNow()
         } else if (showLoadingIndicator) {
@@ -398,6 +401,9 @@ fun DelayedChallengeLoadingIndicator(
             delay(remaining)
             showLoadingIndicator = false
             loadingIndicatorShownAt = null
+        }
+        if (!isLoading) {
+            onLoadingFinished()
         }
     }
     AnimatedVisibility(
