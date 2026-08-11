@@ -16,12 +16,14 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.MovePlayer
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
@@ -167,6 +169,14 @@ class GameScreenModel(
             ModelRef(playerId, player)
         }
     }
+
+    // In Dev Mode, this is used to track a player we are currently moving
+    val playerToMove: StateFlow<PlayerId?>
+        field = MutableStateFlow<PlayerId?>(null)
+
+    // In Dev Mode, this used to track a player that is being edited on the State Panel
+    private var playerEditorOpenOnStatePlayerId: PlayerId? = null
+
     val uiState: UiGameController = UiGameController(
         uiClientType,
         uiMode,
@@ -269,6 +279,28 @@ class GameScreenModel(
 
     fun dismissPlayerStatCard() {
         playerStatCardDismissed.value = true
+    }
+
+    fun beginMovePlayer(playerId: PlayerId) {
+        hidePlayerContextMenu()
+        playerToMove.value = playerId
+    }
+
+    fun movePlayerTo(coordinate: PitchCoordinate) {
+        val playerId = playerToMove.value ?: return
+        playerToMove.value = null
+        actionProvider.currentProvider.userActionSelected(MovePlayer(playerId, coordinate))
+        playerEditorOpenOnStatePlayerId = playerId
+        showPlayerContextMenu(playerId)
+    }
+
+    // Returns `true` if we are moving a player as part of modifying their state.
+    // In that case, we should open the player editor on the "State" panel again.
+    fun shouldOpenPlayerEditorOnState(playerId: PlayerId): Boolean = (playerEditorOpenOnStatePlayerId == playerId)
+    fun clearPlayerEditorOpenOnState(playerId: PlayerId) {
+        if (playerEditorOpenOnStatePlayerId == playerId) {
+            playerEditorOpenOnStatePlayerId = null
+        }
     }
 
     val logsBackgroundColor: Flow<PanelBackground> = combine(

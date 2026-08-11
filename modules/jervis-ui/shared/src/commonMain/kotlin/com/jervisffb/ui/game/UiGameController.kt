@@ -589,6 +589,26 @@ class UiGameController(
                             action is DevModeGameAction -> {
                                 try {
                                     gameController.handleAction(action)
+                                    val devState = controller.state
+                                    val devActions = controller.getAvailableActions()
+                                    val devAccumulator = UiSnapshotAccumulator(
+                                        uiStateFlow = uiStateFlow,
+                                        uiActionWheelFlow = uiActionWheelFlow,
+                                        uiContextWheelFlow = uiContextWheelFlow,
+                                        previousSnapshot = lastUiState,
+                                        uiController = this@UiGameController,
+                                    )
+                                    actionProvider.prepareForNextAction(controller, devActions)
+                                    addBaseGameStateChanges(
+                                        devState,
+                                        devActions,
+                                        controller.getDelta(),
+                                        devAccumulator,
+                                    )
+                                    applyUiIndicators(devActions, controller, devAccumulator)
+                                    actionProvider.decorateAvailableActions(devActions, devAccumulator)
+                                    devAccumulator.emitAllUpdates()
+                                    lastUiState = devAccumulator.build()
                                     devActionHandled.emit(Unit)
                                 } catch (ex: InvalidActionException) {
                                     reportInvalidAction(ex)

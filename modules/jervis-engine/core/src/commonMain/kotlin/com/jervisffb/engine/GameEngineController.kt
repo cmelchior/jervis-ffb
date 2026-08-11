@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.MovePlayer
 import com.jervisffb.engine.actions.RemovePlayerKeyword
 import com.jervisffb.engine.actions.RemovePlayerSkill
 import com.jervisffb.engine.actions.Revert
@@ -34,7 +35,9 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.ReportAvailableActions
@@ -502,10 +505,30 @@ class GameEngineController(
                         INVALID_ACTION(action, "Location is not on the pitch: $location")
                     }
                 }
-                buildCompositeCommand {
-                    add(com.jervisffb.engine.commands.SetPlayerState(player, action.state, hasTackleZones))
-                    add(com.jervisffb.engine.commands.SetPlayerLocation(player, location))
+                compositeCommandOf(
+                    com.jervisffb.engine.commands.SetPlayerState(player, action.state, hasTackleZones),
+                    com.jervisffb.engine.commands.SetPlayerLocation(player, location)
+                )
+            }
+            is MovePlayer -> {
+                val player = action.getPlayer(state)
+                if (player.state !is PlayerPitchState) {
+                    INVALID_ACTION(action, "Player state is not compatible with being moved on the pitch: ${player.state}")
                 }
+                val location = action.location
+                if (!location.isOnPitch(rules)) {
+                    INVALID_ACTION(action, "Location is not a valid on-pitch location: $location")
+                }
+                when (location) {
+                    is GiantLocation -> TODO("Not supported yet")
+                    is PitchCoordinate -> {
+                        val square = state.pitch[location]
+                        if (square.isOccupied() || square.hasTrapdoor || square.hasChest || square.balls.isNotEmpty()) {
+                            INVALID_ACTION(action, "Cannot move player to occupied square: $location")
+                        }
+                    }
+                }
+                com.jervisffb.engine.commands.SetPlayerLocation(player, location)
             }
             is SetBallState -> {
                 val ball = action.getBall(state)

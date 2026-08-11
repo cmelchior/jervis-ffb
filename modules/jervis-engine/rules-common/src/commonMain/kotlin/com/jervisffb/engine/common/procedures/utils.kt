@@ -56,6 +56,13 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
     }
 
     val rules = state.rules
+    // A dev-mode edit can move the active player to the dogout while the
+    // activation procedure is still on the move-selection node. There are no
+    // movement options for a player that is not on the pitch, and checking this
+    // here avoids accessing Player.coordinates for a dogout player.
+    if (!player.location.isOnPitch(rules)) {
+        return null
+    }
     val options = mutableListOf<MoveType>()
 
     // Standup

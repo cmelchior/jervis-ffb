@@ -77,6 +77,7 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.RerollOptionSelected::class)
         subclass(com.jervisffb.engine.actions.Revert::class)
         subclass(com.jervisffb.engine.actions.SetBallState::class)
+        subclass(com.jervisffb.engine.actions.MovePlayer::class)
         subclass(com.jervisffb.engine.actions.SetPlayerState::class)
         subclass(com.jervisffb.engine.actions.SkillSelected::class)
         subclass(com.jervisffb.engine.actions.Undo::class)
@@ -87,6 +88,7 @@ val coreSerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.actions.RemovePlayerKeyword::class)
             subclass(com.jervisffb.engine.actions.RemovePlayerSkill::class)
             subclass(com.jervisffb.engine.actions.SetBallState::class)
+            subclass(com.jervisffb.engine.actions.MovePlayer::class)
             subclass(com.jervisffb.engine.actions.SetPlayerState::class)
         }
         polymorphic(com.jervisffb.engine.actions.DieResult::class) {

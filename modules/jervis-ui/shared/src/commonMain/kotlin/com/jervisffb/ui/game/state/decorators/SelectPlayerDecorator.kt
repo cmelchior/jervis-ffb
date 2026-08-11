@@ -62,11 +62,13 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                     }
                 }
                 is PitchCoordinate -> {
-                    acc.updateSquare(playerLocation) {
-                        it.copy(
-                            selectedAction = null,
-                            isActionWheelFocus = false
-                        )
+                    if (acc.squares.containsKey(playerLocation)) {
+                        acc.updateSquare(playerLocation) {
+                            it.copy(
+                                selectedAction = null,
+                                isActionWheelFocus = false
+                            )
+                        }
                     }
                     acc.updatePlayer(playerId) {
                         it.copy(

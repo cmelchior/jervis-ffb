@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.PlayerSize
-import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.icons_game_humanref1
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -52,15 +51,16 @@ fun PlayerLayer(
     if (snapshot == null) return
     // Needed to keep player zIndexes from creating problems on other layers
     Box(modifier = Modifier.fillMaxSize()) {
-        snapshot!!.players.forEach { (id, player) ->
-            if (player.location !is PitchCoordinate) return@forEach
+        snapshot!!.squares.forEach { (coordinates, square) ->
+            val id = square.player ?: return@forEach
+            val player = snapshot!!.players[id] ?: return@forEach
 
             // Players leaving the pitch change how many children this loop emits, so without a
             // key every player after the gap would move to a different composition slot and
             // throw away its remembered icons/indicators.
             key(id) {
                 val playerSize = pitchSizeData.getPlayerSquareSize(player.size)
-                val coordinates = player.location
+                val pitchPlayer = if (player.location == coordinates) player else player.copy(location = coordinates)
                 val xDiff = playerSize.width - pitchSizeData.squareSize.width
                 val yDiff = playerSize.height - pitchSizeData.squareSize.height
 
@@ -78,15 +78,13 @@ fun PlayerLayer(
                             )
                         }
                 ) {
-                    if (coordinates.isOnPitch(snapshot!!.game.rules)) {
-                        PlayerWithIndicators(
-                            vm.screenModel,
-                            Modifier,
-                            snapshot!!.squares[coordinates]!!,
-                            player,
-                            null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
-                        )
-                    }
+                    PlayerWithIndicators(
+                        vm.screenModel,
+                        Modifier,
+                        square,
+                        pitchPlayer,
+                        null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
+                    )
                 }
             }
         }

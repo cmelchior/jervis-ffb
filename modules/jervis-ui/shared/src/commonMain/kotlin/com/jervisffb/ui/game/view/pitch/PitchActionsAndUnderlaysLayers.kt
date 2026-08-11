@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPitchPlayer
@@ -50,6 +51,7 @@ fun PitchActionsAndUnderlaysLayers(
 ) {
     val pathFinderFlow = remember { vm.observePathFinder() }
     val pitchDataFlow = remember { vm.observePitch() }
+    val playerToMove by vm.screenModel.playerToMove.collectAsState(null)
 
     val pitchDataData: Map<PitchCoordinate, Pair<UiPitchSquare, UiPitchPlayer?>> by pitchDataFlow.collectAsState(emptyMap())
     val pathFinderData by pathFinderFlow.collectAsState(null)
@@ -63,6 +65,7 @@ fun PitchActionsAndUnderlaysLayers(
             squareData ?: EMPTY_SQUARE,
             playerData,
             pathFinderData?.let { it[coordinate] },
+            playerToMove,
         )
     }
 }
@@ -75,15 +78,17 @@ private fun SquareHighlightAndAction(
     square: UiPitchSquare,
     player: UiPitchPlayer? = null,
     pathfinderData: UiPathFinderData?,
+    playerToMove: PlayerId?,
     fontSize: TextUnit = 16.jsp // Size of PathFinder and "Moves Used" indicators
 ) {
     val sharedPitchData = vm.sharedPitchData
-    val bgColor = remember(square, player) {
+    val bgColor = remember(square, player, playerToMove) {
         when {
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
             player?.isSelectable == true -> Color.Transparent
+            playerToMove != null && square.isEmpty() -> JervisTheme.availableActionBackground
             square.selectedAction != null -> JervisTheme.availableActionBackground // Fallback for active squares
             else -> Color.Transparent
         }
@@ -108,7 +113,7 @@ private fun SquareHighlightAndAction(
 
     // TODO Move some of this to the Dialog Layer?
     val boxWrapperModifier =
-        if (square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
+        if (playerToMove != null && square.isEmpty() || square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
             modifier
                 .jervisPointerEvent(SquarePointerEventType.PrimaryClickSquare, square.coordinates) {
                     // In that case, it is the square that should handle opening it again, after which control transfers
@@ -121,7 +126,9 @@ private fun SquareHighlightAndAction(
                     // Toggling the Action Wheel should take precedence over triggering square/player actions.
                     // Ideally, none should be configured anyway, but just in case.
                     if (square.contextMenuOptions.isEmpty()) {
-                        pathfinderData?.hoverAction()
+                        if (playerToMove != null && square.isEmpty()) {
+                            vm.screenModel.movePlayerTo(square.coordinates)
+                        } else pathfinderData?.hoverAction()
                             ?: player?.selectedAction?.invoke(vm.screenModel, player)
                             ?: square.selectedAction?.invoke()
                     }

@@ -34,7 +34,6 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.throwBall
 import com.jervisffb.test.utils.TeamRerollSelected
 import com.jervisffb.test.utils.assertActive
-import com.jervisffb.test.utils.assertActiveTeam
 import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Test

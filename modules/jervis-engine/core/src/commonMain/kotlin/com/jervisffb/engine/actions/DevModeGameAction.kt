@@ -12,6 +12,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.StatModifier
 import kotlinx.serialization.Serializable
@@ -68,6 +69,8 @@ data class RemovePlayerKeyword(
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
+// Dev Action that can be used to modify the player state and move them between
+// Pitch and Dogout.
 @Serializable
 data class SetPlayerState(
     val playerId: PlayerId,
@@ -82,6 +85,24 @@ data class SetPlayerState(
         }
         val isDogoutState = (state is PlayerDogoutState)
         if (isDogoutState && location != Dogout) throw IllegalArgumentException("The chosen state is only valid if the location is Dogout: $state")
+    }
+    fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
+}
+
+// Dev action that makes it possible to move a player anywhere on the pitch.
+// This is only valid to use if a player is already on the pitch.
+//
+// For now, we do not allow a player to move into a square with the ball
+// or trapdoors to prevent problems being in a somewhat unresolved position.
+@Serializable
+data class MovePlayer(
+    val playerId: PlayerId,
+    val location: OnPitchLocation,
+) : DevModeGameAction {
+    init {
+        if (location is PitchCoordinate) {
+            require(location.x >= 0 && location.y >= 0) { "Invalid pitch coordinate: $location" }
+        }
     }
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }

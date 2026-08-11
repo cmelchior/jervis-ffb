@@ -56,12 +56,20 @@ import com.jervisffb.engine.actions.ChangePlayerBaseStat
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RemovePlayerKeyword
 import com.jervisffb.engine.actions.RemovePlayerSkill
+import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerPitchState
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillValue
 import com.jervisffb.engine.model.isOnHomeTeam
+import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.net.handlers.handleAction
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
@@ -89,6 +97,13 @@ fun PlayerEditorCard(
 ) {
     var updateTrigger by remember { mutableStateOf(0) }
     val borderSize = 6.jdp
+    val openOnState = gameModel.shouldOpenPlayerEditorOnState(player.model.id)
+
+    LaunchedEffect(player.model.id, openOnState) {
+        if (openOnState) {
+            gameModel.clearPlayerEditorOpenOnState(player.model.id)
+        }
+    }
 
     LaunchedEffect(gameModel.uiState.devActionHandled) {
         gameModel.uiState.devActionHandled.collect {
@@ -228,8 +243,12 @@ private fun PlayerEditor(
     borderSize: Dp,
     handleAction: (GameAction) -> Unit
 ) {
-    val tabs = listOf("Skills", "Stats", "Keywords")
-    val pagerStateTop = rememberPagerState(initialPage = 0) { tabs.size }
+    val tabs = listOf("Skills", "Stats", "Keywords", "State")
+    val initialPage = when (vm.shouldOpenPlayerEditorOnState(player.model.id)) {
+        true -> tabs.indexOf("State").coerceAtLeast(0)
+        false -> 0
+    }
+    val pagerStateTop = rememberPagerState(initialPage = initialPage) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     var userScrollEnabled by remember { mutableStateOf(true) }
 
@@ -245,7 +264,7 @@ private fun PlayerEditor(
             modifier = Modifier.fillMaxWidth().height(36.dp),
             containerColor = Color.Transparent,
             contentColor = player.color,
-            selectedTabIndex = 0,
+            selectedTabIndex = pagerStateTop.currentPage,
             indicator = { },
             divider = @Composable { /* None */ },
         ) {
@@ -294,6 +313,7 @@ private fun PlayerEditor(
                 }
                 1 -> StatsSelectorTab(vm, player, updateTrigger, handleAction)
                 2 -> KeywordsSelectorTab(player, updateTrigger, borderSize, handleAction)
+                3 -> PlayerStateSelectorTab(vm, player, updateTrigger, borderSize, handleAction)
             }
         }
     }
@@ -550,6 +570,156 @@ private fun StatsSelectorTab(
 }
 
 @Composable
+private fun PlayerStateSelectorTab(
+    vm: GameScreenModel,
+    playerData: UiPlayerCard,
+    updateTrigger: Int,
+    borderSize: Dp,
+    handleAction: (GameAction) -> Unit,
+) {
+    val player = remember(playerData, updateTrigger) { playerData.player }
+    val color = if (player.model.isOnHomeTeam()) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
+    var activeState by remember(player, updateTrigger) { mutableStateOf(player.model.state) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(borderSize)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        PlayerStateSection(
+            title = "On Pitch",
+            states = PlayerPitchState.entries,
+            color = color,
+            player = player,
+            activeState = activeState,
+            handleAction = { action ->
+                if (action is SetPlayerState) {
+                    activeState = action.state
+                }
+                handleAction(action)
+            }
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+            ,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            JervisButton(
+                text = "Move Player",
+                buttonColor = color,
+                enabled = activeState is PlayerPitchState,
+                onClick = { vm.beginMovePlayer(player.model.id) },
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        PlayerStateSection(
+            title = "Dogout",
+            states = PlayerDogoutState.entries,
+            color = color,
+            player = player,
+            activeState = activeState,
+            handleAction = { action ->
+                if (action is SetPlayerState) {
+                    activeState = action.state
+                }
+                handleAction(action)
+            }
+        )
+    }
+}
+
+@Composable
+private fun PlayerStateSection(
+    title: String,
+    states: List<PlayerState>,
+    color: Color,
+    player: ModelRef<Player>,
+    activeState: PlayerState,
+    handleAction: (GameAction) -> Unit,
+) {
+    CategoryHeader(title, color)
+    Spacer(modifier = Modifier.height(8.dp))
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        states.forEach { state ->
+            PlayerStateButton(
+                state = state,
+                isActive = (activeState == state),
+                color = color,
+                handleAction = { newState ->
+                    val player = player.model
+                    val location = when (newState) {
+                        is PlayerDogoutState -> Dogout
+                        is PlayerPitchState -> player.location as? OnPitchLocation ?: findAvailablePitchLocation(player)
+                    }
+                    handleAction(SetPlayerState(player.id, state, location))
+                },
+            )
+        }
+    }
+}
+
+// Until we find a better UI. This just puts the player in the first available spot
+private fun findAvailablePitchLocation(player: Player): PitchCoordinate {
+    return player.team.game.pitch.first { it.isUnoccupied() && it.balls.isEmpty() && !it.hasTrapdoor }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun PlayerStateButton(
+    state: PlayerState,
+    isActive: Boolean,
+    color: Color,
+    handleAction: (PlayerState) -> Unit,
+) {
+    val shape = RoundedCornerShape(0.dp)
+    var isHover by remember { mutableStateOf(false) }
+    val border: BorderStroke? = when (isActive) {
+        false -> BorderStroke(4.dp, color)
+        true -> null
+    }
+    val containerColor = when {
+        isActive -> color
+        isHover -> color.copy(alpha = 0.25f)
+        else -> Color.Transparent
+    }
+
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+        Button(
+            modifier = Modifier
+                .onClickWithSmallDragControl(onClick = {
+                    handleAction(state)
+                })
+                .onPointerEvent(PointerEventType.Enter) { isHover = true }
+                .onPointerEvent(PointerEventType.Exit) { isHover = false },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = containerColor,
+                disabledContainerColor = JervisTheme.rulebookPaperMediumDark
+            ),
+            shape = shape,
+            onClick = { /* Handled by modifier */ },
+            border = border,
+            enabled = true,
+        ) {
+            Text(
+                text = state.label,
+                fontSize = 12.sp,
+                lineHeight = 1.em,
+                fontWeight = FontWeight.Medium,
+                color = if (isActive) JervisTheme.white else JervisTheme.contentTextColor,
+            )
+        }
+    }
+}
+
+@Composable
 private fun KeywordsSelectorTab(
     player: UiPlayerCard,
     updateTrigger: Int,
@@ -783,4 +953,3 @@ fun SkillValueButton(
         }
     }
 }
-
