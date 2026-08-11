@@ -16,6 +16,30 @@ import com.jervisffb.engine.teamBuilder
 object BB2025StandaloneStandardTeams {
     private val rules = StandardBB2025Rules()
     val defaultTeams = mapOf(
+        "amazon-starter-team-bb2025.jrt" to buildTeamFile {
+            metadata = JervisMetaData(FILE_FORMAT_VERSION)
+            roster = AMAZON_TEAM_BB2025
+            team = teamBuilder(rules, AMAZON_TEAM_BB2025) {
+                name = "Amazon Starter Team #1"
+                addPlayer("Am1".playerId, "Blocker-1", 1.playerNo, AMAZON_BLOCKER)
+                addPlayer("Am2".playerId, "Blocker-2", 2.playerNo, AMAZON_BLOCKER)
+                addPlayer("Am3".playerId, "Blitzer-3", 3.playerNo, AMAZON_BLITZER)
+                addPlayer("Am4".playerId, "Blitzer-4", 4.playerNo, AMAZON_BLITZER)
+                addPlayer("Am5".playerId, "Linewoman-5", 5.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am6".playerId, "Linewoman-6", 6.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am7".playerId, "Linewoman-7", 7.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am8".playerId, "Linewoman-8", 8.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am9".playerId, "Linewoman-9", 9.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am10".playerId, "Linewoman-10", 10.playerNo, AMAZON_LINEMAN)
+                addPlayer("Am11".playerId, "Linewoman-11", 11.playerNo, AMAZON_LINEMAN)
+                rerolls = 3
+                apothecaries = 1
+                dedicatedFans = 2
+                teamValue = 980_000
+            }
+            history = null
+        },
+
         "human-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = HUMAN_TEAM_BB2025
@@ -60,6 +84,29 @@ object BB2025StandaloneStandardTeams {
                 rerolls = 1
                 apothecaries = 0
                 dedicatedFans = 1
+                teamValue = 1_000_000
+            }
+            history = null
+        },
+
+        "nurgle-starter-team-bb2025.jrt" to buildTeamFile {
+            metadata = JervisMetaData(FILE_FORMAT_VERSION)
+            roster = NURGLE_TEAM_BB2025
+            team = teamBuilder(rules, NURGLE_TEAM_BB2025) {
+                name = "Nurgle Starter Team #1"
+                addPlayer("Nu1".playerId, "Rotter-1", 1.playerNo, ROTTER_LINEMEN)
+                addPlayer("Nu2".playerId, "Rotter-2", 2.playerNo, ROTTER_LINEMEN)
+                addPlayer("Nu3".playerId, "Rotter-3", 3.playerNo, ROTTER_LINEMEN)
+                addPlayer("Nu4".playerId, "Rotter-4", 4.playerNo, ROTTER_LINEMEN)
+                addPlayer("Nu5".playerId, "Bloater-5", 5.playerNo, BLOATERS)
+                addPlayer("Nu6".playerId, "Bloater-6", 6.playerNo, BLOATERS)
+                addPlayer("Nu7".playerId, "Bloater-7", 7.playerNo, BLOATERS)
+                addPlayer("Nu8".playerId, "Bloater-8", 8.playerNo, BLOATERS)
+                addPlayer("Nu9".playerId, "Pestigor-9", 9.playerNo, PESTIGORS)
+                addPlayer("Nu10".playerId, "Pestigor-10", 10.playerNo, PESTIGORS)
+                addPlayer("Nu11".playerId, "Rotspawn-11", 11.playerNo, ROTSPAWN)
+                rerolls = 2
+                apothecaries = 0
                 teamValue = 1_000_000
             }
             history = null
@@ -133,6 +180,30 @@ object BB2025StandaloneStandardTeams {
                 apothecaries = 0
                 dedicatedFans = 2
                 teamValue = 985_000
+            }
+            history = null
+        },
+
+        "tomb-kings-starter-team-bb2025.jrt" to buildTeamFile {
+            metadata = JervisMetaData(FILE_FORMAT_VERSION)
+            roster = TOMB_KINGS_TEAM_BB2025
+            team = teamBuilder(rules, TOMB_KINGS_TEAM_BB2025) {
+                name = "Tomb Kings Starter Team #1"
+                addPlayer("Tk1".playerId, "TombGuardian-1", 1.playerNo, TOMB_GUARDIANS)
+                addPlayer("Tk2".playerId, "TombGuardian-2", 2.playerNo, TOMB_GUARDIANS)
+                addPlayer("Tk3".playerId, "TombGuardian-3", 3.playerNo, TOMB_GUARDIANS)
+                addPlayer("Tk4".playerId, "TombGuardian-4", 4.playerNo, TOMB_GUARDIANS)
+                addPlayer("Tk5".playerId, "Blitzer-5", 5.playerNo, TOMB_KINGS_BLITZERS)
+                addPlayer("Tk6".playerId, "Blitzer-6", 6.playerNo, TOMB_KINGS_BLITZERS)
+                addPlayer("Tk7".playerId, "Thrower-7", 7.playerNo, TOMB_KINGS_THROWERS)
+                addPlayer("Tk8".playerId, "Skeleton-8", 8.playerNo, SKELETON_LINEMEN)
+                addPlayer("Tk9".playerId, "Skeleton-9", 9.playerNo, SKELETON_LINEMEN)
+                addPlayer("Tk10".playerId, "Skeleton-10", 10.playerNo, SKELETON_LINEMEN)
+                addPlayer("Tk11".playerId, "Skeleton-11", 11.playerNo, SKELETON_LINEMEN)
+                rerolls = 2
+                apothecaries = 0
+                dedicatedFans = 2
+                teamValue = 975_000
             }
             history = null
         },
