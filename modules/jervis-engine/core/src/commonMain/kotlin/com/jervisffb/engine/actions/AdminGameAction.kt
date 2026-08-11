@@ -26,14 +26,14 @@ import kotlinx.serialization.Serializable
  * [com.jervisffb.engine.GameEngineController.handleAction] and leave access
  * control to other layers.
  */
-sealed interface DevModeGameAction: GameAction
+sealed interface AdminGameAction: GameAction
 
 @Serializable
 data class ChangePlayerBaseStat(
     val playerId: PlayerId,
     val type: StatModifier.Type,
     val modifier: Int
-): DevModeGameAction {
+): AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
@@ -41,7 +41,7 @@ data class ChangePlayerBaseStat(
 data class AddPlayerSkill(
     val playerId: PlayerId,
     val skill: SkillId
-): DevModeGameAction {
+): AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
@@ -49,7 +49,7 @@ data class AddPlayerSkill(
 data class RemovePlayerSkill(
     val playerId: PlayerId,
     val skill: SkillId
-): DevModeGameAction {
+): AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
@@ -57,7 +57,7 @@ data class RemovePlayerSkill(
 data class AddPlayerKeyword(
     val playerId: PlayerId,
     val keyword: PlayerKeyword
-): DevModeGameAction {
+): AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
@@ -65,7 +65,7 @@ data class AddPlayerKeyword(
 data class RemovePlayerKeyword(
     val playerId: PlayerId,
     val keyword: PlayerKeyword
-): DevModeGameAction {
+): AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
@@ -76,7 +76,7 @@ data class SetPlayerState(
     val playerId: PlayerId,
     val state: PlayerState,
     val location: Location,
-) : DevModeGameAction {
+) : AdminGameAction {
     constructor(playerId: PlayerId, state: PlayerState, x: Int, y: Int) : this(playerId, state, PitchCoordinate(x, y))
     // The GameController is responsible for the full validation. Here we just validate the most obvious things
     init {
@@ -98,7 +98,7 @@ data class SetPlayerState(
 data class MovePlayer(
     val playerId: PlayerId,
     val location: OnPitchLocation,
-) : DevModeGameAction {
+) : AdminGameAction {
     init {
         if (location is PitchCoordinate) {
             require(location.x >= 0 && location.y >= 0) { "Invalid pitch coordinate: $location" }
@@ -114,7 +114,7 @@ data class SetBallState(
     val y: Int,
     val ballState: BallState? = null,
     val carriedBy: PlayerId? = null,
-) : DevModeGameAction {
+) : AdminGameAction {
     fun getBall(state: Game): Ball = state.balls.first { it.id == ballId }
     fun getPlayer(state: Game): Player? = carriedBy?.let { state.getPlayerById(it) }
     fun coordinate(): PitchCoordinate = PitchCoordinate(x, y)

@@ -2,6 +2,7 @@ package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
@@ -23,7 +24,6 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DeselectPlayer
-import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
@@ -199,7 +199,7 @@ fun GameAction.isRandomAction(): Boolean {
         is ForegoActivationSelected -> false
         is PlayersSelected -> false
         is PassTypeSelected -> false
-        is DevModeGameAction -> false
+        is AdminGameAction -> false
     }
 }
 

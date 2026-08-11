@@ -53,7 +53,7 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.SetPlayerState::class)
         subclass(com.jervisffb.engine.actions.SkillSelected::class)
         subclass(com.jervisffb.engine.actions.Undo::class)
-        polymorphic(com.jervisffb.engine.actions.DevModeGameAction::class) {
+        polymorphic(com.jervisffb.engine.actions.AdminGameAction::class) {
             subclass(com.jervisffb.engine.actions.AddPlayerKeyword::class)
             subclass(com.jervisffb.engine.actions.AddPlayerSkill::class)
             subclass(com.jervisffb.engine.actions.ChangePlayerBaseStat::class)
@@ -86,6 +86,10 @@ val coreSerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.challenge.ChallengeScore::class) {
         subclass(com.jervisffb.engine.challenge.ChallengeScore.CompletionOnly::class)
         subclass(com.jervisffb.engine.challenge.ChallengeScore.ProbabilityScore::class)
+    }
+    polymorphic(com.jervisffb.engine.model.PlayerState::class) {
+        subclass(com.jervisffb.engine.model.PlayerDogoutState::class)
+        subclass(com.jervisffb.engine.model.PlayerPitchState::class)
     }
     polymorphic(com.jervisffb.engine.model.SkillValue::class) {
         subclass(com.jervisffb.engine.model.SkillValue.IntAdjustment::class)
@@ -176,10 +180,6 @@ val coreSerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.model.locations.PitchCoordinate::class) {
             subclass(com.jervisffb.engine.model.locations.PitchCoordinateImpl::class)
         }
-    }
-    polymorphic(com.jervisffb.engine.model.PlayerState::class) {
-        subclass(com.jervisffb.engine.model.PlayerDogoutState::class)
-        subclass(com.jervisffb.engine.model.PlayerPitchState::class)
     }
     polymorphic(com.jervisffb.engine.model.modifiers.PlayerStatusEffect::class) {
         subclass(com.jervisffb.engine.model.modifiers.OwnedPlayerStatusEffect::class)

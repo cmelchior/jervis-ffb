@@ -2,11 +2,11 @@ package com.jervisffb.engine
 
 import com.jervisffb.engine.actions.AddPlayerKeyword
 import com.jervisffb.engine.actions.AddPlayerSkill
+import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.ChangePlayerBaseStat
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.DevModeGameAction
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
@@ -407,7 +407,7 @@ class GameEngineController(
             currentProcedure.currentNode())
         logInternalEvent(ReportHandleAction(userAction))
         val currentNode: ActionNode = stack.currentNode() as ActionNode
-        if (validateActions && userAction !is DevModeGameAction) {
+        if (validateActions && userAction !is AdminGameAction) {
             validateAction(userAction)
         }
 
@@ -434,7 +434,7 @@ class GameEngineController(
                 ),
             )
         }
-        val actionCommand = when (userAction is DevModeGameAction) {
+        val actionCommand = when (userAction is AdminGameAction) {
             true -> processSingleDevAction(userAction)
             false -> currentNode.applyAction(userAction, state, rules)
         }
@@ -448,7 +448,7 @@ class GameEngineController(
         deltaBuilder.endAction()
     }
 
-    private fun processSingleDevAction(action: DevModeGameAction): Command {
+    private fun processSingleDevAction(action: AdminGameAction): Command {
         if (!rules.allowPlayerEditsDuringGame) {
             INVALID_ACTION(action, "Player edits are not allowed during this game.")
         }

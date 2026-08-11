@@ -95,7 +95,7 @@ class MonstrousMouthTests: JervisGameBB2025Test() {
             *chompRoll(3.d6),
         )
         state.assertNoActivePlayer()
-        assertEquals(attacker, (defender.statusEffects.single { it.type == PlayerStatusEffectType.CHOMPED } as OwnedPlayerStatusEffect).causedBy)
+        assertEquals(attacker, (defender.statusEffects.single { it.type == PlayerStatusEffectType.CHOMPED } as OwnedPlayerStatusEffect).getCausedBy(state))
     }
 
     @Test

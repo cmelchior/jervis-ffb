@@ -72,7 +72,7 @@ class CalculatedAction(private val action: GameEngineController.(Game, Rules) ->
  * The rule engine will this action as an atomic action. This means that when you
  * Undo this action, all "sub-actions" will all be undone as one.
  *
- * It is not allowed to put [DevModeGameAction] inside of this action.
+ * It is not allowed to put [AdminGameAction] inside of this action.
  */
 @Serializable
 data class CompositeGameAction(val actionList: List<GameAction>): GameAction {
