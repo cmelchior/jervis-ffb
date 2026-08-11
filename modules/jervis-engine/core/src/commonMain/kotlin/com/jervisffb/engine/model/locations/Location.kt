@@ -2,6 +2,7 @@ package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
+import kotlinx.serialization.Serializable
 
 /**
  * Interface representing the abstract idea of a location on the main "pitch",
@@ -11,6 +12,7 @@ import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
 * the pitch's coordinates system. In particular, this means that [Dogout] is
  * not represented this way.
  */
+@Serializable
 sealed interface Location {
     fun isOnLineOfScrimmage(rules: Rules): Boolean
     fun isInWideZone(rules: Rules): Boolean

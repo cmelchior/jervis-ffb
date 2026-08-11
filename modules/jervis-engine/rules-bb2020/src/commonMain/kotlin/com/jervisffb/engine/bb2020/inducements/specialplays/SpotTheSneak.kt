@@ -5,8 +5,10 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.inducements.DirtyTrick
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.common.skills.Duration
+import kotlinx.serialization.Serializable
 
 // Dirty Trick: Spot the Sneak - See Special Plays Card Pack
+@Serializable
 class SpotTheSneak: DirtyTrick() {
     override val name: String = "Spot the Sneak"
     override val duration: Duration = Duration.END_OF_DRIVE

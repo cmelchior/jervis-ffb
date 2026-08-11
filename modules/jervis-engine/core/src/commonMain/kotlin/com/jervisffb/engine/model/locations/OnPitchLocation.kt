@@ -2,11 +2,13 @@ package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
+import kotlinx.serialization.Serializable
 
 /**
  * Interface representing a location on the pitch of a Blood Bowl match.
  * This does not include the [Dogout].
  */
+@Serializable
 sealed interface OnPitchLocation: Location {
 
     /**

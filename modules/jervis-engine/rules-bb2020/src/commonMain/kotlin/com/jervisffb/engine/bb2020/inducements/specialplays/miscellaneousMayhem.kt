@@ -9,8 +9,10 @@ import com.jervisffb.engine.model.inducements.MiscellaneousMayhem
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
+import kotlinx.serialization.Serializable
 
 // Miscellaneous Mayhem: Assassination Attempt - See Special Plays Card Pack
+@Serializable
 class AssassinationAttempt: MiscellaneousMayhem() {
     override val name: String = "Assassination Attempt"
     override val duration: Duration = Duration.IMMEDIATE

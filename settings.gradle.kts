@@ -33,5 +33,6 @@ include(":modules:jervis-ui:webApp")
 include(":modules:platform-utils")
 include(":modules:replay-analyzer")
 include(":modules:tourplay-net")
+include(":tools")
 
 include("modules:jervis-engine:package")

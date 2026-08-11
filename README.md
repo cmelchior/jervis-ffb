@@ -76,8 +76,8 @@ This repository is structured in the following way:
 - `modules/`: The main entry point for all code. See the section below.
 - `docs/`: Contains more fine-grained docs about the progress on various aspects
   of the project.
-- `tools/`: Contains helper tools for the project that are either commandline or
-  Kotlin Notebooks.
+- `tools/`: A JVM Gradle module containing helper tools and, during the gradual
+  migration, the project's Kotlin Notebooks.
 - `mavenRepo/`: contains some packages that are not available on Maven Central.
   Artifacts here are used to build parts of the project.
 - `logo/`: Contains project logos used by various platforms.
@@ -144,7 +144,8 @@ of the following modules:
 - `replay-analyzer`: A helper for processing and converting the JSON content of 
    a FUMBBL replay file into something that Jervis can process.
 
-  
+- `tools`: Contains helper tools used during development of the project.
+ 
 ### UI Resources
 The Jervis Client is heavily inspired by [FUMBBL](https://github.com/christerk/ffb)
 and borrows many of its assets from there. They are used with permission. All 

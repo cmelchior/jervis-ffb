@@ -4,12 +4,14 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.serialization.Serializable
 
 /**
  * This class represents a Giants location on the board.
  *
  * See page 54 in BB2020 Death Zone.
  */
+@Serializable
 data class GiantLocation(val coordinates: PersistentList<PitchCoordinate>): OnPitchLocation {
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {

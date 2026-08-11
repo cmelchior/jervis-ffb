@@ -110,6 +110,28 @@ This skips the packaging step but takes longer per invocation:
 ./gradlew :modules:fuzzer-cli:run --args="<fuzzerConfigurationName>"
 ```
 
+### Development tools
+
+The repository's helper tools live in the `:tools` Gradle module. 
+
+Display the available tool tasks with:
+
+```shell
+./gradlew :tools:help
+```
+
+Of note:
+
+```shell
+./gradlew generateSerializers
+```
+
+Can be used to keep the Kotlin Serialization modules up to date when the engine
+adds new subclasses to polymorphic types, as these must normally manually be 
+registered using `polymorphic { ... }`. Calling this task, does this 
+automatically if the top-level type is listed as a root in 
+`GenerateSerializers.kt`.
+
 ## Formatting code
 The project uses [ktlint](https://github.com/pinterest/ktlint) via the Gradle
 plugin. `ktlintCheck` runs as part of `./gradlew check` and CI will fail on

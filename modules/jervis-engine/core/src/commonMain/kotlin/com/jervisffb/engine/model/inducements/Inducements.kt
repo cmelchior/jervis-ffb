@@ -40,7 +40,8 @@ interface InfamousCoachAbility: InducementEffect {
     }
 }
 
-// See page 16 in Deathzone
+// See page 16 in DeathZone
+@Serializable
 class ByThePowerOfTheGoods: InfamousCoachAbility {
     override val name: String = "By The Power Of The Gods!"
     override var used: Boolean = false
@@ -68,31 +69,37 @@ interface SpecialPlayCard: InducementEffect {
     }
 }
 
+@Serializable
 abstract class DirtyTrick: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.DIRTY_TRICK
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
+@Serializable
 abstract class RandomEvent: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.RANDOM_EVENT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
+@Serializable
 abstract class MagicalMemorabilia: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.MAGIC_MEMORABILIA
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
+@Serializable
 abstract class HeroicFeat: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.HEROIC_FEAT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
+@Serializable
 abstract class BenefitOfTraining: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.HEROIC_FEAT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
+@Serializable
 abstract class MiscellaneousMayhem: SpecialPlayCard {
     override val type: SpecialPlayCardType = SpecialPlayCardType.MISCELLANEOUS_MAYHEM
     override var used: Boolean = false

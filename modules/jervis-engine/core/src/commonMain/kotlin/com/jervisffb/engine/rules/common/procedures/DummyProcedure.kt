@@ -7,12 +7,14 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
+import kotlinx.serialization.Serializable
 
 /**
  * Dummy procedure that does nothing.
  *
  * This can be used as a placeholder during development or testing.
  */
+@Serializable
 object DummyProcedure : Procedure() {
     override val initialNode: Node = Dummy
 

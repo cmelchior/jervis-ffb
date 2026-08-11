@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
  * Smoke tests that exercise the polymorphic serializer registrations for
  * both rulesets. If a subclass registration goes missing after the split
  * of `generatedSerializer.kt` into three per-module files, these tests
- * will fail at serialize time with a `SerializationException`.
+ * will fail at serializing time with a `SerializationException`.
  */
 class SerializerRoundTripTests {
 

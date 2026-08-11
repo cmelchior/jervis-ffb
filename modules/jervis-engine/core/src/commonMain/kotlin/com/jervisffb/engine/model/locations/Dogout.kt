@@ -2,7 +2,9 @@ package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
+import kotlinx.serialization.Serializable
 
+@Serializable
 data object Dogout : Location {
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
     override fun isInWideZone(rules: Rules): Boolean = false

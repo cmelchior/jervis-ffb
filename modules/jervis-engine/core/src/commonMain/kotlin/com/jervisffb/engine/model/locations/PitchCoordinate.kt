@@ -3,6 +3,7 @@ package com.jervisffb.engine.model.locations
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
+import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -238,4 +239,5 @@ interface PitchCoordinate: OnPitchLocation {
     }
 }
 
+@Serializable
 data class PitchCoordinateImpl(override val x: Int, override val y: Int) : PitchCoordinate

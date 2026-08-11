@@ -2,6 +2,7 @@ package com.jervisffb.engine.model
 
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.OnPitchLocation
+import kotlinx.serialization.Serializable
 
 /**
  * This interface describes the high-level state of players. It is split into
@@ -23,6 +24,7 @@ sealed interface PlayerState {
  * States for players on the pitch. These should only be used when
  * [Player.location] is a [OnPitchLocation].
  */
+@Serializable
 enum class PlayerPitchState(override val label: String) : PlayerState {
     STANDING("Standing"),
     PRONE("Prone"),
@@ -36,6 +38,7 @@ enum class PlayerPitchState(override val label: String) : PlayerState {
  * States for players in the Dogout. These should only be used when
  * [Player.location] is [Dogout].
  */
+@Serializable
 enum class PlayerDogoutState(override val label: String) : PlayerState {
     RESERVE("Reserve"),
     KNOCKED_OUT("Knocked Out"),
@@ -56,6 +59,7 @@ enum class PlayerDogoutState(override val label: String) : PlayerState {
  * value is, e.g., a player being Knocked Down will transition from STANDING to
  * PRONE. While this is happening, the intermediate state is set to KNOCKED_DOWN.
  */
+@Serializable
 enum class PlayerIntermediateState {
     KNOCKED_DOWN,
     FALLEN_OVER,

@@ -386,7 +386,7 @@ fun getResetChompedStateCommands(
     if (player.hasStatusEffect(PlayerStatusEffectType.CHOMPED)) {
         player.statusEffects.forEach { statusEffect ->
             if (statusEffect.type == PlayerStatusEffectType.CHOMPED) {
-                val causedBy = (statusEffect as OwnedPlayerStatusEffect).causedBy
+                val causedBy = (statusEffect as OwnedPlayerStatusEffect).getCausedBy(state)
                 if (!causedBy.location.isAdjacent(state.rules, nextLocation)) {
                     commands.add(RemovePlayerStatusEffect(player, statusEffect))
                 }
@@ -400,7 +400,7 @@ fun getResetChompedStateCommands(
             opponentPlayer.statusEffects.forEach { statusEffect ->
                 if (statusEffect is OwnedPlayerStatusEffect) {
                     val causedBy = statusEffect.causedBy
-                    if (statusEffect.type == PlayerStatusEffectType.CHOMPED && causedBy == player) {
+                    if (statusEffect.type == PlayerStatusEffectType.CHOMPED && causedBy == player.id) {
                         if (forceRemoveChompedByChomper || !opponentPlayer.location.isAdjacent(state.rules, nextLocation)) {
                             commands.add(RemovePlayerStatusEffect(opponentPlayer, statusEffect))
                         }
