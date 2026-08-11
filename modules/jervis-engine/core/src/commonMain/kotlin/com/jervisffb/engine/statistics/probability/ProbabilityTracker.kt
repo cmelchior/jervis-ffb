@@ -23,6 +23,16 @@ class ProbabilityTracker {
         delta.chanceObservations.forEach { apply(it, observations) }
     }
 
+    /**
+     * Reset all probability observations.
+     * 
+     * Can be used to e.g, reset observations between turns so it is possible to calculate
+     * the chance of success for each turn during a game.
+     */
+    fun resetObservations() {
+        observations.clear()
+    }
+
     private fun apply(change: ChanceObservationChange, collector: MutableList<ChanceObservation>) {
         when (change) {
             is ChanceObservationChange.Recorded -> {

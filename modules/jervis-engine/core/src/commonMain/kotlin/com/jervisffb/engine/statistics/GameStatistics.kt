@@ -24,7 +24,11 @@ import com.jervisffb.engine.statistics.probability.ProbabilityTracker
  * challenges. We need to figure out exactly what kind of statistics we want to
  * collect before adding more functionality.
  */
-class GameStatistics {
+class GameStatistics(
+    // If `set` any actions loaded in `GameEngineController.initialActions` will
+    // not be used when calculating statistics.
+    val ignoreInitialActions: Boolean = true
+) {
 
     // Track dice rolls to calculate the chance of success for the given sequence.
     // TODO: Perhaps this concept can be extended to also include Luck Calculations,

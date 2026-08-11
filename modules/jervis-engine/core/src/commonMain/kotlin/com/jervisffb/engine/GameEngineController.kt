@@ -261,6 +261,7 @@ class GameEngineController(
         actionMode = ActionMode.MANUAL
         setupInitialStartingState()
         rollForwardToNextActionNode()
+        state.collectChanceData = (collectStatistics && statistics?.ignoreInitialActions != true)
         initialActions.forEach {
             handleAction(it)
         }
