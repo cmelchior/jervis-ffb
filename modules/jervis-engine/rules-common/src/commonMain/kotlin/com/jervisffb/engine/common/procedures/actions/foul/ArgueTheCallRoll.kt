@@ -51,7 +51,7 @@ object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BeingSentOffContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.ARGUE_THE_CALL))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val table = rules.argueTheCallTable

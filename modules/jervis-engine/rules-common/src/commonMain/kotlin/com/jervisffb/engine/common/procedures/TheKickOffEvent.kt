@@ -55,7 +55,7 @@ object TheKickOffEvent : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6, Dice.D6))
+            return listOf(RollDice(Dice.D6, Dice.D6, type = DiceRollType.KICK_OFF_TABLE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

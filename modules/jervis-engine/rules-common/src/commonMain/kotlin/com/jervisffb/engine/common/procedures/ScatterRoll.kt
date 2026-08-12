@@ -131,7 +131,7 @@ object ScatterRoll : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D8, Dice.D8, Dice.D8))
+            return listOf(RollDice(Dice.D8, Dice.D8, Dice.D8, type = DiceRollType.SCATTER))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

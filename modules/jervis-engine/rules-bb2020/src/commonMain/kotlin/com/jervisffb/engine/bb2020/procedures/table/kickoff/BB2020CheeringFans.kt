@@ -70,7 +70,7 @@ object BB2020CheeringFans : Procedure(), ChanceObservationHandler {
     object KickingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.CHEERING_FANS))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -94,7 +94,7 @@ object BB2020CheeringFans : Procedure(), ChanceObservationHandler {
     object ReceivingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.CHEERING_FANS))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()

@@ -91,7 +91,7 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.THROWIN_DIRECTION))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -124,7 +124,7 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
     object RollDistance : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6, Dice.D6))
+            return listOf(RollDice(Dice.D6, Dice.D6, type = DiceRollType.THROWIN_DISTANCE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRollList<D6Result>(action) { dice ->

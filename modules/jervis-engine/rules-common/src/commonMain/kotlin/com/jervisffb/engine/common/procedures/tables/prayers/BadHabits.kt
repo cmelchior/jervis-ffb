@@ -61,7 +61,7 @@ object BadHabits : Procedure(), ChanceObservationHandler {
     object RollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.BAD_HABITS))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

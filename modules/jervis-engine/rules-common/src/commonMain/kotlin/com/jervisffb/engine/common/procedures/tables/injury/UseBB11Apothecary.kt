@@ -101,7 +101,7 @@ object UseBB11Apothecary: Procedure() {
     object ApothecaryCasualtyReRoll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D16))
+            return listOf(RollDice(Dice.D16, type = DiceRollType.CASUALTY))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -123,7 +123,7 @@ object UseBB11Apothecary: Procedure() {
     object ApothecaryLastingInjuryReroll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.LASTING_INJURY))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

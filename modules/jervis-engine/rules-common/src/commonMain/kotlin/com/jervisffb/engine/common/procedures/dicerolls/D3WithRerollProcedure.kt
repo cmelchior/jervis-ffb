@@ -116,7 +116,7 @@ abstract class D3WithRerollProcedure: Procedure(), ChanceObservationHandler {
 
         override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = rollType))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
@@ -240,7 +240,7 @@ abstract class D3WithRerollProcedure: Procedure(), ChanceObservationHandler {
 
         override fun actionOwner(state: Game, rules: Rules): Team = getActionOwner(state).team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = rollType))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->

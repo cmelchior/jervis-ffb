@@ -45,7 +45,7 @@ object BribeRoll: Procedure(), ChanceObservationHandler {
     object RollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BeingSentOffContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.BRIBE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->

@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
@@ -159,30 +160,56 @@ data object TossCoin : GameActionDescriptor {
     override fun createAll(): List<GameAction> = CoinTossResult.allOptions()
 }
 
-// Roll a number of dice and return their result. Returned results must be in the same order
-// as the types defined here.
-data class RollDice(
+/**
+ * Roll a number of dice and return their result. Returned results must be in the same order
+ * as the types defined here.
+ *
+ * [allowedFaces] makes it possible to restrict which values are allowed to be rolled. Since
+ * this is an uncommon use-case, it is represented as a bitmask. Use [getAllowedFaces] to
+ * access a typesafe wrapper, making access easier.
+ */
+@ConsistentCopyVisibility
+data class RollDice private constructor(
     // Which kind of dice should be rolled
     val dice: List<Dice>,
+    // What type of roll is being done.
+    val type: DiceRollType,
+    // Compact representation of the allowed faces for each die. If set for one die,
+    // it must be set for all.
+    private val allowedFaces: IntArray? = null
 ) : GameActionDescriptor {
-    constructor(vararg dice: Dice) : this(dice.toList())
+    constructor(dice: List<Dice>, type: DiceRollType) : this(dice, type, null)
+    constructor(vararg dice: Dice, type: DiceRollType) : this(dice.toList(), type)
+    constructor(
+        vararg dice: Dice,
+        type: DiceRollType,
+        allowedFaces: List<DiceFaces>
+    ) : this(dice.toList(), type, allowedFaces.map { it.mask }.toIntArray())
+
+    init {
+        if (allowedFaces != null && allowedFaces.size != dice.size) {
+            error("allowedFaces must have the same size as dice")
+        }
+    }
+
     override val size: Int
         get() {
             return dice.fold(1) { acc, die ->
-                val sides = when (die) {
-                    Dice.D2 -> 2
-                    Dice.D3 -> 3
-                    Dice.D4 -> 4
-                    Dice.D6 -> 6
-                    Dice.D8 -> 8
-                    Dice.D12 -> 12
-                    Dice.D16 -> 16
-                    Dice.D20 -> 20
-                    Dice.BLOCK -> 6
-                }
+                val sides = die.sides
                 acc * sides
             }
         }
+
+    /**
+     * Returns the allowed faces for the die at the given index.
+     */
+    fun getAllowedFaces(index: Int): DiceFaces {
+        if (index >= dice.size) error("Index $index is out of bounds for dice size ${dice.size}")
+        return when (allowedFaces != null) {
+            true -> DiceFaces.fromMask(allowedFaces[index])
+            false -> DiceFaces.all(dice[index])
+        }
+    }
 
     override fun createRandom(random: Random): GameAction {
         return dice.map {
@@ -204,6 +231,28 @@ data class RollDice(
 
     override fun createAll(): List<GameAction> {
         TODO("Not yet implemented")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as RollDice
+
+        if (dice != other.dice) return false
+        if (type != other.type) return false
+        if (!allowedFaces.contentEquals(other.allowedFaces)) return false
+        if (size != other.size) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dice.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (allowedFaces?.contentHashCode() ?: 0)
+        result = 31 * result + size
+        return result
     }
 }
 

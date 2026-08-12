@@ -48,7 +48,7 @@ object RecoverPlayerRoll: Procedure(), ChanceObservationHandler {
             return state.getContext<RecoverKnockedOutPlayersContext>().selectedPlayer?.team ?: INVALID_GAME_STATE("Missing player")
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.RECOVER_PLAYER))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->

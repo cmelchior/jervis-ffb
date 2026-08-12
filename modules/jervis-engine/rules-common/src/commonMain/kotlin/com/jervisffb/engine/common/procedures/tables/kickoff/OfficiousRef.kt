@@ -60,7 +60,7 @@ object OfficiousRef : Procedure(), ChanceObservationHandler {
     object KickingTeamRollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.OFFICIOUS_REF_FAN_FACTOR))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -93,7 +93,7 @@ object OfficiousRef : Procedure(), ChanceObservationHandler {
     object ReceivingTeamRollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.OFFICIOUS_REF_FAN_FACTOR))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -155,7 +155,7 @@ object OfficiousRef : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.OFFICIOUS_REF_REFEREE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -218,7 +218,7 @@ object OfficiousRef : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.OFFICIOUS_REF_REFEREE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

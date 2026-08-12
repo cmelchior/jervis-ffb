@@ -65,8 +65,7 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * Main entry point for running a single game according to some predefined rules.
  **
  * This class should not be used until both teams have been identified and a ruleset
- * has been agreed upon. This should be the responsibility of a specific
- * [GameRunner]
+ * has been agreed upon.
  *
  * - [initialActions] Actions to run as soon as the controller is started using [startManualMode]
  *   or [startTestMode]
@@ -464,7 +463,7 @@ class GameEngineController(
     private fun processSingleAdminAction(action: AdminGameAction): Command {
         if (
             (!rules.allowPlayerEditsDuringGame && !initializing)
-                || (initializing && !allowAdminActionsInInitialActions)
+            || (initializing && !allowAdminActionsInInitialActions)
         ) {
             INVALID_ACTION(action, "Player edits are not allowed during this game.")
         }

@@ -39,7 +39,7 @@ object LastingInjuryRoll: Procedure(), ChanceObservationHandler {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6, type = DiceRollType.LASTING_INJURY))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val table = rules.lastingInjuryTable
             return castDiceRoll<D6Result>(action) { d6 ->

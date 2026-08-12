@@ -72,7 +72,7 @@ object SolidDefense : Procedure(), ChanceObservationHandler {
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.SOLID_DEFENSE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

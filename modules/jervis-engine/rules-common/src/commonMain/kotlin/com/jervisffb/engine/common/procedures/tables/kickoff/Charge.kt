@@ -179,7 +179,7 @@ object Charge : Procedure(), ChanceObservationHandler {
     object RollForPlayers: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.CHARGE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { roll ->

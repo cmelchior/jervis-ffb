@@ -50,7 +50,7 @@ object SingleStandardBlockRollDice: Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
-            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
+            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }, type = DiceRollType.BLOCK))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

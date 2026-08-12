@@ -56,7 +56,7 @@ object Bounce : Procedure(), ChanceObservationHandler {
     object RollDirection : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D8))
+            return listOf(RollDice(Dice.D8, type = DiceRollType.BOUNCE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

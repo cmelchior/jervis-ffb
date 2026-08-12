@@ -98,7 +98,7 @@ object UseBB7Apothecary: Procedure(), ChanceObservationHandler {
     object ApothecaryInjuryReroll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6))
+            return listOf(RollDice(Dice.D6, type = DiceRollType.BB7_APOTHECARY))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

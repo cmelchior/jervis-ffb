@@ -47,7 +47,7 @@ object SingleStandardBlockRerollDice: Procedure(), ChanceObservationHandler {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val rerollContext = state.getRerollContext()
             val dice = rerollContext.rerollDice ?: INVALID_GAME_STATE("Cannot determine number of dice: $rerollContext")
-            return listOf(RollDice(List(dice.size) { Dice.BLOCK }))
+            return listOf(RollDice(List(dice.size) { Dice.BLOCK }, type = DiceRollType.BLOCK))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

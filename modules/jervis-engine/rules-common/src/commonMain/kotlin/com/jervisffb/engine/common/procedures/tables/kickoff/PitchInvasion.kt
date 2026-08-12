@@ -57,7 +57,7 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForKickingTeamFans : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6, type = DiceRollType.PITCH_INVASION_FAN_FACTOR))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
@@ -80,7 +80,7 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForReceivingTeamFans : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6, type = DiceRollType.PITCH_INVASION_FAN_FACTOR))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PitchInvasionContext>()
@@ -112,7 +112,7 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForReceivingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
@@ -168,7 +168,7 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForKickingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()

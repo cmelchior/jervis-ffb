@@ -38,7 +38,7 @@ object FanFactorRolls : Procedure(), ChanceObservationHandler {
     object SetFanFactorForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.homeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.FAN_FACTOR))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val team = state.homeTeam
@@ -64,7 +64,7 @@ object FanFactorRolls : Procedure(), ChanceObservationHandler {
     object SetFanFactorForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.awayTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D3))
+            return listOf(RollDice(Dice.D3, type = DiceRollType.FAN_FACTOR))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val team = state.awayTeam

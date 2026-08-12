@@ -63,7 +63,7 @@ object SwelteringHeat : Procedure(), ChanceObservationHandler {
             val onPitchPlayers = state.homeTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
             return when (onPitchPlayers.isEmpty()) {
                 true -> listOf(ContinueWhenReady)
-                false -> listOf(RollDice(Dice.D3))
+                false -> listOf(RollDice(Dice.D3, type = DiceRollType.SWELTERING_HEAT))
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -127,7 +127,7 @@ object SwelteringHeat : Procedure(), ChanceObservationHandler {
             val onPitchPlayers = state.awayTeam.filter { it.location.isOnPitch(rules) }.map { it.id }
             return when (onPitchPlayers.isEmpty()) {
                 true -> listOf(ContinueWhenReady)
-                false -> listOf(RollDice(Dice.D3))
+                false -> listOf(RollDice(Dice.D3, type = DiceRollType.SWELTERING_HEAT))
             }
         }
 

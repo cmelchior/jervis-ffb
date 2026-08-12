@@ -66,7 +66,7 @@ object StandardBlockRerollDice: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // TODO Some skills allow only rerolling some dice. We need to capture this somehow
             val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
-            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
+            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }, type = DiceRollType.BLOCK))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

@@ -41,7 +41,7 @@ object WeatherRoll : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.homeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Each coach should role a dice, but just treat this as a single dice roll here
-            return listOf(RollDice(Dice.D6, Dice.D6))
+            return listOf(RollDice(Dice.D6, Dice.D6, type = DiceRollType.WEATHER))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

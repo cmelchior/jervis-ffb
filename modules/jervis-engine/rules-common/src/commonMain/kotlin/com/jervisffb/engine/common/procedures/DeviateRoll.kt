@@ -47,7 +47,7 @@ object DeviateRoll : Procedure(), ChanceObservationHandler {
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D8, Dice.D6))
+            return listOf(RollDice(Dice.D8, Dice.D6, type = DiceRollType.DEVIATE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D8Result, D6Result>(action) { d8, d6 ->

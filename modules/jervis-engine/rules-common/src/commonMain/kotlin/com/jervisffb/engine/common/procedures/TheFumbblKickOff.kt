@@ -24,6 +24,7 @@ import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
 /**
@@ -122,7 +123,7 @@ object TheFumbblKickOff : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D8, Dice.D6))
+            return listOf(RollDice(Dice.D8, Dice.D6, type = DiceRollType.DEVIATE))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

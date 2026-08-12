@@ -49,7 +49,7 @@ object PrayersToNuffleRoll : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(rules.prayersToNuffleTable.die))
+            return listOf(RollDice(rules.prayersToNuffleTable.die, type = DiceRollType.PRAYERS_TO_NUFFLE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val table = rules.prayersToNuffleTable
