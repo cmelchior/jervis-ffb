@@ -87,6 +87,11 @@ class GameEngineController(
     private val cacheActionDescriptor: Boolean = false,
     // If `true`, initial actions cannot be undone.
     private val protectInitialActions: Boolean = false,
+    // When loading challenges, we might load a game that was preconfigured using Admin
+    // Actions, but when the game itself is running. They should not be allowed.
+    // In that case, set this to true as this will override a rules behavior that
+    // disallow them.
+    private val allowAdminActionsInInitialActions: Boolean = false,
     // Called when the controller is started.
     // If set, the controller will collect statistics about the game while it
     // is running.
@@ -104,6 +109,9 @@ class GameEngineController(
         MANUAL, TEST, NOT_STARTED
     }
 
+    // Set to `true` while setting up the game state and loading initial actions.
+    var initializing = false
+
     // Copy of Home and Away teams state, taken just before starting the game.
     // This is required so we can write the initial state to a save file (which
     // is required as we apply all commands in the save file to this state).
@@ -120,8 +128,9 @@ class GameEngineController(
 
     // Track the entire "forward" history. In case of Undo's. The last delta
     // is removed from history, reversed and put in `lastActionIfUndo`
-    private val _history: MutableList<GameDelta> = mutableListOf()
-    val history: List<GameDelta> = _history
+    val history: List<GameDelta>
+        field: MutableList<GameDelta> = mutableListOf()
+
     private val collectStatistics: Boolean = (statistics != null)
 
     // Point in `history` that calling Undo cannot move past.
@@ -237,7 +246,7 @@ class GameEngineController(
      * of the action that was undone.
      */
     fun getDelta(): GameDelta {
-        return lastActionIfUndo?.second ?: _history.lastOrNull() ?: GameDelta(id = GameActionId(0), steps = emptyList())
+        return lastActionIfUndo?.second ?: history.lastOrNull() ?: GameDelta(id = GameActionId(0), steps = emptyList())
     }
 
     /**
@@ -259,6 +268,7 @@ class GameEngineController(
         if (actionMode != ActionMode.NOT_STARTED) {
             error("Controller already started: $actionMode")
         }
+        initializing = true
         this.logAvailableActions = logAvailableActions
         actionMode = ActionMode.MANUAL
         setupInitialStartingState()
@@ -269,11 +279,13 @@ class GameEngineController(
         }
         lockInitialActions()
         state.collectChanceData = collectStatistics
+        initializing = false
         onStarted(this)
     }
 
     fun startTestMode(start: Procedure, logAvailableActions: Boolean = true) {
         actionMode = ActionMode.TEST
+        initializing = true
         this.logAvailableActions = logAvailableActions
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
@@ -282,6 +294,7 @@ class GameEngineController(
         }
         lockInitialActions()
         state.collectChanceData = collectStatistics
+        initializing = false
         onStarted(this)
     }
 
@@ -293,7 +306,7 @@ class GameEngineController(
         if (!protectInitialActions) return
         // Measured from history because a CompositeGameAction is split into
         // one delta per step.
-        undoFloor = _history.size
+        undoFloor = history.size
     }
 
     fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
@@ -315,7 +328,7 @@ class GameEngineController(
      * given team also created the game action.
      */
     fun isUndoAvailable(team: TeamId? = null): Boolean {
-        if (_history.size <= undoFloor) return false
+        if (history.size <= undoFloor) return false
         if (rules.undoActionBehavior == UndoActionBehavior.NOT_ALLOWED) return false
 
         // Since CompositeGameActions are split into separate GameDeltas, it should be safe
@@ -357,8 +370,8 @@ class GameEngineController(
                 "Controller is in replay mode. `revert` is only available in manual mode.",
             )
         }
-        if (_history.isEmpty()) return
-        val delta = _history.removeLast().reverse()
+        if (history.isEmpty()) return
+        val delta = history.removeLast().reverse()
         lastActionIfUndo = currentNode() to delta
         delta.steps.forEach { step ->
             step.commands.forEach { command -> command.undo(state) }
@@ -394,7 +407,7 @@ class GameEngineController(
             else -> processSingleAction(deltaBuilder, userAction)
         }
         val delta = deltaBuilder.build()
-        _history.add(delta)
+        history.add(delta)
         lastGameActionId = newDeltaId
         statistics?.handleAction(userAction, delta)
     }
@@ -435,7 +448,7 @@ class GameEngineController(
             )
         }
         val actionCommand = when (userAction is AdminGameAction) {
-            true -> processSingleDevAction(userAction)
+            true -> processSingleAdminAction(userAction)
             false -> currentNode.applyAction(userAction, state, rules)
         }
 
@@ -448,8 +461,11 @@ class GameEngineController(
         deltaBuilder.endAction()
     }
 
-    private fun processSingleDevAction(action: AdminGameAction): Command {
-        if (!rules.allowPlayerEditsDuringGame) {
+    private fun processSingleAdminAction(action: AdminGameAction): Command {
+        if (
+            (!rules.allowPlayerEditsDuringGame && !initializing)
+                || (initializing && !allowAdminActionsInInitialActions)
+        ) {
             INVALID_ACTION(action, "Player edits are not allowed during this game.")
         }
         val command = when (action) {
