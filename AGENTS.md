@@ -4,6 +4,7 @@ Instructions for coding agents working in the Jervis Fantasy Football
 repository. Read this before making changes.
 
 ## Project overview
+
 Jervis is a Kotlin Multiplatform implementation of the Blood Bowl board game,
 consisting of a UI-agnostic rules engine, a Compose Multiplatform client
 (Desktop/Web/iPad), a lightweight game server, and adapters for the FUMBBL
@@ -22,6 +23,7 @@ More background lives in [`README.md`](README.md) and `docs/`:
 - `docs/architecture-ui.md` — describes the high-level concepts of the UI layer.
 
 ## Project Structure
+
 See [`README.md`](README.md#repository-structure) for an overview of how the
 project is structured.
 
@@ -63,6 +65,7 @@ Some guidelines when creating new procedures:
 - Naming of Procedures should follow terminology and keywords from the rulebook.
 
 ### Add a new "concept"
+
 When adding a new concept, like a new type of inducement. We strive to keep 
 the `core` module as clean of rules-specific code as possible. We use the 
 following approach:
@@ -144,20 +147,24 @@ Engine test helpers of note:
   (`4.d6`, `DiceRollResults(4.d6, 5.d6)`).
 
 ### Fuzz testing
+
 Run the Fuzz Tester when adding new non-trivial rules. 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md#fuzz-tester) for instructions on how to
 run it.
 
 ## Formatting and linting
+
 Run the formatter and linter before declaring any work done.
 See [CONTRIBUTING.md](CONTRIBUTING.md#formatting-code) for instructions on how
 to run them.
 
 ## Before submitting a PR
+
 Before submitting a PR to GitHub, make sure to run through the checklist found
 in [`CONTRIBUTING.md`](CONTRIBUTING.md#pr-checklist).
 
 ## Running the app locally
+
 Only needed for UI changes; not required for engine-only PRs.
 
 - Desktop: `./gradlew :modules:jervis-ui:desktopApp:run`
@@ -168,7 +175,27 @@ Only needed for UI changes; not required for engine-only PRs.
 Some settings code is generated at build time; unresolved references on a
 fresh clone usually resolve after the first successful build.
 
+## Code Style
+
+Prefer `when` over `if` for two branches:
+
+```adlanguage
+// Do not do this
+if (booleanValue) {
+  handleTrue()
+} else{
+  handleFalse()
+}
+
+// Do this
+when (booleanValue) {
+  true -> handleTrue()
+  false -> handleFalse()
+}
+```
+
 ## Conventions
+
 - Avoid platform-specific code unless absolutely necessary. If needed, all 
   platform-specific code must be in `platform-utils` behind an expect/actual 
   interface. 
@@ -199,3 +226,9 @@ fresh clone usually resolve after the first successful build.
   `ModelRef` wrapper to improve compose skipping.
 - When adding a new conditional reroll, `RerollSource.toChanceSnapshot` must 
   also be updated.
+- When adding a new feature or concept, do not just add it. Think about if it is
+  a concept that can be generalized. If yes, do that instead and create the 
+  appropriate interface or abstraction. Top-level abstractions must either live
+  in the `core` engine module or `shared` UI module.
+
+## 
