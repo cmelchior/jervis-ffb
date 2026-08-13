@@ -155,20 +155,20 @@ data class ActionRequest(
                             is D8Result -> (rollRequest.dice[index] == Dice.D8)
                             is DBlockResult -> (rollRequest.dice[index] == Dice.BLOCK)
                         }
-                        if (!isMatch) return false
+                        if (!isMatch || !rollRequest.getAllowedFaces(index).contains(result.value)) return false
                     }
                     true
                 } ?: false
             }
-            is D12Result -> checkDiceRequest(Dice.D12, actions)
-            is D16Result -> checkDiceRequest(Dice.D16, actions)
-            is D20Result -> checkDiceRequest(Dice.D20, actions)
-            is D2Result -> checkDiceRequest(Dice.D2, actions)
-            is D3Result -> checkDiceRequest(Dice.D3, actions)
-            is D4Result -> checkDiceRequest(Dice.D4, actions)
-            is D6Result -> checkDiceRequest(Dice.D6, actions)
-            is D8Result -> checkDiceRequest(Dice.D8, actions)
-            is DBlockResult -> checkDiceRequest(Dice.BLOCK, actions)
+            is D12Result -> checkDiceRequest(Dice.D12, action.value, actions)
+            is D16Result -> checkDiceRequest(Dice.D16, action.value, actions)
+            is D20Result -> checkDiceRequest(Dice.D20, action.value, actions)
+            is D2Result -> checkDiceRequest(Dice.D2, action.value, actions)
+            is D3Result -> checkDiceRequest(Dice.D3, action.value, actions)
+            is D4Result -> checkDiceRequest(Dice.D4, action.value, actions)
+            is D6Result -> checkDiceRequest(Dice.D6, action.value, actions)
+            is D8Result -> checkDiceRequest(Dice.D8, action.value, actions)
+            is DBlockResult -> checkDiceRequest(Dice.BLOCK, action.value, actions)
             is DirectionSelected -> {
                 actions.singleInstanceOfOrNull<SelectDirection>()?.directions.orEmpty().contains(action.direction)
             }
@@ -230,12 +230,12 @@ data class ActionRequest(
         }
     }
 
-    private fun checkDiceRequest(type: Dice, actions: List<GameActionDescriptor>): Boolean {
+    private fun checkDiceRequest(type: Dice, value: Int, actions: List<GameActionDescriptor>): Boolean {
         for (descriptor in actions) {
             if (descriptor is RollDice) {
                 if (descriptor.dice.size != 1) return false
                 if (descriptor.dice.first() != type) return false
-                return true
+                return descriptor.getAllowedFaces(0).contains(value)
             }
         }
         return false

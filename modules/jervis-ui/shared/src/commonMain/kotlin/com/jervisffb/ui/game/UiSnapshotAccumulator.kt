@@ -61,6 +61,11 @@ class UiSnapshotAccumulator(
     var showReferee = false
     var refereeCoordinates: PitchCoordinate? = null
 
+    // Set by an action provider when the action being decorated was selected without
+    // input from the coach. Action-wheel controllers use this to animate actions that
+    // should not be presented as selectable input.
+    var actionWasSelectedWithoutUserInput = false
+
     fun addActionWheelEvent(event: ActionWheelUiState) {
         actionWheelEvents.add(event)
         when (event) {

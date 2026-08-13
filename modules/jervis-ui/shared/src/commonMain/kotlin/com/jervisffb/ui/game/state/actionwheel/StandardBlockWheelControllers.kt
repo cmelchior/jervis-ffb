@@ -18,7 +18,6 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -142,20 +141,18 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
-        val serverDice = selectedAction.safeCast<DiceRollResults>().rolls.map { it as DBlockResult }
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
-        if (serverRoll) {
+        val rolledDice = selectedAction.safeCast<DiceRollResults>().rolls.map { it as DBlockResult }
+        if (shouldAnimateAction(acc)) {
             val rerollContext = acc.game.getRerollContextOrNull()
             val isReroll = (rerollContext != null && rerollContext.rerollDice != null)
             val diceButtons = if (isReroll) {
-                // Map server dice back to their position in the original roll
-                // `serverRoll` -> find dieId in `rerollDice` -> find index in `originalRoll`
+                // Map the rerolled dice back to their position in the original roll.
                 val dicePool = rerollContext.originalRoll
                 val rerollDice = rerollContext.rerollDice ?: error("No reroll was selected")
-                val rolledDieIds = serverDice.indices.map { index -> rerollDice[index].id }
+                val rolledDieIds = rolledDice.indices.map { index -> rerollDice[index].id }
                 dicePool.mapIndexed { index, die ->
-                    val indexRolledOnServer = rolledDieIds.indexOfFirst { it == die.id }
-                    val newValue = if (indexRolledOnServer != -1) serverDice[indexRolledOnServer] else null
+                    val indexRolled = rolledDieIds.indexOfFirst { it == die.id }
+                    val newValue = if (indexRolled != -1) rolledDice[indexRolled] else null
                     DieButtonData(
                         id = ButtonId("block-$index"),
                         label = { null },
@@ -173,7 +170,7 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                     )
                 }
             } else {
-                serverDice.mapIndexed { index, die ->
+                rolledDice.mapIndexed { index, die ->
                     DieButtonData(
                         id = ButtonId("block-$index"),
                         label = { null },

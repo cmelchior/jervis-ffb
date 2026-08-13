@@ -11,7 +11,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
@@ -66,13 +65,12 @@ object CoinTossWheelController : ActionWheelDialogController() {
         acc.addActionWheelEvent(wheelState)
     }
 
-    // Animate rolling the die, but only for clients
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
-        if (!serverRoll) return false
+        if (!shouldAnimateAction(acc)) return false
 
         val tossResult = (selectedAction as CoinTossResult).result
         val coinButton = CoinButtonData(

@@ -55,6 +55,20 @@ abstract class ActionWheelDialogController {
         return false
     }
 
+    /**
+     * Returns whether the selected action should be shown with an animation-only
+     * wheel.
+     *
+     * Providers mark actions that were generated outside the coach's input.
+     * This covers both server/remote results and locally generated results.
+     * Like those generated during challenges.
+     *
+     * Using [com.jervisffb.engine.rules.builder.DiceRollOwner] is not enough.
+     */
+    protected fun shouldAnimateAction(acc: UiSnapshotAccumulator): Boolean {
+        return acc.actionWasSelectedWithoutUserInput
+    }
+
     protected fun getHomeCenterCoordinates(state: Game): PitchCoordinate {
         val y = (state.rules.pitchHeight / 2)
         val x = (state.rules.pitchWidth / 4)

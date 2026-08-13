@@ -212,17 +212,18 @@ data class RollDice private constructor(
     }
 
     override fun createRandom(random: Random): GameAction {
-        return dice.map {
-            when (it) {
-                Dice.D2 -> D2Result.allOptions().random(random)
-                Dice.D3 -> D3Result.allOptions().random(random)
-                Dice.D4 -> D4Result.allOptions().random(random)
-                Dice.D6 -> D6Result.allOptions().random(random)
-                Dice.D8 -> D8Result.allOptions().random(random)
-                Dice.D12 -> D12Result.allOptions().random(random)
-                Dice.D16 -> D16Result.allOptions().random(random)
-                Dice.D20 -> D20Result.allOptions().random(random)
-                Dice.BLOCK -> DBlockResult.allOptions().random(random)
+        return dice.mapIndexed { index, die ->
+            val value = getAllowedFaces(index).random(random)
+            when (die) {
+                Dice.D2 -> D2Result(value)
+                Dice.D3 -> D3Result(value)
+                Dice.D4 -> D4Result(value)
+                Dice.D6 -> D6Result(value)
+                Dice.D8 -> D8Result(value)
+                Dice.D12 -> D12Result(value)
+                Dice.D16 -> D16Result(value)
+                Dice.D20 -> D20Result(value)
+                Dice.BLOCK -> DBlockResult(value)
             }
         }.let { diceRolls ->
             DiceRollResults(diceRolls)

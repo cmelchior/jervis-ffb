@@ -12,7 +12,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -96,7 +95,7 @@ object KickoffEventWheelController : ActionWheelDialogController() {
         acc.addActionWheelEvent(wheelState)
     }
 
-    // Animate rolling the die, but only for clients
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
@@ -104,8 +103,7 @@ object KickoffEventWheelController : ActionWheelDialogController() {
         val dice = selectedAction.safeCast<DiceRollResults>().let { diceResults ->
             diceResults.rolls.last() as D6Result to diceResults.first() as D6Result
         }
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
-        if (serverRoll) {
+        if (shouldAnimateAction(acc)) {
             val diceButtons = listOf(
                 DieButtonData(
                     id = ButtonId("kickoff-1-d6"),

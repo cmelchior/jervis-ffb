@@ -4,8 +4,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.ui.game.UiGameClientType
+import com.jervisffb.ui.game.state.ChallengeActionProvider
 import com.jervisffb.ui.game.state.LocalActionProvider
-import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.ChallengeGame
 import com.jervisffb.ui.menu.GameScreen
@@ -49,8 +49,8 @@ object ChallengeGameFactory {
         val actionProvider = LocalActionProvider(
             gameController,
             gameSettings,
-            ManualActionProvider(gameController, menuViewModel, TeamActionMode.HOME_TEAM, gameSettings),
-            ManualActionProvider(gameController, menuViewModel, TeamActionMode.AWAY_TEAM, gameSettings),
+            ChallengeActionProvider(gameController, menuViewModel, TeamActionMode.HOME_TEAM, gameSettings),
+            ChallengeActionProvider(gameController, menuViewModel, TeamActionMode.AWAY_TEAM, gameSettings),
         )
         return GameScreenModel(
             uiClientType = UiGameClientType.HOTSEAT,

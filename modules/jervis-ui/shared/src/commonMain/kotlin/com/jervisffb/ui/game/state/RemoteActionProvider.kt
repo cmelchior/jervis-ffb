@@ -58,7 +58,7 @@ class RemoteActionProvider(
     }
 
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
-        // Do nothing
+        acc.actionWasSelectedWithoutUserInput = true
     }
 
     override suspend fun getAction(): GameAction {

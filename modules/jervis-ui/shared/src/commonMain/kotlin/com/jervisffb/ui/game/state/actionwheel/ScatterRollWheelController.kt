@@ -14,7 +14,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
@@ -92,14 +91,13 @@ object ScatterRollWheelController : ActionWheelDialogController() {
         acc.addActionWheelEvent(wheelState)
     }
 
-    // Animate rolling the die, but only for clients
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
         val dice = selectedAction.safeCast<DiceRollResults>()
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
-        if (serverRoll) {
+        if (shouldAnimateAction(acc)) {
             val diceButtons = (1..3).map {
                 DieButtonData(
                     id = ButtonId("scatter-3-$it"),

@@ -50,7 +50,6 @@ import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
 import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
 import com.jervisffb.ui.game.view.DialogFactory
-import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
@@ -82,6 +81,10 @@ open class ManualActionProvider(
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
     var automatedAction: GameAction? = null
+
+    // Tracks the source of the action returned by getAction() until the UI decorators
+    // have had a chance to expose it to action-wheel controllers.
+    private var lastActionWasAutomaticallySelected = false
 
     // If a user selected multiple actions, they are all listed here. This queue should be emptied before
     // sending anything else
@@ -212,7 +215,8 @@ open class ManualActionProvider(
     }
 
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
-        // Do nothing
+        acc.actionWasSelectedWithoutUserInput = lastActionWasAutomaticallySelected
+        lastActionWasAutomaticallySelected = false
     }
 
     override suspend fun getAction(): GameAction {
@@ -223,6 +227,7 @@ open class ManualActionProvider(
 
         // Empty queued data if present
         if (queuedActions.isNotEmpty()) {
+            lastActionWasAutomaticallySelected = false
             val action = queuedActions.removeFirst()
             // Do not pause for flow-control events, only events that would appear "visible"
             // to the player
@@ -236,9 +241,13 @@ open class ManualActionProvider(
         // Otherwise empty automated response
         // And finally ask the UI
         return automatedAction?.let { action ->
+            lastActionWasAutomaticallySelected = true
             automatedAction = null
             action
-        } ?: actionSelectedChannel.receive()
+        } ?: run {
+            lastActionWasAutomaticallySelected = false
+            actionSelectedChannel.receive()
+        }
     }
 
     override fun userActionSelected(action: GameAction) {
@@ -373,12 +382,12 @@ open class ManualActionProvider(
     }
 
     /**
-     * Check if we can respond automatically to an event without having to involve the user.
+     * Calculate an automatic response without involving the user.
      *
-     * Some requirements:
-     * - Any action returned this way should also have an entry in [Feature], so the User can toggle the behavior.
+     * The default implementation uses the normal game-settings and feature-based behavior.
+     * Specialized providers may extend this for actions that are automatic in their game mode.
      */
-    private fun calculateAutomaticResponse(
+    protected open fun calculateAutomaticResponse(
         actions: ActionRequest,
     ): GameAction? {
         val currentNode = game.currentNode()
@@ -446,5 +455,3 @@ open class ManualActionProvider(
         sharedData?.uiDecorations?.useFumblerooskiOnNextMove(null)
     }
 }
-
-

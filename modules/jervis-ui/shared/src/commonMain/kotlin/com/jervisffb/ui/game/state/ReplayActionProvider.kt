@@ -217,6 +217,7 @@ class ReplayActionProvider(
     }
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         decorationProvider.decorateSelectedAction(action, acc)
+        acc.actionWasSelectedWithoutUserInput = true
     }
     override fun userActionSelected(action: GameAction) { /* Do nothing */ }
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) { /* Do nothing */ }

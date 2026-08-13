@@ -18,7 +18,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
@@ -70,15 +69,13 @@ abstract class D3RollWheelController: ActionWheelDialogController() {
         }
     }
 
-    // Animate rolling the die, but only for clients with server dice rolls enabled
-    // as they would already have chosen the result in `onDecorateActions`
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
         val currentNode = acc.stack.currentNode()
-        if (!((currentNode == rollDiceNode) && serverRoll)) return false
+        if (!((currentNode == rollDiceNode) && shouldAnimateAction(acc))) return false
 
         val button = selectedAction.safeDiceRollCast<D3Result>().let { d3Roll ->
             val buttonId = ButtonId("$buttonIdPrefix-${d3Roll.value}")
@@ -209,6 +206,4 @@ object ThrowInWheelController: D3RollWheelController() {
         return context.outOfBoundsAt
     }
 }
-
-
 

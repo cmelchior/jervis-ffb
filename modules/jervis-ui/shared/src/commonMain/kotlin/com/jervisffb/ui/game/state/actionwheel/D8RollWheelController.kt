@@ -15,7 +15,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
@@ -71,15 +70,13 @@ abstract class D8RollWheelController: ActionWheelDialogController() {
         }
     }
 
-    // Animate rolling the die, but only for clients with server dice rolls enabled
-    // as they would already have chosen the result in `onDecorateActions`
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
         val currentNode = acc.stack.currentNode()
-        if (!((nodes.contains(currentNode)) && serverRoll)) return false
+        if (!((nodes.contains(currentNode)) && shouldAnimateAction(acc))) return false
 
         val button = selectedAction.safeDiceRollCast<D8Result>().let { d8Roll ->
             val buttonId = ButtonId("$buttonIdPrefix-${d8Roll.value}")

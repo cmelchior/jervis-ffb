@@ -12,7 +12,6 @@ import com.jervisffb.engine.common.procedures.PickupRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
@@ -113,15 +112,13 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         }
     }
 
-    // Animate rolling the die, but only for clients with server dice rolls enabled
-    // as they would already have chosen the result in `onDecorateActions`
+    // Animate the result when it was not selected in the UI.
     override fun onPostActionAnimation(
         acc: UiSnapshotAccumulator,
         selectedAction: GameAction,
     ): Boolean {
-        val serverRoll = (acc.gameController.rules.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER)
         val currentNode = acc.stack.currentNode()
-        if ((currentNode == rollDiceNode || currentNode == rerollDiceNode) && serverRoll) {
+        if ((currentNode == rollDiceNode || currentNode == rerollDiceNode) && shouldAnimateAction(acc)) {
             val button = getDieResult(selectedAction, dieClass).let  { dieRoll ->
                 val buttonId = when (currentNode) {
                     rollDiceNode -> ButtonId("$buttonIdPrefix-${dieRoll.value}")
