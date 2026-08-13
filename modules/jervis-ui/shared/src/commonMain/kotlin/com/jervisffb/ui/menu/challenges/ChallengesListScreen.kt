@@ -85,7 +85,7 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
 
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
-        title = "Challenges (Prototype)",
+        title = "Challenges",
         icon = Res.drawable.jervis_frontpage_mummy,
         topMenuLeftContent = {
 
@@ -108,12 +108,27 @@ private fun ChallengesListContent(menuViewModel: MenuViewModel, viewModel: Chall
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     MenuSidebarButton("List", selected = true, onClick = { /* Do nothing */ })
-                    MenuSidebarButton("Create New", onClick = {
-                        menuViewModel.openNotImplementedYet("Create New Challenge", true)
-                    })
-                    MenuSidebarButton("My Challenges", onClick = {
-                        menuViewModel.openNotImplementedYet("My Challenges", true)
-                    })
+                    MenuSidebarButton(
+                        text = "Create New",
+                        enabled = false,
+                        onClick = {
+                            menuViewModel.openNotImplementedYet("Create New Challenge", true)
+                        }
+                    )
+                    MenuSidebarButton(
+                        text = "My Challenges",
+                        enabled = false,
+                        onClick = {
+                            menuViewModel.openNotImplementedYet("My Challenges", true)
+                        }
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        text = "Challenges are still in development. All state is reset upon leaving the app.",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = JervisTheme.white
+                    )
                 }
                 Spacer(modifier = Modifier.fillMaxHeight(0.20f))
             }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.menu.TopbarButton
 import com.jervisffb.ui.menu.components.SmallHeader
 import com.jervisffb.ui.menu.p2p.host.BoxHeader
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.utils.openUrlInBrowser
 
 class FumbblScreen(private val menuViewModel: MenuViewModel, private val viewModel: FumbblScreenModel) : Screen {
@@ -121,6 +123,7 @@ fun SidebarBoxHeader(text: String, color: Color = JervisTheme.rulebookOrange) {
 fun MenuSidebarButton(
     text: String,
     selected: Boolean = false,
+    enabled: Boolean = true,
     onClick: () -> Unit = { }
 ) {
     val backgroundColor = if (selected) JervisTheme.white.copy(alpha = 0.3f) else JervisTheme.white.copy(alpha = 0.1f)
@@ -129,8 +132,11 @@ fun MenuSidebarButton(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .clickable { onClick() }
+            .applyIf(enabled) {
+                clickable { onClick() }
+            }
             .padding(8.dp)
+            .alpha(if (enabled) 1f else 0.3f)
     ) {
         Text(
             modifier = Modifier.padding(bottom = 2.dp),
