@@ -37,6 +37,7 @@ fun SelectTeamComponent(
                 val team = availableTeams[index]
                 TeamCard(
                     name = team.teamName,
+                    race = team.teamRoster,
                     teamValue = team.teamValue,
                     rerolls = team.rerolls,
                     isSelected = (selectedTeam?.teamId == team.teamId),

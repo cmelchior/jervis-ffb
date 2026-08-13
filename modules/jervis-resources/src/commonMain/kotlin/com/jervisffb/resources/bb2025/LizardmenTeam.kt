@@ -114,7 +114,7 @@ val KROXIGOR =
 @Serializable
 val LIZARDMEN_TEAM_BB2025 = Roster(
     id = RosterId("jervis-lizardmen"),
-    name = "Lizardmen Team",
+    name = "Lizardmen",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 70_000,

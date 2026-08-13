@@ -118,7 +118,7 @@ val AMAZON_BLOCKER =
 
 val AMAZON_TEAM_BB2020 = Roster(
     id = RosterId("jervis-amazon"),
-    name = "Amazon Team",
+    name = "Amazon",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 60_000,

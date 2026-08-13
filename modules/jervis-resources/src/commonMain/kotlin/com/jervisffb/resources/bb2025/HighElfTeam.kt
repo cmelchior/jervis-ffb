@@ -105,7 +105,7 @@ val DRAGON_PRINCE =
 @Serializable
 val HIGH_ELF_TEAM_BB2025 = Roster(
     id = RosterId("jervis-high-elf"),
-    name = "High Elf Team",
+    name = "High Elf",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,

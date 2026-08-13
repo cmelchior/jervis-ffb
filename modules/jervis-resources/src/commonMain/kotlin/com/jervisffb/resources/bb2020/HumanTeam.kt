@@ -161,7 +161,7 @@ val OGRE =
 
 val HUMAN_TEAM_BB2020 = Roster(
     id = RosterId("jervis-human"),
-    name = "Human Team",
+    name = "Human",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,

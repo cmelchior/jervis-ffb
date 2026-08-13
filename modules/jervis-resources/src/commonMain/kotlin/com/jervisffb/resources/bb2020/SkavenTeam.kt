@@ -125,7 +125,7 @@ val RAT_OGRE =
 @Serializable
 val SKAVEN_TEAM_BB2020 = Roster(
     id = RosterId("jervis-skaven"),
-    name = "Skaven Team",
+    name = "Skaven",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,

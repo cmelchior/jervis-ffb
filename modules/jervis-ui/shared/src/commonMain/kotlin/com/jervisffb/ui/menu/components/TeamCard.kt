@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.menu.utils.JervisTooltip
 
 /**
  * Component responsible for showing a "Team Card" when selecting teams for
@@ -36,10 +37,12 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
  * - Team Logo
  * - CTV
  * - Rerolls
+ * - Race
  */
 @Composable
 fun TeamCard(
     name: String,
+    race: String,
     teamValue: Int,
     rerolls: Int,
     logo: ImageBitmap,
@@ -93,12 +96,14 @@ fun TeamCard(
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Image(
-                    modifier = Modifier.padding(8.dp),
-                    bitmap = logo,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
-                )
+                JervisTooltip(tooltip = race) {
+                    Image(
+                        modifier = Modifier.padding(8.dp),
+                        bitmap = logo,
+                        contentDescription = null,
+                        contentScale = ContentScale.Inside,
+                    )
+                }
             }
         }
     }
