@@ -1,4 +1,5 @@
 package com.jervisffb.ui.game.view
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -32,12 +34,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_dice_roll
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
@@ -278,6 +282,13 @@ fun ActionWheelDialog(
     var showTip by remember { mutableStateOf(false) }
     var tipRotationDegree by remember { mutableStateOf(0f) }
     var offset: IntOffset? by remember { mutableStateOf(null) }
+    val enableAnimations by SETTINGS_MANAGER
+        .observeBooleanKey(SettingsKeys.JERVIS_UI_ENABLE_ANIMATIONS_VALUE, true)
+        .collectAsState(true)
+    val animationSpeedFactor = when (enableAnimations) {
+        true -> pitchVm.screenModel.uiState.animationSpeedFactor
+        else -> 0f
+    }
 
     uiState.let { uiState ->
         Box(
@@ -295,7 +306,7 @@ fun ActionWheelDialog(
             }
             ActionWheel(
                 uiState = uiState,
-                animationSpeedFactor = pitchVm.screenModel.uiState.animationSpeedFactor,
+                animationSpeedFactor = animationSpeedFactor,
                 offsetDelegate = { state: ActionWheelUiState? ->
                     // It is challenging for the hiding action to know where the last wheel
                     // was shown, so in the case where we are hiding the wheel, we do not

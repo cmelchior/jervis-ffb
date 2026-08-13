@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game
 
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
@@ -30,6 +31,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiPitchPlayer
@@ -864,7 +866,8 @@ class UiGameController(
     private fun isAnimationsEnabled(currentAction: GameAction? = null): Boolean {
         if (currentAction == null && gameController.lastActionWasUndo()) return false
         if (currentAction != null && currentAction is Undo) return false
-        return animationSpeedFactor > 0f
+        val isAnimationsEnabled = SETTINGS_MANAGER.getBoolean(SettingsKeys.JERVIS_UI_ENABLE_ANIMATIONS_VALUE, true)
+        return isAnimationsEnabled && animationSpeedFactor > 0f
     }
 
     fun userSelectedAction(action: GameAction) {
