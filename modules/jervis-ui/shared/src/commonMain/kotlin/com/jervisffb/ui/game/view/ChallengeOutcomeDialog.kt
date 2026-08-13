@@ -30,7 +30,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.actions.D12Result
+import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D20Result
+import com.jervisffb.engine.actions.D2Result
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.D4Result
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.challenge.ChallengeOutcome
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.challenge.ChallengeScoring
@@ -61,7 +70,7 @@ import kotlin.time.Duration
 
 data class DiceRollStat(
     val index: Int, // 1-indexed number
-    val target: D6Result, // What dice were rolled
+    val target: DieResult, // What dice were rolled
     val type: String, // What kind of dice was rolled
     val rerollSource: String?, // Type of reroll triggering this roll
     val probability: Probability, // [0, 1.0] probability of success
@@ -69,6 +78,12 @@ data class DiceRollStat(
 ) {
     // Probability as formatted percentage 0.00% to 100.00%
     val chance = "${(probability.value * 100).toFixed(2)}%"
+
+    // Text representation of the die face
+    val dieFace = when (target) {
+        is DBlockResult -> target.blockResult.description
+        else -> "  ${target.value}"
+    }
 
     val reroll = when (rerollSource != null) {
         true -> rerollSource.removeSuffix(" reroll").removeSuffix(" Reroll").trim()
@@ -147,8 +162,15 @@ fun ChallengeOutcomeDialog(
         ?.events
         ?.filterIsInstance<ActionPathEvent.Physical>()
         ?.mapNotNull { event ->
-            val result = event.results.singleOrNull() as? D6Result ?: return@mapNotNull null
-            if (event.resolution !is ActionPathEvent.Resolution.Dice) return@mapNotNull null
+            val result = when (val resolution = event.resolution) {
+                is ActionPathEvent.Resolution.Dice -> event.results.singleOrNull() as? D6Result
+                is ActionPathEvent.Resolution.Block -> {
+                    event.results
+                        .filterIsInstance<DBlockResult>()
+                        .firstOrNull { it.blockResult == resolution.selectedFace }
+                }
+                else -> null
+            } ?: return@mapNotNull null
             event to result
         }
         ?.withPrevious()
@@ -303,7 +325,7 @@ private fun DiceStatisticRows(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(modifier = Modifier.weight(1.5f), text = stat.type, color = textColor, textAlign = TextAlign.Start)
-                Text(modifier = Modifier.weight(1f), text = "  ${stat.target.value}", color = textColor, textAlign = TextAlign.Start)
+                Text(modifier = Modifier.weight(1f), text = stat.dieFace, color = textColor, textAlign = TextAlign.Start)
                 if (hasReroll) {
                     Text(modifier = Modifier.weight(1f), text = stat.reroll, color = textColor, textAlign = TextAlign.Start)
                 }
