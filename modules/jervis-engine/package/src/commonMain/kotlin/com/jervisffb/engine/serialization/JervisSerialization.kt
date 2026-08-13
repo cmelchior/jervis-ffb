@@ -37,14 +37,17 @@ data class GameFileData(
 
     // If we update the rules before starting the engine, we need to re-initialize the game
     // engine to keep everything consistent.
-    fun updateRules(rules: Rules): GameEngineController {
+    fun updateRules(
+        rules: Rules,
+    ): GameEngineController {
         return GameEngineController(
             state = Game(
                 rules = rules,
                 homeTeam = game.state.homeTeam,
                 awayTeam = game.state.awayTeam,
             ),
-            initialActions = actions
+            initialActions = actions,
+            allowAdminActionsInInitialActions = true
         )
     }
 }

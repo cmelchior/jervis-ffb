@@ -269,6 +269,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
+            allowPlayerEditsDuringGame = true
             build()
         }
         val updatedController = file.updateRules(rules)

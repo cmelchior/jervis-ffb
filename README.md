@@ -168,3 +168,4 @@ List of other Blood Bowl resources that inspired this project.
 - [FUMBBL Datasets](https://github.com/gsverhoeven/fumbbl_datasets)
 - [BotBowl](https://njustesen.github.io/botbowl/)
 - [Blood Bowl Challenges](https://bbtactics.com/strategy/articles/challenges/)
+- [Blood Bowl Tools](https://scottyos.github.io/Blood-Bowl-Tools/)
