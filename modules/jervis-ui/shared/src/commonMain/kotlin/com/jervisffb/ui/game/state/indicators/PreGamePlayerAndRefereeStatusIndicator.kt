@@ -53,7 +53,7 @@ object PreGamePlayerAndRefereeStatusIndicator: PitchStatusIndicator {
 
         if (awayPlayer != null) {
             acc.addOrUpdateSquare(
-                homePlayerCoords,
+                awayPlayerCoords,
                 UiPitchSquare(
                     coordinates = awayPlayerCoords,
                     player = awayPlayer.id
