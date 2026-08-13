@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.Team
  * Modifies a goal, so it has to be achieved by the given [team].
  */
 data class PerformedByTeam(val team: Team) : GoalModifier {
-    override val description: String = "Using ${team.name}"
+    override val description: String = "Using any player on ${team.name}"
     override fun initialize(state: Game): ChallengeContext? = null
     override fun evaluate(
         state: Game,

@@ -14,6 +14,9 @@ interface ChallengeRule {
     /** One line, shown in the "Rules" list on the challenge details page. */
     val description: String
 
+    /** Can different instances of this rule be applied to a game */
+    val isMultipleAllowed: Boolean
+
     /** Any extra rules policies this challenge puts on top of the normal game rules */
     val policies: List<GameRulePolicy>
         get() = emptyList()

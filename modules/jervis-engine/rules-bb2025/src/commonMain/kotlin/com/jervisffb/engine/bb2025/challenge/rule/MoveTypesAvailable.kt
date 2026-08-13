@@ -45,6 +45,7 @@ data class MoveTypesAvailable(
             else -> append(" are not allowed.")
         }
     }
+    override val isMultipleAllowed: Boolean = false
 
     override val policies: List<GameRulePolicy> = listOf(this)
 

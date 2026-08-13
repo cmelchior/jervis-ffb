@@ -19,27 +19,32 @@ import com.jervisffb.engine.rules.policy.GameRulePolicy
 
 /**
  * Challenge rule that forces all block dice to roll [forcedResult], but only
- * if [diceCount] number of dice was rolled.
+ * if [diceType] number of dice was rolled.
  *
- * [diceCount] can either be [1, 3] (for rolling 1 to 3 dice with the attacker
- * choosing) or [-2, -3] (for rolling 2 or 3 dice with the defender choosing).
+ * If [diceType] is null, then the rule will be applied to all dice rolls.
  */
 class RestrictedBlockDiceRule(
     val forcedResult: DBlockResult,
-    val diceCount: Int
+    val diceType: RollType? = null,
 ) : ChallengeRule, ActionFilterPolicy {
 
-    init {
-        require(diceCount in listOf(1, 2, 3, -2, -3)) { "diceCount must be in [1, 3] or [-2, -3]: $diceCount" }
+    enum class RollType {
+        OPPONENT_CHOOSES, // [-2, -3]
+        SINGLE_DIE, // [1]
+        ATTACKER_CHOOSES, // [2, 3]
     }
 
     override val description: String = buildString {
-        when (diceCount > 0) {
-            true -> append("Always roll ${forcedResult.blockResult.description} when rolling $diceCount or more Block dice in your favour.")
-            false -> append("Always roll ${forcedResult.blockResult.description} when rolling ${-diceCount} or more Block dice in opponents favour.")
+        val label = when (diceType) {
+            RollType.ATTACKER_CHOOSES -> "Always rolls ${forcedResult.blockResult.description} when rolling 2 or more Block dice in your favour."
+            RollType.SINGLE_DIE -> "Always rolls ${forcedResult.blockResult.description} when rolling 1 Block dice."
+            RollType.OPPONENT_CHOOSES -> "Always rolls ${forcedResult.blockResult.description} when rolling 2 or more Block dice in your opponents favour."
+            null -> "All Block dice will roll ${forcedResult.blockResult.description}."
         }
+        append(label)
     }
 
+    override val isMultipleAllowed: Boolean = true
     override val policies: List<GameRulePolicy> = listOf(this)
 
     override fun applyToGame(state: Game) {
@@ -60,7 +65,7 @@ class RestrictedBlockDiceRule(
                 if (
                     descriptor is RollDice
                     && descriptor.type == DiceRollType.BLOCK
-                    && context.state.getContext<BlockContext>().calculateNoOfBlockDice() == diceCount
+                    && getDiceType(context) == diceType
                 ) {
                     RollDice(
                         *descriptor.dice.toTypedArray(),
@@ -72,5 +77,15 @@ class RestrictedBlockDiceRule(
                 }
             },
         )
+    }
+
+    private fun getDiceType(context: ActionFilterContext): RollType {
+        val dice = context.state.getContext<BlockContext>().calculateNoOfBlockDice()
+        return when {
+            dice < 0 -> RollType.OPPONENT_CHOOSES
+            dice == 1 -> RollType.SINGLE_DIE
+            dice > 1 -> RollType.ATTACKER_CHOOSES
+            else -> error("Unsupported value: $dice")
+        }
     }
 }

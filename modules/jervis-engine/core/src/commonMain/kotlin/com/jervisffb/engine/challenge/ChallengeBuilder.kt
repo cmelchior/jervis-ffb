@@ -26,7 +26,7 @@ class ChallengeBuilder(val id: ChallengeId) {
     private val rules = mutableListOf<ChallengeRule>()
 
     fun addRule(rule: ChallengeRule): ChallengeBuilder {
-        if (rules.any { it::class == rule::class }) {
+        if (!rule.isMultipleAllowed && rules.any { it::class == rule::class }) {
             throw IllegalArgumentException("'$name' already has a ${rule::class.simpleName} rule.")
         }
         rules.add(rule)

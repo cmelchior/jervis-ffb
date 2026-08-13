@@ -32,6 +32,8 @@ data class TurnLimit(val turns: Int) : ChallengeRule {
         else -> "You have $turns turns to solve it."
     }
 
+    override val isMultipleAllowed: Boolean = false
+
     override fun applyToGame(state: Game) {
         // Do nothing
     }

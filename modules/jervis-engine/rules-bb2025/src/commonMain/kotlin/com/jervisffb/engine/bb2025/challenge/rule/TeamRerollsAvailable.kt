@@ -26,6 +26,8 @@ data class TeamRerollsAvailable(val count: Int) : ChallengeRule {
         else -> "$count team re-rolls are available."
     }
 
+    override val isMultipleAllowed: Boolean = false
+
     override fun applyToGame(state: Game) {
         // Override team rerolls, so there is only the configured amount available
         // Remove team rerolls above the configured

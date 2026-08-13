@@ -35,6 +35,7 @@ class RestrictedSingleD6DiceRollRule(
         false -> "All D6 rolls will roll a ${forcedResult.value}."
     }
 
+    override val isMultipleAllowed: Boolean = true
     override val policies: List<GameRulePolicy> = listOf(this)
 
     override fun applyToGame(state: Game) {
