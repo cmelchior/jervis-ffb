@@ -36,6 +36,8 @@ interface ActionPlanner {
         state: Game, // Current state of the game, from which to create the movement plan.
         player: Player, // Player to create the movement plan for.
         maxSteps: Int? = null, // Limit the number of movement steps to consider.
+        includeDodges: Boolean = false,
+        includeRushes: Boolean = false,
     ): MovePlan
 
 }

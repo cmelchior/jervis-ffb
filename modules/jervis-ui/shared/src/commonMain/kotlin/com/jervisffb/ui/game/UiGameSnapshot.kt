@@ -46,8 +46,8 @@ data class UiGameSnapshot(
     val weather: Weather,
     val homeTeamInfo: UiTeamInfoUpdate,
     val awayTeamInfo: UiTeamInfoUpdate,
-    // If set, it means we are in the middle of a move action that allows the player
-    // to move multiple squares.
+    // If set, it means we have a move plan available, allowing players to queue up multiple squares
+    // to reach a target.
     val movePlan: MovePlan?,
     val showReferee: Boolean,
     val refereeCoordinates: PitchCoordinate?,

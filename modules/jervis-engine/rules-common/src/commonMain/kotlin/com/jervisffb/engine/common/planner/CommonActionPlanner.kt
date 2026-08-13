@@ -34,6 +34,8 @@ object CommonActionPlanner : ActionPlanner {
         state: Game,
         player: Player,
         maxSteps: Int?,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): MovePlan {
         require(maxSteps == null || maxSteps >= 0) { "maxSteps must be non-negative: $maxSteps" }
         val policyContext = MovePolicyContext(state, GameRulePhase.LIVE)
@@ -42,8 +44,8 @@ object CommonActionPlanner : ActionPlanner {
         }
         val isProne = (player.state == PlayerPitchState.PRONE)
         return when (isProne) {
-            true -> createAfterStandingUpPlan(state, player, policyContext, maxSteps)
-            false -> createStandardPlan(state, player, policyContext, maxSteps)
+            true -> createAfterStandingUpPlan(state, player, policyContext, maxSteps, includeDodges, includeRushes)
+            false -> createStandardPlan(state, player, policyContext, maxSteps, includeDodges, includeRushes)
         }
     }
 
@@ -52,20 +54,30 @@ object CommonActionPlanner : ActionPlanner {
         player: Player,
         policyContext: MovePolicyContext,
         maxSteps: Int?,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): MovePlan {
         val rules = state.rules
         val start = player.coordinates
         val requiresDodge = rules.calculateMarks(state, player.team, start) > 0
         val targets = standardMoveTargets(state, player)
+            .filter { target -> !target.requiresDodge || includeDodges }
+            .filter { target -> !target.requiresRush || includeRushes }
             .filter { target ->
                 state.rulesContext.allowsMove(
                     policyContext,
                     MoveCandidate(player.id, MoveType.STANDARD, start, target),
                 )
             }
-        val maximumPathLength = when (requiresDodge) {
+        val extraSprintRushes = if (includeRushes && player.isSkillAvailable(SkillType.SPRINT)) {
+            SPRINT_EXTRA_RUSHES
+        } else {
+            0
+        }
+        val maximumPathLength = when (requiresDodge && !includeDodges) {
             true -> 1
-            false -> player.movesLeft.coerceAtLeast(0)
+            false -> player.movesLeft.coerceAtLeast(0) +
+                if (includeRushes) player.rushesLeft + extraSprintRushes else 0
         }.limitTo(maxSteps)
         val immediateMoves = if (maxSteps == null || maximumPathLength > 0) {
             targets.associate { target ->
@@ -76,15 +88,16 @@ object CommonActionPlanner : ActionPlanner {
         }
         val paths = maximumPathLength
             .takeIf { it > 0 }
-            ?.let { pathFinder.calculateAllPaths(state, player, it) }
+            ?.let { pathFinder.calculateAllPaths(state, player, it, includeDodges, includeRushes) }
 
         return MovePlan(
+            pathStart = start,
             immediateMoves = immediateMoves,
             paths = paths,
             maximumPathLength = maximumPathLength,
             movesUsedBeforePath = movesUsedBeforePath(player),
             normalMovesAvailable = player.movesLeft.coerceAtLeast(0),
-            startingRequiresDodge = requiresDodge,
+            requiresDodgeAt = { coordinate -> rules.isMarked(player, coordinate) },
             pathActionTail = pathActionTail(player),
         )
     }
@@ -94,13 +107,21 @@ object CommonActionPlanner : ActionPlanner {
         player: Player,
         policyContext: MovePolicyContext,
         maxSteps: Int?,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): MovePlan {
         val rules = state.rules
         val start = player.coordinates
         val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP)
         val standingUpCost = if (hasJumpUp) 0 else rules.moveRequiredForStandingUp
         val movesAfterStandingUp = (player.movesLeft - standingUpCost).coerceAtLeast(0)
-        val maximumPathLength = movesAfterStandingUp.limitTo(maxSteps)
+        val extraSprintRushes = when (includeRushes && player.isSkillAvailable(SkillType.SPRINT)) {
+            true -> SPRINT_EXTRA_RUSHES
+            false -> 0
+        }
+        val maximumPathLength = (
+            movesAfterStandingUp + if (includeRushes) player.rushesLeft + extraSprintRushes else 0
+        ).limitTo(maxSteps)
         val requiresDodge = rules.calculateMarks(state, player.team, start) > 0
         val requiresRush = (movesAfterStandingUp == 0)
         val movesUsedBeforePath = movesUsedBeforePath(player) + standingUpCost
@@ -108,6 +129,10 @@ object CommonActionPlanner : ActionPlanner {
             if (player.isSkillAvailable(SkillType.SPRINT)) SPRINT_EXTRA_RUSHES else 0
 
         if ((maxSteps != null && maxSteps <= 0) || movesAfterStandingUp + futureRushes <= 0) {
+            return MovePlan.empty(movesUsedBeforePath)
+        }
+
+        if ((requiresDodge && !includeDodges) || (requiresRush && !includeRushes)) {
             return MovePlan.empty(movesUsedBeforePath)
         }
 
@@ -130,20 +155,22 @@ object CommonActionPlanner : ActionPlanner {
                 maximumPathLength = 0,
                 movesUsedBeforePath = movesUsedBeforePath,
                 normalMovesAvailable = movesAfterStandingUp,
-                startingRequiresDodge = requiresDodge,
+                pathStart = start,
+                requiresDodgeAt = { coordinate -> rules.isMarked(player, coordinate) },
             )
         }
 
         val paths = maximumPathLength
             .takeIf { it > 0 }
-            ?.let { pathFinder.calculateAllPaths(state, player, it) }
+            ?.let { pathFinder.calculateAllPaths(state, player, it, includeDodges, includeRushes) }
         return MovePlan(
             immediateMoves = emptyMap(),
             paths = paths,
             maximumPathLength = maximumPathLength,
             movesUsedBeforePath = movesUsedBeforePath,
             normalMovesAvailable = movesAfterStandingUp,
-            startingRequiresDodge = false,
+            pathStart = start,
+            requiresDodgeAt = { coordinate -> rules.isMarked(player, coordinate) },
             pathActionTail = pathActionTail(player),
         )
     }

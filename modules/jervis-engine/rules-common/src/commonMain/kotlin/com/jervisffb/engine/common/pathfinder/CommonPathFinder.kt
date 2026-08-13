@@ -91,6 +91,8 @@ class CommonPathFinder : PathFinder {
         goal: PitchCoordinate,
         maxMove: Int,
         includeDebugInfo: Boolean,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): PathFinder.SinglePathResult {
         val pitchView: Array<Array<Int>> = preparePitchView(state.rules, state.pitch, movingPlayer.team)
         var pathState = listOf<PitchCoordinate>()
@@ -123,7 +125,7 @@ class CommonPathFinder : PathFinder {
                 val neighborValue = pitchView[neighbor.x][neighbor.y]
                 val hasBall = state.pitch[neighbor].balls.any { it.state == BallState.ON_GROUND }
                 val inTackleZone = (neighborValue > 0 && neighborValue < Int.MAX_VALUE)
-                val isTerminalNode = hasBall || inTackleZone
+                val isTerminalNode = hasBall || (inTackleZone && !includeDodges)
 
                 // Skip all squares containing a player
                 if (neighborValue  == Int.MAX_VALUE) {
@@ -131,7 +133,7 @@ class CommonPathFinder : PathFinder {
                 }
                 val tentativeGScore = gScore.getValue(currentLocation) + currentLocation.realDistanceTo(neighbor)
                 val tentativeDistanceInSteps = distanceInSteps.getValue(currentLocation) + 1
-                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistanceInSteps)) {
+                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistanceInSteps, includeDodges, includeRushes)) {
                     continue
                 }
                 if (tentativeGScore < gScore.getValue(neighbor)) {
@@ -178,6 +180,8 @@ class CommonPathFinder : PathFinder {
         state: Game,
         movingPlayer: Player,
         maxMove: Int,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): PathFinder.AllPathsResult {
         // Prepare a primitive version of the pitch that contains the following values:
         // - Int.MAX if the square is occupied
@@ -210,9 +214,9 @@ class CommonPathFinder : PathFinder {
                 val hasTackleZone = (pitchView[neighbor.x][neighbor.y] > 0)
                 val hasBall = state.pitch[neighbor.x, neighbor.y].balls.any { it.state == BallState.ON_GROUND }
                 val isTreacherousTrapdoor = false
-                val isTerminalNode = hasTackleZone || hasBall || isTreacherousTrapdoor
+                val isTerminalNode = (hasTackleZone && !includeDodges) || hasBall || isTreacherousTrapdoor
                 val tentativeDistance = distances.getValue(currentLocation) + 1
-                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistance)) {
+                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistance, includeDodges, includeRushes)) {
                     continue
                 }
 
@@ -315,7 +319,12 @@ class CommonPathFinder : PathFinder {
         from: PitchCoordinate,
         target: PitchCoordinate,
         distanceInSteps: Int,
+        includeDodges: Boolean,
+        includeRushes: Boolean,
     ): Boolean {
+        val requiresDodge = state.rules.isMarked(player, from)
+        val requiresRush = distanceInSteps > player.movesLeft
+        if ((requiresDodge && !includeDodges) || (requiresRush && !includeRushes)) return false
         if (!state.rulesContext.hasMovePolicies) return true
         val context = MovePolicyContext(state, GameRulePhase.LIVE)
         if (!state.rulesContext.allowsMoveType(context, MoveType.STANDARD)) return false
@@ -325,8 +334,8 @@ class CommonPathFinder : PathFinder {
             from = from,
             target = TargetSquare.move(
                 coordinate = target,
-                needRush = distanceInSteps > player.movesLeft,
-                needDodge = state.rules.isMarked(player, from),
+                needRush = requiresRush,
+                needDodge = requiresDodge,
             ),
         )
         return state.rulesContext.allowsMove(context, candidate)

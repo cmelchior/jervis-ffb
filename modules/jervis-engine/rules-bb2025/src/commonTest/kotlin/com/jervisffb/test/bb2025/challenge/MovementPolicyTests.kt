@@ -134,7 +134,7 @@ class MovementPolicyTests {
         controller.rollForward(*activatePlayer("A1", PlayerStandardActionType.MOVE))
 
         val plan = state.rulesContext.actionPlanner.createMovePlan(state, state.activePlayer!!)
-        assertTrue(plan.immediateMoves.isEmpty())
+        assertTrue(plan.neighborMoves.isEmpty())
         assertFalse(plan.hasPaths)
 
         controller.handleAction(MoveTypeSelected(MoveType.STANDARD))
@@ -150,11 +150,30 @@ class MovementPolicyTests {
         player.movesLeft = 0
 
         val plan = state.rulesContext.actionPlanner.createMovePlan(state, state.activePlayer!!)
-        assertTrue(plan.immediateMoves.isEmpty())
+        assertTrue(plan.neighborMoves.isEmpty())
         assertFalse(plan.hasPaths)
 
         controller.handleAction(MoveTypeSelected(MoveType.STANDARD))
         assertNull(controller.getAvailableActions().getOrNull<SelectPitchLocation>())
+    }
+
+    @Test
+    fun plannerCanIncludeRushTargetsWhenRequested() {
+        val (state, controller) = createFixture()
+        val player = state.getPlayerById("A8".playerId)
+        controller.rollForward(*activatePlayer(player, PlayerStandardActionType.MOVE))
+        player.movesLeft = 0
+
+        val defaultPlan = state.rulesContext.actionPlanner.createMovePlan(state, player)
+        assertTrue(defaultPlan.neighborMoves.isEmpty())
+
+        val planWithRushes = state.rulesContext.actionPlanner.createMovePlan(
+            state,
+            player,
+            includeRushes = true,
+        )
+        assertTrue(planWithRushes.neighborMoves.isNotEmpty())
+        assertTrue(planWithRushes.neighborMoves.values.all { it.target.requiresRush })
     }
 
     @Test
@@ -192,8 +211,8 @@ class MovementPolicyTests {
         controller.rollForward(*activatePlayer(player, PlayerStandardActionType.MOVE))
 
         val plan = state.rulesContext.actionPlanner.createMovePlan(state, state.activePlayer!!)
-        assertFalse(plan.immediateMoves.containsKey(blockedSquare))
-        plan.immediateMoves.values.forEach { plannedMove ->
+        assertFalse(plan.neighborMoves.containsKey(blockedSquare))
+        plan.neighborMoves.values.forEach { plannedMove ->
             val nodeBefore = controller.currentNode()
             controller.handleAction(plannedMove.action)
             controller.handleAction(Revert)
@@ -236,11 +255,15 @@ class MovementPolicyTests {
         player.rushesLeft = 0
 
         assertTrue(controller.getAvailableActions().contains(MoveType.STANDARD))
-        val plan = state.rulesContext.actionPlanner.createMovePlan(state, state.activePlayer!!)
-        assertTrue(plan.immediateMoves.isNotEmpty())
-        assertTrue(plan.immediateMoves.values.all { it.target.requiresRush })
+        val plan = state.rulesContext.actionPlanner.createMovePlan(
+            state,
+            state.activePlayer!!,
+            includeRushes = true,
+        )
+        assertTrue(plan.neighborMoves.isNotEmpty())
+        assertTrue(plan.neighborMoves.values.all { it.target.requiresRush })
 
-        controller.handleAction(plan.immediateMoves.values.first().action)
+        controller.handleAction(plan.neighborMoves.values.first().action)
     }
 
     @Test

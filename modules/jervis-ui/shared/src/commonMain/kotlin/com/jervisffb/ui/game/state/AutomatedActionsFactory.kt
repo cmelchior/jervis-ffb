@@ -541,8 +541,14 @@ class AutomatedActionsFactory(
         return descriptor.types.any { type ->
             when (type) {
                 MoveType.STANDARD -> {
-                    val plan = game.rulesContext.actionPlanner.createMovePlan(game, player, maxSteps = 1)
-                    plan.immediateMoves.isNotEmpty()
+                    val plan = game.rulesContext.actionPlanner.createMovePlan(
+                        game,
+                        player,
+                        maxSteps = 1,
+                        includeDodges = true,
+                        includeRushes = true,
+                    )
+                    plan.neighborMoves.isNotEmpty()
                 }
                 else -> true
             }

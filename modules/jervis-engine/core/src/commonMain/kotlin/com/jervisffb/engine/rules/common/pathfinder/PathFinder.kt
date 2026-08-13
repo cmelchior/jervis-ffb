@@ -44,6 +44,8 @@ interface PathFinder {
         goal: PitchCoordinate,
         maxMove: Int,
         includeDebugInfo: Boolean = false,
+        includeDodges: Boolean = false,
+        includeRushes: Boolean = false,
     ): SinglePathResult
 
     /**
@@ -57,6 +59,8 @@ interface PathFinder {
         state: Game,
         movingPlayer: Player,
         maxMove: Int,
+        includeDodges: Boolean = false,
+        includeRushes: Boolean = false,
     ): AllPathsResult
 
     /**

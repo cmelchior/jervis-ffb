@@ -113,9 +113,16 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
 
             MoveType.STANDARD -> {
                 val movePlan = state.rulesContext.actionPlanner.createMovePlan(state, player)
-                acc.movePlan = movePlan
+                val neighborMovePlan = state.rulesContext.actionPlanner.createMovePlan(
+                    state,
+                    player,
+                    includeDodges = true,
+                    includeRushes = true,
+                )
+                val displayPlan = movePlan.withImmediateMoves(neighborMovePlan.neighborMoves)
+                acc.movePlan = displayPlan
 
-                movePlan.immediateMoves.forEach { (coordinate, plannedMove) ->
+                displayPlan.neighborMoves.forEach { (coordinate, plannedMove) ->
                     acc.updateSquare(coordinate) {
                         it.copy(
                             selectedAction = UiAction(plannedMove.action) {
@@ -203,8 +210,15 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         if (!eligibleActions.contains(action)) return
 
         val movePlan = state.rulesContext.actionPlanner.createMovePlan(state, player)
-        acc.movePlan = movePlan
-        movePlan.immediateMoves.forEach { (coordinate, plannedMove) ->
+        val immediateMovePlan = state.rulesContext.actionPlanner.createMovePlan(
+            state,
+            player,
+            includeDodges = true,
+            includeRushes = true,
+        )
+        val displayPlan = movePlan.withImmediateMoves(immediateMovePlan.neighborMoves)
+        acc.movePlan = displayPlan
+        displayPlan.neighborMoves.forEach { (coordinate, plannedMove) ->
             acc.updateSquare(coordinate) {
                 it.copy(
                     selectedAction = UiAction(Pair("standUpThenMoveTo", coordinate)) {
@@ -215,8 +229,10 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                                 val currentPlan = controller.state.rulesContext.actionPlanner.createMovePlan(
                                     controller.state,
                                     player,
+                                    includeDodges = true,
+                                    includeRushes = true,
                                 )
-                                currentPlan.immediateMoves[coordinate]
+                                currentPlan.neighborMoves[coordinate]
                                     ?.action
                                     ?.let(::QueuedActionsResult)
                             } else {

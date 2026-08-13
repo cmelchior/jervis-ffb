@@ -54,8 +54,9 @@ class UiSnapshotAccumulator(
     var homeTeamInfo = UiTeamInfoUpdate(game.homeTeam)
     var awayTeamInfo = UiTeamInfoUpdate(game.awayTeam)
 
-    // If set, it means we are in the middle of a move action that allows the player
-    // to move multiple squares.
+    // If set, it means we have a move plan available, allowing players to
+    // queue up multiple squares to reach a target.
+    // TODO This feels like the wrong architecture somewhere. There must be a better way.
     var movePlan: MovePlan? = null
 
     var showReferee = false
