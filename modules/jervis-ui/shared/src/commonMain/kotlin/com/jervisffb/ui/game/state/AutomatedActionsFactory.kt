@@ -190,6 +190,7 @@ class AutomatedActionsFactory(
                 BlockAction.SelectBlockType,
                 com.jervisffb.engine.bb2025.procedures.actions.block.BlockAction.SelectBlockType,
                 BlitzAction.SelectBlockType,
+                com.jervisffb.engine.bb2025.procedures.actions.blitz.BlitzAction.SelectBlockType,
             ))
         ) {
             actions.filterIsInstance<SelectBlockType>().firstOrNull()?.let {
