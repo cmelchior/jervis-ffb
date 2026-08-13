@@ -5,6 +5,8 @@ import com.jervisffb.engine.bb2025.challenge.goal.ScoreTouchdownGoalBuilder
 import com.jervisffb.engine.bb2025.challenge.modifier.BlockDiceRequired
 import com.jervisffb.engine.bb2025.challenge.modifier.PerformedByTeam
 import com.jervisffb.engine.bb2025.challenge.rule.MoveTypesAvailable
+import com.jervisffb.engine.bb2025.challenge.rule.RestrictedBlockDiceRule
+import com.jervisffb.engine.bb2025.challenge.rule.RestrictedSingleD6DiceRollRule
 import com.jervisffb.engine.bb2025.challenge.rule.TeamRerollsAvailable
 import com.jervisffb.engine.bb2025.challenge.rule.TurnLimit
 import com.jervisffb.engine.challenge.Challenge
@@ -13,6 +15,8 @@ import com.jervisffb.engine.challenge.ChallengeCategory
 import com.jervisffb.engine.challenge.ChallengeScore
 import com.jervisffb.engine.challenge.ChallengeScoring
 import com.jervisffb.engine.challenge.GoalTarget
+import com.jervisffb.engine.ext.d6
+import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.Coach
@@ -38,7 +42,7 @@ data class ChallengePresentation(
 )
 
 /**
- * List of (incomplete) challenges. Should only be used for testing.
+ * List of sample challenges. Should only be used for testing.
  *
  * The file behind it is read once by [SampleChallenges.load] and handed in as
  * text, but it is parsed again for every challenge on purpose: `Game` rebinds a
@@ -152,8 +156,41 @@ object SampleChallenges {
                         .build()
                     addRules(
                         MoveTypesAvailable(dodge = false, rush = false),
+                        RestrictedSingleD6DiceRollRule(forcedResult = 2.d6, rollTypes = null),
                         TeamRerollsAvailable(0),
                         TurnLimit(1)
+                    )
+                }.build(),
+                communityVotes = 0,
+                userVote = false,
+            )
+        },
+        "https://jervis.ilios.dk/uploads/challenges/v1/prevent_the_td.jrg" to { data ->
+            ChallengePresentation(
+                challenge = ChallengeBuilder(ChallengeId("prevent-the-td")).apply {
+                    name = "Prevent the TD!"
+                    author = "Blood Bowl Tactics".toSampleCoach()
+                    category = ChallengeCategory.BLOCKING
+                    description = """
+                        During a tournament match at the Old World Football Tournament League (OFTL), the game between Mardaed’s Bawl Players and Kal_Durak’s Regnat Rattus came down to this play. Mardaed’s Bawl Players were able to stall and score as the kicking team during the first half.  The stall left the Bawl Players short-handed, but they were still able to position the ball carrier on a break-away run, 2 spaces from scoring, AND more importantly, too far from the stormvermin to blitz.
+
+                        You are the Skaven coach.  2D Blitz the ball carrier!  Can you ball like Kal?
+                        
+                        Original Source: https://bbtactics.com/blood-bowl-challenge-002/
+                        
+                    """.trimIndent()
+                    addGameData(data)
+                    scoring = ChallengeScoring.ProbabilityScoring(homeTeam!!.id)
+                    goal = BlockGoalBuilder(homeTeam!!, GoalTarget.SpecificPlayer(awayTeam!!["He5".playerId]))
+                        .addModifier(PerformedByTeam(homeTeam!!))
+                        .addModifier(BlockDiceRequired(2))
+                        .build()
+                    addRules(
+                        RestrictedBlockDiceRule(6.dblock, RestrictedBlockDiceRule.RollType.ATTACKER_CHOOSES),
+                        RestrictedBlockDiceRule(1.dblock, RestrictedBlockDiceRule.RollType.SINGLE_DIE),
+                        RestrictedBlockDiceRule(1.dblock, RestrictedBlockDiceRule.RollType.OPPONENT_CHOOSES),
+                        RestrictedSingleD6DiceRollRule(forcedResult = 2.d6, rollTypes = null),
+                        TurnLimit(1),
                     )
                 }.build(),
                 communityVotes = 0,

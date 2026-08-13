@@ -186,8 +186,8 @@ class AutomatedActionsFactory(
         // When selecting block results after reroll and only 1 dice is available.
         if (
             menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_DIE_IF_ONLY_OPTION)
-                && (currentNode == StandardBlockChooseResult.SelectBlockResult || currentNode == SingleStandardBlockChooseResult.SelectBlockResult)
-                && actions.size == 1
+            && (currentNode == StandardBlockChooseResult.SelectBlockResult || currentNode == SingleStandardBlockChooseResult.SelectBlockResult)
+            && actions.size == 1
         ) {
             val choices = (actions.first() as SelectDicePoolResult).pools
             if (choices.size == 1 && choices.first().dice.size == 1) {

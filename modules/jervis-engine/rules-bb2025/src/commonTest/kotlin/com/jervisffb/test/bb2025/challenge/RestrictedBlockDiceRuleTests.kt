@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.bb2025.challenge.rule.RestrictedBlockDiceRule
+import com.jervisffb.engine.bb2025.challenge.rule.RestrictedBlockDiceRule.RollType
 import com.jervisffb.engine.challenge.ChallengeRule
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.ext.dblock
@@ -39,7 +40,7 @@ class RestrictedBlockDiceRuleTests {
         val controller: GameEngineController,
     )
 
-    private fun createFixture(rule: ChallengeRule = RestrictedBlockDiceRule(3.dblock, 1)): Fixture {
+    private fun createFixture(rule: ChallengeRule = RestrictedBlockDiceRule(3.dblock, RollType.SINGLE_DIE)): Fixture {
         val rules = StandardBB2025Rules()
         val state = Game(
             GameRulesContext(rules, rule.policies),
@@ -71,7 +72,7 @@ class RestrictedBlockDiceRuleTests {
 
     @Test
     fun doesNotFilterBlockDiceWithDifferentCount() {
-        val (_, controller) = createFixture(RestrictedBlockDiceRule(3.dblock, 2))
+        val (_, controller) = createFixture(RestrictedBlockDiceRule(3.dblock, RollType.ATTACKER_CHOOSES))
         val request = controller.getAvailableActions().get<RollDice>()
 
         request.dice.indices.forEach { index ->
