@@ -17,6 +17,7 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MovePlayer
+import com.jervisffb.engine.bb2025.challenge.goal.BlockGoal
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
@@ -31,6 +32,9 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.formatCurrency
+import com.jervisffb.ui.game.UiFocus
+import com.jervisffb.ui.game.UiFocusProvider
+import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
@@ -126,6 +130,17 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
+    private val focusProvider: UiFocusProvider? = when (val gameMode = mode) {
+        is ChallengeGame -> UiFocusProvider { state ->
+            val goal = gameMode.challenge.goal as? BlockGoal
+            val targetIds = goal?.targetPlayerIds(state).orEmpty()
+            UiFocus(
+                players = targetIds.associateWith { UiFocusStyle.CHALLENGE_TARGET },
+            )
+        }
+        else -> null
+    }
+
     // Scope for everything that observes this game for as long as it exists.
     // Deliberately not Voyager's `screenModelScope`. GameScreenModels are always
     // constructed directly rather than through `rememberScreenModel`, and for an
@@ -183,7 +198,8 @@ class GameScreenModel(
         gameController,
         actionProvider,
         menuViewModel,
-        actions
+        actions,
+        focusProvider,
     )
     val pitchBackground: Flow<PitchDetails> = uiState.uiStateFlow.map { uiSnapshot ->
         val weather = uiSnapshot.weather

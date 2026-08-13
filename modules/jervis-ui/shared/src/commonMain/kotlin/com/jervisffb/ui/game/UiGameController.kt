@@ -229,7 +229,8 @@ class UiGameController(
     val gameController: GameEngineController,
     val actionProvider: UiActionProviderGroup,
     val menuViewModel: MenuViewModel,
-    private val preloadedActions: List<GameAction>
+    private val preloadedActions: List<GameAction>,
+    private val focusProvider: UiFocusProvider? = null,
 ) {
 
     companion object {
@@ -734,6 +735,7 @@ class UiGameController(
      * Method responsible for updating the UI state based on recent changes in the [Game] model.
      */
     private fun addBaseGameStateChanges(state: Game, actions: ActionRequest, delta: GameDelta, acc: UiSnapshotAccumulator) {
+        val focus = focusProvider?.getFocus(state) ?: UiFocus.NONE
 
         // Update the persistent UI decorations before starting
         updatePersistentUiDecorations(state, delta, uiDecorations, acc)
@@ -743,7 +745,7 @@ class UiGameController(
         (0 until rules.pitchWidth).forEach { x ->
             (0 until rules.pitchHeight).forEach { y ->
                 val coordinate = PitchCoordinate(x, y)
-                val square= renderSquare(coordinate, state)
+                val square = renderSquare(coordinate, state, focus.squares[coordinate])
                 acc.addOrUpdateSquare(coordinate, square)
             }
         }
@@ -751,10 +753,16 @@ class UiGameController(
         // This will reset the player state and the data class should ensure equality is
         // checked correctly using the auto-generated `equals()`
         state.homeTeam.forEach { player ->
-            acc.addOrUpdatePlayer(player.id, UiPitchPlayer(player))
+            acc.addOrUpdatePlayer(
+                player.id,
+                UiPitchPlayer(player, focusStyle = focus.players[player.id]),
+            )
         }
         state.awayTeam.forEach { player ->
-            acc.addOrUpdatePlayer(player.id, UiPitchPlayer(player))
+            acc.addOrUpdatePlayer(
+                player.id,
+                UiPitchPlayer(player, focusStyle = focus.players[player.id]),
+            )
         }
     }
 
@@ -843,11 +851,13 @@ class UiGameController(
     private fun renderSquare(
         coordinate: PitchCoordinate,
         game: Game,
+        focusStyle: UiFocusStyle? = null,
     ): UiPitchSquare {
         val square = game.pitch[coordinate]
         return UiPitchSquare(
             coordinates = coordinate,
-            player = square.player?.id
+            player = square.player?.id,
+            focusStyle = focusStyle,
         )
     }
 

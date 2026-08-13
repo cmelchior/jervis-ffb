@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.menu.GameScreenModel
 
 /**
@@ -45,11 +46,13 @@ data class UiPitchPlayer(
     val dice: Int = 0, // Show block dice decorator
     val isBlocked: Boolean = false, // Show "blocked" indicator
     val isHighlighted: Boolean = false, // Show "highlighted" indicator. This is different from "selectable"
+    val focusStyle: UiFocusStyle? = null,
 ) {
     constructor(
         model: Player,
         overrideLocation: Location = model.location,
-        selectAction: ((GameScreenModel, UiPitchPlayer) -> Unit)? = null
+        selectAction: ((GameScreenModel, UiPitchPlayer) -> Unit)? = null,
+        focusStyle: UiFocusStyle? = null,
     ) : this(
         id = model.id,
         location = overrideLocation,
@@ -66,7 +69,8 @@ data class UiPitchPlayer(
             model.intermediateState == PlayerIntermediateState.KNOCKED_DOWN
                 || model.intermediateState == PlayerIntermediateState.FALLEN_OVER
         ),
-        hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnPitch(model.team.game.rules)
+        hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnPitch(model.team.game.rules),
+        focusStyle = focusStyle,
     )
     val isTemporarySelected = mutableStateOf(false)
     val isSelectable = (selectedAction != null)

@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.view.pitch.SquarePointerEventType
@@ -139,6 +140,8 @@ fun Player(
             isActionWheelFocus = contextMenuShowing,
             isGoingDown = player.isGoingDown,
             isHighlighted = player.isHighlighted,
+            isActiveFocus = player.focusStyle != null && player.isActive,
+            focusStyle = player.focusStyle,
             alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
         )
         if (player.carriesBall) {
@@ -255,6 +258,8 @@ fun PlayerImage(
     isActionWheelFocus: Boolean,
     isGoingDown: Boolean,
     isHighlighted: Boolean,
+    isActiveFocus: Boolean = false,
+    focusStyle: UiFocusStyle? = null,
     alpha: Float,
     filterQuality: FilterQuality = FilterQuality.Low,
 ) {
@@ -265,6 +270,8 @@ fun PlayerImage(
     val playerBorderShader = when {
         isActionWheelFocus || isHighlighted -> playerInFocus
         isTempSelected -> playerTempSelectedShader
+        isActiveFocus -> playerSelectedBorderShader
+        focusStyle != null -> playerDownBorderShader
         isGoingDown -> playerDownBorderShader
         else -> playerSelectedBorderShader
     }
@@ -274,7 +281,7 @@ fun PlayerImage(
             .aspectRatio(1f)
             .fillMaxSize()
             .drawWithCache {
-                if (!isSelectable && !isHighlighted /* && !isGoingDown && !isActionWheelFocus */) {
+                if (!isSelectable && !isHighlighted && focusStyle == null /* && !isGoingDown && !isActionWheelFocus */) {
                     return@drawWithCache onDrawBehind { /* Do nothing */ }
                 }
                 val canvasWidth = size.width

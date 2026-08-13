@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.model
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.game.view.ContextMenuOption
 import com.jervisffb.ui.game.view.ContextWheelMenu
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
@@ -25,6 +26,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class UiPitchSquare(
     val coordinates: PitchCoordinate,
     val player: PlayerId? = null, // Reference to the player present in this field.
+    val focusStyle: UiFocusStyle? = null,
     val isBallOnGround: Boolean = false,
     val isBallExiting: Boolean = false,
     val isBallCarried: Boolean = false,

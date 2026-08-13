@@ -37,6 +37,20 @@ class BlockGoal(
     override val modifiers: List<GoalModifier>
 ): ChallengeGoal() {
     constructor(owningTeam: Team, targetPlayers: GoalTarget.SpecificPlayer, modifiers: List<GoalModifier>) : this(owningTeam.id, targetPlayers, modifiers)
+
+    // Resolve the goal's possible targets against the running game instance.
+    fun targetPlayerIds(state: Game): Set<PlayerId> {
+        return when (targetPlayers) {
+            is GoalTarget.AnyPlayers -> {
+                val targetTeam = state.getTeam(owningTeam).run {
+                    if (!targetPlayers.sameTeam) this.otherTeam() else this
+                }
+                targetTeam.filter { !it.missNextGame }.map { it.id }.toSet()
+            }
+            is GoalTarget.SpecificPlayer -> setOf(targetPlayers.id)
+        }
+    }
+
     override val description: String = buildString {
         when (targetPlayers) {
             is GoalTarget.AnyPlayers -> {
