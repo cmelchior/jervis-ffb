@@ -326,7 +326,10 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
                                     Text(
                                         fontSize = skillFontSize,
                                         lineHeight = 1.5.em,
-                                        color = JervisTheme.contentTextColor,
+                                        color = when (it in player.model.extraSkills) {
+                                            true -> JervisTheme.lightGreen
+                                            false -> JervisTheme.contentTextColor
+                                        },
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier.padding(0.jdp).fillMaxWidth(),
                                         text = it.name + if (it.compulsory) "*" else "",
