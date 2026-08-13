@@ -22,6 +22,10 @@ object BB2025StandaloneRosters {
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
             roster = HUMAN_TEAM_BB2025,
         ),
+        "high-elf-roster-bb2025.jrr" to JervisRosterFile(
+            metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
+            roster = HIGH_ELF_TEAM_BB2025,
+        ),
         "khorne-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
             roster = KHORNE_TEAM_BB2025,

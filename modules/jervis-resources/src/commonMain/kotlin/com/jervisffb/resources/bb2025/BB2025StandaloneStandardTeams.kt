@@ -65,6 +65,30 @@ object BB2025StandaloneStandardTeams {
             history = null
         },
 
+        "high-elf-starter-team-bb2025.jrt" to buildTeamFile {
+            metadata = JervisMetaData(FILE_FORMAT_VERSION)
+            roster = HIGH_ELF_TEAM_BB2025
+            team = teamBuilder(rules, HIGH_ELF_TEAM_BB2025) {
+                name = "FUMBBL Starter #1"
+                addPlayer("He1".playerId, "Aethyrion Swiftflame", 1.playerNo, DRAGON_PRINCE)
+                addPlayer("He2".playerId, "Caledor Starcrest", 2.playerNo, DRAGON_PRINCE)
+                addPlayer("He3".playerId, "Korhil Whiteclaw", 3.playerNo, WHITE_LION)
+                addPlayer("He4".playerId, "Caradryan Brightmane", 4.playerNo, WHITE_LION)
+                addPlayer("He5".playerId, "Elarion Dawnrunner", 5.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He6".playerId, "Finubar Goldleaf", 6.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He7".playerId, "Talandor Silverspear", 7.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He8".playerId, "Aerandir Moonblade", 8.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He9".playerId, "Letharion Swiftwind", 9.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He10".playerId, "Vaelith Starbrow", 10.playerNo, HIGH_ELF_LINEMAN)
+                addPlayer("He11".playerId, "Thalion Brightshield", 11.playerNo, HIGH_ELF_LINEMAN)
+                rerolls = 2
+                apothecaries = 0
+                dedicatedFans = 1
+                teamValue = 995_000
+            }
+            history = null
+        },
+
         "lizardmen-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = LIZARDMEN_TEAM_BB2025
