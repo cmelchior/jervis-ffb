@@ -1,5 +1,6 @@
 package com.jervisffb.net
 
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -23,10 +24,11 @@ class GameCache {
     }
 
     suspend fun shutdownAll() {
-        gamesLock.withLock {
-            games.forEach { (id, session) ->
+        val shutdownJobs = gamesLock.withLock {
+            games.values.map { session ->
                 session.shutdownGame(JervisExitCode.SERVER_CLOSING, "Server is shutting down.")
             }
         }
+        shutdownJobs.joinAll()
     }
 }

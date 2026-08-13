@@ -384,9 +384,11 @@ class GameSession(
      *
      * This method can be called outside the normal control of handling messages.
      */
-    suspend fun shutdownGame(exitCode: JervisExitCode, reason: String) {
-        // If this runs in the eventActionScope it deadlocks
-        networkScope.launch {
+    fun shutdownGame(exitCode: JervisExitCode, reason: String): Job {
+        // Launching on `networkScope, because callers might be on `gameEventScope`.
+        // Waiting for `sessionClosed` from that scope would deadlock the event loop before
+        // it gets a chance to observe the closed channel.
+        return networkScope.launch {
             LOG.i { "[Server] Shutting down game '${gameId.value}' ($exitCode): $reason"}
             incomingMessages.close()
             sessionClosed.join() // Allow incoming message queue to drain // drainQueuedMessages(incomingMessages)

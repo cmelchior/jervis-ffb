@@ -1,14 +1,12 @@
 package com.jervisffb.net
 
 import com.jervisffb.net.messages.ClientMessage
-import com.jervisffb.net.messages.ReadMessageServerError
 import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.jervisLogger
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.util.logging.error
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
@@ -19,13 +17,19 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.encodeToString
 import okio.ProtocolException
+import kotlin.concurrent.Volatile
 
 /**
  * Class for controlling the websocket connection to a Jervis Game Host or Server.
@@ -42,9 +46,20 @@ class JervisClientWebSocketConnection(
         val LOG = jervisLogger()
     }
 
-    private val scope = CoroutineScope(CoroutineName("JervisClientWebSocket-${gameId.value}") + Dispatchers.Default)
+    private val scope = CoroutineScope(
+        SupervisorJob() + CoroutineName("JervisClientWebSocket-${gameId.value}") + Dispatchers.Default
+    )
 
+    // Mutex guarding all attempts at closing the connection.
+    private val lifecycleMutex = Mutex()
+
+    // Coroutine job that controls the WebSocket connection.
+    private var connectionJob: Job? = null
+
+    @Volatile
     private var session: DefaultWebSocketSession? = null
+
+    private var closeRequested = false
 
     // Messages sent from the server. Users of this class
     // are required to listen to the channel.
@@ -56,8 +71,6 @@ class JervisClientWebSocketConnection(
     // Track the underlying close reason from the websocket connection (if any)
     private var jervisCloseReason = CompletableDeferred<CloseReason>()
 
-    private var closeDone = CompletableDeferred<Unit>()
-
     // Returns `true` if the connection is still think it is connected to the host.
     val isActive: Boolean
         get() = session != null && !jervisCloseReason.isCompleted
@@ -68,40 +81,53 @@ class JervisClientWebSocketConnection(
      * close reason.
      */
     fun start() {
-        if (session != null) throw IllegalStateException("WebSocketClientConnection is already started.")
+        if (session != null || connectionJob != null) {
+            throw IllegalStateException("WebSocketClientConnection is already started.")
+        }
         val client = getHttpClient()
         jervisCloseReason = CompletableDeferred()
-        scope.launch {
+        closeRequested = false
+        connectionJob = scope.launch {
             try {
-                val session = client.webSocketSession(url).also {
-                    this@JervisClientWebSocketConnection.session = it
+                val connectedSession = client.webSocketSession(url)
+                val closeImmediately = lifecycleMutex.withLock {
+                    when (closeRequested) {
+                        true -> true
+                        false -> {
+                            this@JervisClientWebSocketConnection.session = connectedSession
+                            false
+                        }
+                    }
                 }
-                val job1 = launch { monitorDisconnect(session) }
-                val job2 = launch { monitorOutgoingClientMessages() }
-                val job3 = launch { monitorIncomingServerMessages(session) }
+
+                if (closeImmediately) {
+                    connectedSession.close(JervisExitCode.CLIENT_CLOSING, "Client is closing.")
+                    return@launch
+                }
+
+                val job1 = launch { monitorDisconnect(connectedSession) }
+                val job2 = launch { monitorOutgoingClientMessages(connectedSession) }
+                val job3 = launch { monitorIncomingServerMessages(connectedSession) }
                 joinAll(job1, job2, job3)
             } catch (ex: ProtocolException) {
                 // Unsure if ProtocolException is thrown in other cases than 404, so just to be sure
-                LOG.e { "[Server] ${ex.stackTraceToString()}" }
-                if (ex.message?.contains("404 Not Found") == true) {
-                    jervisCloseReason.complete(CloseReason(JervisExitCode.URL_NOT_FOUND.code, ex.message ?: ""))
-                } else {
-                    jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
+                if (!isCloseRequested()) {
+                    LOG.e { "[Server] ${ex.stackTraceToString()}" }
+                    if (ex.message?.contains("404 Not Found") == true) {
+                        jervisCloseReason.complete(CloseReason(JervisExitCode.URL_NOT_FOUND.code, ex.message ?: ""))
+                    } else {
+                        jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
+                    }
                 }
-                closeDone.complete(Unit)
             } catch (ex: CancellationException) {
                 // These are special and should always propagate
                 throw ex
             } catch (ex: Throwable) {
                 // Wrong use of ws/wss will end up here as an SSLException
-                LOG.e { "[Client-${coachName}] Unexpected error in running the WebSocket connection: ${ex.stackTraceToString()}" }
-                jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
-                closeDone.complete(Unit)
-            }
-        }.invokeOnCompletion { error: Throwable? ->
-            closeDone.complete(Unit)
-            if (error != null && error !is CancellationException) {
-                throw error
+                if (!isCloseRequested()) {
+                    LOG.e { "[Client-${coachName}] Unexpected error in running the WebSocket connection: ${ex.stackTraceToString()}" }
+                    jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
+                }
             }
         }
     }
@@ -112,9 +138,7 @@ class JervisClientWebSocketConnection(
             jervisCloseReason.complete(reason)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            val stacktrace = e.stackTraceToString()
-            LOG.e(e) { "Client disconnected unexpectedly:\n$stacktrace" }
-            jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, stacktrace))
+            if (!isCloseRequested()) throw e
         } finally {
             closeFromServer() // Also cleanup internal channels and scopes
         }
@@ -136,23 +160,21 @@ class JervisClientWebSocketConnection(
             LOG.d { "Connection was closed. Cannot handle any more messages" }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
-            val error = ReadMessageServerError(ex.stackTraceToString())
-            // TODO How to handle errors here?
-            throw ex
+            if (!isCloseRequested()) throw ex
         }
     }
 
-    private suspend fun JervisClientWebSocketConnection.monitorOutgoingClientMessages() {
+    private suspend fun JervisClientWebSocketConnection.monitorOutgoingClientMessages(session: DefaultWebSocketSession) {
         try {
             for (outMessage in outgoingChannel) {
                 val messageJson = jervisNetworkSerializer.encodeToString(outMessage)
                 LOG.i { "[Client-$coachName] Sending message: $messageJson" }
-                session?.outgoing?.send(Frame.Text(messageJson))
+                session.outgoing.send(Frame.Text(messageJson))
                 LOG.i { "[Client-$coachName] Sent message: $messageJson" }
             }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
-            LOG.e { ex.stackTraceToString() }
+            if (!isCloseRequested()) LOG.e { ex.stackTraceToString() }
         }
     }
 
@@ -174,24 +196,38 @@ class JervisClientWebSocketConnection(
      * takes precedence.
      */
     suspend fun close(exitCode: JervisExitCode = JervisExitCode.CLIENT_CLOSING, message: String = "Client is closing.") {
-        session?.incoming?.cancel()
-        session?.close(exitCode, message)
-        session = null
-        // If the server terminated the connection, this is a no-op and close reason is already set.
+        val (currentSession, job) = lifecycleMutex.withLock {
+            closeRequested = true
+            val currentSession = session
+            session = null
+            currentSession to connectionJob
+        }
+
+        currentSession?.close(exitCode, message)
+        currentSession?.incoming?.cancel()
+
+        // If the server terminated the connection, this is a no-op and the server close reason wins.
         jervisCloseReason.complete(CloseReason(exitCode.code, message))
         incomingChannel.cancel(cause = CancellationException("Client is closing."))
         outgoingChannel.close()
+        job?.cancelAndJoin()
         scope.cancel(cause = CancellationException("Client is closing."))
-        closeDone.await()
         LOG.d { "[Client-$coachName] Closing connection: $this"  }
     }
 
-    suspend fun closeFromServer() {
-        session = null
+    private suspend fun closeFromServer() {
+        val closedByClient = lifecycleMutex.withLock {
+            session = null
+            closeRequested
+        }
         incomingChannel.close()
         outgoingChannel.close()
-        LOG.d { "[Client-$coachName] Connection was closed due to a server disconnect: $this"  }
+        if (!closedByClient) {
+            LOG.d { "[Client-$coachName] Connection was closed due to a server disconnect: $this"  }
+        }
     }
+
+    private suspend fun isCloseRequested(): Boolean = lifecycleMutex.withLock { closeRequested }
 
     /**
      * Wait for the connection to terminate.
