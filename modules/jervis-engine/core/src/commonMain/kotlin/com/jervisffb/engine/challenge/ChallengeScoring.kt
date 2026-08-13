@@ -54,7 +54,7 @@ sealed interface ChallengeScoring<T: ChallengeScore<T>> {
         val policy: ChallengeRerollSelectionPolicy = ChallengeRerollSelectionPolicy.PhysicalRerollSelection(),
     ) : ChallengeScoring<ChallengeScore.ProbabilityScore> {
         override val id = ChallengeScoringId("jervis-probability-score")
-        override val description: String = "Jervis Probability Score: Higher is better"
+        override val description: String = "Jervis Probability Score: An approximation of the probability of success. Higher is better."
 
         override fun scoreGame(
             state: Game,
