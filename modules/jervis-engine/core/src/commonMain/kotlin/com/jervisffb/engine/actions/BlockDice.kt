@@ -11,7 +11,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 enum class BlockDice(val description: String) {
     PLAYER_DOWN("Player Down"),
     BOTH_DOWN("Both Down"),
-    PUSH_BACK("Pushback"),
+    PUSH_BACK("Push Back"),
     STUMBLE("Stumble"),
     POW("POW!"),
     ;
