@@ -37,6 +37,7 @@ import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025Stumble
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.UseStripBallStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockChooseResult
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
@@ -183,7 +184,11 @@ class AutomatedActionsFactory(
         }
 
         // When selecting block results after reroll and only 1 dice is available.
-        if (currentNode == StandardBlockChooseResult.SelectBlockResult && actions.size == 1) {
+        if (
+            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_DIE_IF_ONLY_OPTION)
+                && (currentNode == StandardBlockChooseResult.SelectBlockResult || currentNode == SingleStandardBlockChooseResult.SelectBlockResult)
+                && actions.size == 1
+        ) {
             val choices = (actions.first() as SelectDicePoolResult).pools
             if (choices.size == 1 && choices.first().dice.size == 1) {
                 return DicePoolResultsSelected(listOf(
