@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -22,6 +23,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
@@ -158,8 +160,15 @@ class AutomatedActionsFactory(
                 }
         }
 
-        // If a player action can only end, just end it immediately
-        if (menuViewModel.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION) && actions.size == 1 && actions.first() is EndActionWhenReady) {
+        // If a player action can only end, just end it immediately. Standard movement is
+        // special as some challenge rules might prevent certain kinds of movement. For this
+        // reason we need to go through the Action Planner to check if MoveType.STANDARD is
+        // just a false positive here.
+        if (
+            menuViewModel.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION)
+            && actions.all { it is EndActionWhenReady || it is SelectMoveType }
+            && actions.none { it is SelectMoveType && hasExecutableMove(it) }
+        ) {
             return EndAction
         }
 
@@ -520,6 +529,19 @@ class AutomatedActionsFactory(
         }
 
         return null
+    }
+
+    private fun hasExecutableMove(descriptor: SelectMoveType): Boolean {
+        val player = game.activePlayer ?: return false
+        return descriptor.types.any { type ->
+            when (type) {
+                MoveType.STANDARD -> {
+                    val plan = game.rulesContext.actionPlanner.createMovePlan(game, player, maxSteps = 1)
+                    plan.immediateMoves.isNotEmpty()
+                }
+                else -> true
+            }
+        }
     }
 
 }
