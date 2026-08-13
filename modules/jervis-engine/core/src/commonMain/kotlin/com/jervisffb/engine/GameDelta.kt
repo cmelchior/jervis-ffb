@@ -10,6 +10,7 @@ import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.commands.probabiliy.UpdateChanceObservation
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationChange
@@ -128,7 +129,7 @@ internal class DeltaBuilder(
     fun addCommand(command: Command) {
         when (command) {
             is CompositeCommand -> command.commands.forEach { addCommand(it) }
-//            is LogEntry -> logs.add(command)
+            // is LogEntry -> logs.add(command)
             else -> commands.add(command)
         }
     }
@@ -169,5 +170,19 @@ internal class DeltaBuilder(
 
     fun build(): GameDelta {
         return GameDelta(actionId, steps, actionOwner)
+    }
+
+    /**
+     * Undo every command that completed while the current delta was being built.
+     *
+     * Should be used if an exception occurs while building it, to ensure that
+     * we don't accidentally leave behind a modified state. This can especially
+     * happen when using [CompositeGameAction].
+     */
+    fun rollback(state: Game) {
+        commands.asReversed().forEach { it.undo(state) }
+        steps.asReversed().forEach { step ->
+            step.commands.asReversed().forEach { it.undo(state) }
+        }
     }
 }

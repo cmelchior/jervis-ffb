@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.MovePlan
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiPitchPlayer
@@ -48,7 +48,7 @@ data class UiGameSnapshot(
     val awayTeamInfo: UiTeamInfoUpdate,
     // If set, it means we are in the middle of a move action that allows the player
     // to move multiple squares.
-    val pathFinder: PathFinder.AllPathsResult?,
+    val movePlan: MovePlan?,
     val showReferee: Boolean,
     val refereeCoordinates: PitchCoordinate?,
 

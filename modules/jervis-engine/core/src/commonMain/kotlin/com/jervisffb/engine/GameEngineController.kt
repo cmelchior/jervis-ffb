@@ -19,6 +19,7 @@ import com.jervisffb.engine.actions.SetBallState
 import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.commands.EnterProcedure
 import com.jervisffb.engine.commands.ModifyPlayerBaseStat
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -46,6 +47,8 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.policy.ActionFilterContext
+import com.jervisffb.engine.rules.policy.GameRulePhase
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.statistics.GameStatistics
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
@@ -62,40 +65,35 @@ data class AddEntry(val log: LogEntry) : ListEvent
 data class RemoveEntry(val log: LogEntry) : ListEvent
 
 /**
- * Main entry point for running a single game according to some predefined rules.
- **
- * This class should not be used until both teams have been identified and a ruleset
- * has been agreed upon.
+ * Main entry point for running a single game using to some predefined rules.
  *
- * - [initialActions] Actions to run as soon as the controller is started using [startManualMode]
- *   or [startTestMode]
- *
- * - [validateActions] If `true`, all actions will be validated against [getAvailableActions]
- *   before [ActionNode.applyAction] is called. Illegal or invalid actions will throw an
- *   [InvalidActionException].
- *
- * - [cacheActionDescriptor] If `true`, the result of [getAvailableActions] will be cached
- *   and reused for subsequent calls to [getAvailableActions]. This can be useful if
- *   [getAvailableActions] is called frequently, but the result is not expected to change.
- *   It is most commonly `false` during unit tests as they are expected to modify the result.
+ * This class should not be used until both teams have been identified and a
+ * ruleset has been agreed upon.
  */
 class GameEngineController(
     state: Game,
+    // Actions to run as soon as the controller is started using [startManualMode] or [startTestMode].
     private val initialActions: List<GameAction> = emptyList(),
+    // Validate all incoming actions (after initial actions have been applied).
+    // Invalid actions will throw an [InvalidActionException].
     private val validateActions: Boolean = true,
-    private val cacheActionDescriptor: Boolean = false,
+    // Validate all initial actions. Can be configured independently of `validateActions`.
+    private val validateInitialActions: Boolean = validateActions,
     // If `true`, initial actions cannot be undone.
     private val protectInitialActions: Boolean = false,
     // When loading challenges, we might load a game that was preconfigured using Admin
     // Actions, but when the game itself is running. They should not be allowed.
-    // In that case, set this to true as this will override a rules behavior that
+    // In that case, set this to true as this will override the rule behavior that
     // disallow them.
     private val allowAdminActionsInInitialActions: Boolean = false,
+    // Cache Action descriptors to improve performance. Should be disabled when modifying state manually and
+    // not only through GameActions. This normally only happen in unit tests.
+    private val cacheActionDescriptor: Boolean = true,
     // Called when the controller is started.
     // If set, the controller will collect statistics about the game while it
     // is running.
     val statistics: GameStatistics? = null,
-    private val onStarted: (GameEngineController) -> Unit = { controller -> /* Do nothing */ },
+    private val onStarted: (GameEngineController) -> Unit = { _ -> /* Do nothing */ },
 ) {
 
     companion object {
@@ -176,18 +174,32 @@ class GameEngineController(
     /**
      * Returns a [ActionRequest] representing the available actions for the
      * current [Node] as well as who is responsible for providing it.
+     *
+     * The returned request is filtered through any policies in
+     * [Game.rulesContext].
      */
     fun getAvailableActions(): ActionRequest {
-        if (cacheActionDescriptor && cachedActionRequest?.id == currentActionIndex()) {
+        if (cacheActionDescriptor && cachedActionRequest?.id == nextActionIndex()) {
             return cachedActionRequest!!
         }
-        if (stack.isEmpty()) return ActionRequest(nextActionIndex(), null, emptyList())
+        if (stack.isEmpty()) {
+            return ActionRequest(nextActionIndex(), null, emptyList()).also {
+                if (cacheActionDescriptor) {
+                    cachedActionRequest = it
+                }
+            }
+        }
         if (stack.currentNode() !is ActionNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        return ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions).also {
+        val phase = if (initializing) GameRulePhase.INITIAL_ACTIONS else GameRulePhase.LIVE
+        val request = state.rulesContext.filterActionRequest(
+            context = ActionFilterContext(state, currentNode, phase),
+            request = ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions),
+        )
+        return request.also {
             if (cacheActionDescriptor) {
                 cachedActionRequest = it
             }
@@ -279,7 +291,7 @@ class GameEngineController(
         lockInitialActions()
         state.collectChanceData = collectStatistics
         initializing = false
-        onStarted(this)
+        notifyStarted()
     }
 
     fun startTestMode(start: Procedure, logAvailableActions: Boolean = true) {
@@ -294,7 +306,19 @@ class GameEngineController(
         lockInitialActions()
         state.collectChanceData = collectStatistics
         initializing = false
+        notifyStarted()
+    }
+
+    private fun notifyStarted() {
+        // The `onStarted` callback is primarily used by Challenges which can,
+        // and will, modify the game state in way that are normally not allowed.
+        // This can affect which available actions are available. So we need
+        // to bust the cache before the callback to ensure that it sees the
+        // latest available actions, and after to avoid issues if the
+        // callback did modify the game state.
+        cachedActionRequest = null
         onStarted(this)
+        cachedActionRequest = null
     }
 
     /**
@@ -388,6 +412,7 @@ class GameEngineController(
     }
 
     private fun processForwardAction(userAction: GameAction) {
+        val previousLastActionIfUndo = lastActionIfUndo
         lastActionIfUndo = null
         val actionOwner = currentNode().let { node ->
             if (node is ActionNode) {
@@ -398,12 +423,19 @@ class GameEngineController(
         }
         val newDeltaId = (lastGameActionId + 1)
         deltaBuilder = DeltaBuilder(newDeltaId, actionOwner, collectStatistics)
-        when (userAction) {
-            is Undo -> error("Invalid action: $userAction")
-            is CompositeGameAction -> userAction.actionList.forEach { actionElement ->
-                processSingleAction(deltaBuilder, actionElement)
+        try {
+            when (userAction) {
+                is Undo -> error("Invalid action: $userAction")
+                is CompositeGameAction -> userAction.actionList.forEach { actionElement ->
+                    processSingleAction(deltaBuilder, actionElement)
+                }
+                else -> processSingleAction(deltaBuilder, userAction)
             }
-            else -> processSingleAction(deltaBuilder, userAction)
+        } catch (ex: Exception) {
+            deltaBuilder.rollback(state)
+            lastActionIfUndo = previousLastActionIfUndo
+            cachedActionRequest = null
+            throw ex
         }
         val delta = deltaBuilder.build()
         history.add(delta)
@@ -419,7 +451,8 @@ class GameEngineController(
             currentProcedure.currentNode())
         logInternalEvent(ReportHandleAction(userAction))
         val currentNode: ActionNode = stack.currentNode() as ActionNode
-        if (validateActions && userAction !is AdminGameAction) {
+        val shouldValidate = if (initializing) validateInitialActions else validateActions
+        if (shouldValidate && userAction !is AdminGameAction) {
             validateAction(userAction)
         }
 
@@ -561,9 +594,18 @@ class GameEngineController(
     }
 
     private fun executeCommand(command: Command) {
-        deltaBuilder.addCommand(command)
+        // Commands can advance the procedure stack without advancing the action
+        // index (e.g. when rolling across computation nodes). To avoid seeing
+        // stale available actions during this, we need to invalidate the cache.
+        // It will be generated on the first outside access.
+        cachedActionRequest = null
+        if (command is CompositeCommand) {
+            command.commands.forEach(::executeCommand)
+            return
+        }
         try {
             command.execute(state)
+            deltaBuilder.addCommand(command)
         } catch (ex: Exception) {
             val message = ex.message?.let {
                 when (it.isBlank()) {

@@ -19,6 +19,9 @@ val commonSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.common.inducements.wizards.Zap::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.pathfinder.PathFinder::class) {
-        subclass(com.jervisffb.engine.common.pathfinder.StandardPathFinder::class)
+        subclass(com.jervisffb.engine.common.pathfinder.CommonPathFinder::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.planner.ActionPlanner::class) {
+        subclass(com.jervisffb.engine.common.planner.CommonActionPlanner::class)
     }
 }

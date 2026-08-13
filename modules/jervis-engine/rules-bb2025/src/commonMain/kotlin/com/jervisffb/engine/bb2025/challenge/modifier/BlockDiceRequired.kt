@@ -30,8 +30,8 @@ data class BlockDiceRequired(val count: Int) : GoalModifier {
     }
 
     override val description: String = when {
-        count < 0 -> "With ${-count} block dice against"
-        else -> "With $count block dice"
+        count < 0 -> "With ${-count} or more block dice against"
+        else -> "With $count or more block dice"
     }
 
     override fun initialize(state: Game): ChallengeContext? = null

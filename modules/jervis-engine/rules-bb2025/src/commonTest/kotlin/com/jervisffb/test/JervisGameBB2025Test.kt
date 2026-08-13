@@ -86,6 +86,7 @@ abstract class JervisGameBB2025Test {
         awayTeam = state.awayTeam
         controller = GameEngineController(
             state = state,
+            cacheActionDescriptor = false,
             statistics = if (collectMetadata) GameStatistics() else null,
         )
         controller.startTestMode(FullGame)

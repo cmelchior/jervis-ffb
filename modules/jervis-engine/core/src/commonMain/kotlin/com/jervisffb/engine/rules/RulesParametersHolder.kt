@@ -14,7 +14,7 @@ import com.jervisffb.engine.rules.builder.StadiumRule
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
@@ -90,7 +90,7 @@ data class RulesParametersHolder(
     override val standingUpTarget: Int,
     override val moveRequiredForStandingUp: Int,
     override val secureTheBallTarget: Int,
-    override val pathFinder: PathFinder,
+    override val actionPlanner: ActionPlanner,
     override val undoActionBehavior: UndoActionBehavior,
     override val diceRollsOwner: DiceRollOwner,
     override val foulActionBehavior: FoulActionBehavior,

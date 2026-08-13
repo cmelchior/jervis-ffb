@@ -120,6 +120,36 @@ class GameEngineControllerTests {
         assertEquals(FanFactorRolls.SetFanFactorForHomeTeam, controller.currentNode())
     }
 
+    @Test
+    fun invalidCompositeActionRollsBackAllCompletedSteps() {
+        val controller = createGameController(StandardBB2025Rules())
+        val state = controller.state
+        val nodeBefore = controller.currentNode()
+        val stackBefore = controller.stack.stateToPrettyString()
+        val requestBefore = controller.getAvailableActions()
+        val logsBefore = state.logs.toList()
+        val homeFansBefore = state.homeTeam.fairWeatherFans
+        val historySizeBefore = controller.history.size
+        val actionIdBefore = controller.currentActionIndex()
+
+        assertFailsWith<InvalidActionException> {
+            controller.handleAction(
+                CompositeGameAction(
+                    1.d3,
+                    DirectionSelected(Direction.LEFT),
+                ),
+            )
+        }
+
+        assertEquals(nodeBefore, controller.currentNode())
+        assertEquals(stackBefore, controller.stack.stateToPrettyString())
+        assertEquals(requestBefore, controller.getAvailableActions())
+        assertEquals(logsBefore, state.logs)
+        assertEquals(homeFansBefore, state.homeTeam.fairWeatherFans)
+        assertEquals(historySizeBefore, controller.history.size)
+        assertEquals(actionIdBefore, controller.currentActionIndex())
+    }
+
     // During Replay, we can both play backwards and forwards using a pre-determined sequence of actions.
     // If the various ID's, especially DiceId, are not correctly incremented and decremented, the game will
     // crash with invalid action errors.

@@ -39,7 +39,7 @@ import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
@@ -183,7 +183,7 @@ open class AbstractTestRules: Rules {
     override val standingUpTarget: Int = 2
     override val moveRequiredForStandingUp: Int = 3
     override val secureTheBallTarget: Int = 0
-    override val pathFinder: PathFinder get() = TODO()
+    override val actionPlanner: ActionPlanner get() = TODO()
     override val undoActionBehavior: UndoActionBehavior = UndoActionBehavior.ALLOWED
     override val diceRollsOwner: DiceRollOwner = DiceRollOwner.ROLL_ON_CLIENT
     override val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.BB2025

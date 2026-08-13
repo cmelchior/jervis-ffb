@@ -136,7 +136,7 @@ object SwoopStep: Procedure() {
                 // Create a direct line between player and location. This is the line the player follows when thrown
                 // So, we just need to find where they go out-of-bounds using this.
                 // This logic might need to be revisited for Dungeon Bowl.
-                val exit = rules.pathFinder.getStraightLine(state, context.coordinate, landsAt)
+                val exit = state.rulesContext.actionPlanner.pathFinder.getStraightLine(state, context.coordinate, landsAt)
                     .zipWithNext()
                     .firstOrNull { (from, to) ->
                         from.isOnPitch(rules) && !to.isOnPitch(rules)

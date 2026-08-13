@@ -1,6 +1,7 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.AddEntry
+import com.jervisffb.engine.GameRulesContext
 import com.jervisffb.engine.ListEvent
 import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.fsm.MutableProcedureStack
@@ -29,10 +30,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  * objects.
  */
 class Game(
-    val rules: Rules,
+    context: GameRulesContext,
     val homeTeam: Team,
     val awayTeam: Team,
 ) {
+    constructor(
+        rules: Rules,
+        homeTeam: Team,
+        awayTeam: Team,
+    ) : this(GameRulesContext(rules), homeTeam, awayTeam)
+
+    // Quick references to game rules
+    val rulesContext: GameRulesContext = context
+    val rules: Rules = rulesContext.rules
+
     init {
         // The Game State doesn't support the same team playing against itself.
         // Mostly because we use playerIds to identify players on the UI.

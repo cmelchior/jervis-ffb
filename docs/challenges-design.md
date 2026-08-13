@@ -28,6 +28,35 @@ from the engine and will need to be added somehow. This will require some
 experimentation to figure out the best way to do this. This is not critical
 to shipping an MVP of this feature.
 
+### Challenge rule composition
+
+A challenge keeps the selected Blood Bowl ruleset as its base `Rules` object.
+When a game is created, the engine wraps that object in a `GameRulesContext` and
+adds the stateless policies contributed by every `ChallengeRule`. Policies are
+composed by intersection: each policy may remove a base-rules option, but it
+cannot introduce an option the ruleset does not know how to resolve.
+
+There are two policy APIs:
+
+- `ActionFilterPolicy` transforms an `ActionRequest`. Its context contains the
+  game, current node, and rule phase, but not a controller, so the policy stays
+  independent of the engine driver and the UI.
+- `MovePolicy` works with semantic move types and `MoveCandidate`s. The same
+  policy is used while exposing immediate actions and while traversing paths,
+  which prevents previews from suggesting a move the controller will reject.
+
+`GameRulesContext.actionPlanner` is the engine-owned entry point for movement affordances.
+It returns a `MovePlan` containing legal immediate moves, longer paths, and the
+exact actions needed to execute them. The UI renders that plan and does not
+inspect concrete challenge rules or predict the procedure flow itself.
+
+Policies apply to live play by default. Challenge setup runs in the
+`INITIAL_ACTIONS` phase and has separate validation control, allowing trusted
+authoring actions to establish the starting position without weakening live
+validation. A `CompositeGameAction` is processed transactionally, so if a
+later child action is invalid, all commands and logs from earlier children are
+rolled back and no action ID or history entry is committed.
+
 ### Terminology
 
 - Action Path: The sequence of game actions that make up a solution to a 
@@ -197,6 +226,16 @@ puzzle authors to design a consistent and comparable experience.
    especially for Blocks this is hard to do automatically and will most 
    likely require a new kind of UI.
 
+4. Restrict Actions
+
+   Some examples:
+   - Do not allow Dodge or Rush
+   - Only allow Block against a certain player, not Blitz
+   - Cannot dodge into tacklezones, out of them is fine
+   - Player X cannot Dodge
+   - Modifier: Accomplish result with > 50% probability
+   -
+   -
 
 ### Setting the Goal
 

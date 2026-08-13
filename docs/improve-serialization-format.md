@@ -195,7 +195,7 @@ diffs), with a `printGolden()` helper to regenerate on intentional change.
 - **`@SerialName` on class declarations (repeating):** `core/.../actions/GameAction.kt`,
   `core/.../serialize/JervisGameFile.kt`, and concrete classes across `core/.../model/**`,
   `core/.../rules/builder/**`, `core/.../model/inducements/**`; `rules-common/.../**`
-  (`Fireball`/`Zap`/`StandardPathFinder`); every class named in `bb2020Serializers.kt` /
+  (`Fireball`/`Zap`/`CommonPathFinder`); every class named in `bb2020Serializers.kt` /
   `bb2025Serializers.kt` (tables, skill settings, team actions, wizards);
   `jervis-net/.../messages/ClientMessage.kt` + `ServerMessage.kt` leaves.
 - **Custom serializer descriptor strings (4):** `rules-bb2020/.../rules/bb2020Rules.kt`,

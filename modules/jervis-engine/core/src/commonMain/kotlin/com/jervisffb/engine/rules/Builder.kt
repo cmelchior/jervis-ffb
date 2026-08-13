@@ -13,7 +13,7 @@ import com.jervisffb.engine.rules.builder.StadiumRule
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
@@ -82,7 +82,7 @@ abstract class RulesParameterBuilder(parameters: RulesParameters) {
     var useApothecaryBehavior: UseApothecaryBehavior = parameters.useApothecaryBehavior
     var skillSettings: SkillSettings = parameters.skillSettings
     var allowPlayerEditsDuringGame: Boolean = parameters.allowPlayerEditsDuringGame
-    var pathFinder: PathFinder = parameters.pathFinder
+    var actionPlanner: ActionPlanner = parameters.actionPlanner
     var canUseMultipleRerollsOnDicePools: Boolean = parameters.canUseMultipleRerollsOnDicePools
 
     fun buildParameters(): RulesParametersHolder {
@@ -140,7 +140,7 @@ abstract class RulesParameterBuilder(parameters: RulesParameters) {
             useApothecaryBehavior = useApothecaryBehavior,
             skillSettings = skillSettings,
             allowPlayerEditsDuringGame = allowPlayerEditsDuringGame,
-            pathFinder = pathFinder,
+            actionPlanner = actionPlanner,
             canUseMultipleRerollsOnDicePools = canUseMultipleRerollsOnDicePools,
         )
     }

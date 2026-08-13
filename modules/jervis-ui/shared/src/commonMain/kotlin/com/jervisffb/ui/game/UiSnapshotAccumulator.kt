@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.MovePlan
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
@@ -56,7 +56,7 @@ class UiSnapshotAccumulator(
 
     // If set, it means we are in the middle of a move action that allows the player
     // to move multiple squares.
-    var pathFinder: PathFinder.AllPathsResult? = null
+    var movePlan: MovePlan? = null
 
     var showReferee = false
     var refereeCoordinates: PitchCoordinate? = null
@@ -162,7 +162,7 @@ class UiSnapshotAccumulator(
             weather = weather,
             homeTeamInfo = homeTeamInfo,
             awayTeamInfo = awayTeamInfo,
-            pathFinder = pathFinder,
+            movePlan = movePlan,
             showReferee = showReferee,
             refereeCoordinates = refereeCoordinates,
         )

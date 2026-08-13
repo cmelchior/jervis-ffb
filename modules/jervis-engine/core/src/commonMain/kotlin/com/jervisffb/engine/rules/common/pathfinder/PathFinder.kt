@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.common.pathfinder
 
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.PitchCoordinate
 
 /**
@@ -39,7 +40,7 @@ interface PathFinder {
      */
     fun calculateShortestPath(
         state: Game,
-        start: PitchCoordinate,
+        movingPlayer: Player,
         goal: PitchCoordinate,
         maxMove: Int,
         includeDebugInfo: Boolean = false,
@@ -54,7 +55,7 @@ interface PathFinder {
      */
     fun calculateAllPaths(
         state: Game,
-        start: PitchCoordinate,
+        movingPlayer: Player,
         maxMove: Int,
     ): AllPathsResult
 

@@ -520,7 +520,7 @@ class UiGameController(
                 weather = Weather.PERFECT_CONDITIONS,
                 homeTeamInfo = UiTeamInfoUpdate.INITIAL,
                 awayTeamInfo = UiTeamInfoUpdate.INITIAL,
-                pathFinder = null,
+                movePlan = null,
                 showReferee = false,
                 refereeCoordinates = null,
             )

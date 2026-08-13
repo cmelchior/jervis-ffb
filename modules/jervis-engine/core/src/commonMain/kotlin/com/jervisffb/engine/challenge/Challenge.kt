@@ -1,6 +1,7 @@
 package com.jervisffb.engine.challenge
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameRulesContext
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.Coach
@@ -49,16 +50,26 @@ data class Challenge(
 ) {
     /** Builds a fresh game for this challenge. */
     fun createGame(): GameEngineController {
+        val ruleContext = GameRulesContext(
+            rules = gameRules,
+            policies = rules.flatMap { it.policies },
+        )
         val game = Game(
-            gameRules,
+            ruleContext,
             SerializedTeam.deserialize(gameRules, initialHomeTeamState, homeTeam.coach),
             SerializedTeam.deserialize(gameRules, initialAwayTeamState, awayTeam.coach),
         )
+
         return GameEngineController(
             state = game,
             initialActions = setup,
+            // Live input must honor both the base rules and challenge policies. Setup actions are
+            // trusted data and may establish an otherwise unreachable position.
             validateActions = true,
-            protectInitialActions = true, // Actions provided by challenge authors cannot be modified.
+            validateInitialActions = false,
+            allowAdminActionsInInitialActions = true,
+            // Actions provided by challenge authors cannot be modified.
+            protectInitialActions = true,
             statistics = if (scoring is ChallengeScoring.ProbabilityScoring) GameStatistics() else null,
             onStarted = { controller ->
                 rules.forEach { rule -> rule.applyToGame(controller.state) }

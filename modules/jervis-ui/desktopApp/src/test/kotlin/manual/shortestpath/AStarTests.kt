@@ -17,7 +17,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
-import com.jervisffb.engine.common.pathfinder.StandardPathFinder
+import com.jervisffb.engine.common.pathfinder.CommonPathFinder
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
@@ -46,10 +46,10 @@ fun AStarContent() {
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), PitchCoordinate(0, 14), 4, true)
+    val result = state.rulesContext.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), PitchCoordinate(0, 14), 4, true)
     when (result) {
         is PathFinder.Failure -> {
-            (result.debugInformation as StandardPathFinder.DebugInformation).let {
+            (result.debugInformation as CommonPathFinder.DebugInformation).let {
                 BoxGrid(
                     rules.pitchHeight,
                     rules.pitchWidth,
@@ -61,7 +61,7 @@ fun AStarContent() {
         }
 
         is PathFinder.Success -> {
-            (result.debugInformation as StandardPathFinder.DebugInformation).let {
+            (result.debugInformation as CommonPathFinder.DebugInformation).let {
                 BoxGrid(
                     rules.pitchHeight,
                     rules.pitchWidth,

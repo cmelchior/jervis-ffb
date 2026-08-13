@@ -2,11 +2,9 @@ package com.jervisffb.ui.game.state.decorators
 
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.model.Game
@@ -114,37 +112,19 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
             }
 
             MoveType.STANDARD -> {
-                val requiresDodge = state.rules.calculateMarks(state, player.team, activeLocation) > 0
-                // We cannot check amount of rushesLeft here, as they might only be added later (e.g. Spring)
-                val requiresRush = (player.movesLeft == 0)
+                val movePlan = state.rulesContext.actionPlanner.createMovePlan(state, player)
+                acc.movePlan = movePlan
 
-                // We calculate all paths here, rather than doing it in the ViewModel. Mostly because
-                // it allows us to front-load slightly more computations. But it hasn't been benchmarked,
-                // Maybe doing the calculation on the fly is fine.
-                val allPaths = state.rules.pathFinder.calculateAllPaths(
-                    state,
-                    activeLocation,
-                    if (requiresDodge) 1 else player.movesLeft,
-                )
-                acc.pathFinder = allPaths
-
-                // Also mark all squares around the player as immediately selectable
-                activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-                    .filter { state.pitch[it].isUnoccupied() }
-                    .forEach { loc ->
-                        val action = CompositeGameAction(
-                            listOf(
-                                MoveTypeSelected(MoveType.STANDARD),
-                                PitchSquareSelected(loc),
-                            )
+                movePlan.immediateMoves.forEach { (coordinate, plannedMove) ->
+                    acc.updateSquare(coordinate) {
+                        it.copy(
+                            selectedAction = UiAction(plannedMove.action) {
+                                actionProvider.userActionSelected(plannedMove.action)
+                            },
+                            requiresRoll = plannedMove.requiresRoll,
                         )
-                        acc.updateSquare(loc) {
-                            it.copy(
-                                selectedAction = UiAction(action) { actionProvider.userActionSelected(action) },
-                                requiresRoll = requiresDodge || requiresRush
-                            )
-                        }
                     }
+                }
 
                 if (player.isSkillAvailable(SkillType.FUMBLEROOSKI) && player.hasBall()) {
                     // If player has Fumblerooski, they can enable it before-hand here
@@ -205,8 +185,9 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         }
     }
 
-    // Add UI options that allows the User to skip manually selecting Stand Up
-    // and then move. Instead players can move directly.
+    // Add UI options allowing the Coach to skip manually selecting Stand Up
+    // and then move. Instead, players can move directly. This should only
+    // be available if it is free to stand up.
     private fun addStandUpAndMoveOptions(
         actionProvider: ManualActionProvider,
         state: Game,
@@ -216,65 +197,37 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
     ) {
         // For Standing Up, we make it easier for the player depending
         // on their Action. So if there is a move part of their
-        // current action, we try to calculate what they can do after standing
+        // current action, we calculate what they can do after standing
         // up and allow the player to go directly that.
         val action = state.getContext<ActivatePlayerContext>().declaredAction?.type
         if (!eligibleActions.contains(action)) return
 
-        val requiresDodge = state.rules.calculateMarks(state, player.team, activeLocation) > 0
-        val requiresRush = player.move < state.rules.moveRequiredForStandingUp
-
-        // If Player must either dodge or has less than 3 move, it requires a Rush/Dodge Roll to move anywhere, so we
-        // just mark all open squares around the player as "requires a roll" to move to, but do not otherwise use the
-        // PathFinder.
-        if (requiresRush || requiresDodge) {
-            addSelectableRushSquares(activeLocation, state, acc, actionProvider)
-        } else {
-            val hasJumpUp = player.isSkillAvailable(SkillType.JUMP_UP)
-            val maxMove = when (hasJumpUp) {
-                false -> (player.move - state.rules.moveRequiredForStandingUp)
-                true -> player.move
-            }
-            val allPaths = state.rules.pathFinder.calculateAllPaths(
-                state,
-                activeLocation as PitchCoordinate,
-                maxMove.coerceAtLeast(0),
-            )
-            acc.pathFinder = allPaths
-        }
-    }
-
-    private fun addSelectableRushSquares(
-        activeLocation: OnPitchLocation,
-        state: Game,
-        acc: UiSnapshotAccumulator,
-        actionProvider: ManualActionProvider
-    ) {
-        activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-            .filter { state.pitch[it].isUnoccupied() }
-            .forEach { loc ->
-                acc.updateSquare(loc) {
-                    it.copy(
-                        // The body only varies with `loc`, so that is the whole key. See [UiAction].
-                        selectedAction = UiAction(Pair("standUpThenMoveTo", loc)) {
-                            actionProvider.registerQueuedActionGenerator { controller ->
-                                val availableActions = controller.getAvailableActions()
-                                val canMove = availableActions.contains(MoveType.STANDARD)
-                                if (canMove) {
-                                    val action = CompositeGameAction(
-                                        MoveTypeSelected(MoveType.STANDARD),
-                                        PitchSquareSelected(loc)
-                                    )
-                                    QueuedActionsResult(action)
-                                } else {
-                                    null
-                                }
+        val movePlan = state.rulesContext.actionPlanner.createMovePlan(state, player)
+        acc.movePlan = movePlan
+        movePlan.immediateMoves.forEach { (coordinate, plannedMove) ->
+            acc.updateSquare(coordinate) {
+                it.copy(
+                    selectedAction = UiAction(Pair("standUpThenMoveTo", coordinate)) {
+                        actionProvider.registerQueuedActionGenerator { controller ->
+                            val availableActions = controller.getAvailableActions()
+                            val canMove = availableActions.contains(MoveType.STANDARD)
+                            if (canMove) {
+                                val currentPlan = controller.state.rulesContext.actionPlanner.createMovePlan(
+                                    controller.state,
+                                    player,
+                                )
+                                currentPlan.immediateMoves[coordinate]
+                                    ?.action
+                                    ?.let(::QueuedActionsResult)
+                            } else {
+                                null
                             }
-                            actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
-                        },
-                        requiresRoll = true
-                    )
-                }
+                        }
+                        actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                    },
+                    requiresRoll = plannedMove.requiresRoll,
+                )
             }
+        }
     }
 }

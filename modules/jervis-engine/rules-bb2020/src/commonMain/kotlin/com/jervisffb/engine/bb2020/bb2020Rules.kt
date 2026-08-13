@@ -25,7 +25,7 @@ import com.jervisffb.engine.bb2020.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.bb2020.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
-import com.jervisffb.engine.common.pathfinder.StandardPathFinder
+import com.jervisffb.engine.common.planner.CommonActionPlanner
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
@@ -265,7 +265,7 @@ abstract class BB2020Rules(
             standingUpTarget = 4,
             moveRequiredForStandingUp = 3,
             secureTheBallTarget = 2,
-            pathFinder = StandardPathFinder(),
+            actionPlanner = CommonActionPlanner,
             undoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS,
             diceRollsOwner = DiceRollOwner.ROLL_ON_SERVER,
             foulActionBehavior = FoulActionBehavior.BB2020,

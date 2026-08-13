@@ -1,7 +1,9 @@
 package com.jervisffb.engine.rules
 
+import com.jervisffb.engine.GameRulesContext
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.IntRangeSerializer
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.rules.builder.BallSelectorRule
@@ -14,7 +16,7 @@ import com.jervisffb.engine.rules.builder.StadiumRule
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
@@ -25,6 +27,7 @@ import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.engine.rules.common.tables.RangeRuler
 import com.jervisffb.engine.rules.common.tables.WeatherTable
+import com.jervisffb.engine.rules.policy.GameRulePolicy
 import kotlinx.serialization.Serializable
 
 /**
@@ -123,9 +126,17 @@ interface RulesParameters {
     val moveRequiredForStandingUp: Int
     val secureTheBallTarget: Int
 
-    // Defines how the paths between locations on the pitch are calculated. This can be rules-specific,
-    // since it might involve the use of skills.
-    val pathFinder: PathFinder
+    /**
+     * The base action planner used by [GameRulesContext], only taking into
+     * account state found in [Game] or [Rules].
+     *
+     * Consumers should normally use [GameRulesContext.actionPlanner], accessed
+     * through [Game.rulesContext]. This instance represents the movement rules
+     * for the complete game, including restrictions applied by any configured
+     * [GameRulePolicy].
+     */
+    val actionPlanner: ActionPlanner
+
     // Behavior customization, .e.g. allow the rules to specify which Procedure should
     // be used for certain aspects of the game
     // Whether coaches are allowed to undo actions, and to what degree.
@@ -151,4 +162,3 @@ interface RulesParameters {
     val canUseMultipleRerollsOnDicePools: Boolean
 
 }
-

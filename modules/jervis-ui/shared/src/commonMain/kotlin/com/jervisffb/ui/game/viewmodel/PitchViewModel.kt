@@ -5,19 +5,13 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
-import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerPitchState
-import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
@@ -152,42 +146,23 @@ class PitchViewModel(
             // over already existing move decorations.
             val activePlayer: Player? = uiSnapshot.game.activePlayer
             val requiresStandingUp = (activePlayer?.state == PlayerPitchState.PRONE)
-            val standingUpIsFree = (activePlayer?.hasSkill(SkillType.JUMP_UP) == true)
 
-            // Use path finder
-            val pathList = uiSnapshot.pathFinder?.let { pathFinder ->
-                if (showPathFinder(activePlayer, mouseEnter, screenModel.actionProvider.currentProvider as? ManualActionProvider)) {
-                    val standingUpPenalty = when {
-                        requiresStandingUp && !standingUpIsFree -> rules.moveRequiredForStandingUp
-                        else -> 0
-                    }
-                    val maxMoves = (activePlayer!!.movesLeft - standingUpPenalty)
-                    val path: List<PitchCoordinate> = when (maxMoves > 0) {
-                        true -> uiSnapshot.pathFinder.getClosestPathTo(mouseEnter!!, maxMoves)
-                        else -> emptyList()
-                    }
+            val pathList = uiSnapshot.movePlan?.let { movePlan ->
+                if (
+                    movePlan.hasPaths &&
+                    showPathFinder(activePlayer, mouseEnter, screenModel.actionProvider.currentProvider as? ManualActionProvider)
+                ) {
+                    val path = movePlan.getClosestPathTo(mouseEnter!!)
 
                     // Create the action triggered if clicking the mouse-over square.
-                    val action = UiAction(Triple(path, requiresStandingUp, activePlayer.id)) {
+                    val action = UiAction(Triple(path.map { it.target.coordinate }, requiresStandingUp, activePlayer!!.id)) {
                         val actionProvider = (uiState.actionProvider)
                         fun getQueuedActionsForPath(): QueuedActionsResult {
-                            // If the player is using Fumblerooski we have disabled the Pathfinder
-                            // This means that if they _haven't_ used it, we need to _not_ use it
-                            // across all moves triggered by the PathFinder.
-                            val isFumblerooskiAvailable = activePlayer.isSkillAvailable(SkillType.FUMBLEROOSKI) && activePlayer.hasBall()
-                            val selectedSquares = path.map {
-                                CompositeGameAction(
-                                    listOfNotNull(
-                                        MoveTypeSelected(MoveType.STANDARD),
-                                        PitchSquareSelected(it),
-                                        if (isFumblerooskiAvailable) Cancel else null
-                                    )
-                                )
-                            }
-                            return if (selectedSquares.size == 1) {
-                                QueuedActionsResult(selectedSquares.first())
+                            val actions = path.map { it.action }
+                            return if (actions.size == 1) {
+                                QueuedActionsResult(actions.first())
                             } else {
-                                QueuedActionsResult(selectedSquares, true)
+                                QueuedActionsResult(actions, true)
                             }
                         }
 
@@ -214,16 +189,10 @@ class PitchViewModel(
 
                     // Annotate all squares with "Move Used" amount + add action on the square
                     // that is currently being hovered over.
-                    val standingUpModifier = if (requiresStandingUp && !standingUpIsFree) rules.moveRequiredForStandingUp else 0
-                    val currentMovesLeft = activePlayer.move - activePlayer.movesLeft
-                    path.mapIndexed { index, pathSquare ->
-                        val shownMoveValue = when (index) {
-                            0 -> currentMovesLeft + index + 1 + standingUpModifier
-                            else -> currentMovesLeft + index + 1 + standingUpModifier
-                        }
+                    path.mapIndexed { index, plannedMove ->
                         UiPathFinderData(
-                            coordinate = pathSquare,
-                            futureMoveDistance = shownMoveValue,
+                            coordinate = plannedMove.target.coordinate,
+                            futureMoveDistance = movePlan.movesUsedBeforePath + index + 1,
                             hoverAction = action
                         )
                     }

@@ -226,10 +226,10 @@ fun tentaclePlayer(playerWithTentacles: Player, roll: D6Result = 6.d6) = arrayOf
 fun SmartMoveTo(x: Int, y: Int): GameAction {
     return CalculatedAction { state, rules ->
         val activePlayer = state.activePlayer
-        val pathfinder = rules.pathFinder
+        val pathfinder = state.rulesContext.actionPlanner.pathFinder
         val start = activePlayer!!.coordinates
         val end = PitchCoordinate(x, y)
-        val path = pathfinder.calculateShortestPath(state, start, end, activePlayer.movesLeft)
+        val path = pathfinder.calculateShortestPath(state, activePlayer, end, activePlayer.movesLeft)
         val lastSquare = path.path.last()
         if (lastSquare != PitchCoordinate(x, y)) {
             throw IllegalArgumentException(
@@ -501,5 +501,4 @@ fun giveBallToPlayer(player: Player) {
 }
 
 fun regenerationRoll(roll: D6Result = 6.d6) = roll
-
 

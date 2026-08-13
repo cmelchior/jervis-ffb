@@ -262,6 +262,14 @@ data class SelectMoveType(
     override val size: Int = types.size
     override fun createRandom(random: Random): GameAction = MoveTypeSelected(types.random(random))
     override fun createAll(): List<GameAction> = types.map { MoveTypeSelected(it) }
+
+    // Remove the given move type from the list of allowed types.
+    // If no more types are allowed, return null.
+    fun remove(type: MoveType): SelectMoveType? {
+        return (types - type)
+            .takeIf { it.isNotEmpty() }
+            ?.let(::SelectMoveType)
+    }
 }
 
 data class SelectDirection(

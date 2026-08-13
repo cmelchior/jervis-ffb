@@ -1,13 +1,19 @@
 package com.jervisffb.engine.common.pathfinder
 
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Pitch
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PriorityQueue
+import com.jervisffb.engine.rules.common.planner.MoveCandidate
+import com.jervisffb.engine.rules.common.planner.MovePolicyContext
+import com.jervisffb.engine.rules.policy.GameRulePhase
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 
@@ -16,7 +22,7 @@ import kotlin.math.abs
  * taking into account the presence of players and tackle zones.
  */
 @Serializable
-class StandardPathFinder : PathFinder {
+class CommonPathFinder : PathFinder {
     class DebugInformation(
         val pitchView: Array<Array<Int>>,
         val openSet: PriorityQueue<AStarNode>,
@@ -81,23 +87,26 @@ class StandardPathFinder : PathFinder {
      */
     override fun calculateShortestPath(
         state: Game,
-        start: PitchCoordinate,
+        movingPlayer: Player,
         goal: PitchCoordinate,
         maxMove: Int,
         includeDebugInfo: Boolean,
     ): PathFinder.SinglePathResult {
-        val pitchView: Array<Array<Int>> = preparePitchView(state.rules,state.pitch, state.activeTeamOrThrow())
+        val pitchView: Array<Array<Int>> = preparePitchView(state.rules, state.pitch, movingPlayer.team)
         var pathState = listOf<PitchCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
+        val start = movingPlayer.location as? PitchCoordinate ?: error("Player is not on the pitch: ${movingPlayer.location}")
         val openSet = PriorityQueue<AStarNode> { a, b -> a.compareTo(b) }
         val cameFrom = mutableMapOf<PitchCoordinate, PitchCoordinate?>()
         val gScore = mutableMapOf<PitchCoordinate, Double>().withDefault { Double.MAX_VALUE }
+        val distanceInSteps = mutableMapOf<PitchCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Track the closest location to the goal. Only used if goal couldn't be reached
         var closestLocation: Pair<PitchCoordinate, Int> = Pair(start, Int.MAX_VALUE)
 
         openSet.offer(AStarNode(start, 0.0, calculateHeuristicValue(start, goal)))
         gScore[start] = 0.0
+        distanceInSteps[start] = 0
 
         while (!openSet.isEmpty) {
             val currentNode = openSet.poll()!!
@@ -121,9 +130,14 @@ class StandardPathFinder : PathFinder {
                     continue
                 }
                 val tentativeGScore = gScore.getValue(currentLocation) + currentLocation.realDistanceTo(neighbor)
+                val tentativeDistanceInSteps = distanceInSteps.getValue(currentLocation) + 1
+                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistanceInSteps)) {
+                    continue
+                }
                 if (tentativeGScore < gScore.getValue(neighbor)) {
                     cameFrom[neighbor] = currentLocation
                     gScore[neighbor] = tentativeGScore
+                    distanceInSteps[neighbor] = tentativeDistanceInSteps
                     val heuristicDistance = calculateHeuristicValue(neighbor, goal)
                     closestLocation = if (heuristicDistance < closestLocation.second) Pair(neighbor, heuristicDistance) else closestLocation
                     if (!isTerminalNode) {
@@ -162,14 +176,15 @@ class StandardPathFinder : PathFinder {
      */
     override fun calculateAllPaths(
         state: Game,
-        start: PitchCoordinate,
+        movingPlayer: Player,
         maxMove: Int,
     ): PathFinder.AllPathsResult {
         // Prepare a primitive version of the pitch that contains the following values:
         // - Int.MAX if the square is occupied
         // - i > 0 is the number of tackle zones.
         // - 0 = Square is safe to move to
-        val pitchView: Array<Array<Int>> = preparePitchView(state.rules,state.pitch, state.activeTeamOrThrow())
+        val start = (movingPlayer.location as? PitchCoordinate) ?: error("Player position is not the pitch: ${movingPlayer.location}")
+        val pitchView: Array<Array<Int>> = preparePitchView(state.rules, state.pitch, movingPlayer.team)
         // Calculated distances
         val distances = mutableMapOf<PitchCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Nodes being processed
@@ -197,6 +212,9 @@ class StandardPathFinder : PathFinder {
                 val isTreacherousTrapdoor = false
                 val isTerminalNode = hasTackleZone || hasBall || isTreacherousTrapdoor
                 val tentativeDistance = distances.getValue(currentLocation) + 1
+                if (!isMoveAllowed(state, movingPlayer, currentLocation, neighbor, tentativeDistance)) {
+                    continue
+                }
 
                 // We found a path that is straight up more optimal.
                 if (tentativeDistance < neighborValue && tentativeDistance <= maxMove) {
@@ -289,6 +307,29 @@ class StandardPathFinder : PathFinder {
             // TODO Other things, end zone detection, trapdoors? Anything else dangerous?
         }
         return pitchView
+    }
+
+    private fun isMoveAllowed(
+        state: Game,
+        player: Player,
+        from: PitchCoordinate,
+        target: PitchCoordinate,
+        distanceInSteps: Int,
+    ): Boolean {
+        if (!state.rulesContext.hasMovePolicies) return true
+        val context = MovePolicyContext(state, GameRulePhase.LIVE)
+        if (!state.rulesContext.allowsMoveType(context, MoveType.STANDARD)) return false
+        val candidate = MoveCandidate(
+            player = player.id,
+            type = MoveType.STANDARD,
+            from = from,
+            target = TargetSquare.move(
+                coordinate = target,
+                needRush = distanceInSteps > player.movesLeft,
+                needDodge = state.rules.isMarked(player, from),
+            ),
+        )
+        return state.rulesContext.allowsMove(context, candidate)
     }
 
     private fun calculateHeuristicValue(

@@ -44,7 +44,7 @@ class BresenhamTests {
                         rules.pitchWidth,
                         path.value,
                         { start: PitchCoordinate, end: PitchCoordinate ->
-                            path.value = rules.pathFinder.getStraightLine(state, start, end)
+                            path.value = state.rulesContext.pathFinder.getStraightLine(state, start, end)
                         },
                     )
                 }

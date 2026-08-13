@@ -50,7 +50,7 @@ fun DjiekstraContent() {
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateAllPaths(state, PitchCoordinate(12, 6), 6)
+    val result = state.rulesContext.pathFinder.calculateAllPaths(state, PitchCoordinate(12, 6), 6)
     val path = remember { mutableStateOf(listOf<PitchCoordinate>()) }
     DjiekstraBoxGrid(
         state,
@@ -59,7 +59,7 @@ fun DjiekstraContent() {
         result.distances,
         path.value,
         update = { end: PitchCoordinate ->
-            val newPath = rules.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), end, 4, false)
+            val newPath = state.rulesContext.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), end, 4, false)
             path.value = result.getClosestPathTo(end) // newPath.path
         },
     )

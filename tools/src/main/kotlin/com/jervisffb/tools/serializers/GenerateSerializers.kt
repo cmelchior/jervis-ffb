@@ -54,6 +54,7 @@ private val roots = listOf(
     com.jervisffb.engine.rules.common.actions.ActionType::class,
     com.jervisffb.engine.rules.common.actions.TeamActions::class,
     com.jervisffb.engine.rules.common.pathfinder.PathFinder::class,
+    com.jervisffb.engine.rules.common.planner.ActionPlanner::class,
     com.jervisffb.engine.rules.common.procedures.DieRoll::class,
     com.jervisffb.engine.rules.common.roster.Position::class,
     com.jervisffb.engine.rules.common.roster.SpecialRules::class,
