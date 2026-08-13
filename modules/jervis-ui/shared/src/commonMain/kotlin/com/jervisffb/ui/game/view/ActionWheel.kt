@@ -361,7 +361,7 @@ private suspend fun runWheelAnimations(
     val ringJob = async {
         val target = if (to.topItems.isNotEmpty() || to.bottomItems.isNotEmpty()) maxRingAlpha else 0f
         val isUndo = to.isLastActionUndo()
-        if (isUndo) {
+        if (isUndo || animationDurationMs == 0) {
             ringAlpha.snapTo(target)
         } else {
             ringAlpha.animateTo(target, tween(animationDurationMs, easing = LinearEasing))
@@ -397,6 +397,32 @@ private suspend fun animateRegion(
                 Animatable(it.defaultStartingAngle),
             )
         }
+    }
+
+    // A disabled animation setting is a state transition, not a zero-length
+    // animation. The animated branches below launch separate coroutines for
+    // alpha and angle changes. With a zero-duration tween those coroutines can
+    // still be scheduled after the render-list cleanup, leaving a newly
+    // appearing button at alpha 0. Snap the complete region synchronously so
+    // the render list and animation cache are always consistent before this
+    // function returns.
+    if (animationDuration == 0) {
+        to.forEach { button ->
+            val animation = animationsCache[button.id]
+                ?: error("Missing animation for ${button.id}")
+            animation.angleDegree.snapTo(button.targetAngle)
+            animation.alpha.snapTo(1f)
+            animation.yOffset.snapTo(0f)
+            animation.rotation.snapTo(0f)
+            animation.isAnimating.value = false
+            button.animateRoll?.let { roll ->
+                animation.displayFace.value = roll.endValue
+            }
+        }
+        disappearing.forEach { button ->
+            animationsCache[button.id]?.alpha?.snapTo(0f)
+        }
+        return@coroutineScope
     }
 
     when (animationMode) {
