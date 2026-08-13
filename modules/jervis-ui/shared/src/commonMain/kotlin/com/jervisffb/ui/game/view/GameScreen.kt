@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,6 +54,9 @@ import com.jervisffb.shared.generated.resources.jervis_icon_lock_closed
 import com.jervisffb.shared.generated.resources.jervis_icon_lock_open
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_undo
+import com.jervisffb.ui.game.view.pitch.ActionWheelLayer
+import com.jervisffb.ui.game.view.pitch.ContextMenuLayer
+import com.jervisffb.ui.game.view.pitch.LocalPitchData
 import com.jervisffb.ui.game.view.pitch.Pitch
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.ChallengeSessionViewModel
@@ -110,11 +115,7 @@ fun GameScreen(
             val bottomRowHeight = maxHeight - pitchHeight - spacerHeight
             val panelBackground by screenModel.logsBackgroundColor.collectAsState(PanelBackground.DEFAULT)
             Column(
-                // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
-                // is the first thing that intercepts touch events if it overlaps with these sections.
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(1f),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
@@ -191,11 +192,24 @@ fun GameScreen(
                 }
             }
 
+            // Keep the action wheels in their pitch-sized coordinate space, but lift them above
+            // the log panel. The pitch itself remains below the log panel so an expanded log can
+            // cover players without hiding the action wheel.
+            ActionWheelOverlay(
+                pitch = pitch,
+                pitchHeight = maxPitchHeight,
+                aspectRatio = aspectRation,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(3f),
+            )
+
             // LogPanel is placed outside the bottom Row, so it can expand beyond its limits.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 24.jdp)
+                    .zIndex(2f)
                 ,
                 contentAlignment = Alignment.BottomStart,
             ) {
@@ -263,6 +277,46 @@ fun GameScreen(
             onTryAgain = onChallengeReset,
             onExit = onChallengeExit,
         )
+    }
+}
+
+@Composable
+private fun ActionWheelOverlay(
+    pitch: PitchViewModel,
+    pitchHeight: Dp,
+    aspectRatio: Float,
+    modifier: Modifier,
+) {
+    val density = LocalDensity.current
+    Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
+        Row(
+            modifier = Modifier
+                .heightIn(max = pitchHeight)
+                .aspectRatio(aspectRatio),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Spacer(modifier = Modifier.weight(550f))
+            Box(
+                modifier = Modifier
+                    .weight(2354f)
+                    .align(Alignment.Top),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                Box(
+                    modifier = Modifier.size(
+                        with(density) { pitch.sharedPitchData.size.totalPitchWidthPx.toDp() },
+                        with(density) { pitch.sharedPitchData.size.totalPitchHeightPx.toDp() },
+                    ),
+                ) {
+                    CompositionLocalProvider(LocalPitchData provides pitch.sharedPitchData) {
+                        ContextMenuLayer(pitch)
+                        ActionWheelLayer(pitch)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.weight(550f))
+        }
     }
 }
 

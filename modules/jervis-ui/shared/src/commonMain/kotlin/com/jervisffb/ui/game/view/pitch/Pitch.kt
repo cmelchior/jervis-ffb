@@ -182,8 +182,6 @@ fun Pitch(
                         BallLayer(vm)
                         DirectionArrowsLayer(vm)
                         AnimationLayer(vm)
-                        ContextMenuLayer(vm)
-                        ActionWheelLayer(vm)
                     }
                 }
             }
@@ -419,5 +417,4 @@ fun PitchSquares(
 //        }
 //    }
 //}
-
 

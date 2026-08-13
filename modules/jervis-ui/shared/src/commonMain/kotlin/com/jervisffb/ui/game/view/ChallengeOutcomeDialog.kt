@@ -30,14 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.engine.actions.D12Result
-import com.jervisffb.engine.actions.D16Result
-import com.jervisffb.engine.actions.D20Result
-import com.jervisffb.engine.actions.D2Result
-import com.jervisffb.engine.actions.D3Result
-import com.jervisffb.engine.actions.D4Result
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.challenge.ChallengeOutcome
