@@ -110,16 +110,17 @@ fun GameScreen(
             val bottomRowHeight = maxHeight - pitchHeight - spacerHeight
             val panelBackground by screenModel.logsBackgroundColor.collectAsState(PanelBackground.DEFAULT)
             Column(
-                modifier = Modifier.fillMaxSize(),
+                // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
+                // is the first thing that intercepts touch events if it overlaps with these sections.
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     modifier = Modifier
                         .heightIn(max = maxPitchHeight)
                         .aspectRatio(aspectRation)
-                        // Pitch should be above the sidebar and bottom log viewers, so the Action Wheel
-                        // is the first thing that intercepts touch events if it overlaps with these sections.
-                        .zIndex(1f)
                     ,
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top,
