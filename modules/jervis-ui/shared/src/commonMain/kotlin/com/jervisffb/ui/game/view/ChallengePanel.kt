@@ -62,8 +62,18 @@ fun ChallengePanel(
         if (inputs.isEmpty()) "Extra Actions" else "Extra Actions (${inputs.size})",
     )
 
-    // Nothing selects the action tab automatically, but once the last pending action is gone the
-    // tabs are hidden again.
+    // Select the action tab when a later update produces extra actions. The initial snapshot is
+    // intentionally skipped by [ActionSelectorViewModel.availableActionUpdates] so a challenge
+    // always starts on its information tab, while its initial actions remain visible.
+    LaunchedEffect(actions.availableActionUpdates) {
+        actions.availableActionUpdates.collect { updatedInputs ->
+            if (updatedInputs.isNotEmpty()) {
+                tabIndex = 1
+            }
+        }
+    }
+
+    // Once the last pending action is gone the tabs are hidden again.
     LaunchedEffect(inputs.isEmpty()) {
         if (inputs.isEmpty()) {
             tabIndex = 0
