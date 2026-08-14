@@ -52,6 +52,7 @@ fun PitchActionsAndUnderlaysLayers(
     val pathFinderFlow = remember { vm.observePathFinder() }
     val pitchDataFlow = remember { vm.observePitch() }
     val playerToMove by vm.screenModel.playerToMove.collectAsState(null)
+    val isMovePlayersFreelyMode by vm.screenModel.isMovePlayersFreely.collectAsState()
 
     val pitchDataData: Map<PitchCoordinate, Pair<UiPitchSquare, UiPitchPlayer?>> by pitchDataFlow.collectAsState(emptyMap())
     val pathFinderData by pathFinderFlow.collectAsState(null)
@@ -65,7 +66,8 @@ fun PitchActionsAndUnderlaysLayers(
             squareData ?: EMPTY_SQUARE,
             playerData,
             pathFinderData?.let { it[coordinate] },
-            playerToMove,
+            playerToMove?.id,
+            isMovePlayersFreelyMode,
         )
     }
 }
@@ -79,6 +81,7 @@ private fun SquareHighlightAndAction(
     player: UiPitchPlayer? = null,
     pathfinderData: UiPathFinderData?,
     playerToMove: PlayerId?,
+    isMovePlayersFreelyMode: Boolean,
     fontSize: TextUnit = 16.jsp // Size of PathFinder and "Moves Used" indicators
 ) {
     val sharedPitchData = vm.sharedPitchData
@@ -113,7 +116,7 @@ private fun SquareHighlightAndAction(
 
     // TODO Move some of this to the Dialog Layer?
     val boxWrapperModifier =
-        if (playerToMove != null && square.isEmpty() || square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
+        if (playerToMove != null && (square.isEmpty() || player?.id == playerToMove) || square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
             modifier
                 .jervisPointerEvent(SquarePointerEventType.PrimaryClickSquare, square.coordinates) {
                     // In that case, it is the square that should handle opening it again, after which control transfers
@@ -126,8 +129,10 @@ private fun SquareHighlightAndAction(
                     // Toggling the Action Wheel should take precedence over triggering square/player actions.
                     // Ideally, none should be configured anyway, but just in case.
                     if (square.contextMenuOptions.isEmpty()) {
-                        if (playerToMove != null && square.isEmpty()) {
-                            vm.screenModel.movePlayerTo(square.coordinates)
+                        if (playerToMove != null && (square.isEmpty() || player?.id == playerToMove)) {
+                            vm.screenModel.movePlayerFreelyTo(square.coordinates)
+                        } else if (isMovePlayersFreelyMode && playerToMove != null) {
+                            // Do not select another player while choosing a destination.
                         } else pathfinderData?.hoverAction()
                             ?: player?.selectedAction?.invoke(vm.screenModel, player)
                             ?: square.selectedAction?.invoke()

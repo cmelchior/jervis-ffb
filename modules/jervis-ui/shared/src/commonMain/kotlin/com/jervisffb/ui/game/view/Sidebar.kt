@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervis.generated.SettingsKeys
+import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.ButtonData
@@ -54,10 +55,18 @@ fun Sidebar(
     modifier: Modifier = Modifier,
 ) {
     val sidebarAction by vm.dogoutAction.collectAsState(null)
+    val playerToMove by vm.gameViewModel.playerToMove.collectAsState(null)
+    val isMovePlayersFreelyMode by vm.gameViewModel.isMovePlayersFreely.collectAsState()
+    val canMoveToDogout = (isMovePlayersFreelyMode && playerToMove != null)
     Box(
         modifier = modifier
-            .applyIf(sidebarAction != null) {
-                clickable { sidebarAction?.invoke() }.background(JervisTheme.availableActionBackground)
+            .applyIf(sidebarAction != null || canMoveToDogout) {
+                clickable {
+                    when (canMoveToDogout) {
+                        true -> vm.gameViewModel.movePlayerFreelyTo(Dogout)
+                        false -> sidebarAction?.invoke()
+                    }
+                }.background(JervisTheme.availableActionBackground)
             },
         contentAlignment = Alignment.TopCenter
     ) {

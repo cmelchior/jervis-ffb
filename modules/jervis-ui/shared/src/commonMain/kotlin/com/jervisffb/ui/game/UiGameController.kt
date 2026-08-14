@@ -4,6 +4,7 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -234,6 +235,10 @@ class UiGameController(
     private val preloadedActions: List<GameAction>,
     private val focusProvider: UiFocusProvider? = null,
 ) {
+
+    // Callback triggered after handling a non-admin action
+    // We use this to exit certain admin modes. Like moving players freely.
+    var onNonAdminAction: () -> Unit = { }
 
     companion object {
         private val LOG = jervisLogger()
@@ -600,6 +605,9 @@ class UiGameController(
                 try {
                     val actionWheelLocation = actionWheelControllers.firstOrNull { it.nodes.contains(currentNode) }?.getActionWheelCenter(state)
                     gameController.handleAction(userAction)
+                    if (userAction !is AdminGameAction) {
+                        onNonAdminAction()
+                    }
                     actionProvider.actionHandled(actions.team, userAction)
                     // Now that we know the next node, we can also determine if the Action Wheel
                     // is visible next step, if it isn't, we can hide it immediately.

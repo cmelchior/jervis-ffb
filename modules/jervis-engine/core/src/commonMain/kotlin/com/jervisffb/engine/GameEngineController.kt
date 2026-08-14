@@ -34,8 +34,10 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
@@ -532,6 +534,12 @@ class GameEngineController(
                         INVALID_ACTION(action, "Location is not on the pitch: $location")
                     }
                 }
+                if (location is OnPitchLocation && action.state !is PlayerPitchState) {
+                    INVALID_ACTION(action, "Location is on the pitch, but the state does not match: $location and ${action.state} ")
+                }
+                if (location is Dogout && action.state !is PlayerDogoutState) {
+                    INVALID_ACTION(action, "Location is in the dogout pitch, but the state does not match: $location and ${action.state} ")
+                }
                 compositeCommandOf(
                     com.jervisffb.engine.commands.SetPlayerState(player, action.state, hasTackleZones),
                     com.jervisffb.engine.commands.SetPlayerLocation(player, location)
@@ -550,7 +558,8 @@ class GameEngineController(
                     is GiantLocation -> TODO("Not supported yet")
                     is PitchCoordinate -> {
                         val square = state.pitch[location]
-                        if (square.isOccupied() || square.hasTrapdoor || square.hasChest || square.balls.isNotEmpty()) {
+                        val alreadyInSquare = (square.player?.id == action.playerId)
+                        if ((square.isOccupied() && !alreadyInSquare) || square.hasTrapdoor || square.hasChest || square.balls.isNotEmpty()) {
                             INVALID_ACTION(action, "Cannot move player to occupied square: $location")
                         }
                     }

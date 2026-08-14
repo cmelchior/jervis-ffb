@@ -1,6 +1,7 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.MovePlayer
 import com.jervisffb.engine.actions.SetBallState
 import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.actions.Undo
@@ -8,14 +9,19 @@ import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.model.BallId
 import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerPitchState
+import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertReserves
+import com.jervisffb.test.utils.assertStanding
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -55,6 +61,44 @@ class DevModeGameEngineControllerTests {
         assertEquals(PitchCoordinate(5, 10), player.location)
         val square = controller.state.pitch[PitchCoordinate(5, 10)]
         assertEquals(player, square.player)
+    }
+
+    @Test
+    fun movePlayerCanReturnToItsCurrentSquare() {
+        val controller = createGameController()
+        val player = controller.state.homeTeam[PlayerId("H1")]
+        controller.handleAction(SetPlayerState(player.id, PlayerPitchState.STANDING, 5, 10))
+
+        controller.handleAction(
+            MovePlayer(player.id, player.coordinates)
+        )
+
+        assertEquals(player.coordinates, player.location)
+    }
+
+    @Test
+    fun movePlayerBetweenPitchAndDogoutUpdatesState() {
+        val controller = createGameController()
+        val player = controller.state.homeTeam[PlayerId("H1")]
+
+        controller.handleAction(
+            SetPlayerState(player.id, PlayerPitchState.STANDING, 5, 10)
+        )
+        player.assertCoordinates(5, 10)
+        player.assertStanding()
+
+        controller.handleAction(
+            SetPlayerState(player.id, PlayerDogoutState.RESERVE, Dogout)
+        )
+
+        assertEquals(Dogout, player.location)
+        player.assertReserves()
+
+        controller.handleAction(
+            SetPlayerState(player.id, PlayerPitchState.STANDING, 5, 10)
+        )
+        player.assertCoordinates(5, 10)
+        player.assertStanding()
     }
 
     @Test

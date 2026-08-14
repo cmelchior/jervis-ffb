@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 
@@ -133,7 +134,10 @@ class SidebarViewModel(
     }
 
     // Expose Dogout information as a separate flow
-    private val dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>> = uiState.uiStateFlow.map { snapshot: UiGameSnapshot ->
+    private val dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<UiSidebarPlayer>>> = combine(
+        uiState.uiStateFlow,
+        gameViewModel.isMovePlayersFreely,
+    ) { snapshot: UiGameSnapshot, isMovePlayersFreelyMode: Boolean ->
         val list = if (team.isHomeTeam()) {
             snapshot.game.homeTeam.filter { player ->
                 player.location == Dogout && snapshot.players[player.id]?.location == Dogout
@@ -146,7 +150,13 @@ class SidebarViewModel(
         val newList = list.map { player ->
             snapshot.players[player.id]?.let {
                 UiSidebarPlayer(
-                    it,
+                    when (isMovePlayersFreelyMode) {
+                        true -> {
+                            val playerRef = snapshot.game.getPlayerById(player.id)
+                            it.copy(selectedAction = { model, selected -> model.beginMovePlayer(playerRef) })
+                        }
+                        false -> it
+                    },
                     UiPlayerTransientData(
                         onHover = UiAction(Pair("onHover", player.id)) { hoverOver(player) },
                         onHoverExit = UiAction(Pair("onHoverExit", player.id)) { hoverExit() },

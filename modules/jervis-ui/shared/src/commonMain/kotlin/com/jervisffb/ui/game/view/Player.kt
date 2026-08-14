@@ -82,6 +82,7 @@ fun Player(
         screenModel.uiState.uiDecorations.fumblerooskiEnabled.map { it?.id == player.id }
     }
     val isUsingFumblerooski by isUsingFumblerooskiFlow.collectAsState(false)
+    val isMovePlayersFreelyMode by screenModel.isMovePlayersFreely.collectAsState()
     val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
     val ballImage = IconFactory.getHeldBallOverlay(isUsingFumblerooski)
     var isTempSelected by player.isTemporarySelected
@@ -142,6 +143,7 @@ fun Player(
             isHighlighted = player.isHighlighted,
             isActiveFocus = player.focusStyle != null && player.isActive,
             focusStyle = player.focusStyle,
+            isMoveFreelyMode = isMovePlayersFreelyMode,
             alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
         )
         if (player.carriesBall) {
@@ -260,6 +262,7 @@ fun PlayerImage(
     isHighlighted: Boolean,
     isActiveFocus: Boolean = false,
     focusStyle: UiFocusStyle? = null,
+    isMoveFreelyMode: Boolean = false,
     alpha: Float,
     filterQuality: FilterQuality = FilterQuality.Low,
 ) {
@@ -268,6 +271,7 @@ fun PlayerImage(
     // more investigation.
     val imageShader = remember(bitmap) { ImageShader(bitmap, TileMode.Decal, TileMode.Decal) }
     val playerBorderShader = when {
+        isMoveFreelyMode -> playerSelectedBorderShader
         isActionWheelFocus || isHighlighted -> playerInFocus
         isTempSelected -> playerTempSelectedShader
         isActiveFocus -> playerSelectedBorderShader
@@ -281,7 +285,7 @@ fun PlayerImage(
             .aspectRatio(1f)
             .fillMaxSize()
             .drawWithCache {
-                if (!isSelectable && !isHighlighted && focusStyle == null /* && !isGoingDown && !isActionWheelFocus */) {
+                if (!isSelectable && !isHighlighted && !isMoveFreelyMode && focusStyle == null /* && !isGoingDown && !isActionWheelFocus */) {
                     return@drawWithCache onDrawBehind { /* Do nothing */ }
                 }
                 val canvasWidth = size.width

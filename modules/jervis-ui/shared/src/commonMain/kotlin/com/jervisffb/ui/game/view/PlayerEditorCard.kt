@@ -611,7 +611,7 @@ private fun PlayerStateSelectorTab(
                 text = "Move Player",
                 buttonColor = color,
                 enabled = activeState is PlayerPitchState,
-                onClick = { vm.beginMovePlayer(player.model.id) },
+                onClick = { vm.beginMovePlayer(player.model) },
             )
         }
 

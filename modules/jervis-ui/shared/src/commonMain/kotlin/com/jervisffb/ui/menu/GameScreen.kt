@@ -122,6 +122,7 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                         GameMenuDrawer(
                             drawerState = drawerState,
                             menuViewModel = menuViewModel,
+                            gameScreenModel = viewModel,
                             showMenuDrawer = { visible ->
                                 drawerScope.launch {
                                     drawerState.snapTo(if (visible) DrawerValue.Open else DrawerValue.Closed)

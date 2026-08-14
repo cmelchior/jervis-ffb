@@ -17,14 +17,18 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MovePlayer
+import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.bb2025.challenge.goal.BlockGoal
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
@@ -185,9 +189,12 @@ class GameScreenModel(
         }
     }
 
-    // In Dev Mode, this is used to track a player we are currently moving
-    val playerToMove: StateFlow<PlayerId?>
-        field = MutableStateFlow<PlayerId?>(null)
+    // In Admin Mode, this is used to track a player we are currently moving
+    val playerToMove: StateFlow<Player?>
+        field = MutableStateFlow<Player?>(null)
+
+    // `true` if we are in "Move Players Freely" admin mode
+    val isMovePlayersFreely = MutableStateFlow(false)
 
     // In Dev Mode, this used to track a player that is being edited on the State Panel
     private var playerEditorOpenOnStatePlayerId: PlayerId? = null
@@ -217,6 +224,7 @@ class GameScreenModel(
 
     init {
         sharedPitchData = LocalPitchDataWrapper(uiState)
+        uiState.onNonAdminAction = ::exitMovePlayersFreelyMode
     }
 
     // Calculate which player to show on either the away or home side
@@ -297,17 +305,54 @@ class GameScreenModel(
         playerStatCardDismissed.value = true
     }
 
-    fun beginMovePlayer(playerId: PlayerId) {
+    fun beginMovePlayer(player: Player) {
         hidePlayerContextMenu()
-        playerToMove.value = playerId
+        playerToMove.value = player
     }
 
-    fun movePlayerTo(coordinate: PitchCoordinate) {
-        val playerId = playerToMove.value ?: return
+    fun enterMovePlayersFreelyMode() {
+        hidePlayerContextMenu()
         playerToMove.value = null
-        actionProvider.currentProvider.userActionSelected(MovePlayer(playerId, coordinate))
-        playerEditorOpenOnStatePlayerId = playerId
-        showPlayerContextMenu(playerId)
+        isMovePlayersFreely.value = true
+    }
+
+    fun exitMovePlayersFreelyMode() {
+        playerToMove.value = null
+        isMovePlayersFreely.value = false
+    }
+
+    // Execute the Admin command of moving a player anywhere on the field (pitch + dogout)
+    fun movePlayerFreelyTo(location: Location) {
+        val player = playerToMove.value ?: return
+        playerToMove.value = null
+
+        // Logic:
+        // - If moving between on-pitch locations: keep the player's current state
+        // - If moving between dogout locations: keep the player's current state
+        // - If moving from the dogout to the pitch: Set player state to Standing
+        // - If moving from the pitch to the dogout: Set player state to Reservers
+        val currentLocation = player.location
+        val newLocation = location
+        val adminAction = when {
+            currentLocation is OnPitchLocation && newLocation is OnPitchLocation -> {
+                MovePlayer(player.id, newLocation)
+            }
+            currentLocation is Dogout && newLocation is Dogout -> {
+                SetPlayerState(player.id, player.state, newLocation)
+            }
+            currentLocation is OnPitchLocation && newLocation is Dogout -> {
+                SetPlayerState(player.id, PlayerDogoutState.RESERVE, newLocation)
+            }
+            currentLocation is Dogout && newLocation is OnPitchLocation -> {
+                SetPlayerState(player.id, PlayerPitchState.STANDING, newLocation)
+            }
+            else -> error("Unsupported error: $currentLocation -> $newLocation ")
+        }
+        actionProvider.currentProvider.userActionSelected(adminAction)
+        if (!isMovePlayersFreely.value) {
+            playerEditorOpenOnStatePlayerId = player.id
+            showPlayerContextMenu(player.id)
+        }
     }
 
     // Returns `true` if we are moving a player as part of modifying their state.

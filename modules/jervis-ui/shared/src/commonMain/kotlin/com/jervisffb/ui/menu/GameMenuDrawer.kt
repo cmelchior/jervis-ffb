@@ -88,10 +88,12 @@ data class ChallengeMenuActions(
 fun GameMenuDrawer(
     drawerState: DrawerState,
     menuViewModel: MenuViewModel,
+    gameScreenModel: GameScreenModel,
     showMenuDrawer: (Boolean) -> Unit,
     actionButtons: List<GameDrawerActionButton>,
 ) {
     val uiState: UiGameSnapshot? by menuViewModel.uiState.uiStateFlow.collectAsState(null)
+    val isActionWheelVisible by remember { gameScreenModel.sharedPitchData.isActionWheelVisible }
     var secondLevelItems: DrawerSecondLevelContent? by remember { mutableStateOf(null) }
 
     // Close submenus when the drawer is closing
@@ -135,6 +137,21 @@ fun GameMenuDrawer(
             ) {
                 DrawerSectionHeader("Game", topPadding = 0.dp)
                 DrawerButton("Save Game") { menuViewModel.showSaveGameDialog(includeDebugState = false) }
+
+                if (gameScreenModel.rules.allowPlayerEditsDuringGame) {
+                    DrawerSectionHeader("Admin Console")
+                    val isMovePlayersFreelyMode by gameScreenModel.isMovePlayersFreely.collectAsState()
+                    DrawerButton(
+                        text = if (isMovePlayersFreelyMode) "Stop Moving Players" else "Move Players Freely",
+                        enabled = isMovePlayersFreelyMode || !isActionWheelVisible,
+                    ) {
+                        when (isMovePlayersFreelyMode) {
+                            true -> gameScreenModel.exitMovePlayersFreelyMode()
+                            false -> gameScreenModel.enterMovePlayersFreelyMode()
+                        }
+                        showMenuDrawer(false)
+                    }
+                }
 
                 DrawerSectionHeader("Developer Console")
                 val currentNodeDescription: String = remember(uiState) {
@@ -391,11 +408,12 @@ private fun SettingsEntry(item: ToggleItem, itemIndex: Int) {
  * seems a bit off.
  */
 @Composable
-private fun DrawerButton(text: String, onClick: () -> Unit) {
+private fun DrawerButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
     JervisButton(
         modifier = Modifier.fillMaxWidth(),
         text = text,
         onClick = onClick,
+        enabled = enabled,
         buttonColor = JervisTheme.rulebookRed,
         shape = RectangleShape,
     )

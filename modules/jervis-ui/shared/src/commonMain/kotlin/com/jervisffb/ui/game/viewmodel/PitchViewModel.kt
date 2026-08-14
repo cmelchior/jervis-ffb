@@ -217,9 +217,17 @@ class PitchViewModel(
      * See [com.jervisffb.ui.game.view.pitch.PitchHoverUnderlayLayer]
      */
     fun observePitch(): Flow<Map<PitchCoordinate, Pair<UiPitchSquare, UiPitchPlayer?>>> {
-        return uiState.uiStateFlow.map { uiSnapshot ->
+        return combine(uiState.uiStateFlow, screenModel.isMovePlayersFreely) { uiSnapshot, isMovePlayersFreelyMode ->
             uiSnapshot.squares.map {
-                it.key to Pair(it.value, uiSnapshot.players[it.value.player])
+                val player = uiSnapshot.players[it.value.player]
+                val selectablePlayer = when (isMovePlayersFreelyMode && player != null) {
+                    true -> {
+                        val playerRef = uiSnapshot.game.getPlayerById(player.id)
+                        player.copy(selectedAction = { model, selected -> model.beginMovePlayer(playerRef) })
+                    }
+                    false -> player
+                }
+                it.key to Pair(it.value, selectablePlayer)
             }.toMap()
         }
     }
