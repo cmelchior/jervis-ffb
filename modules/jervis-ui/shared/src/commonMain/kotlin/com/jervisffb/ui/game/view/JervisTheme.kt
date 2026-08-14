@@ -83,6 +83,32 @@ object JervisTheme {
     val rulebookPaper = Color(0xFFf5e3ce)
     val rulebookDisabled = Color.Gray
 
+    // Colors currently used by challenge metadata tags. Values come from the
+    // GitHub label palette: https://github.com/cmelchior/jervis-ffb/labels.
+    val challengeGameVersionBb2020Tag = Color(0xFFE4E669)
+    val challengeGameVersionBb2025Tag = Color(0xFF008672)
+    val challengeGameTypeStandardTag = Color(0xFF7057FF)
+    val challengeGameTypeBb7Tag = Color(0xFFD876E3)
+    val challengeGameTypeDungeonBowlTag = Color(0xFFB7FFD0)
+    val challengeGameTypeGutterBowlTag = Color(0xFFCFD3D7)
+    val challengeCategoryCrowdSurfingTag = rulebookRed
+    val challengeCategoryBlockingTag = rulebookBlue
+    val challengeCategoryScoringTag = rulebookGreen
+    val challengeCategoryBreakTheCageTag = rulebookOrange
+    val challengeCategoryOneTurnTouchdownsTag = rulebookPurple
+
+    // Reserved GitHub label colors for future challenge tags. Keep commented
+    // out until each color has a concrete Jervis usage.
+    val challengeBugTag = Color(0xFFD73A4A)
+    val challengeDocumentationTag = Color(0xFF0075CA)
+    val challengeFumbblTag = Color(0xFF217C3E)
+    val challengeGoodFirstIssueTag = Color(0xFFA2EEEF)
+    val challengeRulesTag = Color(0xFFF61DA5)
+    val challengeUserTag = Color(0xFFD93F0B)
+    val challengeUserCrashTag = Color(0xFFF1215A)
+    val challengeUxTag = Color(0xFFE263C9)
+    val challengeWontfixTag = Color(0xFFFFFFFF)
+
     val statusStunned = Color(0xFFEE6060)
     val statusProne = Color(0xFFfedb55)
     val statusRooted = Color(0xFFb9785a)
@@ -165,6 +191,3 @@ object JervisTheme {
 //    val fumbblOrange = Color(0xFFFB8B24) // Color(0xFFF58A07)
 //    val fumbblBackground = Color(0xFFE8DDB5) // Color(0xFFE6E8E6)
 }
-
-
-

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -135,7 +136,12 @@ private fun ChallengeDetailContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                CategoryChip(details.data.category)
+                ChallengeMetadataTags(
+                    category = details.data.category,
+                    gameVersion = details.data.gameRules.baseVersion,
+                    gameType = details.data.gameRules.gameType,
+                    tagLayoutDirection = LayoutDirection.Ltr,
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

@@ -290,7 +290,11 @@ private fun ChallengeListRow(
                 //    )
             }
         }
-        CategoryChip(row.data.category)
+        ChallengeMetadataTags(
+            category = row.data.category,
+            gameVersion = row.data.gameRules.baseVersion,
+            gameType = row.data.gameRules.gameType,
+        )
         SolvedTrophy(state = row.userState)
     }
 }

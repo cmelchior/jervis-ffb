@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -17,10 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,15 +42,19 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.challenge.ChallengeCategory
 import com.jervisffb.engine.challenge.ChallengeScore
+import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.challenge_default_pitch
 import com.jervisffb.shared.generated.resources.jervis_icon_thumbs_up_large
@@ -206,18 +214,155 @@ fun VoteControl(
  * A small colored label showing a challenge's [ChallengeCategory].
  */
 @Composable
-fun CategoryChip(category: ChallengeCategory, modifier: Modifier = Modifier) {
-    val background = categoryColor(category)
+fun CategoryTag(category: ChallengeCategory, modifier: Modifier = Modifier) {
+    MetadataTag(
+        text = category.label,
+        background = categoryColor(category),
+        textColor = categoryTextColor(category),
+        modifier = modifier,
+    )
+}
+
+/**
+ * A generic tag for challenge metadata.
+ */
+@Composable
+fun MetadataTag(
+    text: String,
+    modifier: Modifier = Modifier,
+    background: Color = JervisTheme.contentTextColor.copy(alpha = 0.12f),
+    textColor: Color = JervisTheme.contentTextColor,
+) {
     Text(
         modifier = modifier
-            .background(background, RoundedCornerShape(4.dp))
+            .background(background, RoundedCornerShape(3.dp))
             .padding(horizontal = 8.dp, vertical = 3.dp),
-        text = category.label.uppercase(),
+        text = text.uppercase(),
         lineHeight = 1.em,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
-        color = categoryTextColor(category),
+        color = textColor,
     )
+}
+
+private data class ChallengeMetadataTagData(
+    val text: String,
+    val background: Color,
+    val textColor: Color,
+) {
+    val characterLength: Int = text.length
+}
+
+/**
+ * Displays challenge metadata in one or two right-aligned rows.
+ *
+ * When the tags exceed [maxCharactersPerRow], tags are assigned starting with
+ * the bottom row and then added to whichever row is currently shortest.
+ */
+@Composable
+fun ChallengeMetadataTags(
+    category: ChallengeCategory,
+    gameVersion: GameVersion,
+    gameType: GameType? = null,
+    metaTags: List<String> = emptyList(),
+    modifier: Modifier = Modifier,
+    maxCharactersPerRow: Int = 28,
+    tagLayoutDirection: LayoutDirection = LayoutDirection.Rtl,
+) {
+    val tags = buildList {
+
+        // Will be added from right to left
+
+        // Challenge category
+        add(ChallengeMetadataTagData(category.label, categoryColor(category), categoryTextColor(category)))
+
+        // Game Version
+        val (background, textColor) = when (gameVersion) {
+            GameVersion.BB2020 -> JervisTheme.challengeGameVersionBb2020Tag to JervisTheme.white
+            GameVersion.BB2025 -> JervisTheme.challengeGameVersionBb2025Tag to JervisTheme.white
+        }
+        add(ChallengeMetadataTagData(
+            text = gameVersion.name,
+            background = background,
+            textColor = textColor,
+        ))
+
+        // Game Type
+        if (gameType != null && gameType != GameType.STANDARD) {
+            val (background, textColor) = when (gameType) {
+                GameType.STANDARD -> JervisTheme.challengeGameTypeStandardTag to JervisTheme.white
+                GameType.BB7 -> JervisTheme.challengeGameTypeBb7Tag to JervisTheme.black
+                GameType.DUNGEON_BOWL -> JervisTheme.challengeGameTypeDungeonBowlTag to JervisTheme.black
+                GameType.GUTTER_BOWL -> JervisTheme.challengeGameTypeGutterBowlTag to JervisTheme.black
+            }
+            add(ChallengeMetadataTagData(gameType.name, background, textColor))
+        }
+
+        // Extra Metadata
+        metaTags.forEach {
+            add(
+                ChallengeMetadataTagData(
+                    it,
+                    JervisTheme.contentTextColor.copy(alpha = 0.12f),
+                    JervisTheme.contentTextColor,
+                )
+            )
+        }
+    }
+    val rows = metadataTagRows(tags, maxCharactersPerRow)
+
+    CompositionLocalProvider(LocalLayoutDirection provides tagLayoutDirection) {
+        Column(
+            modifier = modifier
+                .widthIn(max = 240.dp)
+                .wrapContentWidth(),
+            horizontalAlignment = when (tagLayoutDirection) {
+                LayoutDirection.Ltr -> Alignment.Start
+                LayoutDirection.Rtl -> Alignment.End
+            },
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            rows.forEach { row ->
+                Row(
+                    modifier = Modifier.wrapContentWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    row.forEach { tag ->
+                        MetadataTag(
+                            text = tag.text,
+                            background = tag.background,
+                            textColor = tag.textColor,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun metadataTagRows(
+    tags: List<ChallengeMetadataTagData>,
+    maxCharactersPerRow: Int,
+): List<List<ChallengeMetadataTagData>> {
+    if (tags.sumOf { it.characterLength } <= maxCharactersPerRow) return listOf(tags)
+
+    val bottomRow = mutableListOf<ChallengeMetadataTagData>()
+    val topRow = mutableListOf<ChallengeMetadataTagData>()
+    var bottomLength = 0
+    var topLength = 0
+    tags.forEach { tag ->
+        when (bottomLength <= topLength) {
+            true -> {
+                bottomRow += tag
+                bottomLength += tag.characterLength
+            }
+            false -> {
+                topRow += tag
+                topLength += tag.characterLength
+            }
+        }
+    }
+    return listOfNotNull(topRow.takeIf { it.isNotEmpty() }, bottomRow)
 }
 
 
@@ -438,11 +583,11 @@ private fun LoadingIndicator() {
 }
 
 private fun categoryColor(category: ChallengeCategory): Color = when (category) {
-    ChallengeCategory.CROWD_SURFING -> JervisTheme.rulebookRed
-    ChallengeCategory.BLOCKING -> JervisTheme.rulebookBlue
-    ChallengeCategory.SCORING -> JervisTheme.rulebookGreen
-    ChallengeCategory.BREAK_THE_CAGE -> JervisTheme.rulebookOrange
-    ChallengeCategory.ONE_TURN_TOUCHDOWNS -> JervisTheme.rulebookPurple
+    ChallengeCategory.CROWD_SURFING -> JervisTheme.challengeCategoryCrowdSurfingTag
+    ChallengeCategory.BLOCKING -> JervisTheme.challengeCategoryBlockingTag
+    ChallengeCategory.SCORING -> JervisTheme.challengeCategoryScoringTag
+    ChallengeCategory.BREAK_THE_CAGE -> JervisTheme.challengeCategoryBreakTheCageTag
+    ChallengeCategory.ONE_TURN_TOUCHDOWNS -> JervisTheme.challengeCategoryOneTurnTouchdownsTag
 }
 
 private fun categoryTextColor(category: ChallengeCategory): Color {
