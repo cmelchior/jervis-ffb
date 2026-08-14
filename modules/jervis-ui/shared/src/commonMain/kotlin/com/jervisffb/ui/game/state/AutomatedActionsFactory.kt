@@ -313,6 +313,10 @@ class AutomatedActionsFactory(
             return PlayerSelected(selectedPlayer)
         }
 
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TWO_HEADS) && currentNode == DodgeRoll.ChooseToUseTwoHeads) {
+            return Confirm
+        }
+
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == BB2020Stumble.ChooseToUseTackle)) {
             return Confirm
         }

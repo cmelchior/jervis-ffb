@@ -142,33 +142,34 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
     // Game messages asking to use a skill or not
     private fun buildUseSimpleActionMessages(): Map<Node, (Boolean, Boolean, Game) -> String?> {
         val skills = mapOf(
-            Pickup.ChooseToUseBigHand to SkillType.BIG_HAND,
-            SecureTheBallStep.ChooseToUseBigHand to SkillType.BIG_HAND,
-            com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
-            JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
-            CreatePushChainStep.DecideToUseSidestep to SkillType.SIDESTEP,
-            CreatePushChainStep.DecideToUseGrab to SkillType.GRAB,
-            CreatePushChainStep.DecideToUseStandFirm to SkillType.STAND_FIRM,
-            FoulStep.ChooseToUseSneakyGit to SkillType.SNEAKY_GIT,
-            ArmourRoll.ChooseToUseLoneFouler to SkillType.LONE_FOULER,
-            CreatePushChainStep.ChooseToUseEyeGouge to SkillType.EYE_GOUGE,
-            SafePairOfHandsStep.ChooseToUseSafePairOfHands to SkillType.SAFE_PAIR_OF_HANDS,
-            Catch.ChooseToUseDivingCatch to SkillType.DIVING_CATCH,
-            HitAndRunStep.ChooseToUseHitAndRun to SkillType.HIT_AND_RUN,
-            BlitzAction.ChooseToUseSprintForBlocking to SkillType.SPRINT,
-            BB2025BothDown.DefenderChooseToUseWrestle to SkillType.WRESTLE,
-            BB2025BothDown.AttackerChooseToUseWrestle to SkillType.WRESTLE,
-            StandardMoveStep.ChooseToUseFumblerooski to SkillType.FUMBLEROOSKI,
-            JumpStep.ChooseToUseFumblerooskiAfterJumpingToTargetSquare to SkillType.FUMBLEROOSKI,
-            LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare to SkillType.FUMBLEROOSKI,
-            PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare to SkillType.FUMBLEROOSKI,
-            UseStripBallStep.ChooseToUseStripBall to SkillType.STRIP_BALL,
-            PileDriverStep.ChooseToUsePileDriver to SkillType.PILE_DRIVER,
-            ThrowPlayerStep.ChooseToUseBullseye to SkillType.BULLSEYE,
-            SwoopStep.ChooseToUseSwoop to SkillType.SWOOP,
             ArmourRoll.ChooseToUseClaws to SkillType.CLAWS,
             ArmourRoll.ChooseToUseIronHardSkin to SkillType.IRON_HARD_SKIN,
-            ChainsawFoulStep.ChooseToUseChainsaw to SkillType.CHAINSAW
+            ArmourRoll.ChooseToUseLoneFouler to SkillType.LONE_FOULER,
+            BB2025BothDown.AttackerChooseToUseWrestle to SkillType.WRESTLE,
+            BB2025BothDown.DefenderChooseToUseWrestle to SkillType.WRESTLE,
+            BlitzAction.ChooseToUseSprintForBlocking to SkillType.SPRINT,
+            Catch.ChooseToUseDivingCatch to SkillType.DIVING_CATCH,
+            ChainsawFoulStep.ChooseToUseChainsaw to SkillType.CHAINSAW,
+            CreatePushChainStep.ChooseToUseEyeGouge to SkillType.EYE_GOUGE,
+            CreatePushChainStep.DecideToUseGrab to SkillType.GRAB,
+            CreatePushChainStep.DecideToUseSidestep to SkillType.SIDESTEP,
+            CreatePushChainStep.DecideToUseStandFirm to SkillType.STAND_FIRM,
+            DodgeRoll.ChooseToUseTwoHeads to SkillType.TWO_HEADS,
+            FoulStep.ChooseToUseSneakyGit to SkillType.SNEAKY_GIT,
+            HitAndRunStep.ChooseToUseHitAndRun to SkillType.HIT_AND_RUN,
+            JumpStep.ChooseToUseFumblerooskiAfterJumpingToTargetSquare to SkillType.FUMBLEROOSKI,
+            JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
+            LeapStep.ChooseToUseFumblerooskiAfterLeapingToTargetSquare to SkillType.FUMBLEROOSKI,
+            Pickup.ChooseToUseBigHand to SkillType.BIG_HAND,
+            PileDriverStep.ChooseToUsePileDriver to SkillType.PILE_DRIVER,
+            PogoStep.ChooseToUseFumblerooskiAfterPogoToTargetSquare to SkillType.FUMBLEROOSKI,
+            SafePairOfHandsStep.ChooseToUseSafePairOfHands to SkillType.SAFE_PAIR_OF_HANDS,
+            SecureTheBallStep.ChooseToUseBigHand to SkillType.BIG_HAND,
+            StandardMoveStep.ChooseToUseFumblerooski to SkillType.FUMBLEROOSKI,
+            SwoopStep.ChooseToUseSwoop to SkillType.SWOOP,
+            ThrowPlayerStep.ChooseToUseBullseye to SkillType.BULLSEYE,
+            UseStripBallStep.ChooseToUseStripBall to SkillType.STRIP_BALL,
+            com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep.ChooseToUseVeryLongLegs to SkillType.VERY_LONG_LEGS,
         )
 
         return skills.toList().associate {
@@ -746,4 +747,3 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         acc.setGameStatusText(message)
     }
 }
-

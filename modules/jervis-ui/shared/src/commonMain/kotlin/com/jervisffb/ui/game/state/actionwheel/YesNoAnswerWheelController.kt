@@ -44,6 +44,7 @@ import com.jervisffb.engine.common.procedures.RegenerationRoll
 import com.jervisffb.engine.common.procedures.TheKickOff
 import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
+import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
@@ -51,6 +52,7 @@ import com.jervisffb.engine.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.PushContext
@@ -301,6 +303,16 @@ object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val defender = state.getContext<StumbleContext>().defender
+        return defender.coordinates
+    }
+}
+
+object UseTwoHeadsWheelController: UseSkillWheelController(SkillType.TWO_HEADS) {
+    override val nodes: Set<Node> = setOf(
+        DodgeRoll.ChooseToUseTwoHeads,
+    )
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        val defender = state.getContext<DodgeRollContext>().player
         return defender.coordinates
     }
 }

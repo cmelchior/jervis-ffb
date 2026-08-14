@@ -155,6 +155,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseSwoopWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTackleWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseTauntWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseThickSkullWheelController
+import com.jervisffb.ui.game.state.actionwheel.UseTwoHeadsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
 import com.jervisffb.ui.game.state.actionwheel.WeatherRollWheelController
@@ -329,6 +330,7 @@ class UiGameController(
         UseDirtyPlayerWheelController,
         UseDivingCatchWheelController,
         UseDodgeWheelController,
+        UseTwoHeadsWheelController,
         UseEyeGougeWheelController,
         UseFendWheelController,
         UseFumblerooskiWheelController,
