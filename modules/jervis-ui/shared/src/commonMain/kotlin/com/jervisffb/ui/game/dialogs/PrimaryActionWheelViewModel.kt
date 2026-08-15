@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.dialogs
 
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.utils.assert
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.channels.Channel
@@ -69,7 +70,7 @@ class PrimaryActionWheelViewModel(
         error("Should never be called for a primary action wheel. It should always be visible")
     }
 
-    override fun hideWheel(onDismiss: (() -> Unit)?) {
+    override fun hideWheel(onDismiss: GuardedAction?) {
         sharedPitchData.let {
             assert(it.isActionWheelVisible.value) {
                 "Action wheel is not visible, but hideWheel() was called"

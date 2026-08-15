@@ -12,6 +12,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.CoinButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -40,13 +41,13 @@ object SelectCoinSideWheelController : ActionWheelDialogController() {
                 id = ButtonId("coin-head"),
                 label = { "Heads" },
                 value = Coin.HEAD,
-                action = { provider.userActionSelected(CoinSideSelected(Coin.HEAD)) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, CoinSideSelected(Coin.HEAD)) },
             ),
             CoinButtonData(
                 id = ButtonId("coin-tail"),
                 label = { "Tails" },
                 value = Coin.TAIL,
-                action = { provider.userActionSelected(CoinSideSelected(Coin.TAIL)) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, CoinSideSelected(Coin.TAIL)) },
             ),
         )
         val wheelState = ActionWheelUiStateData(

@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Player
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.dialogs.UserInputDialog
@@ -20,8 +21,8 @@ class DialogsViewModel(
     val diceRollGenerator = uiState.diceGenerator
 
     // Called from the UI when a game action is created
-    fun userActionSelected(action: GameAction) {
-        uiState.userSelectedAction(action)
+    fun userActionSelected(id: GameActionId, action: GameAction) {
+        uiState.userSelectedAction(id, action)
     }
     val dialogData: Flow<UserInputDialog?> = uiState.uiStateFlow.map { it.dialogInput }
     val contextMenu: Flow<ModelRef<Player>?> = screenViewModel.contextMenuFlow.onEach {

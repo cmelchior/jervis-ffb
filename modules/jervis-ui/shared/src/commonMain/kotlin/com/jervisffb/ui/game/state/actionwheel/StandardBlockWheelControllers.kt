@@ -26,6 +26,8 @@ import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -71,7 +73,7 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.BLOCK,
                     diceValue = die.result,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     enabled = isEnabled,
                     options = DBlockResult.allOptions(),
                     expandable = isEnabled,
@@ -86,7 +88,7 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.BLOCK,
                     diceValue = DBlockResult.random(),
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     enabled = true,
                     options = DBlockResult.allOptions(),
                     expandable = true,
@@ -110,14 +112,14 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                 id = buttonId,
                 label = { "Confirm Roll" },
                 icon = ActionIcon.CONFIRM,
-                action = {
+                action = GuardedAction(acc) { id ->
                     val dice = diceButtons.mapNotNull {
                         when (it.enabled) {
                             true -> it.diceValue
                             false -> null
                         }
                     }
-                    provider.userActionSelected(DiceRollResults(dice))
+                    provider.userActionSelected(id, DiceRollResults(dice))
                 },
             )
         )
@@ -158,7 +160,7 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                         label = { null },
                         diceRollType = DiceRollType.BLOCK,
                         diceValue = newValue ?: die.result,
-                        action = { /* Do nothing */ },
+                        action = NoOpGuardedAction,
                         options = DBlockResult.allOptions(),
                         expandable = false,
                         enabled = (newValue != null),
@@ -176,7 +178,7 @@ object StandardBlockRollWheelController : ActionWheelDialogController() {
                         label = { null },
                         diceRollType = DiceRollType.BLOCK,
                         diceValue = die,
-                        action = { /* Do nothing */ },
+                        action = NoOpGuardedAction,
                         options = DBlockResult.allOptions(),
                         expandable = false,
                         animateRoll = RollAnimationData(

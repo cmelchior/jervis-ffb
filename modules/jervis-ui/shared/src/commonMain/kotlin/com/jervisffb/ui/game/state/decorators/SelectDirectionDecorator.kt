@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -32,7 +33,7 @@ object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
                 val action = DirectionSelected(direction)
                 acc.updateSquare(origin.move(direction, 1)) {
                     it.copy(
-                        selectedAction = UiAction(action) { actionProvider.userActionSelected(action) },
+                        selectedAction = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) }),
                         selectableDirection = direction
                     )
                 }

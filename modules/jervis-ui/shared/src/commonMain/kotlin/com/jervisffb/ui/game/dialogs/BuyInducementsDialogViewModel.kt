@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.model.PositionId
@@ -38,6 +40,7 @@ data class BuyInducementsDialog(
     val team: Team,
     val treasury: Int,
     val pettyCash: Int,
+    val nextActionId: GameActionId,
     override var owner: Team? = null,
 ) : UserInputDialog
 
@@ -154,7 +157,10 @@ data class CartEntryView(
     val iconSource: SpriteSource?,
 )
 
-class BuyInducementsViewModel(private val dialog: BuyInducementsDialog) : ScreenModel {
+class BuyInducementsViewModel(
+    val gameController: GameEngineController,
+    private val dialog: BuyInducementsDialog
+) : ScreenModel {
 
     private val team: Team = dialog.team
     private val settings = team.game.rules.inducements

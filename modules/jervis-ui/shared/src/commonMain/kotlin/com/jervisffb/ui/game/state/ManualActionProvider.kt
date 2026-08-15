@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
@@ -65,7 +66,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * See [UiGameController.startGameEventLoop]
  */
 open class ManualActionProvider(
-    protected val game: GameEngineController,
+    val controller: GameEngineController,
     private val menuViewModel: MenuViewModel,
     private val clientMode: TeamActionMode, // Which teams are controlled by this game client
     private val gameSettings: GameSettings
@@ -77,7 +78,7 @@ open class ManualActionProvider(
 
     private lateinit var availableActions: ActionRequest
 
-    val automatedActionsFactory = AutomatedActionsFactory(game, menuViewModel, gameSettings)
+    val automatedActionsFactory = AutomatedActionsFactory(controller, menuViewModel, gameSettings)
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
     var automatedAction: GameAction? = null
@@ -89,7 +90,7 @@ open class ManualActionProvider(
     // If a user selected multiple actions, they are all listed here. This queue should be emptied before
     // sending anything else
     private var delayBetweenActions = false
-    private val queuedActions = mutableListOf<GameAction>()
+    private val queuedActions = mutableListOf<AsyncGameAction>()
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
     private var sharedData: LocalPitchDataWrapper? = null
 
@@ -168,7 +169,9 @@ open class ManualActionProvider(
             val result = iter.next()(controller)
             if (result != null) {
                 delayBetweenActions = result.delayBetweenActions
-                queuedActions.addAll(result.actions)
+                queuedActions.addAll(result.actions.mapIndexed { index, action ->
+                    AsyncGameAction(GameActionId(actions.id.value + index), action)
+                })
                 iter.remove()
             }
         }
@@ -189,8 +192,8 @@ open class ManualActionProvider(
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
         var showActionDecorators = when (clientMode) {
-            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == game.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> actions.team?.id == game.state.awayTeam.id
+            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == controller.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> actions.team?.id == controller.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> true
         }
 
@@ -219,7 +222,7 @@ open class ManualActionProvider(
         lastActionWasAutomaticallySelected = false
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GameAction {
         // When returning actions we resolve it with the following priority
         // 1. All Queued actions
         // 2. Then automated actions
@@ -228,9 +231,14 @@ open class ManualActionProvider(
         // Empty queued data if present
         if (queuedActions.isNotEmpty()) {
             lastActionWasAutomaticallySelected = false
-            val action = queuedActions.removeFirst()
+            val actionDesc = queuedActions.removeFirst()
+            if (actionDesc.id != id) {
+                error("Action id mismatch, expected $id but got ${actionDesc.id}")
+            }
+
             // Do not pause for flow-control events, only events that would appear "visible"
             // to the player
+            val action = actionDesc.action
             if (action !is MoveTypeSelected && delayBetweenActions) {
                 delay(150.milliseconds)
             }
@@ -246,20 +254,22 @@ open class ManualActionProvider(
             action
         } ?: run {
             lastActionWasAutomaticallySelected = false
-            actionSelectedChannel.receive()
+            waitForNextAction(id)
         }
     }
 
-    override fun userActionSelected(action: GameAction) {
-        if (actionSelectedChannel.trySend(action).isFailure) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
+        if (actionSelectedChannel.trySend(AsyncGameAction(id, action)).isFailure) {
             error("Unable to send action to channel. Is the channel closed?")
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         if (actions.isEmpty()) throw IllegalArgumentException("Action list must contain at least one action")
         // Store all events to be sent and sent the first one to be processed
-        queuedActions.addAll(actions)
+        queuedActions.addAll(actions.mapIndexed { index, action ->
+            AsyncGameAction(GameActionId(startingId.value + index), action)
+        })
         delayBetweenActions = delayEvent
         actionScope.launch {
             val action = queuedActions.removeFirst()
@@ -309,7 +319,7 @@ open class ManualActionProvider(
     private fun addModalDialogDecorators(provider: UiActionProvider, state: UiSnapshotAccumulator, actions: ActionRequest) {
         // First configure "standard" modal dialogs
         val dialogData = DialogFactory.createDialogIfPossible(
-            game,
+            controller,
             actions,
             provider,
             sharedData!!,
@@ -390,13 +400,13 @@ open class ManualActionProvider(
     protected open fun calculateAutomaticResponse(
         actions: ActionRequest,
     ): GameAction? {
-        val currentNode = game.currentNode()
+        val currentNode = controller.currentNode()
 
         // When reacting to an `Undo` command, all automatic responses are disabled.
         // If not disabled, Undo'ing an action might put us in a state that will
         // automatically move us forward again, which will make it appear as if the
         // Undo didn't work.
-        if (game.lastActionWasUndo()) {
+        if (controller.lastActionWasUndo()) {
             return null
         }
 

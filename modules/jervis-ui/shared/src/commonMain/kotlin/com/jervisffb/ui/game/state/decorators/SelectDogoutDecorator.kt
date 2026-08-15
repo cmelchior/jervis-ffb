@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
 object SelectDogoutDecorator: PitchActionDecorator<SelectDogout> {
@@ -16,12 +17,12 @@ object SelectDogoutDecorator: PitchActionDecorator<SelectDogout> {
         acc: UiSnapshotAccumulator
     ) {
         if (owner?.isAwayTeam() == true) {
-            acc.awayDogoutOnClickAction = {
-                actionProvider.userActionSelected(DogoutSelected)
+            acc.awayDogoutOnClickAction = GuardedAction(actionProvider.controller) { id ->
+                actionProvider.userActionSelected(id, DogoutSelected)
             }
         } else {
-            acc.homeDogoutOnClickAction = {
-                actionProvider.userActionSelected(DogoutSelected)
+            acc.homeDogoutOnClickAction = GuardedAction(actionProvider.controller) { id ->
+                actionProvider.userActionSelected(id, DogoutSelected)
             }
         }
     }

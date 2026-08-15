@@ -22,6 +22,8 @@ import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -35,7 +37,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
 
     override val nodes: Set<Node> = setOf(DeviateRoll.RollDice)
 
-    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.currentBall().coordinates
     }
 
@@ -53,7 +55,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                 label = { "Distance" },
                 diceRollType = DiceRollType.DEVIATE,
                 diceValue = D6Result.random(),
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = D6Result.allOptions(),
                 expandable = true,
             ),
@@ -62,7 +64,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                 label = { "Direction" },
                 diceRollType = DiceRollType.DEVIATE,
                 diceValue = D8Result.random(),
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = D8Result.allOptions(),
                 expandable = true,
                 preferLtr = false,
@@ -78,13 +80,13 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                     } ?: "Confirm Roll"
                 },
                 icon = ActionIcon.CONFIRM,
-                action = {
+                action = GuardedAction(acc) { id ->
                     // The UI has the dice in a different order than the one expected by the rules
                     // engine, so reverse them to match the rules.
                     val dice = diceButtons.reversed().map {
                         it.diceValue
                     }
-                    provider.userActionSelected(DiceRollResults(dice))
+                    provider.userActionSelected(id, DiceRollResults(dice))
                 }
             )
         )
@@ -118,7 +120,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.DEVIATE,
                     diceValue = dice.first,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = D6Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(
@@ -130,7 +132,7 @@ object DeviateRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.DEVIATE,
                     diceValue = dice.second,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = D8Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(

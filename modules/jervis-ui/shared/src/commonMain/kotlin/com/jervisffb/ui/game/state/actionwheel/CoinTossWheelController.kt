@@ -17,6 +17,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.CoinButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -44,13 +46,13 @@ object CoinTossWheelController : ActionWheelDialogController() {
                 id = ButtonId("coin-toss-head"),
                 label = { "Heads" },
                 value = Coin.HEAD,
-                action = { provider.userActionSelected(CoinTossResult(Coin.HEAD)) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, CoinTossResult(Coin.HEAD)) },
             ),
             CoinButtonData(
                 id = ButtonId("coin-toss-tail"),
                 label = { "Tails" },
                 value = Coin.TAIL,
-                action = { provider.userActionSelected(CoinTossResult(Coin.TAIL)) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, CoinTossResult(Coin.TAIL)) },
             ),
         )
         val wheelState = ActionWheelUiStateData(
@@ -77,7 +79,7 @@ object CoinTossWheelController : ActionWheelDialogController() {
             id = ButtonId("coin-toss"),
             value = tossResult,
             label = { "" },
-            action = { },
+            action = NoOpGuardedAction,
             animateRoll = RollAnimationData(
                 endValue = when (tossResult) {
                     Coin.HEAD -> 1.d2

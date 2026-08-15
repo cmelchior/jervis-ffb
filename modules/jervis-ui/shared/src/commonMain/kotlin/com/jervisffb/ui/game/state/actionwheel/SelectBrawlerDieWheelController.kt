@@ -21,6 +21,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -66,17 +67,18 @@ object SelectBrawlerDieWheelController : ActionWheelDialogController() {
                 label = { null },
                 diceRollType = context.type,
                 diceValue = originalDie.result,
-                action = {
-                    if (!isSelectable) return@DieButtonData
-                    val action = if (actions.contains<SelectNoReroll>()) {
-                        CompositeGameAction(
-                            NoRerollSelected(0),
+                action = GuardedAction(acc) { id ->
+                    if (isSelectable) {
+                        val action = if (actions.contains<SelectNoReroll>()) {
+                            CompositeGameAction(
+                                NoRerollSelected(0),
+                                DicePoolResultsSelected.fromSingleDice(originalDie)
+                            )
+                        } else {
                             DicePoolResultsSelected.fromSingleDice(originalDie)
-                        )
-                    } else {
-                        DicePoolResultsSelected.fromSingleDice(originalDie)
+                        }
+                        provider.userActionSelected(id, action)
                     }
-                    provider.userActionSelected(action)
                 },
                 options = DBlockResult.allOptions(),
                 expandable = false,
@@ -93,7 +95,7 @@ object SelectBrawlerDieWheelController : ActionWheelDialogController() {
             label = { "Cancel using Brawler" },
             icon = ActionIcon.CANCEL,
             enabled = true,
-            action = { provider.userActionSelected(Cancel) }
+            action = GuardedAction(acc) { id -> provider.userActionSelected(id, Cancel) }
         ))
 
         val wheelState = ActionWheelUiStateData(

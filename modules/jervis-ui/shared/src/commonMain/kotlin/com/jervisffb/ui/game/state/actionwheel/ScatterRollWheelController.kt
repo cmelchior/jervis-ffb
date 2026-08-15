@@ -23,6 +23,8 @@ import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -52,7 +54,7 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                 label = { "Scatter" },
                 diceRollType = DiceRollType.SCATTER,
                 diceValue = D8Result.random(),
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = D8Result.allOptions(),
                 expandable = true,
                 preferLtr = (it > 1),
@@ -71,9 +73,9 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                     }
                 },
                 icon = ActionIcon.CONFIRM,
-                action = {
+                action = GuardedAction(acc) { id ->
                     val dice = diceButtons.map { it.diceValue }
-                    provider.userActionSelected(DiceRollResults(dice))
+                    provider.userActionSelected(id, DiceRollResults(dice))
                 }
             )
         )
@@ -104,7 +106,7 @@ object ScatterRollWheelController : ActionWheelDialogController() {
                     label = { "Scatter" },
                     diceRollType = DiceRollType.SCATTER,
                     diceValue = dice.rolls[it - 1],
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = D8Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(

@@ -6,6 +6,7 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
 object EndTurnDecorator : PitchActionDecorator<EndTurnWhenReady> {
@@ -23,7 +24,7 @@ object EndTurnDecorator : PitchActionDecorator<EndTurnWhenReady> {
         acc.updateGameStatus {
             it.copy(
                 centerBadgeText = title,
-                centerBadgeAction = { actionProvider.userActionSelected(EndTurn) },
+                centerBadgeAction = GuardedBadgeAction(acc) { id, _ -> actionProvider.userActionSelected(id, EndTurn) },
                 centerBadgeEnabled = true
             )
         }

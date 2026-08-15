@@ -5,6 +5,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.common.context.SetupTeamContext
@@ -74,18 +75,18 @@ class RandomActionProvider(
         acc.actionWasSelectedWithoutUserInput = true
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GameAction {
         actionRequestChannel.send(Pair(controller, actions))
-        return actionSelectedChannel.receive()
+        return waitForNextAction(id)
     }
 
-    override fun userActionSelected(action: GameAction) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
         actionScope.launch {
-            actionSelectedChannel.send(action)
+            actionSelectedChannel.send(AsyncGameAction(id, action))
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         TODO("Not yet supported")
     }
 
@@ -121,8 +122,8 @@ class RandomActionProvider(
                 if (teamActionHandledHere && (!actionHandledOnServer || isServer)) {
                     if (!useManualAutomatedActions(controller)) {
                         val selectedAction = createRandomAction(controller)
-                        delay(delay.inWholeMilliseconds)
-                        actionSelectedChannel.send(selectedAction)
+                        delay(delay)
+                        actionSelectedChannel.send(AsyncGameAction(request.id, selectedAction))
                     }
                 }
             }
@@ -164,7 +165,11 @@ class RandomActionProvider(
                 handleManualAwayKickingSetup(controller, compositeActions)
             }
             compositeActions.add(EndSetup)
-            actionSelectedChannel.send(CompositeGameAction(compositeActions))
+            actionSelectedChannel.send(
+                AsyncGameAction(
+                    id = controller.nextActionIndex(),
+                    action = CompositeGameAction(compositeActions))
+            )
             return true
         } else {
             return false

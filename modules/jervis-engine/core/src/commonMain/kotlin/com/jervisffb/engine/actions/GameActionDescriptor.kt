@@ -44,6 +44,15 @@ value class GameActionId(val value: Int) {
     operator fun compareTo(other: GameActionId): Int {
         return value.compareTo(other.value)
     }
+
+    // Returns the expected next game id
+    fun next(): GameActionId {
+        return GameActionId(value + 1)
+    }
+
+    companion object {
+        val NONE = GameActionId(-1)
+    }
 }
 
 /**

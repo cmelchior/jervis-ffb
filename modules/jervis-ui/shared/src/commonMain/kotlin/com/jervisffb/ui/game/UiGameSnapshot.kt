@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.planner.MovePlan
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import kotlinx.collections.immutable.PersistentList
@@ -37,8 +38,8 @@ data class UiGameSnapshot(
     // Black text above the pitch
     val gameStatusText: String?,
     val unknownActions: PersistentList<GameAction>,
-    val homeDogoutOnClickAction: (() -> Unit)?,
-    val awayDogoutOnClickAction: (() -> Unit)?,
+    val homeDogoutOnClickAction: GuardedAction?,
+    val awayDogoutOnClickAction: GuardedAction?,
     // If set, a dialog should be shown as a first priority
     val dialogInput: UserInputDialog?,
     // These are not used for rending, but to cache information we cannot extract from the rule engine

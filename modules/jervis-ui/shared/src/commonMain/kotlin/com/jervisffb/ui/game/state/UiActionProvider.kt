@@ -3,11 +3,13 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.utils.closeIfPossible
+import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -15,6 +17,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+
+// Wrapper for game actions created asynchronously.
+// We use this to prevent race conditions where actions arrive out-of-order.
+// If the id doesn't match the current action, it is ignored.
+data class AsyncGameAction(
+    val id: GameActionId, // The index that the GameEngineController expects next
+    val action: GameAction
+)
 
 typealias QueuedActionsGenerator = (GameEngineController) -> QueuedActionsResult?
 
@@ -53,7 +63,7 @@ abstract class UiActionProvider {
     // Used to communicate internally in the ActionProvider. Needed so we can decouple the lifecycle of things.
     // Like the lifecycle of the GameLoop vs. the lifecycle of UI actions.
     protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
-    protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
+    protected val actionSelectedChannel = Channel<AsyncGameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 
     abstract fun startHandler()
 
@@ -86,19 +96,44 @@ abstract class UiActionProvider {
     // Hook to manipulate the UI after an action has been selected
     abstract fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator)
     // Block until the next action is generated. Normally by calling `userActionSelected`.
-    abstract suspend fun getAction(): GameAction
-    // Parse in an action that will returned to the next call to `getAction` (or if it is currently waiting for an action)
+    // `id` is the expected action id
+    abstract suspend fun getAction(id: GameActionId): GameAction
+    // Parse in an action that will return by the next call to `getAction` (or if it is currently waiting for an action)
     // Normally used by the UI to pass in an action created by a coach.
-    abstract fun userActionSelected(action: GameAction)
+    // `id` is the expected value of `GameEngineController.nextActionIndex()` and is used to
+    // verity that the UI and Rules Engine agree on the current state.
+    // While the UI should not send multiple actions for the same id, sometimes it happens due
+    // to race conditions. In that case, any following actions for the same id are silently dropped.
+    abstract fun userActionSelected(id: GameActionId, action: GameAction)
     // Similar to `userActionSelected` but for multiple actions. This can e.g. be used for moves and makes it possible
     // to queue them all up-front. It is up to the caller to ensure a legal sequence. Illegal actions will still throw an
     // exception from the rules engine. Delaying between each event makes it possible to "fake" animations or the user
     // clicking each step along the way.
-    abstract fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean = true)
+    abstract fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean = true)
     // Similar to `userMultipleActionsSelected` but allows for flexibility in the generated sequence. In some cases,
     // you cannot fully predict the full sequence (e.g. if you need to roll dice along the way).
     abstract fun registerQueuedActionGenerator(generator: QueuedActionsGenerator)
     // Returns `true` if the next action is already available. Either because it was automated or because a QueuedActionGenerator
     // will provide it.
     abstract fun hasQueuedActions(): Boolean
+
+    // Helper that unifies waiting for the correct game action and handle it when it doesn't happen.
+    suspend fun waitForNextAction(id: GameActionId): GameAction {
+        var action: GameAction? = null
+        while (action == null) {
+            val generatedAction = actionSelectedChannel.receive()
+            when {
+                generatedAction.id == id -> action = generatedAction.action
+                generatedAction.id > id -> error("Future action id received: ${generatedAction.id} > $id")
+                generatedAction.id < id -> {
+                    LOG.w { "Outdated action received: ${generatedAction.id} < $id: ${generatedAction.action}" }
+                }
+            }
+        }
+        return action
+    }
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 }

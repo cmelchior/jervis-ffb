@@ -20,6 +20,8 @@ import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -56,7 +58,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
                     id = ButtonId("$buttonIdPrefix-${dieOption.value}"),
                     label = { null }, // "Roll ${d6Option.value}",
                     diceValue = dieOption,
-                    action = { provider.userActionSelected(dieOption) },
+                    action = GuardedAction(acc) { id -> provider.userActionSelected(id, dieOption) },
                     options = allOptions,
                     expandable = false,
                     diceRollType = diceRollType,
@@ -81,7 +83,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
                 label = { "Accept roll: ${roll.value}" },
                 diceRollType = diceRollType,
                 diceValue = roll,
-                action = { provider.userActionSelected(NoRerollSelected()) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, NoRerollSelected()) },
                 options = emptyList(),
                 expandable = false,
             )
@@ -93,7 +95,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
                         label = { rerollSource.rerollDescription },
                         icon = ActionIcon.TEAM_REROLL,
                         enabled = true,
-                        action = { provider.userActionSelected(RerollOptionSelected(option)) }
+                        action = GuardedAction(acc) { id -> provider.userActionSelected(id, RerollOptionSelected(option)) }
                     )
                 }
             } ?: emptyList()
@@ -133,7 +135,7 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
                     label = { "" },
                     diceRollType = diceRollType,
                     diceValue = dieRoll,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = emptyList(),
                     expandable = false,
                     enabled = false,

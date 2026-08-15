@@ -7,6 +7,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
@@ -579,16 +580,16 @@ class UiGameController(
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
                 val userAction = run {
-                    tailrec suspend fun getNextAcceptedAction(): GameAction {
-                        val action = actionProvider.getAction()
+                    tailrec suspend fun getNextAcceptedAction(id: GameActionId): GameAction {
+                        val action = actionProvider.getAction(id)
                         return when {
                             // When actions are frozen, we still accept them from the UI
                             // but silently drop them, leaving the UI and board state untouched.
-                            actionsFrozen -> getNextAcceptedAction()
+                            actionsFrozen -> getNextAcceptedAction(id)
                             else -> action
                         }
                     }
-                    getNextAcceptedAction()
+                    getNextAcceptedAction(controller.nextActionIndex())
                 }
 
                 // After an action was selected, run all decorators that modify
@@ -880,8 +881,8 @@ class UiGameController(
         return isAnimationsEnabled && animationSpeedFactor > 0f
     }
 
-    fun userSelectedAction(action: GameAction) {
-        actionProvider.userActionSelected(action)
+    fun userSelectedAction(id: GameActionId, action: GameAction) {
+        actionProvider.userActionSelected(id, action)
     }
 
     fun notifyAnimationDone() {

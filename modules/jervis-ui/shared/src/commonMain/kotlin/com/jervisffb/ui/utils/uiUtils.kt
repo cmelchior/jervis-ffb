@@ -184,7 +184,7 @@ fun Color.toSkiaColor(): Int {
 fun Modifier.onClickWithSmallDragControl(
     slopPx: Float = 6f, // Within these many pixels a drag is converted to OnClick
     onClick: () -> Unit
-) = pointerInput(Unit) {
+) = pointerInput(onClick) {
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false)
         var dx = 0f

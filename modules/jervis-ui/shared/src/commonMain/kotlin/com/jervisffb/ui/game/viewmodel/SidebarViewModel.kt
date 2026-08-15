@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
@@ -158,11 +159,11 @@ class SidebarViewModel(
                         false -> it
                     },
                     UiPlayerTransientData(
-                        onHover = UiAction(Pair("onHover", player.id)) { hoverOver(player) },
-                        onHoverExit = UiAction(Pair("onHoverExit", player.id)) { hoverExit() },
-                        onSecondaryClick = UiAction(Pair("onSecondaryClick", player.id)) {
+                        onHover = UiAction(Pair("onHover", player.id), GuardedAction(uiState.gameController) { hoverOver(player) }),
+                        onHoverExit = UiAction(Pair("onHoverExit", player.id), GuardedAction(uiState.gameController) { hoverExit() }),
+                        onSecondaryClick = UiAction(Pair("onSecondaryClick", player.id), GuardedAction(uiState.gameController) {
                             gameViewModel.showPlayerContextMenu(player.id)
-                        }
+                        })
                     )
                 )
             } ?: error("Cannot find player: $player.id}")
@@ -170,7 +171,7 @@ class SidebarViewModel(
         Pair(snapshot, newList)
     }.shareIn(menuViewModel.uiScope, SharingStarted.Eagerly, 1)
 
-    val dogoutAction: Flow<(() -> Unit)?> = uiState.uiStateFlow.map {
+    val dogoutAction: Flow<GuardedAction?> = uiState.uiStateFlow.map {
         when (team.isHomeTeam()) {
             true -> it.homeDogoutOnClickAction
             false -> it.awayDogoutOnClickAction

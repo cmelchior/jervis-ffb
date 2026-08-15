@@ -20,6 +20,8 @@ import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -53,7 +55,7 @@ object WeatherRollWheelController : ActionWheelDialogController() {
                 label = { "" },
                 diceRollType = DiceRollType.WEATHER,
                 diceValue = D6Result.random(),
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = D6Result.allOptions(),
                 expandable = true,
             ),
@@ -62,7 +64,7 @@ object WeatherRollWheelController : ActionWheelDialogController() {
                 label = { "" },
                 diceRollType = DiceRollType.WEATHER,
                 diceValue = D6Result.random(),
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = D6Result.allOptions(),
                 expandable = true,
                 preferLtr = false,
@@ -78,9 +80,9 @@ object WeatherRollWheelController : ActionWheelDialogController() {
                     result.title
                 },
                 icon = ActionIcon.CONFIRM,
-                action = {
+                action = GuardedAction(acc) { id ->
                     val dice = diceButtons.map { it.diceValue }
-                    provider.userActionSelected(DiceRollResults(dice))
+                    provider.userActionSelected(id, DiceRollResults(dice))
                 }
             )
         )
@@ -114,7 +116,7 @@ object WeatherRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.WEATHER,
                     diceValue = dice.first,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = D6Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(
@@ -126,7 +128,7 @@ object WeatherRollWheelController : ActionWheelDialogController() {
                     label = { null },
                     diceRollType = DiceRollType.WEATHER,
                     diceValue = dice.second,
-                    action = { /* Do nothing */ },
+                    action = NoOpGuardedAction,
                     options = D6Result.allOptions(),
                     expandable = false,
                     animateRoll = RollAnimationData(

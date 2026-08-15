@@ -28,9 +28,9 @@ class ChallengeActionProvider(
         // ManualActionProvider deliberately leaves client-owned random actions to the UI.
         // Challenges still use client-owned rolls for their presentation, but the random result
         // itself must be generated automatically so the coach cannot choose it.
-        if (game.lastActionWasUndo()) return null
+        if (controller.lastActionWasUndo()) return null
         return if (actions.containsActionWithRandomBehavior() && actions.hasConstrainedDiceRoll()) {
-            createRandomAction(game)
+            createRandomAction(controller)
         } else {
             null
         }

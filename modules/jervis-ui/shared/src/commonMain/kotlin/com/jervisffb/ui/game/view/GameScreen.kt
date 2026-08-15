@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_lock_closed
 import com.jervisffb.shared.generated.resources.jervis_icon_lock_open
@@ -61,6 +60,7 @@ import com.jervisffb.ui.game.view.pitch.Pitch
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.ChallengeSessionViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
+import com.jervisffb.ui.game.viewmodel.ExtraActions
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.PanelBackground
@@ -441,7 +441,7 @@ private fun ExpandableActionPanel(
     animateHeightChangeMs: Int = 200
 ) {
     val expansionEnabled = collapsedHeight < expandedHeight
-    val inputs: List<GameAction> by remember(actions.availableActions) { actions.availableActions }.collectAsState(emptyList())
+    val inputs: ExtraActions by remember(actions.availableActions) { actions.availableActions }.collectAsState(ExtraActions.NONE)
     var hovered by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -469,7 +469,7 @@ private fun ExpandableActionPanel(
             .height(animatedHeight)
             .background(if (hovered) background.hoverColor else background.color)
             .onPointerEvent(PointerEventType.Enter) {
-                if (inputs.isNotEmpty() && expansionEnabled) {
+                if (inputs.actions.isNotEmpty() && expansionEnabled) {
                     hovered = true
                 }
             }
@@ -481,15 +481,15 @@ private fun ExpandableActionPanel(
         // as this causes crashes. The Box height constrains it to 0 when collapsed.
         Box(modifier = Modifier.height(animatedHeight)) {
             ActionSelector(
-                actions = inputs,
+                actions = inputs.actions,
                 modifier = Modifier.fillMaxSize(),
                 showEmptyMessage = false,
                 scrollState = scrollState
             ) { action ->
-                actions.actionSelected(action)
+                actions.actionSelected(inputs.id, action)
             }
         }
-        if (inputs.isNotEmpty() && expansionEnabled) {
+        if (inputs.actions.isNotEmpty() && expansionEnabled) {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -498,7 +498,7 @@ private fun ExpandableActionPanel(
                 ,
                 verticalArrangement = Arrangement.Bottom,
             ) {
-                if (inputs.isNotEmpty()) {
+                if (inputs.actions.isNotEmpty()) {
                     Text(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
                         fontFamily = JervisTheme.extendedDefaultFontFamily(),

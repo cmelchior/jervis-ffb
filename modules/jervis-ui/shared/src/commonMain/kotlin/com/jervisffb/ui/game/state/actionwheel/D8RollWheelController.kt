@@ -21,6 +21,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -51,7 +53,7 @@ abstract class D8RollWheelController: ActionWheelDialogController() {
                     id = ButtonId("$buttonIdPrefix-${d8Option.value}"),
                     label = { null },
                     diceValue = d8Option,
-                    action = { provider.userActionSelected(d8Option) },
+                    action = GuardedAction(acc) { id -> provider.userActionSelected(id, d8Option) },
                     options = D8Result.allOptions(),
                     expandable = false,
                     diceRollType = diceRollType,
@@ -85,7 +87,7 @@ abstract class D8RollWheelController: ActionWheelDialogController() {
                 label = { "" },
                 diceRollType = diceRollType,
                 diceValue = d8Roll,
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = emptyList(),
                 expandable = false,
                 enabled = false,

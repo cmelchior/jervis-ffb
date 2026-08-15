@@ -4,8 +4,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.ui.game.mappings.UiTeamReroll
+import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.viewmodel.ButtonData
-import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.DrawableResource
@@ -69,7 +69,7 @@ data class UiGameStatusUpdate(
     val drive: Int = 0,
     val turnMax: Int = 0,
     val centerBadgeText: String = "",
-    val centerBadgeAction: ((GameScreenModel) -> Unit)? = null,
+    val centerBadgeAction: GuardedBadgeAction? = null,
     val centerBadgeEnabled: Boolean = false,
     val badgeSubButtons: PersistentList<ButtonData> = persistentListOf(),
     val actionButtons: PersistentList<ButtonData> = persistentListOf(),

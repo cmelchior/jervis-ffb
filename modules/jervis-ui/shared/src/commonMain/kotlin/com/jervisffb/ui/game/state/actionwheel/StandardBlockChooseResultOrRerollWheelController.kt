@@ -29,6 +29,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -60,6 +62,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         // If it is the blocking player that also chooses the final result, we shortcut
         // the action sequence a bit, by folding "no-reroll" into pressing one of the
         // dice.
+        //
         // If not, we add a "Confirm" roll to the action buttons, which will transfer
         // control to the other coach for selecting the final result.
         val context = acc.game.getContext<BlockContext>()
@@ -68,6 +71,8 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         val diceButtonEnabled = attackerChooseResult
             || (currentNode == SingleStandardBlockChooseResult.SelectBlockResult)
             || (currentNode == StandardBlockChooseResult.SelectBlockResult)
+        val choosingReroll = currentNode == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
+            || currentNode == SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll
 
         val diceButtons = context.roll.mapIndexed { index, die ->
             DieButtonData(
@@ -75,7 +80,9 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                 label = { null },
                 diceRollType = DiceRollType.BLOCK,
                 diceValue = die.result,
-                action = {
+                action = GuardedAction(acc) { id ->
+                    // Selecting a die while the attacker is choosing a reroll is a
+                    // shortcut for accepting the roll and then selecting the die.
                     val action = if (actions.contains<SelectNoReroll>()) {
                         CompositeGameAction(
                             NoRerollSelected(0),
@@ -84,7 +91,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                     } else {
                         DicePoolResultsSelected.fromSingleDice(die)
                     }
-                    provider.userActionSelected(action)
+                    provider.userActionSelected(id, action)
                 },
                 options = DBlockResult.allOptions(),
                 expandable = false,
@@ -94,10 +101,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
         }
 
         val actionButtons = mutableListOf<ButtonData>()
-        if (
-            currentNode == StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
-            || currentNode == SingleStandardBlockChooseReroll.ChooseRerollSourceOrAcceptRoll
-        ) {
+        if (choosingReroll) {
             // The buttonId's here must be kept in sync with `StandardBlockWheelControllers` to make sure the buttons
             // animate correctly.
             // TODO The Rules Engine no longer sends multiple reroll options for the same type, but not all use cases has been
@@ -114,7 +118,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                             label = { rerollSource.rerollDescription },
                             icon = ActionIcon.TEAM_REROLL,
                             enabled = true,
-                            action = { provider.userActionSelected(RerollOptionSelected(options.first())) }
+                            action = GuardedAction(acc) { id -> provider.userActionSelected(id, RerollOptionSelected(options.first())) }
                         )
                     } else {
 
@@ -131,10 +135,9 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                                 expandable = false,
                                 enabled = (matchingOption != null),
                                 preferLtr = (index == 0),
-                                action = if (matchingOption != null) {
-                                    { provider.userActionSelected(RerollOptionSelected(matchingOption)) }
-                                } else {
-                                    {}
+                                action = when (matchingOption != null) {
+                                    true -> GuardedAction(acc) { id -> provider.userActionSelected(id, RerollOptionSelected(matchingOption)) }
+                                    false -> NoOpGuardedAction
                                 },
                             )
                         }
@@ -169,8 +172,8 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
                         id = ButtonId("confirm"),
                         label = { "Confirm Roll" },
                         icon = ActionIcon.CONFIRM,
-                        action = {
-                            provider.userActionSelected(NoRerollSelected())
+                        action = GuardedAction(acc) { id ->
+                            provider.userActionSelected(id, NoRerollSelected())
                         },
                     )
                 )
@@ -202,7 +205,7 @@ object StandardBlockChooseResultOrRerollWheelController : ActionWheelDialogContr
 //                    id = ButtonId("block-$index"),
 //                    label = null,
 //                    diceValue = die,
-//                    action = { /* Do nothing */ },
+//                    action = NoOpGuardedAction,
 //                    options = DBlockResult.allOptions(),
 //                    expandable = false,
 //                    animateRoll = RollAnimationData(

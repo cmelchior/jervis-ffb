@@ -13,6 +13,7 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.common.context.FoulContext
@@ -37,6 +38,7 @@ class MultipleChoiceUserInputDialog(
     val message: String,
     val dice: List<Pair<Dice, List<DieResult>>>,
     val result: (DiceRollResults) -> String?,
+    val nextActionId: GameActionId,
     override var owner: Team? = null,
     val width: Dp = DialogSize.MEDIUM,
     val movable: Boolean = true,
@@ -44,7 +46,7 @@ class MultipleChoiceUserInputDialog(
 
     companion object {
 
-        fun createWeatherRollDialog(rules: Rules): UserInputDialog {
+        fun createWeatherRollDialog(id: GameActionId, rules: Rules): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Weather roll",
                 message = "Roll 2D6 for the weather",
@@ -61,12 +63,13 @@ class MultipleChoiceUserInputDialog(
                         ).title
                     "$description (${rolls.sumOf { it.value }})"
                 },
+                nextActionId = id,
                 movable = false,
                 width = DialogSize.D6_SELECTOR
             )
         }
 
-        fun createDeviateDialog(rules: Rules, isKickOff: Boolean = true): UserInputDialog {
+        fun createDeviateDialog(id: GameActionId, rules: Rules, isKickOff: Boolean = true): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = if (isKickOff) "The KickOff" else "Deviate the ball",
                 message = "Roll Roll 1D8 + 1D6 to deviate the ball.",
@@ -92,11 +95,12 @@ class MultipleChoiceUserInputDialog(
                         }
                     "$description(${d6.value})"
                 },
+                nextActionId = id,
                 width = DialogSize.D8_SELECTOR
             )
         }
 
-        fun createKickOffEventDialog(rules: Rules): UserInputDialog {
+        fun createKickOffEventDialog(id: GameActionId, rules: Rules): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "KickOff Event",
                 message = "Roll 2D6 for the KickOff event.",
@@ -113,28 +117,31 @@ class MultipleChoiceUserInputDialog(
                         ).description
                     "$description (${rolls.sumOf { it.value }})"
                 },
+                nextActionId = id,
             )
         }
 
-        fun createBlockRollDialog(diceCount: Int, isBlitz: Boolean): UserInputDialog {
+        fun createBlockRollDialog(id: GameActionId, diceCount: Int, isBlitz: Boolean): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "${ if (isBlitz) "Blitz" else "Block"} roll",
                 message = "Roll ${diceCount}D6",
                 dice = (1..diceCount).map { Pair(Dice.BLOCK, DBlockResult.allOptions()) },
-                result = { rolls: DiceRollResults -> null },
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createSelectBlockDie(result: SelectDicePoolResult): UserInputDialog {
+        fun createSelectBlockDie(id: GameActionId, result: SelectDicePoolResult): UserInputDialog {
             return DicePoolUserInputDialog(
                 dialogTitle = "Select Block Result",
                 message = "Select die to apply",
                 poolTitles = emptyList(),
                 dice = result.pools.map { Pair(Dice.BLOCK, it) },
+                nextActionId = id,
             )
         }
 
-        fun createArmourRollDialog(player: Player): UserInputDialog {
+        fun createArmourRollDialog(id: GameActionId, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Armour roll",
                 message = "Roll 2D6 to break armour for ${player.name}",
@@ -146,10 +153,11 @@ class MultipleChoiceUserInputDialog(
                 result = { rolls: DiceRollResults ->
                     rolls.sum().toString()
                 },
+                nextActionId = id,
             )
         }
 
-        fun createInjuryRollDialog(rules: Rules, player: Player): UserInputDialog {
+        fun createInjuryRollDialog(id: GameActionId, rules: Rules, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Injury roll",
                 message = "Roll 2D6 for an injury on ${player.name}",
@@ -162,10 +170,11 @@ class MultipleChoiceUserInputDialog(
                     val result = rules.injuryTable.roll(rolls.first() as D6Result, rolls.last() as D6Result)
                     "${result.title} (${rolls.sum()})"
                 },
+                nextActionId = id,
             )
         }
 
-        fun createCasualtyRollDialog(rules: Rules, player: Player): UserInputDialog {
+        fun createCasualtyRollDialog(id: GameActionId, rules: Rules, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Casualty roll",
                 message = "Roll D16 for a casualty on ${player.name}",
@@ -184,10 +193,11 @@ class MultipleChoiceUserInputDialog(
                     val result = rules.casualtyTable.roll(rolls.first() as D16Result, modifiers)
                     "${result.title} (${rolls.sum()})"
                 },
+                nextActionId = id,
             )
         }
 
-        fun createLastingInjuryRollDialog(rules: Rules, player: Player): UserInputDialog {
+        fun createLastingInjuryRollDialog(id: GameActionId, rules: Rules, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Lasting Injury roll",
                 message = "Roll D6 for a Lasting Injury on ${player.name}",
@@ -196,10 +206,11 @@ class MultipleChoiceUserInputDialog(
                     val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
                     "${result.description} (${rolls.sum()})"
                 },
+                nextActionId = id,
             )
         }
 
-        fun createArgueTheCallRollDialog(context: FoulContext, rules: Rules): UserInputDialog {
+        fun createArgueTheCallRollDialog(id: GameActionId, context: FoulContext, rules: Rules): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Argue The Call Roll",
                 message = "Roll D6 to Argue The Call on behalf of ${context.fouler.name}",
@@ -208,19 +219,21 @@ class MultipleChoiceUserInputDialog(
                     val result = rules.argueTheCallTable.roll(rolls.first() as D6Result)
                     "${result.title} (${rolls.sum()})"
                 },
+                nextActionId = id,
             )
         }
 
-        fun createAccuracyRollDialog(passContext: PassContext, rules: Rules): UserInputDialog {
+        fun createAccuracyRollDialog(id: GameActionId, passContext: PassContext, rules: Rules): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Test for Accuracy",
                 message = "${passContext.thrower.name} rolls a D6 to test for accuracy when making a pass",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createScatterRollDialog(rules: Rules): UserInputDialog {
+        fun createScatterRollDialog(id: GameActionId, rules: Rules): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Scatter Roll",
                 message = "Roll 3D8 to scatter the ball",
@@ -243,38 +256,42 @@ class MultipleChoiceUserInputDialog(
                             "null"
                         }
                     }
-                }
+                },
+                nextActionId = id,
             )
         }
 
-        fun createDodgeRollDialog(player: Player, target: PitchCoordinate): UserInputDialog {
+        fun createDodgeRollDialog(id: GameActionId, player: Player, target: PitchCoordinate): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Dodge Roll",
                 message = "${player.name} rolls D6 to dodge to ${target.toLogString()}.",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createRushRollDialog(player: Player, target: OnPitchLocation): UserInputDialog {
+        fun createRushRollDialog(id: GameActionId, player: Player, target: OnPitchLocation): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createSwelteringHeatRollDialog(): UserInputDialog {
+        fun createSwelteringHeatRollDialog(id: GameActionId): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Sweltering Heat Roll",
                 message = "Roll D3 to find number of affected players.",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
-                result = { rolls: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createPrayersToNuffleRollDialog(rules: Rules, rollsRemaining: Int): UserInputDialog {
+        fun createPrayersToNuffleRollDialog(id: GameActionId, rules: Rules, rollsRemaining: Int): UserInputDialog {
             val diceOptions = when (rules.prayersToNuffleTable.die) {
                 Dice.D8 -> Pair(Dice.D8, D8Result.allOptions())
                 Dice.D16 -> Pair(Dice.D16, D16Result.allOptions())
@@ -286,74 +303,82 @@ class MultipleChoiceUserInputDialog(
                 dice = listOf(diceOptions),
                 result = { rolls: DiceRollResults ->
                     rules.prayersToNuffleTable.roll(rolls.first()).description
-                }
+                },
+                nextActionId = id,
             )
         }
 
-        fun createBadHabitsRoll(): UserInputDialog {
+        fun createBadHabitsRoll(id: GameActionId): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Bad Habits Roll",
                 message = "Roll D3 to find number of affected players",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createCheeringFansRollDialog(team: Team): UserInputDialog {
+        fun createCheeringFansRollDialog(id: GameActionId, team: Team): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Cheering Fans Roll",
                 message = "${team.name} rolls a D6 for Cheering Fans",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createBrilliantCoachingRolLDialog(team: Team): UserInputDialog {
+        fun createBrilliantCoachingRolLDialog(id: GameActionId, team: Team): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Brilliant Coaching Roll",
                 message = "${team.name} rolls a D6 for Brilliant Coaching",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createOfficiousRefRollDialog(team: Team): UserInputDialog {
+        fun createOfficiousRefRollDialog(id: GameActionId, team: Team): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Officious Ref Roll",
                 message = "${team.name} rolls a D6 for Officious Ref",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createOfficiousRefPlayerRollDialog(player: Player): UserInputDialog {
+        fun createOfficiousRefPlayerRollDialog(id: GameActionId, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Officious Ref Player Roll",
                 message = "${player.name} rolls a D6 while arguing with the Ref",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createStandingUpRollDialog(player: Player): UserInputDialog {
+        fun createStandingUpRollDialog(id: GameActionId, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Standing up Roll",
                 message = "Roll D6 for ${player.name} to stand up.",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createApothecaryInjuryRollDialog(player: Player): UserInputDialog {
+        fun createApothecaryInjuryRollDialog(id: GameActionId, player: Player): UserInputDialog {
             return MultipleChoiceUserInputDialog(
                 title = "Patching-up Casualty",
                 message = "Roll D6 to see if the apothecary can patch up ${player.name}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
 
-        fun createUnknownDiceRoll(dicePool: RollDice): UserInputDialog {
+        fun createUnknownDiceRoll(id: GameActionId, dicePool: RollDice): UserInputDialog {
             val dice= dicePool.dice.map {
                 when (it) {
                     Dice.D2 -> Pair(it, D2Result.allOptions())
@@ -372,7 +397,8 @@ class MultipleChoiceUserInputDialog(
                 title = "Unknown Dice Roll",
                 message = "Unmapped die roll (see logs for details)",
                 dice = dice,
-                result = { _: DiceRollResults -> null }
+                result = { _: DiceRollResults -> null },
+                nextActionId = id,
             )
         }
     }

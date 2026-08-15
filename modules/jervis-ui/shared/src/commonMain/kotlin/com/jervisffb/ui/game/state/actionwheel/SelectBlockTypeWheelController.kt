@@ -15,6 +15,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -44,7 +45,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
 
         val wheelOptions = actions.get<SelectBlockType>().types.map {
             val id = ButtonId("[BlockType] ${it.name}")
-            createActionOption(id, acc.game, provider, it)
+            createActionOption(id, acc, provider, it)
         }.toMutableList()
 
         val wheelState = ActionWheelUiStateData(
@@ -61,7 +62,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
     // Temporary work-around while transition from PitchDecorator api
     private fun createActionOption(
         id: ButtonId,
-        state: Game,
+        acc: UiSnapshotAccumulator,
         provider: UiActionProvider,
         blockType: BlockType
     ): ActionButtonData {
@@ -79,7 +80,7 @@ object SelectBlockTypeWheelController : ActionWheelDialogController() {
             id = id,
             label = { title },
             icon = icon,
-            action = { provider.userActionSelected(BlockTypeSelected(blockType)) },
+            action = GuardedAction(acc) { id -> provider.userActionSelected(id, BlockTypeSelected(blockType)) },
             enabled = true,
         )
     }

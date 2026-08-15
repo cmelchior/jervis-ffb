@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -21,7 +22,7 @@ object DeselectPlayerDecorator: PitchActionDecorator<DeselectPlayer> {
             val coordinate = player.location as PitchCoordinate
             val action = PlayerDeselected(player)
             acc.updateSquare(coordinate) {
-                it.copy(onMenuHidden = UiAction(action) { actionProvider.userActionSelected(action) })
+                it.copy(onMenuHidden = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) }))
             }
         }
     }

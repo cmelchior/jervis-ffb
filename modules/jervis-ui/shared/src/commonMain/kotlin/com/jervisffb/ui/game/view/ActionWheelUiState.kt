@@ -1,9 +1,11 @@
 package com.jervisffb.ui.game.view
 
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.dialogs.wheel.ButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.model.GuardedAction
 import kotlin.math.ceil
 
 /**
@@ -29,6 +31,8 @@ object NoContextMenu: ContextWheelUiState
  * should be performed.
  */
 sealed class ActionWheelUiState {
+    open val actionId: GameActionId = GameActionId.NONE // The Game Action this Action Wheel is associated with
+
     // Where should the Action Wheel be placed? If `null` it will be centered in the middle of the screen.
     // Otherwise, we will do a best-effort attempt at placing the circle directly over the `center` coordinate,
     // but in case there is no room, like if the square is too close to the edge. It will be placed to the side
@@ -41,7 +45,7 @@ sealed class ActionWheelUiState {
     open val bottomItems: List<ButtonData> = emptyList()
     open val bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact()
     open val bottomAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE
-    open val onDismiss: (() -> Unit)? = null
+    open val onDismiss: GuardedAction? = null
     open val animationOnly: Boolean = false
     open val hideWhenClickOutside: Boolean = false
     open val enableAnimation: Boolean = true
@@ -82,7 +86,7 @@ data class ActionWheelUiStateData(
     override val bottomItems: List<ButtonData> = emptyList(),
     override val bottomExpandMode: MenuExpandMode = MenuExpandMode.Compact(),
     override val bottomAnimationType: ButtonLayoutMode = ButtonLayoutMode.STABLE,
-    override val onDismiss: (() -> Unit)? = null,
+    override val onDismiss: GuardedAction? = null,
     override val animationOnly: Boolean = false,
     override val hideWhenClickOutside: Boolean = false,
     override val enableAnimation: Boolean = true,

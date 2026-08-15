@@ -22,6 +22,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -55,6 +56,7 @@ data class SingleChoiceInputDialog(
     val message: String,
     val width: Dp,
     val actionDescriptions: List<Pair<GameAction, String>>,
+    val nextActionId: GameActionId,
     override var owner: Team? = null,
     val moveable: Boolean = true,
 ) : UserInputDialog {
@@ -99,6 +101,7 @@ data class SingleChoiceInputDialog(
         private fun create(
             title: String,
             message: String,
+            actionId: GameActionId,
             actions: List<GameAction>,
             state: Game,
             owner: Team,
@@ -111,6 +114,7 @@ data class SingleChoiceInputDialog(
                 message = message,
                 width = width,
                 actionDescriptions = actions.map { Pair(it, getDescription(state, it))},
+                nextActionId = actionId,
                 owner = owner,
                 moveable = movable,
             )
@@ -119,6 +123,7 @@ data class SingleChoiceInputDialog(
         private fun createWithDescription(
             title: String,
             message: String,
+            actionId: GameActionId,
             actions: List<Pair<GameAction, String>>,
             owner: Team,
             width: Dp = DialogSize.MEDIUM,
@@ -130,15 +135,17 @@ data class SingleChoiceInputDialog(
                 message = message,
                 width = width,
                 actionDescriptions = actions,
+                nextActionId = actionId,
                 owner = owner,
                 moveable = movable
             )
         }
 
-        fun createFanFactorDialog(team: Team): UserInputDialog = create(
+        fun createFanFactorDialog(actionId: GameActionId, team: Team): UserInputDialog = create(
             title = "Fan Factor Roll",
             message = "Roll D3 for ${team.name}",
             actions = D3Result.allOptions(),
+            actionId = actionId,
             state = team.game,
             owner = team,
             width = DialogSize.SMALL,
@@ -147,10 +154,12 @@ data class SingleChoiceInputDialog(
 
         fun createSelectKickoffCoinTossResultDialog(
             team: Team,
+            actionId: GameActionId,
             actions: List<GameAction>,
         ) = create(
             title = "Coin Toss",
             message = "Call the outcome of the coin toss.",
+            actionId = actionId,
             actions = actions,
             state = team.game,
             owner = team,
@@ -159,6 +168,7 @@ data class SingleChoiceInputDialog(
         )
 
         fun createTossDialog(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>)
         : SingleChoiceInputDialog =
@@ -166,6 +176,7 @@ data class SingleChoiceInputDialog(
                 title = "Coin Toss",
                 message = "Flip coin into the air.",
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = state.homeTeam,
                 width = DialogSize.SMALL,
@@ -173,6 +184,7 @@ data class SingleChoiceInputDialog(
             )
 
         fun createChooseToKickoffDialog(
+            actionId: GameActionId,
             team: Team,
             actions: List<Pair<GameAction, String>>,
         ): SingleChoiceInputDialog =
@@ -180,30 +192,34 @@ data class SingleChoiceInputDialog(
                 title = "Kickoff?",
                 message = "${team.name} must choose to kick-off or receive",
                 actions = actions,
+                actionId = actionId,
                 owner = team,
                 width = DialogSize.SMALL,
                 movable = false
             )
 
-        fun createInvalidSetupDialog(team: Team): SingleChoiceInputDialog =
+        fun createInvalidSetupDialog(actionId: GameActionId, team: Team): SingleChoiceInputDialog =
             create(
                 title = "Invalid Setup",
                 message = "Invalid setup, please try again",
                 actions = listOf(Confirm),
+                actionId = actionId,
                 state = team.game,
                 owner = team
             )
 
-        fun createTouchdownScoredDialog(player: Player): SingleChoiceInputDialog =
+        fun createTouchdownScoredDialog(actionId: GameActionId, player: Player): SingleChoiceInputDialog =
             create(
                 title = "TOUCHDOWN!",
                 message = "A touchdown was scored by ${player.name}",
                 actions = listOf(Confirm),
+                actionId = actionId,
                 state = player.team.game,
                 owner = player.team
             )
 
         fun createCatchBallDialog(
+            actionId: GameActionId,
             player: Player,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog =
@@ -211,11 +227,13 @@ data class SingleChoiceInputDialog(
                 title = "Catch Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
+                actionId = actionId,
                 state = player.team.game,
                 owner = player.team,
             )
 
         fun createPickupBallDialog(
+            actionId: GameActionId,
             player: Player,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog =
@@ -223,11 +241,13 @@ data class SingleChoiceInputDialog(
                 title = "Pickup Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
+                actionId = actionId,
                 state = player.team.game,
                 owner = player.team,
             )
 
         fun createCatchRerollDialog(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>,
             owner: Team
@@ -237,12 +257,14 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = owner,
             )
         }
 
         fun createPickupRerollDialog(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog {
@@ -251,12 +273,14 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = state.activeTeam!!,
             )
         }
 
         fun createChooseBlockResultOrReroll(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>,
             owner: Team
@@ -266,6 +290,7 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll or Result",
                 message = message,
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = owner
             )
@@ -273,6 +298,7 @@ data class SingleChoiceInputDialog(
 
         @Deprecated("Use ActionWheelInputDialog.createBounceBallDialog() instead")
         fun createBounceBallDialog(
+            actionId: GameActionId,
             rules: Rules,
             actions: List<D8Result>,
             owner: Team,
@@ -296,46 +322,52 @@ data class SingleChoiceInputDialog(
                             }
                         Pair(roll, description)
                     },
-                owner = owner
+                owner = owner,
+                actionId = actionId,
             )
 
-        fun createFollowUpDialog(player: Player): SingleChoiceInputDialog {
+        fun createFollowUpDialog(actionId: GameActionId, player: Player): SingleChoiceInputDialog {
             return createWithDescription(
                 title = "Follow-up",
                 message = "Does ${player.name} want to follow up?",
                 actions = listOf(Confirm to "Follow Up", Cancel to "Stay In Place"),
+                actionId = actionId,
                 owner = player.team
             )
         }
 
-        fun createUseApothecaryDialog(context: RiskingInjuryContext): SingleChoiceInputDialog {
+        fun createUseApothecaryDialog(actionId: GameActionId, context: RiskingInjuryContext): SingleChoiceInputDialog {
             return createWithDescription(
                 title = "Use Apothecary",
                 message = "Do you want to use an apothecary to heal ${context.player.name} from a ${context.injuryResult}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+                actionId = actionId,
                 owner = context.player.team
             )
         }
 
-        fun createUseSkillDialog(player: Player, skill: Skill<*>): UserInputDialog {
+        fun createUseSkillDialog(actionId: GameActionId, player: Player, skill: Skill<*>): UserInputDialog {
             return createWithDescription(
                 title = "Use ${skill.name}?",
                 message = "Does ${player.name} want to use ${skill.name}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+                actionId = actionId,
                 owner = player.team,
             )
         }
 
-        fun createArgueTheCallDialog(context: FoulContext): UserInputDialog {
+        fun createArgueTheCallDialog(actionId: GameActionId, context: FoulContext): UserInputDialog {
             return createWithDescription(
                 title = "Argue the call",
                 message = "${context.fouler.name} was caught by the ref. Argue the call?",
                 actions = listOf(Confirm to "Argue", Cancel to "Stay silent"),
+                actionId = actionId,
                 owner = context.fouler.team
             )
         }
 
         fun createRushRerollDialog(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>,
             owner: Team
@@ -345,12 +377,14 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = owner
             )
         }
 
         fun createDodgeRerollDialog(
+            actionId: GameActionId,
             state: Game,
             actions: List<GameAction>,
             owner: Team
@@ -360,6 +394,7 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                actionId = actionId,
                 state = state,
                 owner = owner
             )

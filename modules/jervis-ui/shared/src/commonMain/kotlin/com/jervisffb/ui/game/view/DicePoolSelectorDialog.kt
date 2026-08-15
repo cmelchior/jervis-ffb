@@ -131,7 +131,7 @@ fun DicePoolSelectorDialog(
                                 DicePoolChoice(el.second.id, listOf(DicePoolChoice.SelectedDiceRoll(selectedRoll)))
                             }
                         )
-                        vm.userActionSelected(selectedResultsAction)
+                        vm.userActionSelected(dialog.nextActionId, selectedResultsAction)
                     },
                     enabled = true // (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {

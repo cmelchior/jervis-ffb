@@ -24,6 +24,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -50,7 +52,7 @@ abstract class D3RollWheelController: ActionWheelDialogController() {
                     id = ButtonId("$buttonIdPrefix-${d3Option.value}"),
                     label = { null },
                     diceValue = d3Option,
-                    action = { provider.userActionSelected(d3Option) },
+                    action = GuardedAction(acc) { id -> provider.userActionSelected(id, d3Option) },
                     options = D3Result.allOptions(),
                     expandable = false,
                     diceRollType = diceRollType,
@@ -84,7 +86,7 @@ abstract class D3RollWheelController: ActionWheelDialogController() {
                 label = { "" },
                 diceRollType = diceRollType,
                 diceValue = d3Roll,
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = emptyList(),
                 expandable = false,
                 enabled = false,
@@ -206,4 +208,3 @@ object ThrowInWheelController: D3RollWheelController() {
         return context.outOfBoundsAt
     }
 }
-

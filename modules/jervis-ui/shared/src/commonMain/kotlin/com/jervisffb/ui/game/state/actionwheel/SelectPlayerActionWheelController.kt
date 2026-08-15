@@ -25,6 +25,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
@@ -48,7 +49,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
     ) {
         val wheelOptions = actions.get<SelectPlayerAction>().actions.map {
             val id = ButtonId("player-action-${it.type}")
-            createActionOption(id, acc.game, provider, it)
+            createActionOption(acc, id, provider, it)
         }.toMutableList()
 
         // If prone, also add a "Stand Up & And Action". But only if the
@@ -58,7 +59,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             val menuItem = ActionButtonData(
                 id = ButtonId("[${actions.id.value}] Stand Up & End Action"),
                 label = { "Stand Up & End Action" },
-                action = {
+                action = GuardedAction(acc) { id ->
                     // If players need to stand up or roll for negatraits before standing
                     // up we need wait for it.
                     provider.registerQueuedActionGenerator { controller ->
@@ -72,6 +73,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
                         }
                     }
                     provider.userActionSelected(
+                        id,
                         CompositeGameAction(PlayerActionSelected(PlayerStandardActionType.MOVE), MoveTypeSelected(MoveType.STAND_UP))
                     )
                 },
@@ -79,8 +81,8 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             )
             wheelOptions.add(menuItem)
         }
-        val onDismiss = {
-            provider.userActionSelected(PlayerDeselected(activePlayer))
+        val onDismiss = GuardedAction(acc) { id ->
+            provider.userActionSelected(id, PlayerDeselected(activePlayer))
         }
         val wheelState = ActionWheelUiStateData(
             center = getActionWheelCenter(acc.game),
@@ -95,11 +97,12 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
 
     // Temporary work-around while transition from PitchDecorator api
     private fun createActionOption(
+        acc: UiSnapshotAccumulator,
         id: ButtonId,
-        state: Game,
         provider: UiActionProvider,
         action: PlayerAction
     ): ActionButtonData {
+        val state = acc.game
         return state.activePlayer?.location?.let { location ->
             val (actionName, actionIcon) = when (action.type) {
                 PlayerStandardActionType.MOVE -> "Move" to ActionIcon.MOVE
@@ -136,7 +139,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
                 id = id,
                 label = { actionName },
                 icon = actionIcon,
-                action = { provider.userActionSelected(PlayerActionSelected(action.type)) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, PlayerActionSelected(action.type)) },
                 enabled = true,
             )
         } ?: error("No active player")

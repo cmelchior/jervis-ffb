@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.dialogs
 
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DicePool
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.model.Team
 
@@ -14,17 +15,21 @@ class DicePoolUserInputDialog(
     val message: String,
     val poolTitles: List<String>,
     val dice: List<Pair<Dice, DicePool<*, *>>>,
+    val nextActionId: GameActionId,
     override var owner: Team? = null,
 ) : UserInputDialog {
+
     companion object {
-        fun createSelectBlockDie(result: SelectDicePoolResult): UserInputDialog {
+        fun createSelectBlockDie(id: GameActionId, result: SelectDicePoolResult): UserInputDialog {
             if (result.pools.size != 1) throw IllegalStateException("Unexpected number of pools: ${result.pools.size}")
             return DicePoolUserInputDialog(
                 dialogTitle = "Select Block Result",
                 message = "Select die to apply",
                 poolTitles = emptyList(),
                 dice = result.pools.map { Pair(Dice.BLOCK, it)},
+                nextActionId = id
             )
         }
     }
+
 }

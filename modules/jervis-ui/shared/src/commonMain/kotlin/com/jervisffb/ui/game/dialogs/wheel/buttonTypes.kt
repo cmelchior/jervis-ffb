@@ -5,6 +5,8 @@ import com.jervisffb.engine.ext.d2
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import kotlin.jvm.JvmInline
@@ -26,9 +28,10 @@ data class RollAnimationData<T: DieResult>(
         .random() as T
 }
 
+// Top-level interface for all Action Wheel Buttons
 sealed interface ButtonData {
     val id: ButtonId
-    val action: () -> Unit
+    val action: GuardedAction
     val label: () -> String?
     var targetAngle: Float
     var defaultStartingAngle: Float
@@ -39,7 +42,7 @@ data class ActionButtonData(
     override val id: ButtonId,
     override val label: () -> String,
     val icon: ActionIcon,
-    override val action: () -> Unit,
+    override val action: GuardedAction,
     val enabled: Boolean = true,
 ): ButtonData {
     override var targetAngle: Float = 0f
@@ -54,7 +57,7 @@ data class ActionButtonOpenSubMenu(
     val enabled: Boolean = true,
     val subMenu: ActionWheelUiState,
 ): ButtonData {
-    override val action: () -> Unit = { /* Do nothing. This will not be used */ }
+    override val action: GuardedAction = NoOpGuardedAction
     override var targetAngle: Float = 0f
     override var defaultStartingAngle: Float = 0f
     override val animateRoll: RollAnimationData<*>? = null
@@ -66,7 +69,7 @@ data class ActionButtonCancelSubMenu(
     val enabled: Boolean = true,
 ): ButtonData {
     val icon: ActionIcon = ActionIcon.CANCEL
-    override val action: () -> Unit = { /* Do nothing. This will not be used */ }
+    override val action: GuardedAction = NoOpGuardedAction
     override var targetAngle: Float = 0f
     override var defaultStartingAngle: Float = 0f
     override val animateRoll: RollAnimationData<*>? = null
@@ -77,7 +80,7 @@ data class DieButtonData<T: DieResult>(
     override val label: () -> String?,
     val diceRollType: DiceRollType,
     var diceValue: T,
-    override val action: () -> Unit,
+    override val action: GuardedAction,
     val options: List<T>,
     val expandable: Boolean,
     val enabled: Boolean = true,
@@ -94,7 +97,7 @@ data class CoinButtonData(
     val value: Coin,
     val enabled: Boolean = true,
     override val label: () -> String?,
-    override val action: () -> Unit,
+    override val action: GuardedAction,
     override val animateRoll: RollAnimationData<*>? = null
 ): ButtonData {
     override var targetAngle: Float = 0f

@@ -19,6 +19,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.dialogs.PrimaryActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.SecondaryActionWheelViewModel
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
@@ -74,6 +75,7 @@ class PitchViewModel(
     private val uiState: UiGameController,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
+    val gameController = uiState.gameController
     val rules = uiState.rules
     val game = uiState.state
     val width = rules.pitchWidth
@@ -155,7 +157,7 @@ class PitchViewModel(
                     val path = movePlan.getClosestPathTo(mouseEnter!!)
 
                     // Create the action triggered if clicking the mouse-over square.
-                    val action = UiAction(Triple(path.map { it.target.coordinate }, requiresStandingUp, activePlayer!!.id)) {
+                    val action = UiAction(Triple(path.map { it.target.coordinate }, requiresStandingUp, activePlayer!!.id), GuardedAction(uiState.gameController) { id ->
                         val actionProvider = (uiState.actionProvider)
                         fun getQueuedActionsForPath(): QueuedActionsResult {
                             val actions = path.map { it.action }
@@ -179,13 +181,13 @@ class PitchViewModel(
                                 }
                             }
                             // Trigger Stand-up
-                            actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                            actionProvider.userActionSelected(id, MoveTypeSelected(MoveType.STAND_UP))
                         } else {
                             // Nothing should prevent the player from moving straight away, so
                             // just queue up all pathfinder data directly.
-                            actionProvider.userMultipleActionsSelected(getQueuedActionsForPath().actions)
+                            actionProvider.userMultipleActionsSelected(id, getQueuedActionsForPath().actions,)
                         }
-                    }
+                    })
 
                     // Annotate all squares with "Move Used" amount + add action on the square
                     // that is currently being hovered over.

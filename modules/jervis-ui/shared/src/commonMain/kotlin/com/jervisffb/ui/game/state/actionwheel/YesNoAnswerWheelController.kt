@@ -71,6 +71,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -129,13 +130,13 @@ abstract class YesNoAnswerWheelController : ActionWheelDialogController() {
                 id = ButtonId("accept-yes"),
                 label = { yesLabel },
                 icon = ActionIcon.CONFIRM,
-                action = { provider.userActionSelected(Confirm) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, Confirm) },
             ),
             ActionButtonData(
                 id = ButtonId("accept-no"),
                 label = { noLabel },
                 icon = ActionIcon.CANCEL,
-                action = { provider.userActionSelected(Cancel) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, Cancel) },
             ),
         )
         val wheelState = ActionWheelUiStateData(

@@ -30,6 +30,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.dialogs.wheel.RollAnimationData
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -56,7 +58,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
                     id = ButtonId("$buttonIdPrefix-${d6Option.value}"),
                     label = { null },
                     diceValue = d6Option,
-                    action = { provider.userActionSelected(d6Option) },
+                    action = GuardedAction(acc) { id -> provider.userActionSelected(id, d6Option) },
                     options = D6Result.allOptions(),
                     expandable = false,
                     diceRollType = diceRollType,
@@ -90,7 +92,7 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
                 label = { "" },
                 diceRollType = diceRollType,
                 diceValue = d6Roll,
-                action = { /* Do nothing */ },
+                action = NoOpGuardedAction,
                 options = emptyList(),
                 expandable = false,
                 enabled = false,

@@ -5,6 +5,8 @@ import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
 import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.NoOpGuardedAction
 import com.jervisffb.ui.game.view.ActionWheelUiState
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.game.view.ContextWheelMenu
@@ -72,7 +74,7 @@ class SecondaryActionWheelViewModel(
                     id = ButtonId("context-${contextOption.title}"),
                     label = { contextOption.title },
                     icon = contextOption.icon,
-                    action = {
+                    action = GuardedAction(pitchViewModel.gameController) {
                         hideWheel()
                         pitchViewModel.triggerHoverExit()
                         contextOption.command()
@@ -87,7 +89,7 @@ class SecondaryActionWheelViewModel(
             },
             bottomExpandMode = MenuExpandMode.FanOut(spread = 360f),
             bottomAnimationType = ButtonLayoutMode.CONTRACT_NEW_SUBMENU,
-            onDismiss = { /* Do nothing */ },
+            onDismiss = NoOpGuardedAction,
             hideWhenClickOutside = true
         )
         return wheelState
@@ -106,7 +108,7 @@ class SecondaryActionWheelViewModel(
         _eventFlow.safeTryEmit(currentWheel!!)
     }
 
-    override fun hideWheel(onDismiss: (() -> Unit)?) {
+    override fun hideWheel(onDismiss: GuardedAction?) {
         sharedPitchData.let {
             it.setContextActionWheelVisibility(false)
             _eventFlow.safeTryEmit(hideAction)

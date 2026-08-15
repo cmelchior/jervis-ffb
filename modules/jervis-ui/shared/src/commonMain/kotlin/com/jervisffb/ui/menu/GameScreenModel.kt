@@ -348,11 +348,15 @@ class GameScreenModel(
             }
             else -> error("Unsupported error: $currentLocation -> $newLocation ")
         }
-        actionProvider.currentProvider.userActionSelected(adminAction)
+        actionProvider.currentProvider.userActionSelected(gameController.nextActionIndex(), adminAction)
         if (!isMovePlayersFreely.value) {
             playerEditorOpenOnStatePlayerId = player.id
             showPlayerContextMenu(player.id)
         }
+    }
+
+    fun userSelectedAction(action: GameAction) {
+        actionProvider.currentProvider.userActionSelected(gameController.nextActionIndex(), action)
     }
 
     // Returns `true` if we are moving a player as part of modifying their state.

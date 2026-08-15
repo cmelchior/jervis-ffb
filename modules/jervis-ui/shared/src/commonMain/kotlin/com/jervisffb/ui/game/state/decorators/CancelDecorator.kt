@@ -26,6 +26,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
@@ -108,7 +110,7 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
             acc.updateGameStatus {
                 it.copy(
                     centerBadgeText = title,
-                    centerBadgeAction = { actionProvider.userActionSelected(Cancel) },
+                    centerBadgeAction = GuardedBadgeAction(acc) { id, _ -> actionProvider.userActionSelected(id, Cancel) },
                     centerBadgeEnabled = true
                 )
             }
@@ -129,7 +131,7 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
                     contextMenuOptions = it.contextMenuOptions.add(
                         SimpleContextMenuOption(
                             title,
-                            UiAction(Cancel) { actionProvider.userActionSelected(Cancel) },
+                            UiAction(Cancel, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, Cancel) }),
                             ActionIcon.CANCEL
                         )
                     )

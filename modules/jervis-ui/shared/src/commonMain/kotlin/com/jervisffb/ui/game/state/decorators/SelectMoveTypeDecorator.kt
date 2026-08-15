@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
@@ -56,9 +57,9 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         }
     }
 
-    private fun moveTypeAction(actionProvider: ManualActionProvider, type: MoveType): UiAction {
+    private fun moveTypeAction(actionProvider: ManualActionProvider, acc: UiSnapshotAccumulator, type: MoveType): UiAction {
         val action = MoveTypeSelected(type)
-        return UiAction(action) { actionProvider.userActionSelected(action) }
+        return UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) })
     }
 
     private fun handleType(actionProvider: ManualActionProvider, state: Game, acc: UiSnapshotAccumulator, type: MoveType) {
@@ -75,7 +76,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Jump",
-                                moveTypeAction(actionProvider, MoveType.JUMP),
+                                moveTypeAction(actionProvider, acc, MoveType.JUMP),
                                 ActionIcon.JUMP
                             )
                         )
@@ -89,7 +90,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Leap",
-                                moveTypeAction(actionProvider, MoveType.LEAP),
+                                moveTypeAction(actionProvider, acc, MoveType.LEAP),
                                 ActionIcon.LEAP
                             )
                         )
@@ -103,7 +104,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Pogo",
-                                moveTypeAction(actionProvider, MoveType.POGO),
+                                moveTypeAction(actionProvider, acc, MoveType.POGO),
                                 ActionIcon.LEAP
                             )
                         )
@@ -125,9 +126,9 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                 displayPlan.neighborMoves.forEach { (coordinate, plannedMove) ->
                     acc.updateSquare(coordinate) {
                         it.copy(
-                            selectedAction = UiAction(plannedMove.action) {
-                                actionProvider.userActionSelected(plannedMove.action)
-                            },
+                            selectedAction = UiAction(plannedMove.action, GuardedAction(acc) { id ->
+                                actionProvider.userActionSelected(id, plannedMove.action)
+                            }),
                             requiresRoll = plannedMove.requiresRoll,
                         )
                     }
@@ -141,21 +142,21 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         val useFumblerooski = ToggleContextMenuOption.ContextData(
                             "Use Fumblerooski when moving next",
                             ActionIcon.FUMBLEROOSKI_USE,
-                            UiAction(Pair("useFumblerooski", player.id)) {
+                            UiAction(Pair("useFumblerooski", player.id), GuardedAction(acc) {
                                 val uiController = acc.uiController
                                 // We need to reset the UI decoration at the correct place when Undo'ing actions
                                 uiController.uiDecorations.registerUndo(uiController.gameController.currentActionIndex()) {
                                     actionProvider.nextFumblerooskiCommand(player, null)
                                 }
                                 actionProvider.nextFumblerooskiCommand(player, Confirm)
-                            },
+                            }),
                         )
                         val cancelFumblerooski = ToggleContextMenuOption.ContextData(
                             "Cancel Fumblerooski on next move",
                             ActionIcon.FUMBLEROOSKI_CANCEL,
-                            UiAction(Pair("cancelFumblerooski", player.id)) {
+                            UiAction(Pair("cancelFumblerooski", player.id), GuardedAction(acc) {
                                 actionProvider.nextFumblerooskiCommand(player, Cancel)
-                            },
+                            }),
                         )
                         it.copy(
                             contextMenuOptions = it.contextMenuOptions.add(
@@ -181,7 +182,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                         contextMenuOptions = it.contextMenuOptions.add(
                             SimpleContextMenuOption(
                                 "Stand-Up",
-                                moveTypeAction(actionProvider, MoveType.STAND_UP),
+                                moveTypeAction(actionProvider, acc, MoveType.STAND_UP),
                                 ActionIcon.STAND_UP
                             )
                         )
@@ -221,7 +222,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         displayPlan.neighborMoves.forEach { (coordinate, plannedMove) ->
             acc.updateSquare(coordinate) {
                 it.copy(
-                    selectedAction = UiAction(Pair("standUpThenMoveTo", coordinate)) {
+                    selectedAction = UiAction(Pair("standUpThenMoveTo", coordinate), GuardedAction(acc) { id ->
                         actionProvider.registerQueuedActionGenerator { controller ->
                             val availableActions = controller.getAvailableActions()
                             val canMove = availableActions.contains(MoveType.STANDARD)
@@ -239,8 +240,8 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                                 null
                             }
                         }
-                        actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
-                    },
+                        actionProvider.userActionSelected(id, MoveTypeSelected(MoveType.STAND_UP))
+                    }),
                     requiresRoll = plannedMove.requiresRoll,
                 )
             }

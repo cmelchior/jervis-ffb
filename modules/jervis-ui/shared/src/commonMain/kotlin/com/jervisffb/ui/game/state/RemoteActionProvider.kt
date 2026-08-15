@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -61,17 +62,17 @@ class RemoteActionProvider(
         acc.actionWasSelectedWithoutUserInput = true
     }
 
-    override suspend fun getAction(): GameAction {
-        return actionSelectedChannel.receive()
+    override suspend fun getAction(id: GameActionId): GameAction {
+        return waitForNextAction(id)
     }
 
-    override fun userActionSelected(action: GameAction) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
         actionScope.launch {
-            actionSelectedChannel.send(action)
+            actionSelectedChannel.send(AsyncGameAction(id, action))
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         TODO("Not yet supported")
     }
 

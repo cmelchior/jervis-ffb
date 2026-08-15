@@ -94,7 +94,7 @@ class ReplayActionProvider(
         this.controller = controller
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GameAction {
         while (true) {
             // Detect whether the previously emitted action was rejected by the engine.
             val emitted = lastEmittedAction
@@ -219,8 +219,8 @@ class ReplayActionProvider(
         decorationProvider.decorateSelectedAction(action, acc)
         acc.actionWasSelectedWithoutUserInput = true
     }
-    override fun userActionSelected(action: GameAction) { /* Do nothing */ }
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) { /* Do nothing */ }
+    override fun userActionSelected(id: GameActionId, action: GameAction) { /* Do nothing */ }
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) { /* Do nothing */ }
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) { /* Do nothing */ }
     override fun hasQueuedActions(): Boolean = false
 }

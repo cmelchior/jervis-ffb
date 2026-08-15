@@ -27,9 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.ChallengeSessionViewModel
+import com.jervisffb.ui.game.viewmodel.ExtraActions
 
 /**
  * Challenge Panel: Being shown in the bottom-right corner during challenge
@@ -49,17 +49,17 @@ fun ChallengePanel(
     modifier: Modifier = Modifier,
 ) {
     var tabIndex by remember { mutableStateOf(0) }
-    val inputs: List<GameAction> by remember(actions.availableActions) { actions.availableActions }.collectAsState(emptyList())
+    val inputs: ExtraActions by remember(actions.availableActions) { actions.availableActions }.collectAsState(ExtraActions.NONE)
 
     // An action without a dedicated UI control blocks the engine, so keep the tabs visible while
     // any are pending, even when not hovering. The count in the title says where to look.
-    val showTabs = hovered || inputs.isNotEmpty()
+    val showTabs = hovered || inputs.actions.isNotEmpty()
     // The number of tabs must stay fixed. The indicator indexes into the tabs it was given, so a
     // tab that came and went would require `tabIndex` to be clamped in the same frame. Changing
     // the titles is fine.
     val tabs = listOf(
         "Challenge Info",
-        if (inputs.isEmpty()) "Extra Actions" else "Extra Actions (${inputs.size})",
+        if (inputs.actions.isEmpty()) "Extra Actions" else "Extra Actions (${inputs.actions.size})",
     )
 
     // Select the action tab when a later update produces extra actions. The initial snapshot is
@@ -67,15 +67,15 @@ fun ChallengePanel(
     // always starts on its information tab, while its initial actions remain visible.
     LaunchedEffect(actions.availableActionUpdates) {
         actions.availableActionUpdates.collect { updatedInputs ->
-            if (updatedInputs.isNotEmpty()) {
+            if (updatedInputs.actions.isNotEmpty()) {
                 tabIndex = 1
             }
         }
     }
 
     // Once the last pending action is gone the tabs are hidden again.
-    LaunchedEffect(inputs.isEmpty()) {
-        if (inputs.isEmpty()) {
+    LaunchedEffect(inputs.actions.isEmpty()) {
+        if (inputs.actions.isEmpty()) {
             tabIndex = 0
         }
     }
@@ -127,12 +127,12 @@ fun ChallengePanel(
             // to make it behave exactly like it does inside `ExpandableActionPanel`.
             1 -> {
                 ActionSelector(
-                    actions = inputs,
+                    actions = inputs.actions,
                     modifier = Modifier.fillMaxSize(),
                     scrollState = actionsScrollState,
                     showEmptyMessage = true
                 ) { action ->
-                    actions.actionSelected(action)
+                    actions.actionSelected(inputs.id, action)
                 }
             }
         }

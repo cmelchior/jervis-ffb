@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -18,7 +19,7 @@ object SelectPitchLocationDecorator: PitchActionDecorator<SelectPitchLocation> {
     ) {
         descriptor.squares.forEach { squareData ->
             val action = PitchSquareSelected(squareData.coordinate)
-            val selectedAction = UiAction(action) { actionProvider.userActionSelected(action) }
+            val selectedAction = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) })
             acc.updateSquare(squareData.coordinate) {
                 it.copy(
                     selectedAction = selectedAction,

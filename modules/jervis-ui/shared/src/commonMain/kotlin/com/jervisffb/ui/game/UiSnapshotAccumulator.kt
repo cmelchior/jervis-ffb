@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.planner.MovePlan
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
@@ -46,8 +47,8 @@ class UiSnapshotAccumulator(
     val squares: Map<PitchCoordinate, UiPitchSquare>
         field = previousSnapshot.squares.builder()
     val stack = uiController.state.stack
-    var awayDogoutOnClickAction: (() -> Unit)? = null
-    var homeDogoutOnClickAction: (() -> Unit)? = null
+    var awayDogoutOnClickAction: GuardedAction? = null
+    var homeDogoutOnClickAction: GuardedAction? = null
     private val actionWheelEvents = mutableListOf<ActionWheelUiState>()
     private val contextWheelEvents = mutableListOf<ContextWheelUiState>()
     var dialogInput: UserInputDialog? = null

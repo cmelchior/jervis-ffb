@@ -47,6 +47,7 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.view.NoActionWheel.animationOnly
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
@@ -126,19 +127,25 @@ fun SingleSelectUserActionDialog(
 
                             }
                             is DieResult -> {
+                                val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
+                                    GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id -> vm.userActionSelected(id, action) }
+                                }
                                 DialogDiceButton(
                                     modifier = Modifier.offset(y = 4.dp),
                                     die = action,
                                     isSelected = false,
-                                    onClick = { vm.userActionSelected(action) },
+                                    onClick = onClickCallback,
                                     useSelectedColorAsHover = true
                                 )
                             }
                             else -> {
+                                val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
+                                    GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id -> vm.userActionSelected(id, action) }
+                                }
                                 JervisButton(
                                     modifier = Modifier.offset(y = 8.dp),
                                     text = description,
-                                    onClick = { vm.userActionSelected(action) },
+                                    onClick = onClickCallback,
                                     buttonColor = if (dialog.owner?.isAwayTeam() == true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue,
                                 )
                             }
@@ -233,14 +240,17 @@ fun MultipleSelectUserActionDialog(
                 },
                 buttons = {
                     val buttonText by derivedStateOf { resultText ?: "Confirm" }
+                    val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
+                        GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                            showDialog = false
+                            val result = DiceRollResults(selectedRolls.filterNotNull())
+                            vm.userActionSelected(id, result)
+                        }
+                    }
                     JervisButton(
                         modifier = Modifier.offset(y = 8.dp),
                         text = buttonText,
-                        onClick = {
-                            showDialog = false
-                            val result = DiceRollResults(selectedRolls.filterNotNull())
-                            vm.userActionSelected(result)
-                        },
+                        onClick = onClickCallback,
                         buttonColor = buttonColor,
                         enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                     )

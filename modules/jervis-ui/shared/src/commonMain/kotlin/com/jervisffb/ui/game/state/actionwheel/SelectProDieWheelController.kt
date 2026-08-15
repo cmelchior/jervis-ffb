@@ -21,6 +21,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -67,7 +68,7 @@ object SelectProDieWheelController : ActionWheelDialogController() {
                 label = { null },
                 diceRollType = context.type,
                 diceValue = die.result,
-                action = {
+                action = GuardedAction(acc) { id ->
                     val action = if (actions.contains<SelectNoReroll>()) {
                         CompositeGameAction(
                             NoRerollSelected(0),
@@ -76,7 +77,7 @@ object SelectProDieWheelController : ActionWheelDialogController() {
                     } else {
                         DicePoolResultsSelected.fromSingleDice(die)
                     }
-                    provider.userActionSelected(action)
+                    provider.userActionSelected(id, action)
                 },
                 options = DBlockResult.allOptions(),
                 expandable = false,
@@ -93,7 +94,7 @@ object SelectProDieWheelController : ActionWheelDialogController() {
             label = { "Cancel using Pro" },
             icon = ActionIcon.CANCEL,
             enabled = true,
-            action = { provider.userActionSelected(Cancel) }
+            action = GuardedAction(acc) { id -> provider.userActionSelected(id, Cancel) }
         ))
 
         val wheelState = ActionWheelUiStateData(

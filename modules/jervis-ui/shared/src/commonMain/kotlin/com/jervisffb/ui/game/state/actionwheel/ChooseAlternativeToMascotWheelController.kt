@@ -18,6 +18,7 @@ import com.jervisffb.ui.game.dialogs.wheel.ButtonId
 import com.jervisffb.ui.game.dialogs.wheel.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.wheel.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -50,7 +51,7 @@ object ChooseAlternativeToMascotWheelController : ActionWheelDialogController() 
                 id = ButtonId("accept-yes"),
                 label = { "Keep Mascot Roll" },
                 icon = ActionIcon.CONFIRM,
-                action = { provider.userActionSelected(NoRerollSelected()) },
+                action = GuardedAction(acc) { id -> provider.userActionSelected(id, NoRerollSelected()) },
             ),
         )
         val rerollOptions = actions.filterIsInstance<SelectRerollOption>().firstOrNull()?.let { rerollOption ->
@@ -61,7 +62,7 @@ object ChooseAlternativeToMascotWheelController : ActionWheelDialogController() 
                     label = { rerollSource.rerollDescription },
                     icon = ActionIcon.TEAM_REROLL,
                     enabled = true,
-                    action = { provider.userActionSelected(RerollOptionSelected(option)) }
+                    action = GuardedAction(acc) { id -> provider.userActionSelected(id, RerollOptionSelected(option)) }
                 )
             }
         } ?: emptyList()

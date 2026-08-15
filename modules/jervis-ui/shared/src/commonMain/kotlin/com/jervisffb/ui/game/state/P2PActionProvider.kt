@@ -68,15 +68,15 @@ class P2PActionProvider(
                 // TODO Should this be moved into RemoteActionProvider somehow?
                 lastServerActionIndex = serverIndex
                 if (producer == engine.state.awayTeam.coach.id) { // TODO Is this check always correct?
-                    awayProvider.userActionSelected(action)
+                    awayProvider.userActionSelected(serverIndex, action)
                 } else {
-                    homeProvider.userActionSelected(action)
+                    homeProvider.userActionSelected(serverIndex, action)
                 }
             }
 
             override fun onServerError(error: ServerError) {
                 // If actions are rejected on the server, we queue them up here to
-                // be undone here. The UI experience for this will probably be a bit
+                // be undone. The UI experience for this will probably be a bit
                 // weird, since it will display the intermediate UI actions for
                 // each step backwards, but since it is impossible to know when the
                 // rollback is done, it is hard to do anything about it. Unless some
@@ -106,7 +106,7 @@ class P2PActionProvider(
 
         val clientActionIndex = engine.currentActionIndex()
         // Should only send this if the event is truly from this client and not just a sync message
-        // TODO lastServerActionIndex seems to be out of syn
+        // TODO lastServerActionIndex seems to be out of sync
         LOG.d("Sending message to server ($clientActionIndex > $lastServerActionIndex): $action")
         if (clientActionIndex > lastServerActionIndex) {
             actionScope.launch {
@@ -155,23 +155,23 @@ class P2PActionProvider(
         }
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GameAction {
         if (handlingServerRevert) {
             val action = queuedServerActions.removeFirst()
             LOG.i { "Handling revert: $handlingServerRevert -> $action" }
             return action
         } else {
             LOG.i { "GetAction($currentProvider)" }
-            return currentProvider.getAction()
+            return currentProvider.getAction(id)
         }
     }
 
-    override fun userActionSelected(action: GameAction) {
-        currentProvider.userActionSelected(action)
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
+        currentProvider.userActionSelected(id, action)
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
-        currentProvider.userMultipleActionsSelected(actions, delayEvent)
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
+        currentProvider.userMultipleActionsSelected(startingId, actions, delayEvent)
     }
 
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {

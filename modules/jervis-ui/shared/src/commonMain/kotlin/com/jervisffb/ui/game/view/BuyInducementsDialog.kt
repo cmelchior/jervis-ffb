@@ -98,6 +98,7 @@ import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.dialogs.GroupItemView
 import com.jervisffb.ui.game.dialogs.MERCENARY_NAMES
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.NumberChangeButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
@@ -116,7 +117,7 @@ fun BuyInducementsDialog(
     dialog: BuyInducementsDialog,
     dialogsVm: DialogsViewModel,
 ) {
-    val vm = remember(dialog) { BuyInducementsViewModel(dialog) }
+    val vm = remember(dialog) { BuyInducementsViewModel(dialogsVm.screenViewModel.uiState.gameController, dialog) }
     val isHomeTeam = dialog.team.isHomeTeam()
     val teamColor = if (isHomeTeam) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
 
@@ -350,9 +351,14 @@ fun BuyInducementsDialog(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        val onClickCancelCallback = remember(vm.gameController, dialog.nextActionId) {
+                            GuardedAction(vm.gameController, dialog.nextActionId) { id ->
+                                dialogsVm.userActionSelected(id, Cancel)
+                            }
+                        }
                         JervisButton(
                             text = "Cancel",
-                            onClick = { dialogsVm.userActionSelected(Cancel) },
+                            onClick = onClickCancelCallback,
                             buttonColor = teamColor,
                         )
                         val badgesState = rememberLazyListState()
@@ -371,9 +377,14 @@ fun BuyInducementsDialog(
                                 PurchasedInducementBadge(entry = entry, isHomeTeam = isHomeTeam, teamColor = teamColor)
                             }
                         }
+                        val onClickBuyCallback = remember(vm.gameController, dialog.nextActionId) {
+                            GuardedAction(vm.gameController, dialog.nextActionId) { id ->
+                                dialogsVm.userActionSelected(id, vm.submit())
+                            }
+                        }
                         JervisButton(
                             text = if (vm.totalPrice <= 0) "Buy" else "Buy (${formatCurrency(vm.totalPrice)})",
-                            onClick = { dialogsVm.userActionSelected(vm.submit()) },
+                            onClick = onClickBuyCallback,
                             enabled = vm.canBuy,
                             buttonColor = teamColor,
                         )

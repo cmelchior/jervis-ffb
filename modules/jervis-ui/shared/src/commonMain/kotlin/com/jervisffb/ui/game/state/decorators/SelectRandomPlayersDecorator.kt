@@ -5,6 +5,8 @@ import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.model.GuardedBadgeAction
+import com.jervisffb.ui.game.model.GuardedPlayerAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPlayerAction
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -18,7 +20,7 @@ object SelectRandomPlayersDecorator : PitchActionDecorator<SelectRandomPlayers> 
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
-        val selectedAction = UiPlayerAction(descriptor) onClickHandler@{ screenModel: GameScreenModel, player: UiPitchPlayer ->
+        val selectedAction = UiPlayerAction(descriptor, GuardedPlayerAction(acc) onClickHandler@{ _, screenModel: GameScreenModel, player: UiPitchPlayer ->
             val enablePlayer = !player.isTemporarySelected.value
             if (enablePlayer && screenModel.selectedPlayersInUi.size == descriptor.count) return@onClickHandler
             player.isTemporarySelected.value = enablePlayer
@@ -40,7 +42,7 @@ object SelectRandomPlayersDecorator : PitchActionDecorator<SelectRandomPlayers> 
             } else {
                 screenModel.gameStatusBoxTitle.value = "Finish selecting players"
             }
-        }
+        })
         descriptor.players.forEach { playerId ->
             acc.updatePlayer(playerId) {
                 it.copy(selectedAction = selectedAction)
@@ -49,9 +51,9 @@ object SelectRandomPlayersDecorator : PitchActionDecorator<SelectRandomPlayers> 
         acc.updateGameStatus {
             it.copy(
                 centerBadgeText = "Select ${descriptor.count} random players",
-                centerBadgeAction = { model ->
+                centerBadgeAction = GuardedBadgeAction(acc) { id, model ->
                     val action = RandomPlayersSelected(model.getSelectedPlayers())
-                    actionProvider.userActionSelected(action)
+                    actionProvider.userActionSelected(id, action)
                 },
                 centerBadgeEnabled = false
             )

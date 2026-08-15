@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -149,7 +150,11 @@ fun Dialogs(vm: DialogsViewModel) {
         }
         is BuyInducementsDialog -> {
             val dialog = dialogData as BuyInducementsDialog
-            BuyInducementsDialog(dialog, vm)
+            // Treat each action request as a new dialog, as otherwise the onclick
+            // handlers get cached (not 100% sure why)
+            key(dialog.nextActionId) {
+                BuyInducementsDialog(dialog, vm)
+            }
         }
         is AbstractActionWheelViewModel,
         null -> { /* Do nothing */ }
@@ -270,5 +275,3 @@ fun DebugLog(vm: LogViewModel) {
         }
     }
 }
-
-

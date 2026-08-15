@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.dialogs
 
 import androidx.compose.runtime.mutableStateOf
 import com.jervisffb.engine.model.Team
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.DelicateCoroutinesApi
 
@@ -42,5 +43,5 @@ abstract class AbstractActionWheelViewModel(
     override var owner: Team? = team
 
     abstract fun showWheel()
-    abstract fun hideWheel(onDismiss: (() -> Unit)? = null)
+    abstract fun hideWheel(onDismiss: GuardedAction? = null)
 }

@@ -81,6 +81,7 @@ import com.jervisffb.ui.game.UiTeamFeatureType
 import com.jervisffb.ui.game.UiTeamInfoUpdate
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.menu.GameScreenModel
@@ -536,7 +537,7 @@ private fun GameStatusBox(
     statusBoxWidth: Dp,
     padding: Dp = 0.dp,
     angle: Float,
-    action: ((GameScreenModel) -> Unit)? = null
+    action: GuardedBadgeAction? = null
 ) {
     val isEnabled by gameScreenModel.isGameStatusBoxEnabled
     val title by gameScreenModel.gameStatusBoxTitle
@@ -563,11 +564,11 @@ private fun GameStatusBox(
                 }
             }
             .applyIf(isEnabled) {
-                onClick(onClick = {
+                onClickWithSmallDragControl {
                     if (action != null) {
                         action(gameScreenModel)
                     }
-                })
+                }
             }
             .border(4.jdp, borderColor, shape)
 

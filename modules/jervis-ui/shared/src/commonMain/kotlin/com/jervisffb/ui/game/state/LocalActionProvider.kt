@@ -4,6 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController
@@ -76,7 +77,7 @@ class LocalActionProvider(
         currentProvider.decorateSelectedAction(action, acc)
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GameAction {
         val provider = currentProvider
         // For now, disable timer actions as we need to implement timer infrastructure
         // in the network protocol first
@@ -87,20 +88,21 @@ class LocalActionProvider(
                 // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
                 // delay(settings.timerSettings.turnFreeTime ?: settings.timerSettings.turnActionTime)
                 val action = createRandomAction(engine)
-                provider.userActionSelected(action)
+                val id = engine.nextActionIndex()
+                provider.userActionSelected(id, action)
             }
         }
-        return provider.getAction().also {
+        return provider.getAction(id).also {
             actionJob?.cancel()
         }
     }
 
-    override fun userActionSelected(action: GameAction) {
-        currentProvider.userActionSelected(action)
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
+        currentProvider.userActionSelected(id, action)
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
-        currentProvider.userMultipleActionsSelected(actions, delayEvent)
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
+        currentProvider.userMultipleActionsSelected(startingId, actions, delayEvent)
     }
 
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {

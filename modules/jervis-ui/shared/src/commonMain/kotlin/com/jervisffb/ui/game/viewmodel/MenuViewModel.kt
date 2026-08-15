@@ -245,7 +245,7 @@ class MenuViewModel {
             TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
         }
         if (uiState.gameController.isUndoAvailable(team = team)) {
-            uiState.userSelectedAction(Undo)
+            uiState.userSelectedAction(uiState.gameController.nextActionIndex(), Undo)
         } else {
             SoundManager.play(SoundEffect.ERROR)
         }
@@ -344,7 +344,7 @@ class MenuViewModel {
         }
 
         // Treat the entire setup as one action. Which makes it easy to undo again
-        uiState.userSelectedAction(CompositeGameAction(setupActions))
+        uiState.userSelectedAction(game.nextActionIndex(), CompositeGameAction(setupActions))
     }
 
     // Called by the UiGameController whenever a new snapshot is created. This can be used to determine

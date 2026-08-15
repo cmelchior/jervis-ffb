@@ -69,7 +69,6 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.Skill
-import com.jervisffb.net.handlers.handleAction
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
@@ -125,7 +124,9 @@ fun PlayerEditorCard(
                 PlayerStatsCard(flowOf(player))
             }
             PlayerEditor(gameModel, player, updateTrigger, borderSize, { action ->
-                gameModel.actionProvider.userActionSelected(action)
+                // TODO We should probably put this in a GuardedAction, but as an AdminGameAction
+                //  it shouldn't matter as much
+                gameModel.userSelectedAction(action)
             })
         }
     }

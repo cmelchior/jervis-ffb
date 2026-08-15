@@ -65,11 +65,13 @@ object DialogFactory {
         mapUnknownActions: (ActionRequest) -> List<GameAction>
     ): UserInputDialog? {
         val rules = controller.rules
+        val id = controller.nextActionIndex()
         val userInput: UserInputDialog? =
             when (val currentNode = controller.state.stack.currentNode()) {
 
                 is ArgueTheCallRoll.RollDie -> {
                     MultipleChoiceUserInputDialog.createArgueTheCallRollDialog(
+                        id,
                         controller.state.getContext<FoulContext>(),
                         rules
                     )
@@ -78,32 +80,32 @@ object DialogFactory {
                 is ArmourRoll.ReRollDice,
                 is ArmourRoll.RollDice -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
-                    MultipleChoiceUserInputDialog.createArmourRollDialog(player)
+                    MultipleChoiceUserInputDialog.createArmourRollDialog(id, player)
                 }
 
                 BadHabits.RollDie -> {
-                    MultipleChoiceUserInputDialog.createBadHabitsRoll()
+                    MultipleChoiceUserInputDialog.createBadHabitsRoll(id)
                 }
 
                 is BrilliantCoaching.KickingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createBrilliantCoachingRolLDialog(controller.state.kickingTeam)
+                    MultipleChoiceUserInputDialog.createBrilliantCoachingRolLDialog(id, controller.state.kickingTeam)
                 }
 
                 is BrilliantCoaching.ReceivingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createBrilliantCoachingRolLDialog(controller.state.kickingTeam)
+                    MultipleChoiceUserInputDialog.createBrilliantCoachingRolLDialog(id, controller.state.kickingTeam)
                 }
 
                 is CasualtyRoll.RollDie -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
-                    MultipleChoiceUserInputDialog.createCasualtyRollDialog(rules, player)
+                    MultipleChoiceUserInputDialog.createCasualtyRollDialog(id, rules, player)
                 }
 
                 BB2020CheeringFans.KickingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createCheeringFansRollDialog(controller.state.kickingTeam)
+                    MultipleChoiceUserInputDialog.createCheeringFansRollDialog(id, controller.state.kickingTeam)
                 }
 
                 BB2020CheeringFans.ReceivingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createCheeringFansRollDialog(controller.state.receivingTeam)
+                    MultipleChoiceUserInputDialog.createCheeringFansRollDialog(id, controller.state.receivingTeam)
                 }
 
                 is DetermineKickingTeamStep.ChooseKickingTeam -> {
@@ -113,11 +115,12 @@ object DialogFactory {
                             Cancel to "Receive",
                         )
                     val context = controller.state.getContext<CoinTossContext>()
-                    SingleChoiceInputDialog.createChooseToKickoffDialog(context.winner!!, choices)
+                    SingleChoiceInputDialog.createChooseToKickoffDialog(id, context.winner!!, choices)
                 }
 
                 is DetermineKickingTeamStep.CoinToss -> {
                     SingleChoiceInputDialog.createTossDialog(
+                        id,
                         state = controller.state,
                         CoinTossResult.allOptions())
                 }
@@ -125,12 +128,13 @@ object DialogFactory {
                 is DetermineKickingTeamStep.SelectCoinSide -> {
                     SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
                         controller.state.awayTeam,
+                        id,
                         CoinSideSelected.allOptions(),
                     )
                 }
 
                 is BeingSentOff.DecideToArgueTheCall -> {
-                    SingleChoiceInputDialog.createArgueTheCallDialog(controller.state.getContext<FoulContext>())
+                    SingleChoiceInputDialog.createArgueTheCallDialog(id, controller.state.getContext<FoulContext>())
                 }
 
                 BuyInducements.HigherCtvBuyPurchaseInducements,
@@ -140,53 +144,54 @@ object DialogFactory {
                         team = request.team!!,
                         treasury = descriptor.treasury,
                         pettyCash = descriptor.pettyCash,
+                        nextActionId = request.id
                     )
                 }
 
                 is InjuryRoll.RollDice -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
-                    MultipleChoiceUserInputDialog.createInjuryRollDialog(rules, player)
+                    MultipleChoiceUserInputDialog.createInjuryRollDialog(id, rules, player)
                 }
 
                 is LastingInjuryRoll.RollDie -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
-                    MultipleChoiceUserInputDialog.createLastingInjuryRollDialog(rules, player)
+                    MultipleChoiceUserInputDialog.createLastingInjuryRollDialog(id, rules, player)
                 }
 
                 is OfficiousRef.KickingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                    MultipleChoiceUserInputDialog.createOfficiousRefRollDialog(id, controller.state.kickingTeam)
                 }
 
                 is OfficiousRef.ReceivingTeamRollDie -> {
-                    MultipleChoiceUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                    MultipleChoiceUserInputDialog.createOfficiousRefRollDialog(id, controller.state.kickingTeam)
                 }
 
                 is OfficiousRef.RollForReceivingTemSelectedPlayer -> {
                     val context = controller.state.getContext<OfficiousRefContext>()
-                    MultipleChoiceUserInputDialog.createOfficiousRefPlayerRollDialog(context.receivingTeamPlayerSelected!!)
+                    MultipleChoiceUserInputDialog.createOfficiousRefPlayerRollDialog(id, context.receivingTeamPlayerSelected!!)
                 }
 
                 is OfficiousRef.RollForKickingTeamSelectedPlayer -> {
                     val context = controller.state.getContext<OfficiousRefContext>()
-                    MultipleChoiceUserInputDialog.createOfficiousRefPlayerRollDialog(context.kickingTeamPlayerSelected!!)
+                    MultipleChoiceUserInputDialog.createOfficiousRefPlayerRollDialog(id, context.kickingTeamPlayerSelected!!)
                 }
 
                 PrayersToNuffleRoll.RollDie -> {
                     val context = controller.state.getContext<PrayersToNuffleRollContext>()
-                    MultipleChoiceUserInputDialog.createPrayersToNuffleRollDialog(controller.rules, context.rollsRemaining)
+                    MultipleChoiceUserInputDialog.createPrayersToNuffleRollDialog(id, controller.rules, context.rollsRemaining)
                 }
 
                 is PatchUpPlayer.ChooseToUseApothecary -> {
                     val context = controller.state.getContext<RiskingInjuryContext>()
-                    SingleChoiceInputDialog.createUseApothecaryDialog(context)
+                    SingleChoiceInputDialog.createUseApothecaryDialog(id, context)
                 }
 
                 is FanFactorRolls.SetFanFactorForAwayTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam)
+                    SingleChoiceInputDialog.createFanFactorDialog(id, controller.state.awayTeam)
                 }
 
                 is FanFactorRolls.SetFanFactorForHomeTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam)
+                    SingleChoiceInputDialog.createFanFactorDialog(id, controller.state.awayTeam)
                 }
 
                 is WeatherRoll.RollWeatherDice -> {
@@ -196,19 +201,19 @@ object DialogFactory {
                             diceRolls.add(DiceRollResults(firstD6, secondD6))
                         }
                     }
-                    MultipleChoiceUserInputDialog.createWeatherRollDialog(rules)
+                    MultipleChoiceUserInputDialog.createWeatherRollDialog(id, rules)
                 }
 
                 is ScatterRoll.RollDice -> {
-                    MultipleChoiceUserInputDialog.createScatterRollDialog(rules)
+                    MultipleChoiceUserInputDialog.createScatterRollDialog(id, rules)
                 }
 
                 is ScoringATouchdown.InformOfTouchdown -> {
-                    SingleChoiceInputDialog.createTouchdownScoredDialog(controller.state.getContext<ScoringATouchDownContext>().player)
+                    SingleChoiceInputDialog.createTouchdownScoredDialog(id, controller.state.getContext<ScoringATouchDownContext>().player)
                 }
 
                 is SetupTeam.InformOfInvalidSetup -> {
-                    SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.getContext<SetupTeamContext>().team)
+                    SingleChoiceInputDialog.createInvalidSetupDialog(id, controller.state.getContext<SetupTeamContext>().team)
                 }
 
                 //    (currentNode == StandingUpRoll.RollDie),
@@ -219,12 +224,12 @@ object DialogFactory {
 
                 is SwelteringHeat.RollForAwayTeam,
                 is SwelteringHeat.RollForHomeTeam -> {
-                    MultipleChoiceUserInputDialog.createSwelteringHeatRollDialog()
+                    MultipleChoiceUserInputDialog.createSwelteringHeatRollDialog(id)
                 }
 
                 is UseBB7Apothecary.ApothecaryInjuryReroll -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
-                    MultipleChoiceUserInputDialog.createApothecaryInjuryRollDialog(player)
+                    MultipleChoiceUserInputDialog.createApothecaryInjuryRollDialog(id, player)
                 }
 
                 else -> {
@@ -233,7 +238,7 @@ object DialogFactory {
             }
 
         return if (userInput == null && request.actions.size == 1 && request.actions.first() is RollDice) {
-            MultipleChoiceUserInputDialog.createUnknownDiceRoll(request.actions.first() as RollDice).apply {
+            MultipleChoiceUserInputDialog.createUnknownDiceRoll(id, request.actions.first() as RollDice).apply {
                 this.owner = request.team
             }
         } else {

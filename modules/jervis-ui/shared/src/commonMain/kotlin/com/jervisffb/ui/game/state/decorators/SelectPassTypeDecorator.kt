@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.actions.punt.PuntAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
@@ -62,7 +63,7 @@ object SelectPassTypeDecorator : PitchActionDecorator<SelectPassType> {
                     contextMenuOptions = it.contextMenuOptions.add(
                         SimpleContextMenuOption(
                             title,
-                            UiAction(action) { actionProvider.userActionSelected(action) },
+                            UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) }),
                             icon
                         )
                     )
