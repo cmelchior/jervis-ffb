@@ -23,6 +23,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
+import com.jervisffb.ui.markings.PlayerMarkingsManager
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.intro.FrontpageScreen
@@ -35,6 +36,7 @@ import com.jervisffb.utils.jervisLogger
 
 val FILE_MANAGER = FileManager()
 val SETTINGS_MANAGER: SettingsManager = SettingsManager()
+val PLAYER_MARKINGS_MANAGER = PlayerMarkingsManager(SETTINGS_MANAGER)
 
 suspend fun initApplication() {
     initializePlatform()

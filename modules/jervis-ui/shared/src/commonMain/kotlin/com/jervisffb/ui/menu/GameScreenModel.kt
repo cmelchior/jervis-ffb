@@ -33,6 +33,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.ui.PLAYER_MARKINGS_MANAGER
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.formatCurrency
@@ -53,6 +54,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.PanelBackground
 import com.jervisffb.ui.game.viewmodel.PitchDetails
 import com.jervisffb.ui.game.viewmodel.PitchViewData
+import com.jervisffb.ui.markings.PlayerMarkingsSettings
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +73,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -168,6 +171,9 @@ class GameScreenModel(
     )
 
     val sharedPitchData: LocalPitchDataWrapper
+
+    val playerMarkings: StateFlow<PlayerMarkingsSettings> = PLAYER_MARKINGS_MANAGER.observePlayerMarkings()
+        .stateIn(modelScope, SharingStarted.Eagerly, PLAYER_MARKINGS_MANAGER.getPlayerMarkings())
 
     var fumbbl: FumbblReplayAdapter? = null
     val rules: Rules = gameController.rules

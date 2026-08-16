@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -56,6 +57,7 @@ import com.jervis.generated.gameSettingsMenu
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_arrow_down
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_arrow_right
+import com.jervisffb.ui.PLAYER_MARKINGS_MANAGER
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.view.JervisTheme
@@ -63,10 +65,14 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.markings.PlayerMarking
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
 import com.jervisffb.ui.menu.dice.DiceColorSettingsPanel
+import com.jervisffb.ui.menu.player_markings.PlayerMarkingEditPanel
+import com.jervisffb.ui.menu.player_markings.PlayerMarkingEditorState
+import com.jervisffb.ui.menu.player_markings.PlayerMarkingsSettingsPanel
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jsp
 import org.jetbrains.compose.resources.painterResource
@@ -74,6 +80,7 @@ import org.jetbrains.compose.resources.painterResource
 private sealed interface DrawerSecondLevelContent
 private data class GeneratedSection(val section: MenuSection) : DrawerSecondLevelContent
 private data object DiceColorSection : DrawerSecondLevelContent
+private data object PlayerMarkingsSection : DrawerSecondLevelContent
 
 /**
  * The challenge-specific actions in the game menu.
@@ -95,12 +102,53 @@ fun GameMenuDrawer(
     val uiState: UiGameSnapshot? by menuViewModel.uiState.uiStateFlow.collectAsState(null)
     val isActionWheelVisible by remember { gameScreenModel.sharedPitchData.isActionWheelVisible }
     var secondLevelItems: DrawerSecondLevelContent? by remember { mutableStateOf(null) }
+    var editingPlayerMarking by remember { mutableStateOf<PlayerMarkingEditorState?>(null) }
+    val secondLevelScrollState = rememberScrollState()
+    val isPlayerMarkingEditorOpen = secondLevelItems is PlayerMarkingsSection && editingPlayerMarking != null
 
-    // Close submenus when the drawer is closing
+    // Close all submenu layers when the drawer is closing.
     LaunchedEffect(drawerState.isOpen) {
         if (!drawerState.isOpen) {
             secondLevelItems = null
+            editingPlayerMarking = null
         }
+    }
+
+    LaunchedEffect(secondLevelItems) {
+        when (secondLevelItems) {
+            is PlayerMarkingsSection -> Unit
+            else -> editingPlayerMarking = null
+        }
+    }
+
+    fun openPlayerMarkingEditor(editor: PlayerMarkingEditorState) {
+        editingPlayerMarking = if (editingPlayerMarking == editor) null else editor
+    }
+
+    fun savePlayerMarking(editor: PlayerMarkingEditorState, marking: PlayerMarking) {
+        val settings = PLAYER_MARKINGS_MANAGER.getPlayerMarkings()
+        val markings = when (editor.index) {
+            null -> settings.markings + marking
+            else -> settings.markings.mapIndexed { index, current ->
+                if (index == editor.index) marking else current
+            }
+        }
+        PLAYER_MARKINGS_MANAGER.setPlayerMarkings(settings.copy(markings = markings))
+        editingPlayerMarking = null
+    }
+
+    fun deletePlayerMarking(editor: PlayerMarkingEditorState) {
+        editor.index?.let { index ->
+            val settings = PLAYER_MARKINGS_MANAGER.getPlayerMarkings()
+            PLAYER_MARKINGS_MANAGER.setPlayerMarkings(
+                settings.copy(
+                    markings = settings.markings.filterIndexed { currentIndex, _ ->
+                        currentIndex != index
+                    }
+                )
+            )
+        }
+        editingPlayerMarking = null
     }
 
     Row {
@@ -279,6 +327,16 @@ fun GameMenuDrawer(
                         secondLevelItems = if (secondLevelItems is DiceColorSection) null else DiceColorSection
                     },
                 )
+                val playerMarkingsIndex = diceColorIndex + 1
+                DrawerMenuGroupHeader(
+                    title = "Player Markings",
+                    isSelected = (secondLevelItems is PlayerMarkingsSection),
+                    if (playerMarkingsIndex % 2 == 1) JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.1f) else Color.Transparent,
+                    enabled = true,
+                    onClick = {
+                        secondLevelItems = if (secondLevelItems is PlayerMarkingsSection) null else PlayerMarkingsSection
+                    },
+                )
             }
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
@@ -312,7 +370,7 @@ fun GameMenuDrawer(
             Column(
                 modifier = Modifier
                     .zIndex(0f)
-                    .fillMaxWidth(0.5f) // Of remaining screen size
+                    .width(550.dp)
                     .fillMaxHeight()
                     .paperBackground()
                     .onClick(
@@ -333,7 +391,12 @@ fun GameMenuDrawer(
                         }
                     }
                     .padding(start = 16.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
-                    .verticalScroll(rememberScrollState())
+                    .then(
+                        when (isPlayerMarkingEditorOpen) {
+                            true -> Modifier
+                            false -> Modifier.verticalScroll(secondLevelScrollState)
+                        }
+                    )
             ) {
                 when (val content = secondLevelItems) {
                     is GeneratedSection -> {
@@ -365,6 +428,34 @@ fun GameMenuDrawer(
                     is DiceColorSection -> {
                         DrawerSectionHeader("Dice Colors", topPadding = 0.dp)
                         DiceColorSettingsPanel(BB2025DiceColorConfig)
+                    }
+                    is PlayerMarkingsSection -> {
+                        when (val editor = editingPlayerMarking) {
+                            null -> {
+                                DrawerSectionHeader("Player Markings", topPadding = 0.dp)
+                                PlayerMarkingsSettingsPanel(
+                                    onCreate = {
+                                        openPlayerMarkingEditor(
+                                            PlayerMarkingEditorState(null, PlayerMarking(text = ""))
+                                        )
+                                    },
+                                    onEdit = { index, marking ->
+                                        openPlayerMarkingEditor(PlayerMarkingEditorState(index, marking))
+                                    },
+                                )
+                            }
+                            else -> {
+                                PlayerMarkingEditPanel(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight(),
+                                    marking = editor.marking,
+                                    onDismiss = { editingPlayerMarking = null },
+                                    onSave = { marking -> savePlayerMarking(editor, marking) },
+                                    onDelete = { deletePlayerMarking(editor) },
+                                )
+                            }
+                        }
                     }
                     null -> { /* AnimatedVisibility handles visibility */ }
                 }
@@ -420,7 +511,7 @@ private fun DrawerButton(text: String, enabled: Boolean = true, onClick: () -> U
 }
 
 @Composable
-private fun DrawerSectionHeader(title: String, topPadding: Dp = 24.dp, bottomPadding: Dp = 8.dp) {
+fun DrawerSectionHeader(title: String, topPadding: Dp = 24.dp, bottomPadding: Dp = 8.dp) {
     Spacer(modifier = Modifier.height(topPadding))
     JervisDialogHeader(title, JervisTheme.rulebookRed)
     TitleBorder(JervisTheme.rulebookRed)

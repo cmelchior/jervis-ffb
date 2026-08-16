@@ -154,6 +154,7 @@ object JervisTheme {
     val darkBlue = Color(0xFF0B5598)
     val lightBlue = Color(0xFF2770B2)
 
+    val brightYellow = Color.Yellow
     val darkYellow = Color(0xFFDCB465)
     val lightYellow = Color(0xFFDAC59A)
 

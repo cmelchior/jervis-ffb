@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
  * - iOS: Stored in NSUserDefaultsSettings
  */
 @OptIn(ExperimentalSettingsApi::class)
-class SettingsManager() {
+class SettingsManager {
 
     private val settings = Settings().makeObservable()
 
@@ -87,4 +87,3 @@ class SettingsManager() {
 
     operator fun set(key: String, value: Any?) = put(key, value)
 }
-

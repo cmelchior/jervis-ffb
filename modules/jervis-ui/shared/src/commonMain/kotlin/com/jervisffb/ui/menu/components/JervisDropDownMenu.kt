@@ -30,11 +30,12 @@ fun <T: DropdownEntry> JervisDropDownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+            modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
             value = selectedEntry?.name ?: "",
             onValueChange = { },
             enabled = enabled,

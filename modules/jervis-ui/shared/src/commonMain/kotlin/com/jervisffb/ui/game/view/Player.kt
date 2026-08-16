@@ -3,9 +3,13 @@ package com.jervisffb.ui.game.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,6 +26,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.asComposeShader
@@ -32,16 +37,29 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.view.pitch.SquarePointerEventType
 import com.jervisffb.ui.game.view.pitch.jervisPointerEvent
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
+import com.jervisffb.ui.markings.PlayerMarking
+import com.jervisffb.ui.markings.PlayerMarkingTeam
+import com.jervisffb.ui.markings.PlayerMarkingType
+import com.jervisffb.ui.markings.PlayerMarkingsSettings
+import com.jervisffb.ui.menu.ChallengeGame
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.Manual
+import com.jervisffb.ui.menu.Random
+import com.jervisffb.ui.menu.Replay
+import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.toSkiaColor
 import kotlinx.coroutines.flow.map
 import org.jetbrains.skia.ImageFilter
@@ -85,6 +103,14 @@ fun Player(
     val isMovePlayersFreelyMode by screenModel.isMovePlayersFreely.collectAsState()
     val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
     val ballImage = IconFactory.getHeldBallOverlay(isUsingFumblerooski)
+    val playerMarkingsSettings by screenModel.playerMarkings.collectAsState()
+    val playerMarkings = remember(player, playerMarkingsSettings, screenModel.mode) {
+        playerMarkingsSettings.matchingMarkings(
+            player = player,
+            isOwnTeam = screenModel.isOwnTeam(player.isOnHomeTeam),
+        )
+    }
+    val playerAlpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f
     var isTempSelected by player.isTemporarySelected
     var playerModifier: Modifier = modifier.aspectRatio(1f)
 
@@ -144,7 +170,7 @@ fun Player(
             isActiveFocus = player.focusStyle != null && player.isActive,
             focusStyle = player.focusStyle,
             isMoveFreelyMode = isMovePlayersFreelyMode,
-            alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
+            alpha = playerAlpha,
         )
         if (player.carriesBall) {
             Image(
@@ -173,6 +199,93 @@ fun Player(
                 modifier = Modifier.fillMaxSize(),
             )
         }
+        if (playerMarkings.isNotEmpty()) {
+            PlayerMarkingText(playerMarkings, playerAlpha)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.PlayerMarkingText(markings: List<String>, alpha: Float) {
+    Text(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .offset(y = 6.jdp)
+            .fillMaxWidth()
+            .alpha(alpha),
+        text = markings.joinToString(separator = ""),
+        maxLines = 1,
+        textAlign = TextAlign.Center,
+        style = JervisTheme.pitchSquareTextStyle.copy(
+            shadow = Shadow(
+                color = JervisTheme.black,
+                blurRadius = 4f,
+                offset = Offset(0f, 0f),
+            ),
+            color = JervisTheme.brightYellow,
+            fontSize = 15.jsp,
+        ),
+    )
+}
+
+// Returns `true` if the player is considerd to be on the "own" team with regard
+// to markings. `null` is returnd in the case where this question is ambiguous.
+internal fun GameScreenModel.isOwnTeam(playerIsHomeTeam: Boolean): Boolean? {
+    return when (val gameMode = mode) {
+        is Manual -> when (gameMode.actionMode) {
+            TeamActionMode.HOME_TEAM -> playerIsHomeTeam
+            TeamActionMode.AWAY_TEAM -> !playerIsHomeTeam
+            TeamActionMode.ALL_TEAMS -> null
+        }
+        // "Own" team is not really defined in this context
+        is ChallengeGame, Random, is Replay -> null
+    }
+}
+
+private fun PlayerMarkingsSettings.matchingMarkings(
+    player: UiPitchPlayer,
+    isOwnTeam: Boolean?, // `null` if ambigious.
+): List<String> {
+    if (!enabled) return emptyList()
+    player.id.let { id ->
+        if (id in playerOverrides) {
+            return listOf(playerOverrides.getValue(id)).filter(String::isNotBlank)
+        }
+    }
+    return generatedMarkings(player.positionalSkills, player.gainedSkills, isOwnTeam)
+}
+
+internal fun PlayerMarkingsSettings.generatedMarkings(
+    skillTypes: List<SkillType>,
+    gainedSkillTypes: List<SkillType>,
+    isOwnTeam: Boolean?, // `null` if ambigious.
+): List<String> {
+    val matchingMarkings = markings.filter { marking ->
+        marking.enabled &&
+            marking.text.isNotBlank() &&
+            marking.team.matches(isOwnTeam) &&
+            marking.skills.isNotEmpty() &&
+            marking.skills.all { skill ->
+                val playerSkills = when (marking.type) {
+                    PlayerMarkingType.ALL -> skillTypes
+                    PlayerMarkingType.GAINED -> gainedSkillTypes
+                }
+                playerSkills.any { it == skill }
+            }
+    }
+    val skillOrder = skillTypes.mapIndexed { index, skill -> skill to index }.toMap()
+    return matchingMarkings
+        .sortedBy { marking -> marking.skills.minOf { skillOrder[it] ?: Int.MAX_VALUE } }
+        .map(PlayerMarking::text)
+}
+
+// If the "own team" is ambiguous, return we will also apply markings. This mean
+// that both teams will be marked, even if the setting is "Own" or "Opponent.
+private fun PlayerMarkingTeam.matches(isOwnTeam: Boolean?): Boolean {
+    return when (this) {
+        PlayerMarkingTeam.BOTH -> true
+        PlayerMarkingTeam.OWN -> isOwnTeam != false
+        PlayerMarkingTeam.OPPONENT -> isOwnTeam != true
     }
 }
 

@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
+    alias(libs.plugins.serialization)
     alias(libs.plugins.multiplatform)
 }
 

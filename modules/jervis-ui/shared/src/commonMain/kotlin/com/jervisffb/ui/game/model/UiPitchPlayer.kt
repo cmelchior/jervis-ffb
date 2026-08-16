@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.menu.GameScreenModel
 
@@ -43,6 +44,8 @@ data class UiPitchPlayer(
     val isActive: Boolean,
     val isGoingDown: Boolean,
     val hasActivated: Boolean,
+    val positionalSkills: List<SkillType> = emptyList(),
+    val gainedSkills: List<SkillType> = emptyList(),
     val dice: Int = 0, // Show block dice decorator
     val isBlocked: Boolean = false, // Show "blocked" indicator
     val isHighlighted: Boolean = false, // Show "highlighted" indicator. This is different from "selectable"
@@ -70,6 +73,8 @@ data class UiPitchPlayer(
                 || model.intermediateState == PlayerIntermediateState.FALLEN_OVER
         ),
         hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnPitch(model.team.game.rules),
+        positionalSkills = model.skills.map { it.type },
+        gainedSkills = model.extraSkills.map { it.type },
         focusStyle = focusStyle,
     )
     val isTemporarySelected = mutableStateOf(false)

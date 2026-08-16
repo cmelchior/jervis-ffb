@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -24,25 +27,33 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +71,7 @@ import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillValue
 import com.jervisffb.engine.model.isOnHomeTeam
@@ -72,16 +84,22 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
+import com.jervisffb.ui.PLAYER_MARKINGS_MANAGER
+import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiKeywordData
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSkillData
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.NumberChangeButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.components.JervisDialogHeader
+import com.jervisffb.ui.menu.components.JervisOutlinedTextField
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.onClickWithSmallDragControl
@@ -107,6 +125,18 @@ fun PlayerEditorCard(
     LaunchedEffect(gameModel.uiState.uiStateFlow) {
         gameModel.uiState.uiStateFlow.collect {
             updateTrigger += 1
+        }
+    }
+
+    // Hide the Player Editor dialog when pressing ESC, rather than opening the game menu.
+    DisposableEffect(gameModel, player.model.id) {
+        val callback = OnBackPress {
+            gameModel.hidePlayerContextMenu()
+            true
+        }
+        BackNavigationHandler.register(callback)
+        onDispose {
+            BackNavigationHandler.unregister(callback)
         }
     }
 
@@ -244,7 +274,36 @@ private fun PlayerEditor(
     borderSize: Dp,
     handleAction: (GameAction) -> Unit
 ) {
-    val tabs = listOf("Skills", "Stats", "Keywords", "State")
+    val tabs = when (vm.rules.allowPlayerEditsDuringGame) {
+        true -> listOf("Markings", "Skills", "Stats", "Keywords", "State")
+        false -> listOf("Markings")
+    }
+    val markingsSettings by vm.playerMarkings.collectAsState()
+    val markingId = player.model.id
+    val generatedMarking = remember(markingsSettings, player, vm.mode) {
+        markingsSettings.generatedMarkings(
+            skillTypes = player.model.skills.map { it.type },
+            gainedSkillTypes = player.model.extraSkills.map { it.type },
+            isOwnTeam = vm.isOwnTeam(player.model.isOnHomeTeam()),
+        ).joinToString("")
+    }
+    var markingDraft by remember(markingId, generatedMarking, markingsSettings.playerOverrides[markingId]) {
+        mutableStateOf(markingsSettings.playerOverrides[markingId] ?: generatedMarking)
+    }
+    fun saveMarking() {
+        val settings = PLAYER_MARKINGS_MANAGER.getPlayerMarkings()
+        val playerOverrides = when (markingDraft == generatedMarking) {
+            true -> settings.playerOverrides - markingId
+            false -> settings.playerOverrides + (markingId to markingDraft)
+        }
+        PLAYER_MARKINGS_MANAGER.setPlayerMarkings(
+            settings.copy(playerOverrides = playerOverrides)
+        )
+    }
+    val latestSaveMarking by rememberUpdatedState { saveMarking() }
+    DisposableEffect(markingId) {
+        onDispose { latestSaveMarking() }
+    }
     val initialPage = when (vm.shouldOpenPlayerEditorOnState(player.model.id)) {
         true -> tabs.indexOf("State").coerceAtLeast(0)
         false -> 0
@@ -252,6 +311,16 @@ private fun PlayerEditor(
     val pagerStateTop = rememberPagerState(initialPage = initialPage) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     var userScrollEnabled by remember { mutableStateOf(true) }
+
+    LaunchedEffect(pagerStateTop) {
+        var previousPage = pagerStateTop.currentPage
+        snapshotFlow { pagerStateTop.currentPage }.collect { page ->
+            if (previousPage == tabs.indexOf("Markings") && page != previousPage) {
+                latestSaveMarking()
+            }
+            previousPage = page
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -261,14 +330,8 @@ private fun PlayerEditor(
         ,
     ) {
         TitleBorder(color = player.color)
-        PrimaryTabRow(
-            modifier = Modifier.fillMaxWidth().height(36.dp),
-            containerColor = Color.Transparent,
-            contentColor = player.color,
-            selectedTabIndex = pagerStateTop.currentPage,
-            indicator = { },
-            divider = @Composable { /* None */ },
-        ) {
+        @Composable
+        fun TabItems() {
             tabs.forEachIndexed { index, title ->
                 val isSelected = (pagerStateTop.currentPage == index)
                 Tab(
@@ -302,6 +365,27 @@ private fun PlayerEditor(
                 )
             }
         }
+        when (tabs.size > 4) {
+            true -> ScrollableTabRow(
+                modifier = Modifier.fillMaxWidth().height(36.dp),
+                containerColor = Color.Transparent,
+                contentColor = player.color,
+                selectedTabIndex = pagerStateTop.currentPage,
+                edgePadding = 0.dp,
+                indicator = { },
+                divider = @Composable { /* None */ },
+                tabs = { TabItems() },
+            )
+            false -> PrimaryTabRow(
+                modifier = Modifier.fillMaxWidth().height(36.dp),
+                containerColor = Color.Transparent,
+                contentColor = player.color,
+                selectedTabIndex = pagerStateTop.currentPage,
+                indicator = { },
+                divider = @Composable { /* None */ },
+                tabs = { TabItems() },
+            )
+        }
         TitleBorder(color = player.color)
         HorizontalPager(
             modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
@@ -309,13 +393,88 @@ private fun PlayerEditor(
             userScrollEnabled = userScrollEnabled,
         ) { page ->
             when (page) {
-                0 -> SkillSelectorTab(player, updateTrigger, borderSize, handleAction) { skillValueSelectorVisible ->
+                0 -> PlayerMarkingsTab(
+                    marking = markingDraft,
+                    player = player,
+                    previewSize = vm.sharedPitchData.size.getPlayerSquareSize(player.model.position.size),
+                    color = player.color,
+                    onMarkingChanged = { markingDraft = it },
+                    onReset = { markingDraft = generatedMarking },
+                )
+                1 -> SkillSelectorTab(player, updateTrigger, borderSize, handleAction) { skillValueSelectorVisible ->
                     userScrollEnabled = !skillValueSelectorVisible
                 }
-                1 -> StatsSelectorTab(vm, player, updateTrigger, handleAction)
-                2 -> KeywordsSelectorTab(player, updateTrigger, borderSize, handleAction)
-                3 -> PlayerStateSelectorTab(vm, player, updateTrigger, borderSize, handleAction)
+                2 -> StatsSelectorTab(vm, player, updateTrigger, handleAction)
+                3 -> KeywordsSelectorTab(player, updateTrigger, borderSize, handleAction)
+                4 -> PlayerStateSelectorTab(vm, player, updateTrigger, borderSize, handleAction)
             }
+        }
+    }
+}
+
+@Composable
+private fun PlayerMarkingsTab(
+    marking: String,
+    player: UiPlayerCard,
+    previewSize: androidx.compose.ui.unit.IntSize,
+    color: Color,
+    onMarkingChanged: (String) -> Unit,
+    onReset: () -> Unit,
+) {
+    val playerMarkingsEnabled by PLAYER_MARKINGS_MANAGER.observePlayerMarkings().collectAsState(PLAYER_MARKINGS_MANAGER.getPlayerMarkings())
+    val playerSprite = remember(player) {
+        IconFactory.getPlayerIcon(UiPitchPlayer(player.model))
+    }
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            JervisOutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = marking,
+                onValueChange = onMarkingChanged,
+                label = if (playerMarkingsEnabled.enabled) "Markings" else "Markings (Globally disabled)",
+            )
+
+            // Player Preview
+            Box(
+                modifier = Modifier
+                    .size(when (player.player.model.position.size) {
+                        PlayerSize.STANDARD -> 40.dp
+                        PlayerSize.BIG_GUY -> 53.dp
+                        PlayerSize.GIANT -> TODO("Not supported")
+                    })
+                ,
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    bitmap = playerSprite,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = 5.dp),
+                    text = marking,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    style = JervisTheme.pitchSquareTextStyle.copy(
+                        color = JervisTheme.brightYellow,
+                        fontSize = 14.sp,
+                    ),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            JervisButton(text = "Reset", buttonColor = color, onClick = onReset)
         }
     }
 }
