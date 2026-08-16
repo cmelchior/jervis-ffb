@@ -3,6 +3,7 @@ package com.jervisffb.test
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
@@ -54,18 +55,18 @@ class GameEngineControllerTests {
         val controller = createGameController(rules)
 
         // Verify that undoing actions keep incrementing the delta id
-        assertEquals(0, controller.currentActionIndex().value)
+        assertEquals(0, controller.currentActionId().counter)
         controller.handleAction(1.d3)
-        assertEquals(1, controller.currentActionIndex().value)
+        assertEquals(1, controller.currentActionId().counter)
         controller.handleAction(2.d3)
-        assertEquals(2, controller.currentActionIndex().value)
+        assertEquals(2, controller.currentActionId().counter)
         assertTrue(controller.isUndoAvailable(controller.state.awayTeam.id))
         controller.handleAction(Undo)
-        assertEquals(3, controller.currentActionIndex().value)
+        assertEquals(3, controller.currentActionId().counter)
         controller.handleAction(Undo)
-        assertEquals(4, controller.currentActionIndex().value)
+        assertEquals(4, controller.currentActionId().counter)
         controller.handleAction(2.d3)
-        assertEquals(5, controller.currentActionIndex().value)
+        assertEquals(5, controller.currentActionId().counter)
     }
 
     @Test
@@ -76,33 +77,40 @@ class GameEngineControllerTests {
         val controller = createGameController(rules)
 
         // Verify that undoing actions keep incrementing the delta id
-        assertEquals(0, controller.currentActionIndex().value)
+        assertEquals(0, controller.currentActionId().counter)
         controller.handleAction(1.d3)
-        assertEquals(1, controller.currentActionIndex().value)
+        assertEquals(1, controller.currentActionId().counter)
         assertFalse(controller.isUndoAvailable(controller.state.homeTeam.id))
         assertFailsWith<InvalidActionException> {
             controller.handleAction(Undo)
         }
-        assertEquals(1, controller.currentActionIndex().value)
+        assertEquals(1, controller.currentActionId().counter)
     }
 
     @Test
-    fun revertDecrementsActionId() {
+    fun revertStartsNewActionIdGeneration() {
         val rules = StandardBB2025Rules().update {
             undoActionBehavior = UndoActionBehavior.NOT_ALLOWED // Revert is always allowed
         }
         val controller = createGameController(rules)
 
-        // Verify that reverting actions also decrement the action id
-        assertEquals(0, controller.currentActionIndex().value)
+        // Verify that reverting actions decrements the counter and starts a new generation.
+        assertEquals(GameActionId.INITIAL, controller.currentActionId())
         controller.handleAction(1.d3)
-        assertEquals(1, controller.currentActionIndex().value)
+        assertEquals(GameActionId(1, 1), controller.currentActionId())
         controller.handleAction(2.d3)
-        assertEquals(2, controller.currentActionIndex().value)
+        assertEquals(GameActionId(2, 1), controller.currentActionId())
         controller.handleAction(Revert)
-        assertEquals(1, controller.currentActionIndex().value)
+        assertEquals(GameActionId(1, 2), controller.currentActionId())
         controller.handleAction(Revert)
-        assertEquals(0, controller.currentActionIndex().value)
+        assertEquals(GameActionId(0, 3), controller.currentActionId())
+    }
+
+    @Test
+    fun gameActionIdComparesGenerationBeforeCounter() {
+        assertTrue(GameActionId(1, 1) > GameActionId(100, 0))
+        assertTrue(GameActionId(1, 0) < GameActionId(2, 0))
+        assertEquals(GameActionId(3, 4), GameActionId(2, 4).next())
     }
 
     @Test
@@ -130,7 +138,7 @@ class GameEngineControllerTests {
         val logsBefore = state.logs.toList()
         val homeFansBefore = state.homeTeam.fairWeatherFans
         val historySizeBefore = controller.history.size
-        val actionIdBefore = controller.currentActionIndex()
+        val actionIdBefore = controller.currentActionId()
 
         assertFailsWith<InvalidActionException> {
             controller.handleAction(
@@ -147,7 +155,7 @@ class GameEngineControllerTests {
         assertEquals(logsBefore, state.logs)
         assertEquals(homeFansBefore, state.homeTeam.fairWeatherFans)
         assertEquals(historySizeBefore, controller.history.size)
-        assertEquals(actionIdBefore, controller.currentActionIndex())
+        assertEquals(actionIdBefore, controller.currentActionId())
     }
 
     // During Replay, we can both play backwards and forwards using a pre-determined sequence of actions.

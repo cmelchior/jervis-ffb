@@ -234,11 +234,11 @@ class NetworkFuzzTester {
             if (hostAction && !isRandom) {
                 val userAction = getSetupAction(controller) ?: createRandomAction(controller, random)
                 controller.handleAction(userAction)
-                conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
+                conn.send(GameActionMessage(controller.currentActionId(), userAction))
             } else {
                 checkServerMessage<SyncGameActionMessage>(conn) {
-                    if (it.serverIndex != controller.currentActionIndex() + 1) {
-                        fail("[Host] Received server message out of order. Expected ${controller.currentActionIndex() + 1}, got ${it.serverIndex}")
+                    if (it.serverIndex != controller.currentActionId() + 1) {
+                        fail("[Host] Received server message out of order. Expected ${controller.currentActionId() + 1}, got ${it.serverIndex}")
                     }
                     val remoteAction = it.action
                     controller.handleAction(remoteAction)
@@ -269,11 +269,11 @@ class NetworkFuzzTester {
             if (clientAction && !isRandom) {
                 val userAction = getSetupAction(controller) ?: createRandomAction(controller, random)
                 controller.handleAction(userAction)
-                conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
+                conn.send(GameActionMessage(controller.currentActionId(), userAction))
             } else {
                 checkServerMessage<SyncGameActionMessage>(conn) {
-                    if (it.serverIndex != controller.currentActionIndex() + 1) {
-                        fail("[Host] Received server message out of order. Expected ${controller.currentActionIndex() + 1}, got ${it.serverIndex}")
+                    if (it.serverIndex != controller.currentActionId() + 1) {
+                        fail("[Host] Received server message out of order. Expected ${controller.currentActionId() + 1}, got ${it.serverIndex}")
                     }
                     val remoteAction = it.action
                     controller.handleAction(remoteAction)

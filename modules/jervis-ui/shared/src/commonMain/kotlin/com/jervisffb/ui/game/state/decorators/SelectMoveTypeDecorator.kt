@@ -145,7 +145,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                             UiAction(Pair("useFumblerooski", player.id), GuardedAction(acc) {
                                 val uiController = acc.uiController
                                 // We need to reset the UI decoration at the correct place when Undo'ing actions
-                                uiController.uiDecorations.registerUndo(uiController.gameController.currentActionIndex()) {
+                                uiController.uiDecorations.registerUndo(uiController.gameController.currentActionId()) {
                                     actionProvider.nextFumblerooskiCommand(player, null)
                                 }
                                 actionProvider.nextFumblerooskiCommand(player, Confirm)

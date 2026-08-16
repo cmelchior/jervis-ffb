@@ -40,7 +40,7 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
         if (message.action is Revert) {
             if (connection != null) {
                 val error = InvalidGameActionTypeServerError(
-                    game.currentActionIndex() + 1,
+                    game.nextActionIndex(),
                     "Clients are not allowed to send `Revert` to the server"
                 )
                 session.out.sendError(connection, error)
@@ -68,7 +68,7 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
         }
 
         try {
-            val expectedDeltaId = session.game!!.currentActionIndex() + 1
+            val expectedDeltaId = session.game!!.nextActionIndex()
             if (message.clientIndex != expectedDeltaId) {
                 session.out.sendError(
                     connection,
@@ -93,6 +93,7 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
     }
 }
 
+
 private val LOG = jervisLogger()
 
 suspend fun handleAction(
@@ -104,7 +105,7 @@ suspend fun handleAction(
 ) {
     game.handleAction(nextAction)
     val sender = if (connection != null) session.getPlayerClient(connection) else null
-    session.out.sendGameActionSync(sender = sender, producer, game.currentActionIndex(), action = nextAction)
+    session.out.sendGameActionSync(sender = sender, producer, game.currentActionId(), action = nextAction)
 
     // TODO If start of turn, start the end-of-turn tracker
 
@@ -122,7 +123,7 @@ suspend fun handleAction(
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
-        session.out.sendGameActionSync(sender = null, producer.coach.id, game.currentActionIndex(), action = action)
+        session.out.sendGameActionSync(sender = null, producer.coach.id, game.currentActionId(), action = action)
         availableActions = game.getAvailableActions()
     }
 
@@ -147,7 +148,7 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
-        session.out.sendGameActionSync(sender = null, producer.coach.id,session.game?.currentActionIndex()!!, action = action)
+        session.out.sendGameActionSync(sender = null, producer.coach.id,session.game?.currentActionId()!!, action = action)
         availableActions = game.getAvailableActions()
     }
 
@@ -165,4 +166,3 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
 //        }
 //    }
 }
-

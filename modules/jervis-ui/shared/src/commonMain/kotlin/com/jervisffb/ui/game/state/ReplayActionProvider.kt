@@ -101,7 +101,7 @@ class ReplayActionProvider(
             val prevIndex = indexBeforeLastEmit
             lastEmittedAction = null
             indexBeforeLastEmit = null
-            if (emitted != null && prevIndex != null && controller.currentActionIndex() == prevIndex) {
+            if (emitted != null && prevIndex != null && controller.currentActionId() == prevIndex) {
                 // Roll our position back to the last successfully applied action and pause.
                 // The game loop already reports the rejected action to the user.
                 when (emitted == Undo) {
@@ -129,7 +129,7 @@ class ReplayActionProvider(
                     }
                     val action = actions[position.value]
                     position.value += 1
-                    indexBeforeLastEmit = controller.currentActionIndex()
+                    indexBeforeLastEmit = controller.currentActionId()
                     lastEmittedAction = action
                     return action
                 }
@@ -143,7 +143,7 @@ class ReplayActionProvider(
                         delay(adjustedPlaybackSpeed)
                     }
                     position.value -= 1
-                    indexBeforeLastEmit = controller.currentActionIndex()
+                    indexBeforeLastEmit = controller.currentActionId()
                     lastEmittedAction = Undo
                     return Undo
                 }

@@ -170,7 +170,7 @@ open class ManualActionProvider(
             if (result != null) {
                 delayBetweenActions = result.delayBetweenActions
                 queuedActions.addAll(result.actions.mapIndexed { index, action ->
-                    AsyncGameAction(GameActionId(actions.id.value + index), action)
+                    AsyncGameAction(actions.id + index, action)
                 })
                 iter.remove()
             }
@@ -268,7 +268,7 @@ open class ManualActionProvider(
         if (actions.isEmpty()) throw IllegalArgumentException("Action list must contain at least one action")
         // Store all events to be sent and sent the first one to be processed
         queuedActions.addAll(actions.mapIndexed { index, action ->
-            AsyncGameAction(GameActionId(startingId.value + index), action)
+            AsyncGameAction(startingId + index, action)
         })
         delayBetweenActions = delayEvent
         actionScope.launch {

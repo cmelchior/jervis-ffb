@@ -217,11 +217,11 @@ data class ActionRequest(
             is RerollOptionSelected -> {
                 actions.singleInstanceOfOrNull<SelectRerollOption>()?.options.orEmpty().contains(action.option)
             }
-            Revert -> (id.value >= 1)
+            Revert -> (id.counter >= 1) && (id.generation >= 1)
             is SkillSelected -> {
                 actions.singleInstanceOfOrNull<SelectSkill>()?.skills.orEmpty().contains(action.skill)
             }
-            Undo -> (id.value >= 1)
+            Undo -> (id.counter >= 1) && (id.generation >= 1)
             is PlayersSelected -> {
                 actions.singleInstanceOfOrNull<SelectPlayers>()?.players?.containsAll(action.players) ?: false
             }

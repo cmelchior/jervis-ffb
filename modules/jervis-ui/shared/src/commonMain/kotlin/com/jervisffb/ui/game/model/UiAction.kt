@@ -31,7 +31,7 @@ private class CallbackGuard(
         val controller = controller ?: run {
             LOG.w {
                 "Ignoring guarded UI callback without a game controller: " +
-                    "expected action ActionId[${this.actionId?.value}]."
+                    "expected action ActionId[${this.actionId}]."
             }
             return
         }
@@ -44,7 +44,7 @@ private class CallbackGuard(
         // This is not thread-safe and is assumed to only be called from the UI
         // thread.
         if (invoked) {
-            LOG.w { "Callback invoked multiple times for action ActionId[${this@CallbackGuard.actionId?.value}]" }
+            LOG.w { "Callback invoked multiple times for action ActionId[${this@CallbackGuard.actionId}]" }
             return
         }
 
@@ -54,8 +54,8 @@ private class CallbackGuard(
         if (expectedActionId != actionId) {
             LOG.w {
                 val currentNode = controller.stack.stateToPrettyString()
-                "Ignoring stale UI callback: expected action ActionId[${actionId?.value}], " +
-                    "but the current action is ActionId[${expectedActionId.value}]. " +
+                "Ignoring stale UI callback: expected action ActionId[$actionId], " +
+                    "but the current action is ActionId[$expectedActionId]. " +
                     "Current node: $currentNode"
             }
             return

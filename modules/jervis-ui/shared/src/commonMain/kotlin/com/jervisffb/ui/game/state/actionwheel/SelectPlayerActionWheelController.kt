@@ -57,7 +57,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
         val activePlayer = acc.game.activePlayer ?: error("No active player")
         if (activePlayer.state == PlayerPitchState.PRONE) {
             val menuItem = ActionButtonData(
-                id = ButtonId("[${actions.id.value}] Stand Up & End Action"),
+                id = ButtonId("[${actions.id}] Stand Up & End Action"),
                 label = { "Stand Up & End Action" },
                 action = GuardedAction(acc) { id ->
                     // If players need to stand up or roll for negatraits before standing

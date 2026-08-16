@@ -137,7 +137,8 @@ class GameEngineController(
     private var undoFloor: Int = 0
 
 
-    private var lastGameActionId: GameActionId = GameActionId(0)
+    private var revertGeneration: Int = GameActionId.START_GENERATION
+    private var lastGameActionId: GameActionId = GameActionId.INITIAL
     private var deltaBuilder = DeltaBuilder(lastGameActionId + 1, collectMetadata = collectStatistics)
     private var cachedActionRequest: ActionRequest? = null
     val state: Game = state
@@ -216,7 +217,7 @@ class GameEngineController(
      * is thrown.
      */
     fun handleAction(action: GameAction) {
-        LOG.i("[Game-${this.hashCode()}] Handling action (${currentActionIndex().value + 1}): $action")
+        LOG.i("[Game-${this.hashCode()}] Handling action (${currentActionId() + 1}): $action")
         if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }
@@ -381,12 +382,15 @@ class GameEngineController(
      * I.e., this can be seen as a "version number" of the engine as game action indexes
      * are always incrementing, even when processing [Undo] actions.
      */
-    fun currentActionIndex(): GameActionId {
+    fun currentActionId(): GameActionId {
         return lastGameActionId
     }
 
     fun nextActionIndex(): GameActionId {
-        return lastGameActionId + 1
+        return when (lastGameActionId == GameActionId.INITIAL) {
+            true -> GameActionId(GameActionId.START_COUNTER, revertGeneration)
+            false -> lastGameActionId + 1
+        }
     }
 
     private fun undoLastAction(action: GameAction, revertActionId: Boolean) {
@@ -402,11 +406,14 @@ class GameEngineController(
             step.commands.forEach { command -> command.undo(state) }
         }
 
-        // UNDO actions are "normal" commands that are synchronized across distributed clients, so will
-        // also increment the action counter.
-        // REVERT actions only happen on a single client, so instead decrement the counter, "hiding" the change.
+        // UNDO actions are "normal" commands that are synchronized across
+        // distributed clients, so will also increment the action counter.
+        // REVERT actions only happen on a single client, so decrement the
+        // counter and start a new generation to make the new timeline
+        // distinguishable.
         lastGameActionId = if (revertActionId) {
-            (lastGameActionId - 1)
+            revertGeneration += 1
+            GameActionId(counter = lastGameActionId.counter - 1, generation = revertGeneration)
         } else {
             (lastGameActionId + 1)
         }
@@ -423,7 +430,7 @@ class GameEngineController(
                 null
             }
         }
-        val newDeltaId = (lastGameActionId + 1)
+        val newDeltaId = GameActionId(counter = lastGameActionId.counter + 1, generation = revertGeneration)
         deltaBuilder = DeltaBuilder(newDeltaId, actionOwner, collectStatistics)
         try {
             when (userAction) {

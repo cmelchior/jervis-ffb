@@ -104,7 +104,7 @@ class P2PActionProvider(
         // state. This means we do not want to send any events to the server during this period.
         if (handlingServerRevert) return
 
-        val clientActionIndex = engine.currentActionIndex()
+        val clientActionIndex = engine.currentActionId()
         // Should only send this if the event is truly from this client and not just a sync message
         // TODO lastServerActionIndex seems to be out of sync
         LOG.d("Sending message to server ($clientActionIndex > $lastServerActionIndex): $action")

@@ -88,10 +88,10 @@ data object Undo : GameAction
 
 /**
  * This action is a special variant of [Undo]. Similar to [Undo] it also
- * reverts the last user action, but on top of this, it also decrements
- * the last seen [GameActionId]. This means that after handling the Revert,
- * there is no way to observe on the [com.jervisffb.engine.GameEngineController]
- * that it was modified.
+ * reverts the last user action, but on top of this, it also decrements the
+ * counter of the last seen [GameActionId] and starts a new ID generation.
+ * This lets clients distinguish actions from the new timeline from actions
+ * that were created before the revert.
  *
  * Since we use the [GameActionId] to synchronize state between distributed
  * clients, this action should be used with caution. Currently the only
