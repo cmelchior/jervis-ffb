@@ -7,6 +7,7 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_MESSAGE
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_STACKTRACE
 import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_TITLE
+import com.jervisffb.utils.WarningLogWriter
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.getPlatformDescription
@@ -55,11 +56,18 @@ object IssueTracker {
         title: String,
         body: String,
         throwable: Throwable?,
-        gameState: GameEngineController?
+        gameState: GameEngineController?,
+        includeGameState: Boolean = true,
     ): Result<String> {
         try {
             val bodyWithStackTrace = buildString {
                 append(body)
+                val warnings = WarningLogWriter.getWarningsDescriptionForGitHub()
+                if (warnings.trim().isNotEmpty()) {
+                    appendLine()
+                    appendLine()
+                    append(warnings)
+                }
                 if (throwable != null) {
                     if (!body.endsWith("\n")) {
                         appendLine()
@@ -89,7 +97,7 @@ object IssueTracker {
                 formData = formData {
                     append("title", title)
                     append("body", bodyWithStackTrace)
-                    if (gameState != null) {
+                    if (gameState != null && includeGameState) {
                         val serializedState = JervisSerialization.serializeGameStateToJson(gameState, true)
                         append("attachments[]", serializedState.toByteArray(), Headers.build {
                             append(HttpHeaders.ContentType, "application/json")

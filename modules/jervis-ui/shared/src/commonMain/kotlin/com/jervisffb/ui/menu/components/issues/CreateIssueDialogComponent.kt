@@ -91,7 +91,7 @@ private fun CreateIssueDialog(
     LaunchedEffect(createInProgress) {
         if (createInProgress) {
             scope.launch(Dispatchers.Default) {
-                IssueTracker.createNewIssue(title, message, error, if (attachGameDump) game else null)
+                IssueTracker.createNewIssue(title, message, error, game, attachGameDump)
                     .onSuccess { createdIssueUrl ->
                         onIssueCreated(createdIssueUrl)
                         createInProgress = false

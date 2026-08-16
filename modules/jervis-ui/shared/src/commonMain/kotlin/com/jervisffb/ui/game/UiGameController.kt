@@ -181,6 +181,7 @@ import com.jervisffb.ui.game.view.NoContextMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.utils.FrameRateAverager
+import com.jervisffb.utils.WarningLogWriter
 import com.jervisffb.utils.closeIfPossible
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
@@ -462,7 +463,13 @@ class UiGameController(
                 The UI created an action that was rejected by the rules engine.
                 State: ${state.stack.stateToPrettyString()}
                 ${ex.message}
-            """.trimIndent(),
+            """.trimIndent().let { body: String ->
+                val warnings = WarningLogWriter.getWarningsDescriptionForGitHub()
+                when (warnings.trim().isNotEmpty()) {
+                    true -> "$body\n\n$warnings"
+                    false -> body
+                }
+            },
             error = ex,
             gameState = gameController
         )
@@ -494,6 +501,7 @@ class UiGameController(
      */
     fun startGameEventLoop() {
         val controller = gameController
+        WarningLogWriter.start()
 
         // We need to start the Rules Engine first.
         // Do this outside the coroutine to ensure that `startHandler` is called correctly
@@ -634,6 +642,7 @@ class UiGameController(
                 }
             }
         }.invokeOnCompletion {
+            WarningLogWriter.stop()
             if (it != null && it !is CancellationException) {
                 throw it
             }
@@ -645,6 +654,7 @@ class UiGameController(
      * stopped to release all resources.
      */
     fun stopGameEventLoop() {
+        WarningLogWriter.stop()
         gameScope.cancel()
         animationScope.cancel()
         animationDispatcher.closeIfPossible()

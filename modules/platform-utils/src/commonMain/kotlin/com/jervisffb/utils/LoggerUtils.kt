@@ -38,6 +38,69 @@ private object TimestampedConsoleWriter : LogWriter() {
     }
 }
 
+/**
+ * Logger capturing logs during a game.
+ * This class is not thread-safe and should only be used from a single thread.
+ */
+object WarningLogWriter : LogWriter() {
+
+    data class LoggedWarning(
+        val message: String,
+        val tag: String,
+        val throwable: Throwable?,
+    )
+
+    private var collectWarnings = false
+    private var loggedWarnings = mutableListOf<LoggedWarning>()
+
+    val warnings: List<LoggedWarning>
+        get() = loggedWarnings.toList()
+
+    override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
+        if (collectWarnings && severity == Severity.Warn) {
+            loggedWarnings.add(LoggedWarning(message, tag, throwable))
+        }
+    }
+
+    fun start() {
+        loggedWarnings = mutableListOf()
+        collectWarnings = true
+    }
+
+    fun stop(): List<LoggedWarning> {
+        collectWarnings = false
+        return loggedWarnings.toList().also {
+            loggedWarnings = mutableListOf()
+        }
+    }
+
+    fun reset() {
+        loggedWarnings = mutableListOf()
+    }
+
+    fun getWarningsDescriptionForGitHub(): String {
+        return buildString {
+            warnings.takeIf { it.isNotEmpty() }?.let { warnings ->
+                appendLine("**Warnings**")
+                appendLine("```")
+                warnings.forEachIndexed { index, warning ->
+                    if (index > 0) appendLine()
+                    if (warning.tag.isNotBlank()) {
+                        append("[${warning.tag}] ")
+                    }
+                    append(warning.message)
+                    warning.throwable?.let {
+                        appendLine()
+                        append(it.stackTraceToString())
+                    }
+                }
+                appendLine()
+                appendLine("```")
+            }
+        }
+    }
+}
+
 // This needs to be expanded so we create a logger instance for each type
 // since it should also affect the output.
 val loggerInstance by lazy {
@@ -47,7 +110,7 @@ val loggerInstance by lazy {
         // re-attach the platform writer (the JVM log file; `null` on iOS/wasm).
         // setLogWriters (not addLogWriter) is required so the default writer is dropped
         // instead of printing every line twice.
-        setLogWriters(listOfNotNull(TimestampedConsoleWriter, getPlatformLogWriter()))
+        setLogWriters(listOfNotNull(WarningLogWriter, TimestampedConsoleWriter, getPlatformLogWriter()))
     }
 }
 
