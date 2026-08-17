@@ -18,8 +18,12 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.common.pathfinder.CommonPathFinder
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.fumbbl.net.model.PlayerType
+import com.jervisffb.test.bb2020.HUMAN_BLITZER
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createStartingTestSetup
 import org.junit.Test
@@ -45,8 +49,16 @@ fun AStarContent() {
     val rules = StandardBB2020Rules()
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
-
-    val result = state.rulesContext.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), PitchCoordinate(0, 14), 4, true)
+    val player = Player(
+        rules = rules,
+        id = PlayerId("0"),
+        position = HUMAN_BLITZER,
+        icon = null,
+        type = com.jervisffb.engine.model.PlayerType.STANDARD
+    ).also {
+        it.location = PitchCoordinate(12, 6)
+    }
+    val result = state.rulesContext.actionPlanner.pathFinder.calculateShortestPath(state, player, PitchCoordinate(0, 14), 4, true)
     when (result) {
         is PathFinder.Failure -> {
             (result.debugInformation as CommonPathFinder.DebugInformation).let {

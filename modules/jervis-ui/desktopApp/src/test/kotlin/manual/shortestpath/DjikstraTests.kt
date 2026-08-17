@@ -23,7 +23,10 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.test.bb2020.HUMAN_BLITZER
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createStartingTestSetup
 import org.junit.Ignore
@@ -49,8 +52,17 @@ fun DjiekstraContent() {
     val rules = StandardBB2020Rules()
     val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
+    val player = Player(
+        rules = rules,
+        id = PlayerId("0"),
+        position = HUMAN_BLITZER,
+        icon = null,
+        type = com.jervisffb.engine.model.PlayerType.STANDARD
+    ).also {
+        it.location = PitchCoordinate(12, 6)
+    }
 
-    val result = state.rulesContext.pathFinder.calculateAllPaths(state, PitchCoordinate(12, 6), 6)
+    val result = state.rulesContext.actionPlanner.pathFinder.calculateAllPaths(state, player, 6)
     val path = remember { mutableStateOf(listOf<PitchCoordinate>()) }
     DjiekstraBoxGrid(
         state,
@@ -59,7 +71,7 @@ fun DjiekstraContent() {
         result.distances,
         path.value,
         update = { end: PitchCoordinate ->
-            val newPath = state.rulesContext.pathFinder.calculateShortestPath(state, PitchCoordinate(12, 6), end, 4, false)
+            val newPath = state.rulesContext.actionPlanner.pathFinder.calculateShortestPath(state, player, end, 4, false)
             path.value = result.getClosestPathTo(end) // newPath.path
         },
     )
