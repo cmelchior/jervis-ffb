@@ -436,9 +436,7 @@ object UseSteadyFootingWheelController: UseSkillWheelController(SkillType.STEADY
         BB2025FallingOver.ChooseToUseSteadyFooting
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
-        val context = state.getContext<SteadyFootingRollContext>()
-        val player = context.player
-        return player.coordinates
+        return state.getContext<RiskingInjuryContext>().player.coordinates
     }
 }
 
