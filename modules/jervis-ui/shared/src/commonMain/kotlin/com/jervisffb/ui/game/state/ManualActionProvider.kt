@@ -31,6 +31,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.ui.game.UiGameClientType
@@ -363,14 +364,22 @@ open class ManualActionProvider(
         // Otherwise, it means that the player is in the middle of their action and we should
         // not show the context menu up front. That should be up to the player
         state.activePlayer?.location?.let { activePlayerLocation ->
-            acc.updateSquare(activePlayerLocation as PitchCoordinate) {
-                if (it.contextMenuOptions.isNotEmpty() && it.contextMenuOptions.none { it.title == "End action" }) {
-                    it.copy(
-                        showContextMenu = true
-                    )
-                } else {
-                    it
+
+            // The active player might have left the field due to an injury. In this case, we should just skip
+            // the context menu entirely.
+            when (activePlayerLocation) {
+                is OnPitchLocation -> {
+                    acc.updateSquare(activePlayerLocation as PitchCoordinate) {
+                        if (it.contextMenuOptions.isNotEmpty() && it.contextMenuOptions.none { it.title == "End action" }) {
+                            it.copy(
+                                showContextMenu = true
+                            )
+                        } else {
+                            it
+                        }
+                    }
                 }
+                else -> { /* Do nothing */ }
             }
         }
 

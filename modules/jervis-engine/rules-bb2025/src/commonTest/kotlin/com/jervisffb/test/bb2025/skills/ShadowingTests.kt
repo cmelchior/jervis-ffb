@@ -18,8 +18,10 @@ import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.shadowPlayer
+import com.jervisffb.test.useApothecary
 import com.jervisffb.test.utils.assertActive
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertKnockedOut
 import com.jervisffb.test.utils.assertNoActivePlayer
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
@@ -168,7 +170,7 @@ class ShadowingTests: JervisGameBB2025Test() {
             *activatePlayer(activePlayer, PlayerStandardActionType.MOVE),
             *moveTo(14, 5),
             *dodge(1.d6),
-            DiceRollResults(1.d6, 1.d6),
+            DiceRollResults(1.d6, 1.d6), // AV roll
             *shadowPlayer(shadowingPlayer, 6.d6)
         )
         state.homeTeam.assertActive()
@@ -177,5 +179,25 @@ class ShadowingTests: JervisGameBB2025Test() {
         shadowingPlayer.assertCoordinates(13, 5)
         activePlayer.assertCoordinates(14, 5)
         activePlayer.assertProne()
+    }
+
+    @Test
+    fun worksIfMovingPlayerLeavesPitch() {
+        val shadowingPlayer = homeTeam[1.playerNo]
+        val activePlayer = awayTeam[1.playerNo]
+        controller.rollForward(
+            *activatePlayer(activePlayer, PlayerStandardActionType.MOVE),
+            *moveTo(14, 5),
+            *dodge(1.d6),
+            DiceRollResults(6.d6, 6.d6), // AV roll
+            DiceRollResults(2.d6, 6.d6), // Injury Roll roll
+            useApothecary(false),
+            *shadowPlayer(shadowingPlayer, 6.d6)
+        )
+        state.homeTeam.assertActive()
+        state.assertNoActivePlayer()
+        shadowingPlayer.assertStanding()
+        shadowingPlayer.assertCoordinates(13, 5)
+        activePlayer.assertKnockedOut()
     }
 }
