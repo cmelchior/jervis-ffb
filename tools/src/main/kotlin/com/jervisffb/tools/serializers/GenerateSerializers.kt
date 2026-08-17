@@ -76,7 +76,6 @@ private val roots = listOf(
 private val ignored = setOf(
     com.jervisffb.engine.actions.CalculatedAction::class,
     com.jervisffb.engine.model.PitchSquare::class,
-    com.jervisffb.engine.rules.AbstractDummyRules::class,
     com.jervisffb.engine.rules.common.procedures.DummyProcedure::class,
     com.jervisffb.engine.rules.common.procedures.ErrorProcedure::class,
 )

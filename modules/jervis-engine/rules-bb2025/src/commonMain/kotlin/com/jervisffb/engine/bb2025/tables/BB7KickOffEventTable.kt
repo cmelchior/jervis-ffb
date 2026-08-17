@@ -5,28 +5,27 @@ import com.jervisffb.engine.common.tables.CommonKickOffEventResult
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import io.ktor.http.ContentTypeMatcher
 import kotlinx.serialization.Serializable
 
 /**
- * Class representing the Kick-Off Event Table.
- *
- * See page XX in the BB 2025 rulebook.
+ * Class representing the Kick-Off Event Table on page XXX in Spike 22.
  */
 @Serializable
-object BB2025StandardKickOffEventTable: KickOffTable {
-    override val name: String = "Standard Kick-Off Table"
+object BB7KickOffEventTable: KickOffTable {
+    override val name: String = "BB7 Kick-Off Table"
     override val entries: Map<Int, KickOffEvent> =
         mapOf(
             2 to CommonKickOffEventResult.GET_THE_REF,
             3 to CommonKickOffEventResult.TIME_OUT,
-            4 to CommonKickOffEventResult.SOLID_DEFENSE,
+            4 to BB2025KickOffEventResult.ALERT_DEFENSE,
             5 to CommonKickOffEventResult.HIGH_KICK,
             6 to BB2025KickOffEventResult.CHEERING_FANS,
             7 to CommonKickOffEventResult.BRILLIANT_COACHING,
             8 to CommonKickOffEventResult.CHANGING_WEATHER,
             9 to CommonKickOffEventResult.QUICK_SNAP,
             10 to BB2025KickOffEventResult.CHARGE,
-            11 to CommonKickOffEventResult.DODGY_SNACK,
+            11 to CommonKickOffEventResult.OFFICIOUS_REF,
             12 to CommonKickOffEventResult.PITCH_INVASION,
         )
 

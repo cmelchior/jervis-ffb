@@ -501,6 +501,7 @@ abstract class AbstractRules(
             DiceRollType.THROWIN_DISTANCE,
 
             // No team is active: Pre-game / Kick-off events / Post-game
+            DiceRollType.ALERT_DEFENSE,
             DiceRollType.BAD_HABITS,
             DiceRollType.BLITZ, // Kick-off Event
             DiceRollType.BRILLIANT_COACHING,
@@ -529,8 +530,7 @@ abstract class AbstractRules(
             DiceRollType.WEATHER,
 
             // Probably cannot be used, find reference
-            DiceRollType.BB7_APOTHECARY,
-            -> false
+            DiceRollType.BB7_APOTHECARY -> false
 
             // All of these should be allowed
             DiceRollType.ACCURACY,
@@ -576,8 +576,7 @@ abstract class AbstractRules(
             DiceRollType.TEAM_MASCOT,
             DiceRollType.TENTACLES,
             DiceRollType.TREACHEROUS_TRAPDOOR,
-            DiceRollType.UNCHANNELLED_FURY,
-            -> true
+            DiceRollType.UNCHANNELLED_FURY -> true
         }
     }
 

@@ -3,11 +3,11 @@ package com.jervisffb.net.handlers
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Revert
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameActionMessage

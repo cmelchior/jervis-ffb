@@ -5,8 +5,8 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.LocalPitchDataWrapper

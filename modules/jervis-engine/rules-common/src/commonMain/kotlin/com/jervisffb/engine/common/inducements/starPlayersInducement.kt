@@ -1,5 +1,9 @@
-package com.jervisffb.engine.model.inducements.settings
+package com.jervisffb.engine.common.inducements
 
+import com.jervisffb.engine.model.inducements.settings.InducementGroupBuilder
+import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.model.inducements.settings.SingleInducement
+import com.jervisffb.engine.model.inducements.settings.SingleInducementBuilder
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.teams.THE_BLACK_GOBBO
@@ -13,7 +17,7 @@ import kotlinx.serialization.Serializable
  * given ruleset.
  */
 @Serializable
-data class StarPlayersInducementList(
+data class StarPlayersInducementGroup(
     override val max: Int = 2,
     override val enabled: Boolean = true,
     override val items: ImmutableList<StarPlayerInducement> = persistentListOf(
@@ -25,26 +29,26 @@ data class StarPlayersInducementList(
             requirements = THE_BLACK_GOBBO.playsFor.toSet(),
         ),
     )
-): InducementGroup<StarPlayersInducementList.Builder, StarPlayerInducement.Builder, StarPlayerInducement> {
-    override val type: InducementType = InducementType.STAR_PLAYERS
+): CommonInducementGroup<StarPlayersInducementGroup.Builder, StarPlayerInducement.Builder, StarPlayerInducement> {
+    override val type: InducementType = CommonInducementType.STAR_PLAYERS
     override val name: String = "Star Players"
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: StarPlayersInducementList): InducementGroupBuilder {
+    class Builder(inducement: StarPlayersInducementGroup): CommonInducementGroupBuilder {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
         override var enabled: Boolean = inducement.enabled
         var starPlayers: List<StarPlayerInducement.Builder> = inducement.items.map { it.toBuilder() }.toMutableList()
 
-        override fun build() = StarPlayersInducementList(max, enabled, starPlayers.map { it.build()}.toImmutableList())
+        override fun build() = StarPlayersInducementGroup(max, enabled, starPlayers.map { it.build()}.toImmutableList())
     }
 }
 
 /**
  * Class wrapping the details for a single Star Player inducement. To be
- * available, it should be added in [StarPlayersInducementList.items].
+ * available, it should be added in [StarPlayersInducementGroup.items].
  */
 @Serializable
 data class StarPlayerInducement(
@@ -56,12 +60,12 @@ data class StarPlayerInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<StarPlayerInducement.Builder> {
-    override val type: InducementType = InducementType.STAR_PLAYERS
+    override val type: InducementType = CommonInducementType.STAR_PLAYERS
     override val name: String = starPlayer.title
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: StarPlayerInducement): SingleInducementBuilder {
-        override val type: InducementType = InducementType.STAR_PLAYERS
+    class Builder(inducement: StarPlayerInducement): CommonSingleInducementBuilder {
+        override val type: InducementType = CommonInducementType.STAR_PLAYERS
         override val name: String = inducement.name
         val starPlayer: StarPlayerPosition = inducement.starPlayer
         override var max: Int = inducement.max

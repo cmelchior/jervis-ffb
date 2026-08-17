@@ -26,7 +26,7 @@ import com.jervisffb.engine.common.context.SolidDefenseContext
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
-import com.jervisffb.engine.common.tables.KickOffEventResult
+import com.jervisffb.engine.common.tables.CommonKickOffEventResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -39,6 +39,7 @@ import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -210,11 +211,11 @@ object SolidDefense : Procedure(), ChanceObservationHandler {
     //
     private fun getExtraPlayersCount(state: Game): Int {
         val context = state.getContext<KickOffEventContext>()
-        val type = context.result as? KickOffEventResult ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
+        val type = context.result
         return when (type) {
-            KickOffEventResult.SOLID_DEFENSE -> 3
-            KickOffEventResult.SOLID_DEFENSE_BB7 -> 1
-            else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.name}")
+            CommonKickOffEventResult.SOLID_DEFENSE if state.rules.gameType != GameType.BB7 -> 3
+            CommonKickOffEventResult.SOLID_DEFENSE if state.rules.gameType == GameType.BB7 -> 1
+            else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.description}")
         }
     }
 }

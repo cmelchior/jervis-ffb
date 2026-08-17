@@ -2,6 +2,7 @@ package com.jervisffb.engine.bb2020
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.bb2020.inducements.BB2020InducementType
 import com.jervisffb.engine.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep
 import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
@@ -25,6 +26,7 @@ import com.jervisffb.engine.bb2020.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.bb2020.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
+import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.common.planner.CommonActionPlanner
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -62,6 +64,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import io.ktor.http.parameters
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -410,57 +413,60 @@ class BB72020Rules(
                 underdogTopUpLimitFromTreasury = Int.MAX_VALUE,
                 inducements = DEFAULT_INDUCEMENTS_BB2020
             ).toBuilder().run {
-                InducementType.entries.forEach { type ->
+                CommonInducementType.entries.forEach { type ->
                     when (type) {
-                        InducementType.TEMP_AGENCY_CHEERLEADER -> {
+                        CommonInducementType.TEMP_AGENCY_CHEERLEADER -> {
                             getSingle(type).let {
                                 it.price = 30_000
                                 it.max = 2
                             }
                         }
-                        InducementType.PART_TIME_ASSISTANT_COACH -> {
+                        CommonInducementType.PART_TIME_ASSISTANT_COACH -> {
                             getSingle(type).let {
                                 it.price = 30_000
                                 it.max = 1
                             }
                         }
-                        InducementType.WEATHER_MAGE -> getSingle(type).enabled = false
-                        InducementType.BLOODWEISER_KEG -> { /* Do nothing */ }
-                        InducementType.SPECIAL_PLAY -> { /* Do nothing */ }
-                        InducementType.EXTRA_TEAM_TRAINING -> getSingle(type).price = 150_000
-                        InducementType.BRIBE -> { /* Do nothing */ }
-                        InducementType.WANDERING_APOTHECARY -> { /* Do nothing */ }
-                        InducementType.MORTUARY_ASSISTANT -> { /* Do nothing */ }
-                        InducementType.PLAGUE_DOCTOR -> { /* Do nothing */ }
-                        InducementType.RIOTOUS_ROOKIE -> getSingle(type).enabled = false
-                        InducementType.HALFLING_MASTER_CHEF -> { /* Do nothing */ }
-                        InducementType.STANDARD_MERCENARY_PLAYERS -> { /* Do nothing */ }
-                        InducementType.STAR_PLAYERS -> getInducement(type).enabled = false
-                        InducementType.INFAMOUS_COACHING_STAFF -> getInducement(type).enabled = false
-                        InducementType.WIZARD -> getInducement(type).enabled = false
-                        InducementType.BIASED_REFEREE -> getInducement(type).enabled = false
-                        InducementType.WAAAGH_DRUMMER -> getInducement(type).enabled = false
-                        InducementType.CAVORTING_NURGLINGS -> getInducement(type).enabled = false
-                        InducementType.DWARFEN_RUNESMITH -> getInducement(type).enabled = false
-                        InducementType.HALFLING_HOTPOT -> getInducement(type).enabled = false
-                        InducementType.MASTER_OF_BALLISTICS -> getInducement(type).enabled = false
-                        InducementType.EXPANDED_MERCENARY_PLAYERS -> { /* Do nothing */ }
-                        InducementType.GIANT -> getSingle(type).enabled = false
-                        InducementType.DESPERATE_MEASURES -> {
+                        CommonInducementType.WEATHER_MAGE -> getSingle(type).enabled = false
+                        CommonInducementType.EXTRA_TEAM_TRAINING -> getSingle(type).price = 150_000
+                        CommonInducementType.BRIBE -> { /* Do nothing */ }
+                        CommonInducementType.WANDERING_APOTHECARY -> { /* Do nothing */ }
+                        CommonInducementType.MORTUARY_ASSISTANT -> { /* Do nothing */ }
+                        CommonInducementType.PLAGUE_DOCTOR -> { /* Do nothing */ }
+                        CommonInducementType.RIOTOUS_ROOKIE -> getSingle(type).enabled = false
+                        CommonInducementType.HALFLING_MASTER_CHEF -> { /* Do nothing */ }
+                        CommonInducementType.STANDARD_MERCENARY_PLAYERS -> { /* Do nothing */ }
+                        CommonInducementType.STAR_PLAYERS -> getInducement(type).enabled = false
+                        CommonInducementType.INFAMOUS_COACHING_STAFF -> getInducement(type).enabled = false
+                        CommonInducementType.WIZARD -> getInducement(type).enabled = false
+                        CommonInducementType.BIASED_REFEREE -> getInducement(type).enabled = false
+                        CommonInducementType.DESPERATE_MEASURES -> getSingle(type).enabled = true
+                    }
+                }
+                BB2020InducementType.entries.forEach { type ->
+                    when (type) {
+                        BB2020InducementType.BLOODWEISER_KEG -> { /* Do nothing */ }
+                        BB2020InducementType.SPECIAL_PLAY -> { /* Do nothing */ }
+                        BB2020InducementType.WAAAGH_DRUMMER -> getInducement(type).enabled = false
+                        BB2020InducementType.CAVORTING_NURGLINGS -> getInducement(type).enabled = false
+                        BB2020InducementType.DWARFEN_RUNESMITH -> getInducement(type).enabled = false
+                        BB2020InducementType.HALFLING_HOTPOT -> getInducement(type).enabled = false
+                        BB2020InducementType.MASTER_OF_BALLISTICS -> getInducement(type).enabled = false
+                        BB2020InducementType.EXPANDED_MERCENARY_PLAYERS -> { /* Do nothing */ }
+                        BB2020InducementType.GIANT -> getSingle(type).enabled = false
+                        BB2020InducementType.DESPERATE_MEASURES -> {
                             getSingle(type).let {
                                 it.enabled = true
                                 it.price = 50_000
                                 it.max = 5
                             }
                         }
-                        InducementType.PRAYERS_TO_NUFFLE,
-                        InducementType.TEAM_MASCOT,
-                        InducementType.BLITZERS_BEST_KEGS,
-                        InducementType.BRETONNIAN_PASTRIES,
-                        InducementType.BRETONNIAN_DAMSEL,
-                        InducementType.CANOPIC_JAR -> { /* Ignore */ }
+                        BB2020InducementType.CANOPIC_JAR,
+                        BB2020InducementType.BRETONNIAN_PASTRIES,
+                        BB2020InducementType.BRETONNIAN_DAMSEL ->  { /* Do nothing */ }
                     }
                 }
+
                 build()
             }
         )

@@ -1,4 +1,4 @@
-package com.jervisffb.engine.common.procedures.tables.kickoff
+package com.jervisffb.engine.bb2025.procedures.table.kickoff
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -17,6 +17,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
+import com.jervisffb.engine.bb2025.tables.BB2025KickOffEventResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -44,7 +45,7 @@ import com.jervisffb.engine.common.procedures.getResetTeamTemporaryModifiersComm
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportEndingCharge
 import com.jervisffb.engine.common.reports.ReportStartingCharge
-import com.jervisffb.engine.common.tables.KickOffEventResult
+import com.jervisffb.engine.common.tables.CommonKickOffEventResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -171,7 +172,7 @@ object Charge : Procedure(), ChanceObservationHandler {
     }
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<KickOffEventContext>()
-        if (context.result != KickOffEventResult.CHARGE) {
+        if (context.result != BB2025KickOffEventResult.CHARGE) {
             INVALID_GAME_STATE("Wrong Kick-off Event: ${context.result}")
         }
     }

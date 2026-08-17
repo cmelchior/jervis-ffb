@@ -52,6 +52,7 @@ import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
 import com.jervisffb.engine.bb2025.skills.SureHands
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.PassContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.context.ThrowTeamMateContext
@@ -84,7 +85,6 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.engine.utils.doDivingTackleHaveAnAffect
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel

@@ -13,12 +13,18 @@ sealed interface InducementBuilder {
     fun build(): Inducement<*>
 }
 
-sealed interface SingleInducementBuilder: InducementBuilder {
+// Top-level interface for inducements that are selected "as-is".
+// Examples: Extra Training, Wandering Apothecaries, Blitzer's Keg.
+interface SingleInducementBuilder: InducementBuilder {
     var price: Int
 }
 
-sealed interface InducementGroupBuilder: InducementBuilder
+// Top-level interface for inducements that are a collection of different types
+// Examples: Biased Referees, Infamous Coaching Staff, Star Players and Wizards
+interface InducementGroupBuilder: InducementBuilder
 
-sealed interface TeamPlayerInducementBuilder: InducementBuilder
+// Top-level interface for inducements that are "normal" team players.
+// Examples: Standard Mercenaries, Expanded Mercenaries
+interface TeamPlayerInducementBuilder: InducementBuilder
 
 

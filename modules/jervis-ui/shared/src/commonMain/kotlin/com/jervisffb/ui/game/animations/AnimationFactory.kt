@@ -6,7 +6,9 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.bb2020.tables.BB2020KickOffEventResult
 import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
+import com.jervisffb.engine.bb2025.tables.BB2025KickOffEventResult
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.Catch
 import com.jervisffb.engine.common.procedures.CatchRoll
@@ -16,7 +18,7 @@ import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.common.tables.KickOffEventResult
+import com.jervisffb.engine.common.tables.CommonKickOffEventResult
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -145,26 +147,36 @@ object AnimationFactory {
         // to support animations is also annoying.
         if (currentNode == TheKickOffEvent.RollForKickOffEvent) {
             val roll = (action as DiceRollResults).rolls.map { it as D6Result }
-            val result = state.rules.kickOffEventTable.roll(roll.first(), roll.last()) as KickOffEventResult
+            val result = state.rules.kickOffEventTable.roll(roll.first(), roll.last())
             val image = when (result) {
-                KickOffEventResult.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEventResult.BLITZ_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEventResult.BRILLIANT_COACHING -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
-                KickOffEventResult.CHANGING_WEATHER -> null // Animation is handled by the Weather Roll
-                KickOffEventResult.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                KickOffEventResult.BB2020_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
-                KickOffEventResult.BB2025_CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
-                KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
-                KickOffEventResult.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
-                KickOffEventResult.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
-                KickOffEventResult.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
-                KickOffEventResult.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
-                KickOffEventResult.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
-                KickOffEventResult.QUICK_SNAP_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
-                KickOffEventResult.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
-                KickOffEventResult.SOLID_DEFENSE_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
-                KickOffEventResult.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
-                KickOffEventResult.TIME_OUT_BB7 -> Res.drawable.icons_animation_kickoff_kick_off_timeout
+                is CommonKickOffEventResult -> {
+                    when (result) {
+                        CommonKickOffEventResult.BRILLIANT_COACHING ->  Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                        CommonKickOffEventResult.CHANGING_WEATHER -> null
+                        CommonKickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
+                        CommonKickOffEventResult.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
+                        CommonKickOffEventResult.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
+                        CommonKickOffEventResult.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
+                        CommonKickOffEventResult.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
+                        CommonKickOffEventResult.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
+                        CommonKickOffEventResult.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
+                        CommonKickOffEventResult.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
+                    }
+                }
+                is BB2020KickOffEventResult -> {
+                    when (result) {
+                        BB2020KickOffEventResult.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                        BB2020KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                    }
+                }
+                is BB2025KickOffEventResult -> {
+                    when (result) {
+                        BB2025KickOffEventResult.ALERT_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence // TODO: Fix this
+                        BB2025KickOffEventResult.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                        BB2025KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                    }
+                }
+                else -> error("Unsupport kick-off event: $result")
             }
             return if (image != null) {
                 KickOffEventAnimation(uiController, image)

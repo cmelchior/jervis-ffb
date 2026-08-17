@@ -21,7 +21,7 @@ import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
-import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator

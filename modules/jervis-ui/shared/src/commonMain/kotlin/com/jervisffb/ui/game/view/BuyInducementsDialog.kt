@@ -70,18 +70,20 @@ import androidx.compose.ui.window.DialogProperties
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList
+import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
+import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
+import com.jervisffb.engine.common.inducements.CommonInducementGroup
+import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.model.inducements.settings.InducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList
-import com.jervisffb.engine.model.inducements.settings.SimpleInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList
+import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
+import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
+import com.jervisffb.engine.common.inducements.SimpleInducement
+import com.jervisffb.engine.common.inducements.StarPlayerInducement
+import com.jervisffb.engine.common.inducements.StarPlayersInducementGroup
 import com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement
-import com.jervisffb.engine.model.inducements.settings.WizardInducement
-import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
+import com.jervisffb.engine.common.inducements.WizardInducement
+import com.jervisffb.engine.common.inducements.WizardsInducementGroup
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -256,12 +258,20 @@ fun BuyInducementsDialog(
                                     PositionTableHeader(
                                         teamColor = teamColor,
                                         showAction = true,
-                                        showStats = group is StarPlayersInducementList,
-                                        skillsLabel = when (group) {
-                                            is StarPlayersInducementList -> "Skills & Traits"
-                                            is BiasedRefereesInducementList,
-                                            is InfamousCoachingStaffsInducementList,
-                                            is WizardsInducementList -> "Special Abilities"
+                                        showStats = group is StarPlayersInducementGroup,
+                                        skillsLabel = run {
+                                            val title = when {
+                                                group is CommonInducementGroup -> {
+                                                    when (group) {
+                                                        is StarPlayersInducementGroup -> "Skills & Traits"
+                                                        is BiasedRefereesInducementGroup,
+                                                        is InfamousCoachingStaffsInducementGroup,
+                                                        is WizardsInducementGroup -> "Special Abilities"
+                                                    }
+                                                }
+                                                else -> error("Unsupported group type: $group")
+                                            }
+                                            title
                                         }
                                     )
                                 }
@@ -335,8 +345,8 @@ fun BuyInducementsDialog(
                                         teamColor = teamColor,
                                         label = "Add ${singularGroupName(mercSettings)}",
                                         onAdd = {
-                                            lastTouchedGroup = InducementType.STANDARD_MERCENARY_PLAYERS
-                                            vm.openDrawer(InducementType.STANDARD_MERCENARY_PLAYERS)
+                                            lastTouchedGroup = CommonInducementType.STANDARD_MERCENARY_PLAYERS
+                                            vm.openDrawer(CommonInducementType.STANDARD_MERCENARY_PLAYERS)
                                         },
                                     )
                                 }
@@ -644,7 +654,7 @@ private fun addRowIndexFor(vm: BuyInducementsViewModel, type: InducementType): I
             index += mercs.size
             lastIdx
         } else -1
-        if (type == InducementType.STANDARD_MERCENARY_PLAYERS) {
+        if (type == CommonInducementType.STANDARD_MERCENARY_PLAYERS) {
             return if (!vm.isMercenaryLimitReached()) index else lastMercIndex
         }
     }
@@ -656,11 +666,16 @@ private fun singularGroupName(group: TeamPlayerInducement<*>): String {
 }
 
 private fun singularGroupName(group: InducementGroup<*, *, *>): String {
-    return when (group) {
-        is BiasedRefereesInducementList -> "Biased Referee"
-        is InfamousCoachingStaffsInducementList -> "Infamous Coaching Staff"
-        is StarPlayersInducementList -> "Star Player"
-        is WizardsInducementList -> "Wizard"
+    return when {
+        group is CommonInducementGroup<*, *, *> -> {
+            when (group) {
+                is BiasedRefereesInducementGroup -> "Biased Referee"
+                is InfamousCoachingStaffsInducementGroup -> "Infamous Coaching Staff"
+                is StarPlayersInducementGroup -> "Star Player"
+                is WizardsInducementGroup -> "Wizard"
+            }
+        }
+        else -> error("Unknown group type: $group")
     }
 }
 
@@ -759,7 +774,7 @@ private fun InducementDrawerContent(
     teamColor: Color,
     isHomeTeam: Boolean,
 ) {
-    val isMercenary = activeType == InducementType.STANDARD_MERCENARY_PLAYERS
+    val isMercenary = activeType == CommonInducementType.STANDARD_MERCENARY_PLAYERS
     val group = vm.groupInducements.firstOrNull { it.type == activeType }
     val title = when {
         isMercenary -> vm.mercenaryInducement?.let { titleWithRange(it.name, it.max) } ?: ""
@@ -802,15 +817,15 @@ private fun InducementDrawerContent(
                 teamColor = teamColor,
                 isHomeTeam = isHomeTeam,
             )
-            group is StarPlayersInducementList -> StarPlayerTable(
+            group is StarPlayersInducementGroup -> StarPlayerTable(
                 vm = vm,
                 group = group,
                 teamColor = teamColor,
                 isHomeTeam = isHomeTeam,
             )
-            group is WizardsInducementList ||
-                group is BiasedRefereesInducementList ||
-                group is InfamousCoachingStaffsInducementList -> AbilityGroupTable(
+            group is WizardsInducementGroup ||
+                group is BiasedRefereesInducementGroup ||
+                group is InfamousCoachingStaffsInducementGroup -> AbilityGroupTable(
                 vm = vm,
                 group = group,
                 teamColor = teamColor,
@@ -960,7 +975,7 @@ private fun ColumnScope.MercenaryBuilder(
 @Composable
 private fun ColumnScope.StarPlayerTable(
     vm: BuyInducementsViewModel,
-    group: StarPlayersInducementList,
+    group: StarPlayersInducementGroup,
     teamColor: Color,
     isHomeTeam: Boolean,
 ) {

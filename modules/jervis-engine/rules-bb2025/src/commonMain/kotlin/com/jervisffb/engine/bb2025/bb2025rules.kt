@@ -4,6 +4,7 @@ import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.bb2025.commands.ResetShadowingSkill
 import com.jervisffb.engine.bb2025.commands.SetWasOnPitchDuringDrive
+import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
 import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
@@ -33,8 +34,13 @@ import com.jervisffb.engine.bb2025.tables.BB2025StandardKickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardPrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable
+import com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable
+import com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable
+import com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable
+import com.jervisffb.engine.bb2025.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
+import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.common.planner.CommonActionPlanner
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -48,6 +54,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.getSkillOrNull
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
@@ -74,6 +81,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import io.ktor.http.parameters
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -383,6 +391,141 @@ class StandardBB2025Rules(
     }
 }
 
+/**
+ * Ruleset for the 2020 Blood Bowl Sevens game.
+ * See Dungeon Bowl rulebook page 90 for more information.
+ */
+@Serializable(with = BB72025RulesSerializer::class)
+class BB72025Rules(
+    parameters: RulesParametersHolder = DEFAULTS
+) : BB2025Rules(parameters) {
+
+    companion object {
+        val DEFAULTS = BB2025Rules.DEFAULTS.copy(
+            name = "Blood Bowl Sevens 2025 Rules",
+            gameType = GameType.BB7,
+            pitchWidth = 20,
+            pitchHeight = 11,
+            wideZone = 2,
+            endZone = 1,
+            lineOfScrimmageHome = 6,
+            lineOfScrimmageAway = 13,
+            playersRequiredOnLineOfScrimmage = 3,
+            maxPlayersInWideZone = 1,
+            maxPlayersOnPitch = 7,
+            turnsPrHalf = 6,
+            kickOffEventTable = BB7KickOffEventTable,
+            injuryTable = BB7StandardInjuryTable,
+            stuntyInjuryTable = BB7StuntyInjuryTable,
+            prayersToNuffleTable = BB7PrayersToNuffleTable,
+            useApothecaryBehavior = UseApothecaryBehavior.BB7,
+            inducements = InducementSettings(
+                topDogTopUpLimitFromTreasury = Int.MAX_VALUE,
+                underdogTopUpLimitFromTreasury = Int.MAX_VALUE,
+                inducements = DEFAULT_INDUCEMENTS_BB2025
+            ).toBuilder().run {
+                CommonInducementType.entries.forEach { type ->
+                    when (type) {
+                        CommonInducementType.TEMP_AGENCY_CHEERLEADER -> {
+                            getSingle(type).let {
+                                it.price = 15_000
+                                it.max = 2
+                            }
+                        }
+                        CommonInducementType.PART_TIME_ASSISTANT_COACH -> {
+                            getSingle(type).let {
+                                it.price = 15_000
+                                it.max = 2
+                            }
+                        }
+                        CommonInducementType.WEATHER_MAGE -> getSingle(type).enabled = false
+                        CommonInducementType.EXTRA_TEAM_TRAINING -> {
+                            getSingle(type).let {
+                                it.price = 125_000
+                                it.max = 6
+                            }
+                        }
+                        CommonInducementType.BRIBE -> {
+                            getSingle(type).let {
+                                it.price = 100_000
+                                it.max = 2
+                                // TODO Reduce price for Bribery and Corruption teams
+                            }
+                        }
+                        CommonInducementType.WANDERING_APOTHECARY -> {
+                            getSingle(type).let {
+                                it.price = 100_000
+                                it.max = 1
+                            }
+                        }
+                        CommonInducementType.MORTUARY_ASSISTANT -> {
+                            getSingle(type).let {
+                                it.price = 100_000
+                                it.max = 1
+                            }
+                        }
+                        CommonInducementType.PLAGUE_DOCTOR -> {
+                            getSingle(type).let {
+                                it.price = 100_000
+                                it.max = 1
+                            }
+                        }
+                        CommonInducementType.RIOTOUS_ROOKIE -> getSingle(type).enabled = false
+                        CommonInducementType.HALFLING_MASTER_CHEF -> {
+                            getSingle(type).let {
+                                it.price = 300_000
+                                it.max = 1
+                                // TODO Reduce price for Hafling teams
+                            }
+                        }
+                        CommonInducementType.STANDARD_MERCENARY_PLAYERS -> getInducement(type).enabled = false
+                        CommonInducementType.STAR_PLAYERS -> getGroup(type).enabled = false
+                        CommonInducementType.INFAMOUS_COACHING_STAFF -> getGroup(type).enabled = false
+                        CommonInducementType.WIZARD -> getGroup(type).enabled = false
+                        CommonInducementType.BIASED_REFEREE -> getGroup(type).enabled = false
+                        CommonInducementType.DESPERATE_MEASURES -> {
+                            getSingle(type).let {
+                                it.enabled = true
+                                it.price = 50_000
+                                it.max = 5
+                            }
+                        }
+                    }
+
+                }
+                BB2025InducementType.entries.forEach { type ->
+                    when (type) {
+                        BB2025InducementType.PRAYERS_TO_NUFFLE -> {
+                            getSingle(type).let {
+                                it.enabled = true
+                                it.price = 5_000
+                                it.max = 2
+                            }
+                        }
+                        BB2025InducementType.TEAM_MASCOT -> getSingle(type).enabled = false
+                        BB2025InducementType.BLITZERS_BEST_KEGS -> {
+                            getSingle(type).let {
+                                it.enabled = true
+                                it.price = 50_000
+                                it.max = 2
+                            }
+                        }
+                    }
+                }
+                build()
+            }
+        )
+
+
+    }
+
+    // Builder API infrastructure
+    override fun toBuilder() = BB72025RulesBuilder(parameters)
+    class BB72025RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {
+        override fun build() = BB72025Rules(buildParameters())
+    }
+}
+
 // -----------------------------------------------------------------------
 // Custom serializers for the concrete BB2025 Rules subclasses.
 //
@@ -401,4 +544,14 @@ object StandardBB2025RulesSerializer : KSerializer<StandardBB2025Rules> {
         delegate.serialize(encoder, value.parameters)
     override fun deserialize(decoder: Decoder): StandardBB2025Rules =
         StandardBB2025Rules(delegate.deserialize(decoder))
+}
+
+object BB72025RulesSerializer : KSerializer<BB72025Rules> {
+    private val delegate = RulesParametersHolder.serializer()
+    override val descriptor: SerialDescriptor =
+        SerialDescriptor("com.jervisffb.engine.rules.BB72025Rules", delegate.descriptor)
+    override fun serialize(encoder: Encoder, value: BB72025Rules) =
+        delegate.serialize(encoder, value.parameters)
+    override fun deserialize(decoder: Decoder): BB72025Rules =
+        BB72025Rules(delegate.deserialize(decoder))
 }

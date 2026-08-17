@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.FumbblBB2020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2025.BB72025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.RulesParameterBuilder
@@ -61,6 +62,12 @@ private val standardRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
 )
 
 private val bb7RulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+    DropdownEntryWithValue("Blood Bowl Sevens 2025 Rules", BB72025Rules()),
+    DropdownEntryWithValue("Blood Bowl Sevens 2025 Rules (Dev Settings)", BB72025Rules().toBuilder().run {
+        diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+        undoActionBehavior = UndoActionBehavior.ALLOWED
+        build()
+    }),
     DropdownEntryWithValue("Blood Bowl Sevens 2020 Rules", BB72020Rules()),
     DropdownEntryWithValue("Blood Bowl Sevens 2020 Rules (Dev Settings)", BB72020Rules().toBuilder().run {
         diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT

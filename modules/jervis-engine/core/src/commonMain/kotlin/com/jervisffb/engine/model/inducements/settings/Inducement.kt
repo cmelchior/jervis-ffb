@@ -28,8 +28,7 @@ sealed interface Inducement<B: InducementBuilder> {
  * Interface representing "simple" inducements. This means inducements that
  * can be created by just knowing the type and how many of them to add.
  */
-@Serializable
-sealed interface SingleInducement<T: SingleInducementBuilder>: Inducement<T> {
+interface SingleInducement<T: SingleInducementBuilder>: Inducement<T> {
     // The standard price for this inducement. Not counting any reductions from special rules
     val defaultPrice: Int
     // If non-empty, only teams with one of these special rules can use it
@@ -69,16 +68,14 @@ sealed interface SingleInducement<T: SingleInducementBuilder>: Inducement<T> {
  * This is used to model Mercenaries or Expanded Mercenaries as they are hard to
  * fit into other categories.
  */
-@Serializable
-sealed interface TeamPlayerInducement<T: TeamPlayerInducementBuilder>: Inducement<T>
+interface TeamPlayerInducement<T: TeamPlayerInducementBuilder>: Inducement<T>
 
 
 /**
  * Interface for describing inducements that are a group of non-uniform items,
  * like Star Players or Wizards.
  */
-@Serializable
-sealed interface InducementGroup<GB: InducementGroupBuilder, IB: SingleInducementBuilder, I: SingleInducement<IB>>: Inducement<GB> {
+interface InducementGroup<GB: InducementGroupBuilder, IB: SingleInducementBuilder, I: SingleInducement<IB>>: Inducement<GB> {
     val items: List<I>
     override fun toBuilder(): GB
 }

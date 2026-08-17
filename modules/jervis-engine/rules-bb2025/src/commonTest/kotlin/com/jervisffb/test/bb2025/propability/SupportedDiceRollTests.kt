@@ -63,7 +63,7 @@ import com.jervisffb.engine.common.procedures.tables.injury.LastingInjuryRoll
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.Blitz
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion

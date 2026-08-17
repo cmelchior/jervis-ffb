@@ -1,5 +1,9 @@
-package com.jervisffb.engine.model.inducements.settings
+package com.jervisffb.engine.common.inducements
 
+import com.jervisffb.engine.model.inducements.settings.InducementGroupBuilder
+import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.model.inducements.settings.SingleInducement
+import com.jervisffb.engine.model.inducements.settings.SingleInducementBuilder
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import kotlinx.serialization.Serializable
@@ -9,29 +13,29 @@ import kotlinx.serialization.Serializable
  * given ruleset.
  */
 @Serializable
-data class WizardsInducementList(
+data class WizardsInducementGroup(
     override val max: Int = 1,
     override val enabled: Boolean,
     override val items: List<WizardInducement> = listOf()
-): InducementGroup<WizardsInducementList.Builder, WizardInducement.Builder, WizardInducement> {
+): CommonInducementGroup<WizardsInducementGroup.Builder, WizardInducement.Builder, WizardInducement> {
     override val name: String = "Wizard"
-    override val type: InducementType = InducementType.WIZARD
+    override val type: InducementType = CommonInducementType.WIZARD
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: WizardsInducementList): InducementGroupBuilder {
+    class Builder(inducement: WizardsInducementGroup): CommonInducementGroupBuilder {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
         override var enabled: Boolean = inducement.enabled
         var wizards: List<WizardInducement.Builder> = inducement.items.toList().map { it.toBuilder() }
-        override fun build() = WizardsInducementList(max, enabled, wizards.map { it.build() })
+        override fun build() = WizardsInducementGroup(max, enabled, wizards.map { it.build() })
     }
 }
 
 /**
  * This class represents a single Wizard inducement. To be  available, it
- * should be added in [WizardsInducementList.items].
+ * should be added in [WizardsInducementGroup.items].
  */
 @Serializable
 data class WizardInducement(
@@ -44,12 +48,12 @@ data class WizardInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<WizardInducement.Builder> {
-    override val type: InducementType = InducementType.WIZARD
+    override val type: InducementType = CommonInducementType.WIZARD
     override val name: String = wizard.name
     override fun toBuilder() = Builder(this)
 
-    class Builder(wizardInducement: WizardInducement): SingleInducementBuilder {
-        override val type: InducementType = InducementType.WIZARD
+    class Builder(wizardInducement: WizardInducement): CommonSingleInducementBuilder {
+        override val type: InducementType = CommonInducementType.WIZARD
         override val name: String = wizardInducement.wizard.name
         val wizard: Wizard = wizardInducement.wizard
         override var max: Int = wizardInducement.max

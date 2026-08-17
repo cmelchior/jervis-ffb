@@ -5,6 +5,7 @@ package com.jervisffb.engine.rules
  */
 enum class DiceRollType(val description: String) {
     ACCURACY("Accuracy"), // For passing and Throw Teammate (in BB2025)
+    ALERT_DEFENSE("Alert Defense"),
     ALWAYS_HUNGRY("Always Hungry"),
     ALWAYS_HUNGRY_EAT_ATTEMPT("Always Hungry (Eat Player)"),
     ANIMAL_SAVAGERY("Animal Savagery"),
