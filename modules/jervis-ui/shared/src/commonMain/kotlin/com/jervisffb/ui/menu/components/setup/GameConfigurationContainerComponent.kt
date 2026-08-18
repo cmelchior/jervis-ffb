@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerComponentModel) {
     val tabs = viewModel.tabs
     val selectedTab by viewModel.selectedGameTab.collectAsState()
+    val rulesModel by viewModel.rulesModel.collectAsState()
     val pagerState = rememberPagerState(0) { tabs[selectedTab].tabs.size }
     val coroutineScope = rememberCoroutineScope()
     val showSetupTabs = tabs[selectedTab].showSetupTabs
@@ -132,7 +133,7 @@ fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerCom
                 ) { page ->
                     when (tabs[selectedTab].tabs[page].type) {
                         SetupTabType.LOAD_FILE -> LoadFileComponent(viewModel.loadFileModel)
-                        SetupTabType.RULES -> SetupRulesComponent(viewModel.rulesModel)
+                        SetupTabType.RULES -> SetupRulesComponent(rulesModel)
                         SetupTabType.MAP -> CustomizationSetupComponent(viewModel.customizationsModel)
                         SetupTabType.TIMERS -> TimersSetupComponent(viewModel.timersModel)
                         SetupTabType.INDUCEMENTS -> InducementsSetupComponent(viewModel.inducementsModel)

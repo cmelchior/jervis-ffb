@@ -11,10 +11,12 @@ import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 
 enum class ConfigType {
     FROM_FILE,
@@ -150,7 +152,10 @@ class GameConfigurationContainerComponentModel(val isHotseat: Boolean, private v
     var rulesBuilder: RulesParameterBuilder = selectedRulesBase.value.value.toBuilder()
 
     // Component models responsible for configuring a new game
-    val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this, menuViewModel)
+    private val currentRulesModel = MutableStateFlow(
+        createRulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this)
+    )
+    val rulesModel: StateFlow<RulesSetupComponentModel> = currentRulesModel
     val timersModel = SetupTimersComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
     val inducementsModel = InducementsSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
     val customizationsModel = CustomizationSetupComponentModel(isHotseat, this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
@@ -158,8 +163,10 @@ class GameConfigurationContainerComponentModel(val isHotseat: Boolean, private v
     // Component models responsible for loading a previous game
     val loadFileModel = LoadFileComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val isRulesSetupValid = rulesModel.flatMapLatest { it.isSetupValid }
     private val isManualSetupValid: Flow<Boolean> = combine(
-        rulesModel.isSetupValid,
+        isRulesSetupValid,
         timersModel.isSetupValid,
         inducementsModel.isSetupValid,
         customizationsModel.isSetupValid,
@@ -189,7 +196,10 @@ class GameConfigurationContainerComponentModel(val isHotseat: Boolean, private v
         selectedRulesBase.value = entry
         rulesBuilder = entry.value.toBuilder()
         // LoadFileComponentModel does not care about preset updates, so is ignored here
-        rulesModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+        currentRulesModel.value = createRulesSetupComponentModel(
+            this@GameConfigurationContainerComponentModel.rulesBuilder,
+            this,
+        )
         timersModel.updateFromRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
         inducementsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
         customizationsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
