@@ -34,6 +34,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2025.BB72025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.model.Game
@@ -203,7 +204,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     private fun createDevHotseatBB7ScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
-        val rules = BB72020Rules().toBuilder().run {
+        val rules = BB72025Rules().toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
@@ -397,9 +398,9 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
         val staticButtons = remember {
             listOf(
                 "Start Standard game with manual actions (2025)" to { viewModel.startManualGame(navigator, rulesVersion = GameVersion.BB2025) },
+                "Start BB7 game with all manual actions (2025)" to { viewModel.startManualBB7Game(navigator) },
                 "Start Standard game with manual actions (2020)" to { viewModel.startManualGame(navigator, rulesVersion = GameVersion.BB2020) },
                 "Start Standard game with all random actions (2020)" to { viewModel.startRandomGame(navigator) },
-                "Start BB7 game with all manual actions (2020)" to { viewModel.startManualBB7Game(navigator) },
                 "Load save file" to { viewModel.loadSaveFile(navigator) }
             )
         }
