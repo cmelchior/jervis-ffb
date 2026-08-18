@@ -30,6 +30,7 @@ import com.jervisffb.utils.jervisLogger
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url
+import io.ktor.http.encodeURLParameter
 
 // Temporary wrapper around sample data to better be able to create it and use
 // it in the ChallengeRepository.
@@ -58,8 +59,8 @@ private fun ChallengeBuilder.addSampleTeam(positionJson: String) {
 }
 
 private suspend fun loadSampleChallenge(url: String): GameFileData {
-    val url = Url(url)
-    val json = getHttpClient().get(url).bodyAsText()
+    val callUrl = Url("https://jervis.ilios.dk/proxy.php?url=${url.encodeURLParameter()}")
+    val json = getHttpClient().get(callUrl).bodyAsText()
     return JervisSerialization.loadFromJsonContent(json).getOrThrow()
 }
 
