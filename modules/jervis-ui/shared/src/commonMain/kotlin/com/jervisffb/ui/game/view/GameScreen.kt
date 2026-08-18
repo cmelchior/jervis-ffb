@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -48,11 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
+import com.jervisffb.engine.model.Team
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_lock_closed
 import com.jervisffb.shared.generated.resources.jervis_icon_lock_open
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_undo
+import com.jervisffb.ui.game.dialogs.DialogSize
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.view.pitch.ActionWheelLayer
 import com.jervisffb.ui.game.view.pitch.ContextMenuLayer
 import com.jervisffb.ui.game.view.pitch.LocalPitchData
@@ -72,6 +77,7 @@ import com.jervisffb.ui.keybinds.ClientShortcut
 import com.jervisffb.ui.keybinds.KeyBindings
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import kotlinx.coroutines.delay
@@ -98,12 +104,26 @@ fun GameScreen(
 ) {
     //val aspectRation = (145f+145f+782f)/452f
     val aspectRation = (550f+550f+2354f)/1362f
+    var teamTableDialog by remember(screenModel) { mutableStateOf<TeamTableDialogData?>(null) }
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        GameStatusTopBar(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
+        GameStatusTopBar(
+            vm = gameStatusController,
+            modifier = Modifier.padding(horizontal = 24.jdp),
+            onTeamClick = { isHomeTeam ->
+                val team = when (isHomeTeam) {
+                    true -> screenModel.homeTeam
+                    false -> screenModel.awayTeam
+                }
+                teamTableDialog = TeamTableDialogData(
+                    team = ModelRef(team.id, team),
+                    isHomeTeam = isHomeTeam,
+                )
+            },
+        )
         Spacer(modifier = Modifier.height(8.jdp))
         BoxWithConstraints(modifier = Modifier.weight(1f)) {
             val minBottomHeight = 60.dp
@@ -270,6 +290,12 @@ fun GameScreen(
         }
     }
     Dialogs(dialogsViewModel)
+    teamTableDialog?.let { dialogData ->
+        TeamTableDialog(
+            dialogData = dialogData,
+            onDismissRequest = { teamTableDialog = null },
+        )
+    }
     if (challengeSession != null) {
         ChallengeOutcomeDialog(
             session = challengeSession,
@@ -278,6 +304,45 @@ fun GameScreen(
             onExit = onChallengeExit,
         )
     }
+}
+
+private data class TeamTableDialogData(
+    val team: ModelRef<Team>,
+    val isHomeTeam: Boolean,
+)
+
+@Composable
+private fun TeamTableDialog(
+    dialogData: TeamTableDialogData,
+    onDismissRequest: () -> Unit,
+) {
+    val team = dialogData.team.model
+    JervisDialog(
+        title = "",
+        icon = null,
+        width = DialogSize.VERY_LARGE,
+        backgroundScrim = true,
+        dialogColor = when (dialogData.isHomeTeam) {
+            true -> JervisTheme.rulebookRed
+            false -> JervisTheme.rulebookBlue
+        },
+        content = { _, _ ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                TeamTable(
+                    width = 950.dp,
+                    team = dialogData.team,
+                    isOnHomeTeam = dialogData.isHomeTeam,
+                )
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
 }
 
 @Composable

@@ -80,7 +80,11 @@ private val col12Width = 60.dp // Cost
 private val totalWidth = col1Width + col2Width + col3Width + col4Width + col5Width + col6Width + col7Width + col8Width + col9Width + col10Width + col11Width + col12Width
 
 @Composable
-fun TeamTable(width: Dp, team: ModelRef<Team>, isOnHomeTeam: Boolean) {
+fun TeamTable(
+    width: Dp,
+    team: ModelRef<Team>,
+    isOnHomeTeam: Boolean
+) {
     val team = remember(team) { team.model }
     Column(modifier = Modifier.width(width).background(Color.Transparent)) {
         TeamTableWrapper(team.name)
@@ -338,7 +342,7 @@ private fun TeamTableWrapper(title: String = "") {
         modifier = Modifier
             .rotate(if (up) 0f else 180f)
             .padding(bottom = 2.dp)
-            .height(50.dp)
+            .height(if (up) 30.dp else 50.dp)
             .fillMaxSize()
             .background(color = Color.Transparent)
             .drawBehind {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,6 +106,7 @@ import kotlin.math.tan
 fun GameStatusTopBar(
     vm: GameStatusViewModel,
     modifier: Modifier,
+    onTeamClick: (isHomeTeam: Boolean) -> Unit,
 ) {
     val progressFlow = remember { vm.progress() }
     val progress by progressFlow.collectAsState(UiGameStatusUpdate.INITIAL)
@@ -120,9 +122,21 @@ fun GameStatusTopBar(
         modifier = modifier
     ) {
         Row {
-            TeamBadge(homeTeamInfo, progress.currentTeam == homeTeamInfo.id, JervisTheme.rulebookRed, leftSide = true)
+            TeamBadge(
+                teamInfo = homeTeamInfo,
+                isActive = progress.currentTeam == homeTeamInfo.id,
+                backgroundColor = JervisTheme.rulebookRed,
+                leftSide = true,
+                onClick = { onTeamClick(true) },
+            )
             Spacer(modifier = Modifier.weight(1f))
-            TeamBadge(awayTeamInfo, progress.currentTeam == awayTeamInfo.id, JervisTheme.rulebookBlue, leftSide = false)
+            TeamBadge(
+                teamInfo = awayTeamInfo,
+                isActive = progress.currentTeam == awayTeamInfo.id,
+                backgroundColor = JervisTheme.rulebookBlue,
+                leftSide = false,
+                onClick = { onTeamClick(false) },
+            )
         }
         Column(
             Modifier,
@@ -628,7 +642,8 @@ private fun TeamBadge(
     teamInfo: UiTeamInfoUpdate,
     isActive: Boolean,
     backgroundColor: Color,
-    leftSide: Boolean
+    leftSide: Boolean,
+    onClick: () -> Unit,
 ) {
     // Changes here should also modify the text
     val coachBarHeight = 28.jdp // 24.jdp
@@ -652,7 +667,9 @@ private fun TeamBadge(
         PixelBorderBox(
             // Make the team icons be slightly closer to the edge than dugout.
             // It looks nicer with the current gfx.
-            modifier = Modifier.offset(x = if (leftSide) -12.jdp else 12.jdp),
+            modifier = Modifier
+                .offset(x = if (leftSide) -12.jdp else 12.jdp)
+                .clickable(onClick = onClick),
             borderEnabled = isActive
         ) {
             Box(

@@ -27,11 +27,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -67,7 +69,9 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.PitchViewData
+import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.utils.applyIf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.roundToInt
@@ -101,7 +105,8 @@ import kotlin.math.roundToInt
 @Composable
 fun JervisDialog(
     title: String,
-    icon: @Composable () -> Unit = { },
+    // If `null`, the entire banner will be hidden
+    icon: (@Composable () -> Unit)? = { },
     width: Dp = DialogSize.MEDIUM,
     minHeight: Dp = 230.dp,
     draggable: Boolean = false,
@@ -113,10 +118,15 @@ fun JervisDialog(
     dialogColor: Color = JervisTheme.rulebookRed,
     content: @Composable ColumnScope.(@Composable (String) -> TextFieldColors, Color) -> Unit = { _, _  -> /* Do nothing */  },
     buttons: (@Composable RowScope.() -> Unit)? = null,
-    onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
+    onDismissRequest: (() -> Unit)? = null
 ) {
     JervisDialog(
-        title = { JervisDialogHeader(title, dialogColor) },
+        title = {
+            if (title.isNotBlank()) {
+                JervisDialogHeader(title, dialogColor)
+                TitleBorder(dialogColor)
+            }
+        },
         icon = icon,
         width = width,
         minHeight = minHeight,
@@ -138,10 +148,11 @@ fun JervisDialog(
 @Composable
 fun JervisDialog(
     title: @Composable () -> Unit,
-    icon: @Composable () -> Unit = { },
+    icon: (@Composable () -> Unit)? = { },
     width: Dp = DialogSize.MEDIUM,
     minHeight: Dp = 230.dp,
     draggable: Boolean = false,
+    // Whether to show a darkened background behind the dialog.
     backgroundScrim: Boolean = false,
     // If set, will be used to center the popup over the pitch
     centerOnPitch: GameScreenModel? = null,
@@ -150,9 +161,11 @@ fun JervisDialog(
     dialogColor: Color = JervisTheme.rulebookRed,
     content: @Composable ColumnScope.(@Composable (String) -> TextFieldColors, Color) -> Unit = { _, _  -> /* Do nothing */  },
     buttons: (@Composable RowScope.() -> Unit)? = null,
-    onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
+    // If set, this will be used rather than letting ESC escape the dialog and open the Game Menu drawer.
+    onDismissRequest: (() -> Unit)? = null
 ) {
     val focusRequester = remember { FocusRequester() }
+    val currentOnDismissRequest = rememberUpdatedState(onDismissRequest)
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: PitchViewData? by centerOnPitch?.pitchViewData?.collectAsState() ?: MutableStateFlow<PitchViewData?>(null).collectAsState()
     var popupOffset: IntOffset by remember { mutableStateOf(IntOffset.Zero) }
@@ -187,6 +200,19 @@ fun JervisDialog(
         focusRequester.requestFocus() // ensure we actually get keyboard focus
     }
 
+    if (currentOnDismissRequest.value != null) {
+        DisposableEffect(Unit) {
+            val callback = OnBackPress {
+                currentOnDismissRequest.value?.invoke()
+                true
+            }
+            BackNavigationHandler.register(callback)
+            onDispose {
+                BackNavigationHandler.unregister(callback)
+            }
+        }
+    }
+
     // Background box for showing a Scrim and tracking the size of the window
     // so we can accurately position the popup in the center.
     Box(
@@ -198,12 +224,12 @@ fun JervisDialog(
                 background(color = Color.Black.copy(alpha = 0.5f))
                     .onPointerEvent(PointerEventType.Press, pass = PointerEventPass.Final) {
                         if (!it.changes.any { it.isConsumed }) {
-                            onDismissRequest()
+                            currentOnDismissRequest.value?.invoke()
                         }
                     }
                     .onPreviewKeyEvent { event ->
                         if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
-                            onDismissRequest()
+                            currentOnDismissRequest.value?.invoke()
                             true // consume
                         } else {
                             false
@@ -236,7 +262,7 @@ fun JervisDialog(
                 .onPreviewKeyEvent { event ->
                     // If a dialog has Input fields, it might risk having focus, so also detect ESC here
                     if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
-                        onDismissRequest()
+                        currentOnDismissRequest.value?.invoke()
                         true // consume
                     } else {
                         false
@@ -283,14 +309,16 @@ fun JervisDialog(
                             .height(IntrinsicSize.Min)
                             .paperBackground(JervisTheme.rulebookPaper)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .width(130.dp)
-                                .fillMaxHeight()
-                                .padding(start = 24.dp)
-                                .bannerBackground(bannerColor = dialogColor)
-                        ) {
-                            icon()
+                        if (icon != null) {
+                            Box(
+                                modifier = Modifier
+                                    .width(130.dp)
+                                    .fillMaxHeight()
+                                    .padding(start = 24.dp)
+                                    .bannerBackground(bannerColor = dialogColor)
+                            ) {
+                                icon()
+                            }
                         }
                         Column(
                             modifier = Modifier
@@ -361,7 +389,6 @@ private fun ColumnScope.JervisDialogContent(
     buttons: (@Composable RowScope.() -> Unit)? = null,
 ) {
     title()
-    TitleBorder(dialogColor)
     Column(modifier = Modifier.weight(1f).fillMaxSize().padding(top = 8.dp)) {
         content()
     }
