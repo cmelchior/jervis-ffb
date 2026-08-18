@@ -75,14 +75,6 @@ val coreSerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.actions.DBlockResult::class)
         }
     }
-    polymorphic(com.jervisffb.engine.actions.InducementSelection::class) {
-        subclass(com.jervisffb.engine.actions.InducementSelection.BiasedReferee::class)
-        subclass(com.jervisffb.engine.actions.InducementSelection.InfamousCoach::class)
-        subclass(com.jervisffb.engine.actions.InducementSelection.Mercenary::class)
-        subclass(com.jervisffb.engine.actions.InducementSelection.Simple::class)
-        subclass(com.jervisffb.engine.actions.InducementSelection.StarPlayer::class)
-        subclass(com.jervisffb.engine.actions.InducementSelection.Wizard::class)
-    }
     polymorphic(com.jervisffb.engine.challenge.ChallengeScore::class) {
         subclass(com.jervisffb.engine.challenge.ChallengeScore.CompletionOnly::class)
         subclass(com.jervisffb.engine.challenge.ChallengeScore.ProbabilityScore::class)
@@ -115,56 +107,6 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.model.inducements.JosefBugman::class)
         subclass(com.jervisffb.engine.model.inducements.KariColdsteel::class)
         subclass(com.jervisffb.engine.model.inducements.PapaSkullbones::class)
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.settings.Inducement::class) {
-        subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.ExpandedMercenaryInducements::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.MercenaryInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.SimpleInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StarPlayerInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.WizardInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.WizardsInducementList::class)
-        polymorphic(com.jervisffb.engine.model.inducements.settings.InducementGroup::class) {
-            subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.WizardsInducementList::class)
-        }
-        polymorphic(com.jervisffb.engine.model.inducements.settings.SingleInducement::class) {
-            subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.MercenaryInducement::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.SimpleInducement::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.StarPlayerInducement::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.WizardInducement::class)
-        }
-        polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
-            subclass(com.jervisffb.engine.model.inducements.settings.ExpandedMercenaryInducements::class)
-            subclass(com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement::class)
-        }
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.settings.InducementGroup::class) {
-        subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.WizardsInducementList::class)
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.settings.SingleInducement::class) {
-        subclass(com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.MercenaryInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.SimpleInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StarPlayerInducement::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.WizardInducement::class)
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
-        subclass(com.jervisffb.engine.model.inducements.settings.ExpandedMercenaryInducements::class)
-        subclass(com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement::class)
     }
     polymorphic(com.jervisffb.engine.model.locations.Location::class) {
         subclass(com.jervisffb.engine.model.locations.Dogout::class)

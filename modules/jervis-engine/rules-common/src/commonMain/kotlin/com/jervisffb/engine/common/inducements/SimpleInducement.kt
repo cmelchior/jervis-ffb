@@ -1,5 +1,7 @@
-package com.jervisffb.engine.model.inducements.settings
+package com.jervisffb.engine.common.inducements
 
+import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.model.inducements.settings.SingleInducement
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -27,7 +29,7 @@ data class SimpleInducement(
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(private val inducement: SimpleInducement): SingleInducementBuilder {
+    class Builder(private val inducement: SimpleInducement): CommonSingleInducementBuilder {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max

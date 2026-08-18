@@ -18,7 +18,9 @@ import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDistanc
 import com.jervisffb.engine.bb2025.procedures.injury.SteadyFootingRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
 import com.jervisffb.engine.bb2025.skills.PuntDistanceRoll
@@ -63,7 +65,6 @@ import com.jervisffb.engine.common.procedures.tables.injury.LastingInjuryRoll
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.Blitz
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
@@ -101,6 +102,7 @@ class SupportedDiceRollTests {
     private fun getExpectedSupport(type: DiceRollType): Boolean {
         return when (type) {
             DiceRollType.ACCURACY,
+            DiceRollType.ALERT_DEFENSE,
             DiceRollType.ALWAYS_HUNGRY,
             DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT,
             DiceRollType.ANIMAL_SAVAGERY,
@@ -187,6 +189,7 @@ class SupportedDiceRollTests {
     private fun getProcedure(type: DiceRollType): Procedure? {
         return when (type) {
             DiceRollType.ACCURACY -> PassAccuracyRoll
+            DiceRollType.ALERT_DEFENSE -> AlertDefense
             DiceRollType.ALWAYS_HUNGRY -> AlwaysHungryRoll
             DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT -> AlwaysHungrySquirmFreeRoll
             DiceRollType.ANIMAL_SAVAGERY -> AnimalSavageryRoll

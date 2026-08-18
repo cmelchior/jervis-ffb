@@ -37,6 +37,7 @@ enum class PrayerToNuffleTableResult(
 
     // BB2025 - All prayers now last the entire game
     DAZZLING_CATCHING("Dazzling Catching", DummyProcedure, Duration.END_OF_GAME),
+    BLESSING_OF_NUFFLE("Blessing of Nuffle", BlessedStatueOfNuffle, Duration.END_OF_GAME),
 
     // BB2020 - Slight changes to duration and effect
     TREACHEROUS_TRAPDOOR("Treacherous Trapdor", TreacherousTrapdoor, Duration.END_OF_HALF),

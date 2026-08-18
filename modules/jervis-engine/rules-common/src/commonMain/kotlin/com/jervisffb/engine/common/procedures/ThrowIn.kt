@@ -36,6 +36,7 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.assert
@@ -48,22 +49,27 @@ import com.jervisffb.engine.utils.sum
  * If a Throw-int triggers a turnover, this should be handled by the caller of
  * this procedure.
  *
+ * This procedure supports both Standard and BB7 throw-ins. The only thing
+ * that changes between the two is the distance the ball is thrown (2D6 vs.
+ * 1D6+2).
+ *
  * See page 51 in the BB2020 rulebook.
  * See page 73 in the BB2025 rulebook.
+ * See page 13 in Spike 22.
  *
  * Developer's Commentary:
- * In BB2025, Bouncing Balls (page 34 in the BB2025 rulebook says that:
+ * In BB2025, Bouncing Balls (page 34) says that:
  * "...When the ball hits the pitch, it will Bounce. When the rules tell you to
  * Bounce the ball..."
  *
  * Throw-in (page 73) does not say anything about bouncing, which would indicate
  * that the ball does indeed not bounce. However, this is a change from BB2020,
- * and also the only place when a ball no longer bounce, catches, being knocked
+ * and also the only place when a ball no longer bounces. Catches, being knocked
  * down and kick-off all still bounce.
  *
  * As the rules also prefix Bouncing with "When the ball hits the pitch...",
  * this could indicate that removing the sentence from Throw-in was an editing
- * mistake, and not intended. At least NAF things so, as they have ruled that
+ *  mistake and not intended. At least NAF thinks so, as they have ruled that
  * the ball does indeed bounce after a Throw-in.
  *
  * This probably needs to be addressed in a FAQ, but until it does, Jervis
@@ -124,13 +130,18 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
     object RollDistance : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D6, Dice.D6, type = DiceRollType.THROWIN_DISTANCE))
+            val dice = when (rules.gameType) {
+                GameType.STANDARD,
+                GameType.DUNGEON_BOWL,
+                GameType.GUTTER_BOWL -> listOf(Dice.D6, Dice.D6)
+                GameType.BB7 -> listOf(Dice.D6)
+            }
+            return listOf(RollDice(dice, type = DiceRollType.THROWIN_DISTANCE))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRollList<D6Result>(action) { dice ->
-                assert(dice.size == 2)
+                val diceDistance = calculateDiceDistance(rules, dice)
                 val context = state.getContext<ThrowInContext>()
-                val diceDistance = dice.sum()
                 val chanceObservation = createFinalTableLookupObservation(
                     state = state,
                     team = observationTeam(state),
@@ -185,8 +196,6 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
         }
     }
 
-    private fun observationTeam(state: Game): Team = state.activeTeam ?: state.kickingTeam
-
     object ResolveOutOfBounds : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Replace the current throw in context
@@ -209,4 +218,27 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
             return ExitProcedure()
         }
     }
+
+    //
+    // HELPER FUNCTIONS
+    //
+    private fun observationTeam(state: Game): Team = state.activeTeam ?: state.kickingTeam
+
+    private fun calculateDiceDistance(rules: Rules, dice: List<D6Result>): Int {
+        return when (rules.gameType) {
+            GameType.STANDARD,
+            GameType.DUNGEON_BOWL,
+            GameType.GUTTER_BOWL -> {
+                // Throw-in is 2D6
+                assert(dice.size == 2)
+                dice.sum()
+            }
+            GameType.BB7 -> {
+                // Throw-in is 1D6 + 2
+                assert(dice.size == 1)
+                dice.sum() + 2
+            }
+        }
+    }
+
 }

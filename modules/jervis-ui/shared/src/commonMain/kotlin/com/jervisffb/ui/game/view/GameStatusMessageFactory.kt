@@ -42,6 +42,7 @@ import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotStep
 import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
 import com.jervisffb.engine.bb2025.skills.PuntDistanceRoll
@@ -96,7 +97,6 @@ import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap

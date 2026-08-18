@@ -1,7 +1,6 @@
 package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
@@ -38,7 +37,6 @@ import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -75,26 +73,12 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.SkillValue
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.JumpRollContext
 import com.jervisffb.engine.model.context.LeapRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.hasContext
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList
-import com.jervisffb.engine.model.inducements.settings.ExpandedMercenaryInducements
-import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList
-import com.jervisffb.engine.model.inducements.settings.MercenaryInducement
-import com.jervisffb.engine.model.inducements.settings.SimpleInducement
-import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList
-import com.jervisffb.engine.model.inducements.settings.WizardInducement
-import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
@@ -109,7 +93,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.collections.plus
 import kotlin.jvm.JvmName
-import kotlin.random.Random
 
 fun ActionRequest.containsActionWithRandomBehavior(): Boolean {
     return this.actions.containsActionWithRandomBehavior()
@@ -201,97 +184,6 @@ fun GameAction.isRandomAction(): Boolean {
         is PassTypeSelected -> false
         is AdminGameAction -> false
     }
-}
-
-/**
- * Developer debugging utility. Makes it easier to inject dice rolls to get the behaviour you want.
- * Should only be used when Dev Mode isn't enough to trigger the bug. Common use cases where
- * this might be nice is debugging race conditions in the UI.
- */
-val randomList = mutableListOf<GameAction>(
-//    1.d3, // Fan Factor roll (Home)
-//    1.d3, // Fan Factor roll (Away)
-//    DiceRollResults(3.d6, 4.d6), // Weather Roll
-//    CoinTossResult(Coin.HEAD), // Coin Toss
-//    DiceRollResults(2.d8, 1.d6), // Kick
-//    DiceRollResults(5.d6, 5.d6), // Kickoff event
-)
-
-/**
- * Create a random action for the next ActionNode.
- */
-fun createRandomAction(
-    controller: GameEngineController,
-    random: Random = Random,
-    canUndo: Boolean = false
-): GameAction {
-
-    // Hacky way to inject events. Should probably try to add some kind of Developer UI
-    // for this. See the `randomList` above` this function.
-    if (randomList.isNotEmpty()) {
-        return randomList.removeAt(0)
-    }
-
-    // 2% of the time, we will UNDO, rather than progress the game state.
-    if (canUndo && controller.history.isNotEmpty() && random.nextInt(100) < 2) {
-        return Undo
-    }
-
-    // Select a random action but disallow certain ones:
-    // - EndAction: Do not call this to prevent a player stopping their turn too soon
-    val availableActions = controller.getAvailableActions().actions
-    var actionDesc: GameActionDescriptor?
-    val filtered = availableActions.filter { it != EndActionWhenReady }
-    if (filtered.isEmpty()) {
-        actionDesc = availableActions.random(random)
-    } else {
-        actionDesc = filtered.random(random)
-    }
-
-    // Inducements are a bit special as we need access to the rules to create them, so do this manually for now
-    return if (actionDesc is SelectInducements) {
-        createRandomInducements(random, controller.getAvailableActions().team!!, actionDesc.treasury + actionDesc.pettyCash)
-    } else {
-        actionDesc.createRandom(random)
-    }
-}
-
-private fun createRandomInducements(random: Random, team: Team, availableGold: Int): GameAction {
-    val settings = team.game.rules.inducements
-    var done = false
-    var usedGold = 0
-    val selectedInducements = mutableListOf<InducementSelection<*>>()
-    val availableTypes = InducementType.entries.toMutableSet()
-    while (!done && availableTypes.isNotEmpty()) {
-        // val inducement = settings.entries.random(random)
-        val nextType = availableTypes.random(random)
-        availableTypes.remove(nextType)
-        val inducement = settings[nextType] ?: continue
-        when (inducement) {
-            is BiasedRefereesInducementList -> { /* Do nothing for now */ }
-            is InfamousCoachingStaffsInducementList -> { /* Do nothing for now */ }
-            is StarPlayersInducementList -> { /* Do nothing for now */ }
-            is WizardsInducementList -> { /* Do nothing for now */ }
-            is ExpandedMercenaryInducements -> { /* Do nothing for now */ }
-            is SimpleInducement -> {
-                val price = inducement.getPrice(team)
-                val count = random.nextInt(1, inducement.max + 1)
-                if (usedGold + (price * count) > availableGold) {
-                    done = true
-                } else {
-                    selectedInducements.add(InducementSelection.Simple(inducement.type, count))
-                }
-                usedGold += (price * count)
-            }
-            is StandardMercenaryInducement -> { /* Do nothing for now */ }
-            is BiasedRefereeInducement,
-            is InfamousCoachingStaffInducement,
-            is StarPlayerInducement,
-            is WizardInducement -> error("Should not appear as a top-level inducement: $inducement")
-            is MercenaryInducement -> { /* Do nothing for now */ }
-        }
-    }
-    return InducementsSelected(selectedInducements)
 }
 
 const val enableAsserts = true

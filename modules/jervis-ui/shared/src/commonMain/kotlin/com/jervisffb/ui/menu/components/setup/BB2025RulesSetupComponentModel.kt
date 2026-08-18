@@ -8,6 +8,13 @@ import com.jervisffb.engine.bb2025.tables.BB2025StandardKickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardPrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable
+import com.jervisffb.engine.bb2025.tables.BB7ArgueTheCallTable
+import com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable
+import com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable
+import com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable
+import com.jervisffb.engine.bb2025.tables.BB7StuntyInjuryTable
+import com.jervisffb.engine.common.tables.DisabledCasualtyTable
+import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.builder.GameVersion
@@ -82,37 +89,46 @@ private val BB2025_RULES_SETUP_CONFIGURATION = RulesSetupConfiguration(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025StandardPrayersToNuffleTable, true),
         ),
+        "Spike Magazine 22" to listOf(
+            DropdownEntryWithValue("Sevens", BB7PrayersToNuffleTable, false),
+        ),
     ),
     kickOffTables = listOf(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025StandardKickOffEventTable, true),
         ),
-        //    "Spike Magazine 22" to listOf(
-        //        DropdownEntryWithValue("Sevens", BB2025StandardKickOffEventTable, false),
-        //    ),
+        "Spike Magazine 22" to listOf(
+            DropdownEntryWithValue("Sevens", BB7KickOffEventTable, false),
+        ),
     ),
     injuryTables = listOf(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025StandardInjuryTable, true),
         ),
-        //    "Spike 22" to listOf(
-        //        DropdownEntryWithValue("Sevens", BB2025StandardInjuryTable, true),
-        //    ),
+        "Spike 22" to listOf(
+            DropdownEntryWithValue("Sevens", BB7StandardInjuryTable, true),
+        ),
     ),
     stuntyInjuryTables = listOf(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025StuntyInjuryTable, true),
         ),
-        //    "Spike 22" to listOf(
-        //        DropdownEntryWithValue("Sevens", BB2025StuntyInjuryTable, true),
-        //    ),
+        "Spike 22" to listOf(
+            DropdownEntryWithValue("Sevens", BB7StuntyInjuryTable, true),
+        ),
     ),
     casualtyTables = listOf(
+        "" to listOf(
+            DropdownEntryWithValue("Disabled", DisabledCasualtyTable, true),
+        ),
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025CasualtyTable, true),
         ),
     ),
     lastingInjuryTables = listOf(
+        "" to listOf(
+            DropdownEntryWithValue("Disabled", DisabledLastingInjuryTable, true),
+        ),
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025LastingInjuryTable, true),
         ),
@@ -121,9 +137,9 @@ private val BB2025_RULES_SETUP_CONFIGURATION = RulesSetupConfiguration(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2025ArgueTheCallTable, true),
         ),
-        //    "Spike 22" to listOf(
-        //        DropdownEntryWithValue("Sevens", BB2025ArgueTheCallTable, true),
-        //    ),
+        "Spike 22" to listOf(
+            DropdownEntryWithValue("Sevens (Amateur Referees)", BB7ArgueTheCallTable, true),
+        ),
     ),
     unusualBallList = listOf(
         "Rulebook" to listOf(

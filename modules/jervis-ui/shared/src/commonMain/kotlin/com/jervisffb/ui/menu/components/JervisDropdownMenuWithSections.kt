@@ -50,7 +50,9 @@ fun <T: DropdownEntry> JervisDropdownMenuWithSections(
             onDismissRequest = { expanded = false }
         ) {
             entries.forEachIndexed { index, (sectionTitle, items) ->
-                DropdownHeader(sectionTitle.uppercase())
+                if (sectionTitle.isNotBlank()) {
+                    DropdownHeader(sectionTitle.uppercase())
+                }
                 items.forEach { item ->
                     DropdownMenuItem(
                         text = {

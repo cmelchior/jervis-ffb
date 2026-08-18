@@ -1,6 +1,8 @@
 package com.jervisffb.test
 
+import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2025.BB72025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.JervisSerialization.jervisEngineSerializerModule
@@ -26,7 +28,7 @@ class SerializerRoundTripTests {
     }
 
     @Test
-    fun bb2020RulesRoundTrip() {
+    fun bb2020_rulesRoundTrip() {
         val original: Rules = StandardBB2020Rules()
         val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
         val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
@@ -36,7 +38,17 @@ class SerializerRoundTripTests {
     }
 
     @Test
-    fun bb2025RulesRoundTrip() {
+    fun bb7_bb2020_rulesRoundTrip() {
+        val original: Rules = BB72020Rules()
+        val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
+        val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
+        assertTrue(restored is BB72020Rules, "Restored should be StandardBB2020Rules, was $restored")
+        assertEquals(original.name, restored.name)
+        assertEquals(original.baseVersion, restored.baseVersion)
+    }
+
+    @Test
+    fun bb2025_rulesRoundTrip() {
         val original: Rules = StandardBB2025Rules()
         val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
         val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
@@ -45,4 +57,13 @@ class SerializerRoundTripTests {
         assertEquals(original.baseVersion, restored.baseVersion)
     }
 
+    @Test
+    fun bb7_bb2025_rulesRoundTrip() {
+        val original: Rules = BB72025Rules()
+        val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
+        val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
+        assertTrue(restored is BB72025Rules, "Restored should be BB72025Rules, was $restored")
+        assertEquals(original.name, restored.name)
+        assertEquals(original.baseVersion, restored.baseVersion)
+    }
 }

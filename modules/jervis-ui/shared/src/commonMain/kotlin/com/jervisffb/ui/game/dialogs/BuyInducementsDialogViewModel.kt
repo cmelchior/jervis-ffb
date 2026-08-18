@@ -10,21 +10,23 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.actions.InducementsSelected
+import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
+import com.jervisffb.engine.common.inducements.CommonInducementSelection
+import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
+import com.jervisffb.engine.common.inducements.SimpleInducement
+import com.jervisffb.engine.common.inducements.StandardMercenaryInducement
+import com.jervisffb.engine.common.inducements.StarPlayerInducement
+import com.jervisffb.engine.common.inducements.WizardInducement
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.WizardId
 import com.jervisffb.engine.model.inducements.BiasedRefereeType
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaffType
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement
 import com.jervisffb.engine.model.inducements.settings.InducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement
-import com.jervisffb.engine.model.inducements.settings.SimpleInducement
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
-import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
-import com.jervisffb.engine.model.inducements.settings.WizardInducement
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.sprites.SpriteSource
@@ -49,22 +51,22 @@ sealed interface CartKey {
 
     data class Simple(override val type: InducementType) : CartKey
     data class Wizard(val id: WizardId) : CartKey {
-        override val type: InducementType = InducementType.WIZARD
+        override val type: InducementType = CommonInducementType.WIZARD
     }
     data class BiasedReferee(val refereeType: BiasedRefereeType) : CartKey {
-        override val type: InducementType = InducementType.BIASED_REFEREE
+        override val type: InducementType = CommonInducementType.BIASED_REFEREE
     }
     data class InfamousCoach(val coachType: InfamousCoachingStaffType) : CartKey {
-        override val type: InducementType = InducementType.INFAMOUS_COACHING_STAFF
+        override val type: InducementType = CommonInducementType.INFAMOUS_COACHING_STAFF
     }
     data class StarPlayer(val position: PositionId) : CartKey {
-        override val type: InducementType = InducementType.STAR_PLAYERS
+        override val type: InducementType = CommonInducementType.STAR_PLAYERS
     }
     // Mercenary entries are unique per addition — two mercenaries of the same position
     // with the same skill still count as two separate purchases. The id is a monotonic
     // counter allocated by the ViewModel.
     data class Mercenary(val id: Int) : CartKey {
-        override val type: InducementType = InducementType.STANDARD_MERCENARY_PLAYERS
+        override val type: InducementType = CommonInducementType.STANDARD_MERCENARY_PLAYERS
     }
 }
 
@@ -187,7 +189,7 @@ class BuyInducementsViewModel(
             }
 
     val mercenaryInducement: StandardMercenaryInducement? =
-        (settings[InducementType.STANDARD_MERCENARY_PLAYERS] as? StandardMercenaryInducement)
+        (settings[CommonInducementType.STANDARD_MERCENARY_PLAYERS] as? StandardMercenaryInducement)
             ?.takeIf { it.enabled && mercenaryPositionsById.isNotEmpty() }
 
     val mercenaryPositions: List<Position> = mercenaryPositionsById.values.sortedBy { it.title }
@@ -244,7 +246,7 @@ class BuyInducementsViewModel(
                 ?: "Mercenary ${merc.position.titleSingular}"
             out += CartEntryView(
                 key = CartKey.Mercenary(merc.id),
-                type = InducementType.STANDARD_MERCENARY_PLAYERS,
+                type = CommonInducementType.STANDARD_MERCENARY_PLAYERS,
                 name = nameWithSkill,
                 tooltipName = tooltip,
                 count = 1,
@@ -257,7 +259,7 @@ class BuyInducementsViewModel(
 
     val mercenaries: List<MercenaryCartEntry> by derivedStateOf {
         cart.entries.mapNotNull { (key, selection) ->
-            if (key !is CartKey.Mercenary || selection !is InducementSelection.Mercenary) return@mapNotNull null
+            if (key !is CartKey.Mercenary || selection !is CommonInducementSelection.Mercenary) return@mapNotNull null
             val firstSkill = selection.extraSkills.firstOrNull()
             val displayName = mercenaryDisplayNames[key.id] ?: "Mercenary"
             MercenaryCartEntry(
@@ -317,7 +319,7 @@ class BuyInducementsViewModel(
     fun addMercenary(position: Position, skill: SkillId?, displayName: String) {
         val id = mercenaryIdCounter++
         mercenaryDisplayNames[id] = displayName
-        cart[CartKey.Mercenary(id)] = InducementSelection.Mercenary(
+        cart[CartKey.Mercenary(id)] = CommonInducementSelection.Mercenary(
             position = position,
             extraSkills = if (skill != null) listOf(skill) else emptyList(),
         )
@@ -329,7 +331,7 @@ class BuyInducementsViewModel(
     }
 
     fun simpleCount(type: InducementType): Int {
-        val entry = cart[CartKey.Simple(type)] as? InducementSelection.Simple
+        val entry = cart[CartKey.Simple(type)] as? CommonInducementSelection.Simple
         return entry?.count ?: 0
     }
 
@@ -352,7 +354,7 @@ class BuyInducementsViewModel(
         if (next == 0) {
             cart.remove(key)
         } else {
-            cart[key] = InducementSelection.Simple(inducement.type, next)
+            cart[key] = CommonInducementSelection.Simple(inducement.type, next)
         }
     }
 
@@ -414,10 +416,10 @@ class BuyInducementsViewModel(
 
     private fun buildSelection(inducement: SingleInducement<*>): InducementSelection<*>? {
         return when (val key = cartKeyFor(inducement)) {
-            is CartKey.Wizard -> InducementSelection.Wizard(key.id)
-            is CartKey.BiasedReferee -> InducementSelection.BiasedReferee(key.refereeType)
-            is CartKey.InfamousCoach -> InducementSelection.InfamousCoach(key.coachType)
-            is CartKey.StarPlayer -> InducementSelection.StarPlayer(key.position)
+            is CartKey.Wizard -> CommonInducementSelection.Wizard(key.id)
+            is CartKey.BiasedReferee -> CommonInducementSelection.BiasedReferee(key.refereeType)
+            is CartKey.InfamousCoach -> CommonInducementSelection.InfamousCoach(key.coachType)
+            is CartKey.StarPlayer -> CommonInducementSelection.StarPlayer(key.position)
             else -> null
         }
     }

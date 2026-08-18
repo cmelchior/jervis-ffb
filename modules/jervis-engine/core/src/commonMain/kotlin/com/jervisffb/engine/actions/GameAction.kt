@@ -13,25 +13,8 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.WizardId
-import com.jervisffb.engine.model.inducements.BiasedRefereeType
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaffType
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereeInducement
-import com.jervisffb.engine.model.inducements.settings.BiasedRefereesInducementList
-import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffInducement
-import com.jervisffb.engine.model.inducements.settings.InfamousCoachingStaffsInducementList
-import com.jervisffb.engine.model.inducements.settings.MercenaryInducement
-import com.jervisffb.engine.model.inducements.settings.SimpleInducement
-import com.jervisffb.engine.model.inducements.settings.SingleInducement
-import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayerInducement
-import com.jervisffb.engine.model.inducements.settings.StarPlayersInducementList
-import com.jervisffb.engine.model.inducements.settings.WizardInducement
-import com.jervisffb.engine.model.inducements.settings.WizardsInducementList
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.ActionType
@@ -39,7 +22,6 @@ import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
-import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.statistics.probability.Probability
 import kotlinx.serialization.Serializable
@@ -589,87 +571,6 @@ data class InducementsSelected(val inducements: List<InducementSelection<*>>) : 
     fun totalPrice(team: Team): Int {
         return inducements.sumOf {
             it.getPrice(team)
-        }
-    }
-}
-
-/**
- * This interface is used to capture information about each single bought inducement.
- * It is up to the Rules Engine to map these into the concrete inducements in the
- * model layer.
- *
- * This is done in [com.jervisffb.engine.rules.common.procedures.ApplyInducements].
- */
-@Serializable
-sealed interface InducementSelection<T: SingleInducement<*>> {
-
-    val type: InducementType
-    val count: Int
-
-    fun getSettings(rules: Rules): T
-    // Returns the full price that must be paid for this inducement by the current team.
-    // This takes into account any discounts that may be available to the team.
-    fun getPrice(team: Team): Int = getSettings(team.game.rules).getPrice(team) * count
-    // Returns `false` if this inducement is not available to the given team.
-    // This method is a shortcut for looking up the same information in the Rules for the inducement.
-    fun isAvailableToTeam(team: Team): Boolean {
-        val settings = getSettings(team.game.rules).requirements
-        return settings.isEmpty() || team.specialRules.any { it in settings }
-    }
-
-    @Serializable
-    data class Simple(override val type: InducementType, override val count: Int) : InducementSelection<SimpleInducement> {
-        override fun getSettings(rules: Rules): SimpleInducement = rules.inducements[type] as SimpleInducement
-    }
-
-    @Serializable
-    data class Wizard(val id: WizardId) : InducementSelection<WizardInducement> {
-        override val count: Int = 1
-        override val type: InducementType = InducementType.WIZARD
-        override fun getSettings(rules: Rules): WizardInducement = (rules.inducements[type] as WizardsInducementList).items.first { it.wizard.id == id }
-
-    }
-
-
-    @Serializable
-    data class BiasedReferee(val referee: BiasedRefereeType) : InducementSelection<BiasedRefereeInducement> {
-        override val count: Int = 1
-        override val type: InducementType = InducementType.BIASED_REFEREE
-        override fun getSettings(rules: Rules): BiasedRefereeInducement = (rules.inducements[type] as BiasedRefereesInducementList).items.first { it.referee.type == referee }
-    }
-
-    @Serializable
-    data class InfamousCoach(val coachType: InfamousCoachingStaffType) : InducementSelection<InfamousCoachingStaffInducement> {
-        override val count: Int = 1
-        override val type: InducementType = InducementType.INFAMOUS_COACHING_STAFF
-        override fun getSettings(rules: Rules): InfamousCoachingStaffInducement = (rules.inducements[type] as InfamousCoachingStaffsInducementList).items.first { it.staff.type == coachType }
-
-    }
-
-
-    @Serializable
-    data class StarPlayer(val position: PositionId) : InducementSelection<StarPlayerInducement> {
-        override val count: Int = 1
-        override val type: InducementType = InducementType.STAR_PLAYERS
-        override fun getSettings(rules: Rules): StarPlayerInducement = (rules.inducements[type] as StarPlayersInducementList).items.first { it.starPlayer.id == position }
-
-    }
-
-    @Serializable
-    data class Mercenary(
-        val position: Position,
-        val extraSkills: List<SkillId> = emptyList(),
-    ) : InducementSelection<MercenaryInducement> {
-        override val count: Int = 1
-        override val type: InducementType = InducementType.STANDARD_MERCENARY_PLAYERS
-        override fun getSettings(rules: Rules): MercenaryInducement {
-            val groupSettings = (rules.inducements[type] as StandardMercenaryInducement)
-            return MercenaryInducement(
-                position,
-                extraSkills,
-                groupSettings.extraCost,
-                groupSettings.skillCost
-            )
         }
     }
 }

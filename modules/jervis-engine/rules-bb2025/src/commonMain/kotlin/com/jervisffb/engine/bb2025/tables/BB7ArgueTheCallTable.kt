@@ -1,0 +1,32 @@
+package com.jervisffb.engine.bb2025.tables
+
+import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
+import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
+
+/**
+ * Class representing the Argue the Call table for BB7.
+ *
+ * See page 13 in Spike 22.
+ */
+@Serializable
+object BB7ArgueTheCallTable: ArgueTheCallTable {
+    override val entries: Map<Int, ArgueTheCallResult> =
+        mapOf(
+            1 to ArgueTheCallResult.I_DONT_CARE,
+            2 to ArgueTheCallResult.I_DONT_CARE,
+            3 to ArgueTheCallResult.I_DONT_CARE,
+            4 to ArgueTheCallResult.I_DONT_CARE,
+            5 to ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT,
+            6 to ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT,
+        )
+
+    override fun roll(
+        d6: D6Result,
+    ): ArgueTheCallResult {
+        val result = d6.value
+        return entries[result] ?: INVALID_GAME_STATE("$result was not found in the Argue the Call Table.")
+    }
+}

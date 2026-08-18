@@ -1,6 +1,6 @@
 package com.jervisffb.net.handlers
 
-import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.InternalGameActionMessage

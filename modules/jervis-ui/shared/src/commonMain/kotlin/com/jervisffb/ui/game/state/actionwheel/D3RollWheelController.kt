@@ -6,10 +6,10 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeDiceRollCast
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.ThrowIn
-import com.jervisffb.engine.common.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense

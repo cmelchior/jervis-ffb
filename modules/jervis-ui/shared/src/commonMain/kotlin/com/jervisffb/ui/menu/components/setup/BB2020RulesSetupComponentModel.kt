@@ -16,6 +16,8 @@ import com.jervisffb.engine.bb2020.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.bb2020.tables.SpringWeatherTable
 import com.jervisffb.engine.bb2020.tables.SummerWeatherTable
 import com.jervisffb.engine.bb2020.tables.WinterWeatherTable
+import com.jervisffb.engine.common.tables.DisabledCasualtyTable
+import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
 import com.jervisffb.engine.model.BallType
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.StadiumType
@@ -139,11 +141,17 @@ private val BB2020_RULES_SETUP_CONFIGURATION = RulesSetupConfiguration(
         ),
     ),
     casualtyTables = listOf(
+        "" to listOf(
+            DropdownEntryWithValue("Disabled", DisabledCasualtyTable, true),
+        ),
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2020CasualtyTable, true),
         ),
     ),
     lastingInjuryTables = listOf(
+        "" to listOf(
+            DropdownEntryWithValue("Disabled", DisabledLastingInjuryTable, true),
+        ),
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", BB2020LastingInjuryTable, true),
         ),

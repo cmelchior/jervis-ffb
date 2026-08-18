@@ -1,7 +1,7 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.actions.D16Result
-import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
@@ -63,7 +63,7 @@ object PrayersToNuffleRoll : Procedure(), ChanceObservationHandler {
                     dice = listOf(dieRoll),
                     favorableOutcomes = table.entries.values.count { it == result },
                     possibleOutcomes = when (table.die) {
-                        Dice.D6 -> D6Result.SIDES
+                        Dice.D8 -> D8Result.SIDES
                         Dice.D16 -> D16Result.SIDES
                         else -> error("Unsupported Prayers to Nuffle die: ${table.die}")
                     },

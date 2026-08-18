@@ -6,8 +6,8 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.DiceFaces
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 

@@ -31,6 +31,18 @@ val bb2020SerializerModule = SerializersModule {
             }
         }
     }
+    polymorphic(com.jervisffb.engine.model.inducements.settings.Inducement::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
+        polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
+        }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.settings.InducementType::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.BB2020InducementType::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
+    }
     polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)
         polymorphic(com.jervisffb.engine.bb2020.inducements.wizards.BB2020Wizard::class) {

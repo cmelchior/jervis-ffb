@@ -43,6 +43,7 @@ private val roots = listOf(
     com.jervisffb.engine.model.inducements.Spell::class,
     com.jervisffb.engine.model.inducements.settings.Inducement::class,
     com.jervisffb.engine.model.inducements.settings.InducementGroup::class,
+    com.jervisffb.engine.model.inducements.settings.InducementType::class,
     com.jervisffb.engine.model.inducements.settings.SingleInducement::class,
     com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class,
     com.jervisffb.engine.model.inducements.wizards.Wizard::class,
@@ -76,7 +77,6 @@ private val roots = listOf(
 private val ignored = setOf(
     com.jervisffb.engine.actions.CalculatedAction::class,
     com.jervisffb.engine.model.PitchSquare::class,
-    com.jervisffb.engine.rules.AbstractDummyRules::class,
     com.jervisffb.engine.rules.common.procedures.DummyProcedure::class,
     com.jervisffb.engine.rules.common.procedures.ErrorProcedure::class,
 )

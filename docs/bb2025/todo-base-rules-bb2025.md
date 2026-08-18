@@ -589,6 +589,10 @@ book.
 
 - [ ] Place Kick (BB7): All locations not on kicking teams side.
 - [ ] Touchback ((BB7): Only happens when crossing back to kicker's side, not in No Man's Land.
-
+- [ ] Throw-in is 1D6+2
+- [ ] Different Argue the Call Table
+- [ ] Apothecary is un-defined, assume BB2020 BB7 behavior
+- [ ] Different Injury Table
+- [ ] Different Stunty Injury Table
 
 
