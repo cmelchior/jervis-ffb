@@ -56,56 +56,66 @@ object ApplyInducements : Procedure() {
                         is CommonInducementSelection.Mercenary -> { /* Not supported yet */ }
                         is CommonInducementSelection.Simple -> {
                             when (val type = inducement.type) {
-                                BB2025InducementType.PRAYERS_TO_NUFFLE -> {
-                                    add(UpdateContext(context.copy(rollForPrayers = inducement.count)))
-                                    rollForPrayers = true
-                                }
-                                CommonInducementType.PART_TIME_ASSISTANT_COACH -> add(SetPartTimeAssistantCoaches(team, inducement.count))
-                                CommonInducementType.TEMP_AGENCY_CHEERLEADER -> add(SetTempAgencyCheerleaders(team, inducement.count))
-                                BB2025InducementType.TEAM_MASCOT -> {
-                                    repeat(inducement.count) {
-                                        add(AddTeamMascot(team))
+                                is CommonInducementType -> {
+                                    when (type) {
+                                        CommonInducementType.BIASED_REFEREE -> INVALID_GAME_STATE("Use `InducementSelection.BiasedReferee` instead")
+                                        CommonInducementType.BRIBE -> {
+                                            repeat(inducement.count) {
+                                                add(AddBribe(team, Bribe(duration = Duration.END_OF_GAME)))
+                                            }
+                                        }
+                                        CommonInducementType.DESPERATE_MEASURES -> {
+                                            // Ignore for now as support has not been implemented.
+                                        }
+                                        CommonInducementType.EXTRA_TEAM_TRAINING -> {
+                                            repeat(inducement.count) { i ->
+                                                add(AddTeamReroll(team, ExtraTeamTrainingReroll(teamId = team.id, index = i)))
+                                            }
+                                        }
+                                        CommonInducementType.HALFLING_MASTER_CHEF -> add(SetHalflingMasterChefs(team, inducement.count))
+                                        CommonInducementType.INFAMOUS_COACHING_STAFF -> INVALID_GAME_STATE("Use `InducementSelection.InfamousCoach` instead")
+                                        CommonInducementType.MORTUARY_ASSISTANT -> {
+                                            repeat(inducement.count) {
+                                                add(AddMortuaryAssistant(team))
+                                            }
+                                        }
+                                        CommonInducementType.PART_TIME_ASSISTANT_COACH -> add(SetPartTimeAssistantCoaches(team, inducement.count))
+                                        CommonInducementType.PLAGUE_DOCTOR -> {
+                                            repeat(inducement.count) {
+                                                add(AddPlagueDoctor(team))
+                                            }
+                                        }
+                                        CommonInducementType.RIOTOUS_ROOKIE ->  { /* Not supported yet */ }
+                                        CommonInducementType.STANDARD_MERCENARY_PLAYERS -> INVALID_GAME_STATE("Use `InducementSelection.Mercenary` instead")
+                                        CommonInducementType.STAR_PLAYERS -> INVALID_GAME_STATE("Use `InducementSelection.StarPlayer` instead")
+                                        CommonInducementType.TEMP_AGENCY_CHEERLEADER -> add(SetTempAgencyCheerleaders(team, inducement.count))
+                                        CommonInducementType.WANDERING_APOTHECARY -> {
+                                            repeat(inducement.count) {
+                                                add(AddWanderingApothecary(team))
+                                            }
+                                        }
+                                        CommonInducementType.WEATHER_MAGE -> {
+                                            repeat(inducement.count) {
+                                                add(AddWeatherMage(team))
+                                            }
+                                        }
+                                        CommonInducementType.WIZARD -> INVALID_GAME_STATE("Use `InducementSelection.Wizard` instead")
                                     }
                                 }
-                                CommonInducementType.WEATHER_MAGE -> {
-                                    repeat(inducement.count) {
-                                        add(AddWeatherMage(team))
+                                is BB2025InducementType -> {
+                                    when (type) {
+                                        BB2025InducementType.BLITZERS_BEST_KEGS -> add(SetBlitzersBestKegs(team, inducement.count))
+                                        BB2025InducementType.PRAYERS_TO_NUFFLE -> {
+                                            add(UpdateContext(context.copy(rollForPrayers = inducement.count)))
+                                            rollForPrayers = true
+                                        }
+                                        BB2025InducementType.TEAM_MASCOT -> {
+                                            repeat(inducement.count) {
+                                                add(AddTeamMascot(team))
+                                            }
+                                        }
                                     }
                                 }
-                                BB2025InducementType.BLITZERS_BEST_KEGS -> add(SetBlitzersBestKegs(team, inducement.count))
-                                CommonInducementType.BRIBE -> {
-                                    repeat(inducement.count) {
-                                        add(AddBribe(team, Bribe(duration = Duration.END_OF_GAME)))
-                                    }
-                                }
-                                CommonInducementType.EXTRA_TEAM_TRAINING -> {
-                                    repeat(inducement.count) { i ->
-                                        add(AddTeamReroll(team, ExtraTeamTrainingReroll(teamId = team.id, index = i)))
-                                    }
-                                }
-                                CommonInducementType.MORTUARY_ASSISTANT -> {
-                                    repeat(inducement.count) {
-                                        add(AddMortuaryAssistant(team))
-                                    }
-                                }
-                                CommonInducementType.PLAGUE_DOCTOR -> {
-                                    repeat(inducement.count) {
-                                        add(AddPlagueDoctor(team))
-                                    }
-                                }
-                                CommonInducementType.RIOTOUS_ROOKIE ->  { /* Not supported yet */ }
-                                CommonInducementType.WANDERING_APOTHECARY -> {
-                                    repeat(inducement.count) {
-                                        add(AddWanderingApothecary(team))
-                                    }
-                                }
-                                CommonInducementType.HALFLING_MASTER_CHEF -> add(SetHalflingMasterChefs(team, inducement.count))
-                                CommonInducementType.BIASED_REFEREE -> INVALID_GAME_STATE("Use `InducementSelection.BiasedReferee` instead")
-                                CommonInducementType.INFAMOUS_COACHING_STAFF -> INVALID_GAME_STATE("Use `InducementSelection.InfamousCoach` instead")
-                                CommonInducementType.STANDARD_MERCENARY_PLAYERS -> INVALID_GAME_STATE("Use `InducementSelection.Mercenary` instead")
-                                CommonInducementType.STAR_PLAYERS -> INVALID_GAME_STATE("Use `InducementSelection.StarPlayer` instead")
-                                CommonInducementType.WIZARD -> INVALID_GAME_STATE("Use `InducementSelection.Wizard` instead")
-                                else -> INVALID_GAME_STATE("Unknown inducement type: $type")
                             }
                         }
                         is CommonInducementSelection.StarPlayer ->  { /* Not supported yet */ }

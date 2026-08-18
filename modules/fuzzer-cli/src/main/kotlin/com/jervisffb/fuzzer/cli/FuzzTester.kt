@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.SetupTeamContext
 import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Coach
@@ -36,7 +37,6 @@ import com.jervisffb.engine.statistics.GameStatistics
 import com.jervisffb.engine.statistics.probability.scorer.PhysicalActionPathScorer
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.engine.teamBuilder
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2025.createDefaultGameStateBB2025
 import com.jervisffb.utils.multiThreadDispatcher
