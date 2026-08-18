@@ -40,7 +40,10 @@ fun SelectP2PTeamScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(modifier = Modifier.weight(1f).fillMaxSize()) {
-            SelectTeamComponent(viewModel)
+            SelectTeamComponent(
+                viewModel = viewModel,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
 
         // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that

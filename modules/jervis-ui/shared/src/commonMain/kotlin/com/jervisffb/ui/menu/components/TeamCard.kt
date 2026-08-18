@@ -8,20 +8,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.formatCurrency
@@ -46,15 +54,18 @@ fun TeamCard(
     teamValue: Int,
     rerolls: Int,
     logo: ImageBitmap,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     isEnabled: Boolean = true,
     emptyTeam: Boolean = false,
-    onClick: (() -> Unit)?
+    highlight: String = "",
+    highlightColor: Color = JervisTheme.brightYellow,
+    onClick: (() -> Unit)?,
 ) {
     val borderWidth = if (isSelected || !isEnabled) 3.dp else 0.dp
     val borderColor = if (isSelected || !isEnabled) JervisTheme.rulebookRed else Color.Transparent
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(width = 300.dp, height = 150.dp)
             .alpha(if (isEnabled) 1f else 0.3f)
             .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
@@ -74,7 +85,7 @@ fun TeamCard(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 8.dp, bottom = 2.dp),
-                        text = name.uppercase(),
+                        text = name.highlightMatches(highlight, highlightColor = highlightColor),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = JervisTheme.white
@@ -97,12 +108,90 @@ fun TeamCard(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 JervisTooltip(tooltip = race) {
-                    Image(
-                        modifier = Modifier.padding(8.dp),
-                        bitmap = logo,
-                        contentDescription = null,
-                        contentScale = ContentScale.Inside,
-                    )
+                    Box(
+                        modifier = Modifier.aspectRatio(1f).fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ShadowImage(
+                            modifier = Modifier.padding(8.dp),
+                            painter = logo,
+                            contentDescription = null,
+                            shadowColor = highlightColor,
+                            shadowEnabled = highlight.isNotBlank() && race.contains(highlight, ignoreCase = true),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShadowImage(
+    painter: ImageBitmap,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    shadowEnabled: Boolean = true,
+    shadowOffset: DpOffset = DpOffset(0.dp, 0.dp),
+    shadowColor: Color = JervisTheme.brightYellow,
+) {
+    val density = LocalDensity.current
+
+    Box(modifier) {
+        // Shadow
+        if (shadowEnabled) {
+            Image(
+                bitmap = painter,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    shadowColor,
+                    blendMode = BlendMode.SrcIn,
+                ),
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer {
+                        translationX = with(density) { shadowOffset.x.toPx() }
+                        translationY = with(density) { shadowOffset.y.toPx() }
+                        scaleX = 1.05f
+                        scaleY = 1.05f
+                    },
+            )
+        }
+
+        // Actual image
+        Image(
+            bitmap = painter,
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Fit,
+        )
+    }
+}
+
+private fun String.highlightMatches(
+    filter: String,
+    highlightColor: Color = JervisTheme.brightYellow,
+): AnnotatedString {
+    val displayName = uppercase()
+    return when (filter.isBlank()) {
+        true -> AnnotatedString(displayName)
+        false -> buildAnnotatedString {
+            append(displayName)
+            var searchStart = 0
+            while (searchStart < displayName.length) {
+                val matchStart = displayName.indexOf(filter, startIndex = searchStart, ignoreCase = true)
+                when (matchStart) {
+                    -1 -> break
+                    else -> {
+                        addStyle(
+                            style = SpanStyle(
+                                color = JervisTheme.contentTextColor,
+                                background = highlightColor,
+                            ),
+                            start = matchStart,
+                            end = matchStart + filter.length,
+                        )
+                        searchStart = matchStart + filter.length
+                    }
                 }
             }
         }

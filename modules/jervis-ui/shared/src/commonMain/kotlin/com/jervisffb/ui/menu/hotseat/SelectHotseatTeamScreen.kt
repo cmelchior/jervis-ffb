@@ -49,7 +49,10 @@ fun SelectHotseatTeamScreen(
                 )
             }
             Spacer(modifier = Modifier.width(32.dp))
-            SelectTeamComponent(viewModel.teamSelectorModel)
+            SelectTeamComponent(
+                viewModel = viewModel.teamSelectorModel,
+                modifier = Modifier.fillMaxSize().weight(1f),
+            )
         }
         // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
         // it is hard to capture the buttons inside the same component due to how the layout is structured.
