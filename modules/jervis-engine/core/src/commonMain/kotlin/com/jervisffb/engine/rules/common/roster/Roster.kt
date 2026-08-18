@@ -32,5 +32,7 @@ data class Roster(
     val specialRules: List<SpecialRules>,
     val logo: RosterLogo,
 ) {
-    operator fun get(id: PositionId): Position = positions.first { it.id == id }
+    operator fun get(id: PositionId): Position {
+        return positions.firstOrNull { it.id == id } ?: error("Position not found: $id")
+    }
 }
