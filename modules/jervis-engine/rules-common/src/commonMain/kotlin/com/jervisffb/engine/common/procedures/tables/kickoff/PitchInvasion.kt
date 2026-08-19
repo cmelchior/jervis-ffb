@@ -35,6 +35,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.math.min
@@ -44,6 +45,7 @@ import kotlin.math.min
  *
  * See page 41 in the BB2020 rulebook.
  * See page 48 in the BB2025 rulebook.
+ * See page 11 in Spike 22.
  *
  * Developer's Commentary:
  * It isn't defined in the rules, which team resolves their roll first, so we have just
@@ -112,22 +114,38 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForReceivingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return when (rules.gameType == GameType.BB7) {
+                true -> listOf(ContinueWhenReady) // Always 1 player affected
+                false -> listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
+            }
+        }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D3Result>(action) { d3 ->
-                val context = state.getContext<PitchInvasionContext>()
-                val chanceObservation = createFinalAtLeastObservation(
-                    state = state,
-                    team = state.receivingTeam,
-                    rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
-                    die = d3,
-                )
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
-                    chanceObservation?.let(::AddChanceObservation),
-                    UpdateContext(context.copy(receivingPlayersAffected = d3.value)),
-                    GotoNode(SelectReceivingTeamAffectedPlayers),
-                )
+            val context = state.getContext<PitchInvasionContext>()
+            return when (action) {
+                Continue -> {
+                    if (rules.gameType != GameType.BB7) INVALID_GAME_STATE("Only allowed for BB7")
+                    compositeCommandOf(
+                        UpdateContext(context.copy(receivingPlayersAffected = 1)),
+                        GotoNode(SelectReceivingTeamAffectedPlayers),
+                    )
+                }
+                else -> {
+                    castDiceRoll<D3Result>(action) { d3 ->
+                        val chanceObservation = createFinalAtLeastObservation(
+                            state = state,
+                            team = state.receivingTeam,
+                            rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
+                            die = d3,
+                        )
+                        compositeCommandOf(
+                            ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
+                            chanceObservation?.let(::AddChanceObservation),
+                            UpdateContext(context.copy(receivingPlayersAffected = d3.value)),
+                            GotoNode(SelectReceivingTeamAffectedPlayers),
+                        )
+                    }
+                }
             }
         }
     }
@@ -168,22 +186,39 @@ object PitchInvasion : Procedure(), ChanceObservationHandler {
 
     object RollForKickingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return when (rules.gameType == GameType.BB7) {
+                true -> listOf(ContinueWhenReady)
+                false -> listOf(RollDice(Dice.D3, type = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED))
+            }
+        }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return castDiceRoll<D3Result>(action) { d3 ->
-                val context = state.getContext<PitchInvasionContext>()
-                val chanceObservation = createFinalAtLeastObservation(
-                    state = state,
-                    team = state.kickingTeam,
-                    rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
-                    die = d3,
-                )
-                compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
-                    chanceObservation?.let(::AddChanceObservation),
-                    UpdateContext(context.copy(kickingPlayersAffected = d3.value)),
-                    GotoNode(SelectKickingTeamAffectedPlayers),
-                )
+            val context = state.getContext<PitchInvasionContext>()
+            return when (action) {
+                Continue -> {
+                    if (rules.gameType != GameType.BB7) INVALID_GAME_STATE("Only allowed for BB7")
+                    compositeCommandOf(
+                        UpdateContext(context.copy(kickingPlayersAffected = 1)),
+                        GotoNode(SelectKickingTeamAffectedPlayers),
+                    )
+                }
+                else -> {
+                    castDiceRoll<D3Result>(action) { d3 ->
+                        val context = state.getContext<PitchInvasionContext>()
+                        val chanceObservation = createFinalAtLeastObservation(
+                            state = state,
+                            team = state.kickingTeam,
+                            rollType = DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
+                            die = d3,
+                        )
+                        compositeCommandOf(
+                            ReportDiceRoll(DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED, d3),
+                            chanceObservation?.let(::AddChanceObservation),
+                            UpdateContext(context.copy(kickingPlayersAffected = d3.value)),
+                            GotoNode(SelectKickingTeamAffectedPlayers),
+                        )
+                    }
+                }
             }
         }
     }

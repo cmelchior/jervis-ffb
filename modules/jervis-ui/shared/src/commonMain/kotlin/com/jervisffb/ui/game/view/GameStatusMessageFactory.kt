@@ -6,6 +6,7 @@ import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025BothDown
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
@@ -42,6 +43,7 @@ import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotStep
 import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
@@ -52,6 +54,7 @@ import com.jervisffb.engine.bb2025.skills.ShadowingRoll
 import com.jervisffb.engine.bb2025.skills.ShadowingStep
 import com.jervisffb.engine.bb2025.skills.TentaclesRoll
 import com.jervisffb.engine.bb2025.skills.TentaclesStep
+import com.jervisffb.engine.common.context.AlertDefenseContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChargeContext
 import com.jervisffb.engine.common.context.DeviateRollContext
@@ -106,7 +109,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.LocalActionProvider
@@ -124,9 +129,9 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
  */
 class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private val state: Game) {
 
-    private val messageFactories = buildFactoryMap()
+    private val messageFactories = buildFactoryMap(state.rules)
 
-    private fun buildFactoryMap(): Map<Node, (Boolean, Boolean, Game) -> String?> {
+    private fun buildFactoryMap(rules: Rules): Map<Node, (Boolean, Boolean, Game) -> String?> {
         // We split these factories into multiple groups, mostly to work around IntelliJ
         // being slow at type resolution when combining them all into one Map.
         // Second, because it makes it easier to add similar messages.
@@ -134,7 +139,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         // fit, put it into the Custom group.
         return buildMap {
             putAll(buildUseSimpleActionMessages())
-            putAll(buildDiceRollMessages())
+            putAll(buildDiceRollMessages(rules))
             putAll(buildCustomActionMessages())
         }
     }
@@ -183,10 +188,12 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
         }
     }
 
-    private fun buildDiceRollMessages(): Map<Node, (Boolean, Boolean, Game) -> String?> {
+    private fun buildDiceRollMessages(rules: Rules): Map<Node, (Boolean, Boolean, Game) -> String?> {
+        val isBB7 = (rules.gameType == GameType.BB7)
         val rollDiceScenarios = listOf(
             AccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
             AccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
+            AlertDefense.RollDie to "Roll D3 + 1 for Number of Players to Move during Alert Defense",
             AlwaysHungryRoll.RollDie to "Roll D6 for Always Hungry",
             AlwaysHungryRoll.ReRollDie to "Re-roll D6 for Always Hungry",
             AlwaysHungrySquirmFreeRoll.RollDie to "Roll D6 to Squirm Free",
@@ -194,6 +201,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             AnimalSavageryRoll.RollDie to "Roll D6 for Animal Savagery",
             AnimalSavageryRoll.ReRollDie to "Re-roll D6 for Animal Savagery",
             ArgueTheCallRoll.RollDie to "Roll D6 to Argue the Call",
+            BB7KickOffDeviateRoll.RollDice to "Roll D8 + 2D6 (Lowest) to Deviate the Ball",
             BB2020CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
             BB2020CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
             BribeRoll.RollDie to "Roll D6 to use Bribe",
@@ -210,10 +218,11 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ChainsawRoll.ReRollDie to "Re-roll D6 to use Chainsaw",
             ChompRoll.ReRollDie to "Re-roll D6 to Chomp the opponent",
             ChompRoll.RollDie to "Roll D6 to Chomp the opponent",
-            Charge.RollForPlayers to "Roll D3 + 3 for Number of Players to be used during Charge",
+            Charge.RollForPlayers to "Roll D3 + ${if (isBB7) "1" else "3"} for Number of Players to be used during Charge",
             DauntlessRoll.ReRollDie to "Re-roll D6 for Dauntless",
             DauntlessRoll.RollDie to "Roll D6 for Dauntless",
             DeviateRoll.RollDice to "Roll D8 + D6 to Deviate the Ball",
+
             DodgeRoll.ReRollDie to "Re-roll D6 to Dodge",
             DodgeRoll.RollDie to "Roll D6 to Dodge",
             DodgySnack.KickingTeamRollDie to "Roll D6 for Dodgy Snack",
@@ -248,7 +257,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ProRoll.RollDie to "Roll D6 for Pro",
             ProjectileVomitRoll.ReRollDie to "Re-roll D6 for Projectile Vomit",
             ProjectileVomitRoll.RollDie to "Roll D6 for Projectile Vomit",
-            QuickSnap.RollDie to "Roll D3 + 3 for Number of Players to Move during Quick Snap",
+            QuickSnap.RollDie to "Roll D3 + ${if (isBB7) "1" else "3"} for Number of Players to Move during Quick Snap",
             PuntDirectionRoll.RollDie to "Roll D6 for Punt Direction",
             PuntDirectionRoll.ReRollDie to "Re-roll D3 for Punt Direction",
             PuntDistanceRoll.RollDie to "Roll D3 for Punt Distance",
@@ -613,6 +622,13 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 when {
                     isActiveClient -> "Select Up to ${context.playersToSelect} Players to be used during Charge"
                     else -> "Waiting for opponent to select Players for Charge"
+                }
+            },
+            AlertDefense.SelectPlayerOrEndSetup to { isActiveClient, _, state ->
+                val context = state.getContext<AlertDefenseContext>()
+                when {
+                    isActiveClient -> "Select Player to Move - ${context.playersLeft} Left"
+                    else -> null
                 }
             },
             QuickSnap.SelectPlayerOrEndSetup to { isActiveClient, _, state ->

@@ -59,7 +59,7 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<QuickSnapContext>()
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = null
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3, type = DiceRollType.QUICK_SNAP))
         }
@@ -75,7 +75,7 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUICK_SNAP, d3),
                     chanceObservation?.let(::AddChanceObservation),
-                    AddContext(QuickSnapContext(roll = d3)),
+                    AddContext(QuickSnapContext(roll = d3, extraPlayers = extraPlayerCount)),
                     ReportQuickSnapResult(state.receivingTeam, d3, extraPlayerCount),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
@@ -88,8 +88,7 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Max D3 + 3/1 players must be selected, once a player has moved, it cannot move again
             val context = state.getContext<QuickSnapContext>()
-            val extraPlayerCount = getExtraPlayersCount(state)
-            return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
+            return if (!context.playersLeftToMove()) {
                 listOf(EndSetupWhenReady)
             } else {
                 // Already moved players can no longer move, otherwise all open players are eligible.
@@ -183,7 +182,7 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
                     target = null,
                 )),
                 // Automatically exit Quick Snap when no more players can be moved
-                if (updatedPlayersMoved.size == (context.roll.value + 3)) {
+                if (updatedPlayersMoved.size == (context.roll.value + context.extraPlayers)) {
                     ExitProcedure()
                 } else {
                     GotoNode(SelectPlayerOrEndSetup)

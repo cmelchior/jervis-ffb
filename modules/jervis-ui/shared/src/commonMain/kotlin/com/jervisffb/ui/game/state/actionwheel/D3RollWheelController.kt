@@ -6,6 +6,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeDiceRollCast
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.FanFactorRolls
@@ -149,6 +150,16 @@ object ChargePlayersRollWheelController: D3RollWheelController() {
     override val diceRollType: DiceRollType = DiceRollType.CHARGE
 
     // There is no "real" center for this, so we place it in the center of the pitch
+    override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
+}
+
+
+object AlertDefenseRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "alert-defense"
+    override val rollDiceNode: Node = AlertDefense.RollDie
+    override val diceRollType: DiceRollType = DiceRollType.ALERT_DEFENSE
+
+    // There is no "real" center for this, so we place it in the center of the Pitch
     override fun getActionWheelCenter(state: Game): PitchCoordinate? = null
 }
 

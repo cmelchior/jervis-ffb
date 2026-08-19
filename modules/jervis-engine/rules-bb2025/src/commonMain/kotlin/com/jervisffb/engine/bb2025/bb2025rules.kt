@@ -2,10 +2,12 @@ package com.jervisffb.engine.bb2025
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.bb2025.StandardBB2025Rules.StandardBB2025RulesBuilder
 import com.jervisffb.engine.bb2025.commands.ResetShadowingSkill
 import com.jervisffb.engine.bb2025.commands.SetWasOnPitchDuringDrive
 import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
 import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
+import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ChainsawFoulStep
@@ -43,6 +45,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.common.planner.CommonActionPlanner
+import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.tables.DisabledCasualtyTable
 import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
 import com.jervisffb.engine.fsm.Node
@@ -271,6 +274,7 @@ abstract class BB2025Rules(
     @Transient override val applyInducementsStep: Procedure = BB2025ApplyInducements
     @Transient override val cheeringFansStep: Procedure = BB2025CheeringFans
     @Transient override val chainsawFoulStep: Procedure = ChainsawFoulStep
+    @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
 
     override val rightStuffMaxStrength: Int = Int.MAX_VALUE
     override fun calculateLeaderRerollStatusChange(team: Team): Command? = Leader.calculateLeaderRerollStatusChange(team)
@@ -337,7 +341,7 @@ abstract class BB2025Rules(
             matchEventsEnabled = false,
             kickOffEventTable = BB2025StandardKickOffEventTable,
             prayersToNufflePriceForUnderdog = 50_000,
-            prayersToNuffleEnabledForUnderdogDuringPregame = true,
+            prayersToNuffleEnabledForUnderdogDuringPregame = false,
             prayersToNuffleTable = BB2025StandardPrayersToNuffleTable,
             weatherTable = BB2025StandardWeatherTable,
             injuryTable = BB2025StandardInjuryTable,
@@ -522,6 +526,16 @@ class BB72025Rules(
         )
 
 
+    }
+
+    @Transient override val kickOffDeviateRollStep: Procedure = BB7KickOffDeviateRoll
+
+    /**
+     * Returns an updated copy of the current ruleset.
+     * The original ruleset is not modified.
+     */
+    fun update(block: BB72025RulesBuilder.() -> Unit): BB72025Rules {
+        return toBuilder().apply(block).build()
     }
 
     // Builder API infrastructure

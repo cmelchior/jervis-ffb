@@ -4,6 +4,8 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.common.commands.ResetAvailableTeamRerolls
+import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
@@ -14,6 +16,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
 
@@ -158,6 +161,44 @@ fun createDefaultHomeTeamBB2025(rules: Rules): Team {
         apothecaries = 1
         dedicatedFans = 1
         teamValue = 1_000_000
+    }
+}
+
+fun createDefault2025HomeTeamForBB7(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM_TEST_BB2025) {
+        type = GameType.BB7
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
+        name = "HomeTeam"
+        addPlayer("H1".playerId, "Thrower-1-H", 1.playerNo, HUMAN_THROWER)
+        addPlayer("H2".playerId, "Catcher-2-H", 2.playerNo, HUMAN_CATCHER)
+        addPlayer("H3".playerId, "Blitzer-3-H", 3.playerNo, HUMAN_BLITZER)
+        addPlayer("H4".playerId, "Blitzer-4-H", 4.playerNo, HUMAN_BLITZER)
+        addPlayer("H5".playerId, "Lineman-5-H", 5.playerNo, HUMAN_LINEMAN)
+        addPlayer("H6".playerId, "Lineman-6-H", 6.playerNo, HUMAN_LINEMAN)
+        addPlayer("H7".playerId, "Lineman-7-H", 7.playerNo, HUMAN_LINEMAN)
+        rerolls = 1
+        apothecaries = 0
+        dedicatedFans = 0
+        teamValue = 570_000
+    }
+}
+
+fun createDefault2025AwayTeamForBB7(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM_TEST_BB2025) {
+        type = GameType.BB7
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "AwayTeam"
+        addPlayer("A1".playerId, "Thrower-1-H", 1.playerNo, HUMAN_THROWER)
+        addPlayer("A2".playerId, "Catcher-2-H", 2.playerNo, HUMAN_CATCHER)
+        addPlayer("A3".playerId, "Blitzer-3-H", 3.playerNo, HUMAN_BLITZER)
+        addPlayer("A4".playerId, "Blitzer-4-H", 4.playerNo, HUMAN_BLITZER)
+        addPlayer("A5".playerId, "Lineman-5-H", 5.playerNo, HUMAN_LINEMAN)
+        addPlayer("A6".playerId, "Lineman-6-H", 6.playerNo, HUMAN_LINEMAN)
+        addPlayer("A7".playerId, "Lineman-7-H", 7.playerNo, HUMAN_LINEMAN)
+        rerolls = 1
+        apothecaries = 0
+        dedicatedFans = 0
+        teamValue = 570_000
     }
 }
 

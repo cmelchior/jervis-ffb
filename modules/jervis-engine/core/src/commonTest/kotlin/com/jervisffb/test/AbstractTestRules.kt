@@ -136,6 +136,7 @@ open class AbstractTestRules: Rules {
     override val kickOffStep: Procedure = DummyProcedure
     override val useApothecaryStep: Procedure = DummyProcedure
     override val chainsawFoulStep: Procedure = DummyProcedure
+    override val kickOffDeviateRollStep: Procedure = DummyProcedure
     override fun toBuilder(): RulesParameterBuilder = TODO()
     override val name: String = "Test Rules"
     override val baseVersion: GameVersion = GameVersion.BB2025

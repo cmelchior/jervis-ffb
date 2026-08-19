@@ -74,14 +74,14 @@ object AlertDefense : Procedure(), ChanceObservationHandler {
                 val extraPlayerCount = getExtraPlayersCount(state)
                 val chanceObservation = createFinalAtLeastObservation(
                     state = state,
-                    team = state.receivingTeam,
+                    team = state.kickingTeam,
                     rollType = DiceRollType.ALERT_DEFENSE,
                     die = d3,
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ALERT_DEFENSE, d3),
                     chanceObservation?.let(::AddChanceObservation),
-                    AddContext(AlertDefenseContext(roll = d3)),
+                    AddContext(AlertDefenseContext(roll = d3, extraPlayers = 1)),
                     ReportAlertDefenseResult(state.kickingTeam, d3, extraPlayerCount),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
@@ -92,14 +92,14 @@ object AlertDefense : Procedure(), ChanceObservationHandler {
     object SelectPlayerOrEndSetup: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // Max D3 + 3/1 players must be selected, once a player has moved, it cannot move again
+            // Max D3 + 1 players must be selected; once a player has moved, it cannot move again
             val context = state.getContext<AlertDefenseContext>()
             val extraPlayerCount = getExtraPlayersCount(state)
             return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
                 listOf(EndSetupWhenReady)
             } else {
                 // Already moved players can no longer move, otherwise all open players are eligible.
-                val eligiblePlayers = state.receivingTeam
+                val eligiblePlayers = state.kickingTeam
                     .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() - context.playersMoved.toSet()
@@ -188,8 +188,8 @@ object AlertDefense : Procedure(), ChanceObservationHandler {
                     currentPlayer = null,
                     target = null,
                 )),
-                // Automatically exit Quick Snap when no more players can be moved
-                if (updatedPlayersMoved.size == (context.roll.value + 3)) {
+                // Automatically exit Alert Defense when no more players can be moved
+                if (updatedPlayersMoved.size == (context.roll.value + getExtraPlayersCount(state))) {
                     ExitProcedure()
                 } else {
                     GotoNode(SelectPlayerOrEndSetup)

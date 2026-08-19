@@ -28,6 +28,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.common.planner.CommonActionPlanner
+import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.tables.DisabledCasualtyTable
 import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
 import com.jervisffb.engine.fsm.Node
@@ -311,6 +312,7 @@ abstract class BB2020Rules(
     @Transient override val hailMaryPassStep: Procedure = DummyProcedure
     @Transient override val applyInducementsStep: Procedure = DummyProcedure
     @Transient override val chainsawFoulStep: Procedure = DummyProcedure
+    @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
 
     override val rightStuffMaxStrength: Int = 3
     override fun calculateLeaderRerollStatusChange(team: Team): Command? =

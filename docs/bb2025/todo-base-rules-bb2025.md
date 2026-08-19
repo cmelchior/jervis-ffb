@@ -587,12 +587,22 @@ book.
 
 ## BB7
 
-- [ ] Place Kick (BB7): All locations not on kicking teams side.
-- [ ] Touchback ((BB7): Only happens when crossing back to kicker's side, not in No Man's Land.
+- [x] Place Kick (BB7): All locations on receiving teams side. Not No Man's Land.
+- [x] Touchback ((BB7): Only happens when crossing back to kicker's side, not in 
+      No Man's Land.
+- [x] Kick-off Events
+  - [x] Alert Defense
+  - [x] Time-out: Now only turn 5-6
+  - [x] Charge: Now 1D3 + 1
+  - [x] Quick Snap: Now 1D3 + 1
+  - [x] Pitch Invasion: Only 1 affected
+- [x] Kick behavior is undefined: For now, allow to reduce chosen dice to D3. 
+- [x] Deviate distance on Kick-off is 2D6 (choose lowest)
 - [ ] Throw-in is 1D6+2
 - [ ] Different Argue the Call Table
 - [ ] Apothecary is un-defined, assume BB2020 BB7 behavior
 - [ ] Different Injury Table
 - [ ] Different Stunty Injury Table
+- [ ] Different Prayers To Nuffle tabl
 
 

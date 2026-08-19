@@ -53,7 +53,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object ResolveBallLandingOnPitch: Procedure() {
     override val initialNode: Node = DetermineIfCatchIsPossible
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         // If any player has used Diving Catch, it can now be used again
         val context = state.getContextOrNull<DivingCatchContext>()
         val commands = listOf(state.homeTeam, state.awayTeam).flatMap { team ->

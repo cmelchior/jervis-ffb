@@ -32,7 +32,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
-import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.BB72025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules

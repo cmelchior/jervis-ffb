@@ -196,9 +196,11 @@ abstract class AbstractRules(
     }
 
     override fun canPlaceBallForKickoff(kickingTeam: Team, location: PitchSquare): Boolean {
+        // For both BB7 and BB11. The rules say that you must place the ball on the opponent's half
+        // of the pitch. This excludes No Man's Land in BB7.
         return when (kickingTeam.isHomeTeam()) {
-            true -> location.x > lineOfScrimmageHome
-            false -> location.x < lineOfScrimmageAway
+            true -> location.x >= lineOfScrimmageAway
+            false -> location.x <= lineOfScrimmageHome
         }
     }
 

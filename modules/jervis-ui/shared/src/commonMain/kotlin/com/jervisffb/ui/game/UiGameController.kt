@@ -42,6 +42,7 @@ import com.jervisffb.ui.game.state.UiActionProviderGroup
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2020WheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025PassWheelController
 import com.jervisffb.ui.game.state.actionwheel.AccuracyBB2025ThrowTeamMateWheelController
+import com.jervisffb.ui.game.state.actionwheel.AlertDefenseRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.AlwaysHungrySquirmFreeWheelController
 import com.jervisffb.ui.game.state.actionwheel.AlwaysHungryWheelController
 import com.jervisffb.ui.game.state.actionwheel.AnimalSavageryWheelController
@@ -378,6 +379,7 @@ class UiGameController(
         WeatherRollWheelController,
         KickoffEventWheelController,
         ChargePlayersRollWheelController,
+        AlertDefenseRollWheelController,
         QuickSnapRollWheelController,
         SolidDefenseWheelController,
         CheeringFansKickingTeamRollWheelController,

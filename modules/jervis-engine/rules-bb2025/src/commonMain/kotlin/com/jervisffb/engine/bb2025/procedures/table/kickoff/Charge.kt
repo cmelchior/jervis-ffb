@@ -62,6 +62,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -183,7 +184,7 @@ object Charge : Procedure(), ChanceObservationHandler {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { roll ->
-                val maxPlayers = roll.value + 3
+                val maxPlayers = roll.value + getExtraPlayersCount(rules)
                 val availablePlayers = state.kickingTeam.filter { rules.isOpen(it) }
                 val playersToSelect = min(availablePlayers.size, maxPlayers)
                 val chanceObservation = createFinalAtLeastObservation(
@@ -425,5 +426,14 @@ object Charge : Procedure(), ChanceObservationHandler {
                 SetPlayerAvailability(it, Availability.UNAVAILABLE)
             }
         }.toTypedArray()
+    }
+
+    private fun getExtraPlayersCount(rules: Rules): Int {
+        return when (rules.gameType) {
+            GameType.STANDARD,
+            GameType.DUNGEON_BOWL,
+            GameType.GUTTER_BOWL -> 3
+            GameType.BB7 -> 1
+        }
     }
 }

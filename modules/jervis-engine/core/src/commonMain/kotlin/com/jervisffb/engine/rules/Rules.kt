@@ -75,12 +75,6 @@ interface Rules : RulesParameters {
     /**
      * Returns whether a given location is valid for placing the ball during
      * kick-off.
-     *
-     * For Standard and BB7, this generalizes to all locations _not_ in the area
-     * between the End Zone and kicking teams Line of Scrimmage. In particular,
-     * it allows you to place the ball in all of any configured "No Man's Land".
-     *
-     * This is in line with the Designer's Commentary, May 2024, page 10.
      */
     fun canPlaceBallForKickoff(kickingTeam: Team, location: PitchSquare): Boolean
 
@@ -486,6 +480,8 @@ interface Rules : RulesParameters {
     val useApothecaryStep: Procedure
     /** Procedure for using a Chainsaw during a Foul */
     val chainsawFoulStep: Procedure
+    /** Procedure for handling deviate during Kick Off */
+    val kickOffDeviateRollStep: Procedure
 
     // -- PROCEDURE-DISPATCH END
 

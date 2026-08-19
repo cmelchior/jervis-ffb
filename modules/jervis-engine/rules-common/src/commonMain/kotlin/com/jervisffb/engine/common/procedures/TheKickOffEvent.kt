@@ -151,11 +151,13 @@ object TheKickOffEvent : Procedure(), ChanceObservationHandler {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveBallLandingOnPitch
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Some effect, like the ball bouncing or Diving Catch might cause the ball to end
-            // up on the opponent side. Instead of trying to fix that, at every possible scenario
-            // we check here if the ball is in a legal position.
-            val isOnReceivingSide = isOnTeamSide(state.singleBall(), state.receivingTeam)
+            // up back on the kicking teams side. Instead of trying to fix that, at every
+            // possible scenario we check here if the ball is in a legal position.
+            // Also, in BB7, landing in No Man's Land is allowed, so we only check for the
+            // kicking team's side, which should cover both BB7 and BB11.
+            val inOnKickingSide = isOnTeamSide(state.singleBall(), state.kickingTeam)
             return compositeCommandOf(
-                if (!isOnReceivingSide) {
+                if (state.singleBall().state == BallState.OUT_OF_BOUNDS || inOnKickingSide) {
                     GotoNode(SelectTouchBack)
                 } else {
                     ExitProcedure()

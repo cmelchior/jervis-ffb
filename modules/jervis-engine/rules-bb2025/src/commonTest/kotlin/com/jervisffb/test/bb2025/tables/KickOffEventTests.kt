@@ -701,8 +701,6 @@ class KickOffEventTests: JervisGameBB2025Test() {
         assertTrue(awayTeam[5.playerNo].hasBall())
     }
 
-
-
     @Test
     fun quickSnap() {
         controller.rollForward(

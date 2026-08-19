@@ -54,16 +54,18 @@ interface PitchCoordinate: OnPitchLocation {
         return x > rules.lineOfScrimmageHome && x < rules.lineOfScrimmageAway
     }
 
-    // "Home-side" is a bit vague and needs to be clarified
+    // "Home-side" is a bit vague and needs to be clarified.
+    // For now, it doesn't include No Man's Land
     override fun isOnHomeSide(rules: Rules): Boolean {
         if (y < 0 || y >= rules.pitchHeight) return false
-        return x < rules.pitchWidth / 2
+        return x <= rules.lineOfScrimmageHome
     }
 
     // "Away-side" is a bit vague and needs to be clarified
+    // For now, it doesn't include No Man's Land
     override fun isOnAwaySide(rules: Rules): Boolean {
         if (y < 0 || y >= rules.pitchHeight) return false
-        return x >= rules.pitchWidth / 2
+        return x >= rules.lineOfScrimmageAway
     }
 
     override fun isOnPitch(rules: Rules): Boolean {

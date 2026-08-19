@@ -43,7 +43,7 @@ abstract class JervisGameBB2025Test {
         setupDefaultGame()
     }
 
-    fun startDefaultGame() {
+    open fun startDefaultGame() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

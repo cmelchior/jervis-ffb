@@ -5,7 +5,6 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -150,7 +149,7 @@ object TheKickOff : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return AddContext(DeviateRollContext(from = state.currentBall().coordinates))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.kickOffDeviateRollStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ChooseToUseKick)
         }
@@ -167,7 +166,8 @@ object TheKickOff : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val useKick = (action is Confirm)
             val context = state.getContext<DeviateRollContext>()
-
+            val d8 = context.deviateRoll.first() as D8Result
+            val d6 = context.minD6
             if (!useKick) {
                 val newLocation = context.landsAt ?: error("Missing landing coordinate: $context")
                 val ball = state.currentBall()
@@ -175,7 +175,7 @@ object TheKickOff : Procedure() {
                     RemoveContext<DeviateRollContext>(),
                     if (context.outOfBoundsAt != null) SetBallState.outOfBounds(ball, context.outOfBoundsAt) else SetBallState.deviating(ball),
                     SetBallLocation(ball, newLocation),
-                    ReportKickResult(state.kickingTeam, context.deviateRoll.first() as D8Result, context.deviateRoll.last() as D6Result, newLocation, rules),
+                    ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),
                     ExitProcedure(),
                 )
             } else {
@@ -183,8 +183,6 @@ object TheKickOff : Procedure() {
                 val ball = state.currentBall()
                 var newLocation = context.from
                 var outOfBoundsAt: PitchCoordinate? = null
-                val d8 = context.deviateRoll.first() as D8Result
-                val d6 = context.deviateRoll.last() as D6Result
                 val direction = rules.direction(d8)
                 val distance = d6.toD3().value
                 for (i in 1..distance) {
@@ -200,7 +198,7 @@ object TheKickOff : Procedure() {
                     ReportKickSkillResult(state.kickingPlayer!!, d6, d6.toD3()),
                     if (outOfBoundsAt != null) SetBallState.outOfBounds(ball, outOfBoundsAt) else SetBallState.deviating(ball),
                     SetBallLocation(ball, newLocation),
-                    ReportKickResult(state.kickingTeam, context.deviateRoll.first() as D8Result, context.deviateRoll.last() as D6Result, newLocation, rules),
+                    ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),
                     ExitProcedure(),
                 )
             }
