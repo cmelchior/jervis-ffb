@@ -599,7 +599,7 @@ book.
   - [x] Pitch Invasion: Only 1 affected
 - [x] Kick behavior is undefined: For now, allow to reduce chosen dice to D3. 
 - [x] Deviate distance on Kick-off is 2D6 (choose lowest)
-- [ ] Throw-in is 1D6+2
+- [x] Throw-in is 1D6+2
 - [x] Different Argue the Call Table
 - [x] Apothecary is un-defined, assume BB2020 BB7 behavior
 - [x] Different Injury Table

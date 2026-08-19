@@ -240,7 +240,18 @@ data class D6Result(override val value: Int) : DieResult() {
             return combinations(dice, total, includeAbove = true)
         }
 
-        private fun combinations(dice: Int, total: Int, includeAbove: Boolean): Int {
+        /**
+         * Returns all combinations of [dice] D6 rolls, where the sum of the
+         * dice is equal to [total].
+         *
+         * If [includeAbove] is `true` all values above [total] are also
+         * included.
+         */
+        private fun combinations(
+            dice: Int,
+            total: Int,
+            includeAbove: Boolean
+        ): Int {
             require(dice > 0) { "At least one D6 is required: $dice" }
 
             var possibleOutcomes = 1

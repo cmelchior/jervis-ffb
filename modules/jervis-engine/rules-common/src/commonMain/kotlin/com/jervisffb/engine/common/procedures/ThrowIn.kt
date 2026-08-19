@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.actions.TargetSquare.Companion.direction
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -147,8 +148,14 @@ object ThrowIn : Procedure(), ChanceObservationHandler {
                     team = observationTeam(state),
                     rollType = DiceRollType.THROWIN_DISTANCE,
                     dice = dice,
-                    favorableOutcomes = D6Result.combinationsEqualToTotal(dice = dice.size, total = diceDistance),
-                    possibleOutcomes = dice.size * D6Result.SIDES,
+                    favorableOutcomes = when (rules.gameType == GameType.BB7) {
+                        true -> D6Result.SIDES - dice.single().value + 1
+                        false -> D6Result.combinationsEqualToTotal(dice = dice.size, total = diceDistance)
+                    },
+                    possibleOutcomes = when (rules.gameType == GameType.BB7) {
+                        true -> D6Result.SIDES
+                        false -> dice.size * D6Result.SIDES
+                    },
                 )
 
                 // Move the ball the entire distance until it either goes out of bounds again

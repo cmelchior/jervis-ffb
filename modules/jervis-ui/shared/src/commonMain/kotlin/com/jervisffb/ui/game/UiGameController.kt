@@ -117,6 +117,7 @@ import com.jervisffb.ui.game.state.actionwheel.TakeRootWheelController
 import com.jervisffb.ui.game.state.actionwheel.TeamCaptainWheelController
 import com.jervisffb.ui.game.state.actionwheel.TeamMascotWheelController
 import com.jervisffb.ui.game.state.actionwheel.TentaclesWheelController
+import com.jervisffb.ui.game.state.actionwheel.ThrowInDistanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.ThrowInWheelController
 import com.jervisffb.ui.game.state.actionwheel.UnchannelledFuryWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseApothecaryWheelController
@@ -395,6 +396,7 @@ class UiGameController(
         PitchInvasionKickingTeamPlayersAffectedRollWheelController,
         PitchInvasionReceivingTeamPlayersAffectedRollWheelController,
         ThrowInWheelController,
+        ThrowInDistanceWheelController,
 
         // Coin
         SelectCoinSideWheelController,

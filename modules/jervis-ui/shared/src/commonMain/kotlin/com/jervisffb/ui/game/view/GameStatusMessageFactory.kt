@@ -78,6 +78,7 @@ import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.TakeRootRoll
 import com.jervisffb.engine.common.procedures.TheKickOff
 import com.jervisffb.engine.common.procedures.TheKickOffEvent
+import com.jervisffb.engine.common.procedures.ThrowIn
 import com.jervisffb.engine.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
@@ -297,6 +298,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             com.jervisffb.engine.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to "Roll D8 to Bounce the Player",
             PassAccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
             PassAccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
+            ThrowIn.RollDirection to "Roll D3 for Throw-in Direction",
+            ThrowIn.RollDistance to "Roll ${if (rules.gameType == GameType.BB7) "1D6 + 2" else "2D6"} for Throw-in Distance"
         )
         val askForRerollScenarios = listOf(
             AccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
