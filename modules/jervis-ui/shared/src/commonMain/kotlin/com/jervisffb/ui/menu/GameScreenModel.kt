@@ -480,7 +480,7 @@ class GameScreenModel(
         loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
         if (attachToMenu) {
-            menuViewModel.uiState = uiState
+            menuViewModel.attachGame(uiState)
         }
         // Also starts the rules engine, so the controller must not have been
         // started beforehand.
@@ -501,6 +501,7 @@ class GameScreenModel(
      * Safe to call more than once.
      */
     override fun onDispose() {
+        menuViewModel.detachGame(uiState)
         onGameStopped()
         uiState.stopGameEventLoop()
         modelScope.cancel()

@@ -168,11 +168,10 @@ private fun detectUndo(event: KeyEvent): Boolean {
 private fun detectSharedShortcuts(menuViewModel: MenuViewModel, event: KeyEvent, onFullscreenToggle: () -> Unit): Boolean {
     return if (event.type == KeyEventType.KeyDown) {
         when {
-            detectUndo(event) -> { menuViewModel.undoAction(); true}
+            detectUndo(event) -> menuViewModel.undoAction()
             detectFullscreenShortcut(event) -> { onFullscreenToggle(); true }
             event.key == Key.Escape -> BackNavigationHandler.execute()
             else -> false
         }
     } else false
 }
-

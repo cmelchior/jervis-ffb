@@ -137,7 +137,9 @@ class MenuViewModel {
     val challengesRepository: ChallengeRepository = InMemoryChallengesRepository()
 
     var controller: GameEngineController? = null
-    lateinit var uiState: UiGameController
+    private var attachedUiState: UiGameController? = null
+    val uiState: UiGameController
+        get() = checkNotNull(attachedUiState) { "No game is attached to the menu" }
 
     val p2pHostAvaiable: Boolean = canBeHost()
 
@@ -238,17 +240,33 @@ class MenuViewModel {
         return JervisSerialization.serializeGameStateToJson(controller!!, includeDebugState)
     }
 
-    fun undoAction() {
-        val team = when (uiState.uiMode) {
-            TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
+    // Called when a game has started.
+    // During game, some menu options behave differently than on the main menu.
+    fun attachGame(uiState: UiGameController) {
+        attachedUiState = uiState
+    }
+
+    // Must be called when leaving the game screen again
+    fun detachGame(uiState: UiGameController) {
+        if (attachedUiState !== uiState) return
+        attachedUiState = null
+        controller = null
+        setupAvailable.value = null
+    }
+
+    fun undoAction(): Boolean {
+        val activeUiState = attachedUiState ?: return false
+        val team = when (activeUiState.uiMode) {
+            TeamActionMode.HOME_TEAM -> activeUiState.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> activeUiState.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
         }
-        if (uiState.gameController.isUndoAvailable(team = team)) {
-            uiState.userSelectedAction(uiState.gameController.nextActionIndex(), Undo)
+        if (activeUiState.gameController.isUndoAvailable(team = team)) {
+            activeUiState.userSelectedAction(activeUiState.gameController.nextActionIndex(), Undo)
         } else {
             SoundManager.play(SoundEffect.ERROR)
         }
+        return true
     }
 
     fun isFeatureEnabled(feature: Feature): Boolean {
@@ -354,20 +372,21 @@ class MenuViewModel {
         // the challenge details page is a real game too, and it deliberately
         // never attaches itself to the menu. Ignore snapshots from anything but
         // the attached game, or the menu ends up describing the wrong one.
-        if (!this::uiState.isInitialized || uiSnapshot.game !== uiState.state) {
+        val activeUiState = attachedUiState
+        if (activeUiState == null || uiSnapshot.game !== activeUiState.state) {
             return
         }
 
         // Enable/Disable Setup options
         val setupKickingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupKickingTeam)
         val setupReceivingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupReceivingTeam)
-        val teamControlledByClient = when (uiState.uiMode) {
+        val teamControlledByClient = when (activeUiState.uiMode) {
             TeamActionMode.HOME_TEAM -> setupKickingTeam && uiSnapshot.game.kickingTeam.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> setupReceivingTeam && uiSnapshot.game.receivingTeam.isHomeTeam()
             TeamActionMode.ALL_TEAMS -> true
         }
         if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
-            setupAvailable.value = uiState.rules.gameType
+            setupAvailable.value = activeUiState.rules.gameType
         } else {
             setupAvailable.value = null
         }
@@ -403,4 +422,3 @@ object Setups {
             .sortedBy { it.name }
     }
 }
-

@@ -31,8 +31,9 @@ suspend fun main() {
         //  keep them in sync with the JVM keybinds? For now, just capture
         //  Undo, which is by far the most important.
         if ((event.ctrlKey || event.metaKey) && event.key.lowercase() == "z") {
-            event.preventDefault() // Stop propagating into browser Undo
-            menuViewModel.undoAction()
+            if (menuViewModel.undoAction()) {
+                event.preventDefault() // Stop propagating into browser Undo
+            }
         }
     }
     // This only seems to work in Compose 1.9.0+
