@@ -599,10 +599,10 @@ book.
 - [x] Kick behavior is undefined: For now, allow to reduce chosen dice to D3. 
 - [x] Deviate distance on Kick-off is 2D6 (choose lowest)
 - [ ] Throw-in is 1D6+2
-- [ ] Different Argue the Call Table
+- [x] Different Argue the Call Table
 - [ ] Apothecary is un-defined, assume BB2020 BB7 behavior
-- [ ] Different Injury Table
-- [ ] Different Stunty Injury Table
-- [ ] Different Prayers To Nuffle tabl
+- [x] Different Injury Table
+- [x] Different Stunty Injury Table
+- [ ] Different Prayers To Nuffle table
 
 
