@@ -98,6 +98,7 @@ import io.ktor.http.Url
 import io.ktor.http.encodeURLParameter
 import io.ktor.http.headers
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import okio.internal.commonToUtf8String
 import org.jetbrains.compose.resources.DrawableResource
@@ -288,6 +289,8 @@ object IconFactory {
                 val image = Res.loadFileAsImage(path)
                 cachedImages[path] = image
                 return image
+            } catch (ex: CancellationException) {
+                throw ex
             } catch (ex: Exception) {
                 throw IllegalStateException("Problems loading image resource: $path", ex)
             }
