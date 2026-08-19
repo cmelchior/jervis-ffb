@@ -369,6 +369,7 @@ book.
     - [ ] Use on injury when pushed into the crowd
     - [x] Select first roll
     - [x] Select 2nd roll
+    - [ ] What kind of players does it work on?
 - [ ] Scoring
     - [x] Moving into the End Zone with the ball using a standard move
     - [x] Follow-up into the End Zone
@@ -600,7 +601,7 @@ book.
 - [x] Deviate distance on Kick-off is 2D6 (choose lowest)
 - [ ] Throw-in is 1D6+2
 - [x] Different Argue the Call Table
-- [ ] Apothecary is un-defined, assume BB2020 BB7 behavior
+- [x] Apothecary is un-defined, assume BB2020 BB7 behavior
 - [x] Different Injury Table
 - [x] Different Stunty Injury Table
 - [ ] Different Prayers To Nuffle table

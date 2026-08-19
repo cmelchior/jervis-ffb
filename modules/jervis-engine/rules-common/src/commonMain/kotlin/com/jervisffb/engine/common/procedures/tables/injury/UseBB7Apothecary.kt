@@ -40,8 +40,18 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceObservation
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
- * Procedure for using an apothecary as described on page 95 in Death Zone.
- * The result of using the apothecary is stored in [com.jervisffb.engine.common.context.RiskingInjuryContext]
+ * Procedure for using an apothecary in BB7. The result of using the apothecary
+ * is stored in [RiskingInjuryContext].
+ *
+ * See page 95 in Death Zone (2020).
+ * See page 9 in Spike 22 (2025).
+ *
+ * Currently, the behavior for apothecaries in BB2025 is not defined. In BB2020,
+ * the behavior was changed explicitly. In BB2025, this text is gone. This means
+ * the behavior should fall back to what is written in the rulebook, but this
+ * doesn't make sense as there is no Casualty table to roll on again in BB7.
+ *
+ * For now, we just re-use the behavior from BB2020.
  *
  * Developer's Commentary:
  * This procedure has a lot of overlap with the [UseBB11Apothecary] procedure.
