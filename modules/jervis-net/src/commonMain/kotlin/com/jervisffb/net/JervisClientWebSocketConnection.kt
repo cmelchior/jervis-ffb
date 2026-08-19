@@ -105,10 +105,10 @@ class JervisClientWebSocketConnection(
                     return@launch
                 }
 
-                val job1 = launch { monitorDisconnect(connectedSession) }
-                val job2 = launch { monitorOutgoingClientMessages(connectedSession) }
-                val job3 = launch { monitorIncomingServerMessages(connectedSession) }
-                joinAll(job1, job2, job3)
+                val incomingMessagesJob = launch { monitorIncomingServerMessages(connectedSession) }
+                val disconnectJob = launch { monitorDisconnect(connectedSession, incomingMessagesJob) }
+                val outgoingMessagesJob = launch { monitorOutgoingClientMessages(connectedSession) }
+                joinAll(incomingMessagesJob, disconnectJob, outgoingMessagesJob)
             } catch (ex: ProtocolException) {
                 // Unsure if ProtocolException is thrown in other cases than 404, so just to be sure
                 if (!isCloseRequested()) {
@@ -132,9 +132,13 @@ class JervisClientWebSocketConnection(
         }
     }
 
-    private suspend fun monitorDisconnect(session: DefaultWebSocketSession?) {
+    private suspend fun monitorDisconnect(session: DefaultWebSocketSession?, incomingMessagesJob: Job) {
         try {
             val reason = session?.closeReason?.await() ?: CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, "No server close reason.")
+            // A close frame can be observed before the coroutine reading the incoming channel has
+            // forwarded all preceding text frames. Wait for it to drain before reporting the
+            // disconnect or closing the application-facing channel.
+            incomingMessagesJob.join()
             jervisCloseReason.complete(reason)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
