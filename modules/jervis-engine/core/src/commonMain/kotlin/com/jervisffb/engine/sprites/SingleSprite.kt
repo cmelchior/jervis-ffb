@@ -4,7 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SingleSprite(
+    /** Where can this sprite be found? */
     override val type: SpriteLocation,
+    /** The sprite identifier. Its format will depend on [type] */
     override val resource: String,
 ): SpriteSource {
     companion object {

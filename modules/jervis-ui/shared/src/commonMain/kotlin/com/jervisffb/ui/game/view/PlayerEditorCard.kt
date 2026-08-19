@@ -84,8 +84,8 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.PLAYER_MARKINGS_MANAGER
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiKeywordData
 import com.jervisffb.ui.game.model.UiPitchPlayer
@@ -423,7 +423,7 @@ private fun PlayerMarkingsTab(
 ) {
     val playerMarkingsEnabled by PLAYER_MARKINGS_MANAGER.observePlayerMarkings().collectAsState(PLAYER_MARKINGS_MANAGER.getPlayerMarkings())
     val playerSprite = remember(player) {
-        IconFactory.getPlayerIcon(UiPitchPlayer(player.model))
+        ICON_FACTORY.getPlayerIcon(UiPitchPlayer(player.model))
     }
     Column {
         Row(

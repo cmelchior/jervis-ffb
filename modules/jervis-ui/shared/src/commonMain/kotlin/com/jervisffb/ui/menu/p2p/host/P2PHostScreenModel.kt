@@ -13,8 +13,8 @@ import com.jervisffb.engine.serialization.GameFileData
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameClientType
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -308,7 +308,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     private suspend fun prepareSaveFile() {
         saveGameData = setupGameModel.gameSetupModel.loadFileModel.gameFile ?: error("Game file is not loaded")
         val homeTeam = saveGameData!!.homeTeam
-        val homeTeamLogo = IconFactory.loadRosterIcon(
+        val homeTeamLogo = ICON_FACTORY.loadRosterIcon(
             homeTeam.id,
             homeTeam.teamLogo ?: homeTeam.roster.logo,
             LogoSize.SMALL

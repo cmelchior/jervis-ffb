@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisCircularProgressIndicator
@@ -52,8 +52,8 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
     var amazonLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        orc = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
-        amazonLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_amazon_small.png"), LogoSize.SMALL)
+        orc = ICON_FACTORY.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
+        amazonLogo = ICON_FACTORY.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_amazon_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

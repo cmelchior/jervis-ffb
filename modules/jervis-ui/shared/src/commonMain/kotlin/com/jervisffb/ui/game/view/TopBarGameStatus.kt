@@ -75,12 +75,12 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_brush_chalk
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.UiReroll
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
 import com.jervisffb.ui.game.UiTeamInfoUpdate
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.view.utils.paperBackground
@@ -372,7 +372,7 @@ private fun TeamFeaturesRow(
                     UiTeamFeatureType.APOTHECARY -> {
                         TeamFeature(
                             value = feature.value,
-                            icon = IconFactory.getApothecaryIcon(height),
+                            icon = ICON_FACTORY.getApothecaryIcon(height),
                             available = !feature.used,
                             leftSide = leftSide
                         )
@@ -734,14 +734,14 @@ private fun TeamBadge(
                 // using a normal image and this depending on the size (or switch pixelSize more smartly).
                 //        PixelatedImageWithShader(
                 //            modifier = Modifier.padding(8.jdp).size(90.jdp),
-                //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
+                //            painter = BitmapPainter(ICON_FACTORY.getLogo(team.id, LogoSize.SMALL)),
                 //            pixelSize = 2f,
                 //        )
                 // Team Logo
                 if (teamInfo.id.value.isNotEmpty()) {
                     Image(
                         modifier = Modifier.padding(top = logoTopPadding).size(teamLogoSize),
-                        bitmap = IconFactory.getLogo(teamInfo.id, LogoSize.SMALL),
+                        bitmap = ICON_FACTORY.getLogo(teamInfo.id, LogoSize.SMALL),
                         contentDescription = teamInfo.teamName + " logo",
                         contentScale = ContentScale.Fit,
                         filterQuality = FilterQuality.None,

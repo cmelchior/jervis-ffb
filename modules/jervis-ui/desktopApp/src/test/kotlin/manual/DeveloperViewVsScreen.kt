@@ -49,7 +49,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.skia.Point
@@ -80,8 +80,8 @@ fun TeamCard() {
     var darkElfLogo: ImageBitmap? by remember { mutableStateOf(null) }
     var elvenUnionLogo: ImageBitmap? by remember { mutableStateOf(null) }
     LaunchedEffect(Unit) {
-        darkElfLogo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_dark_elf.png"), LogoSize.SMALL)
-        darkElfLogo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_elven_union.png"), LogoSize.SMALL)
+        darkElfLogo = ICON_FACTORY.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_dark_elf.png"), LogoSize.SMALL)
+        darkElfLogo = ICON_FACTORY.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_elven_union.png"), LogoSize.SMALL)
     }
 
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
@@ -653,4 +653,3 @@ fun drawOutline(bitmap: ImageBitmap): ImageBitmap {
     canvas.drawPath(outlinePath, paint)
     return outputBitmap
 }
-

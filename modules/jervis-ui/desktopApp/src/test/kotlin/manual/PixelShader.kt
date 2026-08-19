@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.singleWindowApplication
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.ui.utils.toImageBitmap
@@ -60,8 +60,9 @@ private fun main() = singleWindowApplication {
         createDefaultBB2020AwayTeam(rules),
     )
     runBlocking {
-        IconFactory.initializeFumbblMapping()
-        IconFactory.initialize(density, game.homeTeam, game.awayTeam)
+        ICON_FACTORY.initializeFumbblMapping()
+        ICON_FACTORY.initializeStaticAssets(density)
+        ICON_FACTORY.initializeTeamAssets(game.homeTeam, game.awayTeam)
     }
     Box(
         modifier = Modifier
@@ -72,17 +73,17 @@ private fun main() = singleWindowApplication {
     ) {
 
 //        PixelatedImage(
-//            painter = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
+//            painter = ICON_FACTORY.getDiceIcon(BlockDice.BOTH_DOWN),
 //        )
 //        PixelatedImage(
-//            image = IconFactory.getTestIcon(),
+//            image = ICON_FACTORY.getTestIcon(),
 //            size = 48.dp,
 //            scaleFactor = 2f
 //        )
 
 //        PixelatedImage(
-////            painter = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
-//            painter = painterResource(Res.drawable.jervis_icon_reroll_red), // IconFactory.getDiceIcon(BlockDice.PLAYER_DOWN),
+////            painter = ICON_FACTORY.getDiceIcon(BlockDice.BOTH_DOWN),
+//            painter = painterResource(Res.drawable.jervis_icon_reroll_red), // ICON_FACTORY.getDiceIcon(BlockDice.PLAYER_DOWN),
 //            pixelSize = 2f
 //        )
     }
@@ -220,4 +221,3 @@ fun PixelatedImage(
         )
     }
 }
-

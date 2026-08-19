@@ -24,8 +24,8 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervis.generated.SettingsKeys
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.game.view.GameScreen
 import com.jervisffb.ui.game.view.LoadingScreen
@@ -148,7 +148,7 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                         }
                         Image(
                             modifier = Modifier.fillMaxSize(),
-                            bitmap = IconFactory.getPitch(backgroundImage),
+                            bitmap = ICON_FACTORY.getPitch(backgroundImage),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                         )

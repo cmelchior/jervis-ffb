@@ -25,8 +25,8 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.DiceColor
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D20Shape
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
@@ -47,7 +47,7 @@ fun DialogDiceButton(
     onClick: () -> Unit,
     useSelectedColorAsHover: Boolean = false,
 ) {
-    val buttonSize = remember(JervisTheme.windowSizeDp) { IconFactory.getDiceSizeDp(die) }
+    val buttonSize = remember(JervisTheme.windowSizeDp) { ICON_FACTORY.getDiceSizeDp(die) }
     Box(
         modifier = modifier.size(buttonSize),
         contentAlignment = Alignment.Center
@@ -60,14 +60,14 @@ fun DialogDiceButton(
                 is D6Result -> DiceColor.YELLOW
                 else -> DiceColor.DEFAULT
             }
-            IconFactory.getDiceIcon(die, color)
+            ICON_FACTORY.getDiceIcon(die, color)
         } else {
             val color = when (die) {
                 is D3Result,
                 is D6Result -> DiceColor.BROWN
                 else -> DiceColor.DEFAULT
             }
-            IconFactory.getDiceIcon(die, color)
+            ICON_FACTORY.getDiceIcon(die, color)
         }
         Image(
             bitmap = bitmap,

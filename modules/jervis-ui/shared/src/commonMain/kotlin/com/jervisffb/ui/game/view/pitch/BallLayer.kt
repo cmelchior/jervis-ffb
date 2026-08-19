@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameSnapshot
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
 
 /**
@@ -44,7 +44,7 @@ fun BallLayer(
                     ,
                     alignment = Alignment.Center,
                     contentScale = ContentScale.FillBounds,
-                    bitmap = IconFactory.getBall(),
+                    bitmap = ICON_FACTORY.getBall(),
                     contentDescription = "Ball free at $coordinate",
                 )
             }

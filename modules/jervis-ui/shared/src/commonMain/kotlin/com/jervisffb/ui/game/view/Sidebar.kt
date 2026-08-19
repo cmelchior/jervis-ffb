@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarSection
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
@@ -78,7 +78,7 @@ fun Sidebar(
             if (useSidebarImage) {
                 Image(
                     alignment = Alignment.TopStart,
-                    painter = BitmapPainter(IconFactory.getSidebarBackground()),
+                    painter = BitmapPainter(ICON_FACTORY.getSidebarBackground()),
                     contentDescription = "Box",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
@@ -150,7 +150,7 @@ private fun SidebarButton(modifier: Modifier, text: String, onClick: () -> Unit)
     ) {
         Image(
             modifier = Modifier.fillMaxSize().clickable { onClick() },
-            painter = BitmapPainter(IconFactory.getButton()),
+            painter = BitmapPainter(ICON_FACTORY.getButton()),
             contentDescription = "",
             contentScale = ContentScale.Fit,
         )
@@ -176,7 +176,7 @@ private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> 
     ) {
         Image(
             modifier = Modifier.fillMaxSize().clickable { onClick() },
-            painter = BitmapPainter(IconFactory.getLargeButton()),
+            painter = BitmapPainter(ICON_FACTORY.getLargeButton()),
             contentDescription = "",
             contentScale = ContentScale.Fit,
         )

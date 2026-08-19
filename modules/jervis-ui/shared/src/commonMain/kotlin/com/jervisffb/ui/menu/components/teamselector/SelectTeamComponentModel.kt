@@ -11,7 +11,7 @@ import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -85,7 +85,7 @@ class SelectTeamComponentModel(
     }
 
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
-        val logo = IconFactory.loadRosterIcon(
+        val logo = ICON_FACTORY.loadRosterIcon(
             team.id,
             teamFile.team.teamLogo ?: teamFile.roster.logo,
             LogoSize.SMALL,

@@ -99,6 +99,7 @@ import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_brush_chalk
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonCancelSubMenu
 import com.jervisffb.ui.game.dialogs.wheel.ActionButtonData
@@ -110,7 +111,6 @@ import com.jervisffb.ui.game.dialogs.wheel.CoinButtonData
 import com.jervisffb.ui.game.dialogs.wheel.DieButtonData
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.DiceColor
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
 import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
@@ -880,7 +880,7 @@ private fun ActionWheelBackgroundRing(
     val imageBrush = remember(chalkTexture) {
         ShaderBrush(
             shader = ImageShader(
-                image = chalkTexture.scalePixels(IconFactory.scaleFactor),
+                image = chalkTexture.scalePixels(ICON_FACTORY.scaleFactor),
                 tileModeX = TileMode.Repeated,
                 tileModeY = TileMode.Repeated,
             ),
@@ -1016,7 +1016,7 @@ fun ActionButton(
     onHover: (String?) -> Unit = {},
     onClick: () -> Unit = { },
 ) {
-    val icon = remember(icon) { IconFactory.getActionIcon(icon) }
+    val icon = remember(icon) { ICON_FACTORY.getActionIcon(icon) }
     val colorFilter = remember { ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken) }
     var isHover by remember(icon) { mutableStateOf(false) }
     // Modifier order is a mess to get shadows to animate correctly. The current setup works,
@@ -1087,7 +1087,7 @@ fun CoinButton(
     dropShadow: Boolean = true,
     animationData: ItemAnimatable,
 ) {
-    val buttonSize = IconFactory.getCoinSizeDp(coin.value)
+    val buttonSize = ICON_FACTORY.getCoinSizeDp(coin.value)
     val isAnimating by animationData.isAnimating
     val yOffset by animationData.yOffset.asState()
     val rotation by animationData.rotation.asState()
@@ -1143,7 +1143,7 @@ fun CoinImage(
         contentAlignment = Alignment.Center
     ) {
 
-        val bitmap = IconFactory.getCoinIcon(coin)
+        val bitmap = ICON_FACTORY.getCoinIcon(coin)
         var colorFilter: ColorFilter? by remember { mutableStateOf(null) }
         Image(
             bitmap = bitmap,
@@ -1252,7 +1252,7 @@ fun ExpandableDiceSelector(
         }
     }
     val itemsPrRow = diceList.size / rows
-    val buttonSize = remember(currentDiceValue, JervisTheme.windowSizeDp) { IconFactory.getDiceSizeDp(currentDiceValue) }
+    val buttonSize = remember(currentDiceValue, JervisTheme.windowSizeDp) { ICON_FACTORY.getDiceSizeDp(currentDiceValue) }
     val (buttonWidth, buttonHeight) = buttonSize
     val maxWidthDp = (backgroundPadding * 2f) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
     val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)
@@ -1461,9 +1461,9 @@ private fun DiceButton(
             is D6Result -> DiceColor.YELLOW
             else -> DiceColor.DEFAULT
         }
-        IconFactory.getDiceIcon(value, color)
+        ICON_FACTORY.getDiceIcon(value, color)
     } else {
-        IconFactory.getDiceIcon(value, diceColor)
+        ICON_FACTORY.getDiceIcon(value, diceColor)
     }
 
     fun showHoverEffect() {

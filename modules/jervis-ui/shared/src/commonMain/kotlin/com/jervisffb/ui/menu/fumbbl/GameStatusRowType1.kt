@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 
@@ -49,8 +49,8 @@ fun ColumnScope.GameStatusRowType1(textColor: Color = JervisTheme.contentTextCol
     var orcLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        gnomeLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_gnome_small.png"), LogoSize.SMALL)
-        orcLogo = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
+        gnomeLogo = ICON_FACTORY.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_gnome_small.png"), LogoSize.SMALL)
+        orcLogo = ICON_FACTORY.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

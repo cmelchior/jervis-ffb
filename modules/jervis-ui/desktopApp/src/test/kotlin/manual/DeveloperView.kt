@@ -45,9 +45,9 @@ import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.createDefaultBB2020AwayTeam
 import com.jervisffb.ui.createDefaultBB2020HomeTeam
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.utils.runBlocking
@@ -81,8 +81,9 @@ fun mainTeamTable() {
     application {
         val density = LocalDensity.current
         runBlocking {
-            IconFactory.initializeFumbblMapping()
-            IconFactory.initialize(density, game.homeTeam, game.awayTeam)
+            ICON_FACTORY.initializeFumbblMapping()
+            ICON_FACTORY.initializeStaticAssets(density)
+            ICON_FACTORY.initializeTeamAssets(game.homeTeam, game.awayTeam)
         }
         val windowState = rememberWindowState()
         Window(onCloseRequest = ::exitApplication, state = windowState) {
@@ -201,7 +202,7 @@ private fun TeamInfoSection(
 ) {
     var logo: ImageBitmap? by remember { mutableStateOf(null) }
     LaunchedEffect(Unit) {
-        logo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
+        logo = ICON_FACTORY.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
     }
 
     Row(modifier = Modifier.background(JervisTheme.rulebookPaperMediumDark)) {

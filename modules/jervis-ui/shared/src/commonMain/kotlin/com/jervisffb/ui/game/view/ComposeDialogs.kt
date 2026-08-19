@@ -41,12 +41,12 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_dice_roll
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.view.NoActionWheel.animationOnly
 import com.jervisffb.ui.game.view.utils.JervisButton
@@ -217,7 +217,7 @@ fun MultipleSelectUserActionDialog(
                                             ) {
                                                 Image(
                                                     modifier = Modifier.fillMaxSize(),
-                                                    bitmap = IconFactory.getDiceIcon(it),
+                                                    bitmap = ICON_FACTORY.getDiceIcon(it),
                                                     contentDescription = text,
                                                     alignment = Alignment.Center,
                                                     contentScale = ContentScale.Fit

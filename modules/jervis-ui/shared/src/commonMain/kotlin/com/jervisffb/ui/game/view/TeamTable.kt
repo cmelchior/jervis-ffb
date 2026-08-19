@@ -53,8 +53,8 @@ import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.sprites.RosterLogo
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.formatCurrency
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import kotlinx.coroutines.launch
@@ -200,7 +200,7 @@ private fun TeamInfoSection(
         var teamIcon: ImageBitmap? by remember { mutableStateOf(null) }
         LaunchedEffect(icon) {
             scope.launch {
-                teamIcon = IconFactory.loadRosterIcon(team, icon, LogoSize.SMALL)
+                teamIcon = ICON_FACTORY.loadRosterIcon(team, icon, LogoSize.SMALL)
             }
         }
         Box(
@@ -506,7 +506,7 @@ private fun TeamTableCellIcon(player: ModelRef<Player>, isOnHomeTeam: Boolean, w
     val scope = rememberCoroutineScope()
     LaunchedEffect(player) {
         scope.launch {
-            imageBitmap = IconFactory.loadPlayerSprite(player.model, isOnHomeTeam).default
+            imageBitmap = ICON_FACTORY.loadPlayerSprite(player.model, isOnHomeTeam).default
         }
     }
     Box(

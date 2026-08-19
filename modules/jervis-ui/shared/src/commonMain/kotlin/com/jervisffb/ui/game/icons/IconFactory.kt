@@ -3,7 +3,6 @@ package com.jervisffb.ui.game.icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -82,29 +81,16 @@ import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.PlayerSpriteFallbackGenerator.generatePlayerSprite
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.viewmodel.PitchDetails
-import com.jervisffb.ui.loadFileAsImage
-import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.utils.getSubImage
 import com.jervisffb.ui.utils.jdp
-import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.ui.utils.toImageBitmap
-import com.jervisffb.utils.getHttpClient
-import com.jervisffb.utils.loggerInstance
-import io.ktor.client.request.accept
-import io.ktor.client.request.get
-import io.ktor.client.statement.readRawBytes
-import io.ktor.http.ContentType
+import io.ktor.client.HttpClient
 import io.ktor.http.Url
-import io.ktor.http.encodeURLParameter
-import io.ktor.http.headers
-import io.ktor.http.isSuccess
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
-import okio.internal.commonToUtf8String
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.Image
 
 enum class DiceColor {
     DEFAULT,
@@ -193,107 +179,89 @@ data class PlayerSprite(
  * A lot of the methods in here are `suspend` functions due to how WASM loads
  * resources.
  */
-object IconFactory {
+class IconFactory internal constructor(
+    private val httpClient: HttpClient,
+    getCachedOnDiskImage: suspend (Url) -> ImageBitmap?,
+    saveOnDiskCachedImage: suspend (Url, ImageBitmap) -> Unit,
+) {
 
-    private val BASE_URL = "https://jervis.ilios.dk"
+    constructor(httpClient: HttpClient) : this(
+        httpClient = httpClient,
+        getCachedOnDiskImage = CacheManager::getCachedImage,
+        saveOnDiskCachedImage = CacheManager::saveImage,
+    )
+
     private val DEFAULT_PORTRAIT = SingleSprite.embedded("jervis/portraits/default_portrait.png")
+
+    private val initializationMutex = Mutex()
+    private var initializedStaticResources: StaticResourcesCache? = null
+    private val initializedTeamResources = TeamResourcesCache(
+        httpClient = httpClient,
+        getCachedOnDiskImage = getCachedOnDiskImage,
+        saveOnDiskCachedImage = saveOnDiskCachedImage,
+    )
+    private val staticResources: StaticResourcesCache
+        get() = checkNotNull(initializedStaticResources) { "Static icon assets have not been initialized" }
+    private val teamResources: TeamResourcesCache
+        get() = initializedTeamResources
 
     // Many of the assets are pixel-art, where we want to preserve as much or the
     // blockiness as possible. Use the scale factor to adjust the size of images
     // so they are close to the intended usage size. This will remove interpolation
     // artifacts for smaller adjustments to the size.
-    val scaleFactor
-        get() = density.density.toInt()
-    private lateinit var density: Density
-
-    private val cachedPlayers: MutableMap<PlayerId, PlayerSprite> = mutableMapOf()
-    private var cachedReferee: ImageBitmap? = null
-    // Map from resource "path" to loaded in-memory image
-    private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
-    private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
-    private val cachedLargeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
-    private val cachedSmallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
-    private val cachedDice: MutableMap<DiceColor, MutableMap<DieResult, ImageBitmap>> = mutableMapOf()
-    private val cachedCoin: MutableMap<Coin, ImageBitmap> = mutableMapOf()
-    private val cachedActionIcons: MutableMap<ActionIcon, ImageBitmap> = mutableMapOf()
-    private val cachedGeneratedPlayers: MutableMap<String, ImageBitmap> = mutableMapOf()
-
-    // FUMBBL Mappings
-    private val fumbblCache = mutableMapOf<String, Url>()
-
-    private val httpClient = getHttpClient()
-    private val inFlightRequests = mutableMapOf<Url, CompletableDeferred<ImageBitmap?>>()
+    val scaleFactor: Int
+        get() = initializedStaticResources?.scaleFactor ?: 1
 
     /**
      * Loads the fumbbl ini file and prepare the mapping between local paths
      * and download URLs
      */
     suspend fun initializeFumbblMapping() {
-        fun addPropLineToCache(line: String) {
-            val parts = line.split("=")
-            if (parts.size == 2) {
-                val url = parts[0].replace("https\\", "https")
-                val path = parts[1]
-                fumbblCache[path] = Url(url)
-            }
-        }
-        suspend fun cacheFile(path: String) {
-            val fileContent = Res.readBytes(path)
-            val propsFile = fileContent.commonToUtf8String()
-            propsFile.lines().forEach { line -> addPropLineToCache(line) }
-        }
-        cacheFile("files/fumbbl/icons.ini")
-        cacheFile("files/fumbbl/icons-extra.ini")
+        teamResources.initializeFumbblMapping()
     }
 
-    // Load all image resources used.
+    // Load all static image resources used.
     // It looks like we cannot lazy-load them due to how Compose Resources work on WasmJS
     // `Res.readBytes` is suspendable and runBlocking doesn't work on wasmJs, which makes
     // loading images in the middle of a Composable function quite a nightmare.
-    // Instead, we preload all dynamic resources up front. This will probably result in slightly
+    // Instead, we preload all dynamic resources up front. This will result in slightly
     // higher memory usage, but it will probably not be problematic.
-    suspend fun initialize(density: Density, homeTeam: Team, awayTeam: Team): Boolean {
-        this.density = density
-        PitchDetails.entries.forEach {
-            saveFileIntoCache(it.resource)
-        }
-        initializeDiceMappings(scaleFactor)
-        initializeGameActionIcons(scaleFactor)
-        saveTeamPlayerImagesToCache(homeTeam)
-        saveTeamPlayerImagesToCache(awayTeam)
-        return true
-    }
+    suspend fun initializeStaticAssets(density: Density) {
+        initializationMutex.withLock {
+            if (initializedStaticResources != null) return@withLock
 
-    private suspend fun saveImageIntoCache(path: String) {
-        val image = Res.loadImage(path)
-        cachedImages[path] = image
-    }
-
-    private suspend fun saveFileIntoCache(path: String) {
-        val image = Res.loadFileAsImage(path)
-        cachedImages[path] = image
-    }
-
-    private fun loadImageFromCache(path: String): ImageBitmap {
-        return cachedImages[path] ?: error("Could not find: $path")
-    }
-
-    private suspend fun loadImageFromResources(
-        path: String,
-        cache: Boolean = true,
-    ): ImageBitmap {
-        if (cache && cachedImages.containsKey(path)) {
-            return cachedImages[path]!!
-        } else {
-            try {
-                val image = Res.loadFileAsImage(path)
-                cachedImages[path] = image
-                return image
-            } catch (ex: CancellationException) {
-                throw ex
-            } catch (ex: Exception) {
-                throw IllegalStateException("Problems loading image resource: $path", ex)
+            val scaleFactor = density.density.toInt()
+            val newCache = StaticResourcesCache(scaleFactor, httpClient)
+            PitchDetails.entries.forEach { pitch ->
+                newCache.loadPitch(pitch)
             }
+            initializeDiceMappings(newCache)
+            initializeGameActionIcons(newCache)
+            initializedStaticResources = newCache
+        }
+    }
+
+    /**
+     * Add assets for [homeTeam] and [awayTeam] to the shared team cache.
+     *
+     * Static assets must be initialized first. Existing team assets are
+     * retained when adding new team assets. They do not take up that much
+     * memory and make swapping between different teams faster (like when
+     * switching between challenges).
+     */
+    suspend fun initializeTeamAssets(homeTeam: Team, awayTeam: Team) {
+        initializationMutex.withLock {
+            checkNotNull(initializedStaticResources) {
+                "Static icon assets must be initialized before team assets"
+            }
+            val newCache = initializedTeamResources.copy()
+            saveTeamPlayerImagesToCache(homeTeam, newCache)
+            saveTeamPlayerImagesToCache(awayTeam, newCache)
+            // It should be safe to always write the result into the cache.
+            // The only downside is perhaps getting too many teams into the
+            // cache when browsing many teams, but that should be fine for now.
+            // currentCoroutineContext().ensureActive()
+            newCache.copyInto(initializedTeamResources)
         }
     }
 
@@ -319,13 +287,17 @@ object IconFactory {
         }
     }
 
-    private suspend fun loadPlayerSpriteImage(playerSprite: SpriteSource, size: PlayerSize): ImageBitmap? {
-        return when (playerSprite.type) {
-            SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
-            SpriteLocation.URL -> runCatching { loadImageFromNetwork(Url(playerSprite.resource), false) }.getOrNull()
-            SpriteLocation.FUMBBL_INI -> runCatching { loadImageFromFumbblIni(playerSprite.resource) }.getOrNull()
-            SpriteLocation.GENERATED -> generatePlayerSprite(letters = playerSprite.resource, size)
-        }
+    private suspend fun loadPlayerSpriteImage(
+        playerSprite: SpriteSource,
+        size: PlayerSize,
+        cache: TeamResourcesCache,
+    ): ImageBitmap? {
+        return cache.loadSprite(playerSprite)
+            ?: playerSprite.takeIf { it.type == SpriteLocation.GENERATED }?.let {
+                cache.getOrCreateGeneratedPlayerSprite("${it.resource}:$size") {
+                    generatePlayerSprite(letters = it.resource, size)
+                }
+            }
     }
 
     private fun createPlayerSprite(image: ImageBitmap, playerSprite: SpriteSource, isHomeTeam: Boolean): PlayerSprite {
@@ -339,84 +311,22 @@ object IconFactory {
         }
     }
 
-    private suspend fun createFallbackPlayerSprite(player: Player, isHomeTeam: Boolean): PlayerSprite {
+    private suspend fun createFallbackPlayerSprite(
+        player: Player,
+        isHomeTeam: Boolean,
+        cache: TeamResourcesCache,
+    ): PlayerSprite {
         val letters = player.position.shortHand.ifBlank { "?" }
-        val size  = player.position.size
-        val spriteSheet = if (cachedGeneratedPlayers.contains(letters)) {
-            cachedGeneratedPlayers[letters]!!
-        } else {
-            val spriteSheet = PlayerSpriteFallbackGenerator.generatePlayerSprite(letters, size)
-            cachedGeneratedPlayers[letters] = spriteSheet
-            spriteSheet
+        val size = player.position.size
+        val spriteSheet = cache.getOrCreateGeneratedPlayerSprite("$letters:$size") {
+            PlayerSpriteFallbackGenerator.generatePlayerSprite(letters, size)
         }
         return extractSprites(spriteSheet, variants = 1, selectedIndex = 0, onHomeTeam = isHomeTeam)
     }
 
-    private suspend fun loadImageFromNetwork(url: Url, useProxy: Boolean): ImageBitmap? {
-        CacheManager.getCachedImage(url)?.let { return it }
-
-        // If a fetch for this URL is already in-flight, wait for it instead of
-        // firing a duplicate request. This avoids race conditions on WASM where coroutines
-        // interleave at every suspension point. Which will cause fatal cash misses later.
-        // See https://github.com/cmelchior/jervis-ffb/issues/48
-        inFlightRequests[url]?.let { return it.await() }
-
-        val deferred = CompletableDeferred<ImageBitmap?>()
-        inFlightRequests[url] = deferred
-        try {
-            // Originally the proxy was only used to bypass CORS restrictions on the web client when
-            // running on localhost. JVM and iOS did not need this.
-            // However, TourPlay is using AVIF images, which Compose does not yet support. To work around
-            // this, we also let the proxy convert any AVIF images to PNG.
-            // Due to this, all targets must use the proxy for now.
-
-            // Old check
-            //    val callUrl = when (useProxy && !canBeHost()) {
-            //        true -> Url("${BASE_URL}/proxy.php?url=${url.toString().encodeURLParameter()}")
-            //        false -> url
-            //    }
-
-            // New check: Always use the proxy to work around both CORS and AVIF issues.
-            val callUrl = Url("${BASE_URL}/proxy.php?url=${url.toString().encodeURLParameter()}")
-
-            val result = httpClient.get(callUrl) {
-                headers {
-                    // In some cases, gifs are returned even though the path is a png. Problem?
-                    accept(ContentType.Image.PNG)
-                    accept(ContentType.Image.GIF)
-                    accept(ContentType.Image.AVIF)
-                }
-            }
-            val image = when (result.status.isSuccess()) {
-                true -> {
-                    val bytes = result.readRawBytes()
-                    val image = Image.makeFromEncoded(bytes).toComposeImageBitmap()
-                    CacheManager.saveImage(url, image)
-                    image
-                }
-                false -> null
-            }
-            deferred.complete(image)
-            return image
-        } catch (e: Throwable) {
-            loggerInstance.w("Error loading image from network: $url", e)
-            deferred.completeExceptionally(e)
-            return null
-        } finally {
-            inFlightRequests.remove(url)
-        }
-    }
-
-    private suspend fun loadImageFromFumbblIni(path: String): ImageBitmap? {
-        val url = fumbblCache[path] ?: error("Path not found in ini file: $path")
-        // It looks like most images in the FUMBBL ini file are protected by CORS, so on
-        // web platforms we need to use a proxy to load them.
-        return loadImageFromNetwork(url, true)
-    }
-
-    private suspend fun initializeDiceMappings(scaleFactor: Int) {
+    private suspend fun initializeDiceMappings(cache: StaticResourcesCache) {
         DiceColor.entries.forEach {
-            cachedDice[it] = mutableMapOf()
+            cache.dice[it] = mutableMapOf()
         }
 
         // Block Dice
@@ -424,7 +334,7 @@ object IconFactory {
             val die = it.blockResult
             val typeAsFileName = die.name.lowercase().replace("_", "")
             val path = "jervis/dice/jervis_dblock_black_$typeAsFileName.png"
-            cachedDice[DiceColor.DEFAULT]!![it] = loadImageFromResources(path).scalePixels(scaleFactor)
+            cache.loadDice(DiceColor.DEFAULT, it, path, saveAsDefault = false)
         }
 
         val d6sColors = listOf(
@@ -439,84 +349,76 @@ object IconFactory {
         // D3 (Use D6 images for now)
         d6sColors.forEach { (color, isDefault) ->
             D3Result.allOptions().forEach {
-                val image = loadImageFromResources("jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png").scalePixels(scaleFactor)
-                cachedDice[color]!![it] = image
-                if (isDefault) {
-                    cachedDice[DiceColor.DEFAULT]!![it] = image
-                }
+                val resourcePath = "jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png"
+                cache.loadDice(color, it, resourcePath, saveAsDefault = isDefault)
             }
         }
 
         d6sColors.forEach { (color, isDefault) ->
             D6Result.allOptions().forEach {
-                val image = loadImageFromResources("jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png").scalePixels(scaleFactor)
-                cachedDice[color]!![it] = image
-                if (isDefault) {
-                    cachedDice[DiceColor.DEFAULT]!![it] = image
-                }
+                val resourcePath = "jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png"
+                cache.loadDice(color, it, resourcePath, saveAsDefault = isDefault)
             }
         }
 
         // D8
         D8Result.allOptions().forEach {
-            val image = loadImageFromResources("jervis/dice/jervis_d8_purple_${it.value}.png").scalePixels(scaleFactor)
-            cachedDice[DiceColor.DEFAULT]!![it] = image
+            val resourcePath = "jervis/dice/jervis_d8_purple_${it.value}.png"
+            cache.loadDice(DiceColor.DEFAULT, it, resourcePath)
         }
 
         // D12
         D12Result.allOptions().forEach {
-            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
-            cachedDice[DiceColor.DEFAULT]!![it] = image
+            // We do not have a proper D12 yet, so just reuse D20
+            val resourcePath = "jervis/dice/jervis_d20_green_${it.value}.png"
+            cache.loadDice(DiceColor.DEFAULT, it, resourcePath)
         }
 
         // D16
         D16Result.allOptions().forEach {
-            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
-            cachedDice[DiceColor.DEFAULT]!![it] = image
+            // We do not have a proper D16 yet, so just reuse D20
+            val resourcePath = "jervis/dice/jervis_d20_green_${it.value}.png"
+            cache.loadDice(DiceColor.DEFAULT, it, resourcePath)
         }
 
         // D20
         D20Result.allOptions().forEach {
-            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
-            cachedDice[DiceColor.DEFAULT]!![it] = image
+            val resourcePath = "jervis/dice/jervis_d20_green_${it.value}.png"
+            cache.loadDice(DiceColor.DEFAULT, it, resourcePath)
         }
 
         // Coins
         Coin.entries.forEach {
-            val image = loadImageFromResources("jervis/dice/jervis_coin_${it.name.lowercase()}.png")
-            cachedCoin[it] = image.scalePixels(IconFactory.scaleFactor)
+            val resourcePath = "jervis/dice/jervis_coin_${it.name.lowercase()}.png"
+            cache.loadCoin(it, resourcePath)
         }
     }
 
-    private suspend fun initializeGameActionIcons(scaleFactor: Int) {
-        ActionIcon.entries.forEach {
-            val resource = it.path
-            val image = loadImageFromResources(resource, cache = false).scalePixels(scaleFactor)
-            cachedActionIcons[it] = image
+    private suspend fun initializeGameActionIcons(cache: StaticResourcesCache) {
+        ActionIcon.entries.forEach { icon ->
+            cache.loadActionIcon(icon)
         }
     }
 
-    private suspend fun saveTeamPlayerImagesToCache(team: Team) {
+    private suspend fun saveTeamPlayerImagesToCache(team: Team, cache: TeamResourcesCache) {
         team.forEach { player ->
-            loadPlayerSprite(player, player.isOnHomeTeam())
-            val portrait = player.icon?.portrait ?: DEFAULT_PORTRAIT
-            val portraitImage = when (portrait.type) {
-                SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
-                SpriteLocation.URL -> loadImageFromNetwork(Url(portrait.resource), useProxy = false)
-                SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(portrait.resource)
-                SpriteLocation.GENERATED -> generatePlayerSprite(letters = portrait.resource, player.position.size)
-            } ?: loadImageFromResources(DEFAULT_PORTRAIT.resource)
-            cachedPortraits[player.id] = portraitImage
+            loadPlayerSprite(player, player.isOnHomeTeam(), cache)
+            if (!cache.portraits.containsKey(player.id)) {
+                val portrait = player.icon?.portrait ?: DEFAULT_PORTRAIT
+                val portraitImage = cache.loadPortrait(portrait)
+                    ?: checkNotNull(cache.loadPortrait(DEFAULT_PORTRAIT))
+                cache.portraits[player.id] = portraitImage
+            }
         }
     }
 
     fun getPlayerIcon(player: UiPitchPlayer): ImageBitmap {
         val isActive = player.isActive
-        if (cachedPlayers.contains(player.id)) {
+        if (teamResources.players.contains(player.id)) {
             return if (isActive) {
-                cachedPlayers[player.id]!!.active
+                teamResources.players[player.id]!!.active
             } else {
-                cachedPlayers[player.id]!!.default
+                teamResources.players[player.id]!!.default
             }
         } else {
             error("Could not find player: ${player.id}")
@@ -527,10 +429,11 @@ object IconFactory {
      * Returns size of dice image for the current dice type in [androidx.compose.ui.unit.Dp].
      */
     fun getDiceSizeDp(die: DieResult): DpSize {
-        val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find die: $die")
+        val cache = staticResources
+        val image = cache.dice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find die: $die")
         return DpSize(
-            (image.width / scaleFactor).jdp * 1.25f,
-            (image.height / scaleFactor).jdp * 1.25f
+            (image.width / cache.scaleFactor).jdp * 1.25f,
+            (image.height / cache.scaleFactor).jdp * 1.25f
         )
     }
 
@@ -538,30 +441,31 @@ object IconFactory {
      * Returns size of dice image for the current dice type in pixels
      */
     fun getDiceSizePx(die: DieResult): Size {
-        val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find die: $die")
+        val image = staticResources.dice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find die: $die")
         return Size(image.width.toFloat(), image.height.toFloat())
     }
 
     @Composable
     fun getDiceIcon(die: DieResult, color: DiceColor = DiceColor.DEFAULT): ImageBitmap {
-        return cachedDice[color]?.get(die) ?: error("Could not find die: $die [$color]")
+        return staticResources.dice[color]?.get(die) ?: error("Could not find die: $die [$color]")
     }
 
     @Composable
     fun getCoinIcon(coin: Coin): ImageBitmap {
-        return cachedCoin[coin] ?: error("Could not find coin: $coin")
+        return staticResources.coins[coin] ?: error("Could not find coin: $coin")
     }
 
     fun getCoinSizeDp(coin: Coin): DpSize {
-        val image = cachedCoin[coin] ?: error("Could not find coin: $coin")
+        val cache = staticResources
+        val image = cache.coins[coin] ?: error("Could not find coin: $coin")
         return DpSize(
-            (image.width / scaleFactor).jdp * 1.25f,
-            (image.height / scaleFactor).jdp * 1.25f
+            (image.width / cache.scaleFactor).jdp * 1.25f,
+            (image.height / cache.scaleFactor).jdp * 1.25f
         )
     }
 
     fun getActionIcon(action: ActionIcon): ImageBitmap {
-        return cachedActionIcons[action] ?: error("Could not find action: $action")
+        return staticResources.actionIcons[action] ?: error("Could not find action: $action")
     }
 
     @Composable
@@ -578,7 +482,7 @@ object IconFactory {
     }
 
     fun getPlayerPortrait(player: PlayerId): ImageBitmap {
-        return cachedPortraits[player]!!
+        return teamResources.portraits[player] ?: error("Could not find player portrait: $player")
     }
 
     @Composable
@@ -587,7 +491,7 @@ object IconFactory {
     }
 
     fun getPitch(pitch: PitchDetails): ImageBitmap {
-        return loadImageFromCache(pitch.resource)
+        return staticResources.pitches[pitch] ?: error("Could not find pitch: $pitch")
     }
 
     @Composable
@@ -749,12 +653,7 @@ object IconFactory {
      * icons.
      */
     suspend fun loadSpriteImage(sprite: SpriteSource): ImageBitmap? {
-        return when (sprite.type) {
-            SpriteLocation.EMBEDDED -> runCatching { loadImageFromResources(sprite.resource) }.getOrNull()
-            SpriteLocation.URL -> runCatching { loadImageFromNetwork(Url(sprite.resource), useProxy = false) }.getOrNull()
-            SpriteLocation.FUMBBL_INI -> runCatching { loadImageFromFumbblIni(sprite.resource) }.getOrNull()
-            SpriteLocation.GENERATED -> null // No size context here; caller should fall back.
-        }
+        return teamResources.loadSprite(sprite)
     }
 
     /**
@@ -769,23 +668,9 @@ object IconFactory {
         }
     }
 
-    fun hasLogo(id: TeamId, size: LogoSize): Boolean {
-        return when (size) {
-            LogoSize.LARGE -> cachedLargeLogos.contains(id)
-            LogoSize.SMALL -> cachedSmallLogos.contains(id)
-        }
-    }
-
     suspend fun saveLogo(id: TeamId, logo: SpriteSource, size: LogoSize) {
-        val image = when (logo.type) {
-            SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource), true)
-            SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(logo.resource)
-            SpriteLocation.GENERATED -> error("Generated logos are not supported yet")
-        }
-        when (size) {
-            LogoSize.LARGE -> cachedLargeLogos[id] = image ?: error("Could not find logo: ${logo.resource}")
-            LogoSize.SMALL -> cachedSmallLogos[id] = image ?: error("Could not find logo: ${logo.resource}")
+        checkNotNull(teamResources.loadLogo(id, logo, size)) {
+            "Could not find logo: ${logo.resource}"
         }
     }
 
@@ -798,25 +683,33 @@ object IconFactory {
 
     fun getLogoOrNull(id: TeamId, size: LogoSize): ImageBitmap? {
         return when (size) {
-            LogoSize.LARGE -> cachedLargeLogos[id]
-            LogoSize.SMALL -> cachedSmallLogos[id]
+            LogoSize.LARGE -> teamResources.largeLogos[id]
+            LogoSize.SMALL -> teamResources.smallLogos[id]
         }
     }
 
     suspend fun loadPlayerSprite(player: Player, isOnHomeTeam: Boolean): PlayerSprite {
-        cachedPlayers[player.id]?.let { return it }
+        return loadPlayerSprite(player, isOnHomeTeam, teamResources)
+    }
+
+    private suspend fun loadPlayerSprite(
+        player: Player,
+        isOnHomeTeam: Boolean,
+        cache: TeamResourcesCache,
+    ): PlayerSprite {
+        cache.players[player.id]?.let { return it }
         val playerSprite = player.icon?.sprite
         val sprite = if (playerSprite == null) {
-            createFallbackPlayerSprite(player, isOnHomeTeam)
+            createFallbackPlayerSprite(player, isOnHomeTeam, cache)
         } else {
-            val image = loadPlayerSpriteImage(playerSprite, player.position.size)
+            val image = loadPlayerSpriteImage(playerSprite, player.position.size, cache)
             if (image == null) {
-                createFallbackPlayerSprite(player, isOnHomeTeam)
+                createFallbackPlayerSprite(player, isOnHomeTeam, cache)
             } else {
                 createPlayerSprite(image, playerSprite, isOnHomeTeam)
             }
         }
-        cachedPlayers[player.id] = sprite
+        cache.players[player.id] = sprite
         return sprite
     }
 
@@ -830,8 +723,9 @@ object IconFactory {
         }
         var cachedLogo = getLogoOrNull(team, size)
         if (cachedLogo == null) {
-            saveLogo(team, sprite, size)
-            cachedLogo = getLogo(team, size)
+            cachedLogo = checkNotNull(teamResources.loadLogo(team, sprite, size)) {
+                "Could not find logo: ${sprite.resource}"
+            }
         }
         return cachedLogo
     }
@@ -841,7 +735,6 @@ object IconFactory {
      */
     suspend fun loadRosterIcon(team: TeamId, logo: SpriteSource?, size: LogoSize): ImageBitmap? {
         if (logo == null) return null
-        saveLogo(team, logo, size)
-        return getLogo(team, size)
+        return teamResources.loadLogo(team, logo, size)
     }
 }

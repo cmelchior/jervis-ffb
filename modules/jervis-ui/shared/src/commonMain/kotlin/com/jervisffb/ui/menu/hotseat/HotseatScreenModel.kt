@@ -13,8 +13,8 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.GameFileData
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameClientType
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.LocalActionProvider
@@ -118,12 +118,12 @@ class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: Me
                 saveGameData = setupGameModel.gameConfigModel.loadFileModel.gameFile ?: error("Game file is not loaded")
                 val homeTeam = saveGameData!!.homeTeam
                 val awayTeam = saveGameData!!.awayTeam
-                val homeTeamLogo = IconFactory.loadRosterIcon(
+                val homeTeamLogo = ICON_FACTORY.loadRosterIcon(
                     homeTeam.id,
                     homeTeam.teamLogo ?: homeTeam.roster.logo,
                     logoSize
                 )
-                val awayTeamLogo = IconFactory.loadRosterIcon(
+                val awayTeamLogo = ICON_FACTORY.loadRosterIcon(
                     awayTeam.id,
                     awayTeam.teamLogo ?: awayTeam.roster.logo,
                     logoSize

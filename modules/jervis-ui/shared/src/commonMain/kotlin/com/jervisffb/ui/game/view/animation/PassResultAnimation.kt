@@ -20,9 +20,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.asDp
 import com.jervisffb.ui.game.animations.PassAnimation
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -48,7 +48,7 @@ fun PassResultAnimation(vm: PitchViewModel, animation: PassAnimation) {
     BallAnimation(
         stateCalculator = animStateCalculator,
         duration = duration,
-        image = IconFactory.getBall(),
+        image = ICON_FACTORY.getBall(),
         squareSize = targetSquareSize,
         speedFactor = animation.uiController.animationSpeedFactor,
         animationDone = { vm.notifyAnimationFinished() }

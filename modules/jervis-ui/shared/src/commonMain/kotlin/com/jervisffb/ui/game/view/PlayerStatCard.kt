@@ -60,7 +60,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.utils.BottomEndFlowRow
@@ -220,7 +220,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
 //                                        scaleY = 1.05f
 //                                    }
 //                                ,
-//                                painter = BitmapPainter(IconFactory.getPlayerPortrait(player.model.id)),
+//                                painter = BitmapPainter(ICON_FACTORY.getPlayerPortrait(player.model.id)),
 //                                pixelSize = 2f,
 //                            )
                             Image(
@@ -233,7 +233,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
                                     }
                                 ,
                                 // .aspectRatio(95f / 147f).fillMaxWidth(),
-                                bitmap = IconFactory.getPlayerPortrait(player.model.id),
+                                bitmap = ICON_FACTORY.getPlayerPortrait(player.model.id),
                                 filterQuality = FilterQuality.None,
                                 contentDescription = "Image of ${player.model.name}",
                                 contentScale = ContentScale.Fit,

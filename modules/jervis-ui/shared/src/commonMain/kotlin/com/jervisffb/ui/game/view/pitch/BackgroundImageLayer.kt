@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.viewmodel.PitchDetails
 
 /**
@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.viewmodel.PitchDetails
 @Composable
 fun BoxScope.BackgroundImageLayer(pitch: PitchDetails) {
     Image(
-        painter = BitmapPainter(IconFactory.getPitch(pitch)),
+        painter = BitmapPainter(ICON_FACTORY.getPitch(pitch)),
         contentDescription = pitch.description,
         // We can live with something of the pitch being cropped for now.
         // Avoiding it across game types is hard, and if we want something

@@ -2,7 +2,6 @@ package com.jervisffb.ui.game.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import com.jervisffb.ui.game.view.JervisTheme
-import io.ktor.client.plugins.logging.DEFAULT
 
 /**
  * The background color of the log panels. Can be used to make the text more readable on certain
@@ -18,11 +17,12 @@ data class PanelBackground(
 }
 
 /**
- * List of supported backgrounds for the pitch. They are slightly configurable
- * due to the impact a background can have on the visualal apperance.
+ * List of supported backgrounds for the pitch. They are configurable due to the
+ * impact a background can have on the visual appearance.
  */
 enum class PitchDetails(
-    val resource: String,
+    // Path to the pitch image in `composeResources/files`
+    val resourcePath: String,
     val description: String,
     // Draw lines, dots and end zone markers (if false, it is assumed they are part of the image)
     val drawPitchMarkers: Boolean,

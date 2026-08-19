@@ -101,6 +101,15 @@ kotlin {
                 implementation("org.tritonus:tritonus_share:0.0.1")
             }
         }
+        val jvmTest by getting {
+            dependencies {
+                implementation(project(":modules:jervis-test-utils"))
+                implementation(kotlin("test"))
+                implementation(libs.coroutines.test)
+                implementation(libs.ktor.client.mock)
+                runtimeOnly(compose.desktop.currentOs)
+            }
+        }
         val wasmJsMain by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting

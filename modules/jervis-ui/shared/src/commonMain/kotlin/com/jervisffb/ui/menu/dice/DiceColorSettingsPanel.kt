@@ -46,9 +46,9 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.DiceColor
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.D20Shape
 import com.jervisffb.ui.game.view.utils.D6Shape
@@ -204,7 +204,7 @@ private fun DiceIcon(
     color: DiceColor,
     modifier: Modifier = Modifier,
 ) {
-    val bitmap = IconFactory.getDiceIcon(entry.representativeDie, color)
+    val bitmap = ICON_FACTORY.getDiceIcon(entry.representativeDie, color)
     Image(
         bitmap = bitmap,
         contentDescription = "${entry.label}: ${color.name}",

@@ -17,8 +17,8 @@ import com.jervisffb.engine.model.Pitch
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.icons_game_humanref1
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameSnapshot
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.view.Player
@@ -164,7 +164,7 @@ private fun PlayerWithIndicators(
 
 @Composable
 private fun PlayerBlockedIndicator() {
-    val imageRes = IconFactory.getBlockedDecoration()
+    val imageRes = ICON_FACTORY.getBlockedDecoration()
     Image(
         modifier = Modifier.fillMaxSize(),
         painter = painterResource(imageRes),
@@ -180,7 +180,7 @@ private fun PlayerBlockedIndicator() {
 private fun BlockDiceIndicatorImage(dice: Int) {
 //    val interactionSource = remember { MutableInteractionSource() }
 //    val isHovered by interactionSource.collectIsHoveredAsState()
-    val imageRes = remember(dice) { IconFactory.getBlockDiceRolledIndicator(dice) }
+    val imageRes = remember(dice) { ICON_FACTORY.getBlockDiceRolledIndicator(dice) }
     Image(
         modifier = Modifier.fillMaxSize() /* .hoverable(interactionSource = interactionSource) */,
         painter = painterResource(imageRes),

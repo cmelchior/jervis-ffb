@@ -92,6 +92,7 @@ import com.jervisffb.engine.utils.dedupSkillsByType
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_plus
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.dialogs.BuyInducementsDialog
 import com.jervisffb.ui.game.dialogs.BuyInducementsViewModel
@@ -99,7 +100,6 @@ import com.jervisffb.ui.game.dialogs.CartEntryView
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.dialogs.GroupItemView
 import com.jervisffb.ui.game.dialogs.MERCENARY_NAMES
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.NumberChangeButton
@@ -465,7 +465,7 @@ private fun SimpleInducementRow(
             modifier = Modifier.width(positionIconColWidth).padding(2.dp),
             contentAlignment = Alignment.Center,
         ) {
-            val icon = IconFactory.getInducementIcon(inducement.type)
+            val icon = ICON_FACTORY.getInducementIcon(inducement.type)
             if (icon != null) {
                 Image(
                     painter = painterResource(icon),
@@ -725,7 +725,7 @@ private fun RenderInducementIcon(
     if (iconSource != null) {
         var image by remember(iconSource, isHomeTeam) { mutableStateOf<ImageBitmap?>(null) }
         LaunchedEffect(iconSource, isHomeTeam) {
-            image = IconFactory.loadPlayerIcon(iconSource, isHomeTeam)
+            image = ICON_FACTORY.loadPlayerIcon(iconSource, isHomeTeam)
         }
         val bitmap = image
         if (bitmap != null) {
@@ -737,7 +737,7 @@ private fun RenderInducementIcon(
             return
         }
     }
-    val icon = IconFactory.getInducementIcon(type)
+    val icon = ICON_FACTORY.getInducementIcon(type)
     if (icon != null) {
         Box(
             modifier = Modifier.size(size).clip(RoundedCornerShape(4.dp)),
@@ -1353,7 +1353,7 @@ private fun MercenaryPositionIcon(position: Position, isHomeTeam: Boolean, teamC
     val iconSource = position.icon
     var bitmap by remember(iconSource, isHomeTeam) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(iconSource, isHomeTeam) {
-        bitmap = iconSource?.let { IconFactory.loadPlayerIcon(it, isHomeTeam) }
+        bitmap = iconSource?.let { ICON_FACTORY.loadPlayerIcon(it, isHomeTeam) }
     }
     Box(
         modifier = Modifier.width(positionIconColWidth).padding(2.dp),

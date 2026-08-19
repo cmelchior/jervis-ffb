@@ -33,6 +33,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.PLAYER_MARKINGS_MANAGER
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundManager
@@ -42,7 +43,6 @@ import com.jervisffb.ui.game.UiFocusProvider
 import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.model.UiPlayerCard
@@ -393,13 +393,13 @@ class GameScreenModel(
         actionProvider.updateSharedData(sharedPitchData)
         menuViewModel.backgroundContext.launch {
             // Use large icon for the loading screen
-            homeTeamIcon.value = IconFactory.loadRosterIcon(
+            homeTeamIcon.value = ICON_FACTORY.loadRosterIcon(
                 homeTeam.id,
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.LARGE
             )
             // Prepare small icon for the game view itself
-            IconFactory.loadRosterIcon(
+            ICON_FACTORY.loadRosterIcon(
                 homeTeam.id,
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.SMALL
@@ -407,13 +407,13 @@ class GameScreenModel(
         }
         menuViewModel.backgroundContext.launch {
             // Use large icon for the loading screen
-            awayTeamIcon.value = IconFactory.loadRosterIcon(
+            awayTeamIcon.value = ICON_FACTORY.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
                 LogoSize.LARGE
             )
             // Prepare small icon for the game view itself
-            IconFactory.loadRosterIcon(
+            ICON_FACTORY.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
                 LogoSize.SMALL
@@ -476,7 +476,8 @@ class GameScreenModel(
      */
     suspend fun initialize(density: Density, attachToMenu: Boolean = true) {
         loadingMessages.value = "Initializing icons"
-        IconFactory.initialize(density, homeTeam, awayTeam)
+        ICON_FACTORY.initializeStaticAssets(density)
+        ICON_FACTORY.initializeTeamAssets(homeTeam, awayTeam)
         loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
         if (attachToMenu) {

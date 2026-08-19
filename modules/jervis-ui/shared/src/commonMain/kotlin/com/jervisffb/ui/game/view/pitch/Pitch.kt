@@ -370,7 +370,7 @@ fun PitchSquares(
 //                    .background(color = if (square.isBallExiting) Color.Red else Color.Transparent),
 //                alignment = Alignment.Center,
 //                contentScale = ContentScale.FillBounds,
-//                bitmap = IconFactory.getBall(),
+//                bitmap = ICON_FACTORY.getBall(),
 //                contentDescription = "",
 //            )
 //        } else if (vm.uiEphemeralData.squares[square.model.coordinates]?.futureMoveValue != null && square.isEmpty()) {
@@ -417,4 +417,3 @@ fun PitchSquares(
 //        }
 //    }
 //}
-

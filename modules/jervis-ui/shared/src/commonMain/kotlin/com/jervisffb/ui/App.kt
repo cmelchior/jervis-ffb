@@ -31,12 +31,14 @@ import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.PROP_INITIALIZED
 import com.jervisffb.utils.PROP_INITIALIZED_VERSION
 import com.jervisffb.utils.SettingsManager
+import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.initializePlatform
 import com.jervisffb.utils.jervisLogger
 
 val FILE_MANAGER = FileManager()
 val SETTINGS_MANAGER: SettingsManager = SettingsManager()
 val PLAYER_MARKINGS_MANAGER = PlayerMarkingsManager(SETTINGS_MANAGER)
+val ICON_FACTORY = IconFactory(getHttpClient())
 
 suspend fun initApplication() {
     initializePlatform()
@@ -64,7 +66,7 @@ suspend fun initApplication() {
 
     // Populate FUMBBL image mapping, so `IconFactory` knows where to download
     // images from.
-    IconFactory.initializeFumbblMapping()
+    ICON_FACTORY.initializeFumbblMapping()
 
     // Initialize setup cache
     Setups.initialize()

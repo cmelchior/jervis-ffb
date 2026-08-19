@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.view.ContextPopupMenu
@@ -177,7 +177,7 @@ private fun SquareHighlightAndAction(
                     ,
                     alignment = Alignment.Center,
                     contentScale = ContentScale.FillBounds,
-                    bitmap = IconFactory.getBall(),
+                    bitmap = ICON_FACTORY.getBall(),
                     contentDescription = "Ball left pitch at ${square.coordinates}",
                 )
             }

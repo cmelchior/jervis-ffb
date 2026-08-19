@@ -31,8 +31,8 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.ActionIcon
-import com.jervisffb.ui.game.icons.IconFactory
 import org.intellij.lang.annotations.Language
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
@@ -65,7 +65,7 @@ fun app() {
             onCloseRequest = ::exitApplication,
         ) {
             val density = LocalDensity.current // OR, for example, Density(1f, 1f)
-            val image = IconFactory.getActionIcon(ActionIcon.MOVE)
+            val image = ICON_FACTORY.getActionIcon(ActionIcon.MOVE)
             ImageShaderExample(image)
         }
     }

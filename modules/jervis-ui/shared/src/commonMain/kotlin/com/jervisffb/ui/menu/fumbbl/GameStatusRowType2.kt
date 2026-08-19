@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisCircularProgressIndicator
@@ -52,8 +52,8 @@ fun ColumnScope.GameStatusRowType2(textColor: Color = JervisTheme.contentTextCol
     var vampireLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        lizardmenLogo = IconFactory.loadRosterIcon(TeamId("lizardmen"), SingleSprite.embedded("jervis/roster/logo_lizardmen_small.png"), LogoSize.SMALL)
-        vampireLogo = IconFactory.loadRosterIcon(TeamId("vampire"), SingleSprite.embedded("jervis/roster/logo_vampires_small.png"), LogoSize.SMALL)
+        lizardmenLogo = ICON_FACTORY.loadRosterIcon(TeamId("lizardmen"), SingleSprite.embedded("jervis/roster/logo_lizardmen_small.png"), LogoSize.SMALL)
+        vampireLogo = ICON_FACTORY.loadRosterIcon(TeamId("vampire"), SingleSprite.embedded("jervis/roster/logo_vampires_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

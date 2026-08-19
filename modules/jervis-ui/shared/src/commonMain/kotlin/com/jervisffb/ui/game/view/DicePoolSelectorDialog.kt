@@ -35,8 +35,8 @@ import com.jervisffb.engine.actions.DicePool
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.rules.common.procedures.DieRoll
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import kotlin.random.Random
 
@@ -93,7 +93,7 @@ fun DicePoolSelectorDialog(
                                         ) {
                                             Image(
                                                 modifier = Modifier.fillMaxSize(),
-                                                bitmap = IconFactory.getDiceIcon(diceResult),
+                                                bitmap = ICON_FACTORY.getDiceIcon(diceResult),
                                                 contentDescription = text,
                                                 alignment = Alignment.Center,
                                                 contentScale = ContentScale.Fit

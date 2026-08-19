@@ -13,8 +13,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.messages.P2PClientState
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiGameClientType
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -116,7 +116,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
 
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
         val logoSize = LogoSize.SMALL
-        val teamLogo = IconFactory.loadRosterIcon(
+        val teamLogo = ICON_FACTORY.loadRosterIcon(
             team.id,
             teamFile.team.teamLogo ?: teamFile.roster.logo,
             logoSize

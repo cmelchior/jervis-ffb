@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
@@ -56,8 +56,8 @@ fun DirectionArrowsLayer(
                     }
             ) {
                 val image = when {
-                    square.directionSelected != null -> IconFactory.getDirection(square.directionSelected, true)
-                    square.selectableDirection != null -> IconFactory.getDirection(square.selectableDirection, isHover)
+                    square.directionSelected != null -> ICON_FACTORY.getDirection(square.directionSelected, true)
+                    square.selectableDirection != null -> ICON_FACTORY.getDirection(square.selectableDirection, isHover)
                     else -> null
                 }
                 if (image != null) {
@@ -71,4 +71,3 @@ fun DirectionArrowsLayer(
         }
     }
 }
-

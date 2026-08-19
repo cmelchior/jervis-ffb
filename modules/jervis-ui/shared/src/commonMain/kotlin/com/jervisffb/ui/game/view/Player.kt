@@ -41,8 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.UiFocusStyle
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.view.pitch.SquarePointerEventType
 import com.jervisffb.ui.game.view.pitch.jervisPointerEvent
@@ -101,8 +101,8 @@ fun Player(
     }
     val isUsingFumblerooski by isUsingFumblerooskiFlow.collectAsState(false)
     val isMovePlayersFreelyMode by screenModel.isMovePlayersFreely.collectAsState()
-    val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
-    val ballImage = IconFactory.getHeldBallOverlay(isUsingFumblerooski)
+    val playerImage = remember(player) { ICON_FACTORY.getPlayerIcon(player) }
+    val ballImage = ICON_FACTORY.getHeldBallOverlay(isUsingFumblerooski)
     val playerMarkingsSettings by screenModel.playerMarkings.collectAsState()
     val playerMarkings = remember(player, playerMarkingsSettings, screenModel.mode) {
         playerMarkingsSettings.matchingMarkings(
@@ -183,7 +183,7 @@ fun Player(
         }
         if (player.isProne) {
             Image(
-                bitmap = IconFactory.getProneDecoration(),
+                bitmap = ICON_FACTORY.getProneDecoration(),
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Fit,
@@ -192,7 +192,7 @@ fun Player(
         }
         if (player.isStunned) {
             Image(
-                bitmap = IconFactory.getStunnedDecoration(),
+                bitmap = ICON_FACTORY.getStunnedDecoration(),
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Fit,

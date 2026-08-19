@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisCircularProgressIndicator
@@ -52,8 +52,8 @@ fun ColumnScope.GameStatusRowType3(textColor: Color = JervisTheme.contentTextCol
     var skavenLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        khorneLogo = IconFactory.loadRosterIcon(TeamId("khorne"), SingleSprite.embedded("jervis/roster/logo_khorne_small.png"), LogoSize.SMALL)
-        skavenLogo = IconFactory.loadRosterIcon(TeamId("skaven"), SingleSprite.embedded("jervis/roster/logo_skaven_small.png"), LogoSize.SMALL)
+        khorneLogo = ICON_FACTORY.loadRosterIcon(TeamId("khorne"), SingleSprite.embedded("jervis/roster/logo_khorne_small.png"), LogoSize.SMALL)
+        skavenLogo = ICON_FACTORY.loadRosterIcon(TeamId("skaven"), SingleSprite.embedded("jervis/roster/logo_skaven_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),
