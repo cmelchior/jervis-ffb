@@ -23,6 +23,7 @@ import com.jervisffb.utils.jervisLogger
 private class CallbackGuard(
     private val controller: GameEngineController?,
     private val actionId: GameActionId?, // The id game actions are created for.
+    private val allowMultipleInvocations: Boolean = false
 ) {
     private var invoked = false
 
@@ -43,7 +44,7 @@ private class CallbackGuard(
         //
         // This is not thread-safe and is assumed to only be called from the UI
         // thread.
-        if (invoked) {
+        if (invoked && !allowMultipleInvocations) {
             LOG.w { "Callback invoked multiple times for action ActionId[${this@CallbackGuard.actionId}]" }
             return
         }
@@ -121,17 +122,19 @@ class GuardedCallback1<T>(
 
 // Guarded callback with 2 arguments
 class GuardedCallback2<A, B>(
-    controller: GameEngineController?,
-    private val id: GameActionId?,
+    controller: GameEngineController? = null,
+    private val id: GameActionId? = null,
+    allowMultipleInvocations: Boolean = false,
     private val delegate: (GameActionId, A, B) -> Unit,
 ) : (A, B) -> Unit {
 
     constructor(
         acc: UiSnapshotAccumulator,
+        allowMultipleInvocations: Boolean = false,
         delegate: (GameActionId, A, B) -> Unit,
-    ) : this(acc.gameController, acc.gameController.nextActionIndex(), delegate)
+    ) : this(acc.gameController, acc.gameController.nextActionIndex(), allowMultipleInvocations, delegate)
 
-    private val guard = CallbackGuard(controller, id)
+    private val guard = CallbackGuard(controller, id, allowMultipleInvocations)
     val guardedActionId: GameActionId? get() = id
 
     override fun invoke(first: A, second: B) {

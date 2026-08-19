@@ -20,7 +20,7 @@ object SelectRandomPlayersDecorator : PitchActionDecorator<SelectRandomPlayers> 
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
-        val selectedAction = UiPlayerAction(descriptor, GuardedPlayerAction(acc) onClickHandler@{ _, screenModel: GameScreenModel, player: UiPitchPlayer ->
+        val selectedAction = UiPlayerAction(descriptor, GuardedPlayerAction(acc, true) onClickHandler@{ _, screenModel: GameScreenModel, player: UiPitchPlayer ->
             val enablePlayer = !player.isTemporarySelected.value
             if (enablePlayer && screenModel.selectedPlayersInUi.size == descriptor.count) return@onClickHandler
             player.isTemporarySelected.value = enablePlayer

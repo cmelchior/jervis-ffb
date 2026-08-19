@@ -21,20 +21,20 @@ object SelectPlayersDecorator : PitchActionDecorator<SelectPlayers> {
         owner: Team?,
         acc: UiSnapshotAccumulator
     ) {
-        val selectedAction = UiPlayerAction(descriptor, GuardedPlayerAction(acc) onClickHandler@{ _, screenModel: GameScreenModel, player: UiPitchPlayer ->
-            val enablePlayer = !player.isTemporarySelected.value
-            if (enablePlayer && screenModel.selectedPlayersInUi.size == descriptor.count) return@onClickHandler
-            player.isTemporarySelected.value = enablePlayer
-            // Track selected players
-            if (enablePlayer) {
-                screenModel.selectedPlayersInUi.add(player.id)
-            } else {
-                screenModel.selectedPlayersInUi.remove(player.id)
-            }
-            screenModel.isGameStatusBoxEnabled.value = true
-            screenModel.gameStatusBoxTitle.value = "End Player Selection (${screenModel.selectedPlayersInUi.size})"
-        })
         descriptor.players.forEach { playerId ->
+            val selectedAction = UiPlayerAction(descriptor, GuardedPlayerAction(acc, true) onClickHandler@{ _, screenModel: GameScreenModel, player: UiPitchPlayer ->
+                val enablePlayer = !player.isTemporarySelected.value
+                if (enablePlayer && screenModel.selectedPlayersInUi.size == descriptor.count) return@onClickHandler
+                player.isTemporarySelected.value = enablePlayer
+                // Track selected players
+                if (enablePlayer) {
+                    screenModel.selectedPlayersInUi.add(player.id)
+                } else {
+                    screenModel.selectedPlayersInUi.remove(player.id)
+                }
+                screenModel.isGameStatusBoxEnabled.value = true
+                screenModel.gameStatusBoxTitle.value = "End Player Selection (${screenModel.selectedPlayersInUi.size})"
+            })
             acc.updatePlayer(playerId) {
                 it.copy(selectedAction = selectedAction)
             }
