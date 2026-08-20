@@ -17,19 +17,20 @@ class WebSocketClientConnectionTests {
 
     @Test
     fun closeMultipleTimes() = runBlocking {
-        // Start server
-        val server = LightServer(
-            gameName = "testGame",
-            rules = rules,
-            hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeamBB2020(rules),
-            clientCoach = null,
-            clientTeam = null,
-            testMode = true
-        )
-        server.start()
+        val server = startServerOnFreePort { port ->
+            LightServer(
+                gameName = "testGame",
+                rules = rules,
+                hostCoach = CoachId("HomeCoachID"),
+                hostTeam = createDefaultHomeTeamBB2020(rules),
+                clientCoach = null,
+                clientTeam = null,
+                testMode = true,
+                port = port
+            )
+        }
 
-        val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/game", "host")
+        val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:${server.port}/game", "host")
         conn.start()
         try {
             conn.close()

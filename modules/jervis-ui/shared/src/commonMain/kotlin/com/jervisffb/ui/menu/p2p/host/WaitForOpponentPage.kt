@@ -20,12 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +34,7 @@ import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_copy
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
-import kotlinx.coroutines.delay
+import com.jervisffb.ui.game.view.utils.animatedDots
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,12 +43,13 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
     val globalUrl: String by viewModel.globalGameUrl.collectAsState()
     val localUrl: String by viewModel.localGameUrl.collectAsState()
     val globalUrlError by viewModel.globalGameUrlError.collectAsState()
+    val serverShuttingDown by viewModel.isServerShuttingDown.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
-            WaitForOpponentHeader()
+            WaitForOpponentHeader(serverShuttingDown)
             Spacer(modifier = Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
@@ -113,11 +110,14 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                     )
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Depending on where your opponent is connecting from, send them one of the two URLs above. Note that network setups can be tricky, so it's possible neither will work. If that happens… well, you're on your own. Sorry!",
-                    color = JervisTheme.contentTextColor,
-                )
+            // Hide connection information text while the server is shutting down. It no longer serves a purpose.
+            if (!serverShuttingDown) {
+                Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Depending on where your opponent is connecting from, send them one of the two URLs above. Note that network setups can be tricky, so it's possible neither will work. If that happens… well, you're on your own to figure out which IP address to use. Sorry!",
+                        color = JervisTheme.contentTextColor,
+                    )
+                }
             }
         }
         Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
@@ -127,15 +127,11 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
 }
 
 @Composable
-private fun WaitForOpponentHeader(color: Color = JervisTheme.rulebookRed) {
-    var dotCount by remember { mutableStateOf(1) } // Track the number of dots (1 to 3)
-    LaunchedEffect(Unit) {
-        while (true) {
-            dotCount = (dotCount % 3) + 1
-            delay(500L)
-        }
-    }
-    val loadingText = "Waiting For Opponent" + ".".repeat(dotCount)
+private fun WaitForOpponentHeader(serverShuttingDown: Boolean, color: Color = JervisTheme.rulebookRed) {
+    // Going back to "Configure Game" or "Select Team" keeps this page visible until the server
+    // has released its port, so inform user that this is happening rather than just looking frozen.
+    val title = if (serverShuttingDown) "Shutting Down The Server" else "Waiting For Opponent"
+    val loadingText = title + animatedDots()
 
     TitleBorder(color)
     Box(

@@ -61,7 +61,6 @@ import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 
@@ -160,37 +159,8 @@ class GameSession(
                             // the server is started, and we just assume the client is always valid as well
                             // In the case of a game starting again, we ignore any teams sent and just
                             // reuse the ones from the save game.
-                            @OptIn(ExperimentalUuidApi::class)
                             val coach = Coach(CoachId(Uuid.random().toHexString()), message.coachName, message.coachType)
-                            val client = if (message.isHost) {
-                                val homeTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
-                                    hostTeam
-                                } else {
-                                    (message.team as P2PTeamInfo?)?.team?.let {
-                                        SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
-                                    }
-                                }
-                                JoinedP2PHost(
-                                    connection = connection,
-                                    coach = coach,
-                                    state = P2PHostState.JOIN_SERVER,
-                                    team = homeTeam
-                                )
-                            } else {
-                                val awayTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
-                                    clientTeam
-                                } else {
-                                    (message.team as P2PTeamInfo?)?.team?.let {
-                                        SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
-                                    }
-                                }
-                                JoinedP2PClient(
-                                    connection = connection,
-                                    coach = coach,
-                                    state = P2PClientState.JOIN_SERVER,
-                                    team = awayTeam
-                                )
-                            }
+                            val client = createConnectedCoach(message, coach, connection)
 
                             // Send GameSync before adding the client. This way, both joining and current clients
                             // have the same flow of state. Otherwise, the joining client would get a sync with itself
@@ -205,18 +175,47 @@ class GameSession(
                             client.team?.let { team ->
                                 out.sendTeamJoined(message.isHost, team)
                             }
-                            if (message.isHost) {
+
+                            // TODO The below branchs should be refactored into something more managable.
+                            // A coach can arrive with a team already set: the Host always does, and
+                            // the Client does in the save game flow. Deriving the state from the
+                            // teams the session knows about, rather than assuming a coach joins into
+                            // an empty game, is what keeps the two cases below from going wrong.
+                            if (gameSettings.initialActions.isNotEmpty() && !message.isHost) {
+                                // Save game: the Client plays the team stored in the save file, so
+                                // put it through the normal selection path rather than picking one.
+                                val serializedTeam = SerializedTeam.serialize(clientTeam!!)
+                                val msg = ReceivedMessage(connection, TeamSelectedMessage(P2PTeamInfo(serializedTeam)))
+                                incomingMessages.send(msg)
+                            } else if (homeTeam != null && awayTeam != null) {
+                                // Both teams are known the moment this coach joined, so the game is
+                                // ready to be accepted. Nothing else covers this: the check for all
+                                // teams being selected only runs when a `TeamSelectedMessage`
+                                // arrives, so the coaches would otherwise sit and wait for a step
+                                // that had already happened.
+                                requestGameStartIfAllTeamsSelected()
+                            } else if (message.isHost) {
                                 hostState = P2PHostState.WAIT_FOR_CLIENT
                                 out.sendHostStateUpdate(hostState)
-                            } else {
-                                if (gameSettings.initialActions.isNotEmpty()) {
-                                    val serializedTeam = SerializedTeam.serialize(clientTeam!!)
-                                    val msg = ReceivedMessage(connection, TeamSelectedMessage(P2PTeamInfo(serializedTeam)))
-                                    incomingMessages.send(msg)
-                                } else {
+                                // A Client that arrived before the Host was left waiting rather than being asked to
+                                // pick a team (note, this should never happen in normal scenarios as the Host joins
+                                // immediately after starting the server, but it could happen if the URL is known
+                                // beforehand and the client is aggressively pushing a "join" button).
+                                // Either way, it can only pick once it can see which team the Host took.
+                                val joinedClient = this@GameSession.client
+                                if (joinedClient != null && joinedClient.team == null) {
                                     clientState = P2PClientState.SELECT_TEAM
                                     out.sendClientStateUpdate(clientState)
                                 }
+                            } else if (homeTeam != null) {
+                                clientState = P2PClientState.SELECT_TEAM
+                                out.sendClientStateUpdate(clientState)
+                            } else {
+                                // Otherwise the Host has not joined its own server yet. The game
+                                // exists as soon as the server is listening, so a Client can get
+                                // here first. Asking it to pick now would show a team list where
+                                // the Host's team is not marked as taken, so leave it waiting and
+                                // let the Host's own join send the update.
                             }
                         }
 
@@ -245,6 +244,76 @@ class GameSession(
         incomingMessages.send(ReceivedMessage(connection, command))
         mutex.await()
         return newClient!!
+    }
+
+    private fun createConnectedCoach(
+        message: JoinGameAsCoachMessage,
+        coach: Coach,
+        connection: JervisNetworkWebSocketConnection
+    ): JoinedP2PCoach {
+        return when (message.isHost) {
+            true -> {
+                // Message is from a Host
+                val homeTeam: Team? = when (gameSettings.initialActions.isNotEmpty()) {
+                    true -> hostTeam
+                    false -> {
+                        (message.team as P2PTeamInfo?)?.team?.let {
+                            SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                        }
+                    }
+                }
+                JoinedP2PHost(
+                    connection = connection,
+                    coach = coach,
+                    state = P2PHostState.JOIN_SERVER,
+                    team = homeTeam
+                )
+            }
+            false -> {
+                // Message is from a Client
+                val awayTeam: Team? = when (gameSettings.initialActions.isNotEmpty()) {
+                    true -> clientTeam
+                    false -> {
+                        (message.team as P2PTeamInfo?)?.team?.let {
+                            SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                        }
+                    }
+                }
+                JoinedP2PClient(
+                    connection = connection,
+                    coach = coach,
+                    state = P2PClientState.JOIN_SERVER,
+                    team = awayTeam
+                )
+            }
+        }
+    }
+
+    /**
+     * Ask both coaches to confirm the game, but only once both teams are known.
+     * This is the point where a game moves from [GameState.JOINING] to
+     * [GameState.STARTING], and it can be reached either by a coach selecting a
+     * team or by a coach joining with one already set.
+     */
+    suspend fun requestGameStartIfAllTeamsSelected() {
+        val home = homeTeam
+        val away = awayTeam
+        if (home == null || away == null) {
+            state = GameState.JOINING
+            return
+        }
+        state = GameState.STARTING
+        // Always Home (Host) first, away (Client) second.
+        out.sendStartingGameRequest(
+            gameId,
+            gameSettings.gameRules,
+            gameSettings.initialActions,
+            listOf(home, away),
+        )
+        hostState = P2PHostState.ACCEPT_GAME
+        clientState = P2PClientState.ACCEPT_GAME
+        out.sendHostStateUpdate(hostState)
+        out.sendClientStateUpdate(clientState)
     }
 
     suspend fun sendInternalMessage(connection: JervisNetworkWebSocketConnection?, message: InternalClientMessage) {

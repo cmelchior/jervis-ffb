@@ -3,6 +3,7 @@ package com.jervisffb.resources.bb2025
 import com.jervisffb.engine.bb2025.BB72025Rules
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
@@ -18,6 +19,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = AMAZON_TEAM_BB2025
             team = teamBuilder(rules, AMAZON_TEAM_BB2025) {
+                id = TeamId("jervis-amazon-bb7-boneheader-starter1-bb2025")
                 name = "Bonehead Starter #1"
                 type = GameType.BB7
                 addPlayer("Am1-bb7-1".playerId, "Citlali", 1.playerNo, AMAZON_BLITZER)
@@ -40,6 +42,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = AMAZON_TEAM_BB2025
             team = teamBuilder(rules, AMAZON_TEAM_BB2025) {
+                id = TeamId("jervis-amazon-bb7-boneheader-starter2-bb2025")
                 name = "Bonehead Starter #2"
                 type = GameType.BB7
                 addPlayer("Am2-bb7-1".playerId, "Citlali", 1.playerNo, AMAZON_THROWER)
@@ -61,6 +64,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = ELVEN_UNION_TEAM_BB2025
             team = teamBuilder(rules, ELVEN_UNION_TEAM_BB2025) {
+                id = TeamId("jervis-elven-union-bb7-boneheader-starter1-bb2025")
                 name = "Bonehead Starter #1"
                 type = GameType.BB7
                 addPlayer("E11-bb7-1".playerId, "Elandril Surehand", 1.playerNo, ELVEN_THROWER)
@@ -82,6 +86,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = ELVEN_UNION_TEAM_BB2025
             team = teamBuilder(rules, ELVEN_UNION_TEAM_BB2025) {
+                id = TeamId("jervis-elven-union-bb7-boneheader-starter2-bb2025")
                 name = "Bonehead Starter #2"
                 type = GameType.BB7
                 addPlayer("El2-bb7-1".playerId, "Aerendyl Swiftblade", 1.playerNo, ELVEN_BLITZER)
@@ -103,6 +108,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = CHAOS_DWARF_TEAM_BB2025
             team = teamBuilder(rules, CHAOS_DWARF_TEAM_BB2025) {
+                id = TeamId("jervis-chaos-dwarf-bb7-boneheader-starter1-bb2025")
                 name = "Bonehead Starter #1"
                 type = GameType.BB7
                 addPlayer("Cd1-bb7-1".playerId, "Zhorak Brasshoof", 1.playerNo, BULL_CENTAUR_BLITZERS)
@@ -125,6 +131,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = CHAOS_DWARF_TEAM_BB2025
             team = teamBuilder(rules, CHAOS_DWARF_TEAM_BB2025) {
+                id = TeamId("jervis-chaos-dwarf-bb7-boneheader-starter2-bb2025")
                 name = "Bonehead Starter #2"
                 type = GameType.BB7
                 addPlayer("Cd2-bb7-1".playerId, "Rakhul the Chained", 1.playerNo, ENSLAVED_MINOTAUR)
@@ -146,6 +153,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = DWARF_TEAM_BB2025
             team = teamBuilder(rules, DWARF_TEAM_BB2025) {
+                id = TeamId("jervis-dwarf-bb7-boneheader-starter1-bb2025")
                 name = "Bonehead Starter #1"
                 type = GameType.BB7
                 addPlayer("Dw1-bb7-1".playerId, "Skalf Doomseeker", 1.playerNo, TROLL_SLAYER)
@@ -167,6 +175,7 @@ object BB2025StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = DWARF_TEAM_BB2025
             team = teamBuilder(rules, DWARF_TEAM_BB2025) {
+                id = TeamId("jervis-dwarf-bb7-boneheader-starter2-bb2025")
                 name = "Bonehead Starter #2"
                 type = GameType.BB7
                 addPlayer("Dw2-bb7-1".playerId, "Skorri Fleetfoot", 1.playerNo, DWARF_RUNNER)

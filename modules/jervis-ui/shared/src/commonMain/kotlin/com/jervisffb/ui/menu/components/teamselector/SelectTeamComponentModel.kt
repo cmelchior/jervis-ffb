@@ -189,7 +189,11 @@ class SelectTeamComponentModel(
         }
     }
 
-    fun makeTeamUnavailable(team: TeamId) {
+    /**
+     * Mark [team] as already taken by the other coach, making it impossible to select. Pass `null`
+     * when the other coach no longer has a team, e.g. because they went back and changed it.
+     */
+    fun makeTeamUnavailable(team: TeamId?) {
         unavailableTeam.value = team
     }
 

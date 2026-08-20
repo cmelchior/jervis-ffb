@@ -3,6 +3,7 @@ package com.jervisffb.resources.bb2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
 import com.jervisffb.engine.serialization.buildTeamFile
@@ -20,6 +21,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = AMAZON_TEAM_BB2025
             team = teamBuilder(rules, AMAZON_TEAM_BB2025) {
+                id = TeamId("jervis-amazon-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Am1".playerId, "Xochitl", 1.playerNo, AMAZON_BLOCKER)
                 addPlayer("Am2".playerId, "Itzel", 2.playerNo, AMAZON_BLOCKER)
@@ -44,6 +46,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = HUMAN_TEAM_BB2025
             team = teamBuilder(rules, HUMAN_TEAM_BB2025) {
+                id = TeamId("jervis-human-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Hu1".playerId, "Gustav the Great", 1.playerNo, OGRE)
                 addPlayer("Hu2".playerId, "Heinrich von Toth", 2.playerNo, HUMAN_BLITZER)
@@ -69,6 +72,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = HIGH_ELF_TEAM_BB2025
             team = teamBuilder(rules, HIGH_ELF_TEAM_BB2025) {
+                id = TeamId("jervis-high-elf-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("He1".playerId, "Aethyrion Swiftflame", 1.playerNo, DRAGON_PRINCE)
                 addPlayer("He2".playerId, "Caledor Starcrest", 2.playerNo, DRAGON_PRINCE)
@@ -93,6 +97,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = LIZARDMEN_TEAM_BB2025
             team = teamBuilder(rules, LIZARDMEN_TEAM_BB2025) {
+                id = TeamId("jervis-lizardmen-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Li7".playerId, "Kroxigar", 1.playerNo, KROXIGOR)
                 addPlayer("Li1".playerId, "Tzunki", 2.playerNo, SAURUS_BLOCKERS)
@@ -117,6 +122,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = NURGLE_TEAM_BB2025
             team = teamBuilder(rules, NURGLE_TEAM_BB2025) {
+                id = TeamId("jervis-nurgle-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Nu1".playerId, "The Green Reaper", 1.playerNo, ROTSPAWN)
                 addPlayer("Nu2".playerId, "Filthius", 2.playerNo, ROTTER_LINEMEN)
@@ -140,6 +146,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = SKAVEN_TEAM_BB2025
             team = teamBuilder(rules, SKAVEN_TEAM_BB2025) {
+                id = TeamId("jervis-skaven-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Sk1".playerId, "Gnawdoom", 1.playerNo, RAT_OGRE)
                 addPlayer("Sk2".playerId, "Slink Sharpclaw", 2.playerNo, SKAVEN_BLITZER)
@@ -164,6 +171,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = KHORNE_TEAM_BB2025
             team = teamBuilder(rules, KHORNE_TEAM_BB2025) {
+                id = TeamId("jervis-khorne-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Kh1".playerId, "Gorefang", 1.playerNo, BLOODSPAWN)
                 addPlayer("Kh2".playerId, "Karnak", 2.playerNo, BLOODSEEKERS)
@@ -188,6 +196,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = DWARF_TEAM_BB2025
             team = teamBuilder(rules, DWARF_TEAM_BB2025) {
+                id = TeamId("jervis-dwarf-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Dw1".playerId, "Borin Stonefist", 1.playerNo, DWARF_BLITZER)
                 addPlayer("Dw2".playerId, "Grimnirsson", 2.playerNo, DWARF_BLITZER)
@@ -212,6 +221,7 @@ object BB2025StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = TOMB_KINGS_TEAM_BB2025
             team = teamBuilder(rules, TOMB_KINGS_TEAM_BB2025) {
+                id = TeamId("jervis-tomb-kings-starter-team-bb2025")
                 name = "FUMBBL Starter #1"
                 addPlayer("Tk1".playerId, "Khalida's Guard", 1.playerNo, TOMB_GUARDIANS)
                 addPlayer("Tk2".playerId, "Settra's Guard", 2.playerNo, TOMB_GUARDIANS)

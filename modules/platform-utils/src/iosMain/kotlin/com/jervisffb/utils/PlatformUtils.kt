@@ -15,15 +15,14 @@ public actual fun threadId(): ULong {
 
 public actual suspend fun getPublicIpAddress(): String? {
     try {
-        getHttpClient().use { client ->
-            val response = client.get("https://api.ipify.org")
-            return if (response.status.isSuccess()) {
-                response.body<String>()
-            } else {
-                null
-            }
+        // Do not close the HTTP Client as it is shared by the whole application
+        val response = getHttpClient().get("https://api.ipify.org")
+        return if (response.status.isSuccess()) {
+            response.body<String>()
+        } else {
+            null
         }
-    } catch (ex: Exception) {
+    } catch (_: Exception) {
         return null
     }
 }

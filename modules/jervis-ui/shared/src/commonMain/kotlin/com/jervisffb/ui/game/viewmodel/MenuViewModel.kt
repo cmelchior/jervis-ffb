@@ -101,6 +101,8 @@ enum class Feature(val settingsKey: String) {
 data class ErrorDialog(
     val visible: Boolean,
     val title: String,
+    // What to show in the body of the dialog. If not set, it falls back to the message of [error].
+    val message: String? = null,
     val error: Throwable? = null,
 )
 
@@ -198,10 +200,18 @@ class MenuViewModel {
         isAboutDialogVisible.value = visible
     }
 
-    fun showErrorDialog(message: String, error: Throwable? = null) {
+    /**
+     * Show an error to the user.
+     *
+     * Only pass [error] if the error is a bug worth reporting: doing so offers
+     * the user a "Report Issue" button. Expected failures should only pass
+     * a [message].
+     */
+    fun showErrorDialog(title: String, message: String? = null, error: Throwable? = null) {
         isErrorDialogVisible.value = ErrorDialog(
             visible = true,
-            title = message,
+            title = title,
+            message = message,
             error = error,
         )
     }

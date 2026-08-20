@@ -101,24 +101,26 @@ class NetworkFuzzTester {
             timers.timersEnabled = false
             build()
         }
-        val server = LightServer(
-            gameName = "test",
-            rules = rules,
-            hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeamBB2020(rules),
-            clientCoach = null,
-            clientTeam = null,
-            testMode = true,
-            random = random
-        )
-
-        // Start server and connections
+        // Start server and connections. Each game gets its own port.
         val gameId = "test".gameId
-        server.start()
+        val server = startServerOnFreePort { port ->
+            LightServer(
+                gameName = "test",
+                rules = rules,
+                hostCoach = CoachId("HomeCoachID"),
+                hostTeam = createDefaultHomeTeamBB2020(rules),
+                clientCoach = null,
+                clientTeam = null,
+                testMode = true,
+                random = random,
+                port = port,
+            )
+        }
+        val joinGameUrl = "ws://localhost:${server.port}/joinGame?id=test"
 
-        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl, "host")
         conn1.start()
-        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl, "client")
         conn2.start()
 
         // Run Join sequence, right up until starting the game

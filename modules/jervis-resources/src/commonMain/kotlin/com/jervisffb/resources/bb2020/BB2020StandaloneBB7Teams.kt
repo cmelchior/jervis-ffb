@@ -3,6 +3,7 @@ package com.jervisffb.resources.bb2020
 import com.jervisffb.engine.bb2020.BB72020Rules
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
@@ -18,6 +19,7 @@ object BB2020StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = AMAZON_TEAM_BB2020
             team = teamBuilder(rules, AMAZON_TEAM_BB2020) {
+                id = TeamId("jervis-amazon-bb7-starter-team-bb2020")
                 name = "Amazon Starter Team #1"
                 type = GameType.BB7
                 addPlayer(PlayerId("Am-bb7-1"), "Blitzer-1", PlayerNo(1), AMAZON_BLITZER)
@@ -40,6 +42,7 @@ object BB2020StandaloneBB7Teams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = ORC_TEAM_BB2020
             team = teamBuilder(rules, ORC_TEAM_BB2020) {
+                id = TeamId("jervis-orc-bb7-starter-team-bb2020")
                 name = "Orc Starter Team #1"
                 type = GameType.BB7
                 addPlayer(PlayerId("Orc-bb7-1"), "Blitzer-1", PlayerNo(1), ORC_BLITZER)

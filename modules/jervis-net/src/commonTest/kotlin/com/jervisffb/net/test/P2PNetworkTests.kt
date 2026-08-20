@@ -25,12 +25,14 @@ import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
 import com.jervisffb.net.messages.InvalidGameActionTypeServerError
+import com.jervisffb.net.messages.InvalidTeamServerError
 import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.OutOfOrderGameActionServerError
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
+import com.jervisffb.net.messages.ProtocolErrorServerError
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
@@ -52,6 +54,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
@@ -91,6 +94,155 @@ class P2PNetworkTests {
     }
 
     private fun joinGameUrl(gameId: String = "test"): String = "ws://localhost:$serverPort/joinGame?id=$gameId"
+
+    @Test
+    fun hostJoiningAClientThatAlreadyHasATeamStartsTheGame() = runP2PNetworkTest {
+        server.start()
+        val hostTeam = createDefaultHomeTeamBB2020(rules)
+        val clientTeam = lizardMenAwayTeam(rules)
+
+        // A Client can arrive with its team already set, it is part of the join message. If the
+        // Host then joins, both teams are known without a single `TeamSelectedMessage` being sent.
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "client")
+        conn2.start()
+        conn2.send(
+            JoinGameAsCoachMessage(
+                GameId("test"), "client", null, "client", CoachType.HUMAN, false, P2PTeamInfo(clientTeam),
+            )
+        )
+        consumeServerMessage<GameStateSyncMessage>(conn2)
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "host")
+        conn1.start()
+        conn1.send(
+            JoinGameAsCoachMessage(
+                GameId("test"), "host", null, "host", CoachType.HUMAN, true, P2PTeamInfo(hostTeam),
+            )
+        )
+        consumeServerMessage<GameStateSyncMessage>(conn1)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+
+        // The Host must not be parked in WAIT_FOR_CLIENT: there is nothing left to wait for, and
+        // only a `TeamSelectedMessage` used to trigger the check that spots it.
+        checkServerMessage<ConfirmGameStartMessage>(conn1) {
+            assertEquals("HomeTeam", it.teams[0].teamName)
+            assertEquals("AwayTeam", it.teams[1].teamName)
+        }
+        checkServerMessage<UpdateHostStateMessage>(conn1) {
+            assertEquals(P2PHostState.ACCEPT_GAME, it.state)
+        }
+
+        // The Client sees the Host arrive, then the same "game is ready" sequence.
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+        checkServerMessage<ConfirmGameStartMessage>(conn2) {
+            assertEquals("HomeTeam", it.teams[0].teamName)
+            assertEquals("AwayTeam", it.teams[1].teamName)
+        }
+        checkServerMessage<UpdateClientStateMessage>(conn2) {
+            assertEquals(P2PClientState.ACCEPT_GAME, it.state)
+        }
+
+        conn1.close()
+        conn2.close()
+        server.stop()
+    }
+
+    @Test
+    fun clientJoiningBeforeTheHostWaitsForTheHostTeam() = runP2PNetworkTest {
+        server.start()
+        val hostTeam = createDefaultHomeTeamBB2020(rules)
+
+        // The game exists from the moment the server is listening, so a Client can get in before
+        // the Host has joined its own server. That happens in practise when the Host restarts the
+        // server after rejecting a game.
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "client")
+        conn2.start()
+        conn2.send(
+            JoinGameAsCoachMessage(GameId("test"), "client", null, "client", CoachType.HUMAN, false)
+        )
+        checkServerMessage<GameStateSyncMessage>(conn2) {
+            assertNull(it.homeTeam, "No Host has joined yet, so there cannot be a home team")
+        }
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+
+        // The Client must not be sent to team selection here. Its team list would show the Host's
+        // team as available, and picking it produces a game the engine refuses to create.
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "host")
+        conn1.start()
+        conn1.send(
+            JoinGameAsCoachMessage(
+                GameId("test"), "host", null, "host", CoachType.HUMAN, true, P2PTeamInfo(hostTeam),
+            )
+        )
+
+        // Only once the Host is in, and its team is known, is the Client asked to pick.
+        checkServerMessage<CoachJoinedMessage>(conn2) {
+            assertEquals("host", it.coach.name)
+        }
+        checkServerMessage<TeamJoinedMessage>(conn2) {
+            assertTrue(it.isHomeTeam)
+            assertEquals(hostTeam.id, it.getTeam(rules).id)
+        }
+        checkServerMessage<UpdateClientStateMessage>(conn2) {
+            assertEquals(P2PClientState.SELECT_TEAM, it.state)
+        }
+
+        server.stop()
+    }
+
+    @Test
+    fun clientCannotSelectTheHostTeam() = runP2PNetworkTest {
+        server.start()
+        val hostTeam = createDefaultHomeTeamBB2020(rules)
+
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "host")
+        conn1.start()
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "client")
+        conn2.start()
+
+        conn1.send(
+            JoinGameAsCoachMessage(
+                GameId("test"), "host", null, "host", CoachType.HUMAN, true, P2PTeamInfo(hostTeam),
+            )
+        )
+        consumeServerMessage<GameStateSyncMessage>(conn1)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+
+        conn2.send(
+            JoinGameAsCoachMessage(
+                GameId("test"), "client", null, "client", CoachType.HUMAN, false,
+            )
+        )
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        // The Host's team is part of the state the Client syncs on join, which is what lets the
+        // Client mark it as unavailable in its team selector.
+        checkServerMessage<GameStateSyncMessage>(conn2) {
+            assertEquals(hostTeam.id, it.homeTeam?.id)
+        }
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // A Client that picks it anyway must be rejected. The engine cannot represent a team
+        // playing itself, so letting this through breaks at kick-off instead of here.
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(hostTeam)))
+        checkServerMessage<InvalidTeamServerError>(conn2) {
+            assertTrue(it.message.contains(hostTeam.name), "Unexpected error message: ${it.message}")
+        }
+
+        // The rejection must not have claimed the team, so a different one still works.
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
+        checkServerMessage<TeamJoinedMessage>(conn1) {
+            assertFalse(it.isHomeTeam)
+        }
+
+        server.stop()
+    }
 
     @Test
     fun startP2PGame() = runP2PNetworkTest {
@@ -200,6 +352,72 @@ class P2PNetworkTests {
 
     // Test for a Host starting a game, a Client joins, selects a team, regrets the choice
     // and then submit another team that gets accepted
+    @Test
+    fun hostAcceptsThenClientRejectsKeepsTheServerUsable() = runP2PNetworkTest {
+        server.start()
+
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "host")
+        conn1.start()
+        var conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "client")
+        conn2.start()
+        hostAndClientSelectTeams(conn1, conn2)
+
+        // The Host accepts first. The game cannot start until both have accepted, so the Host is
+        // left sitting on the loading screen with its server still very much in use.
+        conn1.send(AcceptGameMessage(true))
+        // The server stays quiet when only one coach has accepted, and messages from the two
+        // connections are not ordered against each other. Bounce a second accept off the server to
+        // establish that the first one has been handled before the Client rejects.
+        conn1.send(AcceptGameMessage(true))
+        checkServerMessage<ProtocolErrorServerError>(conn1) {
+            assertTrue(it.message.contains("already accepted"), "Unexpected error: ${it.message}")
+        }
+
+        // ... and then the Client rejects.
+        conn2.send(AcceptGameMessage(false))
+        conn2.awaitDisconnect().also {
+            assertEquals(JervisExitCode.GAME_NOT_ACCEPTED.code, it.code)
+        }
+        checkServerMessage<UpdateHostStateMessage>(conn1) {
+            assertEquals(P2PHostState.WAIT_FOR_CLIENT, it.state)
+        }
+        checkServerMessage<UpdateClientStateMessage>(conn2) {
+            assertEquals(P2PClientState.JOIN_SERVER, it.state)
+        }
+        conn2.close()
+        consumeServerMessage<CoachLeftMessage>(conn1)
+
+        // The Host is meant to go back to waiting for an opponent on the same server, so it has to
+        // still be running and still know about the Host's team.
+        conn2 = JervisClientWebSocketConnection(GameId("test"), joinGameUrl(), "client")
+        conn2.start()
+        conn2.send(
+            JoinGameAsCoachMessage(GameId("test"), "client", null, "client", CoachType.HUMAN, false)
+        )
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        checkServerMessage<GameStateSyncMessage>(conn2) {
+            assertNotNull(it.homeTeam, "Server forgot the Host team after the game was rejected")
+        }
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        checkServerMessage<UpdateClientStateMessage>(conn2) {
+            assertEquals(P2PClientState.SELECT_TEAM, it.state)
+        }
+
+        // And the new Client can take the game all the way to "Start Game" again.
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+        consumeServerMessage<ConfirmGameStartMessage>(conn1)
+        consumeServerMessage<ConfirmGameStartMessage>(conn2)
+        checkServerMessage<UpdateHostStateMessage>(conn1) {
+            assertEquals(P2PHostState.ACCEPT_GAME, it.state)
+        }
+
+        conn1.close()
+        conn2.close()
+        server.stop()
+    }
+
     @Test
     fun clientRejectsGame() = runP2PNetworkTest {
         // Start server

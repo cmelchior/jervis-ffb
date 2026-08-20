@@ -3,9 +3,7 @@ package com.jervisffb.net.handlers
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
-import com.jervisffb.net.messages.GameState
-import com.jervisffb.net.messages.P2PClientState
-import com.jervisffb.net.messages.P2PHostState
+import com.jervisffb.net.messages.InvalidTeamServerError
 import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.ProtocolErrorServerError
 import com.jervisffb.net.messages.TeamSelectedMessage
@@ -22,6 +20,19 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
             )
             return
         } else {
+            // The engine cannot represent a team playing against itself, and `Game.init` reports an
+            // invalid game state if it happens. Reject the selection here, so a Client whose team
+            // list is out of sync gets an error.
+            val teamTakenByOtherCoach = session.coaches
+                .filter { otherClient -> otherClient !== client }
+                .any { otherClient -> otherClient.team?.id == team.id }
+            if (teamTakenByOtherCoach) {
+                session.out.sendError(
+                    connection,
+                    InvalidTeamServerError("'${team.name}' has already been selected by the other coach.")
+                )
+                return
+            }
             // TODO This is a temp fix for getting the correct team refs. Should probably be done by serialization instead.
             client.team = SerializedTeam.deserialize(session.gameSettings.gameRules, team, client.coach)
 //            team.forEach { it.team = team }
@@ -34,21 +45,6 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
         session.out.sendTeamJoined(isHomeTeam, team, client.coach)
 
         // Check if all players have selected their teams, in that case continue with accepting the game
-        when (session.coaches.count { it.team != null}) {
-            0, 1 -> session.state = GameState.JOINING
-            2 -> {
-                session.state = GameState.STARTING
-                session.out.sendStartingGameRequest(
-                    session.gameId,
-                    session.gameSettings.gameRules,
-                    session.gameSettings.initialActions,
-                    session.coaches.map { it.team!! }
-                )
-                session.hostState = P2PHostState.ACCEPT_GAME
-                session.clientState = P2PClientState.ACCEPT_GAME
-                session.out.sendHostStateUpdate(session.hostState)
-                session.out.sendClientStateUpdate(session.clientState)
-            }
-        }
+        session.requestGameStartIfAllTeamsSelected()
     }
 }

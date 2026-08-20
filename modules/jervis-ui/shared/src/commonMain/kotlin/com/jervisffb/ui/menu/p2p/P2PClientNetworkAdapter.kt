@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.SerializedTeam
+import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.GameStateSyncMessage
@@ -28,7 +29,9 @@ import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -57,6 +60,15 @@ class P2PClientNetworkAdapter(
 
     val connectionState: StateFlow<ConnectionState>
         field = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
+
+    /**
+     * Errors the server rejected a request with, that the coach needs to be told about. These are
+     * one-off events rather than state, so they are only delivered to whoever is collecting when
+     * they happen. Errors tied to game actions are not reported here, they are handled where the
+     * action was made.
+     */
+    val serverErrors: SharedFlow<ServerError>
+        field = MutableSharedFlow<ServerError>(extraBufferCapacity = 8)
 
     val networkManager: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
 
@@ -91,7 +103,7 @@ class P2PClientNetworkAdapter(
         handler: ClientNetworkMessageHandler,) {
         this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
-        networkManager.addMessageHandler(handler)
+        networkManager.setConnectionHandler(handler)
         networkManager.connectAndJoinGame(gameUrl, gameId, coachName, coachType, isHost = (teamIfHost != null), teamIfHost)
         // TODO How to update state when handler is coming from the outside?
     }
@@ -121,7 +133,7 @@ class P2PClientNetworkAdapter(
 
     suspend fun disconnect(handler: AbstractClintNetworkMessageHandler) {
         updateClientState(P2PClientState.JOIN_SERVER)
-        networkManager.addMessageHandler(handler)
+        networkManager.setConnectionHandler(handler)
         networkManager.disconnect()
     }
 
@@ -167,6 +179,16 @@ class P2PClientNetworkAdapter(
         // Network state
         override fun onConnected() {
             LOG.d { "onConnected" }
+            // A new connection means a new game session, possibly against a server that was
+            // restarted while we were away. Everything below is re-sent by the game sync, and
+            // keeping the old values around means a rejoin looks identical to the previous
+            // session: `MutableStateFlow` conflates equal values, so collectors would never see
+            // the state arrive again, and `onCoachJoined` would drop the coaches as duplicates.
+            homeCoach.value = null
+            awayCoach.value = null
+            homeTeam.value = null
+            awayTeam.value = null
+            spectators.clear()
             connectionState.value = Connected
         }
         override fun onConnecting() {
@@ -190,15 +212,15 @@ class P2PClientNetworkAdapter(
         }
 
         override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
-            if (homeCoach.value == null || awayCoach.value == null) {
-                if (isHomeCoach) {
-                    homeCoach.value = coach
-                } else {
-                    awayCoach.value = coach
-                }
-            } else {
-                LOG.w { "Received onCoachJoined event, but two coaches already joined. Ignoring message" }
+            // Fill the slot the server told us about. The previous version only accepted a coach
+            // while either slot was still empty, which silently dropped the message whenever both
+            // were already filled, e.g. by a stale session.
+            val slot = if (isHomeCoach) homeCoach else awayCoach
+            val current = slot.value
+            if (current != null && current.id != coach.id) {
+                LOG.w { "Replacing already joined coach '${current.name}' with '${coach.name}'" }
             }
+            slot.value = coach
         }
 
         override fun onCoachLeft(coach: Coach) {
@@ -267,8 +289,10 @@ class P2PClientNetworkAdapter(
                 is ProtocolErrorServerError,
                 is ReadMessageServerError,
                 is UnknownServerError -> {
-                    // We need to figure out how to handle these.
                     LOG.e { "Received onServerError event [${error.errorCode}]: ${error.message}" }
+                    // The server refused something we asked for. Nothing further happens on the
+                    // connection, so unless this is surfaced the UI just looks stuck.
+                    serverErrors.safeTryEmit(error)
                 }
                 is OutOfOrderGameActionServerError,
                 is InvalidGameActionOwnerServerError,

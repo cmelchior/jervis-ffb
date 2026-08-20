@@ -28,14 +28,15 @@ import com.jervisffb.ui.menu.components.JervisDialog
 fun ErrorDialogComponent(viewModel: MenuViewModel) {
     val dialogData: ErrorDialog by viewModel.isErrorDialogVisible.collectAsState()
     if (!dialogData.visible) return
+    val message = dialogData.message ?: dialogData.error?.message ?: "An unknown error has occurred."
     ErrorDialog(
         title = dialogData.title,
-        message = dialogData.error?.message ?: "An unknown error has occurred.",
+        message = message,
         showReportIssue = (dialogData.error != null),
         onReportIssueRequest = {
             viewModel.showReportIssueDialog(
                 title = dialogData.title,
-                body = dialogData.error?.message ?: "An unknown error has occurred.",
+                body = message,
                 error = dialogData.error
             )
         },

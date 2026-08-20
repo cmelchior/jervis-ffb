@@ -99,6 +99,7 @@ class P2PHostScreen(private val menuViewModel: MenuViewModel, private val viewMo
 @Composable
 fun PageContent(viewModel: P2PHostScreenModel) {
     val currentPage by viewModel.currentPage.collectAsState()
+    val serverShuttingDown by viewModel.isServerShuttingDown.collectAsState()
     val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
     // Animate going to a new page
@@ -122,7 +123,8 @@ fun PageContent(viewModel: P2PHostScreenModel) {
                     viewModel.networkAdapter.awayTeam,
                     onAcceptGame = { acceptedGame ->
                         viewModel.userAcceptGame(acceptedGame)
-                    }
+                    },
+                    serverShuttingDown = serverShuttingDown,
                 )
             }
         }

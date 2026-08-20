@@ -3,6 +3,7 @@ package com.jervisffb.resources.bb2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
 import com.jervisffb.engine.serialization.buildTeamFile
@@ -17,6 +18,7 @@ object BB2020StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = HUMAN_TEAM_BB2020
             team = teamBuilder(rules, HUMAN_TEAM_BB2020) {
+                id = TeamId("jervis-human-starter-team-bb2020")
                 name = "Human Starter Team #1"
                 addPlayer(PlayerId("Hu1"), "Ogre-1", PlayerNo(1), OGRE)
                 addPlayer(PlayerId("Hu2"), "Blitzer-2", PlayerNo(2), HUMAN_BLITZER)
@@ -41,6 +43,7 @@ object BB2020StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = LIZARDMEN_TEAM_BB2020
             team = teamBuilder(rules, LIZARDMEN_TEAM_BB2020) {
+                id = TeamId("jervis-lizardmen-starter-team-bb2020")
                 name = "Lizardmen Starter Team #1"
                 addPlayer(PlayerId("Li1"), "Skink-1", PlayerNo(1), SKINK_RUNNER_LINEMEN)
                 addPlayer(PlayerId("Li2"), "Skink-2", PlayerNo(2), SKINK_RUNNER_LINEMEN)
@@ -65,6 +68,7 @@ object BB2020StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = SKAVEN_TEAM_BB2020
             team = teamBuilder(rules, SKAVEN_TEAM_BB2020) {
+                id = TeamId("jervis-skaven-starter-team-bb2020")
                 name = "Skaven Starter Team #1"
                 addPlayer(PlayerId("Sk1"), "Blitzer-1", PlayerNo(1), SKAVEN_BLITZER)
                 addPlayer(PlayerId("Sk2"), "Blitzer-2", PlayerNo(2), SKAVEN_BLITZER)
@@ -89,6 +93,7 @@ object BB2020StandaloneStandardTeams {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = KHORNE_TEAM_BB2020
             team = teamBuilder(rules, KHORNE_TEAM_BB2020) {
+                id = TeamId("jervis-khorne-starter-team-bb2020")
                 name = "Khorne Starter Team #1"
                 addPlayer(PlayerId("Kh1"), "Lineman-1", PlayerNo(1), BLOODBORN_MARAUDER_LINEMEN)
                 addPlayer(PlayerId("Kh2"), "Lineman-2", PlayerNo(2), BLOODBORN_MARAUDER_LINEMEN)
