@@ -32,6 +32,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val view
     @Composable
     override fun Content() {
         val sidebarEntries = viewModel.sidebarEntries
+        val reconnecting by viewModel.networkAdapter.reconnecting.collectAsState()
         LifecycleEffectOnce {
             onDispose {
                 viewModel.onDispose()
@@ -79,6 +80,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val view
 @Composable
 private fun PageContent(viewModel: P2PClientScreenModel) {
     val currentPage by viewModel.currentPage.collectAsState()
+    val reconnecting by viewModel.networkAdapter.reconnecting.collectAsState()
     val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
     // Animate going to a new page
@@ -112,7 +114,8 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
                     viewModel.networkAdapter.awayTeam,
                     onAcceptGame = { acceptedGame ->
                         viewModel.userAcceptGame(acceptedGame)
-                    }
+                    },
+                    reconnecting = reconnecting,
                 )
                 else -> error("Invalid page index: $page")
             }

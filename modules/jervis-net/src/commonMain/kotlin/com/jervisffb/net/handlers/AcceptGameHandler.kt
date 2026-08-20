@@ -23,12 +23,27 @@ class AcceptGameHandler(override val session: GameSession) : ClientMessageHandle
             // If accepted, start the game for real
             if (message.startGame) {
                 joinedClient.hasAcceptedGame = true
+                if (session.game != null) {
+                    // Refresh the replay in case the Host advanced while the reconnecting
+                    // Client was deciding whether to continue.
+                    session.out.sendStartingGameRequest(
+                        session.gameId,
+                        session.gameSettings.gameRules,
+                        session.replayActions(),
+                        listOfNotNull(session.homeTeam, session.awayTeam),
+                    )
+                }
                 if (session.isReadyToStart()) {
+                    val reconnecting = session.game != null
                     session.startGame()
                     session.out.sendGameReady(session.gameId)
-                    session.hostState = P2PHostState.RUN_GAME
+                    if (!reconnecting) {
+                        session.hostState = P2PHostState.RUN_GAME
+                    }
                     session.clientState = P2PClientState.RUN_GAME
-                    session.out.sendHostStateUpdate(session.hostState)
+                    if (!reconnecting) {
+                        session.out.sendHostStateUpdate(session.hostState)
+                    }
                     session.out.sendClientStateUpdate(session.clientState)
                 }
             } else {
@@ -43,14 +58,23 @@ class AcceptGameHandler(override val session: GameSession) : ClientMessageHandle
 
                 // But we also need to reset accepted state for everyone. Mostly for the Host in case
                 // they reuse the session for another Client.
-                session.coaches.forEach { coach -> coach.hasAcceptedGame = false}
+                if (session.game == null) {
+                    session.coaches.forEach { coach -> coach.hasAcceptedGame = false }
+                } else {
+                    // The Host is still part of the running game. Only the temporary
+                    // reconnecting Client is being removed from the acceptance flow.
+                    session.state = GameState.ACTIVE
+                    joinedClient.hasAcceptedGame = false
+                }
                 when (joinedClient) {
                     is JoinedP2PClient -> {
-                        session.state = GameState.JOINING
-                        session.hostState = P2PHostState.WAIT_FOR_CLIENT
-                        session.out.sendHostStateUpdate(session.hostState, "${joinedClient.coach.name} did not accept the game.")
-                        session.clientState = P2PClientState.JOIN_SERVER
-                        session.out.sendClientStateUpdate(session.clientState, "${joinedClient.coach.name} did not accept the game.")
+                        if (session.game == null) {
+                            session.state = GameState.JOINING
+                            session.hostState = P2PHostState.WAIT_FOR_CLIENT
+                            session.out.sendHostStateUpdate(session.hostState, "${joinedClient.coach.name} did not accept the game.")
+                            session.clientState = P2PClientState.JOIN_SERVER
+                            session.out.sendClientStateUpdate(session.clientState, "${joinedClient.coach.name} did not accept the game.")
+                        }
                         joinedClient.disconnect(JervisExitCode.GAME_NOT_ACCEPTED, "Game '${session.gameId.value}' was rejected by ${joinedClient.coach.name}.")
                     }
                     is JoinedP2PHost -> {

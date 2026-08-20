@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.serialization.JervisSerialization
+import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
@@ -24,13 +25,14 @@ import com.jervisffb.ui.utils.saveFile
 fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit) {
     val navigator = LocalNavigator.currentOrThrow
     val isHotseat = viewModel.uiState.uiMode == TeamActionMode.ALL_TEAMS
-    val isHost = viewModel.uiState.uiMode == TeamActionMode.HOME_TEAM
+    val isHost = viewModel.uiState.clientType == UiGameClientType.P2P_HOST
+    val isClient = viewModel.uiState.clientType == UiGameClientType.P2P_CLIENT
     val isDone = viewModel.uiState.gameController.stack.isEmpty()
     val dialogText = when {
-        isHotseat && isDone -> "Game is over. It is safe to exit the game."
-        isHotseat && !isDone -> "Game is not over. If you exit the game before saving it, all progress is lost. Are you sure you want to exit?"
-        isHost && isDone -> "Game is over. It is safe to exit the game."
-        !isHost && isDone -> "Game is over. It is safe to exit the game."
+        isDone -> "Game is over. It is safe to exit the game."
+        isHost -> "You, as the Host, are leaving a game in progress. The game server will be closed. Save it to be able to resume."
+        isClient -> "You are leaving a game in progress. You can rejoin as long as the Host keeps the game running."
+        isHotseat -> "You are leaving a game in progress. If you exit the game before saving it, all progress is lost. Are you sure you want to exit?"
         else -> "Game is not over. Are you sure you want to exit?"
     }
     JervisDialog(
@@ -75,6 +77,10 @@ fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> 
                 onClick = {
                     viewModel.onDispose()
                     navigator.pop()
+                    // When exiting a P2P game, go all the way back to the Standalone Menu screen.
+                    if (isClient || isHost) {
+                        navigator.pop()
+                    }
                 },
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor

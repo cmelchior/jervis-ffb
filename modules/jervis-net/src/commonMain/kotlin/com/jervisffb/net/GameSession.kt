@@ -2,8 +2,11 @@
 
 package com.jervisffb.net
 
+import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
+import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
@@ -270,12 +273,22 @@ class GameSession(
                 )
             }
             false -> {
-                // Message is from a Client
+                // Message is from a Client.
+                // TODO Is the below priority list correct? It feels dangerous to potentially ignore a team being sent as part of the connection message.
+                // 1. If the game was loaded from a save file, the team in the file is used.
+                // 2. Otherwise, use any already configured team.
+                // 3. Last, use the team sent as part of the connection message.
                 val awayTeam: Team? = when (gameSettings.initialActions.isNotEmpty()) {
                     true -> clientTeam
                     false -> {
-                        (message.team as P2PTeamInfo?)?.team?.let {
-                            SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                        val awayTeam = game?.state?.awayTeam
+                        when (awayTeam != null) {
+                            true -> awayTeam.also { it.coach = coach }
+                            false -> {
+                                (message.team as P2PTeamInfo?)?.team?.let {
+                                    SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                                }
+                            }
                         }
                     }
                 }
@@ -302,17 +315,20 @@ class GameSession(
             state = GameState.JOINING
             return
         }
+        val reconnecting = game != null
         state = GameState.STARTING
         // Always Home (Host) first, away (Client) second.
         out.sendStartingGameRequest(
             gameId,
             gameSettings.gameRules,
-            gameSettings.initialActions,
+            replayActions(),
             listOf(home, away),
         )
-        hostState = P2PHostState.ACCEPT_GAME
+        if (!reconnecting) {
+            hostState = P2PHostState.ACCEPT_GAME
+            out.sendHostStateUpdate(hostState)
+        }
         clientState = P2PClientState.ACCEPT_GAME
-        out.sendHostStateUpdate(hostState)
         out.sendClientStateUpdate(clientState)
     }
 
@@ -408,6 +424,18 @@ class GameSession(
         return coaches.size == 2 && coaches.all { it.hasAcceptedGame }
     }
 
+    fun replayActions(): List<GameAction> = game?.history
+        ?.map { it.toReplayAction() }
+        ?: gameSettings.initialActions
+
+    // A Game Delta with multiple actions was always received as a composite game action
+    // For action ids to match, we need to turn it back into on before sending sync messages
+    // between clients.
+    private fun GameDelta.toReplayAction(): GameAction = when (steps.size) {
+        1 -> steps.single().action
+        else -> CompositeGameAction(steps.map { it.action })
+    }
+
     private fun startSession() {
         gameEventScope.launch {
             state = GameState.JOINING
@@ -429,9 +457,7 @@ class GameSession(
         if (state != GameState.STARTING) {
             throw IllegalStateException("Wrong game state: $state")
         }
-        if (game != null) {
-            throw IllegalStateException("Game is already running.")
-        }
+        if (game != null) return
         state = GameState.ACTIVE
         val rules = gameSettings.gameRules
         game = GameEngineController(

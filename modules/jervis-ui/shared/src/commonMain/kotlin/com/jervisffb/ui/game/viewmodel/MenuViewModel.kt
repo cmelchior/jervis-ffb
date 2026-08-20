@@ -104,6 +104,10 @@ data class ErrorDialog(
     // What to show in the body of the dialog. If not set, it falls back to the message of [error].
     val message: String? = null,
     val error: Throwable? = null,
+    val onDismiss: (() -> Unit)? = null,
+    val dismissButtonText: String = "Close",
+    val secondaryAction: (() -> Unit)? = null,
+    val secondaryButtonText: String = "Save Game",
 )
 
 data class ReportIssueDialogData(
@@ -207,12 +211,24 @@ class MenuViewModel {
      * the user a "Report Issue" button. Expected failures should only pass
      * a [message].
      */
-    fun showErrorDialog(title: String, message: String? = null, error: Throwable? = null) {
+    fun showErrorDialog(
+        title: String,
+        message: String? = null,
+        error: Throwable? = null,
+        onDismiss: (() -> Unit)? = null,
+        dismissButtonText: String = "Close",
+        secondaryAction: (() -> Unit)? = null,
+        secondaryButtonText: String = "",
+    ) {
         isErrorDialogVisible.value = ErrorDialog(
             visible = true,
             title = title,
             message = message,
             error = error,
+            onDismiss = onDismiss,
+            dismissButtonText = dismissButtonText,
+            secondaryAction = secondaryAction,
+            secondaryButtonText = secondaryButtonText,
         )
     }
 

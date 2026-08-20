@@ -82,6 +82,7 @@ class P2PClientNetworkAdapter(
     val awayCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val homeTeam: MutableStateFlow<ModelRef<Team>?> = MutableStateFlow(null)
     val awayTeam: MutableStateFlow<ModelRef<Team>?> = MutableStateFlow(null)
+    val reconnecting = MutableStateFlow(false)
     val spectators = mutableListOf<Spectator>()
 
     init {
@@ -188,6 +189,7 @@ class P2PClientNetworkAdapter(
             awayCoach.value = null
             homeTeam.value = null
             awayTeam.value = null
+            reconnecting.value = false
             spectators.clear()
             connectionState.value = Connected
         }
@@ -267,6 +269,7 @@ class P2PClientNetworkAdapter(
                 ModelRef(team.id, team)
             }
             clientState.value = message.clientState
+            reconnecting.value = message.reconnecting
         }
 
         override fun updateClientState(state: P2PClientState) {

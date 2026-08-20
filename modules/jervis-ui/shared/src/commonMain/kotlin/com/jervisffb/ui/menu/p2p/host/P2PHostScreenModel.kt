@@ -79,6 +79,8 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     // Page 1: Setup Game
     val setupGameModel = SetupGameScreenModel(menuViewModel, this)
     var saveGameData: GameFileData? = null
+    val isContinuingGame: Boolean
+        get() = (saveGameData != null)
     var rules: Rules? = null
 
     // Page 2: Select team
@@ -118,6 +120,20 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         menuViewModel.navigatorContext.launch {
             networkAdapter.hostState.collect { newState ->
                 workflow.handleHostStateChange(newState)
+            }
+        }
+        menuViewModel.backgroundContext.launch {
+            networkAdapter.awayCoach.collect { coach ->
+                when (coach == null) {
+                    true -> gameViewModel?.markTeamDisconnected(TeamActionMode.AWAY_TEAM)
+                    false -> {
+                        // For P2P games, a reconnecting Client receives a new CoachId.
+                        // So for the Host to be able to correctly identify actions from
+                        // the new client, we need to update the away team coach reference.
+                        gameViewModel?.awayTeam?.coach = coach
+                        gameViewModel?.markTeamConnected(TeamActionMode.AWAY_TEAM)
+                    }
+                }
             }
         }
     }

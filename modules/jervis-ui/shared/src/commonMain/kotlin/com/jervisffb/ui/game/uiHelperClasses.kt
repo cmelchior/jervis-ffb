@@ -40,6 +40,7 @@ data class UiTeamInfoUpdate(
     val id: TeamId,
     val coachName: String,
     val teamName: String,
+    val isDisconnected: Boolean,
     val turn: Int,
     val score: Int,
     val rerolls: PersistentList<UiReroll>,
@@ -49,6 +50,7 @@ data class UiTeamInfoUpdate(
         id = team.id,
         coachName = team.coach.name,
         teamName = team.name,
+        isDisconnected = false,
         turn = team.turnMarker,
         score = if (team.isHomeTeam()) team.game.homeScore else team.game.awayScore,
         rerolls = persistentListOf(),
@@ -57,7 +59,7 @@ data class UiTeamInfoUpdate(
 
     companion object {
         val INITIAL = UiTeamInfoUpdate(
-            TeamId(""), "", "", 0, 0, persistentListOf(), persistentListOf()
+            TeamId(""), "", "", false, 0, 0, persistentListOf(), persistentListOf()
         )
     }
 }

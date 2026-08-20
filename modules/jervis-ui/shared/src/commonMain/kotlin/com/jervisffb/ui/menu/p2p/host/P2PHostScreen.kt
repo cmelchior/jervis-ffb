@@ -124,6 +124,7 @@ fun PageContent(viewModel: P2PHostScreenModel) {
                     onAcceptGame = { acceptedGame ->
                         viewModel.userAcceptGame(acceptedGame)
                     },
+                    reconnecting = viewModel.isContinuingGame,
                     serverShuttingDown = serverShuttingDown,
                 )
             }

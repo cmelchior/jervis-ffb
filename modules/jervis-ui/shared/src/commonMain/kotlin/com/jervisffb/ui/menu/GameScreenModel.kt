@@ -137,6 +137,8 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
+    private val disconnectedTeam = MutableStateFlow<TeamActionMode?>(null)
+
     private val focusProvider: UiFocusProvider? = when (val gameMode = mode) {
         is ChallengeGame -> UiFocusProvider { state ->
             val goal = gameMode.challenge.goal as? BlockGoal
@@ -214,6 +216,23 @@ class GameScreenModel(
         actions,
         focusProvider,
     )
+
+    fun markTeamDisconnected(team: TeamActionMode) {
+        disconnectedTeam.value = team
+    }
+
+    fun markTeamConnected(team: TeamActionMode) {
+        if (disconnectedTeam.value == team) {
+            disconnectedTeam.value = null
+        }
+    }
+
+    val isHomeTeamDisconnected: StateFlow<Boolean> = disconnectedTeam
+        .map { it == TeamActionMode.HOME_TEAM }
+        .stateIn(modelScope, SharingStarted.Eagerly, false)
+    val isAwayTeamDisconnected: StateFlow<Boolean> = disconnectedTeam
+        .map { it == TeamActionMode.AWAY_TEAM }
+        .stateIn(modelScope, SharingStarted.Eagerly, false)
     val pitchBackground: Flow<PitchDetails> = uiState.uiStateFlow.map { uiSnapshot ->
         val weather = uiSnapshot.weather
         when (weather) {

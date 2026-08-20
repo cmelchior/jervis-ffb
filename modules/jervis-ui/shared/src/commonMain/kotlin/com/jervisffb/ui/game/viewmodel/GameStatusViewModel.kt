@@ -6,6 +6,7 @@ import com.jervisffb.ui.game.UiTeamInfoUpdate
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 /**
@@ -22,14 +23,20 @@ class GameStatusViewModel(
     }
 
     fun homeTeamInfoFlow(): Flow<UiTeamInfoUpdate> {
-        return controller.uiStateFlow.map { uiSnapshot ->
-            uiSnapshot.homeTeamInfo
+        return controller.uiStateFlow.combine(screenModel.isHomeTeamDisconnected) { uiSnapshot, disconnected ->
+            uiSnapshot.homeTeamInfo.copy(
+                coachName = if (disconnected) "Disconnected" else uiSnapshot.homeTeamInfo.coachName,
+                isDisconnected = disconnected,
+            )
         }
     }
 
     fun awayTeamInfoFlow(): Flow<UiTeamInfoUpdate> {
-        return controller.uiStateFlow.map { uiSnapshot ->
-            uiSnapshot.awayTeamInfo
+        return controller.uiStateFlow.combine(screenModel.isAwayTeamDisconnected) { uiSnapshot, disconnected ->
+            uiSnapshot.awayTeamInfo.copy(
+                coachName = if (disconnected) "Disconnected" else uiSnapshot.awayTeamInfo.coachName,
+                isDisconnected = disconnected,
+            )
         }
     }
 

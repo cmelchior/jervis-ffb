@@ -122,6 +122,7 @@ data class GameStateSyncMessage(
     val spectatorState: SpectatorState = SpectatorState.START,
     val homeTeam: SerializedTeam?,
     val awayTeam: SerializedTeam?,
+    val reconnecting: Boolean = false,
     // Chat history,
     // Action history,
 ): ServerMessage

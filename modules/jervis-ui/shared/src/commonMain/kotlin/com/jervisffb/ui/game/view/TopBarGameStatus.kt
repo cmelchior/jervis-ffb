@@ -658,7 +658,9 @@ private fun TeamBadge(
     val backgroundShape = ParallelogramShape(if (leftSide) -10f else 10f)
     val textPadding = 60.jdp
     Column(
-        modifier = Modifier.height(teamLogoSize + inducementIconTopPadding + inducementIconSize + logoTopPadding),
+        modifier = Modifier
+            .alpha(if (teamInfo.isDisconnected) 0.5f else 1f)
+            .height(teamLogoSize + inducementIconTopPadding + inducementIconSize + logoTopPadding),
         horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
         verticalArrangement = Arrangement.Center,
     ) {

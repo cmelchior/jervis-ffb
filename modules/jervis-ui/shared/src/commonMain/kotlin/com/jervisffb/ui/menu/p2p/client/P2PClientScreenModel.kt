@@ -81,6 +81,7 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
     val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
 
     private var gameViewModel: GameScreenModel? = null
+    private var serverStoppedHandled = false
 
     /** Sidebar states captured when "Start Game" locked the steps behind it, see [lockCompletedSteps]. */
     private var stateBeforeLockingSteps: List<SidebarEntryState>? = null
@@ -151,8 +152,25 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
                     Connecting ->  { /* Do nothing */ }
                     is Disconnected -> {
                         // Server was closed by the Host
-                        // Error messages will be handled by the JoinHostScreenModel
-                        if (it.reason.code == JervisExitCode.SERVER_CLOSING.code || it.reason.code == JervisExitCode.GAME_NOT_ACCEPTED.code) {
+                        if (it.reason.code == JervisExitCode.SERVER_CLOSING.code && gameViewModel != null && !serverStoppedHandled) {
+                            serverStoppedHandled = true
+                            gameViewModel?.markTeamDisconnected(TeamActionMode.HOME_TEAM)
+                            menuViewModel.showErrorDialog(
+                                title = "Server stopped",
+                                message = "The Server has stopped and the game will exit.",
+                                onDismiss = {
+                                    menuViewModel.hideErrorDialog()
+                                    gameViewModel?.onDispose()
+                                    menuViewModel.navigatorContext.launch {
+                                        navigator.pop()
+                                        navigator.pop()
+                                    }
+                                },
+                                dismissButtonText = "Ok",
+                                secondaryAction = { menuViewModel.showSaveGameDialog() },
+                                secondaryButtonText = "Save Game"
+                            )
+                        } else if (it.reason.code == JervisExitCode.SERVER_CLOSING.code || it.reason.code == JervisExitCode.GAME_NOT_ACCEPTED.code) {
                             resetSelectedTeam()
                             workflow.handleClientStateChange(P2PClientState.JOIN_SERVER)
                         }
@@ -344,7 +362,11 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
     // Called when either pressing "Join" or "Continue" from the "Join Host" screen.
     fun userJoinOrContinue() {
         if (networkAdapter.connectionState.value == Connected) {
-            if (selectedTeam.value != null) {
+            if (networkAdapter.clientState.value == P2PClientState.ACCEPT_GAME ||
+                networkAdapter.clientState.value == P2PClientState.RUN_GAME
+            ) {
+                workflow.handleClientStateChange(P2PClientState.ACCEPT_GAME)
+            } else if (selectedTeam.value != null) {
                 workflow.handleClientStateChange(P2PClientState.ACCEPT_GAME)
             } else if (networkAdapter.homeTeam.value != null) {
                 workflow.handleClientStateChange(P2PClientState.SELECT_TEAM)

@@ -29,6 +29,7 @@ fun StartP2PGamePage(
     homeTeam: Flow<ModelRef<Team>?>,
     awayTeam: Flow<ModelRef<Team>?>,
     onAcceptGame: (Boolean) -> Unit,
+    reconnecting: Boolean = false,
     // Only ever `true` for the Host. Rejecting the game shuts the server down, which takes a moment
     // and keeps this page visible while it happens, so explain the delay and stop taking input.
     serverShuttingDown: Boolean = false,
@@ -52,9 +53,12 @@ fun StartP2PGamePage(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                JervisButton("Reject Game", onClick = { onAcceptGame(false) })
+                JervisButton(
+                    if (reconnecting) "Cancel" else "Reject Game",
+                    onClick = { onAcceptGame(false) },
+                )
                 Spacer(modifier = Modifier.width(16.dp))
-                JervisButton("Start Game", onClick = { onAcceptGame(true) })
+                JervisButton(if (reconnecting) "Continue Game" else "Start Game", onClick = { onAcceptGame(true) })
             }
         }
     }

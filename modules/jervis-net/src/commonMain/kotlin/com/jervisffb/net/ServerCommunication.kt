@@ -78,14 +78,19 @@ class ServerCommunication(
 
     suspend fun sendGameStateSync(client: JoinedClient, session: GameSession) {
         val msg = GameStateSyncMessage(
-            session.gameSettings.gameRules,
-            session.coaches.map { it.coach },
-            session.spectators.map { it.spectator },
-            session.hostState,
-            session.clientState,
-            session.spectatorState,
-            session.homeTeam?.let { SerializedTeam.serialize(it) },
-            session.awayTeam?.let { SerializedTeam.serialize(it) },
+            rules = session.gameSettings.gameRules,
+            coaches = session.coaches.map { it.coach },
+            spectators = session.spectators.map { it.spectator },
+            hostState = session.hostState,
+            // A Client continuing a saved or active game must accept the replay before it is
+            // allowed into the running game. The reconnecting connection is not part of
+            // `coaches` yet when this sync is sent.
+            clientState = if (session.game != null) P2PClientState.ACCEPT_GAME else session.clientState,
+            spectatorState = session.spectatorState,
+            homeTeam = session.homeTeam?.let { SerializedTeam.serialize(it) },
+            awayTeam = session.awayTeam?.let { SerializedTeam.serialize(it) },
+            // We also treat games being started from a saved game as "reconnecting"
+            reconnecting = (session.game != null || session.gameSettings.initialActions.isNotEmpty()),
         )
         sendToConnection(client.connection, msg)
     }

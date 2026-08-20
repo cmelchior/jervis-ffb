@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.components.error
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ fun ErrorDialogComponent(viewModel: MenuViewModel) {
     val dialogData: ErrorDialog by viewModel.isErrorDialogVisible.collectAsState()
     if (!dialogData.visible) return
     val message = dialogData.message ?: dialogData.error?.message ?: "An unknown error has occurred."
+    val dismiss = dialogData.onDismiss ?: { viewModel.hideErrorDialog() }
     ErrorDialog(
         title = dialogData.title,
         message = message,
@@ -40,9 +42,11 @@ fun ErrorDialogComponent(viewModel: MenuViewModel) {
                 error = dialogData.error
             )
         },
-        onDismissRequest = {
-            viewModel.hideErrorDialog()
-        }
+        onDismissRequest = dismiss,
+        onDialogDismissRequest = if (dialogData.onDismiss == null) dismiss else { {} },
+        dismissButtonText = dialogData.dismissButtonText,
+        secondaryAction = dialogData.secondaryAction,
+        secondaryButtonText = dialogData.secondaryButtonText,
     )
 }
 
@@ -55,7 +59,11 @@ private fun ErrorDialog(
     message: String,
     showReportIssue: Boolean,
     onReportIssueRequest: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onDialogDismissRequest: () -> Unit,
+    dismissButtonText: String,
+    secondaryAction: (() -> Unit)?,
+    secondaryButtonText: String,
 ) {
     JervisDialog(
         title,
@@ -81,25 +89,32 @@ private fun ErrorDialog(
             }
         },
         buttons = {
-            if (!showReportIssue) {
-                Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
+            if (secondaryAction != null) {
+                JervisButton(
+                    text = secondaryButtonText,
+                    onClick = secondaryAction,
+                    buttonColor = JervisTheme.rulebookBlue,
+                    textColor = buttonTextColor
+                )
+                Spacer(modifier = Modifier.width(16.dp))
             }
-            JervisButton(
-                text = "Close",
-                onClick = { onDismissRequest() },
-                buttonColor = JervisTheme.rulebookBlue,
-                textColor = buttonTextColor
-            )
             if (showReportIssue) {
-                Spacer(modifier = Modifier.weight(1f))
                 JervisButton(
                     text = "Report Issue",
                     onClick = { onReportIssueRequest() },
                     buttonColor = JervisTheme.rulebookBlue,
                     textColor = buttonTextColor
                 )
+                Spacer(modifier = Modifier.width(16.dp))
             }
+            JervisButton(
+                text = dismissButtonText,
+                onClick = { onDismissRequest() },
+                buttonColor = JervisTheme.rulebookBlue,
+                textColor = buttonTextColor
+            )
         },
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = onDialogDismissRequest,
     )
 }
