@@ -20,7 +20,7 @@ enum class JervisExitCode(val code: Short) {
     CLIENT_CLOSING(4001), // Client is disconnecting gracefully
     SERVER_CLOSING(4002), // Server is disconnecting gracefully (because it is shutting down)
     GAME_NOT_ACCEPTED(4003), // Game was declined by one of the players.
-    UNEXPECTED_ERROR(4004), // An unexpected error happened on the server.
+    UNEXPECTED_ERROR(4004), // An unexpected error happened on the side sending this code, either server or client.
     NO_GAME_FOUND(4005), // No game with the given gameId exists.
     WRONG_STARTING_MESSAGE(4006), // The first message to /game wasn't a JoinGameMessage
     URL_NOT_FOUND(4007), // A 404 was thrown when trying to connect to the game url

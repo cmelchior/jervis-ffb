@@ -27,9 +27,10 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.encodeToString
+import kotlinx.coroutines.withTimeoutOrNull
 import okio.ProtocolException
 import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class for controlling the websocket connection to a Jervis Game Host or Server.
@@ -44,6 +45,10 @@ class JervisClientWebSocketConnection(
 ) {
     companion object {
         val LOG = jervisLogger()
+
+        // How long to wait for the WebSocket close handshake when giving up on a connection
+        // that already failed. Just a safe-guard against a peer that never responds.
+        private val CLOSE_HANDSHAKE_TIMEOUT = 5.seconds
     }
 
     private val scope = CoroutineScope(
@@ -111,23 +116,17 @@ class JervisClientWebSocketConnection(
                 joinAll(incomingMessagesJob, disconnectJob, outgoingMessagesJob)
             } catch (ex: ProtocolException) {
                 // Unsure if ProtocolException is thrown in other cases than 404, so just to be sure
-                if (!isCloseRequested()) {
-                    LOG.e { "[Server] ${ex.stackTraceToString()}" }
-                    if (ex.message?.contains("404 Not Found") == true) {
-                        jervisCloseReason.complete(CloseReason(JervisExitCode.URL_NOT_FOUND.code, ex.message ?: ""))
-                    } else {
-                        jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
-                    }
+                val exitCode = when (ex.message?.contains("404 Not Found")) {
+                    true -> JervisExitCode.URL_NOT_FOUND
+                    else -> JervisExitCode.UNEXPECTED_ERROR
                 }
+                handleUnexpectedError(session, ex, exitCode)
             } catch (ex: CancellationException) {
                 // These are special and should always propagate
                 throw ex
             } catch (ex: Throwable) {
                 // Wrong use of ws/wss will end up here as an SSLException
-                if (!isCloseRequested()) {
-                    LOG.e { "[Client-${coachName}] Unexpected error in running the WebSocket connection: ${ex.stackTraceToString()}" }
-                    jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
-                }
+                handleUnexpectedError(session, ex)
             }
         }
     }
@@ -142,7 +141,7 @@ class JervisClientWebSocketConnection(
             jervisCloseReason.complete(reason)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            if (!isCloseRequested()) throw e
+            handleUnexpectedError(session, e)
         } finally {
             closeFromServer() // Also cleanup internal channels and scopes
         }
@@ -164,10 +163,21 @@ class JervisClientWebSocketConnection(
             LOG.d { "Connection was closed. Cannot handle any more messages" }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
-            if (!isCloseRequested()) throw ex
+            handleUnexpectedError(session, ex)
         }
     }
 
+    /**
+     * Send queued client messages to the server.
+     *
+     * The `try` deliberately wraps the entire loop, so any error ends the
+     * connection rather than just skipping the message that caused it. Besides
+     * transport errors, this also covers [jervisNetworkSerializer] failing to
+     * encode a message. That is intended: every client message changes state on
+     * the server, so silently dropping one would cause client and server to go
+     * out of sync. A reported disconnect is the safer failure. It is visible to
+     * the user, and it tells the server why we left.
+     */
     private suspend fun JervisClientWebSocketConnection.monitorOutgoingClientMessages(session: DefaultWebSocketSession) {
         try {
             for (outMessage in outgoingChannel) {
@@ -178,7 +188,54 @@ class JervisClientWebSocketConnection(
             }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
-            if (!isCloseRequested()) LOG.e { ex.stackTraceToString() }
+            handleUnexpectedError(session, ex)
+        }
+    }
+
+    /**
+     * Convert transport/read errors (including an abrupt EOF) into the normal
+     * connection lifecycle (i.e., a proper disconnect). [monitorDisconnect] runs
+     * in a child coroutine of [connectionJob]. Rethrowing here would cancel
+     * that parent and surface the exception through the global coroutine
+     * exception handler instead of [awaitDisconnect].
+     *
+     * A single error normally reaches all monitors in [connectionJob] at once
+     * (the underlying session fails its close reason and both channels), so
+     * this method must be safe to call multiple times. The first caller wins,
+     * and the rest are no-ops.
+     *
+     * Note that unlike the normal shutdown in [monitorDisconnect], this
+     * completes [jervisCloseReason] without first waiting for buffered incoming
+     * messages to be forwarded. When the reader itself failed, there is nothing
+     * left to drain, but an error surfacing from [monitorOutgoingClientMessages]
+     * can make consumers observe the disconnect before reading everything the
+     * server managed to send.
+     */
+    private suspend fun handleUnexpectedError(
+        session: DefaultWebSocketSession?,
+        error: Throwable,
+        exitCode: JervisExitCode = JervisExitCode.UNEXPECTED_ERROR,
+    ) {
+        val closeReason = CloseReason(
+            exitCode.code,
+            error.message ?: error::class.simpleName ?: "WebSocket connection failed."
+        )
+        val ownsUnexpectedShutdown = lifecycleMutex.withLock {
+            !closeRequested && jervisCloseReason.complete(closeReason)
+        }
+        if (ownsUnexpectedShutdown) {
+            LOG.e { "[Client-$coachName] WebSocket connection failed: ${error.stackTraceToString()}" }
+            // If the transport is still alive, tell the server why we are leaving. This is a
+            // best-effort attempt, the connection is considered closed regardless of the outcome.
+            try {
+                withTimeoutOrNull(CLOSE_HANDSHAKE_TIMEOUT) {
+                    session?.close(exitCode, closeReason.message)
+                }
+            } catch (closeError: CancellationException) {
+                throw closeError
+            } catch (closeError: Throwable) {
+                LOG.d { "[Client-$coachName] Failed to send WebSocket close frame: ${closeError.message}" }
+            }
         }
     }
 
@@ -231,12 +288,8 @@ class JervisClientWebSocketConnection(
         }
     }
 
-    private suspend fun isCloseRequested(): Boolean = lifecycleMutex.withLock { closeRequested }
-
     /**
      * Wait for the connection to terminate.
-     *
-     * @param timeout how long to wait.
      */
     suspend fun awaitDisconnect(): CloseReason {
         return jervisCloseReason.await()
