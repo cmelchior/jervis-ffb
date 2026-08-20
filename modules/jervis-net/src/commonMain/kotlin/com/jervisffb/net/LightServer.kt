@@ -54,12 +54,17 @@ class LightServer(
     }
 
     /**
-     * @throws Exception if the address is already in use
+     * Throws [Exception] the server could not be started, e.g. if the address
+     * is already in use
      */
     suspend fun start() {
         websocketServer.start()
     }
 
+    /**
+     * Stop the server. This method only returns once the server has released [port], so it is safe
+     * to start a new server on the same port immediately afterwards.
+     */
     suspend fun stop(immediately: Boolean = false) {
         // TODO Stopping the server in tests seems to deadlock, need to figure out why
         //  For now running shutting down on a separate thread seems to work

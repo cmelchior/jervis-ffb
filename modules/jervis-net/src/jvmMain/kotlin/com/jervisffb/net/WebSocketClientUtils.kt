@@ -43,8 +43,20 @@ actual fun startEmbeddedServer(
             }
         }
     }
-    platformServer.start(wait = false)
-    jervisLogger().i { "Embedded server started" }
+    try {
+        platformServer.start(wait = false)
+    } catch (ex: Throwable) {
+        // If the engine fails to start (e.g. the port is already in use), Ktor leaves the
+        // application instance and parts of Netty's thread pools running. Shut it down here, so a
+        // failed start doesn't leak threads, and the caller is free to retry on the same port.
+        try {
+            platformServer.stop(0, 0, TimeUnit.MILLISECONDS)
+        } catch (stopError: Throwable) {
+            ex.addSuppressed(stopError)
+        }
+        throw ex
+    }
+    LOG.d { "JVM embedded server started on port ${server.port}" }
     return platformServer
 }
 
@@ -56,7 +68,7 @@ actual fun stopEmbeddedServer(server: Any, immediately: Boolean) {
             shutdownTimeout = if (immediately) 0 else 500,
             timeUnit = TimeUnit.MILLISECONDS,
         )
-        jervisLogger().i { "Embedded server stopped" }
+        jervisLogger().d { "JVM embedded server stopped" }
     } else {
         throw IllegalArgumentException("Invalid server type: $server")
     }

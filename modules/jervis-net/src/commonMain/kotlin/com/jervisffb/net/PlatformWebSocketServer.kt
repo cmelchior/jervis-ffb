@@ -11,6 +11,8 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Websocket close codes that are specific to Jervis.
@@ -38,10 +40,24 @@ class PlatformWebSocketServer(
         val LOG = jervisLogger()
     }
 
-    private lateinit var platformClient: Any
+    // Lock controlling access to `start()` and `stop()`. Both takes a while to
+    // complete, and we cannot expect users of this class to restrict access
+    // to a single thread.
+    private val lifecycleMutex = Mutex()
 
+    // The running platform server, or `null` if the server was never started or
+    // has been stopped again. Only accessed while holding [lifecycleMutex].
+    private var platformClient: Any? = null
 
-    fun start() {
+    /**
+     * Start the server.
+     *
+     * Throws [Exception] if the server could not be started, e.g., if the port
+     * is already in use. In that case, the server is left in a stopped state
+     * and can be started again.
+     */
+    suspend fun start() = lifecycleMutex.withLock {
+        check(platformClient == null) { "Server is already running" }
         // Warning: Leaving the callback scope will automatically close the session.
         val newConnectionCallback: suspend (DefaultWebSocketSession, GameId?) -> Unit = { platformConnection: DefaultWebSocketSession, gameId: GameId? ->
             LOG.d { "[Server] New connection detected: $platformConnection" }
@@ -73,7 +89,7 @@ class PlatformWebSocketServer(
                     }
                 }
             } catch (ex: ClosedReceiveChannelException) {
-                // The connection was closed while waiting for the first message
+                // The connection was closed while waiting for the first message.
                 // We just ignore this.
                 LOG.d("New connection closed before receiving first message: $platformConnection")
             } catch (ex: Throwable) {
@@ -120,7 +136,13 @@ class PlatformWebSocketServer(
         }
     }
 
-    fun stop(immediately: Boolean = false) {
-        stopEmbeddedServer(platformClient, immediately)
+    /**
+     * Stop the server and wait for it to release its port. Stopping a server
+     * that was never started, or has already been stopped, is a no-op.
+     */
+    suspend fun stop(immediately: Boolean = false): Unit = lifecycleMutex.withLock {
+        val runningServer = platformClient ?: return
+        stopEmbeddedServer(runningServer, immediately)
+        platformClient = null
     }
 }
