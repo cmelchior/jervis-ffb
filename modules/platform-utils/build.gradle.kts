@@ -22,7 +22,7 @@ buildConfig {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
@@ -39,7 +39,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 implementation(kotlin("reflect"))
                 implementation(libs.coroutines)
@@ -59,7 +59,7 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
+        val jvmMain = getByName("jvmMain") {
             dependencies {
                 implementation(libs.coroutines.swing)
                 implementation(libs.ktor.client.okhttp)
@@ -68,14 +68,14 @@ kotlin {
             }
         }
 
-        val jvmTest by getting {
+        val jvmTest = getByName("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.coroutines)
             }
         }
 
-        val wasmJsMain by getting {
+        val wasmJsMain = getByName("wasmJsMain") {
             dependencies {
                 // Stored in mavenRepo for now
                 implementation("com.juul.indexeddb:core:main-SNAPSHOT")
@@ -83,9 +83,9 @@ kotlin {
             }
         }
 
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
+        val iosArm64Main = getByName("iosArm64Main")
+        val iosSimulatorArm64Main = getByName("iosSimulatorArm64Main")
+        val iosMain = create("iosMain") {
             dependsOn(commonMain)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)

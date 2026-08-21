@@ -14,7 +14,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
 
     jvm {
         testRuns["test"].executionTask.configure {
@@ -31,7 +31,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":modules:platform-utils"))
                 api(libs.kotlinx.datetime)
@@ -42,17 +42,17 @@ kotlin {
                 api(libs.cryptography.core)
             }
         }
-        val jvmMain by getting {
+        val jvmMain = getByName("jvmMain") {
             dependencies {
                 implementation(libs.cryptography.provider.jdk)
             }
         }
-        val wasmJsMain by getting {
+        val wasmJsMain = getByName("wasmJsMain") {
             dependencies {
                 implementation(libs.cryptography.provider.webcrypto)
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(project(":modules:jervis-test-utils"))

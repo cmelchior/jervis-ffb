@@ -22,7 +22,7 @@ application {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
 }
 
 val serializerOutputDirectory = layout.buildDirectory.dir("generated/serializers")

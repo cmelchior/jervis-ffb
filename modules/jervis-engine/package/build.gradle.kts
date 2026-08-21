@@ -39,7 +39,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":modules:jervis-engine:core"))
                 api(project(":modules:jervis-engine:rules-common"))
@@ -47,7 +47,7 @@ kotlin {
                 api(project(":modules:jervis-engine:rules-bb2025"))
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(project(":modules:jervis-test-utils"))
                 implementation(kotlin("test"))

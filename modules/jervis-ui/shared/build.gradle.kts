@@ -49,7 +49,7 @@ composeCompiler {
 
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     jvm()
 
     listOf(
@@ -67,7 +67,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":modules:platform-utils"))
                 api(project(":modules:fumbbl-net"))
@@ -91,7 +91,7 @@ kotlin {
                 api("com.adamglin:compose-shadow:2.0.4")
             }
         }
-        val jvmMain by getting {
+        val jvmMain = getByName("jvmMain") {
             dependencies {
                 // Additional dependencies required for .ogg support
                 // See https://github.com/finnkuusisto/TinySound/tree/master/lib
@@ -101,7 +101,7 @@ kotlin {
                 implementation("org.tritonus:tritonus_share:0.0.1")
             }
         }
-        val jvmTest by getting {
+        val jvmTest = getByName("jvmTest") {
             dependencies {
                 implementation(project(":modules:jervis-test-utils"))
                 implementation(kotlin("test"))
@@ -110,10 +110,10 @@ kotlin {
                 runtimeOnly(compose.desktop.currentOs)
             }
         }
-        val wasmJsMain by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
+        val wasmJsMain = getByName("wasmJsMain")
+        val iosArm64Main = getByName("iosArm64Main")
+        val iosSimulatorArm64Main = getByName("iosSimulatorArm64Main")
+        val iosMain = create("iosMain") {
             dependsOn(commonMain)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)

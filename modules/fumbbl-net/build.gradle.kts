@@ -15,7 +15,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
@@ -30,7 +30,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 implementation(project(":modules:platform-utils"))
                 implementation(project(":modules:jervis-engine:package"))
@@ -42,17 +42,17 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting
-        val jvmTest by getting
-        val wasmJsMain by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
+        val jvmMain = getByName("jvmMain")
+        val jvmTest = getByName("jvmTest")
+        val wasmJsMain = getByName("wasmJsMain")
+        val iosArm64Main = getByName("iosArm64Main")
+        val iosSimulatorArm64Main = getByName("iosSimulatorArm64Main")
+        val iosMain = create("iosMain") {
             dependsOn(commonMain)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)

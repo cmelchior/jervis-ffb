@@ -43,7 +43,7 @@ val generateIndexHtml = tasks.register<GenerateIndexHtmlTask>("generateIndexHtml
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     wasmJs {
         outputModuleName.set("jervis-ui")
         browser {
@@ -61,7 +61,7 @@ kotlin {
     }
 
     sourceSets {
-        val wasmJsMain by getting {
+        val wasmJsMain = getByName("wasmJsMain") {
             resources.srcDir(generateIndexHtml.map { it.outputs.files.singleFile })
             dependencies {
                 implementation(project(":modules:jervis-ui:shared"))

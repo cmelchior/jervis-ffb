@@ -32,5 +32,5 @@ tasks.shadowJar {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
 }

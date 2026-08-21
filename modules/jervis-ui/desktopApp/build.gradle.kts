@@ -14,7 +14,7 @@ group = "com.jervisffb"
 version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     dependencies {
         implementation(project(":modules:jervis-ui:shared"))
         val composeVersion = libs.versions.compose.get()

@@ -17,7 +17,7 @@ repositories {
 
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
@@ -30,7 +30,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 implementation(project(":modules:platform-utils"))
                 implementation(libs.coroutines)
@@ -38,16 +38,16 @@ kotlin {
                 implementation(project(":modules:jervis-engine:package"))
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting {
+        val jvmMain = getByName("jvmMain") {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
             }
         }
-        val jvmTest by getting
+        val jvmTest = getByName("jvmTest")
     }
 }

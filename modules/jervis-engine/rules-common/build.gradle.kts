@@ -20,7 +20,7 @@ repositories {
 // live under `engine.rules.common.*`.
 // Depends only on `core`.
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
 
     jvm {
         testRuns["test"].executionTask.configure {
@@ -37,12 +37,12 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":modules:jervis-engine:core"))
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(project(":modules:jervis-test-utils"))
             }

@@ -9,7 +9,7 @@ group = "com.jervisffb.test"
 version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
     jvm()
 
     iosArm64()
@@ -22,7 +22,7 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(kotlin("test"))
                 implementation(project(":modules:jervis-engine:package"))

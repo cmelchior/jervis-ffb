@@ -14,7 +14,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain((project.properties["java.version"] as String).toInt())
+    jvmToolchain((project.findProperty("java.version") as String).toInt())
 
     jvm {
         testRuns["test"].executionTask.configure {
@@ -31,13 +31,13 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
             dependencies {
                 api(project(":modules:jervis-engine:core"))
                 api(project(":modules:jervis-engine:rules-common"))
             }
         }
-        val commonTest by getting {
+        val commonTest = getByName("commonTest") {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(project(":modules:jervis-test-utils"))
