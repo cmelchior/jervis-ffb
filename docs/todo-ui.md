@@ -75,7 +75,10 @@ they come up.
     - https://www.youtube.com/watch?v=_KLfj84SOh8&ab_channel=ErikRosolowsky
     - https://www.omnicalculator.com/physics/time-of-flight-projectile-motion
     - I think I implemented the correct algorithm, but the ball landing still looks off. Need to figure out why.
-
+- [ ] Add "action selected" animations for inactive clients in P2P games:
+  - [ ] Player
+  - [ ] Square
+  - [ ] Dogout
 
 ## Design ideas
 

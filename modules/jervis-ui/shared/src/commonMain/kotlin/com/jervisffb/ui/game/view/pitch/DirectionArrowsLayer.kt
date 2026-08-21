@@ -49,7 +49,7 @@ fun DirectionArrowsLayer(
                 modifier = Modifier
                     .jervisSquare(pitchSizeData, coordinate)
                     .jervisPointerEvent(SquarePointerEventType.EnterSquare, coordinate) {
-                        isHover = true
+                        isHover = true && (square.selectedAction != null)
                     }
                     .jervisPointerEvent(SquarePointerEventType.ExitSquare, coordinate) {
                         isHover = false

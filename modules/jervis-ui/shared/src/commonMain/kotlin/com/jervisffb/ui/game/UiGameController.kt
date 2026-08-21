@@ -804,14 +804,32 @@ class UiGameController(
                 acc.emitActionWheelState()
                 awaitAnimationCompletion()
             }
-            val animation = AnimationFactory.getPostActionAnimation(this, state, action)
-            if (animation != null) {
+            val decoratorAnimation = when (acc.actionWasSelectedWithoutUserInput) {
+                true -> {
+                    pitchActionDecorators.values.firstNotNullOfOrNull { decorator ->
+                        decorator.selectedActionAnimation(action, state, acc)
+                    }
+                }
+                false -> null
+            }
+
+            val postActionAnimation = AnimationFactory.getPostActionAnimation(this, state, action)
+
+            if (decoratorAnimation != null || postActionAnimation != null) {
                 // We do not want animations to run on top of action wheels, so hide them
                 // before running the animation.
                 acc.addActionWheelEvent(HideActionWheel(hideImmediately = true))
                 acc.emitActionWheelState()
-                animationFlow.emit(animation)
-                awaitAnimationCompletion()
+
+                if (decoratorAnimation != null) {
+                    animationFlow.emit(decoratorAnimation)
+                    awaitAnimationCompletion()
+                }
+
+                if (postActionAnimation != null) {
+                    animationFlow.emit(postActionAnimation)
+                    awaitAnimationCompletion()
+                }
             }
         }
     }

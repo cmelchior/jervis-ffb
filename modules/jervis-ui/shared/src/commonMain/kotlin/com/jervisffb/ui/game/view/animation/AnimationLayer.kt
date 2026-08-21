@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.jervisffb.ui.game.animations.ConfettiAnimation
+import com.jervisffb.ui.game.animations.DirectionSelectedAnimation
 import com.jervisffb.ui.game.animations.FanFactorResultAnimation
 import com.jervisffb.ui.game.animations.KickOffEventAnimation
 import com.jervisffb.ui.game.animations.LogoAnimation
@@ -21,21 +22,24 @@ fun AnimationLayer(
     Box(modifier = Modifier.fillMaxSize()) {
         val animationFlow = remember { vm.observeAnimation() }
         val animationData by animationFlow.collectAsState(null)
-        when (animationData?.second) {
+        when (val animation = animationData?.second) {
             is KickOffEventAnimation -> {
-                KickOffEventResultAnimation(vm, animationData!!.second as KickOffEventAnimation)
+                KickOffEventResultAnimation(vm, animation)
             }
             is PassAnimation -> {
-                PassResultAnimation(vm, animationData!!.second as PassAnimation)
+                PassResultAnimation(vm, animation)
             }
             is FanFactorResultAnimation -> {
-                FanFactorResultAnimation(vm, animationData!!.second as FanFactorResultAnimation)
+                FanFactorResultAnimation(vm, animation)
             }
             is ConfettiAnimation -> {
-                TouchdownAnimation(vm, animationData!!.second as ConfettiAnimation)
+                TouchdownAnimation(vm, animation)
             }
             is LogoAnimation -> {
-                LogoAnimation(vm, animationData!!.second as LogoAnimation)
+                LogoAnimation(vm, animation)
+            }
+            is DirectionSelectedAnimation -> {
+                DirectionSelectedAnimation(vm, animation)
             }
             else -> { /* Do nothing */ }
         }

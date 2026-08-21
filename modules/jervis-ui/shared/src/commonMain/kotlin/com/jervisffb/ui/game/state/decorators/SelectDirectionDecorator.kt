@@ -47,4 +47,29 @@ object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
             }
         }
     }
+
+    override fun selectedActionAnimation(
+        action: GameAction,
+        state: Game,
+        acc: UiSnapshotAccumulator
+    ): JervisAnimation? {
+        val selectedAction = action as? DirectionSelected ?: return null
+        val target = acc.squares.values.firstOrNull { square ->
+            square.selectableDirection == selectedAction.direction
+                && !square.coordinates.isOutOfBounds(state.rules)
+        } ?: return null
+
+        // Keep the normal arrow in the snapshot. The animation layer fades the
+        // filled (selected) arrow over it before the engine advances.
+        acc.updateSquare(target.coordinates) {
+            it.copy(
+                selectedAction = null
+            )
+        }
+        return DirectionSelectedAnimation(
+            uiController = acc.uiController,
+            coordinate = target.coordinates,
+            direction = selectedAction.direction,
+        )
+    }
 }
