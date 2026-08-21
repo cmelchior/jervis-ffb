@@ -47,11 +47,15 @@ data class PitchLayoutCoordinates(
  * Expand player data with extra callbacks related to UI hover effects.
  * TODO I think this is only used for the Player Stat Card, so we can probably
  *  find a way to remove this.
+ *
+ *  We do not use `GuardedAction` here, because we assume that these events
+ *  are not tied to game actions. If that ever becomes the case, a refactor
+ *  is needed.
  */
 data class UiPlayerTransientData(
-    val onHover: UiAction?,
-    val onHoverExit: UiAction?,
-    val onSecondaryClick: UiAction? = null,
+    val onHover: () -> Unit?,
+    val onHoverExit: () -> Unit?,
+    val onSecondaryClick: (() -> Unit)? = null,
 )
 
 /**

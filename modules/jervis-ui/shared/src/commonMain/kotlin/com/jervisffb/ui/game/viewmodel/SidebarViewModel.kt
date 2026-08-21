@@ -159,11 +159,9 @@ class SidebarViewModel(
                         false -> it
                     },
                     UiPlayerTransientData(
-                        onHover = UiAction(Pair("onHover", player.id), GuardedAction(uiState.gameController) { hoverOver(player) }),
-                        onHoverExit = UiAction(Pair("onHoverExit", player.id), GuardedAction(uiState.gameController) { hoverExit() }),
-                        onSecondaryClick = UiAction(Pair("onSecondaryClick", player.id), GuardedAction(uiState.gameController) {
-                            gameViewModel.showPlayerContextMenu(player.id)
-                        })
+                        onHover = { hoverOver(player) },
+                        onHoverExit = { hoverExit() },
+                        onSecondaryClick = { gameViewModel.showPlayerContextMenu(player.id) }
                     )
                 )
             } ?: error("Cannot find player: $player.id}")
