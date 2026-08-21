@@ -38,7 +38,9 @@ data class UiGameSnapshot(
     // Black text above the pitch
     val gameStatusText: String?,
     val unknownActions: PersistentList<GameAction>,
+    val homeDogoutLooksSelectable: Boolean,
     val homeDogoutOnClickAction: GuardedAction?,
+    val awayDogoutLooksSelectable: Boolean,
     val awayDogoutOnClickAction: GuardedAction?,
     // If set, a dialog should be shown as a first priority
     val dialogInput: UserInputDialog?,

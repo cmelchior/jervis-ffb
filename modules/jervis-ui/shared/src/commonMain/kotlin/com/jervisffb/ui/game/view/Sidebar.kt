@@ -54,19 +54,20 @@ fun Sidebar(
     vm: SidebarViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val sidebarAction by vm.dogoutAction.collectAsState(null)
+    val sidebarAction by vm.dogoutAction.collectAsState(Pair(false, null))
     val playerToMove by vm.gameViewModel.playerToMove.collectAsState(null)
     val isMovePlayersFreelyMode by vm.gameViewModel.isMovePlayersFreely.collectAsState()
     val canMoveToDogout = (isMovePlayersFreelyMode && playerToMove != null)
     Box(
         modifier = modifier
-            .applyIf(sidebarAction != null || canMoveToDogout) {
+            .applyIf(sidebarAction.first || canMoveToDogout) {
                 clickable {
                     when (canMoveToDogout) {
                         true -> vm.gameViewModel.movePlayerFreelyTo(Dogout)
-                        false -> sidebarAction?.invoke()
+                        false -> sidebarAction.second?.invoke()
                     }
-                }.background(JervisTheme.availableActionBackground)
+                }
+                    .background(JervisTheme.availableActionBackground)
             },
         contentAlignment = Alignment.TopCenter
     ) {

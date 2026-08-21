@@ -7,16 +7,22 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.model.GuardedBadgeAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 
 object EndTurnDecorator : PitchActionDecorator<EndTurnWhenReady> {
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: EndTurnWhenReady,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
+        // We don't want to show potential "Badge Actions" to the inactive coach.
+        if (!isEnabled) {
+            return
+        }
+
         val title = when {
             state.stack.containsProcedure(Charge) -> "End Charge!"
             else -> "End Turn"

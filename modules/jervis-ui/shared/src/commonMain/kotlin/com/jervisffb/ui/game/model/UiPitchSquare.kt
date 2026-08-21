@@ -36,6 +36,7 @@ data class UiPitchSquare(
     val directionSelected: Direction? = null, // Show a direction arrow in its selected state
     // If negative, it means the defender has more strength. If positive, it means the attacker has more strength.
     val requiresRoll: Boolean = false, // onSelected is not-null but will result in dice being rolled
+    val isSelectable: Boolean = false, // Determines if the UI should render the square as "selectable", regardless of the presence of a `selectedAction`
     val selectedAction: UiAction? = null, // Action if square is selected
     val onMenuHidden: UiAction? = null, // Action if the context menu is hidden
     val isActionWheelFocus: Boolean = false,

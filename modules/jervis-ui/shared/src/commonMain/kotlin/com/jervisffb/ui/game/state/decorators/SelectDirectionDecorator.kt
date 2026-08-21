@@ -1,21 +1,26 @@
 package com.jervisffb.ui.game.state.decorators
 
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.animations.DirectionSelectedAnimation
+import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 
 object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
+
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: SelectDirection,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         val origin = state.pitch[descriptor.origin as PitchCoordinate]
@@ -31,9 +36,11 @@ object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
         } else {
             descriptor.directions.forEach { direction ->
                 val action = DirectionSelected(direction)
+                val uiAction = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) })
                 acc.updateSquare(origin.move(direction, 1)) {
                     it.copy(
-                        selectedAction = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) }),
+                        isSelectable = true,
+                        selectedAction = uiAction.takeIf { isEnabled },
                         selectableDirection = direction
                     )
                 }

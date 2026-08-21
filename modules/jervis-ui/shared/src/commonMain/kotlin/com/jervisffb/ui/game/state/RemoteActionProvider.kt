@@ -3,15 +3,18 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 /**
  * Action Provider that is responsible for forwarding appropriate events from the server
@@ -34,8 +37,10 @@ class RemoteActionProvider(
     private lateinit var actions: ActionRequest
     private var sharedData: LocalPitchDataWrapper? = null
 
+    private var actionDecorators: Map<KClass<out GameActionDescriptor>, PitchActionDecorator<out GameActionDescriptor>> = emptyMap()
+
     override fun init(controller: UiGameController) {
-        // Do nothing
+        actionDecorators = controller.pitchActionDecorators.toMap()
     }
 
     override fun startHandler() {
@@ -55,7 +60,21 @@ class RemoteActionProvider(
     }
 
     override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
-        // Do nothing
+
+        // Provide visual cues for whatever the other client is being asked to choose between
+        actions.actions.forEach { descriptor ->
+            val decorator = getDecorator(descriptor::class)
+            if (decorator != null && decorator.isApplicable(acc.game, actions)) {
+                decorator.decorate(
+                    actionProvider = this,
+                    state = acc.game,
+                    descriptor = descriptor,
+                    owner = actions.team,
+                    isEnabled = false,
+                    acc = acc
+                )
+            }
+        }
     }
 
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
@@ -83,4 +102,10 @@ class RemoteActionProvider(
     override fun hasQueuedActions(): Boolean {
         return false
     }
+
+    private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): PitchActionDecorator<GameActionDescriptor>? {
+        @Suppress("UNCHECKED_CAST")
+        return actionDecorators[type] as? PitchActionDecorator<GameActionDescriptor>
+    }
+
 }

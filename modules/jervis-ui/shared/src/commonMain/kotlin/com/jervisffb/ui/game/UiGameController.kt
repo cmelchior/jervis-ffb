@@ -5,13 +5,26 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.AdminGameAction
+import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.EndActionWhenReady
+import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.Revert
+import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.actions.SelectDogout
+import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectPassType
+import com.jervisffb.engine.actions.SelectPitchLocation
+import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.SelectPlayers
+import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
@@ -162,6 +175,19 @@ import com.jervisffb.ui.game.state.actionwheel.UseTwoHeadsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
 import com.jervisffb.ui.game.state.actionwheel.WeatherRollWheelController
+import com.jervisffb.ui.game.state.decorators.CancelDecorator
+import com.jervisffb.ui.game.state.decorators.EndActionDecorator
+import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
+import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
+import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
+import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
+import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
+import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPassTypeDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPitchLocationDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
+import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
+import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
@@ -201,6 +227,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.reflect.KClass
 import com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep as BB2020JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep as BB2025JumpStep
 
@@ -404,6 +431,35 @@ class UiGameController(
         ChooseKickingTeamWheelController
     )
 
+    val pitchActionDecorators: Map<KClass<out GameActionDescriptor>, PitchActionDecorator<out GameActionDescriptor>> = mapOf(
+        // EndSetupWhenReady -> TODO()
+        // EndTurnWhenReady -> TODO()
+        // is RollDice -> TODO()
+        // is SelectBlockType -> TODO()
+        // SelectCoinSide -> TODO()
+        // is SelectDicePoolResult -> TODO()
+        // is SelectInducement -> TODO()
+        // is SelectNoReroll -> TODO()
+        // is SelectRandomPlayers -> TODO()
+        // is SelectRerollOption -> TODO()
+        // is SelectSkill -> TODO()
+        // TossCoin -> TODO()
+        // DeselectPlayer::class to DeselectPlayerDecorator,
+        // SelectPlayerAction::class to SelectPlayerActionDecorator,
+        CancelWhenReady::class to CancelDecorator,
+        EndActionWhenReady::class to EndActionDecorator,
+        EndSetupWhenReady::class to EndSetupDecorator,
+        EndTurnWhenReady::class to EndTurnDecorator,
+        SelectDirection::class to SelectDirectionDecorator,
+        SelectDogout::class to SelectDogoutDecorator,
+        SelectMoveType::class to SelectMoveTypeDecorator,
+        SelectPassType::class to SelectPassTypeDecorator,
+        SelectPitchLocation::class to SelectPitchLocationDecorator,
+        SelectPlayer::class to SelectPlayerDecorator,
+        SelectPlayers::class to SelectPlayersDecorator,
+        SelectRandomPlayers::class to SelectRandomPlayersDecorator,
+    )
+
     // Dispatcher is held separately from the scope because cancelling a scope does not release the
     // thread behind its dispatcher. It must be closed manually in `stopGameEventLoop()`
     private val animationDispatcher = singleThreadDispatcher("AnimationDispatcher")
@@ -536,7 +592,9 @@ class UiGameController(
                 gameStatusText = null,
                 status = UiGameStatusUpdate.INITIAL,
                 unknownActions = persistentListOf(),
+                homeDogoutLooksSelectable = false,
                 homeDogoutOnClickAction = null,
+                awayDogoutLooksSelectable = false,
                 awayDogoutOnClickAction = null,
                 dialogInput = null,
                 movesUsed = persistentListOf(),

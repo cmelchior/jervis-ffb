@@ -47,7 +47,9 @@ class UiSnapshotAccumulator(
     val squares: Map<PitchCoordinate, UiPitchSquare>
         field = previousSnapshot.squares.builder()
     val stack = uiController.state.stack
+    var awayDogoutLooksSelectable: Boolean = false
     var awayDogoutOnClickAction: GuardedAction? = null
+    var homeDogoutLooksSelectable: Boolean = false
     var homeDogoutOnClickAction: GuardedAction? = null
     private val actionWheelEvents = mutableListOf<ActionWheelUiState>()
     private val contextWheelEvents = mutableListOf<ContextWheelUiState>()
@@ -161,7 +163,9 @@ class UiSnapshotAccumulator(
             gameStatusText = gameStatusText,
             status = statusBuilder,
             unknownActions = unknownActionsBuilder.build(),
+            homeDogoutLooksSelectable = homeDogoutLooksSelectable,
             homeDogoutOnClickAction = homeDogoutOnClickAction,
+            awayDogoutLooksSelectable = awayDogoutLooksSelectable,
             awayDogoutOnClickAction = awayDogoutOnClickAction,
             dialogInput = dialogInput,
             // actionWheelVisible = actionWheelVisible,

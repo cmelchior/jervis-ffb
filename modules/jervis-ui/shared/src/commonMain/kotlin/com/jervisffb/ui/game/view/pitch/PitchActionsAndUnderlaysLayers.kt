@@ -90,8 +90,9 @@ private fun SquareHighlightAndAction(
             square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             // Hide square color when diretion arrows are shown
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
-            player?.isSelectable == true -> Color.Transparent
+            player?.selectedAction != null || player?.looksSelectable == true -> Color.Transparent
             playerToMove != null && square.isEmpty() -> JervisTheme.availableActionBackground
+            square.isSelectable -> JervisTheme.availableActionBackground
             square.selectedAction != null -> JervisTheme.availableActionBackground // Fallback for active squares
             else -> Color.Transparent
         }
@@ -115,8 +116,16 @@ private fun SquareHighlightAndAction(
         }
 
     // TODO Move some of this to the Dialog Layer?
+
+    val squareHasActionHandler = playerToMove != null
+        && (square.isEmpty() || player?.id == playerToMove)
+        || square.contextMenuOptions.isNotEmpty()
+        || player?.selectedAction != null
+        || square.selectedAction != null
+        || pathfinderData?.hoverAction != null
+
     val boxWrapperModifier =
-        if (playerToMove != null && (square.isEmpty() || player?.id == playerToMove) || square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
+        if (squareHasActionHandler) {
             modifier
                 .jervisPointerEvent(SquarePointerEventType.PrimaryClickSquare, square.coordinates) {
                     // In that case, it is the square that should handle opening it again, after which control transfers

@@ -29,7 +29,7 @@ import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.model.UiAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 /**
@@ -78,14 +78,20 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
     }
 
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: CancelWhenReady,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         // Some Cancel events are actually handled elsewhere, so just swallow them here
         if (state.stack.currentNode() in swallowNodes) {
+            return
+        }
+
+        // We don't want to show potential "Badge Actions" to the inactive coach.
+        if (!isEnabled) {
             return
         }
 

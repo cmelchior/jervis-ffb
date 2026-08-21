@@ -12,15 +12,16 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.model.GuardedPlayerAction
 import com.jervisffb.ui.game.model.UiPlayerAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 
 object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: SelectPlayer,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
@@ -56,7 +57,8 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                 Dogout -> {
                     acc.updatePlayer(playerId) {
                         it.copy(
-                            selectedAction = selectedAction
+                            looksSelectable = true,
+                            selectedAction = selectedAction.takeIf { isEnabled }
                         )
                     }
                 }
@@ -64,6 +66,7 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                     if (acc.squares.containsKey(playerLocation)) {
                         acc.updateSquare(playerLocation) {
                             it.copy(
+                                isSelectable = false,
                                 selectedAction = null,
                                 isActionWheelFocus = false
                             )
@@ -72,7 +75,8 @@ object SelectPlayerDecorator: PitchActionDecorator<SelectPlayer> {
                     acc.updatePlayer(playerId) {
                         it.copy(
                             dice = dice,
-                            selectedAction = selectedAction,
+                            looksSelectable = true,
+                            selectedAction = selectedAction.takeIf { isEnabled },
                         )
                     }
                 }

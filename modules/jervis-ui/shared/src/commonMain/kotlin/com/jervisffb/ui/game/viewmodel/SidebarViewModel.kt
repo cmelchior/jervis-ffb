@@ -171,10 +171,10 @@ class SidebarViewModel(
         Pair(snapshot, newList)
     }.shareIn(menuViewModel.uiScope, SharingStarted.Eagerly, 1)
 
-    val dogoutAction: Flow<GuardedAction?> = uiState.uiStateFlow.map {
+    val dogoutAction: Flow<Pair<Boolean, GuardedAction?>> = uiState.uiStateFlow.map {
         when (team.isHomeTeam()) {
-            true -> it.homeDogoutOnClickAction
-            false -> it.awayDogoutOnClickAction
+            true -> it.homeDogoutLooksSelectable to it.homeDogoutOnClickAction
+            false -> it.awayDogoutLooksSelectable to it.awayDogoutOnClickAction
         }
     }
 

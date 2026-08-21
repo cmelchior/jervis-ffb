@@ -5,23 +5,11 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.NodeStep
 import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.EndActionWhenReady
-import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.SelectDirection
-import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectMoveType
-import com.jervisffb.engine.actions.SelectPassType
-import com.jervisffb.engine.actions.SelectPitchLocation
-import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.actions.SelectPlayers
-import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
@@ -38,19 +26,7 @@ import com.jervisffb.ui.game.UiGameClientType
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.actionwheel.ActionWheelDialogController
-import com.jervisffb.ui.game.state.decorators.CancelDecorator
-import com.jervisffb.ui.game.state.decorators.EndActionDecorator
-import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
-import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
 import com.jervisffb.ui.game.state.decorators.PitchActionDecorator
-import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
-import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
-import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
-import com.jervisffb.ui.game.state.decorators.SelectPassTypeDecorator
-import com.jervisffb.ui.game.state.decorators.SelectPitchLocationDecorator
-import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
-import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
-import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
 import com.jervisffb.ui.game.view.DialogFactory
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
@@ -98,38 +74,11 @@ open class ManualActionProvider(
     var nextFumblerooskiCommand: GameAction? = null
         private set
 
-    private val pitchActionDecorators = mapOf(
-        // EndSetupWhenReady -> TODO()
-        // EndTurnWhenReady -> TODO()
-        // is RollDice -> TODO()
-        // is SelectBlockType -> TODO()
-        // SelectCoinSide -> TODO()
-        // is SelectDicePoolResult -> TODO()
-        // is SelectInducement -> TODO()
-        // is SelectNoReroll -> TODO()
-        // is SelectRandomPlayers -> TODO()
-        // is SelectRerollOption -> TODO()
-        // is SelectSkill -> TODO()
-        // TossCoin -> TODO()
-        // DeselectPlayer::class to DeselectPlayerDecorator,
-        // SelectPlayerAction::class to SelectPlayerActionDecorator,
-        CancelWhenReady::class to CancelDecorator,
-        EndActionWhenReady::class to EndActionDecorator,
-        EndSetupWhenReady::class to EndSetupDecorator,
-        EndTurnWhenReady::class to EndTurnDecorator,
-        SelectDirection::class to SelectDirectionDecorator,
-        SelectDogout::class to SelectDogoutDecorator,
-        SelectMoveType::class to SelectMoveTypeDecorator,
-        SelectPassType::class to SelectPassTypeDecorator,
-        SelectPitchLocation::class to SelectPitchLocationDecorator,
-        SelectPlayer::class to SelectPlayerDecorator,
-        SelectPlayers::class to SelectPlayersDecorator,
-        SelectRandomPlayers::class to SelectRandomPlayersDecorator,
-    )
-
     private var nodeToActionWheelController: Map<Node, ActionWheelDialogController> = emptyMap()
+    private var actionDecorators: Map<KClass<out GameActionDescriptor>, PitchActionDecorator<out GameActionDescriptor>> = emptyMap()
 
     override fun init(controller: UiGameController) {
+        actionDecorators = controller.pitchActionDecorators.toMap()
         nodeToActionWheelController = buildMap {
             controller.actionWheelControllers.forEach { controller ->
                 controller.nodes.forEach { node ->
@@ -280,7 +229,7 @@ open class ManualActionProvider(
 
     private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): PitchActionDecorator<GameActionDescriptor>? {
         @Suppress("UNCHECKED_CAST")
-        return pitchActionDecorators[type] as? PitchActionDecorator<GameActionDescriptor>
+        return actionDecorators[type] as? PitchActionDecorator<GameActionDescriptor>
     }
 
     /**
@@ -348,7 +297,14 @@ open class ManualActionProvider(
         request.actions.forEach { descriptor ->
             val decorator = getDecorator(descriptor::class)
             if (decorator != null && decorator.isApplicable(acc.game, request)) {
-                decorator.decorate(this, state, descriptor, request.team, acc)
+                decorator.decorate(
+                    actionProvider = this,
+                    state = state,
+                    descriptor = descriptor,
+                    owner = request.team,
+                    isEnabled = true,
+                    acc = acc
+                )
             } else {
                 // Any action that isn't being mapped to an UI component needs to go here.
                 // This way, we ensure that the UI is never blocked during development.

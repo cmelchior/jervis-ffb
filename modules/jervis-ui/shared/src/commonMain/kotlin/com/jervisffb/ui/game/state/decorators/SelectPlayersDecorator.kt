@@ -10,15 +10,16 @@ import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.model.GuardedPlayerAction
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPlayerAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.GameScreenModel
 
 object SelectPlayersDecorator : PitchActionDecorator<SelectPlayers> {
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: SelectPlayers,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         descriptor.players.forEach { playerId ->
@@ -39,19 +40,23 @@ object SelectPlayersDecorator : PitchActionDecorator<SelectPlayers> {
                 it.copy(selectedAction = selectedAction)
             }
         }
-        acc.updateGameStatus {
-            it.copy(
-                centerBadgeText = "End Player Selection (0)", // "Select up to ${descriptor.count} players",
-                centerBadgeAction = GuardedBadgeAction(acc) { id, model: GameScreenModel ->
-                    val players = model.getSelectedPlayers()
-                    val action = when (players.isNotEmpty()) {
-                        true -> PlayersSelected(model.getSelectedPlayers())
-                        false -> Cancel
-                    }
-                    actionProvider.userActionSelected(id, action)
-                },
-                centerBadgeEnabled = true
-            )
+
+        // We don't want to show Badge Actions to the inactive coach.
+        if (isEnabled) {
+            acc.updateGameStatus {
+                it.copy(
+                    centerBadgeText = "End Player Selection (0)", // "Select up to ${descriptor.count} players",
+                    centerBadgeAction = GuardedBadgeAction(acc) { id, model: GameScreenModel ->
+                        val players = model.getSelectedPlayers()
+                        val action = when (players.isNotEmpty()) {
+                            true -> PlayersSelected(model.getSelectedPlayers())
+                            false -> Cancel
+                        }
+                        actionProvider.userActionSelected(id, action)
+                    },
+                    centerBadgeEnabled = true
+                )
+            }
         }
     }
 }

@@ -9,17 +9,23 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 object EndActionDecorator: PitchActionDecorator<EndActionWhenReady> {
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: EndActionWhenReady,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
+        // We don't want to show Context Menu options to the inactive coach.
+        if (!isEnabled) {
+            return
+        }
+
         state.activePlayer?.location?.let { location ->
             acc.updateSquare(location as PitchCoordinate) {
                 // Add action at the front so the button is placed at the bottom.

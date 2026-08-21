@@ -13,7 +13,7 @@ import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 /**
@@ -39,14 +39,20 @@ object SelectPassTypeDecorator : PitchActionDecorator<SelectPassType> {
     }
 
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: SelectPassType,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         // Some Cancel events are actually handled elsewhere, so just swallow them here
         if (state.stack.currentNode() in swallowNodes) {
+            return
+        }
+
+        // We don't want to show Context Menu options to the inactive coach.
+        if (!isEnabled) {
             return
         }
 

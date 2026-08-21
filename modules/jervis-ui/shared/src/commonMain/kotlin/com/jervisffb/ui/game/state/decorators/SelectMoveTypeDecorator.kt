@@ -23,6 +23,7 @@ import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
 import com.jervisffb.ui.game.view.ToggleContextMenuOption
 
@@ -39,10 +40,11 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
     )
 
     override fun decorate(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         descriptor: SelectMoveType,
         owner: Team?,
+        isEnabled: Boolean,
         acc: UiSnapshotAccumulator
     ) {
         val hasLeapAndJump = descriptor.types.contains(MoveType.LEAP) && descriptor.types.contains(MoveType.JUMP)
@@ -50,19 +52,25 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         descriptor.types.forEach {
             when (it) {
                 MoveType.JUMP -> {
-                    if (!hideJump) handleType(actionProvider, state, acc, it)
+                    if (!hideJump) handleType(actionProvider, state, acc, it, isEnabled)
                 }
-                else -> handleType(actionProvider, state, acc, it)
+                else -> handleType(actionProvider, state, acc, it, isEnabled)
             }
         }
     }
 
-    private fun moveTypeAction(actionProvider: ManualActionProvider, acc: UiSnapshotAccumulator, type: MoveType): UiAction {
+    private fun moveTypeAction(actionProvider: UiActionProvider, acc: UiSnapshotAccumulator, type: MoveType): UiAction {
         val action = MoveTypeSelected(type)
         return UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) })
     }
 
-    private fun handleType(actionProvider: ManualActionProvider, state: Game, acc: UiSnapshotAccumulator, type: MoveType) {
+    private fun handleType(
+        actionProvider: UiActionProvider,
+        state: Game,
+        acc: UiSnapshotAccumulator,
+        type: MoveType,
+        isEnabled: Boolean
+    ) {
         val player = state.activePlayer ?: error("No active player")
         val activeLocation = player.location as PitchCoordinate
 
@@ -71,6 +79,10 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
         // On-pitch moves are shortcutting the Rules engine, so we need to account for that as well
         when (type) {
             MoveType.JUMP -> {
+                // We don't want to show Context Menu options to the inactive coach.
+                if (!isEnabled) {
+                    return
+                }
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
@@ -85,6 +97,10 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
             }
 
             MoveType.LEAP -> {
+                // We don't want to show Context Menu options to the inactive coach.
+                if (!isEnabled) {
+                    return
+                }
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
@@ -99,6 +115,10 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
             }
 
             MoveType.POGO -> {
+                // We don't want to show Context Menu options to the inactive coach.
+                if (!isEnabled) {
+                    return
+                }
                 acc.updateSquare(activeLocation) {
                     it.copy(
                         contextMenuOptions = it.contextMenuOptions.add(
@@ -126,6 +146,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                 displayPlan.neighborMoves.forEach { (coordinate, plannedMove) ->
                     acc.updateSquare(coordinate) {
                         it.copy(
+                            isSelectable = isEnabled,
                             selectedAction = UiAction(plannedMove.action, GuardedAction(acc) { id ->
                                 actionProvider.userActionSelected(id, plannedMove.action)
                             }),
@@ -134,7 +155,8 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
                     }
                 }
 
-                if (player.isSkillAvailable(SkillType.FUMBLEROOSKI) && player.hasBall()) {
+                if (player.isSkillAvailable(SkillType.FUMBLEROOSKI) && player.hasBall() && isEnabled) {
+                    val actionProvider = actionProvider as ManualActionProvider
                     // If player has Fumblerooski, they can enable it before-hand here
                     acc.updateSquare(player.coordinates) {
                         // Both commands only vary with which player is toggling Fumblerooski;
@@ -176,6 +198,11 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
             }
 
             MoveType.STAND_UP -> {
+                // We don't want to show Context Menu options to the inactive coach.
+                if (!isEnabled) {
+                    return
+                }
+
                 // Add Standing Up Action to the context menu.
                 acc.updateSquare(activeLocation) {
                     it.copy(
@@ -197,7 +224,7 @@ object SelectMoveTypeDecorator: PitchActionDecorator<SelectMoveType> {
     // and then move. Instead, players can move directly. This should only
     // be available if it is free to stand up.
     private fun addStandUpAndMoveOptions(
-        actionProvider: ManualActionProvider,
+        actionProvider: UiActionProvider,
         state: Game,
         player: Player,
         activeLocation: OnPitchLocation,

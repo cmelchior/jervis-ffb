@@ -114,9 +114,9 @@ fun Player(
     var isTempSelected by player.isTemporarySelected
     var playerModifier: Modifier = modifier.aspectRatio(1f)
 
-    if (player.isSelectable && !parentHandleClick) {
+    if ((player.selectedAction != null) && !parentHandleClick) {
         playerModifier = playerModifier.clickable {
-            player.selectedAction!!(screenModel, player)
+            player.selectedAction(screenModel, player)
         }
     }
     if (transientData?.onHover != null) {
@@ -162,7 +162,7 @@ fun Player(
     Box(modifier = playerModifier) {
         PlayerImage(
             bitmap = playerImage,
-            isSelectable = player.isSelectable,
+            isSelectable = (player.selectedAction != null) || player.looksSelectable,
             isTempSelected = isTempSelected,
             isActionWheelFocus = contextMenuShowing,
             isGoingDown = player.isGoingDown,

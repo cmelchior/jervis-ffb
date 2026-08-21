@@ -36,6 +36,7 @@ data class UiPitchPlayer(
     val number: PlayerNo,
     val team: TeamId,
     val size: PlayerSize,
+    val looksSelectable: Boolean,
     val selectedAction: ((GameScreenModel, UiPitchPlayer) -> Unit)?,
     val carriesBall: Boolean,
     val state: PlayerState,
@@ -62,6 +63,7 @@ data class UiPitchPlayer(
         number = model.number,
         team = model.team.id,
         size = model.position.size,
+        looksSelectable = (selectAction != null),
         selectedAction = selectAction,
         carriesBall = model.hasBall(),
         state = model.state,
@@ -78,7 +80,6 @@ data class UiPitchPlayer(
         focusStyle = focusStyle,
     )
     val isTemporarySelected = mutableStateOf(false)
-    val isSelectable = (selectedAction != null)
     val isProne: Boolean = (state == PlayerPitchState.PRONE)
     val isStunned: Boolean = (state == PlayerPitchState.STUNNED || state == PlayerPitchState.STUNNED_OWN_TURN)
 }

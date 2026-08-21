@@ -85,6 +85,7 @@ class P2PActionProvider(
                 // for the future.
                 when (error) {
                     is GameActionServerError -> {
+                        // TODO This does not seem to work?
                         LOG.i { "Queuing up Revert of action: ${error.actionId}" }
                         serverActionScope.launch {
                             revertServerActionsQueue.send { controller: GameEngineController ->
@@ -153,7 +154,7 @@ class P2PActionProvider(
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         if (!handlingServerRevert) {
             currentProvider.decorateSelectedAction(action, acc)
-            
+
             // If the local `engine` is behind`, we know we are handling a
             // server-generated action, which we always want to animate.
             if (engine.nextActionIndex() <= lastServerActionIndex) {
