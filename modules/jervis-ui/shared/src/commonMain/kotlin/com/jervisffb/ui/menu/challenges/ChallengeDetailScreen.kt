@@ -191,8 +191,6 @@ private fun ChallengeDetailContent(
                 )
             }
 
-            ChallengeScreenshot(preview)
-
             key(preview) {
                 ChallengeScreenshot(preview)
             }
