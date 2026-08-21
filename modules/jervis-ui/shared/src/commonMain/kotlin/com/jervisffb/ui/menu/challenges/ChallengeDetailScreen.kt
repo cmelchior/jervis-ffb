@@ -19,6 +19,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -191,6 +192,10 @@ private fun ChallengeDetailContent(
             }
 
             ChallengeScreenshot(preview)
+
+            key(preview) {
+                ChallengeScreenshot(preview)
+            }
 
             Section("Description", topPadding = 0.dp) {
                 val linkText = remember(details.data.description) {
