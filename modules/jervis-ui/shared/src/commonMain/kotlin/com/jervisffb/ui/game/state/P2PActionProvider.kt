@@ -59,7 +59,8 @@ class P2PActionProvider(
     }
 
     override fun init(controller: UiGameController) {
-        // Do nothing
+        homeProvider.init(controller)
+        awayProvider.init(controller)
     }
 
     override fun startHandler() {
@@ -152,6 +153,12 @@ class P2PActionProvider(
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         if (!handlingServerRevert) {
             currentProvider.decorateSelectedAction(action, acc)
+            
+            // If the local `engine` is behind`, we know we are handling a
+            // server-generated action, which we always want to animate.
+            if (engine.nextActionIndex() <= lastServerActionIndex) {
+                acc.actionWasSelectedWithoutUserInput = true
+            }
         }
     }
 
