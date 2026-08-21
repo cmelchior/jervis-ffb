@@ -202,8 +202,16 @@ internal class TeamResourcesCache(
     getCachedOnDiskImage: suspend (Url) -> ImageBitmap? = CacheManager::getCachedImage,
     saveOnDiskCachedImage: suspend (Url, ImageBitmap) -> Unit = CacheManager::saveImage,
 ) : AbstractResourcesCache(httpClient, getCachedOnDiskImage, saveOnDiskCachedImage) {
+
+    // A long-lived app might have players from the same team act as both home and away players.
+    // So the cache needs to be able to distinguish between them.
+    data class PlayerSpriteKey(
+        val id: PlayerId,
+        val isOnHomeTeam: Boolean,
+    )
+
     private val fumbblCache: MutableMap<String, Url> = fumbblCache.toMutableMap()
-    val players: MutableMap<PlayerId, PlayerSprite> = mutableMapOf()
+    val players: MutableMap<PlayerSpriteKey, PlayerSprite> = mutableMapOf()
     val portraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
     val largeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
     val smallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()

@@ -17,6 +17,7 @@ import com.jervisffb.engine.teamBuilder
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.test.bb2025.HUMAN_LINEMAN
 import com.jervisffb.test.bb2025.HUMAN_TEAM_TEST_BB2025
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -34,6 +35,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -89,6 +91,45 @@ class IconFactoryTests {
 
             assertEquals(5, requestCount)
             assertTrue(factory.getPlayerPortrait(player.id).width > 0)
+        }
+    }
+
+    @Test
+    fun playerSpritesAreCachedSeparatelyForHomeAndAwayTeams() = runTest {
+        val client = HttpClient(MockEngine { respondError(HttpStatusCode.ServiceUnavailable) })
+        client.use { client ->
+            val factory = IconFactory(client)
+            val rules = StandardBB2025Rules()
+            val position = HUMAN_LINEMAN.copy(
+                id = PositionId("fallback-lineman"),
+                quantity = 1,
+                icon = null,
+                portrait = null,
+            )
+            val roster = HUMAN_TEAM_TEST_BB2025.copy(
+                id = RosterId("fallback-roster"),
+                positions = listOf(position),
+            )
+            val team = teamBuilder(rules, roster) {
+                id = TeamId("fallback-team")
+                coach = Coach(CoachId("fallback-coach"), "fallback coach")
+                name = "fallback team"
+                addPlayer(PlayerId("fallback-player"), "fallback player", PlayerNo(1), position)
+            }
+            val otherTeam = createTeam(rules, "other", useRemoteImages = false)
+            Game(rules, team, otherTeam)
+            val player = team.first()
+
+            factory.initializeStaticAssets(Density(1f))
+
+            val homeSprite = factory.loadPlayerSprite(player, isOnHomeTeam = true)
+            val awaySprite = factory.loadPlayerSprite(player, isOnHomeTeam = false)
+            val homeUiPlayer = UiPitchPlayer(player)
+            val awayUiPlayer = homeUiPlayer.copy(isOnHomeTeam = false)
+
+            assertNotSame(homeSprite.default, awaySprite.default)
+            assertSame(homeSprite.default, factory.getPlayerIcon(homeUiPlayer))
+            assertSame(awaySprite.default, factory.getPlayerIcon(awayUiPlayer))
         }
     }
 

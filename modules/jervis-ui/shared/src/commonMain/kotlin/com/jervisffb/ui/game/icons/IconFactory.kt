@@ -414,11 +414,12 @@ class IconFactory internal constructor(
 
     fun getPlayerIcon(player: UiPitchPlayer): ImageBitmap {
         val isActive = player.isActive
-        if (teamResources.players.contains(player.id)) {
+        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player.id, player.isOnHomeTeam)
+        if (teamResources.players.contains(playerSpriteKey)) {
             return if (isActive) {
-                teamResources.players[player.id]!!.active
+                teamResources.players[playerSpriteKey]!!.active
             } else {
-                teamResources.players[player.id]!!.default
+                teamResources.players[playerSpriteKey]!!.default
             }
         } else {
             error("Could not find player: ${player.id}")
@@ -697,7 +698,8 @@ class IconFactory internal constructor(
         isOnHomeTeam: Boolean,
         cache: TeamResourcesCache,
     ): PlayerSprite {
-        cache.players[player.id]?.let { return it }
+        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player.id, isOnHomeTeam)
+        cache.players[playerSpriteKey]?.let { return it }
         val playerSprite = player.icon?.sprite
         val sprite = if (playerSprite == null) {
             createFallbackPlayerSprite(player, isOnHomeTeam, cache)
@@ -709,7 +711,7 @@ class IconFactory internal constructor(
                 createPlayerSprite(image, playerSprite, isOnHomeTeam)
             }
         }
-        cache.players[player.id] = sprite
+        cache.players[playerSpriteKey] = sprite
         return sprite
     }
 
