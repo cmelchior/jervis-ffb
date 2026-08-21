@@ -3,6 +3,7 @@ package com.jervisffb.utils
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import com.jervisffb.BuildConfig
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -10,8 +11,10 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
-val DEFAULT_LOG_LEVEL = Severity.Debug
-
+val DEFAULT_LOG_LEVEL = when (BuildConfig.isLocalBuild) {
+    true -> Severity.Debug
+    false -> Severity.Error
+}
 /**
  * Console log writer that prepends a timestamp to every line. Kermit's default
  * console writer has no timestamp, so we replace it with this.

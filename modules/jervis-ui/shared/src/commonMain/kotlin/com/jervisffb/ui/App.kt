@@ -33,6 +33,7 @@ import com.jervisffb.utils.PROP_INITIALIZED_VERSION
 import com.jervisffb.utils.SettingsManager
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.initializePlatform
+import com.jervisffb.utils.isLocalBuild
 import com.jervisffb.utils.jervisLogger
 
 val FILE_MANAGER = FileManager()
@@ -52,7 +53,7 @@ suspend fun initApplication() {
     val clientReleaseVersion = BuildConfig.releaseVersion
     val isClientInitialized = SETTINGS_MANAGER.getBoolean(PROP_INITIALIZED, false)
     val initializedVersion = SETTINGS_MANAGER.getStringOrNull(PROP_INITIALIZED_VERSION)
-    val isLocalBuild = BuildConfig.releaseVersion.endsWith(".local")
+    val isLocalBuild = BuildConfig.isLocalBuild
     if (!isClientInitialized || initializedVersion != clientReleaseVersion || isLocalBuild) {
         LOG.i { "Initializing application: $clientReleaseVersion" }
         CacheManager.createInitialTeamFiles()
