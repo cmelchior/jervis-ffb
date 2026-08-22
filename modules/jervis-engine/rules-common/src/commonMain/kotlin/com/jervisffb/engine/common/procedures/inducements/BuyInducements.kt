@@ -2,6 +2,8 @@ package com.jervisffb.engine.common.procedures.inducements
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.InducementsSelected
@@ -66,11 +68,16 @@ object BuyInducements : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BuyInducementsContext>().higherCtvTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val team = state.getContext<BuyInducementsContext>().higherCtvTeam
-            return listOf(CancelWhenReady, SelectInducements(treasury = min(team.treasury, rules.inducements.topDogTopUpLimitFromTreasury), pettyCash = 0))
+            val availableTreasury = min(team.treasury, rules.inducements.topDogTopUpLimitFromTreasury)
+            return when (availableTreasury > 0) {
+                true -> listOf(CancelWhenReady, SelectInducements(treasury = min(team.treasury, rules.inducements.topDogTopUpLimitFromTreasury), pettyCash = 0))
+                false -> listOf(ContinueWhenReady)
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BuyInducementsContext>()
             return when (action) {
+                Continue,
                 Cancel -> {
                     compositeCommandOf(
                         SetPettyCash(context.lowerCtvTeam, context.ctvDifference),
@@ -108,10 +115,12 @@ object BuyInducements : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BuyInducementsContext>().lowerCtvTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BuyInducementsContext>()
-            return listOf(
-                CancelWhenReady,
-                SelectInducements(treasury = min(context.lowerCtvTeam.treasury, rules.inducements.underdogTopUpLimitFromTreasury), pettyCash = context.lowerCtvTeam.pettyCash)
-            )
+            val availableTreasury = min(context.lowerCtvTeam.treasury, rules.inducements.underdogTopUpLimitFromTreasury)
+            val availablePettyCash = context.lowerCtvTeam.pettyCash
+            return when (availableTreasury > 0 || availablePettyCash > 0) {
+                true -> listOf(CancelWhenReady, SelectInducements(treasury = availableTreasury, pettyCash = availablePettyCash))
+                false -> listOf(ContinueWhenReady)
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
