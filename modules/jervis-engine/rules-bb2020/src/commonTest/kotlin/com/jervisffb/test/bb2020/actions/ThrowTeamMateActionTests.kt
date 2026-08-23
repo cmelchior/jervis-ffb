@@ -38,8 +38,8 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2020.advancedHumanTeamAway
 import com.jervisffb.test.bb2020.createAdvancedHomeTeam
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.landingRoll
@@ -85,7 +85,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
         controller = GameEngineController(state, cacheActionDescriptor = false)
         controller.startTestMode(FullGame)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *arrayOf(*homeSetup(), *awaySetup()),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 5),

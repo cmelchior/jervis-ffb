@@ -11,8 +11,8 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.utils.assertCoordinates
@@ -33,7 +33,7 @@ class DeviateTests: JervisGameBB2025Test() {
     @Test
     fun moveInRandomDirection() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half
@@ -52,7 +52,7 @@ class DeviateTests: JervisGameBB2025Test() {
     @Test
     fun mustCatchIfPlayerIsInLandingSquare() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half
@@ -67,7 +67,7 @@ class DeviateTests: JervisGameBB2025Test() {
     fun noNegativeModifierOnCatch() {
         val catcher = awayTeam["A11".playerId]
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half
@@ -85,7 +85,7 @@ class DeviateTests: JervisGameBB2025Test() {
     @Test
     fun bounceIfPlayerInLandingSquareCannotCatch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         awayTeam["A11".playerId].makeDistracted()
@@ -103,7 +103,7 @@ class DeviateTests: JervisGameBB2025Test() {
     @Test
     fun bounceIfLandingInEmptySquare() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half

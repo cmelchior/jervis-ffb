@@ -54,7 +54,7 @@ val bb2025SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2025.tables.BB2025LastingInjuryTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable::class) {
-        subclass(com.jervisffb.engine.bb2025.tables.BB2025StandardPrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.RangeRuler::class) {

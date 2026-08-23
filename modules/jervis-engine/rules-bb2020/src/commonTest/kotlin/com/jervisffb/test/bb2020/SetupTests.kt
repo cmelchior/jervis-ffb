@@ -15,7 +15,7 @@ import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnPitch
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.JervisGameBB2020Test
-import com.jervisffb.test.defaultPregame
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.setupPlayer
 import kotlin.test.BeforeTest
@@ -35,7 +35,7 @@ class SetupTests: JervisGameBB2020Test() {
     override fun setUp() {
         super.setUp()
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
         )
     }
 

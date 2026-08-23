@@ -63,20 +63,36 @@ fun defaultDetermineKickingTeam() = arrayOf(
     Cancel // Away choices to receive
 )
 
-fun defaultPregame(
+fun defaultBB2020Pregame(
     fanFactor: Array<out GameAction> = defaultFanFactor(),
     weatherRoll: DiceRollResults = defaultWeather(),
     journeyMen: Array<out GameAction> = defaultJourneyMen(),
-    inducements: Array<out GameAction> = defaultInducements(),
     prayersToNuffle: Array<out GameAction> = defaultPrayersToNuffle(),
     determineKickingTeam: Array<out GameAction> = defaultDetermineKickingTeam(),
+    inducements: Array<out GameAction> = defaultInducements(),
 ) = arrayOf(
     *fanFactor,
     weatherRoll,
     *journeyMen,
-    *inducements,
     *prayersToNuffle,
-    *determineKickingTeam
+    *inducements,
+    *determineKickingTeam,
+)
+
+fun defaultBB2025Pregame(
+    fanFactor: Array<out GameAction> = defaultFanFactor(),
+    weatherRoll: DiceRollResults = defaultWeather(),
+    journeyMen: Array<out GameAction> = defaultJourneyMen(),
+    prayersToNuffle: Array<out GameAction> = defaultPrayersToNuffle(),
+    determineKickingTeam: Array<out GameAction> = defaultDetermineKickingTeam(),
+    inducements: Array<out GameAction> = defaultInducements(),
+) = arrayOf(
+    *fanFactor,
+    weatherRoll,
+    *journeyMen,
+    *prayersToNuffle,
+    *inducements,
+    *determineKickingTeam,
 )
 
 fun defaultSetup(homeFirst: Boolean = true): Array<GameAction> {
@@ -501,4 +517,3 @@ fun giveBallToPlayer(player: Player) {
 }
 
 fun regenerationRoll(roll: D6Result = 6.d6) = roll
-

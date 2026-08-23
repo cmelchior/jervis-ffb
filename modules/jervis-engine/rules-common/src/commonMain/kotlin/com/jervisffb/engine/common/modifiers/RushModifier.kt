@@ -4,8 +4,6 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 
 /**
  * Modifiers that can affect a Rush roll.
- *
- * @see [com.jervisffb.rules.bb2020.procedures.actions.move.RushRoll]
  */
 enum class RushModifier(override val modifier: Int, override val description: String) : DiceModifier {
     BLIZZARD(-1, "Blizzard"),

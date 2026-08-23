@@ -35,7 +35,6 @@ import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChainsawContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.estimatedMovesLeft
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
@@ -275,7 +274,7 @@ object BlitzAction : Procedure() {
             val blitzContext = state.getContext<BlitzActionContext>()
             return AddContext(RushRollContext(blitzContext.attacker, blitzContext.attacker.location as OnPitchLocation))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.rushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val rushContext = state.getContext<RushRollContext>()
             return buildCompositeCommand {

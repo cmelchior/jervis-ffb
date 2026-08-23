@@ -1,4 +1,4 @@
-package com.jervisffb.engine.common.procedures.actions.foul
+package com.jervisffb.engine.bb2020.procedures.actions.foul
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.bb2020.tables.BB2020PrayerToNuffleTableResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -18,7 +19,6 @@ import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -37,10 +37,11 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Implement the Argue The Call roll as described on page 63 in the rulebook.
- *
- * The result is stored in [com.jervisffb.engine.common.context.BeingSentOffContext] and it is up to the caller to
+ * Implement the Argue The Call roll.
+ * The result is stored in [BeingSentOffContext] and it is up to the caller to
  * determine what to do with the result.
+ *
+ * See page 63 in the BB2020 rulebook.
  */
 object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDie
@@ -58,9 +59,10 @@ object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
             return castDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<BeingSentOffContext>()
                 val result = table.roll(d6)
+                val team = context.player.team
                 val chanceObservation = createFinalTableLookupObservation(
                     state = state,
-                    team = context.player.team,
+                    team = team,
                     rollType = DiceRollType.ARGUE_THE_CALL,
                     dice = listOf(d6),
                     favorableOutcomes = table.entries.count { it.value == result },
@@ -70,7 +72,7 @@ object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
                 // While weirdly worded "Friends with the Ref" just means that roll 5
                 // can be changed to "Well, When You Put It Like That..."
                 val nextNodeCommand = if (
-                    context.player.team.activePrayersToNuffle.contains(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF)
+                    team.activePrayersToNuffle.contains(BB2020PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF)
                     && d6.value == 5
                 ) {
                     GotoNode(ResolveFriendsWithTheReferences)

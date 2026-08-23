@@ -313,6 +313,9 @@ abstract class BB2020Rules(
     @Transient override val applyInducementsStep: Procedure = DummyProcedure
     @Transient override val chainsawFoulStep: Procedure = DummyProcedure
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
+    @Transient override val rushRoll: Procedure = RushRoll
+    @Transient override val argueTheCallRoll: Procedure = ArgueTheCallRoll
+
 
     override val rightStuffMaxStrength: Int = 3
     override fun calculateLeaderRerollStatusChange(team: Team): Command? =

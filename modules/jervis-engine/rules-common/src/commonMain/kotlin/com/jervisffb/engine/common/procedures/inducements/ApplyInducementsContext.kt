@@ -11,5 +11,5 @@ import com.jervisffb.engine.model.context.ProcedureContext
 data class ApplyInducementsContext(
     val team: Team,
     val inducements: InducementsSelected,
-    val rollForPrayers: Int = 0
+    val rollForPrayers: Int = 0,
 ) : ProcedureContext

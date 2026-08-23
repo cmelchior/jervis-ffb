@@ -14,8 +14,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.argueTheCall
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
@@ -45,7 +45,7 @@ class SecretWeaponTests: JervisGameBB2025Test() {
         val player = homeTeam["H12".playerId]
         player.addSkill(SkillType.SECRET_WEAPON)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
         )

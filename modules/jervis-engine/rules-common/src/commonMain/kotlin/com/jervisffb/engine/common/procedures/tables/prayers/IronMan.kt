@@ -19,17 +19,22 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.common.tables.IronManStatModifier
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Prayer to Nuffle "Iron Man" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Iron Man".
+ *
+ * See page 39 in the BB2020 rulebook.
+ * See page 143 in the BB2025 rulebook.
  */
 object IronMan : Procedure() {
 
@@ -44,7 +49,16 @@ object IronMan : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val requestedAction = context.team
                 .filter { it.state == PlayerDogoutState.RESERVE || it.location.isOnPitch(rules) }
-                .filter { !it.hasSkill(SkillType.LONER) }
+                // BB2020 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2020
+                        && player.hasSkill(SkillType.LONER)
+                }
+                // BB20205 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2025
+                        && player.type == PlayerType.STAR_PLAYER
+                }
                 .let {
                     when (it.isNotEmpty()) {
                         true -> SelectPlayer.fromPlayers(it)
@@ -65,9 +79,10 @@ object IronMan : Procedure() {
                 else -> {
                     castAction<PlayerSelected>(action) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
+                        val duration = context.result?.duration ?: INVALID_GAME_STATE("Missing result: $context")
                         val player = it.getPlayer(state)
                         compositeCommandOf(
-                            AddPlayerStatModifier(player, PrayerStatModifier.IRON_MAN),
+                            AddPlayerStatModifier(player, IronManStatModifier(duration)),
                             UpdateContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Iron Man (+1 AV)"),
                             ExitProcedure(),

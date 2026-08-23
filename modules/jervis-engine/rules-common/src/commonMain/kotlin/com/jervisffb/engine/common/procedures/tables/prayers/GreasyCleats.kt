@@ -18,11 +18,16 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Procedure for handling the Prayer to Nuffle "Greasy Cleats" as described on page 39
@@ -39,13 +44,27 @@ object GreasyCleats : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val requestedAction = context.team.otherTeam()
-                .filter { it.state == PlayerDogoutState.RESERVE || it.location.isOnPitch(rules) }
+                // BB2020 Filters
+                .filterNot { player ->
+                    val validLocations = player.state == PlayerDogoutState.RESERVE || player.location.isOnPitch(rules)
+                    rules.baseVersion == GameVersion.BB2020
+                        && (
+                            player.hasSkill(SkillType.LONER)
+                            || !validLocations
+                        )
+                }
+                // BB20205 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2025
+                        && (player.type == PlayerType.STAR_PLAYER)
+                }
                 .let {
-                    if (it.isNotEmpty()) {
-                        com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)
-                    } else {
-                        // This should only happen if _zero_ players are ready for the drive
-                        ContinueWhenReady
+                    when (it.isNotEmpty()) {
+                        true -> com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)
+                        false -> {
+                            // This should only happen if _zero_ players are ready for the drive
+                            ContinueWhenReady
+                        }
                     }
                 }
             return listOf(requestedAction)
@@ -60,9 +79,11 @@ object GreasyCleats : Procedure() {
                     )
                 }
                 else -> {
+                    val context = state.getContext<PrayersToNuffleRollContext>()
+                    val duration = context.result?.duration ?: INVALID_GAME_STATE("Missing result: $context")
                     castAction<PlayerSelected>(action) {
                         compositeCommandOf(
-                            AddPlayerStatModifier(it.getPlayer(state), PrayerStatModifier.GREASY_CLEATS),
+                            AddPlayerStatModifier(it.getPlayer(state), GreasyCleatsStatModifier(duration)),
                             UpdateContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),
                             ReportGameProgress("${it.getPlayer(state).name} received Greasy Cleats (-1 MA)"),
                             ExitProcedure()

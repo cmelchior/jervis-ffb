@@ -170,7 +170,7 @@ class GameEngineControllerTests {
 
         // Move into a state where we rolled block dice as that has caused problems with diceId
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),

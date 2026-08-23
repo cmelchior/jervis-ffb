@@ -35,7 +35,6 @@ import com.jervisffb.engine.common.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.common.reports.ReportEndingTurn
 import com.jervisffb.engine.common.reports.ReportStartingTurn
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -55,6 +54,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
 
 /**
  * Procedure for controlling the active teams turn.
@@ -239,7 +239,7 @@ object TeamTurn : Procedure() {
             val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
             val activeTeamResetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_OWN_TEAM_TURN)
 
-            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffleTableResult.THROW_A_ROCK)
+            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(BB2025PrayerToNuffleTableResult.THROW_A_ROCK)
             val nextNodeCommand = when (throwRockActive) {
                 true -> GotoNode(CheckForThrowARock)
                 false -> ExitProcedure()

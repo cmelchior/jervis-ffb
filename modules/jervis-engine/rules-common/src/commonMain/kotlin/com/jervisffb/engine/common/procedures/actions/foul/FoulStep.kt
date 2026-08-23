@@ -39,6 +39,8 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.model.modifiers.TeamFeature.Companion.underScrutiny
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -47,9 +49,6 @@ import kotlinx.collections.immutable.toPersistentList
 
 /**
  * Procedure for handling the Foul part of a Foul Action.
- *
- * See [com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction].
- * See [com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction].
  */
 object FoulStep: Procedure() {
     override val initialNode: Node = SelectOffensiveAssists
@@ -185,7 +184,9 @@ object FoulStep: Procedure() {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val spottedByRefArmour: Boolean = (injuryContext.armourRoll[0].result == injuryContext.armourRoll[1].result)
             val spottedByRefInjury: Boolean = (injuryContext.injuryRoll.isNotEmpty() && (injuryContext.injuryRoll[0] == injuryContext.injuryRoll[1]))
-            val spottedByRef = spottedByRefArmour || spottedByRefInjury
+            val underScrutiny = foulContext.fouler.team.hasFeature(TeamFeatureType.UNDER_SCRUTINY) && injuryContext.armourBroken
+
+            val spottedByRef = spottedByRefArmour || spottedByRefInjury || underScrutiny
 
             // Check pre-conditions for Sneaky Git
             val isArmourBroken = injuryContext.armourBroken

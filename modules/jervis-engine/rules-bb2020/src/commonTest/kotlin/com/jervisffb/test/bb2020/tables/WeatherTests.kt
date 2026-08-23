@@ -33,9 +33,9 @@ import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultFanFactor
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
@@ -65,7 +65,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun swelteringHeat() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
             ),
             *defaultSetup(),
@@ -96,7 +96,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun swelteringHeat_noAvailablePlayersThanRolled() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
             ),
             *defaultSetup(),
@@ -125,7 +125,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun swelteringHeat_lessAvailablePlayersThanRolled() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
             ),
             *defaultSetup(),
@@ -160,7 +160,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun verySunny_throwBall() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(1.d6, 2.d6)
             ),
             *defaultSetup(),
@@ -188,7 +188,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun pouringRain_catchRoll() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(5.d6, 6.d6)
             ),
             *defaultSetup(),
@@ -206,7 +206,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun pouringRain_pickupRoll() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(5.d6, 6.d6)
             ),
             *defaultSetup(),
@@ -224,7 +224,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun blizzard_rushRoll() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(6.d6, 6.d6)
             ),
             *defaultSetup(),
@@ -248,7 +248,7 @@ class WeatherTests: JervisGameBB2020Test() {
     @Test
     fun blizzard_restrictPassRange() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(6.d6, 6.d6)
             ),
             *defaultSetup(),

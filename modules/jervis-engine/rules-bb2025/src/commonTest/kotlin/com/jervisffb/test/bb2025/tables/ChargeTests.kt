@@ -29,8 +29,8 @@ import com.jervisffb.engine.utils.singleInstanceOf
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
@@ -55,7 +55,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_moveAction() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -86,7 +86,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_blitzAction() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -121,7 +121,7 @@ class ChargeTests: JervisGameBB2025Test() {
             it.addSkill(SkillType.RIGHT_STUFF)
         }
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -148,7 +148,7 @@ class ChargeTests: JervisGameBB2025Test() {
     @Test
     fun charge_doNotSelectAnyPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -175,7 +175,7 @@ class ChargeTests: JervisGameBB2025Test() {
         homeTeam["H9".playerId].addSkill(SkillType.THROW_TEAMMATE)
         // homeTeam["H9".playerId].addSkill(SkillType.KICK_TEAMMATE)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -199,7 +199,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_endOnFallingOver() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -222,7 +222,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_endOnKnockedDown() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -252,7 +252,7 @@ class ChargeTests: JervisGameBB2025Test() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         homeTeam["H9".playerId].addSkill(SkillType.DODGE)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -280,7 +280,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_canForegoActivation() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -307,7 +307,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_stunnedPlayersAreStillStunnedInFirstTurn() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -331,7 +331,7 @@ class ChargeTests: JervisGameBB2025Test() {
     @Test
     fun charge_onlyOpenPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -353,7 +353,7 @@ class ChargeTests: JervisGameBB2025Test() {
     @Test
     fun charge_lessPlayersThanRolled() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId).forEach {
@@ -380,7 +380,7 @@ class ChargeTests: JervisGameBB2025Test() {
     @Test
     fun charge_skipIfNoAvailablePlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         homeTeam.forEach {
@@ -404,7 +404,7 @@ class ChargeTests: JervisGameBB2025Test() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         homeTeam["H9".playerId].addSkill(SkillType.DODGE)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(14, 11),
@@ -432,7 +432,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun charge_selectLessThanMaxPlayers() {
         val players = listOf("H9".playerId) //
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -456,7 +456,7 @@ class ChargeTests: JervisGameBB2025Test() {
     fun teamRerollsWork() {
         val players = listOf("H6".playerId, "H7".playerId, "H8".playerId, "H9".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(

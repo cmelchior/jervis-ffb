@@ -20,9 +20,9 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffAwayTeam
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
@@ -43,7 +43,7 @@ class GameProgressTests: JervisGameBB2020Test() {
 
     private fun setupGame() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam()
         )
@@ -52,7 +52,7 @@ class GameProgressTests: JervisGameBB2020Test() {
     @Test
     fun noActiveTeamDuringKickOffEvent() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -81,7 +81,7 @@ class GameProgressTests: JervisGameBB2020Test() {
     @Test
     fun increaseTurnAndHalfCounter() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
         )
         // Before setup

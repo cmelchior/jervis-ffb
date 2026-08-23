@@ -45,7 +45,7 @@ abstract class JervisGameBB2025Test {
 
     open fun startDefaultGame() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2025Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
         )
@@ -92,7 +92,7 @@ abstract class JervisGameBB2025Test {
         controller.startTestMode(FullGame)
         state.collectChanceData = false
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *arrayOf(*throwTeamMateHomeSetup(), *throwTeamMateAwaySetup()),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 5),

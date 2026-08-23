@@ -31,8 +31,9 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlin.math.min
 
 /**
- * Procedure controlling both teams purchasing inducements as described on
- * page 94 in the BB2025 rulebook.
+ * Procedure controlling both teams purchasing inducements.
+ *
+ * See page 94 in the BB2025 rulebook.
  */
 object BuyInducements : Procedure() {
     // How much gold can the lower ctv team transfer from their treasury to buy inducements.
@@ -124,7 +125,8 @@ object BuyInducements : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Cancel -> ExitProcedure()
+                Continue,
+                Cancel -> ExitProcedure()
                 is InducementsSelected -> {
                     val context = state.getContext<BuyInducementsContext>()
                     val team = context.lowerCtvTeam

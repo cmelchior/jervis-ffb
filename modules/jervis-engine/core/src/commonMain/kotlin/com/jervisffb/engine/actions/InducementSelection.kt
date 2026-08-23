@@ -13,7 +13,6 @@ import com.jervisffb.engine.rules.Rules
  * This is done in [com.jervisffb.engine.rules.common.procedures.ApplyInducements].
  */
 interface InducementSelection<T: SingleInducement<*>> {
-
     val type: InducementType
     val count: Int
 

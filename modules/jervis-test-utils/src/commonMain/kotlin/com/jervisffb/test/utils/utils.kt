@@ -33,6 +33,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+
+inline fun <reified T: Any?> List<Any?>.containsInstance(): Boolean {
+    return this.any { it is T }
+}
+
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : Any> assertTypeOf(obj: Any?): T {
     contract {

@@ -723,6 +723,50 @@ which means it only allows one skill but chooses which to use this way:
 2. For skills that adjust a roll, the higher number will be used, e.g., 
    Mighty Blow(+2) over Mighty Blow(+1).
 
+## Page 142 - Prayers To Nuffle
+
+From the rules as written, it is unclear if you roll for all prayers at once
+or one at a time. One could make the argument that knowing all the results 
+before choosing the outcome of another might be beneficial.
+
+However, since this is not defined and since this makes both the UX and rule 
+implementation harder to do, Jervis has opted to resolve the rolls one prayer
+at a time.
+
+It is also unclear what happens if a prayer with a random component hits a 
+player that already has that skill, like Blessing of Nuffle rolling a player
+that already has Pro. The rules only specify that you reroll the roll if the
+result was already rolled. NAF has ruled that in that case the roll is lost.
+Jervis copies this interpretation. Note, this also means that e.g., Bad Habits
+granting Loner (2+), will not override Loner on a player with Loner (4+). Nor
+will that player have Loner twice.
+
+Last, it is unclear if Star Players can be selected as part of a random roll.
+However, since the rules say that "...Star Players may never be selected under 
+any circumstances...", Jervis assumes this also applies to random rolls. Similar
+to the above, rolling a Star Player as a random target will also lose that 
+roll.
+
+!!! naf "NAF"
+
+    If a Prayer would give a random player a skill they already have (e.g.Mighty
+    Blow or Loner) or can’t use (e.g. no primary access), nothing happens and no
+    other player is selected.
+
+### Treacherous Trapdoor
+From the rules, it is unclear what happens if both teams roll Treachous 
+Trapdoors. Two options are possible:
+
+1. You roll for both, i.e two 2+ rolls.
+2. You roll only once.
+
+For mostly "fluff" reasons (there are clearly not two trapdoors), Jervis has
+implemented that only one roll is made.
+
+Questions has also been raised whether you can use team rerolls to avoid falling
+through the trapdoor. Since Trapdoors are not listed under the "not allowed to
+reroll" on page 33. Jervis will allow using a team reroll for this.
+
 ## Page 144 - Bribe
 The rules around Bribes are slightly unclear when it comes to handling the 
 Coach. Rolling a 1 results in "On a natural 1, the referee pockets the Bribe 

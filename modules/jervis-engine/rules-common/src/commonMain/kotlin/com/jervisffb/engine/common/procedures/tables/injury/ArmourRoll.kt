@@ -98,6 +98,7 @@ import kotlinx.collections.immutable.toPersistentList
  * 1. Chainsaw (Modifier)
  * 1. Dirty Player (Modifier)
  * 2. Lone Fouler (Reroll)
+ * 3. Under Scrutiny (Send-off)
  *
  * Knocked Down (Throw Team-mate):
  * 1. Lethal Flight (Knocked Down)

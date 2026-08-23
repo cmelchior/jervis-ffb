@@ -31,15 +31,17 @@ import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlin.math.min
 
 /**
@@ -96,7 +98,7 @@ object BadHabits : Procedure(), ChanceObservationHandler {
             return if (badHabitsContext.mustSelectPlayers == 0) {
                 listOf(ContinueWhenReady)
             } else {
-                listOf(SelectRandomPlayers(badHabitsContext.roll.value, availablePlayers))
+                listOf(SelectRandomPlayers(min(availablePlayers.size, badHabitsContext.roll.value), availablePlayers))
             }
         }
 
@@ -119,7 +121,7 @@ object BadHabits : Procedure(), ChanceObservationHandler {
                                     skill = rules.createSkill(
                                         player = player,
                                         skill = SkillType.LONER.idTarget(2),
-                                        expiresAt = Duration.END_OF_DRIVE
+                                        expiresAt = prayerContext.result?.duration ?: INVALID_GAME_STATE("Missing prayer result: $prayerContext")
                                     )
                                 )
                             )
@@ -139,9 +141,17 @@ object BadHabits : Procedure(), ChanceObservationHandler {
     // Helper functions below
 
     private fun getEligiblePlayers(context: PrayersToNuffleRollContext, rules: Rules): List<Player> {
-        return context.team.otherTeam().filter {
-            (it.state == PlayerDogoutState.RESERVE || it.location.isOnPitch(rules)) && !it.hasSkill(SkillType.LONER)
+        return when (rules.baseVersion) {
+            GameVersion.BB2020 -> {
+                context.team.otherTeam().filter {
+                    (it.state == PlayerDogoutState.RESERVE || it.location.isOnPitch(rules)) && !it.hasSkill(SkillType.LONER)
+                }
+            }
+            GameVersion.BB2025 -> {
+                context.team.otherTeam().filterNot {
+                    it.hasSkill(SkillType.LONER) || it.type == PlayerType.STAR_PLAYER
+                }
+            }
         }
     }
-
 }

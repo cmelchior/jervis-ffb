@@ -13,8 +13,8 @@ import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.catch
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.throwBall
@@ -31,7 +31,7 @@ class DeviateTests: JervisGameBB2020Test() {
     @Test
     fun moveInRandomDirection() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 7),
@@ -59,7 +59,7 @@ class DeviateTests: JervisGameBB2020Test() {
     @Test
     fun mustCatchIfPlayerIsInLandingSquare() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 7),
@@ -86,7 +86,7 @@ class DeviateTests: JervisGameBB2020Test() {
     @Test
     fun bounceIfPlayerInLandingSquareCannotCatch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 7),
@@ -116,7 +116,7 @@ class DeviateTests: JervisGameBB2020Test() {
     @Test
     fun bounceIfLandingInEmptySquare() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(17, 7),

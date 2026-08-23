@@ -156,34 +156,37 @@ book.
         - [ ] Biased Referee
         - [ ] How many others(???)
      - [ ] Prayers to Nuffle Table.
-        - [ ] Roll again if duplicate was rolled
+        - [x] Roll again if duplicate was rolled
         - [ ] Abort rolling when there are no more prayers to roll for.
+        - [x] No restrictions on players, except Star Players (unlike BB2020)
+        - [x] They last until the end of the game.
         - [ ] Treacherous Trapdoor
-           - [ ] During Quick Snap Kickoff Event
-           - [ ] During Blitz Kickoff Event
-           - [ ] During High Kick
-           - [ ] During Pushback
-           - [ ] During Chain Push
-           - [ ] Jump into square
-           - [ ] ... (so many edge cases)
-           - [ ] Roll before using Fumblerooski
-    - [ ] Friends with the Ref
-    - [ ] Stiletto
-    - [ ] Iron Man
-    - [ ] Knuckle Dusters
-    - [ ] Bad Habits
-    - [ ] Greasy Cleats
-    - [ ] Blessed Statue of Nuffle
-    - [ ] Moles under the Pitch
-    - [ ] Perfect Passing
-    - [ ] Fan Interaction
-    - [ ] Necessary Violence
-    - [ ] Fouling Frenzy
-    - [ ] Throw a Rock
-        - [ ] Choice is optional
-    - [ ] Under Scrutiny
-    - [ ] Intensive Training
-        - [ ] "Available to Play" also include all players on the pitch when rolled as a kick-off result
+            - [ ] During Quick Snap Kickoff Event
+            - [ ] During Blitz Kickoff Event
+            - [ ] During High Kick
+            - [ ] During Pushback
+            - [ ] During Chain Push
+            - [ ] Jump into square
+            - [ ] ... (so many edge cases)
+            - [ ] Roll before using Fumblerooski
+            - [ ]      
+        - [x] Friends with the Ref
+        - [x] Stiletto
+        - [x] Iron Man
+        - [x] Knuckle Dusters
+        - [x] Bad Habits
+        - [x] Greasy Cleats
+        - [x] Blessed Statue of Nuffle
+        - [x] Moles under the Pitch
+        - [ ] Perfect Passing
+        - [ ] Fan Interaction
+        - [ ] Necessary Violence
+        - [ ] Fouling Frenzy
+        - [ ] Throw a Rock
+          - [ ] Choice is optional
+        - [x] Under Scrutiny
+        - [x] Intensive Training
+
 - [ ] Determine Kicking Team
 
 ## Start of Drive
@@ -605,5 +608,11 @@ book.
 - [x] Different Injury Table
 - [x] Different Stunty Injury Table
 - [ ] Different Prayers To Nuffle table
-
-
+  - [ ] Treacheours Trapdoors
+  - [ ] Stiletto
+  - [ ] Iron Man
+  - [ ] Knuckle Dusters
+  - [ ] Blessing of Nuffle
+  - [ ] Moles Under the Pitch
+  - [ ] Under Scrutiny
+  - [ ] Intensive Training

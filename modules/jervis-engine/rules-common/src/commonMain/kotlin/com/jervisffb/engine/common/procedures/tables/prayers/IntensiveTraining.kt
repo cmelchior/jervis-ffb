@@ -24,17 +24,22 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Prayer to Nuffle "Intensive Training" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Intensive Training".
+ *
+ * See page 39 in the BB2020 rulebook.
+ * See page 143 in the BB2025 rulebook.
  */
 object IntensiveTraining : Procedure() {
     override val initialNode: Node = SelectPlayer
@@ -43,14 +48,24 @@ object IntensiveTraining : Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PrayersToNuffleRollContext>()
 
     object SelectPlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<PrayersToNuffleRollContext>().team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val availablePlayers = state.getContext<PrayersToNuffleRollContext>().team
-                .filter {it.state == PlayerDogoutState.RESERVE }
-                .filter { !it.hasSkill(SkillType.LONER) }
-                .map { SelectPlayer(it) }
-            return availablePlayers.ifEmpty {
-                listOf(ContinueWhenReady)
+                // BB2020 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2020
+                        && player.state != PlayerDogoutState.RESERVE
+                        && player.hasSkill(SkillType.LONER)
+                }
+                // BB20205 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2025
+                        && player.type == PlayerType.STAR_PLAYER
+                }
+
+            return when (availablePlayers.isNotEmpty()) {
+                true -> listOf(com.jervisffb.engine.actions.SelectPlayer.fromPlayers(availablePlayers))
+                false -> listOf(ContinueWhenReady)
             }
         }
 
@@ -85,8 +100,10 @@ object IntensiveTraining : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<SkillSelected>(action) {
+                val prayerContext = state.getContext<PrayersToNuffleRollContext>()
                 val context = state.getContext<IntensiveTrainingContext>()
-                val skill = rules.createSkill(context.player, it.skill, expiresAt = Duration.END_OF_GAME)
+                val duration = prayerContext.result?.duration ?: INVALID_GAME_STATE("No prayer result: $context")
+                val skill = rules.createSkill(context.player, it.skill, expiresAt = duration)
                 return compositeCommandOf(
                     RemoveContext(context),
                     AddPlayerSkill(context.player, skill),

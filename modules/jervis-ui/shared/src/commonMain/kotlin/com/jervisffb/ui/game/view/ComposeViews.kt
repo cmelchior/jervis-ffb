@@ -49,6 +49,7 @@ import com.jervisffb.ui.game.dialogs.AbstractActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.BuyInducementsDialog
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
+import com.jervisffb.ui.game.dialogs.PrimarySkillSelectionDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.ModelRef
@@ -147,6 +148,10 @@ fun Dialogs(vm: DialogsViewModel) {
         is DicePoolUserInputDialog -> {
             val dialog = dialogData as DicePoolUserInputDialog
             DicePoolSelectorDialog(dialog, vm)
+        }
+        is PrimarySkillSelectionDialog -> {
+            val dialog = dialogData as PrimarySkillSelectionDialog
+            PrimarySkillSelectionUserActionDialog(dialog, vm)
         }
         is BuyInducementsDialog -> {
             val dialog = dialogData as BuyInducementsDialog

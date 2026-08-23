@@ -7,13 +7,13 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.common.context.RecoverKnockedOutPlayersContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.RecoverPlayerRoll
 import com.jervisffb.engine.common.procedures.RegenerationRoll
-import com.jervisffb.engine.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.common.procedures.actions.foul.BribeRoll
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack

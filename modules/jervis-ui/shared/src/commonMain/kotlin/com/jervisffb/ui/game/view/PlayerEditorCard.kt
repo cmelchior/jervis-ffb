@@ -100,6 +100,7 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.JervisOutlinedTextField
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.onClickWithSmallDragControl
@@ -1073,6 +1074,7 @@ fun SkillValueButton(
     onClick: () -> Unit,
     color: Color,
     isActive: Boolean = false,
+    enabled: Boolean = true,
 ) {
     var hovered by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(0.dp)
@@ -1090,18 +1092,20 @@ fun SkillValueButton(
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
         Button(
             modifier = Modifier
-                .onClickWithSmallDragControl(onClick = onClick)
+                .applyIf(enabled) {
+                    onClickWithSmallDragControl(onClick = onClick)
+                }
                 .onPointerEvent(PointerEventType.Enter) { hovered = true }
                 .onPointerEvent(PointerEventType.Exit) { hovered = false }
             ,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (hovered) containerColor else Color.Transparent,
-                disabledContainerColor = JervisTheme.rulebookPaperMediumDark
+                disabledContainerColor = if (isActive) color else JervisTheme.rulebookPaperMediumDark,
             ),
             shape = shape,
             onClick = { /* Handled by modifier */ },
             border = border,
-            enabled = true,
+            enabled = enabled,
         ) {
             Text(
                 text = text,

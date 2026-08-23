@@ -2,7 +2,6 @@ package com.jervisffb.engine.bb2025
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
-import com.jervisffb.engine.bb2025.StandardBB2025Rules.StandardBB2025RulesBuilder
 import com.jervisffb.engine.bb2025.commands.ResetShadowingSkill
 import com.jervisffb.engine.bb2025.commands.SetWasOnPitchDuringDrive
 import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
@@ -10,10 +9,12 @@ import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
+import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ChainsawFoulStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.procedures.actions.pass.HailMaryPassStep
 import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
@@ -33,7 +34,6 @@ import com.jervisffb.engine.bb2025.tables.BB2025LastingInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB2025RangeRuler
 import com.jervisffb.engine.bb2025.tables.BB2025StandardInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardKickOffEventTable
-import com.jervisffb.engine.bb2025.tables.BB2025StandardPrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB7ArgueTheCallTable
@@ -41,6 +41,7 @@ import com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB7StuntyInjuryTable
+import com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.CommonInducementType
@@ -86,7 +87,6 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import io.ktor.http.parameters
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -275,6 +275,8 @@ abstract class BB2025Rules(
     @Transient override val cheeringFansStep: Procedure = BB2025CheeringFans
     @Transient override val chainsawFoulStep: Procedure = ChainsawFoulStep
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
+    @Transient override val rushRoll: Procedure = RushRoll
+    @Transient override val argueTheCallRoll: Procedure = ArgueTheCallRoll
 
     override val rightStuffMaxStrength: Int = Int.MAX_VALUE
     override fun calculateLeaderRerollStatusChange(team: Team): Command? = Leader.calculateLeaderRerollStatusChange(team)
@@ -342,7 +344,7 @@ abstract class BB2025Rules(
             kickOffEventTable = BB2025StandardKickOffEventTable,
             prayersToNufflePriceForUnderdog = 50_000,
             prayersToNuffleEnabledForUnderdogDuringPregame = false,
-            prayersToNuffleTable = BB2025StandardPrayersToNuffleTable,
+            prayersToNuffleTable = StandardPrayersToNuffleTable,
             weatherTable = BB2025StandardWeatherTable,
             injuryTable = BB2025StandardInjuryTable,
             stuntyInjuryTable = BB2025StuntyInjuryTable,
@@ -528,7 +530,8 @@ class BB72025Rules(
 
     }
 
-    @Transient override val kickOffDeviateRollStep: Procedure = BB7KickOffDeviateRoll
+    @Transient
+    override val kickOffDeviateRollStep: Procedure = BB7KickOffDeviateRoll
 
     /**
      * Returns an updated copy of the current ruleset.

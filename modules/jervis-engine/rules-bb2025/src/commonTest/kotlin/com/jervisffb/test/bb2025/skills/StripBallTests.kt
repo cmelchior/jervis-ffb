@@ -21,9 +21,9 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
@@ -110,7 +110,7 @@ class StripBallTests: JervisGameBB2025Test() {
     fun noScoreIfPushedPlayerIsStripped() {
         setupDefaultGame()
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),

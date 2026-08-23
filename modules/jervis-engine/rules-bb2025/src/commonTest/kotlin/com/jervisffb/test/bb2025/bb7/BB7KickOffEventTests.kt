@@ -24,9 +24,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB72025Test
 import com.jervisffb.test.activatePlayer
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.assertActive
@@ -45,7 +43,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun timeOut_moveForward() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -60,7 +58,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun timeOut_moveForward_lastChance() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
 
@@ -81,7 +79,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun timeOut_moveBack() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
 
@@ -102,7 +100,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun alertDefense() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -130,7 +128,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun alertDefense_notEnoughPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -154,7 +152,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun alertDefense_automaticallyEndSetup() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -173,7 +171,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun alertDefense_sameSquareDoesNotCountAsMoved() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -194,7 +192,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun quickSnapAmountOfPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -224,7 +222,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     fun chargeAmountOfPlayers() {
         val players = listOf("H4".playerId, "H5".playerId, "H6".playerId, "H7".playerId)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -262,7 +260,7 @@ class BB7KickOffEventTests: JervisGameBB72025Test() {
     @Test
     fun pitchInvasionOnePlayerAffected() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(

@@ -64,7 +64,6 @@ import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.common.procedures.rerolls.ProRoll
@@ -86,6 +85,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import kotlin.time.ExperimentalTime
+import com.jervisffb.engine.bb2020.procedures.actions.move.RushRoll as BB2020RushRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll as BB2025RushRoll
 
 
 /**
@@ -349,9 +350,29 @@ object PickupWheelController : D6WithRerollWheelController() {
 object RushWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "rush"
     override val diceRollType: DiceRollType = DiceRollType.RUSH
-    override val rollDiceNode: Node = RushRoll.RollDie
-    override val chooseRerollSourceNode: Node = RushRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = RushRoll.ReRollDie
+    override val rollDiceNode: Node = BB2025RushRoll.RollDie
+    override val chooseRerollSourceNode: Node = BB2025RushRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = BB2025RushRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        return state.activePlayer?.coordinates ?: error("Missing active player: $state")
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<RushRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action Wheel layout when rolling for Rush in BB2020.
+ */
+object RushBB2020WheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "rush"
+    override val diceRollType: DiceRollType = DiceRollType.RUSH
+    override val rollDiceNode: Node = BB2020RushRoll.RollDie
+    override val chooseRerollSourceNode: Node = BB2020RushRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = BB2020RushRoll.ReRollDie
 
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayer?.coordinates ?: error("Missing active player: $state")
@@ -814,8 +835,6 @@ object PuntDistanceWheelController : D6WithRerollWheelController() {
         return context.distanceRoll?.originalRoll!!
     }
 }
-
-
 
 
 

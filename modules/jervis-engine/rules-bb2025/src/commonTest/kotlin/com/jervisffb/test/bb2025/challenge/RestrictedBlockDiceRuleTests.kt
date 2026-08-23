@@ -23,8 +23,8 @@ import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2025.createDefaultHomeTeamBB2025
 import com.jervisffb.test.bb2025.humanTeamAwayBB2025
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import kotlin.random.Random
@@ -50,7 +50,7 @@ class RestrictedBlockDiceRuleTests {
         val controller = GameEngineController(state)
         controller.startTestMode(FullGame)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),

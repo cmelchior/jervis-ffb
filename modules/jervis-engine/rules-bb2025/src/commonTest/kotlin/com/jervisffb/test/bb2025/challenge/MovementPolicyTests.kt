@@ -32,8 +32,8 @@ import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2025.createDefaultHomeTeamBB2025
 import com.jervisffb.test.bb2025.humanTeamAwayBB2025
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.jump
@@ -75,7 +75,7 @@ class MovementPolicyTests {
         controller.startTestMode(FullGame)
         if (startDefaultGame) {
             controller.rollForward(
-                *defaultPregame(),
+                *defaultBB2020Pregame(),
                 *defaultSetup(),
                 *defaultKickOffHomeTeam(),
             )
@@ -270,7 +270,7 @@ class MovementPolicyTests {
     fun initialActionsBypassChallengePoliciesButLiveActionsDoNot() {
         val restriction = MoveTypesAvailable(jump = false)
         val initialActions = buildList {
-            addAll(defaultPregame())
+            addAll(defaultBB2020Pregame())
             addAll(defaultSetup())
             add(SetPlayerState("H1".playerId, PlayerPitchState.PRONE, 12, 5))
             addAll(defaultKickOffHomeTeam().filterNotNull())

@@ -57,7 +57,9 @@ import com.jervisffb.engine.bb2025.skills.TentaclesStep
 import com.jervisffb.engine.common.context.AlertDefenseContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChargeContext
+import com.jervisffb.engine.common.context.DesperateMeasuresRollContext
 import com.jervisffb.engine.common.context.DeviateRollContext
+import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.common.procedures.Bounce
@@ -83,13 +85,11 @@ import com.jervisffb.engine.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitRoll
-import com.jervisffb.engine.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.procedures.actions.foul.BribeRoll
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
@@ -105,6 +105,14 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
+import com.jervisffb.engine.common.procedures.tables.prayers.BlessedStatueOfNuffle
+import com.jervisffb.engine.common.procedures.tables.prayers.GreasyCleats
+import com.jervisffb.engine.common.procedures.tables.prayers.IntensiveTraining
+import com.jervisffb.engine.common.procedures.tables.prayers.IronMan
+import com.jervisffb.engine.common.procedures.tables.prayers.KnuckleDusters
+import com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
+import com.jervisffb.engine.common.procedures.tables.prayers.Stiletto
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.QuickSnapContext
@@ -120,6 +128,10 @@ import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.ReplayController
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.engine.bb2020.procedures.actions.foul.ArgueTheCallRoll as ArgueTheCallRollBB2020
+import com.jervisffb.engine.bb2020.procedures.actions.move.RushRoll as RushRollBB2020
+import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll as ArgueTheCallRollBB2025
+import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll as RushRollBB2025
 
 /**
  * Class responsible for setting the game status message for the current step.
@@ -201,7 +213,10 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             AlwaysHungrySquirmFreeRoll.ReRollDie to "Re-roll D6 to Squirm Free",
             AnimalSavageryRoll.RollDie to "Roll D6 for Animal Savagery",
             AnimalSavageryRoll.ReRollDie to "Re-roll D6 for Animal Savagery",
-            ArgueTheCallRoll.RollDie to "Roll D6 to Argue the Call",
+            com.jervisffb.engine.bb2020.procedures.actions.foul.ArgueTheCallRoll.RollDie to "Roll D6 to Argue the Call",
+            ArgueTheCallRollBB2020.RollDie to "Roll D6 to Argue the Call",
+            ArgueTheCallRollBB2025.RollDie to "Roll D6 to Argue the Call",
+            BadHabits.RollDie to "Roll D3 for Bad Habits",
             BB7KickOffDeviateRoll.RollDice to "Roll D8 + 2D6 (Lowest) to Deviate the Ball",
             BB2020CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
             BB2020CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
@@ -269,8 +284,10 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             RegenerationRoll.RollDie to "Roll D6 for Regeneration",
             RegenerationRoll.ReRollDie to "Re-roll D6 for Regeneration",
             RegenerationRoll.RerollUsingInducement to "Re-roll D6 for Regeneration",
-            RushRoll.ReRollDie to "Re-roll D6 to Rush",
-            RushRoll.RollDie to "Roll D6 to Rush",
+            RushRollBB2020.ReRollDie to "Re-roll D6 to Rush",
+            RushRollBB2020.RollDie to "Roll D6 to Rush",
+            RushRollBB2025.ReRollDie to "Re-roll D6 to Rush",
+            RushRollBB2025.RollDie to "Roll D6 to Rush",
             SecureTheBallRoll.ReRollDie to "Re-roll D6 to Secure the Ball",
             SecureTheBallRoll.RollDie to "Roll D6 to Secure the Ball",
             ShadowingRoll.ReRollDie to "Re-roll D6 to shadow player",
@@ -326,7 +343,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ProjectileVomitRoll.ChooseReRollSource to "Accept Projectile Vomit Result or Reroll D6?",
             ReallyStupidRoll.ChooseReRollSource to "Accept Really Stupid Result or Reroll D6?",
             RegenerationRoll.ChooseReRollSource to "Accept Regeneration Result or Reroll D6?",
-            RushRoll.ChooseReRollSource to "Accept Rush Result or Reroll D6?",
+            RushRollBB2020.ChooseReRollSource to "Accept Rush Result or Reroll D6?",
+            RushRollBB2025.ChooseReRollSource to "Accept Rush Result or Reroll D6?",
             SecureTheBallRoll.ChooseReRollSource to "Accept Secure the Ball Result or Reroll D6?",
             ShadowingRoll.ChooseReRollSource to "Accept Shadowing Result or Reroll D6?",
             SteadyFootingRoll.ChooseReRollSource to "Accept Steady Footing Result or Reroll D6?",
@@ -723,6 +741,62 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 when (isActiveClient) {
                     true -> "Select player to use Tentacles"
                     false -> "Waiting for player to use Tentacles"
+                }
+            },
+            BadHabits.SelectPlayers to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select players to receive Bad Habits"
+                    false -> "Waiting for opponent to select players to receive Bad Habits"
+                }
+            },
+            BlessedStatueOfNuffle.SelectPlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Blessed Statue of Nuffle"
+                    false -> "Waiting for opponent to select a player to receive Blessed Statue of Nuffle"
+                }
+            },
+            GreasyCleats.SelectPlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Greasy Cleats (-1 MA)"
+                    false -> "Waiting for opponent to select a player to receive Greasy Cleats"
+                }
+            },
+            IntensiveTraining.SelectPlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Intensive Training (Skill)"
+                    false -> "Waiting for opponent to select a player to receive Intensive Training"
+                }
+            },
+            IronMan.ChoosePlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Iron Man (+1 AV)"
+                    false -> "Waiting for opponent to select a player to receive Iron Man"
+                }
+            },
+            KnuckleDusters.ChoosePlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Knuckle Dusters (Mighty Blow)"
+                    false -> "Waiting for opponent to select a player to receive Knuckle Dusters"
+                }
+            },
+            ResolveThrowARock.SelectPlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to hit with Throw a Rock"
+                    false -> "Waiting for opponent to select a player to hit with Throw a Rock"
+                }
+            },
+            Stiletto.ChoosePlayer to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select a player to receive Stiletto (Stab)"
+                    false -> "Waiting for opponent to select a player to receive Stiletto"
+                }
+            },
+            PrayersToNuffleRoll.RollDie to { isActiveClient, _, state ->
+                val context = state.getContext<PrayersToNuffleRollContext>()
+                val remainingRolls = (context.rollsRemaining)
+                when (isActiveClient) {
+                    true -> "Roll D8 for Prayers to Nuffle${if (remainingRolls > 0) " ($remainingRolls Rolls Left)" else ""}"
+                    false -> "Waiting for opponent to roll on the Prayers To Nuffle Table"
                 }
             },
         )

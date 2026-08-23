@@ -18,9 +18,9 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
@@ -45,7 +45,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun catchLandingAfterKickOff() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(16, 1),
@@ -62,7 +62,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun catchAccuratePass() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 1),
@@ -88,7 +88,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun catchHandOff() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 1),
@@ -110,7 +110,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     fun catchBouncingBall() {
         awayTeam["A1".playerId].addSkill(SkillType.CATCH)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 3),
@@ -130,7 +130,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
         catcher.addSkill(SkillType.CATCH)
         // The only place a ball can Deviate in BB2025 is during Kick-off
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half
@@ -146,7 +146,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun catchScatteredBall() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 1),
@@ -173,7 +173,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun doesNotWorkWithMissingTackleZones() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         val catcher = awayTeam["A7".playerId]
@@ -197,7 +197,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
     @Test
     fun onlyWorksOnFailedCatches() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(16, 1),
@@ -219,7 +219,7 @@ class CatchSkillTests: JervisGameBB2025Test() {
         val catcher = awayTeam["A1".playerId]
         catcher.addSkill(SkillType.CATCH)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             *activatePlayer("A10", PlayerStandardActionType.PASS),

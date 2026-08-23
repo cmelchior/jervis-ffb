@@ -476,12 +476,16 @@ interface Rules : RulesParameters {
     val fullGameStep: Procedure
     /** How to select the player kicking the ball during Kick Off */
     val kickOffStep: Procedure
-    /** Procedure controlling how to select and use an Apothecary */
+    //  Procedure controlling how to select and use an Apothecary
     val useApothecaryStep: Procedure
-    /** Procedure for using a Chainsaw during a Foul */
+    // Procedure for using a Chainsaw during a Foul
     val chainsawFoulStep: Procedure
-    /** Procedure for handling deviate during Kick Off */
+    // Procedure for handling deviate during Kick Off
     val kickOffDeviateRollStep: Procedure
+    // Procedure for handling rolling the Rush die (including modifiers)
+    val rushRoll: Procedure
+    // Procedure for handling rolling the Argue the Call die
+    val argueTheCallRoll: Procedure
 
     // -- PROCEDURE-DISPATCH END
 

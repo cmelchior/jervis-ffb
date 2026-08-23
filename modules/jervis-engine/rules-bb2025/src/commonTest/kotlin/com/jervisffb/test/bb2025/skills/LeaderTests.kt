@@ -35,11 +35,11 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.blitzBlock
 import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultDetermineKickingTeam
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffAwayTeam
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
@@ -84,7 +84,7 @@ class LeaderTests: JervisGameBB2025Test() {
         val leader = awayTeam["A10".playerId]
         leader.addSkill(SkillType.LEADER)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
         )
         assertFalse(awayTeam.rerolls.any { it is LeaderTeamReroll })

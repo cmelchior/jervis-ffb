@@ -8,12 +8,14 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
+import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.ThrowIn
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
@@ -141,6 +143,17 @@ object AwayTeamFanFactorRoll: D3RollWheelController() {
         val y = (state.rules.pitchHeight / 2) - 1
         val x = (state.rules.pitchWidth / 2) + 1
         return PitchCoordinate(x, y)
+    }
+}
+
+object BadHabitsRollWheelController: D3RollWheelController() {
+    override val buttonIdPrefix: String = "bad-habits"
+    override val rollDiceNode: Node = BadHabits.RollDie
+    override val diceRollType: DiceRollType = DiceRollType.BAD_HABITS
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        val context = state.getContext<PrayersToNuffleRollContext>()
+        return getTeamCenterCoordinates(context.team)
     }
 }
 

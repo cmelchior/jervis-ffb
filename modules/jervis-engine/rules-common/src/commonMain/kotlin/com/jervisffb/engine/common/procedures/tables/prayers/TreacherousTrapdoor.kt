@@ -15,11 +15,13 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Procedure for handling the Prayer to Nuffle "Treacherous Trapdoor" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Treacherous Trapdoor".
  *
- * It is unclear what happens if you put a player on a trapdoor during setup. Does that count
- * as "enter for any reason". For now, we assume no.
+ * See page 39 in the BB2020 rulebook.
+ * See page 143 in the BB2025 rulebook.
+ *
+ * It is unclear what happens if you put a player on a trapdoor during setup.
+ * Does that count as "enter for any reason". For now, we assume no.
  *
  * This means we need to check for trapdoors in the following cases:
  * - Move normal

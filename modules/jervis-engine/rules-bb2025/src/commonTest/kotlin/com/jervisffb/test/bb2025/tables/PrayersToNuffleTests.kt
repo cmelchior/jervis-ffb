@@ -1,143 +1,117 @@
 package com.jervisffb.test.bb2025.tables
 
-import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.MoveType
-import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.PitchSquareSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
+import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.InducementSelection
+import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.SelectRandomPlayers
+import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
+import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.skills.Loner
 import com.jervisffb.engine.bb2025.skills.MightyBlow
-import com.jervisffb.engine.bb2025.skills.Pro
 import com.jervisffb.engine.bb2025.skills.Stab
-import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
+import com.jervisffb.engine.common.inducements.CommonInducementSelection
 import com.jervisffb.engine.common.modifiers.RushModifier
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
-import com.jervisffb.engine.common.procedures.FullGame
-import com.jervisffb.engine.common.procedures.SetupTeam
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.TeamFeature
+import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
+import com.jervisffb.engine.rules.common.tables.IronManStatModifier
+import com.jervisffb.teams.THE_BLACK_GOBBO
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
-import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.defaultDetermineKickingTeam
 import com.jervisffb.test.defaultFanFactor
-import com.jervisffb.test.defaultInducements
-import com.jervisffb.test.defaultJourneyMen
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.moveTo
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.containsInstance
 import com.jervisffb.test.utils.hasSkill
+import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 /**
- * This class is testing all the results on the Prayer to Nuffle Table
+ * This class is testing all the results on the Prayer to Nuffle Table.
  */
-@Ignore // We cannot test this until we have Inducement Support in BB2025
 class PrayersToNuffleTests: JervisGameBB2025Test() {
 
     @BeforeTest
     override fun setUp() {
         super.setUp()
-        // Trigger one roll on the Prayers to Nuffle table as a default
-        // Some tests might overwrite this
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
+        homeTeam.currentTeamValue = 1_050_000
+        awayTeam.currentTeamValue = 1_000_000
     }
 
-    @Test
-    fun doNotUsePrayersIfNotEnabled() {
-        val state = createDefaultGameStateBB2020(rules.toBuilder().run {
-            prayersToNuffleEnabled = false
-            build()
-        })
-        state.homeTeam.teamValue = 2_000_000
-        state.awayTeam.teamValue = 1_000_000
-        val controller = GameEngineController(state)
-        controller.startTestMode(FullGame)
-        controller.rollForward(
-            *defaultFanFactor(),
-            defaultWeather(),
-            *defaultJourneyMen(),
-            *defaultInducements()
-        )
-        // If prayers are skipped, we jump directly to the coin flip.
-        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentProcedure()!!.currentNode())
+    // This assumes that it is the away team buying inducements
+    private fun buyInducements(vararg inducements: InducementSelection<*>): Array<GameAction> {
+        return buildList {
+            addAll(defaultFanFactor())
+            add(defaultWeather())
+            add(InducementsSelected(inducements.toList()))
+        }.toTypedArray()
     }
 
-    @Test
-    fun numberOfPrayers() {
-        val tests: List<Triple<Int, Int, Int>> = listOf(
-            Triple(1_000_000,  1_049_000, 0),
-            Triple(1_000_000, 1_050_000, 1),
-            Triple(1_000_000, 1_099_000, 1)
+    private fun startGameAfterInducements(): Array<GameAction> {
+        return buildList {
+            addAll(defaultDetermineKickingTeam())
+            addAll(defaultSetup())
+            addAll(defaultKickOffHomeTeam().filterNotNull())
+        }.toTypedArray()
+    }
+
+    private fun createStarPlayer(): Player {
+        return Player(
+            rules,
+            id = "away-starplayer".playerId,
+            position = THE_BLACK_GOBBO,
+            type = PlayerType.STAR_PLAYER
         )
-        tests.forEach { (homeTv, awayTv, rolls) ->
-            val state = createDefaultGameStateBB2020(rules)
-            state.homeTeam.teamValue = homeTv
-            state.awayTeam.teamValue = awayTv
-            val controller = GameEngineController(state)
-            controller.startTestMode(FullGame)
-            controller.rollForward(
-                *defaultFanFactor(),
-                defaultWeather(),
-                *defaultJourneyMen(),
-                *defaultInducements()
-            )
-            when (rolls) {
-                0 -> assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentProcedure()!!.currentNode())
-                1 -> {
-                    val context = state.getContext<PrayersToNuffleRollContext>()
-                    assertEquals(1, context.rollsRemaining)
-                    assertEquals(state.homeTeam, context.team)
-                }
-                else -> fail("Unsupported value: rolls")
-            }
-        }
     }
 
     @Test
     fun rerollPrayerIfAlreadyActive() {
-        // Trigger two rolls on Prayers to Nuffle
-        homeTeam.teamValue = 1_100_000
-        awayTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    1.d16, // First roll
-                    1.d16, // Second roll
-                    2.d16 // Reroll
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 2)
             ),
+            1.d16, // First roll
+            1.d16, // Second roll
+            2.d16 // Rerolla
         )
         assertEquals(2, awayTeam.activePrayersToNuffle.size)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR))
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
         assertEquals(0, homeTeam.activePrayersToNuffle.size)
     }
 
@@ -150,18 +124,16 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     @Test
     fun friendsWithTheRef() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    2.d16, // Roll Friends with the Ref
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            2.d16, // Roll Friends with the Ref
+            *startGameAfterInducements(),
         )
 
         // Put player on home team on the ground so they can be fouled
         homeTeam[1.playerNo].state = PlayerPitchState.PRONE
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
 
         // Foul player and roll 5 to trigger the prayer
         controller.rollForward(
@@ -175,308 +147,230 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         assertTrue(state.getPlayerById("A1".playerId).location.isOnPitch(rules))
         state.getPlayerById("A1".playerId).assertStanding()
 
-        // Check the prayer is gone by the end of drive
+        // Check the prayer stays after the end of the drive (unlike BB2020)
         controller.rollForward(
             *skipTurns(15) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
     }
 
     @Test
     fun stiletto() {
+        awayTeam.forEachIndexed { i, it ->
+            when (i) {
+                1 -> it.addSkill(SkillType.LONER.idTarget(2)) // Players will Loner can get it, unlike BB2020
+                13 -> it.state = PlayerDogoutState.KNOCKED_OUT // Selectable
+            }
+        }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    3.d16, // Roll Stiletto
-                    PlayerSelected("A1".playerId), // Give to A1
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            3.d16, // Roll Stiletto
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
+
+        controller.rollForward(
+            PlayerSelected("A1".playerId), // Give to A1
+            *startGameAfterInducements(),
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.hasSkill<Stab>())
         val stabSkill = player.getSkill(SkillType.STAB)
         assertTrue(stabSkill.isTemporary)
-        assertEquals(Duration.END_OF_DRIVE, stabSkill.expiresAt)
+        assertEquals(Duration.END_OF_GAME, stabSkill.expiresAt)
 
-        // Goes away after the drive
+        // Does not go away after the drive (unlike in BB2020)
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-
-        assertFalse(player.hasSkill<Stab>())
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertTrue(player.hasSkill<Stab>())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
     }
 
-    @Test
-    fun stiletto_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(3.d16),
-                ),
-                bounce = null
-            )
-        )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-
-        controller.rollForward(PlayerSelected("H1".playerId))
-        assertTrue(homeTeam[1.playerNo].hasSkill<Stab>())
-        assertTrue(homeTeam[1.playerNo].getSkill(SkillType.STAB).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-    }
-
+    // Not available to Star Players or players already with Stab
     @Test
     fun stiletto_notAvailableToSomePlayers() {
-        awayTeam.forEachIndexed { i, it ->
-            when (i) {
-                0 -> it.state = PlayerDogoutState.KNOCKED_OUT
-                1 -> it.addSkill(SkillType.STAB)
-                else -> it.addSkill(SkillType.LONER.idTarget(2))
-            }
+        awayTeam.forEach {
+            it.addSkill(SkillType.STAB)
         }
+        awayTeam.noToPlayer[14.playerNo] = createStarPlayer()
+        awayTeam[1.playerNo].addSkill(SkillType.STAB)
+        assertEquals(13, awayTeam.size)
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    3.d16, // Roll Stiletto. Will be ignored
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            3.d16, // Roll Stiletto
+            *startGameAfterInducements()
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-        assertEquals(1, awayTeam.filter{ it.hasSkill<Stab>() }.size)
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
     }
 
     @Test
     fun ironMan() {
+        awayTeam.forEachIndexed { i, it ->
+            when (i) {
+                1 -> it.addSkill(SkillType.LONER.idTarget(2)) // Players will Loner can get it, unlike BB2020
+                13 -> it.state = PlayerDogoutState.KNOCKED_OUT // Selectable
+            }
+        }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    4.d16, // Roll Iron Man
-                    PlayerSelected("A1".playerId), // Give to A1
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            4.d16, // Roll Iron Man
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
+
+        controller.rollForward(
+            PlayerSelected("A1".playerId), // Give to A1
+            *startGameAfterInducements(),
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
         val player = state.getPlayerById("A1".playerId)
-        assertTrue(player.armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+        assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(10, player.armorValue)
     }
 
-    @Test
-    fun ironMan_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(4.d16),
-                ),
-                bounce = null
-            )
-        )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
 
-        controller.rollForward(PlayerSelected("H1".playerId))
-        assertTrue(homeTeam[1.playerNo].armourModifiers.contains(PrayerStatModifier.IRON_MAN))
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-    }
-
+    // Not available to Star Players
     @Test
     fun ironMan_notAvailableToSomePlayers() {
-        awayTeam.forEachIndexed { i, it ->
-            when (i) {
-                // Should it not be available to players that already have AV11?
-                0 -> it.state = PlayerDogoutState.KNOCKED_OUT
-                else -> it.addSkill(SkillType.LONER.idTarget(2))
-            }
-        }
+        awayTeam.noToPlayer.clear()
+        awayTeam.noToPlayer[1.playerNo] = createStarPlayer()
+        assertEquals(1, awayTeam.size)
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    4.d16, // Roll Iron Man. Will be ignored
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            4.d16, // Roll Iron Man, no one can have it
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
-        assertEquals(SetupTeam, controller.currentProcedure()!!.procedure)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertEquals(0, awayTeam.filter { it.statModifiers.contains(PrayerStatModifier.IRON_MAN)}.size)
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
+        assertEquals(0, awayTeam.count { it.statModifiers.containsInstance<IronManStatModifier>() })
     }
 
     @Test
     fun ironMan_onAV11() {
-        val player = state.getPlayerById("A1".playerId)
-        player.baseArmorValue = 11
-        player.armorValue = 11
+        val player = state.getPlayerById("A1".playerId).also {
+            it.baseArmorValue = 11
+            it.armorValue = 11
+        }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    4.d16, // Roll Iron Man.
-                    PlayerSelected("A1".playerId), // Give it to A1
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            4.d16, // Roll Iron Man
+            PlayerSelected("A1".playerId), // Give it to A1
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertTrue(player.armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(11, player.armorValue)
     }
 
     @Test
     fun knuckleDusters() {
+        awayTeam.forEachIndexed { i, it ->
+            when (i) {
+                1 -> it.addSkill(SkillType.LONER.idTarget(2)) // Players will Loner can get it, unlike BB2020
+                13 -> it.state = PlayerDogoutState.KNOCKED_OUT // Selectable
+            }
+        }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    5.d16, // Roll Knuckle Dusters
-                    PlayerSelected("A1".playerId), // Give to A1
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            5.d16, // Roll Knuckle Dusters
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
+
+        controller.rollForward(
+            PlayerSelected("A1".playerId), // Give to A1
+            *startGameAfterInducements(),
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
         val player = state.getPlayerById("A1".playerId)
-        assertTrue(player.hasSkill<MightyBlow>())
         val mightyBlowSkill = player.getSkill(SkillType.MIGHTY_BLOW)
         assertTrue(mightyBlowSkill.isTemporary)
-        assertEquals(Duration.END_OF_DRIVE, mightyBlowSkill.expiresAt)
-        assertEquals(1, mightyBlowSkill.value)
+        assertEquals(Duration.END_OF_GAME, mightyBlowSkill.expiresAt)
 
-        // Will be removed after the drive
+        // Does not go away after the drive (unlike in BB2020)
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertFalse(player.hasSkill<MightyBlow>())
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
-    }
-
-    @Test
-    fun knuckleDusters_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(5.d16),
-                ),
-                bounce = null
-            )
-        )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-
-        controller.rollForward(PlayerSelected("H1".playerId))
-        assertTrue(homeTeam[1.playerNo].hasSkill<MightyBlow>())
-        assertTrue(homeTeam[1.playerNo].getSkill(SkillType.MIGHTY_BLOW).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(player.hasSkill<MightyBlow>())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
     }
 
     @Test
     fun knuckleDusters_notAvailableToSomePlayers() {
-        awayTeam.forEachIndexed { i, it ->
-            when (i) {
-                // Should it not be available to players that already have AV11?
-                0 -> it.state = PlayerDogoutState.KNOCKED_OUT
-                1 -> it.addSkill(SkillType.MIGHTY_BLOW.idAdjustment(2))
-                else -> it.addSkill(SkillType.LONER.idTarget(2))
-            }
+        val playerWithSkill = awayTeam.first().also {
+            it.addSkill(SkillType.MIGHTY_BLOW)
         }
+        awayTeam.noToPlayer.clear()
+        awayTeam.noToPlayer[1.playerNo] = playerWithSkill
+        awayTeam.noToPlayer[2.playerNo] = createStarPlayer()
+        assertEquals(2, awayTeam.size)
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    5.d16, // Roll Knuckle Dusters. Will be ignored
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            5.d16, // Roll Iron Man, no one can have it
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
-        assertEquals(SetupTeam, controller.currentProcedure()!!.procedure)
-        assertEquals(1, awayTeam.filter{ it.hasSkill<MightyBlow>() }.size)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
     }
 
     @Test
     fun badHabits() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    6.d16, // Roll Bad Habits.
-                    2.d3, // Number of players affected
-                    RandomPlayersSelected(listOf("H1".playerId, "H2".playerId)),
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            6.d16, // Roll Bad Habits.
+            2.d3, // Number of players affected
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        val action = controller.getAvailableActions().get<SelectRandomPlayers>()
+        assertEquals(2, action.count)
+        assertEquals(awayTeam.size, action.players.size)
+
+        controller.rollForward(
+            RandomPlayersSelected(listOf("H1".playerId, "H2".playerId)),
+            *startGameAfterInducements()
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(2, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
 
-        // Prayer and effects will be removed after the drive
+        // Does not go away after the drive (unlike in BB2020)
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
-    }
-
-    @Test
-    fun badHabits_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(6.d16),
-                ),
-                bounce = null
-            )
-        )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-
-        controller.rollForward(
-            2.d3, // Number of players affected
-            RandomPlayersSelected(listOf("A1".playerId, "A2".playerId)),
-        )
-        assertTrue(awayTeam[1.playerNo].hasSkill<Loner>())
-        assertTrue(awayTeam[1.playerNo].getSkill(SkillType.LONER).isTemporary)
-        assertTrue(awayTeam[2.playerNo].hasSkill<Loner>())
-        assertTrue(awayTeam[2.playerNo].getSkill(SkillType.LONER).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertEquals(2, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
     @Test
@@ -486,256 +380,228 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         homeTeam.forEachIndexed { i, it ->
             if (i > 0) it.addSkill(SkillType.LONER.idTarget(4))
         }
+        homeTeam.noToPlayer[13.playerNo] = createStarPlayer()
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    6.d16, // Roll Bad Habits.
-                    3.d3, // Number of players affected
-                    RandomPlayersSelected(listOf("H1".playerId)),
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            6.d16, // Roll Bad Habits.
+            2.d3, // Number of players affected
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        val action = controller.getAvailableActions().get<SelectRandomPlayers>()
+        assertEquals(1, action.count)
+        assertEquals(1, action.players.size)
+
+        controller.rollForward(
+            RandomPlayersSelected(listOf("H1".playerId)),
+            *startGameAfterInducements()
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(1, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
     @Test
     fun badHabits_notAvailableToAnyPlayers() {
-        homeTeam.forEachIndexed { i, it ->
-            when (i) {
-                0 -> it.state = PlayerDogoutState.KNOCKED_OUT
-                else -> it.addSkill(SkillType.LONER.idTarget(4))
-            }
+        homeTeam.forEach { it ->
+            it.addSkill(SkillType.LONER.idTarget(4))
         }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    6.d16, // Roll Bad Habits.
-                    3.d3, // Number of players affected
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            6.d16, // Roll Bad Habits.
+            2.d3, // Number of players affected
+            *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(homeTeam.none { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
     @Test
     fun greasyCleats() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    7.d16, // Roll Greasy Cleats.
-                    PlayerSelected("H1".playerId), // Select H1 as target
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            7.d16, // Roll Greasy Cleats
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertTrue(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
 
-        // Prayer and effects will be removed after the drive
+        val player = homeTeam["H1".playerId]
+        controller.rollForward(
+            PlayerSelected(player), // Give to H1
+            *startGameAfterInducements(),
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(player.moveModifiers.containsInstance<GreasyCleatsStatModifier>())
+        assertEquals(5, player.move)
+
+        // Does not go away after the drive (unlike in BB2020)
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
-    }
-
-    @Test
-    fun greasyCleats_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(7.d16),
-                ),
-                bounce = null
-            )
-        )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-
-        controller.rollForward(PlayerSelected("A1".playerId))
-        assertTrue(awayTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(player.moveModifiers.containsInstance<GreasyCleatsStatModifier>())
     }
 
     @Test
     fun greasyCleats_noPlayersAvailable() {
-        homeTeam.forEachIndexed { i, it ->
-            it.state = PlayerDogoutState.KNOCKED_OUT
+        homeTeam.noToPlayer.clear()
+        homeTeam.noToPlayer[1.playerNo] = createStarPlayer()
+        assertEquals(1, homeTeam.size)
+        controller.rollForward(
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+            ),
+            7.d16, // Roll Greasy Cleats, no one can have it
+        )
+
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertEquals(0, homeTeam.count { it.statModifiers.containsInstance<IronManStatModifier>() })
+    }
+
+    @Test
+    fun blessingOfNuffle() {
+        awayTeam.forEachIndexed { i, it ->
+            when (i) {
+                1 -> it.addSkill(SkillType.LONER.idTarget(2)) // Players will Loner can get it, unlike BB2020
+                13 -> it.state = PlayerDogoutState.KNOCKED_OUT // Selectable
+            }
         }
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    7.d16, // Roll Greasy Cleats. Will be ignored
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            8.d16, // Roll Blessing of Nuffle
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertEquals(0, homeTeam.count { it.statModifiers.contains(PrayerStatModifier.GREASY_CLEATS) })
-    }
 
-    @Test
-    fun blessedStatueOfNuffle() {
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    8.d16, // Roll Blessed Statue.
-                    PlayerSelected("A1".playerId), // Select A1 as target
-                )
-            ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            PlayerSelected("A1".playerId), // Give to A1
+            *startGameAfterInducements(),
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertTrue(awayTeam[1.playerNo].hasSkill<Pro>())
-    }
 
-    @Test
-    fun blessedStatueOfNuffle_asKickOffEvent() {
-        homeTeam.teamValue = 1_000_000
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BLESSING_OF_NUFFLE))
+        val player = state.getPlayerById("A1".playerId)
+        assertTrue(player.getSkill(SkillType.PRO).isTemporary)
+
+        // Does not go away after the drive
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
-                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
-                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
-                    DiceRollResults(8.d16),
-                ),
-                bounce = null
-            )
+            *skipTurns(16) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
 
-        controller.rollForward(PlayerSelected("H1".playerId))
-        assertTrue(homeTeam[1.playerNo].hasSkill<Pro>())
-        assertTrue(homeTeam[1.playerNo].getSkill(SkillType.PRO).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(player.getSkill(SkillType.PRO).isTemporary)
     }
 
     @Test
     fun blessedStatueOfNuffle_noValidPlayers() {
-        awayTeam.forEachIndexed { i, player ->
-            when (i) {
-                0 -> player.state = PlayerDogoutState.KNOCKED_OUT
-                1 -> player.addSkill(SkillType.PRO)
-                else -> player.addSkill(SkillType.LONER.idTarget(2))
-            }
-        }
+        // Give everyone Pro, so when you roll 8 on the prayer
+        awayTeam.forEach { it.addSkill(SkillType.PRO) }
+        awayTeam.noToPlayer[13.playerNo] = createStarPlayer()
+
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    8.d16, // Roll BlessedStatue. Will be ignored
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
+            8.d16, // Roll Blessing of Nuffle. Will be ignored.
+            *startGameAfterInducements()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertEquals(0, awayTeam.count { it.hasSkill<Pro>() && it.getSkill(SkillType.PRO).isTemporary })
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BLESSING_OF_NUFFLE))
     }
 
     @Test
     fun molesUnderThePitch() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    9.d16, // Roll Moles Under the Pitch.
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            9.d16, // Roll Moles under the Pitch.
+            *startGameAfterInducements()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
 
-        // Prayer and effects will be removed after the half
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
+
+        assertFalse(homeTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
+
+        // Prayer and effects will not be removed after the half
         controller.rollForward(
             *skipTurns(16)
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
     }
 
     @Test
     fun molesUnderThePitch_affectRushing() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    9.d16, // Roll Moles Under the Pitch.
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
+            9.d16, // Roll Moles under the Pitch.
+            *startGameAfterInducements()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
 
         // Reduce movement so we trigger rushing straight away
-        awayTeam[6.playerNo].movesLeft = 0
+        val player = homeTeam["H6".playerId]
         controller.rollForward(
-            PlayerSelected("A6".playerId),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
-            MoveTypeSelected(MoveType.STANDARD),
-            PitchSquareSelected(13, 1), // Requires Rush
+            EndTurn,
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+        )
+        player.movesLeft = 0
+        controller.rollForward(
+            *moveTo(10, 0), // Requires Rush
             2.d6, // Should fail due to Moles Under The Pitch
         )
         assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())
         val context = state.getContext<RushRollContext>()
         assertFalse(context.isSuccess)
-        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_AWAY))
+        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_HOME))
     }
 
+    // Unlike BB2020, Moles Under The Pitch only affects the opposite team, even if both teams roll it
     @Test
-    fun molesUnderThePitch_canAffectRushingTwice() {
+    fun molesUnderThePitch_onlyAffectOneTeam() {
         controller.rollForward(
-            *defaultPregame(
-                prayersToNuffle = arrayOf(
-                    9.d16, // Roll Moles Under the Pitch.
-                )
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                kickoffEvent = arrayOf(
-                    DiceRollResults(3.d6, 3.d6), // Cheering fans
-                    6.d6, // Brilliant coaching, Home
-                    1.d6, // Brilliant coaching, Away
-                    9.d16, // Home Team rolls Moles Under The Pitch
-                )
-            )
+            9.d16, // Roll Moles under the Pitch.
+            *startGameAfterInducements()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+
+        // Manually add for away team
+        homeTeam.activePrayersToNuffle.add(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH)
+        awayTeam.addFeature(TeamFeature.molesUnderThePitch(Duration.END_OF_GAME))
 
         // Reduce movement so we trigger rushing straight away
-        awayTeam[6.playerNo].movesLeft = 0
+        val player = awayTeam[6.playerNo].also {
+            it.movesLeft = 0
+        }
         controller.rollForward(
-            PlayerSelected("A6".playerId),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
-            MoveTypeSelected(MoveType.STANDARD),
-            PitchSquareSelected(13, 1), // Requires Rush
-            3.d6, // Should fail due to 2xMoles Under The Pitch
+            *activatePlayer(player, PlayerStandardActionType.MOVE),
+            *moveTo(13, 1), // Requires Rush
+            3.d6, // Should succeed because Moles only affect one team.
         )
         assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())
         val context = state.getContext<RushRollContext>()
-        assertFalse(context.isSuccess)
+        assertTrue(context.isSuccess)
         assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_AWAY))
-        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_HOME))
+        assertFalse(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_HOME))
     }
 
     @Test
@@ -781,14 +647,96 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     }
 
     @Test
-    @Ignore
     fun underScrutiny() {
-        TODO()
+        controller.rollForward(
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+            ),
+            15.d16, // Roll Under Scrutiny
+            *startGameAfterInducements()
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.UNDER_SCRUTINY))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
+
+        // Prayer and effects will not be removed after the half
+        controller.rollForward(
+            *skipTurns(16)
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.UNDER_SCRUTINY))
+        assertFalse(awayTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
     }
 
     @Test
-    @Ignore
-    fun intensiveTraining() {
-        TODO()
+    fun underScrutiny_triggerOnArmourBroken() {
+        controller.rollForward(
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+            ),
+            15.d16, // Roll Under Scrutiny
+            *startGameAfterInducements(),
+        )
+
+        // Home is under scrutiny, so let home foul after receiving the kick-off.
+        val victim = awayTeam[1.playerNo].also {
+            it.putProne()
+        }
+        val fouler = homeTeam[1.playerNo]
+        controller.rollForward(
+            EndTurn,
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
+            PlayerSelected(victim),
+            DiceRollResults(5.d6, 6.d6), // Break armour without rolling doubles
+            DiceRollResults(1.d6, 2.d6), // Stunned
+            Cancel, // Do not argue the call
+        )
+
+        assertEquals(PlayerDogoutState.BANNED, homeTeam["H1".playerId].state)
+        assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
     }
+
+    @Test
+    fun intensiveTraining() {
+        controller.rollForward(
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+            ),
+            16.d16, // Roll Intensive Training.
+        )
+
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(awayTeam.size, availablePlayers.size)
+
+        val player = awayTeam[1.playerNo]
+        controller.rollForward(
+            PlayerSelected(player),
+            SkillSelected(SkillType.BLOCK.id()),
+        )
+
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.INTENSIVE_TRAINING))
+        val skill = player.getSkill(SkillType.BLOCK)
+        assertTrue(skill.isTemporary)
+        assertEquals(Duration.END_OF_GAME, skill.expiresAt)
+    }
+
+    @Test
+    fun intensiveTraining_noAvailablePlayers() {
+        awayTeam.noToPlayer.clear()
+        awayTeam.add(createStarPlayer().also { it.number = 13.playerNo })
+        assertEquals(1, awayTeam.size)
+
+        controller.rollForward(
+            *buyInducements(
+                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+            ),
+            16.d16, // Roll Intensive Training, but no player can receive it.
+        )
+
+        assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
+        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.INTENSIVE_TRAINING))
+    }
+
 }

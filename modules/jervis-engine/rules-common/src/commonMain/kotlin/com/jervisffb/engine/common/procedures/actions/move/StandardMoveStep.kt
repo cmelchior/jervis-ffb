@@ -235,7 +235,7 @@ object StandardMoveStep: Procedure() {
             val moveContext = state.getContext<MoveContext>()
             return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.rushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val rushContext = state.getContext<RushRollContext>()

@@ -96,7 +96,7 @@ object BeingSentOff: Procedure() {
     }
 
     object RollForArgueTheCall: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ArgueTheCallRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.argueTheCallRoll
         override fun onExitNode(state: Game, rules: Rules): Command = GotoNode(ChooseToUseBribe)
     }
 

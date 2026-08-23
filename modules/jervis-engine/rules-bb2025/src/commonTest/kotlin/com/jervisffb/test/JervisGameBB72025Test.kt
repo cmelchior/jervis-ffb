@@ -39,7 +39,7 @@ abstract class JervisGameBB72025Test: JervisGameBB2025Test() {
 
     override fun startDefaultGame() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
         )

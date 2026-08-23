@@ -11,9 +11,12 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectInducements
+import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.common.context.CoinTossContext
 import com.jervisffb.engine.common.context.FoulContext
+import com.jervisffb.engine.common.context.IntensiveTrainingContext
 import com.jervisffb.engine.common.context.OfficiousRefContext
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
@@ -24,7 +27,6 @@ import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.common.procedures.WeatherRoll
-import com.jervisffb.engine.common.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
@@ -37,14 +39,17 @@ import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
+import com.jervisffb.engine.common.procedures.tables.prayers.IntensiveTraining
 import com.jervisffb.engine.common.procedures.tables.weather.SwelteringHeat
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.BuyInducementsDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
+import com.jervisffb.ui.game.dialogs.PrimarySkillSelectionDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 
@@ -184,6 +189,19 @@ object DialogFactory {
                 is PatchUpPlayer.ChooseToUseApothecary -> {
                     val context = controller.state.getContext<RiskingInjuryContext>()
                     SingleChoiceInputDialog.createUseApothecaryDialog(id, context)
+                }
+
+                IntensiveTraining.SelectSkill -> {
+                    val player = controller.state.getContext<IntensiveTrainingContext>().player
+                    val descriptor = request.get<SelectSkill>()
+                    PrimarySkillSelectionDialog(
+                        player = ModelRef(player.id, player),
+                        primaryCategories = player.position.primary,
+                        skills = descriptor.skills,
+                        title = "Intensive Training",
+                        nextActionId = id,
+                        owner = player.team,
+                    )
                 }
 
                 is FanFactorRolls.SetFanFactorForAwayTeam -> {

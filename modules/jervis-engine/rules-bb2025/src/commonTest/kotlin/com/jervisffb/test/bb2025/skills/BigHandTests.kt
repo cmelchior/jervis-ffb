@@ -14,8 +14,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.pickup
@@ -39,7 +39,7 @@ class BigHandTests: JervisGameBB2025Test() {
         }
 
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 weatherRoll = DiceRollResults(6.d6, 5.d6)
             ),
             *defaultSetup(),

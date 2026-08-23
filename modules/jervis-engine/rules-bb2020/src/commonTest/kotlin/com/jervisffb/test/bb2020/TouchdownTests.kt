@@ -34,9 +34,9 @@ import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
@@ -60,7 +60,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun movingAwayPlayerIntoHomeEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -87,7 +87,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun movingAwayPlayerIntoAwayEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -116,7 +116,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun movingHomePlayerIntoAwayEndZone() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 determineKickingTeam = arrayOf(
                     CoinSideSelected(Coin.HEAD), // Away: Select side
                     CoinTossResult(Coin.HEAD), // Home flips coin
@@ -150,7 +150,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun movingHomePlayerIntoHomeEndZone() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 determineKickingTeam = arrayOf(
                     CoinSideSelected(Coin.HEAD), // Away: Select side
                     CoinTossResult(Coin.HEAD), // Home flips coin
@@ -186,7 +186,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun failRushInEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -220,7 +220,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun failDodgeInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -256,7 +256,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun jumpIntoOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -296,7 +296,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchPassInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -328,7 +328,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchScatterInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -361,7 +361,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchDeviatedBallInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -394,7 +394,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchHandOffInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -424,7 +424,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchBounceInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -457,7 +457,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun catchThrowInInInOpponentEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -494,7 +494,7 @@ class TouchdownTests: JervisGameBB2020Test() {
         assertEquals(0, state.awayScore)
         assertEquals(0, state.homeScore)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 2),
@@ -524,7 +524,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun chainPushOwnBallCarrierIntoEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),
@@ -557,7 +557,7 @@ class TouchdownTests: JervisGameBB2020Test() {
     @Test
     fun pushOpponentBallCarrierIntoEndZone() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),

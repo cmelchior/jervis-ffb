@@ -5,7 +5,6 @@ import com.jervisffb.engine.bb2025.tables.BB2025CasualtyTable
 import com.jervisffb.engine.bb2025.tables.BB2025LastingInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardKickOffEventTable
-import com.jervisffb.engine.bb2025.tables.BB2025StandardPrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB7ArgueTheCallTable
@@ -13,6 +12,7 @@ import com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB7StuntyInjuryTable
+import com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable
 import com.jervisffb.engine.common.tables.DisabledCasualtyTable
 import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
 import com.jervisffb.engine.model.PitchType
@@ -87,7 +87,7 @@ private val BB2025_RULES_SETUP_CONFIGURATION = RulesSetupConfiguration(
     ),
     prayersToNuffleTables = listOf(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", BB2025StandardPrayersToNuffleTable, true),
+            DropdownEntryWithValue("Standard", StandardPrayersToNuffleTable, true),
         ),
         "Spike Magazine 22" to listOf(
             DropdownEntryWithValue("Sevens", BB7PrayersToNuffleTable, false),

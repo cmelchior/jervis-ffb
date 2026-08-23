@@ -23,10 +23,10 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
 import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
@@ -56,7 +56,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun selectKickingPlayer_fromCenterField() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
         )
         val actions = controller.getAvailableActions().actions
@@ -73,7 +73,7 @@ class KickOffTests: JervisGameBB2025Test() {
 
     @Test
     fun selectKickingPlayer_3Players_onLoS() {
-        controller.rollForward(*defaultPregame())
+        controller.rollForward(*defaultBB2020Pregame())
         // Adjust the home team so we only have 3 players available and then
         // place them on LoS
         (1..9).forEach {
@@ -102,7 +102,7 @@ class KickOffTests: JervisGameBB2025Test() {
 
     @Test
     fun selectKickingPlayer_11Players_onLoS() {
-        controller.rollForward(*defaultPregame())
+        controller.rollForward(*defaultBB2020Pregame())
         controller.rollForward(
             *teamSetup(
                 "H1".playerId to PitchCoordinate(12, 2),
@@ -135,7 +135,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun selectKickingPlayer_noPlayersOnPitch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = false),
         )
@@ -158,7 +158,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun placeKick() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")) // Select Kicker
         )
@@ -173,7 +173,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun ballLanding_onPitch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")) // Select Kicker
         )
@@ -195,7 +195,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun ballLanding_onPlayerWhoCatchesIt() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
@@ -213,7 +213,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun ballLanding_onSecondaryPlayerWhoCatchesIt() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
@@ -232,7 +232,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun ballLanding_teamRerollNotAvailable() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             // Make sure the ball lands on a player
             *defaultKickOffHomeTeam(
@@ -250,7 +250,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_outOfBounds() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             // Place ball in end-zone and make it deviate out back of it
             *defaultKickOffHomeTeam(
@@ -267,7 +267,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_afterBounce() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 0),
@@ -284,7 +284,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_outOfBounds_afterFailedCatch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = false),
             // Move a single player to stand next to the edge of the pitch
@@ -308,7 +308,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_acrossLoS_emptySquare() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 0),
@@ -324,7 +324,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_acrossLoS_onKickingTeamPlayer() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 0),
@@ -341,7 +341,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_acrossLoS_afterSecondaryBounce() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             // Place ball in end-zone and make it deviate out the back of it
             *defaultKickOffHomeTeam(
@@ -362,7 +362,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun touchback_giveToPlayer() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 7),
@@ -382,7 +382,7 @@ class KickOffTests: JervisGameBB2025Test() {
         // Prone/Stunned players cannot be given the ball as long as there are
         // standing players.
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 7),
@@ -404,7 +404,7 @@ class KickOffTests: JervisGameBB2025Test() {
         // after the kickoff event. In this case, the ball is placed on an
         // unoccupied square and does not bounce.
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 0),
@@ -433,7 +433,7 @@ class KickOffTests: JervisGameBB2025Test() {
     @Test
     fun ballKnockedFreeAfterAwardedAsTouchback() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),

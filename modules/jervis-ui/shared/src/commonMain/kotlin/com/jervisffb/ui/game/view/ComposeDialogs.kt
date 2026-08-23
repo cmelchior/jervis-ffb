@@ -1,23 +1,35 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -29,34 +41,48 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_icon_menu_dice_roll
 import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.UiGameClientType
+import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
+import com.jervisffb.ui.game.dialogs.PrimarySkillSelectionDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
 import com.jervisffb.ui.game.model.GuardedAction
+import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.NoActionWheel.animationOnly
 import com.jervisffb.ui.game.view.utils.JervisButton
+import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.PitchViewData
 import com.jervisffb.ui.game.viewmodel.PitchViewModel
+import com.jervisffb.ui.menu.BackNavigationHandler
+import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.components.JervisDialog
+import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.utils.JervisLogo
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
+import kotlinx.coroutines.flow.flowOf
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.hypot
 import kotlin.math.roundToInt
@@ -157,7 +183,141 @@ fun SingleSelectUserActionDialog(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun PrimarySkillSelectionUserActionDialog(
+    dialog: PrimarySkillSelectionDialog,
+    vm: DialogsViewModel,
+) {
+    DisposableEffect(dialog) {
+        val callback = OnBackPress { true }
+        BackNavigationHandler.register(callback)
+        onDispose { BackNavigationHandler.unregister(callback) }
+    }
+
+    var dialogOffset by remember { mutableStateOf(IntOffset.Zero) }
+    val player = dialog.player.model
+    val dialogColor = if (player.isOnHomeTeam()) JervisTheme.rulebookRed else JervisTheme.rulebookBlue
+    BasicAlertDialog(
+        modifier = Modifier
+            .offset { dialogOffset }
+            .width(DialogSize.LARGE)
+            .fillMaxHeight(0.7f)
+            .border(6.dp, dialogColor),
+        onDismissRequest = { },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            scrimColor = Color.Transparent,
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        dialogOffset = IntOffset(
+                            x = (dialogOffset.x + dragAmount.x).roundToInt(),
+                            y = (dialogOffset.y + dragAmount.y).roundToInt(),
+                        )
+                    }
+                },
+        ) {
+            BoxWithConstraints(
+                modifier = Modifier.aspectRatio(555f / 1362f),
+            ) {
+                PlayerStatsCard(flowOf(UiPlayerCard(dialog.player)))
+            }
+            PrimarySkillSelectionPanel(
+                dialog = dialog,
+                vm = vm,
+                dialogColor = dialogColor,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PrimarySkillSelectionPanel(
+    dialog: PrimarySkillSelectionDialog,
+    vm: DialogsViewModel,
+    dialogColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    val player = dialog.player.model
+    val rules = player.team.game.rules
+    val existingSkillTypes = remember(player) { player.skills.map { it.type }.toSet() }
+    val offeredSkills = remember(dialog, player) {
+        dialog.primaryCategories.flatMap { category ->
+            rules.skillSettings.getAvailableSkillsIds(category)
+                .filter { it in dialog.skills }
+                .map { category to it }
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .paperBackground()
+            .padding(start = 16.dp, top = 24.dp, end = 24.dp, bottom = 24.dp),
+    ) {
+        TitleBorder(dialogColor)
+        JervisDialogHeader(dialog.title, dialogColor)
+        TitleBorder(dialogColor)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Text(
+                modifier = Modifier.padding(top = 16.dp),
+                text = "${player.name} must select a primary skill.",
+                color = JervisTheme.contentTextColor,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            dialog.primaryCategories.forEach { category ->
+                val categorySkills = offeredSkills
+                    .filter { it.first == category }
+                    .map { it.second }
+                if (categorySkills.isNotEmpty()) {
+                    JervisDialogHeader("${category.description} (Primary)", dialogColor)
+                    TitleBorder(dialogColor)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        categorySkills.forEach { skillId ->
+                            val isExisting = skillId.type in existingSkillTypes
+                            val onClick = remember(
+                                vm.screenViewModel.uiState.gameController,
+                                dialog.nextActionId,
+                                skillId,
+                            ) {
+                                GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                                    vm.userActionSelected(id, SkillSelected(skillId))
+                                }
+                            }
+                            SkillValueButton(
+                                text = skillId.toNiceString(rules.baseVersion),
+                                onClick = onClick,
+                                color = dialogColor,
+                                isActive = isExisting,
+                                enabled = !isExisting,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun MultipleSelectUserActionDialog(
     dialog: MultipleChoiceUserInputDialog,

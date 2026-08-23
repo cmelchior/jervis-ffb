@@ -22,8 +22,8 @@ import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.statistics.probability.scorer.ProbabilityScoreResult
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
@@ -43,7 +43,7 @@ class ChallengeTrackerTests : JervisGameBB2025Test() {
     override fun setUp() {
         setupDefaultGame(
             initialActions = arrayOf(
-                *defaultPregame(),
+                *defaultBB2020Pregame(),
                 *defaultSetup(),
                 *defaultKickOffHomeTeam(),
             ).filterNotNull().toList(),

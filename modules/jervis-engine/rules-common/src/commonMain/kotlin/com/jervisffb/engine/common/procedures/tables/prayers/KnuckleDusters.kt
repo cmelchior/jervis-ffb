@@ -18,17 +18,21 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Prayer to Nuffle "Knuckle Dusters" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Knuckle Dusters".
+ *
+ *  * See page 39 in the BB2020 rulebook.
+ *  * See page 143 in the BB2025 rulebook.
  */
 object KnuckleDusters : Procedure() {
     override val initialNode: Node = ChoosePlayer
@@ -43,8 +47,21 @@ object KnuckleDusters : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val requestedAction = context.team
-                .filter { it.state == PlayerDogoutState.RESERVE || it.location.isOnPitch(rules) }
-                .filter { !it.hasSkill(SkillType.LONER) && !it.hasSkill(SkillType.MIGHTY_BLOW) }
+                // BB2020 Filters
+                .filterNot { player ->
+                    val validLocations = player.state == PlayerDogoutState.RESERVE || player.location.isOnPitch(rules)
+                    rules.baseVersion == GameVersion.BB2020
+                        && (
+                        player.hasSkill(SkillType.LONER)
+                            || player.hasSkill(SkillType.MIGHTY_BLOW)
+                            || !validLocations
+                        )
+                }
+                // BB20205 Filters
+                .filterNot { player ->
+                    rules.baseVersion == GameVersion.BB2025
+                        && (player.type == PlayerType.STAR_PLAYER || player.hasSkill(SkillType.MIGHTY_BLOW))
+                }
                 .let {
                     when (it.isNotEmpty()) {
                         true -> SelectPlayer.fromPlayers(it)
@@ -64,6 +81,7 @@ object KnuckleDusters : Procedure() {
                 }
                 else -> {
                     castAction<PlayerSelected>(action) {
+                        val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(
                             AddPlayerSkill(
@@ -71,7 +89,7 @@ object KnuckleDusters : Procedure() {
                                 skill = rules.createSkill(
                                     player = player,
                                     skill = SkillType.MIGHTY_BLOW.idAdjustment(1),
-                                    expiresAt = Duration.END_OF_DRIVE
+                                    expiresAt = context.result?.duration ?: INVALID_GAME_STATE("Missing duration: $context"),
                                 ),
                             ),
                             ReportGameProgress("${player.name} received Knuckle Dusters"),

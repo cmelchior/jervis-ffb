@@ -577,6 +577,11 @@ data class SkillSelected(val skill: SkillId): GameAction
  */
 @Serializable
 data class InducementsSelected(val inducements: List<InducementSelection<*>>) : GameAction {
+    constructor(vararg inducement: InducementSelection<*>): this(inducement.toList())
+
+    init {
+        require(inducements.isNotEmpty()) { "InducementsSelected must have at least one inducement" }
+    }
 
     // Calculate the total price of all selected inducements
     fun totalPrice(team: Team): Int {

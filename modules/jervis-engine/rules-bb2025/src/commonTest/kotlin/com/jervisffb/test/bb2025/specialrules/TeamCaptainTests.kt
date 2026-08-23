@@ -20,8 +20,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultHomeSetup
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.teamCaptainRoll
@@ -49,7 +49,7 @@ class TeamCaptainTests: JervisGameBB2025Test() {
         val captain = awayTeam["A12".playerId]
         captain.extraSpecialRules.add(PlayerSpecialRule.TEAM_CAPTAIN)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = true),
         )
@@ -76,7 +76,7 @@ class TeamCaptainTests: JervisGameBB2025Test() {
             state = PlayerDogoutState.BADLY_HURT
         }
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = true),
         )

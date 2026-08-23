@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.engine.bb2020.skills.SureFeet
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -38,17 +38,18 @@ object RushRollMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val report = command.firstReport() as GoForItRollReport
-        newActions.add(D6Result(report.roll), RushRoll.RollDie)
+        val rushRoll = fumbblRushRoll(jervisGame.rules)
+        newActions.add(D6Result(report.roll), rushRoll.RollDie)
 
         if (command.reportList.size == 1) {
-            newActions.add(NoRerollSelected(), RushRoll.ChooseReRollSource)
+            newActions.add(NoRerollSelected(), rushRoll.ChooseReRollSource)
         } else {
             val rerollReport = command.reportList.reports[1] as ReRollReport
             val rerolResult = command.reportList.reports[2] as GoForItRollReport
             val fumbblSource = rerollReport.reRollSource
             newActions.add(
                 action = { state: Game, rules: Rules ->
-                    val rerollOptions = RushRoll.ChooseReRollSource.getAvailableActions(state, rules)
+                    val rerollOptions = fumbblRushRoll(rules).ChooseReRollSource.getAvailableActions(state, rules)
                         .first { it is SelectRerollOption }
                         .let { it as SelectRerollOption }
                     val selectedOption = when (fumbblSource) {
@@ -58,9 +59,12 @@ object RushRollMapper: CommandActionMapper {
                     }
                     RerollOptionSelected(selectedOption)
                 },
-                expectedNode = RushRoll.ChooseReRollSource
+                expectedNode = rushRoll.ChooseReRollSource
             )
-            newActions.add(D6Result(rerolResult.roll), RushRoll.ReRollDie)
+            newActions.add(D6Result(rerolResult.roll), rushRoll.ReRollDie)
         }
     }
+
+    private fun fumbblRushRoll(rules: Rules): D6WithRerollProcedure =
+        rules.rushRoll as D6WithRerollProcedure
 }

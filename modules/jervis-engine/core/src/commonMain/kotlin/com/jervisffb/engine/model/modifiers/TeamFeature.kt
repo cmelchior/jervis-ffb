@@ -15,6 +15,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class TeamFeatureType(val description: String) {
     CHEERING_FANS_OFFENSIVE_ASSIST("Offensive Assist on Next Block"),
+    MOLES_UNDER_THE_PITCH("Moles Under the Pitch"),
+    UNDER_SCRUTINY("Under Scrutiny"),
 }
 
 @Serializable
@@ -24,5 +26,7 @@ data class TeamFeature(
 ) {
     companion object {
         fun cheeringFans() = TeamFeature(TeamFeatureType.CHEERING_FANS_OFFENSIVE_ASSIST, Duration.END_OF_OWN_TEAM_TURN)
+        fun molesUnderThePitch(duration: Duration) = TeamFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH, duration)
+        fun underScrutiny(duration: Duration) = TeamFeature(TeamFeatureType.UNDER_SCRUTINY, duration)
     }
 }

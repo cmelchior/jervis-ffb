@@ -22,8 +22,8 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.catch
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.dodge
 import com.jervisffb.test.ext.rollForward
@@ -132,7 +132,7 @@ class SecureTheBallActionTests : JervisGameBB2025Test() {
         setupDefaultGame()
         // Make ball land in [19, 7]
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(21, 7),

@@ -17,9 +17,9 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.utils.assertActive
@@ -43,7 +43,7 @@ class KickTests: JervisGameBB2025Test() {
     fun kickIsOptional() {
         homeTeam["H10".playerId].addSkill(SkillType.KICK)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half,
@@ -58,7 +58,7 @@ class KickTests: JervisGameBB2025Test() {
     fun kickReducesDistance() {
         homeTeam["H10".playerId].addSkill(SkillType.KICK)
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(PlayerId("H10")), // Select Kicker
             PitchSquareSelected(19, 7), // Center of Away Half,
@@ -73,7 +73,7 @@ class KickTests: JervisGameBB2025Test() {
     @Test
     fun doesNotWorkIfDistractedByEndOfDrive() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(25, 0),

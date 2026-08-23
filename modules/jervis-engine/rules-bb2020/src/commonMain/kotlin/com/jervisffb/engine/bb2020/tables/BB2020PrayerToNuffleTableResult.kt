@@ -1,4 +1,4 @@
-package com.jervisffb.engine.common.tables
+package com.jervisffb.engine.bb2020.tables
 
 import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.common.procedures.tables.prayers.BlessedStatueOfNuffle
@@ -17,30 +17,23 @@ import com.jervisffb.engine.common.procedures.tables.prayers.ThrowARock
 import com.jervisffb.engine.common.procedures.tables.prayers.TreacherousTrapdoor
 import com.jervisffb.engine.common.procedures.tables.prayers.UnderScrutiny
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffleEvent
 
 /**
- * List all possible outcomes, across all rule variants, when rolling on the Prayer to Nuffle table.
+ * List of all Prayer to Nuffle results in BB2020.
+
+ * In many cases, the name is shared between BB2020 and BB2025, but the effect
+ * is different, which is why they are tracked separately.
  *
- * This is the concrete catalog of prayers. It implements the `core`-resident
- * [com.jervisffb.engine.rules.common.tables.PrayerToNuffleEvent] abstraction and lives in `rules-common` together with
- * the procedures it references, so those procedures do not have to reside in
- * `core`.
+ * See page 39 in the BB2020 rulebook.
  */
-enum class PrayerToNuffleTableResult(
+enum class BB2020PrayerToNuffleTableResult(
     override val description: String,
     override val procedure: Procedure,
     override val duration: Duration
 ): PrayerToNuffleEvent {
-
-    // BB2025 - All prayers now last the entire game
-    DAZZLING_CATCHING("Dazzling Catching", DummyProcedure, Duration.END_OF_GAME),
-    BLESSING_OF_NUFFLE("Blessing of Nuffle", BlessedStatueOfNuffle, Duration.END_OF_GAME),
-
-    // BB2020 - Slight changes to duration and effect
-    TREACHEROUS_TRAPDOOR("Treacherous Trapdor", TreacherousTrapdoor, Duration.END_OF_HALF),
+    TREACHEROUS_TRAPDOOR("Treacherous Trapdoor", TreacherousTrapdoor, Duration.END_OF_HALF),
     FRIENDS_WITH_THE_REF("Friends with the Ref", FriendsWithTheRef, Duration.END_OF_DRIVE),
     STILETTO("Stiletto", Stiletto, Duration.END_OF_DRIVE),
     IRON_MAN("Iron Man", IronMan, Duration.END_OF_DRIVE),

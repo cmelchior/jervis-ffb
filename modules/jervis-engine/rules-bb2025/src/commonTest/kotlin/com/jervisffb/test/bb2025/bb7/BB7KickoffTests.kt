@@ -11,8 +11,8 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB72025Test
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultKickOffEvent
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.utils.assertActive
 import com.jervisffb.test.utils.assertCoordinates
@@ -29,7 +29,7 @@ class BB7KickoffTests: JervisGameBB72025Test() {
     @Test
     fun deviate2D6OnKickOff() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(14, 5),
@@ -44,7 +44,7 @@ class BB7KickoffTests: JervisGameBB72025Test() {
     @Test
     fun placeKick_notInNoMansLand() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         controller.rollForward(
@@ -61,7 +61,7 @@ class BB7KickoffTests: JervisGameBB72025Test() {
     @Test
     fun touchback_notAwardedWhenLandingInNoMansLand() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(14, 5),
@@ -80,7 +80,7 @@ class BB7KickoffTests: JervisGameBB72025Test() {
     @Test
     fun touchback_afterCatch_notAwardedWhenLandingInNoMansLand() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(15, 5),
@@ -103,7 +103,7 @@ class BB7KickoffTests: JervisGameBB72025Test() {
             it.addSkill(SkillType.KICK)
         }
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             PlayerSelected(kicker),
             PitchSquareSelected(15, 5),

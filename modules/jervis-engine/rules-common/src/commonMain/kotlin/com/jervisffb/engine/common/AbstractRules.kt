@@ -518,7 +518,7 @@ abstract class AbstractRules(
             DiceRollType.OFFICIOUS_REF_REFEREE,
             DiceRollType.PITCH_INVASION_FAN_FACTOR,
             DiceRollType.PITCH_INVASION_PLAYERS_AFFECTED,
-            DiceRollType.PRAYERS_TO_NUFFLE, // Only in BB2020
+            DiceRollType.PRAYERS_TO_NUFFLE,
             DiceRollType.QUICK_SNAP,
             DiceRollType.RECOVER_PLAYER,
             DiceRollType.SOLID_DEFENSE,

@@ -4,6 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.UiActionProvider
@@ -79,5 +80,12 @@ abstract class ActionWheelDialogController {
         val y = (state.rules.pitchHeight / 2)
         val x = state.rules.pitchWidth - (state.rules.pitchWidth / 4) - 1
         return PitchCoordinate(x, y)
+    }
+
+    protected fun getTeamCenterCoordinates(team: Team): PitchCoordinate {
+        return when (team.isHomeTeam()) {
+            true -> getHomeCenterCoordinates(team.game)
+            false -> getAwayCenterCoordinates(team.game)
+        }
     }
 }

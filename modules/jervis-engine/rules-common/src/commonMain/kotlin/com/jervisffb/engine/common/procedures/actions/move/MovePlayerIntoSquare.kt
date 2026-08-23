@@ -23,9 +23,9 @@ import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObserv
 import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.common.procedures.tables.prayers.TreacherousTrapdoor
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -131,10 +131,12 @@ object MovePlayerIntoSquare : Procedure(), ChanceObservationHandler {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             val hasTrapdoor = state.pitch[context.target].hasTrapdoor
-            val isTreacherous = (
-                state.homeTeam.hasPrayer(PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR) ||
-                    state.awayTeam.hasPrayer(PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR)
-            )
+            val isTreacherous = state.homeTeam.activePrayersToNuffle
+                .plus(state.awayTeam.activePrayersToNuffle)
+                .any {
+                    // Work-around for `common` not knowing version-specific prayer results.
+                    it.procedure == TreacherousTrapdoor
+                }
             return if (hasTrapdoor && isTreacherous) {
                 GotoNode(RollForTrapdoor)
             } else {

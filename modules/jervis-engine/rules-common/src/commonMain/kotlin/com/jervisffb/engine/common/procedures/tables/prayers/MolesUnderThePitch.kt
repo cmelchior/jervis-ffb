@@ -4,6 +4,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.commands.AddTeamFeature
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ComputationNode
@@ -12,11 +13,15 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Prayer to Nuffle "Moles under the Pitch" as described on page 39
- * of the rulebook.
+ * Procedure for handling the Prayer to Nuffle "Moles under the Pitch".
+ *
+ * See page 39 in the BB2020 rulebook.
+ * See page 143 in the BB2025 rulebook.
  */
 object MolesUnderThePitch : Procedure() {
     override val initialNode: Node = ApplyEvent
@@ -29,9 +34,11 @@ object MolesUnderThePitch : Procedure() {
     object ApplyEvent : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PrayersToNuffleRollContext>()
+            val duration = context.result?.duration ?: INVALID_GAME_STATE("Missing result: $context")
             return compositeCommandOf(
                 UpdateContext(context.copy(resultApplied = true)),
                 ReportGameProgress("${context.team.name} released Moles Under the Pitch"),
+                AddTeamFeature(context.team.otherTeam(), TeamFeature.molesUnderThePitch(duration)),
                 ExitProcedure(),
             )
         }

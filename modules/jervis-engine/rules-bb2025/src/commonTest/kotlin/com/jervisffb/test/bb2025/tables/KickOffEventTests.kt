@@ -42,9 +42,9 @@ import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultAwaySetup
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
@@ -67,7 +67,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun getTheRef() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -82,7 +82,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun timeOut_moveForward() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -97,7 +97,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun timeOut_moveForward_lastChance() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
 
@@ -118,7 +118,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun timeOut_moveBack() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
 
@@ -139,7 +139,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun solidDefense() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -161,7 +161,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun solidDefense_invalid() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -188,7 +188,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun solidDefense_lessPlayersThanRolled() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -212,7 +212,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun solidDefense_doNotCountPlayersNotBeingMoved() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -246,7 +246,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun highKick() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -266,7 +266,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun highKick_onPlayer() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 6),
@@ -289,7 +289,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun highKick_acrossLoS() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 7),
@@ -314,7 +314,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun highKick_noValidPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
         )
         // Put all players prone so they are no longer Open
@@ -339,7 +339,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         homeTeam.tempAgencyCheerleaders = 0
         awayTeam.tempAgencyCheerleaders = 1
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -356,7 +356,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_homeWins() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -373,7 +373,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_awayWins() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -390,7 +390,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_benefitExpiresAfterFirstTurn() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -413,7 +413,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_benefitExpiresAfterFirstTeamTurn() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -443,7 +443,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_usedOnFirstBlock() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -478,7 +478,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_usedOnFirstBlitz() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -516,7 +516,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun cheeringFans_notUsedOnSpecialActions() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -542,7 +542,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun brilliantCoaching_noRerollGiven() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -562,7 +562,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         homeTeam.partTimeAssistantCoaches = 0
         awayTeam.partTimeAssistantCoaches = 1
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -580,7 +580,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun brilliantCoaching_rerollExpire() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -602,7 +602,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun changingWeather() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -617,7 +617,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun changingWeather_scatter() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -640,7 +640,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun changingWeather_scatterBackToReceiverField() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 7),
@@ -662,7 +662,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun changingWeather_scatterBackToKickerField() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 7),
@@ -683,7 +683,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun changingWeather_perfectWeatherWhenOutOfBounds() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = PitchSquareSelected(13, 0),
@@ -704,7 +704,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun quickSnap() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -736,7 +736,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun quickSnap_notEnoughPlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -760,7 +760,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun quickSnap_automaticallyEndSetup() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -783,7 +783,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun quickSnap_sameSquareDoesNotCountAsMoved() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -803,7 +803,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun dodgySnack_reduceStats() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -825,7 +825,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun dodgySnack_sick() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -847,7 +847,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun dodgySnack_expireAtEndOfDrive() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -868,7 +868,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun dodgySnack_bothTeams() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -889,7 +889,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun dodgySnack_noAvailablePlayers() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         // Fake it by moving all kickoff players back to Dogout after setup
@@ -912,7 +912,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun pitchInvasion() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -931,7 +931,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun pitchInvasion_bothTeams() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -955,7 +955,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun pitchInvasion_lessAvailablePlayersOnThePitch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup()
         )
         // Fake it, by moving all kickoff players except 1 back to Dogout after setup
@@ -984,7 +984,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Test
     fun pitchInvasion_noPlayersOnPitch() {
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultHomeSetup(),
             *defaultAwaySetup(endSetup = false)
         )

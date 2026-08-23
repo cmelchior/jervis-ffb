@@ -26,7 +26,6 @@ import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.modifiers.JumpModifier
 import com.jervisffb.engine.common.modifiers.MarkedModifier
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
 import com.jervisffb.engine.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.fsm.ActionNode
@@ -150,7 +149,7 @@ object JumpStep : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.rushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val rushContext = state.getContext<RushRollContext>()
@@ -183,7 +182,7 @@ object JumpStep : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             return AddContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.rushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val rushContext = state.getContext<RushRollContext>()
             val player = rushContext.player

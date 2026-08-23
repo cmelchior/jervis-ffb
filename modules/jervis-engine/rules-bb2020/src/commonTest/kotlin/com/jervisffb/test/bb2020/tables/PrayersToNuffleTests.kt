@@ -9,17 +9,17 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.bb2020.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2020.skills.Loner
 import com.jervisffb.engine.bb2020.skills.MightyBlow
 import com.jervisffb.engine.bb2020.skills.Pro
 import com.jervisffb.engine.bb2020.skills.Stab
+import com.jervisffb.engine.bb2020.tables.BB2020PrayerToNuffleTableResult
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.modifiers.RushModifier
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.common.procedures.SetupTeam
-import com.jervisffb.engine.common.procedures.actions.move.RushRoll
-import com.jervisffb.engine.common.tables.PrayerToNuffleTableResult
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -32,20 +32,22 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
-import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
+import com.jervisffb.engine.rules.common.tables.IronManStatModifier
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.defaultBB2020Pregame
 import com.jervisffb.test.defaultFanFactor
 import com.jervisffb.test.defaultInducements
 import com.jervisffb.test.defaultJourneyMen
 import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.utils.assertStanding
+import com.jervisffb.test.utils.containsInstance
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -126,7 +128,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         homeTeam.teamValue = 1_100_000
         awayTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     1.d16, // First roll
                     1.d16, // Second roll
@@ -135,8 +137,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             ),
         )
         assertEquals(2, awayTeam.activePrayersToNuffle.size)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR))
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
         assertEquals(0, homeTeam.activePrayersToNuffle.size)
     }
 
@@ -149,7 +151,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
     @Test
     fun friendsWithTheRef() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     2.d16, // Roll Friends with the Ref
                 )
@@ -160,7 +162,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
 
         // Put player on home team on the ground so they can be fouled
         homeTeam[1.playerNo].state = PlayerPitchState.PRONE
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
 
         // Foul player and roll 5 to trigger the prayer
         controller.rollForward(
@@ -179,13 +181,13 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         controller.rollForward(
             *skipTurns(15) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
     }
 
     @Test
     fun stiletto() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     3.d16, // Roll Stiletto
                     PlayerSelected("A1".playerId), // Give to A1
@@ -195,7 +197,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.hasSkill<Stab>())
         val stabSkill = player.getSkill(SkillType.STAB)
@@ -208,14 +210,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         )
 
         assertFalse(player.hasSkill<Stab>())
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
     }
 
     @Test
     fun stiletto_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -227,14 +229,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
 
         controller.rollForward(PlayerSelected("H1".playerId))
         assertTrue(homeTeam[1.playerNo].hasSkill<Stab>())
         assertTrue(homeTeam[1.playerNo].getSkill(SkillType.STAB).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
     }
 
     @Test
@@ -247,7 +249,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             }
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     3.d16, // Roll Stiletto. Will be ignored
                 )
@@ -255,14 +257,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.STILETTO))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.STILETTO))
         assertEquals(1, awayTeam.filter{ it.hasSkill<Stab>() }.size)
     }
 
     @Test
     fun ironMan() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     4.d16, // Roll Iron Man
                     PlayerSelected("A1".playerId), // Give to A1
@@ -272,17 +274,24 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
         val player = state.getPlayerById("A1".playerId)
-        assertTrue(player.armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+        assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(10, player.armorValue)
+
+        // Prayer and effects will be removed after the drive
+        controller.rollForward(
+            *skipTurns(16) // Will also end the half
+        )
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
+        assertFalse(homeTeam[1.playerNo].moveModifiers.containsInstance<IronManStatModifier>())
     }
 
     @Test
     fun ironMan_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -294,13 +303,13 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
 
         controller.rollForward(PlayerSelected("H1".playerId))
-        assertTrue(homeTeam[1.playerNo].armourModifiers.contains(PrayerStatModifier.IRON_MAN))
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(homeTeam[1.playerNo].armourModifiers.containsInstance<IronManStatModifier>())
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
     }
 
     @Test
@@ -313,7 +322,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             }
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     4.d16, // Roll Iron Man. Will be ignored
                 )
@@ -322,8 +331,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
 
         // Team is marked as having the prayer, even if no one could actually get it
         assertEquals(SetupTeam, controller.currentProcedure()!!.procedure)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertEquals(0, awayTeam.filter { it.statModifiers.contains(PrayerStatModifier.IRON_MAN)}.size)
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
+        assertEquals(0, awayTeam.count { it.statModifiers.containsInstance<IronManStatModifier>() })
     }
 
     @Test
@@ -332,22 +341,22 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         player.baseArmorValue = 11
         player.armorValue = 11
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     4.d16, // Roll Iron Man.
                     PlayerSelected("A1".playerId), // Give it to A1
                 )
             ),
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.IRON_MAN))
-        assertTrue(player.armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(11, player.armorValue)
     }
 
     @Test
     fun knuckleDusters() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     5.d16, // Roll Knuckle Dusters
                     PlayerSelected("A1".playerId), // Give to A1
@@ -357,7 +366,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.hasSkill<MightyBlow>())
         val mightyBlowSkill = player.getSkill(SkillType.MIGHTY_BLOW)
@@ -370,14 +379,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *skipTurns(16) // Will also end the half
         )
         assertFalse(player.hasSkill<MightyBlow>())
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
     }
 
     @Test
     fun knuckleDusters_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -389,14 +398,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
 
         controller.rollForward(PlayerSelected("H1".playerId))
         assertTrue(homeTeam[1.playerNo].hasSkill<MightyBlow>())
         assertTrue(homeTeam[1.playerNo].getSkill(SkillType.MIGHTY_BLOW).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
     }
 
     @Test
@@ -410,7 +419,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             }
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     5.d16, // Roll Knuckle Dusters. Will be ignored
                 )
@@ -420,13 +429,13 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         // Team is marked as having the prayer, even if no one could actually get it
         assertEquals(SetupTeam, controller.currentProcedure()!!.procedure)
         assertEquals(1, awayTeam.filter{ it.hasSkill<MightyBlow>() }.size)
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
     }
 
     @Test
     fun badHabits() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     6.d16, // Roll Bad Habits.
                     2.d3, // Number of players affected
@@ -437,14 +446,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(2, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
 
         // Prayer and effects will be removed after the drive
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
@@ -452,7 +461,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
     fun badHabits_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -464,8 +473,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
 
         controller.rollForward(
             2.d3, // Number of players affected
@@ -475,8 +484,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
         assertTrue(awayTeam[1.playerNo].getSkill(SkillType.LONER).isTemporary)
         assertTrue(awayTeam[2.playerNo].hasSkill<Loner>())
         assertTrue(awayTeam[2.playerNo].getSkill(SkillType.LONER).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
     }
 
     @Test
@@ -487,7 +496,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             if (i > 0) it.addSkill(SkillType.LONER.idTarget(4))
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     6.d16, // Roll Bad Habits.
                     3.d3, // Number of players affected
@@ -498,7 +507,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(1, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
@@ -511,7 +520,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             }
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     6.d16, // Roll Bad Habits.
                     3.d3, // Number of players affected
@@ -519,14 +528,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             ),
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BAD_HABITS))
         assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
     @Test
     fun greasyCleats() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     7.d16, // Roll Greasy Cleats.
                     PlayerSelected("H1".playerId), // Select H1 as target
@@ -536,22 +545,22 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultKickOffHomeTeam()
         )
 
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertTrue(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(homeTeam[1.playerNo].moveModifiers.containsInstance<GreasyCleatsStatModifier>())
 
         // Prayer and effects will be removed after the drive
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertFalse(homeTeam[1.playerNo].moveModifiers.containsInstance<GreasyCleatsStatModifier>())
     }
 
     @Test
     fun greasyCleats_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -563,13 +572,13 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
 
         controller.rollForward(PlayerSelected("A1".playerId))
-        assertTrue(awayTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(awayTeam[1.playerNo].moveModifiers.containsInstance<GreasyCleatsStatModifier>())
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
     }
 
     @Test
@@ -578,20 +587,20 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             it.state = PlayerDogoutState.KNOCKED_OUT
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     7.d16, // Roll Greasy Cleats. Will be ignored
                 )
             ),
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.GREASY_CLEATS))
-        assertEquals(0, homeTeam.count { it.statModifiers.contains(PrayerStatModifier.GREASY_CLEATS) })
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertEquals(0, homeTeam.count { it.statModifiers.containsInstance<GreasyCleatsStatModifier>() })
     }
 
     @Test
     fun blessedStatueOfNuffle() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     8.d16, // Roll Blessed Statue.
                     PlayerSelected("A1".playerId), // Select A1 as target
@@ -600,7 +609,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultSetup(),
             *defaultKickOffHomeTeam()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
         assertTrue(awayTeam[1.playerNo].hasSkill<Pro>())
     }
 
@@ -608,7 +617,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
     fun blessedStatueOfNuffle_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
         controller.rollForward(
-            *defaultPregame(),
+            *defaultBB2020Pregame(),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -620,14 +629,14 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 bounce = null
             )
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
 
         controller.rollForward(PlayerSelected("H1".playerId))
         assertTrue(homeTeam[1.playerNo].hasSkill<Pro>())
         assertTrue(homeTeam[1.playerNo].getSkill(SkillType.PRO).isTemporary)
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
     }
 
     @Test
@@ -640,20 +649,20 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             }
         }
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     8.d16, // Roll BlessedStatue. Will be ignored
                 )
             ),
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.BLESSED_STATUE_OF_NUFFLE))
         assertEquals(0, awayTeam.count { it.hasSkill<Pro>() && it.getSkill(SkillType.PRO).isTemporary })
     }
 
     @Test
     fun molesUnderThePitch() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     9.d16, // Roll Moles Under the Pitch.
                 )
@@ -661,21 +670,21 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultSetup(),
             *defaultKickOffHomeTeam()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
 
         // Prayer and effects will be removed after the half
         controller.rollForward(
             *skipTurns(16)
         )
-        assertFalse(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
     }
 
     @Test
     fun molesUnderThePitch_affectRushing() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     9.d16, // Roll Moles Under the Pitch.
                 )
@@ -683,8 +692,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
             *defaultSetup(),
             *defaultKickOffHomeTeam()
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
 
         // Reduce movement so we trigger rushing straight away
         awayTeam[6.playerNo].movesLeft = 0
@@ -704,7 +713,7 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
     @Test
     fun molesUnderThePitch_canAffectRushingTwice() {
         controller.rollForward(
-            *defaultPregame(
+            *defaultBB2020Pregame(
                 prayersToNuffle = arrayOf(
                     9.d16, // Roll Moles Under the Pitch.
                 )
@@ -719,8 +728,8 @@ class PrayersToNuffleTests: JervisGameBB2020Test() {
                 )
             )
         )
-        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
-        assertTrue(homeTeam.hasPrayer(PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(awayTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(homeTeam.hasPrayer(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
 
         // Reduce movement so we trigger rushing straight away
         awayTeam[6.playerNo].movesLeft = 0
