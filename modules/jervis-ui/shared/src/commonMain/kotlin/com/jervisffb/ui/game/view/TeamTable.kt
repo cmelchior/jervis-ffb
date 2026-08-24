@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +56,6 @@ import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
-import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -183,8 +181,6 @@ private fun TeamInfoSection(
     currentTeamValue: Int,
     icon: RosterLogo,
 ) {
-    val scope = rememberCoroutineScope()
-
     Row(modifier = Modifier.height(IntrinsicSize.Min).background(JervisTheme.rulebookPaperMediumDark)) {
         Column(
             modifier = Modifier.weight(1f).padding(4.dp),
@@ -199,9 +195,7 @@ private fun TeamInfoSection(
 
         var teamIcon: ImageBitmap? by remember { mutableStateOf(null) }
         LaunchedEffect(icon) {
-            scope.launch {
-                teamIcon = ICON_FACTORY.loadRosterIcon(team, icon, LogoSize.SMALL)
-            }
+            teamIcon = ICON_FACTORY.loadRosterIcon(team, icon, LogoSize.SMALL)
         }
         Box(
             modifier = Modifier
@@ -503,11 +497,8 @@ private fun TeamTableCellText(text: String, width: Dp, center: Boolean = true) {
 @Composable
 private fun TeamTableCellIcon(player: ModelRef<Player>, isOnHomeTeam: Boolean, width: Dp, center: Boolean = true) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    val scope = rememberCoroutineScope()
-    LaunchedEffect(player) {
-        scope.launch {
-            imageBitmap = ICON_FACTORY.loadPlayerSprite(player.model, isOnHomeTeam).default
-        }
+    LaunchedEffect(player, isOnHomeTeam) {
+        imageBitmap = ICON_FACTORY.loadPlayerSprite(player.model, isOnHomeTeam).default
     }
     Box(
         modifier = Modifier.width(width).padding(2.dp),

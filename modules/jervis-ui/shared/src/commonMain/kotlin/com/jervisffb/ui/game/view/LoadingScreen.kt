@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.utils.loggerInstance
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import org.jetbrains.skia.Point
 import kotlin.time.Clock
@@ -71,6 +72,8 @@ fun LoadingScreen(
         LaunchedEffect(viewModel) {
             try {
                 viewModel.initialize(density)
+            } catch (ex: CancellationException) {
+                throw ex
             } catch (ex: Exception) {
                 loggerInstance.w("Error starting game", ex)
                 viewModel.menuViewModel.showReportIssueDialog(

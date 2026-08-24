@@ -30,12 +30,15 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNotSame
+import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -246,6 +249,34 @@ class IconFactoryTests {
             assertNotNull(cache.loadSprite(source))
             assertEquals(2, requestCount)
             assertEquals(2, saveCount)
+        }
+    }
+
+    @Test
+    fun cancellationOfSharedRequestDoesNotCancelOtherLoaders() = runTest {
+        val requestStarted = CompletableDeferred<Unit>()
+        val client = HttpClient(MockEngine {
+            requestStarted.complete(Unit)
+            awaitCancellation()
+        })
+        client.use { client ->
+            val cache = TeamResourcesCache(
+                httpClient = client,
+                getCachedOnDiskImage = { null },
+                saveOnDiskCachedImage = { _, _ -> },
+            )
+            val source = SingleSprite.url("https://icon-factory.test/shared-cancel.png")
+            val owner = async { cache.loadSprite(source) }
+            requestStarted.await()
+            val waiter = async { cache.loadSprite(source) }
+
+            // Ensure the second caller is waiting on the shared request before
+            // the caller that owns the network request is cancelled.
+            yield()
+            owner.cancel(CancellationException("Canceled by test"))
+
+            assertFailsWith<CancellationException> { owner.await() }
+            assertNull(waiter.await())
         }
     }
 

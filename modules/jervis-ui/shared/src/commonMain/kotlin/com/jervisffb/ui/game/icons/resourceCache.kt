@@ -120,7 +120,8 @@ internal abstract class AbstractResourcesCache(
             deferred.complete(image)
             return image
         } catch (ex: CancellationException) {
-            deferred.completeExceptionally(ex)
+            // Cancellation belongs to this caller. It should be published to other waiters.
+            deferred.complete(null)
             throw ex
         } catch (ex: Throwable) {
             loggerInstance.w("Error loading image from network: $url", ex)

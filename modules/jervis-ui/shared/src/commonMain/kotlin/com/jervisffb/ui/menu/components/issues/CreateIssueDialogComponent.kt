@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,8 +35,6 @@ import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.components.JervisOutlinedTextField
 import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.utils.openUrlInBrowser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Handler for the user to create a bug report. It will use a proxy on the Jervis website
@@ -79,7 +76,6 @@ private fun CreateIssueDialog(
     onIssueCreated: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val (descriptionFocus) = FocusRequester.createRefs()
     var title by remember { mutableStateOf(title) }
     var message by remember { mutableStateOf(message) }
@@ -90,17 +86,15 @@ private fun CreateIssueDialog(
 
     LaunchedEffect(createInProgress) {
         if (createInProgress) {
-            scope.launch(Dispatchers.Default) {
-                IssueTracker.createNewIssue(title, message, error, game, attachGameDump)
-                    .onSuccess { createdIssueUrl ->
-                        onIssueCreated(createdIssueUrl)
-                        createInProgress = false
-                    }
-                    .onFailure {
-                        createError = it
-                        createInProgress = false
-                    }
-            }
+            IssueTracker.createNewIssue(title, message, error, game, attachGameDump)
+                .onSuccess { createdIssueUrl ->
+                    onIssueCreated(createdIssueUrl)
+                    createInProgress = false
+                }
+                .onFailure {
+                    createError = it
+                    createInProgress = false
+                }
         }
     }
 
