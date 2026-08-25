@@ -25,6 +25,12 @@ jobs:
     permissions:
       contents: read
 
+  check-serializers:
+    needs: [ setup ]
+    uses: ./.github/workflows/serializers.yml
+    permissions:
+      contents: read
+
   fuzzer:
     needs: [ setup ]
     uses: ./.github/workflows/fuzzer.yml

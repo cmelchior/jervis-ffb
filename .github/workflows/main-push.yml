@@ -28,6 +28,12 @@ jobs:
     permissions:
       contents: read
 
+  check-serializers:
+    needs: [ setup ]
+    uses: ./.github/workflows/serializers.yml
+    permissions:
+      contents: read
+
   fuzzer:
     needs: [ setup ]
     uses: ./.github/workflows/fuzzer.yml
@@ -37,7 +43,7 @@ jobs:
       contents: read
 
   publication:
-    needs: [ setup, test, fuzzer ]
+    needs: [ setup, test, fuzzer, check-serializers ]
     uses: ./.github/workflows/publication.yml
     with:
       commit_count: ${{ needs.setup.outputs.commit_count }}

@@ -107,14 +107,14 @@ val bb2025SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2025.tables.BB7DesperateMeasuresTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.InjuryTable::class) {
-        subclass(com.jervisffb.engine.bb2025.tables.StandardInjuryTable2025::class)
-        subclass(com.jervisffb.engine.bb2025.tables.StuntyInjuryTable2025::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB7StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.bb2025.tables.StandardInjuryTable2025::class)
+        subclass(com.jervisffb.engine.bb2025.tables.StuntyInjuryTable2025::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.KickOffTable::class) {
-        subclass(com.jervisffb.engine.bb2025.tables.StandardKickOffEventTable2025::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable::class)
+        subclass(com.jervisffb.engine.bb2025.tables.StandardKickOffEventTable2025::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.LastingInjuryTable::class) {
         subclass(com.jervisffb.engine.bb2025.tables.LastingInjuryTable2025::class)

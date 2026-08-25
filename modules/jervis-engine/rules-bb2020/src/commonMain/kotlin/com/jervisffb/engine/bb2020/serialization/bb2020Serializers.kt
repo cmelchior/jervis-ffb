@@ -101,29 +101,29 @@ val bb2020SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2020.tables.BB7DesperateMeasuresTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.InjuryTable::class) {
-        subclass(com.jervisffb.engine.bb2020.tables.StandardInjuryTable2020::class)
-        subclass(com.jervisffb.engine.bb2020.tables.StuntyInjuryTable2020::class)
         subclass(com.jervisffb.engine.bb2020.tables.BB7StandardInjuryTable::class)
         subclass(com.jervisffb.engine.bb2020.tables.BB7StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.bb2020.tables.StandardInjuryTable2020::class)
+        subclass(com.jervisffb.engine.bb2020.tables.StuntyInjuryTable2020::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.KickOffTable::class) {
-        subclass(com.jervisffb.engine.bb2020.tables.StandardKickOffEventTable2020::class)
         subclass(com.jervisffb.engine.bb2020.tables.BB7KickOffEventTable::class)
+        subclass(com.jervisffb.engine.bb2020.tables.StandardKickOffEventTable2020::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.LastingInjuryTable::class) {
         subclass(com.jervisffb.engine.bb2020.tables.LastingInjuryTable2020::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable::class) {
-        subclass(com.jervisffb.engine.bb2020.tables.StandardPrayersToNuffleTable2020::class)
         subclass(com.jervisffb.engine.bb2020.tables.BB7PrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.bb2020.tables.StandardPrayersToNuffleTable2020::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.RangeRuler::class) {
         subclass(com.jervisffb.engine.bb2020.tables.RangeRuler2020::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.WeatherTable::class) {
         subclass(com.jervisffb.engine.bb2020.tables.AutumnWeatherTable::class)
-        subclass(com.jervisffb.engine.bb2020.tables.StandardWeatherTable2020::class)
         subclass(com.jervisffb.engine.bb2020.tables.SpringWeatherTable::class)
+        subclass(com.jervisffb.engine.bb2020.tables.StandardWeatherTable2020::class)
         subclass(com.jervisffb.engine.bb2020.tables.SummerWeatherTable::class)
         subclass(com.jervisffb.engine.bb2020.tables.WinterWeatherTable::class)
     }
