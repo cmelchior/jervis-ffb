@@ -1,6 +1,7 @@
 package com.jervisffb.engine.common.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -112,5 +113,8 @@ private fun createCommonRandomInducements(random: Random, team: Team, availableG
             else -> error("Unknown inducement type: $inducement")
         }
     }
-    return InducementsSelected(selectedInducements)
+    return when (selectedInducements.isNotEmpty()) {
+        true -> InducementsSelected(selectedInducements)
+        false -> Cancel
+    }
 }
