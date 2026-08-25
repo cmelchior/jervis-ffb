@@ -20,6 +20,7 @@ import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable
 import com.jervisffb.engine.rules.common.tables.InjuryTable
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
@@ -106,6 +107,7 @@ interface RulesParameters {
     val prayersToNufflePriceForUnderdog: Int
     val prayersToNuffleEnabledForUnderdogDuringPregame: Boolean
     val prayersToNuffleTable: PrayersToNuffleTable
+    val desperateMeasuresTable: DesperateMeasuresTable
     val weatherTable: WeatherTable
     val injuryTable: InjuryTable
     val stuntyInjuryTable: InjuryTable

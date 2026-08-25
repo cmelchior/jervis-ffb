@@ -3,6 +3,7 @@
 package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
@@ -138,9 +139,11 @@ object DesperateMeasuresRollWheelController : SingleDiceWithLabelRollWheelContro
     override val rollDiceNode: Node = DesperateMeasuresRoll.RollDie
     override val diceRollType: DiceRollType = DiceRollType.DESPERATE_MEASURES
     override fun allUiOptions(state: Game): List<DieResult> {
-        TODO("Not yet implemented")
+        return D8Result.allOptions()
     }
-
+    override fun getLabel(state: Game, die: DieResult): String {
+        return state.rules.desperateMeasuresTable.roll(die as D8Result).label
+    }
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<DesperateMeasuresRollContext>()
         return getTeamCenterCoordinates(context.team)

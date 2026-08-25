@@ -26,7 +26,7 @@ object BB2025StandardKickOffEventTable: KickOffTable {
             8 to CommonKickOffEventResult.CHANGING_WEATHER,
             9 to CommonKickOffEventResult.QUICK_SNAP,
             10 to BB2025KickOffEventResult.CHARGE,
-            11 to CommonKickOffEventResult.DODGY_SNACK,
+            11 to BB2025KickOffEventResult.DODGY_SNACK,
             12 to CommonKickOffEventResult.PITCH_INVASION,
         )
 

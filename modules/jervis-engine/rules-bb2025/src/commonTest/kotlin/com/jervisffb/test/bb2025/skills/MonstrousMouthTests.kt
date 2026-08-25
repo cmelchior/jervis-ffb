@@ -22,7 +22,6 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.OwnedPlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -66,6 +65,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025 as PlayerStatusEffectType
 
 /**
  * Class testing usage of the [MonstrousMouth] skill.

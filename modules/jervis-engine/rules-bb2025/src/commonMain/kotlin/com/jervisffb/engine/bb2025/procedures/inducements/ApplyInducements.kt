@@ -21,9 +21,11 @@ import com.jervisffb.engine.common.commands.SetBlitzersBestKegs
 import com.jervisffb.engine.common.commands.SetHalflingMasterChefs
 import com.jervisffb.engine.common.commands.SetPartTimeAssistantCoaches
 import com.jervisffb.engine.common.commands.SetTempAgencyCheerleaders
+import com.jervisffb.engine.common.context.DesperateMeasuresRollContext
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.inducements.CommonInducementSelection
 import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.procedures.DesperateMeasuresRoll
 import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.common.procedures.inducements.ApplyInducementsContext
 import com.jervisffb.engine.fsm.ComputationNode
@@ -35,7 +37,6 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Bribe
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -72,7 +73,9 @@ object ApplyInducements : Procedure() {
                                             }
                                         }
                                         CommonInducementType.DESPERATE_MEASURES -> {
-                                            updatedContext = updatedContext.copy(rollForDesperateMeasures = inducement.count)
+                                            updatedContext = updatedContext.copy(
+                                                rollForDesperateMeasures = inducement.count
+                                            )
                                         }
                                         CommonInducementType.EXTRA_TEAM_TRAINING -> {
                                             repeat(inducement.count) { i ->
@@ -142,30 +145,30 @@ object ApplyInducements : Procedure() {
 
     object RollForTableInducements: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<ApplyInducementsContext>()
+            val inducementsContext = state.getContext<ApplyInducementsContext>()
             return when {
-                context.rollForPrayers > 0 -> GotoNode(ApplyPrayersToNuffle)
-                context.rollForDesperateMeasures > 0 -> GotoNode(ApplyDesperateMeasures)
+                inducementsContext.rollForPrayers > 0 -> GotoNode(ApplyPrayersToNuffle)
+                inducementsContext.rollForDesperateMeasures > 0 -> GotoNode(ApplyDesperateMeasures)
                 else -> ExitProcedure()
             }
         }
     }
 
     object ApplyPrayersToNuffle: ParentNode()  {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            val context = state.getContext<ApplyInducementsContext>()
-            val prayersContext = PrayersToNuffleRollContext(
-                team = context.team,
-                rollsRemaining = context.rollForPrayers,
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val inducementsContexts = state.getContext<ApplyInducementsContext>()
+            val context = PrayersToNuffleRollContext(
+                team = inducementsContexts.team,
+                rollsRemaining = inducementsContexts.rollForPrayers,
             )
-            return AddContext(prayersContext)
+            return AddContext(context)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PrayersToNuffleRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<ApplyInducementsContext>()
+            val inducementsContext = state.getContext<ApplyInducementsContext>()
             return compositeCommandOf(
                 RemoveContext<PrayersToNuffleRollContext>(),
-                when (context.rollForDesperateMeasures > 0) {
+                when (inducementsContext.rollForDesperateMeasures > 0) {
                     true -> GotoNode(ApplyDesperateMeasures)
                     false -> ExitProcedure()
                 }
@@ -174,7 +177,20 @@ object ApplyInducements : Procedure() {
     }
 
     object ApplyDesperateMeasures: ParentNode()  {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DummyProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val inducementsContext = state.getContext<ApplyInducementsContext>()
+            val context = DesperateMeasuresRollContext(
+                team = inducementsContext.team,
+                rollsRemaining = inducementsContext.rollForDesperateMeasures,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DesperateMeasuresRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<DesperateMeasuresRollContext>(),
+                ExitProcedure()
+            )
+        }
     }
 }

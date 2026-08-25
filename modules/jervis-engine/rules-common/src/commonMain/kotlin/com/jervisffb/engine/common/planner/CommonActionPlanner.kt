@@ -5,7 +5,6 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.common.pathfinder.CommonPathFinder
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -189,7 +188,7 @@ object CommonActionPlanner : ActionPlanner {
             .flatMap { it.squares }
         if (baseTargets.isNotEmpty()) return baseTargets
 
-        val standardMoveIsAvailable = calculateMoveTypesAvailable(state, player)
+        val standardMoveIsAvailable = state.rules.calculateMoveTypesAvailable(state, player)
             ?.types
             ?.contains(MoveType.STANDARD)
             ?: false

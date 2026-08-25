@@ -18,6 +18,7 @@ import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable
 import com.jervisffb.engine.rules.common.tables.InjuryTable
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
@@ -76,6 +77,7 @@ data class RulesParametersHolder(
     override val prayersToNufflePriceForUnderdog: Int,
     override val prayersToNuffleEnabledForUnderdogDuringPregame: Boolean,
     override val prayersToNuffleTable: PrayersToNuffleTable,
+    override val desperateMeasuresTable: DesperateMeasuresTable,
     override val weatherTable: WeatherTable,
     override val injuryTable: InjuryTable,
     override val stuntyInjuryTable: InjuryTable,

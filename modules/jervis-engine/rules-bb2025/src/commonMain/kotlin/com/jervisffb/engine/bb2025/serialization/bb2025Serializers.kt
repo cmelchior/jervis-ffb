@@ -10,10 +10,73 @@ val bb2025SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2025.BB72025Rules::class)
         subclass(com.jervisffb.engine.bb2025.StandardBB2025Rules::class, com.jervisffb.engine.bb2025.StandardBB2025RulesSerializer)
     }
+    polymorphic(com.jervisffb.engine.model.inducements.InducementEffect::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+        polymorphic(com.jervisffb.engine.bb2025.inducements.effects.DesperateMeasures::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+        }
+        polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+            polymorphic(com.jervisffb.engine.bb2025.inducements.effects.DesperateMeasures::class) {
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+                subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+            }
+        }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.biasedreferee.DodgyLeagueRep::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+        polymorphic(com.jervisffb.engine.bb2025.inducements.effects.DesperateMeasures::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.Hangover::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.MagicScroll::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+        }
+    }
     polymorphic(com.jervisffb.engine.model.inducements.settings.InducementType::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.BB2025InducementType::class)
     }
-    polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard::class)
         polymorphic(com.jervisffb.engine.bb2025.inducements.wizards.BB2025Wizard::class) {
             subclass(com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard::class)
@@ -40,6 +103,9 @@ val bb2025SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.rules.common.tables.CasualtyTable::class) {
         subclass(com.jervisffb.engine.bb2025.tables.BB2025CasualtyTable::class)
     }
+    polymorphic(com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable::class) {
+        subclass(com.jervisffb.engine.bb2025.tables.BB7DesperateMeasuresTable::class)
+    }
     polymorphic(com.jervisffb.engine.rules.common.tables.InjuryTable::class) {
         subclass(com.jervisffb.engine.bb2025.tables.BB2025StandardInjuryTable::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable::class)
@@ -54,8 +120,8 @@ val bb2025SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2025.tables.BB2025LastingInjuryTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable::class) {
-        subclass(com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable::class)
         subclass(com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.RangeRuler::class) {
         subclass(com.jervisffb.engine.bb2025.tables.BB2025RangeRuler::class)

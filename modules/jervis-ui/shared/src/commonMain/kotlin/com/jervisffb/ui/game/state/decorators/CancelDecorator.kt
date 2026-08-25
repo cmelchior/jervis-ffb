@@ -18,7 +18,6 @@ import com.jervisffb.engine.bb2025.skills.ShadowingStep
 import com.jervisffb.engine.bb2025.skills.TentaclesStep
 import com.jervisffb.engine.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
@@ -31,6 +30,8 @@ import com.jervisffb.ui.game.model.GuardedBadgeAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.SimpleContextMenuOption
+import com.jervisffb.engine.bb2020.procedures.actions.move.DodgeRoll as DodgeRollBB2020
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll as DodgeRollBB2025
 
 /**
  * Some "cancel" actions we want to display in inside the timer button
@@ -40,9 +41,12 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
     private val nodesForGameStatusButton = setOf(
         ShadowingStep.CheckIfShadowingIsAvailable,
         InterceptionStep.SelectPlayerForInterception,
-        DodgeRoll.ChooseToUseTackle,
-        DodgeRoll.ChooseToUsePrehensileTail,
-        DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
+        DodgeRollBB2020.ChooseToUseTackle,
+        DodgeRollBB2020.ChooseToUsePrehensileTail,
+        DodgeRollBB2020.ChooseToUseDivingTackleAfterReRoll,
+        DodgeRollBB2025.ChooseToUseTackle,
+        DodgeRollBB2025.ChooseToUsePrehensileTail,
+        DodgeRollBB2025.ChooseToUseDivingTackleAfterReRoll,
         JumpRoll.ChooseToUseDivingTackleAfterReRoll,
         LeapRoll.ChooseToUseDivingTackleAfterReRoll,
         PogoRoll.ChooseToUseDivingTackleAfterReRoll,
@@ -101,9 +105,12 @@ object CancelDecorator : PitchActionDecorator<CancelWhenReady> {
             val title = when (state.stack.currentNode()) {
                 ShadowingStep.CheckIfShadowingIsAvailable -> "Do not use Shadowing"
                 InterceptionStep.SelectPlayerForInterception -> "Do not intercept"
-                DodgeRoll.ChooseToUseTackle -> "Do not use Tackle"
-                DodgeRoll.ChooseToUsePrehensileTail -> "Do not use Prehensile Tail"
-                DodgeRoll.ChooseToUseDivingTackleAfterReRoll,
+                DodgeRollBB2020.ChooseToUseTackle,
+                DodgeRollBB2025.ChooseToUseTackle -> "Do not use Tackle"
+                DodgeRollBB2020.ChooseToUsePrehensileTail,
+                DodgeRollBB2025.ChooseToUsePrehensileTail -> "Do not use Prehensile Tail"
+                DodgeRollBB2020.ChooseToUseDivingTackleAfterReRoll,
+                DodgeRollBB2025.ChooseToUseDivingTackleAfterReRoll,
                 JumpRoll.ChooseToUseDivingTackleAfterReRoll,
                 LeapRoll.ChooseToUseDivingTackleAfterReRoll,
                 PogoRoll.ChooseToUseDivingTackleAfterReRoll -> "Do not use Diving Tackle"

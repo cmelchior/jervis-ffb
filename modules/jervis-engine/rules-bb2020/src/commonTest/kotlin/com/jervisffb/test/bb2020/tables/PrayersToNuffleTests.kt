@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
 import com.jervisffb.engine.rules.common.tables.IronManStatModifier
+import com.jervisffb.engine.utils.containsInstance
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
@@ -47,7 +48,6 @@ import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.utils.assertStanding
-import com.jervisffb.test.utils.containsInstance
 import com.jervisffb.test.utils.hasSkill
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore

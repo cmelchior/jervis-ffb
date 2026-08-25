@@ -39,14 +39,11 @@ import com.jervisffb.engine.common.modifiers.LandingModifier
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.ThrowIn
-import com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowPlayerResult
-import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalTableLookupObservation
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportPlayerBounce
 import com.jervisffb.engine.common.reports.ReportPlayerLandingInSquare
@@ -492,7 +489,7 @@ object ThrowPlayerStep: Procedure(), ChanceObservationHandler {
                 add(AddContext(injuryContext))
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
@@ -598,7 +595,7 @@ object ThrowPlayerStep: Procedure(), ChanceObservationHandler {
             val target = context.target ?: INVALID_GAME_STATE("Could not find target location: $context")
             return AddContext(MovePlayerIntoSquareContext(player, target))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.movePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
             val player = context.thrownPlayer ?: INVALID_GAME_STATE("Could not find thrown player: $context")

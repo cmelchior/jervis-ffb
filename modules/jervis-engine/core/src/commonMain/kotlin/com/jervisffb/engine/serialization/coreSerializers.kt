@@ -89,25 +89,6 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.model.SkillValue.Keyword::class)
         subclass(com.jervisffb.engine.model.SkillValue.None::class)
     }
-    polymorphic(com.jervisffb.engine.model.inducements.BiasedReferee::class) {
-        subclass(com.jervisffb.engine.model.inducements.DodgyLeagueRep::class)
-        subclass(com.jervisffb.engine.model.inducements.JormTheOgre::class)
-        subclass(com.jervisffb.engine.model.inducements.RanulfRedHokuli::class)
-        subclass(com.jervisffb.engine.model.inducements.StandardBiasedReferee::class)
-        subclass(com.jervisffb.engine.model.inducements.TheThrundlefootTriplets::class)
-        subclass(com.jervisffb.engine.model.inducements.ThoronKorensson::class)
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.InducementEffect::class) {
-        subclass(com.jervisffb.engine.model.inducements.ByThePowerOfTheGoods::class)
-        polymorphic(com.jervisffb.engine.model.inducements.InfamousCoachAbility::class) {
-            subclass(com.jervisffb.engine.model.inducements.ByThePowerOfTheGoods::class)
-        }
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.InfamousCoachingStaff::class) {
-        subclass(com.jervisffb.engine.model.inducements.JosefBugman::class)
-        subclass(com.jervisffb.engine.model.inducements.KariColdsteel::class)
-        subclass(com.jervisffb.engine.model.inducements.PapaSkullbones::class)
-    }
     polymorphic(com.jervisffb.engine.model.locations.Location::class) {
         subclass(com.jervisffb.engine.model.locations.Dogout::class)
         subclass(com.jervisffb.engine.model.locations.GiantLocation::class)

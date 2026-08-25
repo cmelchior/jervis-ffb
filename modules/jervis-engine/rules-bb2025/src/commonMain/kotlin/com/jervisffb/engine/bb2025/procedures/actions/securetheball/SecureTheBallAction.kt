@@ -17,7 +17,6 @@ import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.procedures.ActivatePlayer
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.ActionNode
@@ -85,7 +84,7 @@ object SecureTheBallAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return buildList<GameActionDescriptor> {
                 // Find possible move types
-                addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+                addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
                 // End action before picking up the ball. If no move has happened, we do not count the action as used.
                 add(EndActionWhenReady)
             }
@@ -140,4 +139,3 @@ object SecureTheBallAction : Procedure() {
         }
     }
 }
-

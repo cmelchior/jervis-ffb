@@ -52,9 +52,9 @@ object KnuckleDusters : Procedure() {
                     val validLocations = player.state == PlayerDogoutState.RESERVE || player.location.isOnPitch(rules)
                     rules.baseVersion == GameVersion.BB2020
                         && (
-                        player.hasSkill(SkillType.LONER)
-                            || player.hasSkill(SkillType.MIGHTY_BLOW)
-                            || !validLocations
+                            player.hasSkill(SkillType.LONER)
+                                || player.hasSkill(SkillType.MIGHTY_BLOW)
+                                || !validLocations
                         )
                 }
                 // BB20205 Filters

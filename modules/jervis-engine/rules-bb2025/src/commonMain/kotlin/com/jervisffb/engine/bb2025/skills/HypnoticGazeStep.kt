@@ -1,5 +1,6 @@
 package com.jervisffb.engine.bb2025.skills
 
+import com.jervisffb.engine.bb2025.modifiers.distracted
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand

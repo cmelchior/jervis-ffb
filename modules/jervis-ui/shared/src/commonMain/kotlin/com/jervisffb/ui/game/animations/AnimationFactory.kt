@@ -153,7 +153,6 @@ object AnimationFactory {
                     when (result) {
                         CommonKickOffEventResult.BRILLIANT_COACHING ->  Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
                         CommonKickOffEventResult.CHANGING_WEATHER -> null
-                        CommonKickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                         CommonKickOffEventResult.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
                         CommonKickOffEventResult.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
                         CommonKickOffEventResult.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
@@ -167,6 +166,7 @@ object AnimationFactory {
                     when (result) {
                         BB2020KickOffEventResult.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
                         BB2020KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                        BB2020KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                     }
                 }
                 is BB2025KickOffEventResult -> {
@@ -174,6 +174,7 @@ object AnimationFactory {
                         BB2025KickOffEventResult.ALERT_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence // TODO: Fix this
                         BB2025KickOffEventResult.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
                         BB2025KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                        BB2025KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                     }
                 }
                 else -> error("Unsupport kick-off event: $result")

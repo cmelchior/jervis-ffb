@@ -24,7 +24,6 @@ import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.context.ThrowARockContext
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
 import com.jervisffb.engine.fsm.ActionNode
@@ -144,7 +143,7 @@ object ResolveThrowARock : Procedure(), ChanceObservationHandler {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),

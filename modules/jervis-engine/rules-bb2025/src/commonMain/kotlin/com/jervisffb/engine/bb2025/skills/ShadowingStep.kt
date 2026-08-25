@@ -9,6 +9,8 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.commands.UseShadowingSkill
+import com.jervisffb.engine.bb2025.modifiers.isChomped
+import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -17,8 +19,8 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.modifiers.isRooted
 import com.jervisffb.engine.common.procedures.Pickup
-import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -30,7 +32,6 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ShadowingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -60,8 +61,7 @@ object ShadowingStep: Procedure() {
                         }
                         .mapNotNull { state.pitch[it].player }
                         .filter { it.isSkillAvailable(SkillType.SHADOWING) }
-                        .filterNot { it.hasStatusEffect(PlayerStatusEffectType.ROOTED) }
-                        .filterNot { it.hasStatusEffect(PlayerStatusEffectType.CHOMPED) }
+                        .filterNot { it.isRooted() || it.isChomped() }
                 }
                 false -> emptyList()
             }

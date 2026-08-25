@@ -88,6 +88,7 @@ object BB2025DiceColorConfig : DiceColorConfig() {
             DiceRollType.COIN_TOSS -> null // Coin Toss is not really a dice roll, so do not show it here
             DiceRollType.CROWD_TAKES_ACTION -> DiceRollTypeConfig(rollType, "Cheering Fans", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.DAUNTLESS -> DiceRollTypeConfig(rollType, "Dauntless", d6, d6Colors, DiceColor.DEFAULT)
+            DiceRollType.DESPERATE_MEASURES -> DiceRollTypeConfig(rollType, "Desperate Measures", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.DEVIATE -> DiceRollTypeConfig(rollType, "Deviate", d8, singleColor, DiceColor.DEFAULT)
             DiceRollType.DODGE -> DiceRollTypeConfig(rollType, "Dodge", d6, d6Colors, DiceColor.YELLOW)
             DiceRollType.DODGY_SNACK_EFFECT -> DiceRollTypeConfig(rollType, "Dodgy Snack Effect", d6, d6Colors, DiceColor.WHITE)

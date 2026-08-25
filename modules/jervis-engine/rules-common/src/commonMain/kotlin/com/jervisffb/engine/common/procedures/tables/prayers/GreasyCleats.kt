@@ -50,7 +50,7 @@ object GreasyCleats : Procedure() {
                     rules.baseVersion == GameVersion.BB2020
                         && (
                             player.hasSkill(SkillType.LONER)
-                            || !validLocations
+                                || !validLocations
                         )
                 }
                 // BB20205 Filters

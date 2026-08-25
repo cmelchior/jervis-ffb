@@ -14,7 +14,6 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.BlockContext
-import com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -106,7 +105,7 @@ object MultipleBlockResolveInjuries: Procedure() {
             }
             return AddContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BB2025MultipleBlockContext>()
             val updatedContext = when (context.activeDefender) {
@@ -131,7 +130,7 @@ object MultipleBlockResolveInjuries: Procedure() {
             val context = state.getContext<BB2025MultipleBlockContext>()
             return AddContext(context.attackerInjuryContext.first())
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

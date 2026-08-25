@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.InducementSelection
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -27,6 +28,7 @@ import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * This interface is responsible for tracking all the "static" rules related to
@@ -130,6 +132,17 @@ interface Rules : RulesParameters {
      * on page 38 in the BB2025 rulebook, `false` if not.
      */
     fun isStanding(player: Player): Boolean
+
+    /**
+     * Returns `true` if the given skill can currently be used by [player].
+     */
+    fun isSkillAvailable(player: Player, type: SkillType): Boolean
+
+    /**
+     * Returns the movement types currently available to the given player.
+     * It is assumed that [player] is also [Game.activePlayer].
+     */
+    fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType?
 
     /**
      * Returns `true` if the player is considered "Distracted" as described on
@@ -466,12 +479,10 @@ interface Rules : RulesParameters {
     val teamTurn: Procedure
     /** The procedure resolving a pass throw (bb2020.PassStep vs bb2025.PassStep). */
     val passStep: Procedure
-    /** The procedure resolving a Throw Team-mate action (bb2020.ThrowPlayerStep vs bb2025.ThrowPlayerStep). */
+    /** The procedure resolving the throwing part of a Throw Team-mate action (bb2020.ThrowPlayerStep vs bb2025.ThrowPlayerStep). */
     val throwPlayerStep: Procedure
     /** The procedure resolving Apply Inducements. BB2025-only; BB2020 uses `DummyProcedure`. */
     val applyInducementsStep: Procedure
-    /** The procedure resolving the Cheering Fans kick-off event. Each ruleset supplies its own. */
-    val cheeringFansStep: Procedure
     /** The root procedure for a full game. Shared across all rulesets; supplied by AbstractRules. */
     val fullGameStep: Procedure
     /** How to select the player kicking the ball during Kick Off */
@@ -484,6 +495,20 @@ interface Rules : RulesParameters {
     val kickOffDeviateRollStep: Procedure
     // Procedure for handling rolling the Rush die (including modifiers)
     val rushRoll: Procedure
+    // Procedures whose implementations differ because of ruleset-specific player effects
+    val gameDrive: Procedure
+    val beingSentOff: Procedure
+    val movePlayerIntoSquare: Procedure
+    val patchUpPlayer: Procedure
+    val riskingInjuryRoll: Procedure
+    // Procedure for handling rolling the Dodge die (including modifiers)
+    val dodgeRoll: Procedure
+    // Procedures for handling ruleset-specific negatrait rolls and effects
+    val takeRootRoll: Procedure
+    val boneHeadRoll: Procedure
+    val reallyStupidRoll: Procedure
+    val unchannelledFuryRoll: Procedure
+    val animalSavageryStep: Procedure
     // Procedure for handling rolling the Argue the Call die
     val argueTheCallRoll: Procedure
 

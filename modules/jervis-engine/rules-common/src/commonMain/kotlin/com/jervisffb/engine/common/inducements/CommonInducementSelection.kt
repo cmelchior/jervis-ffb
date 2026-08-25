@@ -4,8 +4,8 @@ import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.WizardId
-import com.jervisffb.engine.model.inducements.BiasedRefereeType
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaffType
+import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.roster.Position
@@ -31,7 +31,7 @@ object CommonInducementSelection {
     data class BiasedReferee(val referee: BiasedRefereeType) : InducementSelection<BiasedRefereeInducement> {
         override val count: Int = 1
         override val type: InducementType = CommonInducementType.BIASED_REFEREE
-        override fun getSettings(rules: Rules): BiasedRefereeInducement = (rules.inducements[type] as BiasedRefereesInducementGroup).items.first { it.referee.type == referee }
+        override fun getSettings(rules: Rules): BiasedRefereeInducement = (rules.inducements[type] as BiasedRefereesInducementGroup).items.first { it.referee == referee }
     }
 
     @Serializable

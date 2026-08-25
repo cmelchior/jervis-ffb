@@ -15,6 +15,7 @@ import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -25,7 +26,6 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 
 /**
@@ -58,7 +58,7 @@ object BB2025PlacedProne: Procedure() {
             val context = state.getContext<RiskingInjuryContext>()
             val activePlayerContext = state.getContext<ActivatePlayerContext>()
             val player = context.player
-            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
+            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectTypeCommon.ROOTED }
             return buildCompositeCommand {
                 add(SetPlayerState(player, PlayerPitchState.PRONE, hasTackleZones = false))
                 if (rootedStatus != null) {

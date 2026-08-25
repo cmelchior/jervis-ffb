@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.PitchSquareSelected
+import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
 import com.jervisffb.engine.bb2025.skills.TentaclesStep
 import com.jervisffb.engine.commands.Command
@@ -32,7 +33,6 @@ import com.jervisffb.engine.common.modifiers.MarkedModifier
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.calculateOptionsForMoveType
 import com.jervisffb.engine.common.procedures.estimatedMovesLeft
-import com.jervisffb.engine.common.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.reports.ReportJumpResult
 import com.jervisffb.engine.common.reports.ReportSkillUsed

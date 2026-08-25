@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.actions.D6Result
@@ -13,6 +11,7 @@ import com.jervisffb.engine.bb2025.context.MascotRollContext
 import com.jervisffb.engine.bb2025.context.SecureTheBallRollContext
 import com.jervisffb.engine.bb2025.context.SwoopContext
 import com.jervisffb.engine.bb2025.context.TeamCaptainRollContext
+import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
@@ -52,17 +51,12 @@ import com.jervisffb.engine.common.context.TakeRootRollContext
 import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.context.UnchannelledFuryRollContext
 import com.jervisffb.engine.common.procedures.AnimalSavageryRoll
-import com.jervisffb.engine.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.common.procedures.CatchRoll
 import com.jervisffb.engine.common.procedures.PickupRoll
-import com.jervisffb.engine.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.common.procedures.RegenerationRoll
-import com.jervisffb.engine.common.procedures.TakeRootRoll
-import com.jervisffb.engine.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceContext
 import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitRoll
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
@@ -84,8 +78,16 @@ import com.jervisffb.engine.model.context.TentaclesRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
-import kotlin.time.ExperimentalTime
+import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.bb2020.procedures.BoneHeadRoll as BoneHeadRollBB2020
+import com.jervisffb.engine.bb2020.procedures.ReallyStupidRoll as ReallyStupidRollBB2020
+import com.jervisffb.engine.bb2020.procedures.UnchannelledFuryRoll as UnchannelledFuryRollBB2020
+import com.jervisffb.engine.bb2020.procedures.actions.move.DodgeRoll as DodgeRollBB2020
 import com.jervisffb.engine.bb2020.procedures.actions.move.RushRoll as BB2020RushRoll
+import com.jervisffb.engine.bb2025.procedures.BoneHeadRoll as BoneHeadRollBB2025
+import com.jervisffb.engine.bb2025.procedures.ReallyStupidRoll as ReallyStupidRollBB2025
+import com.jervisffb.engine.bb2025.procedures.UnchannelledFuryRoll as UnchannelledFuryRollBB2025
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll as DodgeRollBB2025
 import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll as BB2025RushRoll
 
 
@@ -253,9 +255,29 @@ object ChompWheelController : D6WithRerollWheelController() {
 object DodgeWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "dodge"
     override val diceRollType: DiceRollType = DiceRollType.DODGE
-    override val rollDiceNode: Node = DodgeRoll.RollDie
-    override val chooseRerollSourceNode: Node = DodgeRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = DodgeRoll.ReRollDie
+    override val rollDiceNode: Node = DodgeRollBB2025.RollDie
+    override val chooseRerollSourceNode: Node = DodgeRollBB2025.ChooseReRollSource
+    override val rerollDiceNode: Node = DodgeRollBB2025.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        return state.activePlayer?.coordinates ?: error("Missing active player: $state")
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        val context = state.getContext<DodgeRollContext>()
+        return context.roll!!.originalRoll
+    }
+}
+
+/**
+ * Define the Action Wheel layout when rolling for Dodge in BB2020.
+ */
+object DodgeBB2020WheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "dodge"
+    override val diceRollType: DiceRollType = DiceRollType.DODGE
+    override val rollDiceNode: Node = DodgeRollBB2020.RollDie
+    override val chooseRerollSourceNode: Node = DodgeRollBB2020.ChooseReRollSource
+    override val rerollDiceNode: Node = DodgeRollBB2020.ReRollDie
 
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.activePlayer?.coordinates ?: error("Missing active player: $state")
@@ -498,9 +520,29 @@ object JumpUpWheelController : D6WithRerollWheelController() {
 object BoneHeadWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "bonehead"
     override val diceRollType: DiceRollType = DiceRollType.BONE_HEAD
-    override val rollDiceNode: Node = BoneHeadRoll.RollDie
-    override val chooseRerollSourceNode: Node = BoneHeadRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = BoneHeadRoll.ReRollDie
+    override val rollDiceNode: Node = BoneHeadRollBB2025.RollDie
+    override val chooseRerollSourceNode: Node = BoneHeadRollBB2025.ChooseReRollSource
+    override val rerollDiceNode: Node = BoneHeadRollBB2025.ReRollDie
+    override val nodes: Set<Node> = setOf(
+        BoneHeadRollBB2020.RollDie,
+        BoneHeadRollBB2020.ChooseReRollSource,
+        BoneHeadRollBB2020.ReRollDie,
+        BoneHeadRollBB2025.RollDie,
+        BoneHeadRollBB2025.ChooseReRollSource,
+        BoneHeadRollBB2025.ReRollDie,
+    )
+    override fun getRollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> BoneHeadRollBB2020.RollDie
+        GameVersion.BB2025 -> BoneHeadRollBB2025.RollDie
+    }
+    override fun getChooseRerollSourceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> BoneHeadRollBB2020.ChooseReRollSource
+        GameVersion.BB2025 -> BoneHeadRollBB2025.ChooseReRollSource
+    }
+    override fun getRerollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> BoneHeadRollBB2020.ReRollDie
+        GameVersion.BB2025 -> BoneHeadRollBB2025.ReRollDie
+    }
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
@@ -564,9 +606,29 @@ object AnimalSavageryWheelController : D6WithRerollWheelController() {
 object ReallyStupidWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "really-stupid"
     override val diceRollType: DiceRollType = DiceRollType.REALLY_STUPID
-    override val rollDiceNode: Node = ReallyStupidRoll.RollDie
-    override val chooseRerollSourceNode: Node = ReallyStupidRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = ReallyStupidRoll.ReRollDie
+    override val rollDiceNode: Node = ReallyStupidRollBB2025.RollDie
+    override val chooseRerollSourceNode: Node = ReallyStupidRollBB2025.ChooseReRollSource
+    override val rerollDiceNode: Node = ReallyStupidRollBB2025.ReRollDie
+    override val nodes: Set<Node> = setOf(
+        ReallyStupidRollBB2020.RollDie,
+        ReallyStupidRollBB2020.ChooseReRollSource,
+        ReallyStupidRollBB2020.ReRollDie,
+        ReallyStupidRollBB2025.RollDie,
+        ReallyStupidRollBB2025.ChooseReRollSource,
+        ReallyStupidRollBB2025.ReRollDie,
+    )
+    override fun getRollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> ReallyStupidRollBB2020.RollDie
+        GameVersion.BB2025 -> ReallyStupidRollBB2025.RollDie
+    }
+    override fun getChooseRerollSourceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> ReallyStupidRollBB2020.ChooseReRollSource
+        GameVersion.BB2025 -> ReallyStupidRollBB2025.ChooseReRollSource
+    }
+    override fun getRerollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> ReallyStupidRollBB2020.ReRollDie
+        GameVersion.BB2025 -> ReallyStupidRollBB2025.ReRollDie
+    }
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
@@ -609,9 +671,29 @@ object RegenerationWheelController : D6WithRerollWheelController() {
 object UnchannelledFuryWheelController : D6WithRerollWheelController() {
     override val buttonIdPrefix: String = "unchannelled-fury"
     override val diceRollType: DiceRollType = DiceRollType.UNCHANNELLED_FURY
-    override val rollDiceNode: Node = UnchannelledFuryRoll.RollDie
-    override val chooseRerollSourceNode: Node = UnchannelledFuryRoll.ChooseReRollSource
-    override val rerollDiceNode: Node = UnchannelledFuryRoll.ReRollDie
+    override val rollDiceNode: Node = UnchannelledFuryRollBB2025.RollDie
+    override val chooseRerollSourceNode: Node = UnchannelledFuryRollBB2025.ChooseReRollSource
+    override val rerollDiceNode: Node = UnchannelledFuryRollBB2025.ReRollDie
+    override val nodes: Set<Node> = setOf(
+        UnchannelledFuryRollBB2020.RollDie,
+        UnchannelledFuryRollBB2020.ChooseReRollSource,
+        UnchannelledFuryRollBB2020.ReRollDie,
+        UnchannelledFuryRollBB2025.RollDie,
+        UnchannelledFuryRollBB2025.ChooseReRollSource,
+        UnchannelledFuryRollBB2025.ReRollDie,
+    )
+    override fun getRollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> UnchannelledFuryRollBB2020.RollDie
+        GameVersion.BB2025 -> UnchannelledFuryRollBB2025.RollDie
+    }
+    override fun getChooseRerollSourceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> UnchannelledFuryRollBB2020.ChooseReRollSource
+        GameVersion.BB2025 -> UnchannelledFuryRollBB2025.ChooseReRollSource
+    }
+    override fun getRerollDiceNode(state: Game): Node = when (state.rules.baseVersion) {
+        GameVersion.BB2020 -> UnchannelledFuryRollBB2020.ReRollDie
+        GameVersion.BB2025 -> UnchannelledFuryRollBB2025.ReRollDie
+    }
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<ActivatePlayerContext>().player.coordinates
     }
@@ -811,7 +893,7 @@ object TentaclesWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = TentaclesRoll.RollDie
     override val chooseRerollSourceNode: Node = TentaclesRoll.ChooseReRollSource
     override val rerollDiceNode: Node = TentaclesRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<TentaclesRollContext>().tentaclePlayer!!.coordinates
     }
     override fun getOriginalRoll(state: Game): D6Result {
@@ -826,7 +908,7 @@ object PuntDistanceWheelController : D6WithRerollWheelController() {
     override val rollDiceNode: Node = PuntDistanceRoll.RollDie
     override val chooseRerollSourceNode: Node = PuntDistanceRoll.ChooseReRollSource
     override val rerollDiceNode: Node = PuntDistanceRoll.ReRollDie
-    override fun getActionWheelCenter(state: Game): PitchCoordinate? {
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<PuntContext>()
         return context.punter.coordinates
     }
@@ -835,6 +917,3 @@ object PuntDistanceWheelController : D6WithRerollWheelController() {
         return context.distanceRoll?.originalRoll!!
     }
 }
-
-
-

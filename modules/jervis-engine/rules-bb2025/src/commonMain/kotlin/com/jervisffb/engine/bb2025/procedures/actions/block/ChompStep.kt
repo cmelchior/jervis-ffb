@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.context.ChompContext
+import com.jervisffb.engine.bb2025.modifiers.chomped
 import com.jervisffb.engine.bb2025.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.bb2025.reports.ReportChompResult
 import com.jervisffb.engine.commands.AddPlayerStatusEffect

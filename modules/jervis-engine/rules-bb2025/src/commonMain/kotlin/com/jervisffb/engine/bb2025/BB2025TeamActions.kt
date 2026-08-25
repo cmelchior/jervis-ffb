@@ -8,13 +8,13 @@ import com.jervisffb.engine.bb2025.procedures.actions.block.ChompAction
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.bb2025.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallAction
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeAction
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitAction
 import com.jervisffb.engine.common.procedures.actions.block.StabAction
 import com.jervisffb.engine.common.procedures.actions.handoff.HandOffAction
 import com.jervisffb.engine.common.procedures.actions.move.MoveAction
 import com.jervisffb.engine.common.procedures.actions.pass.PassAction
-import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType

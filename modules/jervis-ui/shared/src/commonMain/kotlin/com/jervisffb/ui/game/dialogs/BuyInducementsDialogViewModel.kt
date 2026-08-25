@@ -22,8 +22,8 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.WizardId
-import com.jervisffb.engine.model.inducements.BiasedRefereeType
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaffType
+import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
 import com.jervisffb.engine.model.inducements.settings.InducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement

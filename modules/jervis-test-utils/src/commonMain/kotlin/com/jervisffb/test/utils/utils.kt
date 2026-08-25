@@ -7,6 +7,8 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.bb2025.modifiers.chomped
+import com.jervisffb.engine.bb2025.modifiers.distracted
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -20,7 +22,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Skill
@@ -33,10 +34,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-
-inline fun <reified T: Any?> List<Any?>.containsInstance(): Boolean {
-    return this.any { it is T }
-}
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : Any> assertTypeOf(obj: Any?): T {
@@ -187,7 +184,7 @@ fun Player.assertStanding() {
 fun Player.assertDistracted() {
     assertNull(intermediateState)
     assertFalse(hasTackleZones, "Distracted players should not have tackle zones")
-    assertTrue(statusEffects.any { it.type == PlayerStatusEffectType.DISTRACTED })
+    assertTrue(team.game.rules.isDistracted(this))
 }
 
 /**

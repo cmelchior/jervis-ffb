@@ -14,7 +14,6 @@ import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -71,7 +70,7 @@ object BB2020KnockedDown: Procedure() {
                 )
             } else null
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             // If we are part of a Multiple Block, the bounce is delayed until later,
@@ -109,4 +108,3 @@ object BB2020KnockedDown: Procedure() {
         }
     }
 }
-

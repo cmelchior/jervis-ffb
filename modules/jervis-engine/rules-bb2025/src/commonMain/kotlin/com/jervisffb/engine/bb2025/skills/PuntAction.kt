@@ -20,7 +20,6 @@ import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.PuntContext
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.utils.endActionImmediately
@@ -71,7 +70,7 @@ object PuntAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PuntContext>()
             val options = mutableListOf<GameActionDescriptor>()
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
             if (!context.hasPunted && context.punter.hasBall()) {
                 options.add(SelectPassType(listOf(PassType.PUNT)))
             }

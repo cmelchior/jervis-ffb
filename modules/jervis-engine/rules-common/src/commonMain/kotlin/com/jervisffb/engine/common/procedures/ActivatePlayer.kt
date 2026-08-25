@@ -19,6 +19,8 @@ import com.jervisffb.engine.common.commands.SetHasTackleZones
 import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.common.commands.SetSpecialActionSkillUsed
 import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
+import com.jervisffb.engine.common.modifiers.hasBloodLust
 import com.jervisffb.engine.common.reports.ReportActionEnded
 import com.jervisffb.engine.common.reports.ReportActionSelected
 import com.jervisffb.engine.common.reports.ReportFailedBoneHead
@@ -35,7 +37,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -261,13 +262,13 @@ object ActivatePlayer : Procedure() {
             val player = state.activePlayer ?: error("Missing active player")
             val hasTakeRoot = player.isSkillAvailable(SkillType.TAKE_ROOT)
             val isStanding = rules.isStanding(player)
-            val isAlreadyRooted = player.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+            val isAlreadyRooted = player.statusEffects.any { it.type == PlayerStatusEffectTypeCommon.ROOTED }
             return when (hasTakeRoot && isStanding && !isAlreadyRooted) {
                 true -> null
                 false -> CheckForBoneHead
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = TakeRootRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.takeRootRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             val player = context.player
@@ -289,7 +290,7 @@ object ActivatePlayer : Procedure() {
                 false -> CheckForReallyStupid
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BoneHeadRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.boneHeadRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             val player = context.player
@@ -312,7 +313,7 @@ object ActivatePlayer : Procedure() {
                 false -> CheckForUnchannelledFury
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ReallyStupidRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.reallyStupidRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             val player = context.player
@@ -335,7 +336,7 @@ object ActivatePlayer : Procedure() {
                 false -> CheckForAnimalSavagery
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = UnchannelledFuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.unchannelledFuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             return if (context.activationEndsImmediately) {
@@ -358,7 +359,7 @@ object ActivatePlayer : Procedure() {
                 false -> CheckForBloodLust
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = AnimalSavageryStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.animalSavageryStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             return if (context.activationEndsImmediately) {
@@ -404,7 +405,7 @@ object ActivatePlayer : Procedure() {
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
-            return if (context.player.hasStatusEffect(PlayerStatusEffectType.BLOOD_LUST)) {
+            return if (context.player.hasBloodLust()) {
                 GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 compositeCommandOf(

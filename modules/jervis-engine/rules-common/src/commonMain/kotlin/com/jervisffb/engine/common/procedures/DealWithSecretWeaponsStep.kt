@@ -15,7 +15,6 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.common.context.DealWithSecretWeaponsContext
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ParentNode
@@ -109,7 +108,7 @@ object DealWithSecretWeaponsStep: Procedure() {
                 AddContext(sentOffContext)
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BeingSentOff
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.beingSentOff
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<DealWithSecretWeaponsContext>()
             val player = context.selectedPlayer ?: INVALID_GAME_STATE("Missing selected player")

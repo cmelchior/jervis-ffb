@@ -1,14 +1,16 @@
 package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.model.modifiers.StatModifier
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * List all possible stat modification, across all rules variants, that can
  * happen after rolling on the Lasting Injury Table.
  *
- * @see [com.jervisffb.engine.rules.common.procedures.tables.injury.LastingInjuryRoll]
- * @see [com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll.RollForLastingInjury]
+ * The lasting injury roll is selected through [Rules.riskingInjuryRoll].
+ *
+ * TODO Split into BB2020 and BB2025 variants.
  */
 enum class LastingInjuryResult(
     override val description: String,

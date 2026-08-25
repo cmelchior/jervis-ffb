@@ -172,7 +172,7 @@ object StandardMoveStep: Procedure() {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.movePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<MovePlayerIntoSquareContext>(),
@@ -279,7 +279,7 @@ object StandardMoveStep: Procedure() {
                 moveContext.target!!
             ))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DodgeRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.dodgeRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val dodgeContext = state.getContext<DodgeRollContext>()

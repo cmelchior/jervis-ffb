@@ -1,14 +1,12 @@
 package com.jervisffb.engine.common.procedures
 
 import com.jervisffb.engine.actions.MoveType
-import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
 import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.common.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.common.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.common.commands.RemovePrayersToNuffle
@@ -17,111 +15,23 @@ import com.jervisffb.engine.common.commands.RemoveTeamReroll
 import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.common.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.common.commands.SetSpecialPlayCardActive
-import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.inducements.InfamousCoachAbility
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
-import com.jervisffb.engine.model.inducements.SpecialPlayCard
-import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachAbility
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
+import com.jervisffb.engine.model.inducements.wizard.Spell
+import com.jervisffb.engine.model.inducements.wizard.Wizard
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.locations.Dogout
-import com.jervisffb.engine.model.locations.Location
-import com.jervisffb.engine.model.modifiers.OwnedPlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillType
-
-/**
- * Returns a list of all possible move actions for a given player.
- * This should take into account normal moves, rushing, jump and all
- * skills like Leap and Ball & Chain
- *
- * TODO Maybe not ball an chain? :thinking:
- */
-// TODO
-fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
-    if (state.endActionImmediately()) {
-        return null
-    }
-
-    val rules = state.rules
-    // A dev-mode edit can move the active player to the dogout while the
-    // activation procedure is still on the move-selection node. There are no
-    // movement options for a player that is not on the pitch, and checking this
-    // here avoids accessing Player.coordinates for a dogout player.
-    if (!player.location.isOnPitch(rules)) {
-        return null
-    }
-    val options = mutableListOf<MoveType>()
-
-    // Standup
-    if (player.location.isOnPitch(rules) && player.state == PlayerPitchState.PRONE) {
-        options.add(MoveType.STAND_UP)
-    }
-
-    // If Player is Rooted or Chomped, they cannot leave their current square, so exit early
-    val isRooted = player.hasStatusEffect(PlayerStatusEffectType.ROOTED)
-    val isChomped = player.hasStatusEffect(PlayerStatusEffectType.CHOMPED)
-    if (isRooted || isChomped) {
-        return when (options.isNotEmpty()){
-            true -> SelectMoveType(options)
-            false -> null
-        }
-    }
-
-    // Normal move (with a potential rush)
-    // Sprint is still optional, but here we assume it will be used if needed
-    val extraSprintRush = if (player.isSkillAvailable(SkillType.SPRINT)) SPRINT_EXTRA_RUSHES else 0
-    if (player.movesLeft + player.rushesLeft + extraSprintRush >= 1 && rules.isStanding(player)) {
-        options.add(MoveType.STANDARD)
-    }
-
-    // Jump, if next to a prone player and space on the opposite side
-    val hasMoveLeft = player.movesLeft + player.rushesLeft + extraSprintRush >= JUMP_DISTANCE && rules.isStanding(player)
-    val legalJumpSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
-        .mapNotNull { state.pitch[it].player }
-        .filter { !rules.isStanding(it) }
-        .any {
-            // A jumping player can only jump to the same squares you would normally push the player
-            // to. See page 45 in the rulebook.
-            // This should be kept up to date with `JumpStep`
-            rules.getPushOptions(player, it).any { coords ->
-                coords.isOnPitch(rules) && state.pitch[coords].isUnoccupied()
-            }
-        }
-
-    if (hasMoveLeft && legalJumpSquares) {
-        options.add(MoveType.JUMP)
-    }
-
-    // Leap and Pogo
-    val allSquares = player.coordinates.getSurroundingCoordinates(rules, distance = JUMP_DISTANCE)
-    val adjacentSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
-    val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.pitch[it].isUnoccupied() }
-    if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
-        options.add(MoveType.LEAP)
-    }
-    if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.POGO_STICK)) {
-        options.add(MoveType.POGO)
-    }
-
-    // Skills
-    // Ball & Chain
-    // Others?
-
-    return if (options.isNotEmpty()) SelectMoveType(options) else null
-}
 
 /**
  * Returns all the reachable squares a player can go to using a specific type of
@@ -365,52 +275,6 @@ private fun gatherResetTeamTemporaryModifiersCommands(
         .filter { it.duration == duration }
         .map { RemoveTeamFeature(team, it) }
     builder.addAll(teamFeatures)
-}
-
-// This player is about to move to a new location.
-// - If it is Chomped, it will be removed if no longer adjacent to the Chomper.
-// - If it has Chomped others, those will be removed if no longer adjacent to them.
-fun getResetChompedStateCommands(
-    player: Player,
-    nextLocation: Location = Dogout,
-    // The Chomper had a state change we know will cause Chomped to be removed.
-    forceRemoveChompedByChomper: Boolean = false,
-    // If `true`, we just remove Chomped status effects, but do not search for players affecte by the Chomper
-    // This is needed when moving all players away from the field, e.g. at end of a drive
-    ignoreChomper: Boolean = false
-): Command? {
-    val state = player.team.game
-    val commands = mutableListOf<Command>()
-
-    // Check if `player` is Chomped and if it can be removed
-    if (player.hasStatusEffect(PlayerStatusEffectType.CHOMPED)) {
-        player.statusEffects.forEach { statusEffect ->
-            if (statusEffect.type == PlayerStatusEffectType.CHOMPED) {
-                val causedBy = (statusEffect as OwnedPlayerStatusEffect).getCausedBy(state)
-                if (!causedBy.location.isAdjacent(state.rules, nextLocation)) {
-                    commands.add(RemovePlayerStatusEffect(player, statusEffect))
-                }
-            }
-        }
-    }
-
-    // Check if `player` has Chomped other players
-    if (!ignoreChomper && player.hasSkill(SkillType.MONSTROUS_MOUTH)) {
-        player.team.otherTeam().forEach { opponentPlayer ->
-            opponentPlayer.statusEffects.forEach { statusEffect ->
-                if (statusEffect is OwnedPlayerStatusEffect) {
-                    val causedBy = statusEffect.causedBy
-                    if (statusEffect.type == PlayerStatusEffectType.CHOMPED && causedBy == player.id) {
-                        if (forceRemoveChompedByChomper || !opponentPlayer.location.isAdjacent(state.rules, nextLocation)) {
-                            commands.add(RemovePlayerStatusEffect(opponentPlayer, statusEffect))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return if (commands.isNotEmpty()) compositeCommandOf(commands) else null
 }
 
 /**

@@ -20,7 +20,6 @@ import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.ThrowIn
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -198,7 +197,7 @@ object ResolveEventsInPushChainStep: Procedure() {
                 add(AddContext(injuryContext))
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val ball = state.balls.firstOrNull { it.state == BallState.OUT_OF_BOUNDS }
             val throwInContext = state.getContextOrNull<ThrowInContext>()

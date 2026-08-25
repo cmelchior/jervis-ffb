@@ -25,7 +25,6 @@ import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.modifiers.DefensiveAssistsArmourModifier
 import com.jervisffb.engine.common.modifiers.OffensiveAssistArmourModifier
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.common.reports.ReportSpottedByRef
 import com.jervisffb.engine.fsm.ActionNode
@@ -178,7 +177,7 @@ object FoulStep: Procedure() {
             )
             return AddContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val foulContext = state.getContext<FoulContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
@@ -250,7 +249,7 @@ object FoulStep: Procedure() {
                 AddContext(sentOffContext)
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BeingSentOff
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.beingSentOff
         override fun onExitNode(state: Game, rules: Rules): Command {
             // All consequences have been handled in BeingSentOff, so just cleanup here
             return compositeCommandOf(

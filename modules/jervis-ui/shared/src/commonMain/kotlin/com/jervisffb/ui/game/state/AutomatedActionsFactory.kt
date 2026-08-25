@@ -65,7 +65,6 @@ import com.jervisffb.engine.common.procedures.RecoverKnockedOutPlayersStep
 import com.jervisffb.engine.common.procedures.ResolveBallLandingOnPitch
 import com.jervisffb.engine.common.procedures.TheKickOff
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
@@ -89,6 +88,8 @@ import com.jervisffb.engine.utils.doDivingTackleHaveAnAffect
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlin.collections.contains
+import com.jervisffb.engine.bb2020.procedures.actions.move.DodgeRoll as DodgeRollBB2020
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll as DodgeRollBB2025
 
 /**
  * Class responsible for creating an automated action if the UI settings
@@ -134,7 +135,7 @@ class AutomatedActionsFactory(
                 // Check if Diving Tackle can be used right after the reroll, in that case, we should
                 // not automate this action
                 val currentProcedure = controller.currentProcedure()?.procedure
-                val automateAction = when (currentProcedure != null && (currentProcedure == DodgeRoll || currentProcedure == JumpRoll || currentProcedure == LeapRoll)) {
+                val automateAction = when (currentProcedure != null && (currentProcedure == controller.rules.dodgeRoll || currentProcedure == JumpRoll || currentProcedure == LeapRoll)) {
                     true ->!doDivingTackleHaveAnAffect(controller.state)
                     false -> true
                 }
@@ -307,13 +308,17 @@ class AutomatedActionsFactory(
             }
         }
 
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_DODGE) && (currentNode == DodgeRoll.ChooseToUseTackle)) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_DODGE)
+            && (currentNode == DodgeRollBB2020.ChooseToUseTackle || currentNode == DodgeRollBB2025.ChooseToUseTackle)
+        ) {
             // Always select the first available player to use Tackle
             val selectedPlayer = actions.get<SelectPlayer>().players.first()
             return PlayerSelected(selectedPlayer)
         }
 
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TWO_HEADS) && currentNode == DodgeRoll.ChooseToUseTwoHeads) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TWO_HEADS)
+            && (currentNode == DodgeRollBB2020.ChooseToUseTwoHeads || currentNode == DodgeRollBB2025.ChooseToUseTwoHeads)
+        ) {
             return Confirm
         }
 
@@ -414,7 +419,10 @@ class AutomatedActionsFactory(
         }
 
         if (menuViewModel.isFeatureEnabled(Feature.IGNORE_DIVING_TACKLE_IF_NO_EFFECT)
-            && (currentNode == DodgeRoll.ChooseToUseDivingTackleAfterReRoll || currentNode == JumpRoll.ChooseToUseDivingTackleAfterReRoll || currentNode == LeapRoll.ChooseToUseDivingTackleAfterReRoll)
+            && (currentNode == DodgeRollBB2020.ChooseToUseDivingTackleAfterReRoll
+                || currentNode == DodgeRollBB2025.ChooseToUseDivingTackleAfterReRoll
+                || currentNode == JumpRoll.ChooseToUseDivingTackleAfterReRoll
+                || currentNode == LeapRoll.ChooseToUseDivingTackleAfterReRoll)
             && !doDivingTackleHaveAnAffect(controller.state)
         ) {
             return Cancel

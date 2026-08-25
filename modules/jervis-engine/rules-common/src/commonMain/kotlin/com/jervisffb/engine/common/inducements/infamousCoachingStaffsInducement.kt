@@ -1,7 +1,6 @@
 package com.jervisffb.engine.common.inducements
 
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
-import com.jervisffb.engine.model.inducements.JosefBugman
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
 import com.jervisffb.engine.rules.common.roster.SpecialRules
@@ -15,15 +14,7 @@ import kotlinx.serialization.Serializable
 data class InfamousCoachingStaffsInducementGroup(
     override val max: Int,
     override val enabled: Boolean,
-    override val items: List<InfamousCoachingStaffInducement> = listOf(
-        InfamousCoachingStaffInducement(
-            JosefBugman(),
-            1,
-            100_000,
-            named = true,
-            enabled = true,
-        ),
-    )
+    override val items: List<InfamousCoachingStaffInducement>
 ): CommonInducementGroup<InfamousCoachingStaffsInducementGroup.Builder, InfamousCoachingStaffInducement.Builder, InfamousCoachingStaffInducement> {
     override val type: InducementType = CommonInducementType.INFAMOUS_COACHING_STAFF
     override val name: String = "Infamous Coaching Staff"

@@ -12,24 +12,50 @@ val bb2020SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2020.StandardBB2020Rules::class, com.jervisffb.engine.bb2020.StandardBB2020RulesSerializer)
     }
     polymorphic(com.jervisffb.engine.model.inducements.InducementEffect::class) {
-        subclass(com.jervisffb.engine.bb2020.inducements.specialplays.AssassinationAttempt::class)
-        subclass(com.jervisffb.engine.bb2020.inducements.specialplays.SpotTheSneak::class)
-        polymorphic(com.jervisffb.engine.model.inducements.DirtyTrick::class) {
-            subclass(com.jervisffb.engine.bb2020.inducements.specialplays.SpotTheSneak::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.ByThePowerOfTheGoods::class)
+        polymorphic(com.jervisffb.engine.bb2020.inducements.effects.DirtyTrick::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
         }
-        polymorphic(com.jervisffb.engine.model.inducements.MiscellaneousMayhem::class) {
-            subclass(com.jervisffb.engine.bb2020.inducements.specialplays.AssassinationAttempt::class)
+        polymorphic(com.jervisffb.engine.bb2020.inducements.effects.MiscellaneousMayhem::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
         }
-        polymorphic(com.jervisffb.engine.model.inducements.SpecialPlayCard::class) {
-            subclass(com.jervisffb.engine.bb2020.inducements.specialplays.AssassinationAttempt::class)
-            subclass(com.jervisffb.engine.bb2020.inducements.specialplays.SpotTheSneak::class)
-            polymorphic(com.jervisffb.engine.model.inducements.DirtyTrick::class) {
-                subclass(com.jervisffb.engine.bb2020.inducements.specialplays.SpotTheSneak::class)
+        polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
+            polymorphic(com.jervisffb.engine.bb2020.inducements.effects.DirtyTrick::class) {
+                subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
             }
-            polymorphic(com.jervisffb.engine.model.inducements.MiscellaneousMayhem::class) {
-                subclass(com.jervisffb.engine.bb2020.inducements.specialplays.AssassinationAttempt::class)
+            polymorphic(com.jervisffb.engine.bb2020.inducements.effects.MiscellaneousMayhem::class) {
+                subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
             }
         }
+        polymorphic(com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachAbility::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.ByThePowerOfTheGoods::class)
+        }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.JormTheOgre::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.RanulfRedHokuli::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.StandardBiasedReferee::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.TheThrundlefootTriplets::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.ThoronKorensson::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
+        polymorphic(com.jervisffb.engine.bb2020.inducements.effects.DirtyTrick::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
+        }
+        polymorphic(com.jervisffb.engine.bb2020.inducements.effects.MiscellaneousMayhem::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
+        }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.JosefBugman::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.KariColdsteel::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.PapaSkullbones::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.settings.Inducement::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
@@ -43,7 +69,7 @@ val bb2020SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
     }
-    polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)
         polymorphic(com.jervisffb.engine.bb2020.inducements.wizards.BB2020Wizard::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)
@@ -70,6 +96,9 @@ val bb2020SerializerModule = SerializersModule {
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.CasualtyTable::class) {
         subclass(com.jervisffb.engine.bb2020.tables.BB2020CasualtyTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable::class) {
+        subclass(com.jervisffb.engine.bb2020.tables.BB7DesperateMeasuresTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.tables.InjuryTable::class) {
         subclass(com.jervisffb.engine.bb2020.tables.BB2020StandardInjuryTable::class)

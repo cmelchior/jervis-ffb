@@ -14,7 +14,6 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
-import com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -36,7 +35,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * regeneration roll to use a Mortuary Assistant on.
  *
  * For now, we opt for simplicity and instead just choose which player to fully resolve.
- * To make a proper flow, we need to split [com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer] into steps that can be run
+ * To make a proper flow, we need to split [Rules.patchUpPlayer] into steps that can be run
  * in parallel, similar to [StandardBlocKStep]
  */
 object MultipleBlockResolveInjuries: Procedure() {
@@ -106,7 +105,7 @@ object MultipleBlockResolveInjuries: Procedure() {
             }
             return AddContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BB2020MultipleBlockContext>()
             val updatedContext = when (context.activeDefender) {
@@ -131,7 +130,7 @@ object MultipleBlockResolveInjuries: Procedure() {
             val context = state.getContext<BB2020MultipleBlockContext>()
             return AddContext(context.attackerInjuryContext.first())
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }

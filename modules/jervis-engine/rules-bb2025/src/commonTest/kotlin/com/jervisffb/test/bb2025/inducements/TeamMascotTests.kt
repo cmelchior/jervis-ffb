@@ -10,10 +10,10 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.BB2025Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.bb2025.inducements.StandardTeamMascot
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotReroll
 import com.jervisffb.engine.bb2025.skills.Pro
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId

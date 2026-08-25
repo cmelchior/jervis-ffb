@@ -5,6 +5,7 @@ import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.InducementSelection
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -47,8 +48,10 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillSettings
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable
 import com.jervisffb.engine.rules.common.tables.InjuryTable
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
@@ -72,7 +75,9 @@ open class AbstractTestRules: Rules {
     override fun canMarkPlayers(player: Player): Boolean = false
     override fun isOpen(player: Player): Boolean = false
     override fun isStanding(player: Player): Boolean = false
+    override fun isSkillAvailable(player: Player, type: SkillType): Boolean = false
     override fun isDistracted(player: Player): Boolean = false
+    override fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? = null
     override fun isInjuried(player: Player): Boolean = false
     override fun isMarked(player: Player, location: Location): Boolean = false
     override fun isMarking(player: Player, target: Player): Boolean = false
@@ -131,13 +136,23 @@ open class AbstractTestRules: Rules {
     override val passStep: Procedure = DummyProcedure
     override val throwPlayerStep: Procedure = DummyProcedure
     override val applyInducementsStep: Procedure = DummyProcedure
-    override val cheeringFansStep: Procedure = DummyProcedure
     override val fullGameStep: Procedure = DummyProcedure
     override val kickOffStep: Procedure = DummyProcedure
     override val useApothecaryStep: Procedure = DummyProcedure
     override val chainsawFoulStep: Procedure = DummyProcedure
     override val kickOffDeviateRollStep: Procedure = DummyProcedure
     override val rushRoll: Procedure = DummyProcedure
+    override val gameDrive: Procedure = DummyProcedure
+    override val beingSentOff: Procedure = DummyProcedure
+    override val movePlayerIntoSquare: Procedure = DummyProcedure
+    override val patchUpPlayer: Procedure = DummyProcedure
+    override val riskingInjuryRoll: Procedure = DummyProcedure
+    override val dodgeRoll: Procedure = DummyProcedure
+    override val takeRootRoll: Procedure = DummyProcedure
+    override val boneHeadRoll: Procedure = DummyProcedure
+    override val reallyStupidRoll: Procedure = DummyProcedure
+    override val unchannelledFuryRoll: Procedure = DummyProcedure
+    override val animalSavageryStep: Procedure = DummyProcedure
     override val argueTheCallRoll: Procedure = DummyProcedure
     override fun toBuilder(): RulesParameterBuilder = TODO()
     override val name: String = "Test Rules"
@@ -172,6 +187,7 @@ open class AbstractTestRules: Rules {
     override val prayersToNufflePriceForUnderdog: Int = 0
     override val prayersToNuffleEnabledForUnderdogDuringPregame: Boolean = false
     override val prayersToNuffleTable: PrayersToNuffleTable get() = TODO()
+    override val desperateMeasuresTable: DesperateMeasuresTable get() = TODO()
     override val weatherTable: WeatherTable get() = TODO()
     override val injuryTable: InjuryTable get() = TODO()
     override val stuntyInjuryTable: InjuryTable get() = TODO()

@@ -31,7 +31,6 @@ import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.TeamFeatureType
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
@@ -57,6 +56,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025 as PlayerStatusEffectType
 
 /**
  * This class is testing all the results on the Kick-off Event Table, execept

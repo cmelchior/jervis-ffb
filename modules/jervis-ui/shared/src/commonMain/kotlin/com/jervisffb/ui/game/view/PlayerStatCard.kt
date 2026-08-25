@@ -56,9 +56,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.game.model.UiPlayerCard
@@ -377,32 +378,27 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>, onClick: (() -> Unit)? = null) {
                             }
                             player.model.statusEffects.forEach { statusEffect ->
                                 when (statusEffect.type) {
-                                    PlayerStatusEffectType.ROOTED -> {
+                                    PlayerStatusEffectTypeCommon.ROOTED -> {
                                         StatusText("Rooted", JervisTheme.statusRooted)
                                     }
-                                    PlayerStatusEffectType.DISTRACTED -> {
+                                    PlayerStatusEffectType2025.DISTRACTED -> {
                                         StatusText("Distracted", JervisTheme.statusDistracted)
                                     }
-                                    PlayerStatusEffectType.CHOMPED -> {
+                                    PlayerStatusEffectType2025.CHOMPED -> {
                                         StatusText("Chomped", JervisTheme.statusChomped)
                                     }
-                                    PlayerStatusEffectType.EYE_GOUGE -> {
+                                    PlayerStatusEffectType2025.EYE_GOUGE -> {
                                         StatusText(
                                             "Eye Gouge",
                                             backgroundColor = JervisTheme.statusEyeGouge,
                                             textColor = JervisTheme.white,
                                         )
                                     }
-                                    PlayerStatusEffectType.DODGY_SNACK -> {
+                                    PlayerStatusEffectType2025.DODGY_SNACK -> {
                                         StatusText("Dodgy Snack", JervisTheme.statusDodgySnack)
                                     }
-                                    // BB 2020 effects
-                                    PlayerStatusEffectType.BONE_HEAD,
-                                    PlayerStatusEffectType.HYPNOTIC_GAZE,
-                                    PlayerStatusEffectType.REALLY_STUPID,
-                                    PlayerStatusEffectType.BLOOD_LUST,
-                                    PlayerStatusEffectType.UNCHANNELLED_FURY -> {
-                                        StatusText(statusEffect.type.description, JervisTheme.statusDistracted)
+                                    else -> {
+                                        StatusText(statusEffect.type.label, JervisTheme.statusDistracted)
                                     }
                                 }
                             }

@@ -35,7 +35,6 @@ import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.ChainsawContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.estimatedMovesLeft
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
@@ -129,7 +128,7 @@ object BlitzAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, blitzer))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, blitzer))
 
             // Check if the attacker is adjacent to the target of the Blitz and is able to Block them
             val hasMovesLeft = blitzer.estimatedMovesLeft(includeSprint = true) > 0
@@ -443,7 +442,7 @@ object BlitzAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val options = mutableListOf<GameActionDescriptor>()
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // End action before the block
             // As soon as a target is selected, you can no longer cancel the action

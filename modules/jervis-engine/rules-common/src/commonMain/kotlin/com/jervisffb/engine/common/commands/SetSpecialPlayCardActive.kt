@@ -2,7 +2,7 @@ package com.jervisffb.engine.common.commands
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.inducements.SpecialPlayCard
+import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
 
 class SetSpecialPlayCardActive(private val card: SpecialPlayCard, val active: Boolean) : Command {
     private var original: Boolean = false

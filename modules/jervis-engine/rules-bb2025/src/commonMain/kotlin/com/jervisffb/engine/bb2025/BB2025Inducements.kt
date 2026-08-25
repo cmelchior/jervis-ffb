@@ -1,7 +1,9 @@
 package com.jervisffb.engine.bb2025
 
 import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
+import com.jervisffb.engine.bb2025.inducements.biasedreferee.DodgyLeagueRep
 import com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard
+import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
 import com.jervisffb.engine.common.inducements.CommonInducementType
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
@@ -23,12 +25,29 @@ import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 val DEFAULT_INDUCEMENTS_BB2025: Map<InducementType, Inducement<*>> = buildMap {
     CommonInducementType.entries.forEach { type ->
         val inducement: Inducement<*> = when (type) {
-            CommonInducementType.BIASED_REFEREE -> BiasedRefereesInducementGroup(max = 1, enabled = true)
+            CommonInducementType.BIASED_REFEREE -> BiasedRefereesInducementGroup(
+                max = 1,
+                enabled = true,
+                items = listOf(
+                    BiasedRefereeInducement(
+                        referee = DodgyLeagueRep(),
+                        max = 1,
+                        defaultPrice = 120_000,
+                        named = false,
+                        enabled = true,
+                        specialRulesModifier = mapOf(Pair(TeamSpecialRule.BRIBERY_AND_CORRUPTION, 2/3f)),
+                    ),
+                )
+            )
             CommonInducementType.BRIBE -> SimpleInducement(type, "Bribe", 3, 100_000, true) // 0.5x price and 2x amount for Bribery and Corruption
             CommonInducementType.DESPERATE_MEASURES -> SimpleInducement(type, "Desperate Measures", 5, 50_000, false)
             CommonInducementType.EXTRA_TEAM_TRAINING -> SimpleInducement(type, "Extra Team Training", 8, 100_000, true)
             CommonInducementType.HALFLING_MASTER_CHEF -> SimpleInducement(type, "Hafling Master Chef", 1, 300_000, true, specialRulesModifier = mapOf(), teamNameModifier = listOf("^Hafling$".toRegex().toString() to 1/3f))
-            CommonInducementType.INFAMOUS_COACHING_STAFF -> InfamousCoachingStaffsInducementGroup(max = 1, enabled = true)
+            CommonInducementType.INFAMOUS_COACHING_STAFF -> InfamousCoachingStaffsInducementGroup(
+                max = 1,
+                enabled = true,
+                items = emptyList()
+            )
             CommonInducementType.MORTUARY_ASSISTANT -> SimpleInducement(type, "Mortuary Assistant", 1, 100_000, true, requirements = setOf(TeamSpecialRule.MASTERS_OF_UNDEATH))
             CommonInducementType.PART_TIME_ASSISTANT_COACH -> SimpleInducement(type, "Part-time Assistant Coaches", 5, 20_000, true)
             CommonInducementType.PLAGUE_DOCTOR -> SimpleInducement(type, "Plague Doctor", 1, 100_000, true, requirements = setOf(TeamSpecialRule.FAVOURED_OF_NURGLE))

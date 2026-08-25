@@ -20,7 +20,6 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
-import com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportQuickSnapResult
@@ -170,7 +169,7 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.movePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<QuickSnapContext>()
             val updatedPlayersMoved = context.playersMoved + context.currentPlayer!!

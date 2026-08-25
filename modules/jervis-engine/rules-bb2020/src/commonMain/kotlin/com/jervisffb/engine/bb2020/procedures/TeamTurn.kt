@@ -77,7 +77,7 @@ object TeamTurn : Procedure() {
 
     object UseSpecialEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
+            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_OWN_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
         override fun onExitNode(state: Game, rules: Rules): Command {

@@ -68,7 +68,7 @@ object ExtraTime : Procedure() {
                 ReportStartingDrive(drive),
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules) = GameDrive
+        override fun getChildProcedure(state: Game, rules: Rules) = rules.gameDrive
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Both teams ran out of time
             return if (state.homeTeam.turnMarker == rules.turnsPrHalf && state.awayTeam.turnMarker == rules.turnsPrHalf) {
@@ -87,7 +87,7 @@ object ExtraTime : Procedure() {
                 ReportStartingDrive(drive),
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules) = GameDrive
+        override fun getChildProcedure(state: Game, rules: Rules) = rules.gameDrive
         override fun onExitNode(state: Game, rules: Rules): Command {
             val outOfTime = (
                 state.homeTeam.turnMarker == rules.turnsInExtraTime &&

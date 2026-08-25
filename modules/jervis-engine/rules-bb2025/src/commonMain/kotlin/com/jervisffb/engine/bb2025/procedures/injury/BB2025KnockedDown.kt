@@ -24,9 +24,9 @@ import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.AnimalSavageryContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -42,7 +42,6 @@ import com.jervisffb.engine.model.context.SteadyFootingRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -129,7 +128,7 @@ object BB2025KnockedDown: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val player = context.player
-            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectType.ROOTED }
+            val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectTypeCommon.ROOTED }
             return buildCompositeCommand {
                 add(UpdateContext(context.copy(isKnockedDown = true)))
                 add(SetPlayerIntermediateState(player, PlayerIntermediateState.KNOCKED_DOWN))
@@ -164,7 +163,7 @@ object BB2025KnockedDown: Procedure() {
     }
 
     object RollForInjury: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             // If we are part of a Multiple Block, the bounce is delayed until later,

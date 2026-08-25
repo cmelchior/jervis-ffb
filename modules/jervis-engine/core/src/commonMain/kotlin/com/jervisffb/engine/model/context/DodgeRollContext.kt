@@ -3,6 +3,7 @@ package com.jervisffb.engine.model.context
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.sum
 import kotlinx.collections.immutable.PersistentList
@@ -11,7 +12,7 @@ import kotlinx.collections.immutable.persistentListOf
 /**
  * Context data for a player making a dodge roll.
  *
- * @see com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
+ * See [Rules.dodgeRoll]
  */
 data class DodgeRollContext(
     val player: Player,

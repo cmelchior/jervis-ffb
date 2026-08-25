@@ -31,7 +31,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
-import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

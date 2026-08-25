@@ -2,7 +2,6 @@ package com.jervisffb.engine.model.modifiers
 
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.rules.common.skills.Duration
-import kotlinx.serialization.Serializable
 
 /**
  * Some effects are hard to put into other buckets, like a player that failed a
@@ -14,20 +13,6 @@ import kotlinx.serialization.Serializable
  * Effects are removed again as part of checking for any other modifiers that
  * has a [Duration].
  */
-@Serializable
-enum class PlayerStatusEffectType(val description: String) {
-    // BB 2025
-    ROOTED("Rooted"),
-    DISTRACTED("Distracted"),
-    CHOMPED("Chomped"),
-    EYE_GOUGE("Eye Gouge"),
-    // This is just a marker. Stat decreases are added separately
-    DODGY_SNACK("Dodgy Snack"),
-
-    // BB2020
-    BONE_HEAD("Bone Head"), // Player failed a Bone Head roll
-    REALLY_STUPID("Really Stupid"), // Player failed a Really Stupid Roll
-    BLOOD_LUST("Blood Lust"), // Player failed a Blood Lust roll
-    HYPNOTIC_GAZE("Hypnotic Gaze"), // Player is affected by Hypnotic Gaze
-    UNCHANNELLED_FURY("Unchannelled Fury")
+interface PlayerStatusEffectType {
+    val label: String
 }

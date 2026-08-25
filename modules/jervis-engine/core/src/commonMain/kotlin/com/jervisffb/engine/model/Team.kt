@@ -1,14 +1,14 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.model.inducements.Apothecary
-import com.jervisffb.engine.model.inducements.BiasedReferee
 import com.jervisffb.engine.model.inducements.Bribe
-import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.MortuaryAssistant
-import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.TeamMascot
 import com.jervisffb.engine.model.inducements.WeatherMage
-import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee
+import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
+import com.jervisffb.engine.model.inducements.wizard.Wizard
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.model.modifiers.TeamFeature
 import com.jervisffb.engine.model.modifiers.TeamFeatureType

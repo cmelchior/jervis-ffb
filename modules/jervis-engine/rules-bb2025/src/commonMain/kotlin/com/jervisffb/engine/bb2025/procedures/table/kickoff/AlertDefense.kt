@@ -21,7 +21,6 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.AlertDefenseContext
-import com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportAlertDefenseResult
 import com.jervisffb.engine.common.reports.ReportDiceRoll
@@ -177,7 +176,7 @@ object AlertDefense : Procedure(), ChanceObservationHandler {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.movePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<AlertDefenseContext>()
             val updatedPlayersMoved = context.playersMoved + context.currentPlayer!!

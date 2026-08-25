@@ -8,7 +8,6 @@ import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.Skill
@@ -288,29 +287,7 @@ class Player(
 
 fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == type }
 
-// This method assumes the player is on the pitch
-fun Player.isSkillAvailable(type: SkillType): Boolean {
-    return getSkillOrNull(type)?.let { skill ->
-        val rules = this.team.game.rules
-
-        // Check for distracted state
-        val isDistracted = when (rules.baseVersion) {
-            GameVersion.BB2020 -> !hasTackleZones && !skill.workWithoutTackleZones && this.state == PlayerPitchState.STANDING
-            GameVersion.BB2025 -> statusEffects.any { it.type == PlayerStatusEffectType.DISTRACTED } && !skill.workWithoutTackleZones
-        }
-        if (isDistracted) {
-            return false
-        }
-
-        // Check for Prone state
-        // TODO Is a Stunned player considered Prone or are they completely separate?
-        val isProne = (state == PlayerPitchState.PRONE || state == PlayerPitchState.STUNNED || state == PlayerPitchState.STUNNED_OWN_TURN)
-        if (isProne && !skill.workWhenProne) {
-            return@let false
-        }
-        return !skill.used
-    } ?: false
-}
+fun Player.isSkillAvailable(type: SkillType): Boolean = this.team.game.rules.isSkillAvailable(this, type)
 
 /**
  * Only used this when you are 100% sure about the skill class, i.e. when it used by a single

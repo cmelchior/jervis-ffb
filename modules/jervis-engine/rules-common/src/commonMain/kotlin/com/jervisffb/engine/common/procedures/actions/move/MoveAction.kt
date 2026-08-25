@@ -13,7 +13,6 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.utils.endActionImmediately
@@ -53,7 +52,7 @@ object MoveAction : Procedure() {
     object SelectMoveType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val moveOptions = calculateMoveTypesAvailable(state, state.activePlayer!!)
+            val moveOptions = rules.calculateMoveTypesAvailable(state, state.activePlayer!!)
             return buildList {
                 moveOptions?.let { add(it) }
                 add(EndActionWhenReady)
@@ -67,7 +66,7 @@ object MoveAction : Procedure() {
                     )
                 }
                 is MoveTypeSelected -> {
-                    if (calculateMoveTypesAvailable(state, state.activePlayer!!)?.types?.contains(action.moveType) != true) {
+                    if (rules.calculateMoveTypesAvailable(state, state.activePlayer!!)?.types?.contains(action.moveType) != true) {
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(

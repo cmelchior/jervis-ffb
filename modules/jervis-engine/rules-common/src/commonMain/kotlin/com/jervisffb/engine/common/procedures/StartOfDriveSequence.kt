@@ -68,6 +68,16 @@ object StartOfDriveSequence : Procedure() {
         }
     }
 
+    object CheckForInducementEffects: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            TODO("Not yet implemented")
+        }
+
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            TODO("Not yet implemented")
+        }
+    }
+
     object KickOff : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = TheKickOff
         override fun onEnterNode(state: Game, rules: Rules): Command {

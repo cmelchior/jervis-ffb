@@ -17,14 +17,10 @@ val commonSerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.InducementEffect::class) {
         subclass(com.jervisffb.engine.common.inducements.wizards.Fireball::class)
         subclass(com.jervisffb.engine.common.inducements.wizards.Zap::class)
-        polymorphic(com.jervisffb.engine.model.inducements.Spell::class) {
+        polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
             subclass(com.jervisffb.engine.common.inducements.wizards.Fireball::class)
             subclass(com.jervisffb.engine.common.inducements.wizards.Zap::class)
         }
-    }
-    polymorphic(com.jervisffb.engine.model.inducements.Spell::class) {
-        subclass(com.jervisffb.engine.common.inducements.wizards.Fireball::class)
-        subclass(com.jervisffb.engine.common.inducements.wizards.Zap::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.settings.Inducement::class) {
         subclass(com.jervisffb.engine.common.inducements.BiasedRefereeInducement::class)
@@ -93,6 +89,10 @@ val commonSerializerModule = SerializersModule {
     }
     polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
         subclass(com.jervisffb.engine.common.inducements.StandardMercenaryInducement::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
+        subclass(com.jervisffb.engine.common.inducements.wizards.Fireball::class)
+        subclass(com.jervisffb.engine.common.inducements.wizards.Zap::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.pathfinder.PathFinder::class) {
         subclass(com.jervisffb.engine.common.pathfinder.CommonPathFinder::class)

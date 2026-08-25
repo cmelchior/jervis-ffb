@@ -34,11 +34,20 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
 
     // Parameters / Methods required to customize the behavior
     abstract val buttonIdPrefix: String
+
+    // Short-cut for the common case, where only one node is used
     abstract val rollDiceNode: Node
     abstract val chooseRerollSourceNode: Node
     abstract val rerollDiceNode: Node
+
+    // For advanced use-cases where the node changes between rulesets
+    protected open fun getRollDiceNode(state: Game): Node = rollDiceNode
+    protected open fun getChooseRerollSourceNode(state: Game): Node = chooseRerollSourceNode
+    protected open fun getRerollDiceNode(state: Game): Node = rerollDiceNode
+
     abstract val diceRollType: DiceRollType
     abstract fun getOriginalRoll(state: Game): T
+
     override val nodes: Set<Node> by lazy {
         setOf(
             rollDiceNode,
@@ -52,6 +61,9 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         actions: ActionRequest,
         sharedData: LocalPitchDataWrapper,
     ) {
+        val rollDiceNode = getRollDiceNode(acc.game)
+        val chooseRerollSourceNode = getChooseRerollSourceNode(acc.game)
+        val rerollDiceNode = getRerollDiceNode(acc.game)
         if (acc.stack.currentNode() == rollDiceNode || acc.stack.currentNode() == rerollDiceNode) {
             val buttons = allOptions.map { dieOption ->
                 DieButtonData(
@@ -120,6 +132,8 @@ abstract class SingleDieWithRerollWheelController<T: DieResult> : ActionWheelDia
         selectedAction: GameAction,
     ): Boolean {
         val currentNode = acc.stack.currentNode()
+        val rollDiceNode = getRollDiceNode(acc.game)
+        val rerollDiceNode = getRerollDiceNode(acc.game)
         if ((currentNode == rollDiceNode || currentNode == rerollDiceNode) && shouldAnimateAction(acc)) {
             val button = getDieResult(selectedAction, dieClass).let  { dieRoll ->
                 val buttonId = when (currentNode) {

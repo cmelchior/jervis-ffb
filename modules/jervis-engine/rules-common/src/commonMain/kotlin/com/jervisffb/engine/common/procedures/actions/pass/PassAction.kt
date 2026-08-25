@@ -22,7 +22,6 @@ import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.PassContext
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.reports.ReportSkillUsed
@@ -88,7 +87,7 @@ object PassAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // If holding the ball, the player can start the "Pass" section of the Pass action
             if (context.thrower.hasBall()) {
@@ -233,7 +232,7 @@ object PassAction : Procedure() {
             }
             val options = mutableListOf<GameActionDescriptor>()
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
             // End the action
             options.add(EndActionWhenReady)
             return options

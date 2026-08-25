@@ -8,7 +8,6 @@ import com.jervisffb.engine.bb2025.skills.AnimalSavagery
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -30,6 +29,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025 as PlayerStatusEffectType
 
 /**
  * Class testing usage of the [AnimalSavagery] skill.

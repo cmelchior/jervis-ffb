@@ -1,6 +1,6 @@
 package com.jervisffb.engine.bb2020.inducements.wizards
 
-import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.wizard.Wizard
 
 /** Interface capturing all Wizards available in BB2020 */
 sealed interface BB2020Wizard: Wizard

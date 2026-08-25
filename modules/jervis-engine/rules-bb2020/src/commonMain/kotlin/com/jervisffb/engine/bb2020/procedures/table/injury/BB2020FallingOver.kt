@@ -12,7 +12,6 @@ import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -40,7 +39,7 @@ object BB2020FallingOver: Procedure() {
              * will bounce from this square.
              *
              * In case a ball was lying on the ground in the square the player was falling
-             * over in. It will bounce from the square as part of [com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare],
+             * over in. It will bounce from the square as part of [Rules.movePlayerIntoSquare]
              * so when we get to this procedure and the player drops the ball, there should only
              * be one ball in the square.
              */
@@ -72,7 +71,7 @@ object BB2020FallingOver: Procedure() {
     }
 
     object RollForInjury: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             val ball = state.currentBallOrNull()

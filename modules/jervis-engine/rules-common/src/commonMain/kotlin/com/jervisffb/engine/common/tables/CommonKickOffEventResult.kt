@@ -2,7 +2,6 @@ package com.jervisffb.engine.common.tables
 
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.common.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.GetTheRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.HighKick
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
@@ -27,7 +26,6 @@ enum class CommonKickOffEventResult(
 ): KickOffEvent {
     BRILLIANT_COACHING("Brilliant Coaching", BrilliantCoaching, Duration.IMMEDIATE),
     CHANGING_WEATHER("Changing Weather", ChangingWeather, Duration.IMMEDIATE),
-    DODGY_SNACK("Dodgy Snack", DodgySnack, Duration.IMMEDIATE),
     GET_THE_REF("Get the Ref", GetTheRef, Duration.IMMEDIATE),
     HIGH_KICK("High Kick", HighKick, Duration.IMMEDIATE),
     OFFICIOUS_REF("Officious Ref", OfficiousRef, Duration.IMMEDIATE),

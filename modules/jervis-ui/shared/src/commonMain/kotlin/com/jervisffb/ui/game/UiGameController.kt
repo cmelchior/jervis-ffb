@@ -82,6 +82,7 @@ import com.jervisffb.ui.game.state.actionwheel.CoinTossWheelController
 import com.jervisffb.ui.game.state.actionwheel.DauntlessWheelController
 import com.jervisffb.ui.game.state.actionwheel.DesperateMeasuresRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DeviateRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.DodgeBB2020WheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgeWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnKickingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnReceivingTeamRollWheelController
@@ -319,6 +320,7 @@ class UiGameController(
         DauntlessWheelController,
         DeviateRollWheelController,
         DodgeWheelController,
+        DodgeBB2020WheelController,
         FoulAppearanceWheelController,
         HypnoticGazeWheelController,
         InterceptionWheelController,

@@ -27,14 +27,12 @@ import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.common.procedures.WeatherRoll
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.common.procedures.tables.injury.LastingInjuryRoll
-import com.jervisffb.engine.common.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
@@ -52,6 +50,10 @@ import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
+import com.jervisffb.engine.bb2020.procedures.actions.foul.BeingSentOff as BeingSentOffBB2020
+import com.jervisffb.engine.bb2020.procedures.table.injury.PatchUpPlayer as PatchUpPlayerBB2020
+import com.jervisffb.engine.bb2025.procedures.actions.foul.BeingSentOff as BeingSentOffBB2025
+import com.jervisffb.engine.bb2025.procedures.injury.PatchUpPlayer as PatchUpPlayerBB2025
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.
@@ -138,7 +140,8 @@ object DialogFactory {
                     )
                 }
 
-                is BeingSentOff.DecideToArgueTheCall -> {
+                is BeingSentOffBB2020.DecideToArgueTheCall,
+                is BeingSentOffBB2025.DecideToArgueTheCall -> {
                     SingleChoiceInputDialog.createArgueTheCallDialog(id, controller.state.getContext<FoulContext>())
                 }
 
@@ -186,7 +189,8 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createPrayersToNuffleRollDialog(id, controller.rules, context.rollsRemaining)
                 }
 
-                is PatchUpPlayer.ChooseToUseApothecary -> {
+                is PatchUpPlayerBB2020.ChooseToUseApothecary,
+                is PatchUpPlayerBB2025.ChooseToUseApothecary -> {
                     val context = controller.state.getContext<RiskingInjuryContext>()
                     SingleChoiceInputDialog.createUseApothecaryDialog(id, context)
                 }

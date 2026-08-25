@@ -42,9 +42,7 @@ import com.jervisffb.engine.common.procedures.Catch
 import com.jervisffb.engine.common.procedures.Pickup
 import com.jervisffb.engine.common.procedures.RegenerationRoll
 import com.jervisffb.engine.common.procedures.TheKickOff
-import com.jervisffb.engine.common.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
@@ -75,6 +73,10 @@ import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ActionWheelUiStateData
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import kotlin.time.ExperimentalTime
+import com.jervisffb.engine.bb2020.procedures.actions.foul.BeingSentOff as BeingSentOffBB2020
+import com.jervisffb.engine.bb2020.procedures.actions.move.DodgeRoll as DodgeRollBB2020
+import com.jervisffb.engine.bb2025.procedures.actions.foul.BeingSentOff as BeingSentOffBB2025
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll as DodgeRollBB2025
 
 
 /**
@@ -309,7 +311,8 @@ object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
 
 object UseTwoHeadsWheelController: UseSkillWheelController(SkillType.TWO_HEADS) {
     override val nodes: Set<Node> = setOf(
-        DodgeRoll.ChooseToUseTwoHeads,
+        DodgeRollBB2020.ChooseToUseTwoHeads,
+        DodgeRollBB2025.ChooseToUseTwoHeads,
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val defender = state.getContext<DodgeRollContext>().player
@@ -634,7 +637,8 @@ object UsePlagueDoctorWheelController: YesNoAnswerWheelController() {
 
 object ArgueTheCallWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
-        BeingSentOff.DecideToArgueTheCall,
+        BeingSentOffBB2020.DecideToArgueTheCall,
+        BeingSentOffBB2025.DecideToArgueTheCall,
     )
     override val yesLabel: String = "Argue The Call"
     override val noLabel: String = "Stay Silent"
@@ -648,7 +652,8 @@ object ArgueTheCallWheelController: YesNoAnswerWheelController() {
 
 object UseBribeWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
-        BeingSentOff.ChooseToUseBribe,
+        BeingSentOffBB2020.ChooseToUseBribe,
+        BeingSentOffBB2025.ChooseToUseBribe,
     )
     override val yesLabel: String = "Use Bribe"
     override val noLabel: String = "Do not use Bribe"

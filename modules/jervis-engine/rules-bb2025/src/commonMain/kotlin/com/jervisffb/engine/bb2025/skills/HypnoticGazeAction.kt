@@ -18,7 +18,6 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.utils.endActionImmediately
@@ -73,7 +72,7 @@ object HypnoticGazeAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<HypnoticGazeContext>()
             val options = mutableListOf<GameActionDescriptor>()
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
             if (!context.hasGazed) {
                 val eligibleTargets = context.gazer.coordinates.getSurroundingCoordinates(rules, 1)
                     .mapNotNull { state.pitch[it].player }

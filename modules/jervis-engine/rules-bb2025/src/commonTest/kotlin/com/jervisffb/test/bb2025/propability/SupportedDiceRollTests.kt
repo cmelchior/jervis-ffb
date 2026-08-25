@@ -1,5 +1,9 @@
 package com.jervisffb.test.bb2025.propability
 
+import com.jervisffb.engine.bb2025.procedures.BoneHeadRoll
+import com.jervisffb.engine.bb2025.procedures.ReallyStupidRoll
+import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
+import com.jervisffb.engine.bb2025.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
@@ -7,7 +11,9 @@ import com.jervisffb.engine.bb2025.procedures.actions.block.DauntlessRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.JumpUpRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockRollDice
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapRoll
+import com.jervisffb.engine.bb2025.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoRoll
 import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.procedures.actions.pass.InterceptionRoll
@@ -23,6 +29,7 @@ import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.DodgySnack
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
 import com.jervisffb.engine.bb2025.skills.PuntDistanceRoll
@@ -30,7 +37,6 @@ import com.jervisffb.engine.bb2025.skills.ShadowingRoll
 import com.jervisffb.engine.bb2025.skills.TentaclesRoll
 import com.jervisffb.engine.common.procedures.AnimalSavageryRoll
 import com.jervisffb.engine.common.procedures.BloodLustRoll
-import com.jervisffb.engine.common.procedures.BoneHeadRoll
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.CatchRoll
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
@@ -38,22 +44,17 @@ import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.PickupRoll
 import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
-import com.jervisffb.engine.common.procedures.ReallyStupidRoll
 import com.jervisffb.engine.common.procedures.RecoverPlayerRoll
 import com.jervisffb.engine.common.procedures.RegenerationRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
 import com.jervisffb.engine.common.procedures.SuddenDeathStep
-import com.jervisffb.engine.common.procedures.TakeRootRoll
 import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.common.procedures.ThrowIn
-import com.jervisffb.engine.common.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.common.procedures.actions.foul.BribeRoll
-import com.jervisffb.engine.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
-import com.jervisffb.engine.common.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.common.procedures.actions.move.StandingUpRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
@@ -65,7 +66,6 @@ import com.jervisffb.engine.common.procedures.tables.injury.LastingInjuryRoll
 import com.jervisffb.engine.common.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.common.procedures.tables.kickoff.Blitz
 import com.jervisffb.engine.common.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.common.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.common.procedures.tables.kickoff.QuickSnap
@@ -178,11 +178,13 @@ class SupportedDiceRollTests {
             DiceRollType.UNCHANNELLED_FURY,
             DiceRollType.WEATHER -> true
 
+            DiceRollType.DESPERATE_MEASURES,
             DiceRollType.BLITZ,
             DiceRollType.BLOODLUST,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.PASSING_INTERFERENCE,
             DiceRollType.QUALITY -> false
+
         }
     }
 
@@ -267,6 +269,7 @@ class SupportedDiceRollTests {
             DiceRollType.UNCHANNELLED_FURY -> UnchannelledFuryRoll
             DiceRollType.WEATHER -> WeatherRoll
 
+            DiceRollType.DESPERATE_MEASURES,
             DiceRollType.BLOODLUST,
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.PASSING_INTERFERENCE, // Not supported in BB2025

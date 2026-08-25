@@ -28,7 +28,6 @@ import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.common.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -493,8 +492,7 @@ object BB2020PushStepInitialMoveSequence: Procedure() {
                 add(AddContext(injuryContext))
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),

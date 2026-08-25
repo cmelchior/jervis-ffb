@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.common.planner.ActionPlanner
 import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.DesperateMeasuresTable
 import com.jervisffb.engine.rules.common.tables.InjuryTable
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
@@ -61,6 +62,7 @@ abstract class RulesParameterBuilder(parameters: RulesParameters) {
     var prayersToNufflePrice: Int = parameters.prayersToNufflePriceForUnderdog
     var prayersToNuffleEnabled: Boolean = parameters.prayersToNuffleEnabledForUnderdogDuringPregame
     var prayersToNuffleTable: PrayersToNuffleTable = parameters.prayersToNuffleTable
+    var desperateMeasuresTable: DesperateMeasuresTable = parameters.desperateMeasuresTable
     var weatherTable: WeatherTable = parameters.weatherTable
     var injuryTable: InjuryTable = parameters.injuryTable
     var stuntyInjuryTable: InjuryTable = parameters.stuntyInjuryTable
@@ -119,6 +121,7 @@ abstract class RulesParameterBuilder(parameters: RulesParameters) {
             prayersToNufflePriceForUnderdog = prayersToNufflePrice,
             prayersToNuffleEnabledForUnderdogDuringPregame = prayersToNuffleEnabled,
             prayersToNuffleTable = prayersToNuffleTable,
+            desperateMeasuresTable = desperateMeasuresTable,
             weatherTable = weatherTable,
             injuryTable = injuryTable,
             stuntyInjuryTable = stuntyInjuryTable,

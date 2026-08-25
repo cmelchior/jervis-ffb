@@ -29,7 +29,6 @@ import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -228,7 +227,7 @@ abstract class AbstractRules(
     override fun canCatch(player: Player): Boolean {
         // TODO Probably need to account for difference between Bomb and Ball here
         return player.hasTackleZones &&
-            player.statusEffects.none { it.type == PlayerStatusEffectType.DISTRACTED } &&
+            !isDistracted(player) &&
             player.state == PlayerPitchState.STANDING &&
             player.location.isOnPitch(this) &&
             !player.hasBall()
@@ -333,8 +332,6 @@ abstract class AbstractRules(
         if (assister.team == target.team) return false
         if (!assister.location.isAdjacent(this, target.location)) return false
         if (!canMarkPlayers(assister)) return false
-        // Eye Gouge is only present in BB2025, but should be safe to check for in common code
-        if (assister.statusEffects.any { it.type == PlayerStatusEffectType.EYE_GOUGE }) return false
 
         // We always apply Guard and Defensive.
         // They are technically optional skills, but there should be no reason
@@ -509,6 +506,7 @@ abstract class AbstractRules(
             DiceRollType.BRILLIANT_COACHING,
             DiceRollType.CHARGE,
             DiceRollType.COIN_TOSS,
+            DiceRollType.DESPERATE_MEASURES,
             DiceRollType.DEVIATE,
             DiceRollType.DODGY_SNACK_EFFECT,
             DiceRollType.DODGY_SNACK_ROLL_OFF,

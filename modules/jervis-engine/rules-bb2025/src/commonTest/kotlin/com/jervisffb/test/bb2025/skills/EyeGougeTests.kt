@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.modifiers.eyeGouge
 import com.jervisffb.engine.bb2025.skills.EyeGouge
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.common.context.BlockContext
@@ -21,7 +22,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
@@ -40,6 +40,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025 as PlayerStatusEffectType
 
 /**
  * Class testing usage of the [EyeGouge] skill.

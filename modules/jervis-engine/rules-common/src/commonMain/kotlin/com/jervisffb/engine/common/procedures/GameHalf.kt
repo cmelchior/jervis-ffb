@@ -51,7 +51,7 @@ object GameHalf : Procedure() {
     }
 
     object Drive : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = GameDrive
+        override fun getChildProcedure(state: Game, rules: Rules) = rules.gameDrive
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val drive: Int = state.driveNo + 1
             return compositeCommandOf(

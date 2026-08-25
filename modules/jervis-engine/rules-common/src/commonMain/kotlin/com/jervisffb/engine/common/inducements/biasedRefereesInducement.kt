@@ -1,11 +1,9 @@
 package com.jervisffb.engine.common.inducements
 
-import com.jervisffb.engine.model.inducements.BiasedReferee
-import com.jervisffb.engine.model.inducements.DodgyLeagueRep
+import com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
 import com.jervisffb.engine.rules.common.roster.SpecialRules
-import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import kotlinx.serialization.Serializable
 
 /**
@@ -15,16 +13,7 @@ import kotlinx.serialization.Serializable
 data class BiasedRefereesInducementGroup(
     override val max: Int = 1,
     override val enabled: Boolean,
-    override val items: List<BiasedRefereeInducement> = listOf(
-        BiasedRefereeInducement(
-            referee = DodgyLeagueRep(),
-            max = 1,
-            defaultPrice = 120_000,
-            named = false,
-            enabled = true,
-            specialRulesModifier = mapOf(Pair(TeamSpecialRule.BRIBERY_AND_CORRUPTION, 2/3f)),
-        ),
-    )
+    override val items: List<BiasedRefereeInducement> = emptyList()
 ): CommonInducementGroup<BiasedRefereesInducementGroup.Builder, BiasedRefereeInducement.Builder, BiasedRefereeInducement> {
     override val name: String = "Biased Referee"
     override val type: InducementType = CommonInducementType.BIASED_REFEREE

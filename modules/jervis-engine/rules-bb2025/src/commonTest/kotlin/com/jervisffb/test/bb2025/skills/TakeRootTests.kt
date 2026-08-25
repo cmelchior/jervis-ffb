@@ -10,6 +10,8 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.TakeRoot
 import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
+import com.jervisffb.engine.common.modifiers.rooted
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
@@ -18,7 +20,6 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -44,6 +45,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025 as PlayerStatusEffectType
 
 /**
  * Class testing usage of the [TakeRoot] skill
@@ -66,7 +68,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         )
         assertEquals(player,state.activePlayer)
         assertFalse(rules.isDistracted(player))
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -82,7 +84,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             *activatePlayer(player, PlayerStandardActionType.MOVE),
         )
         assertEquals(player,state.activePlayer)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         assertTrue(controller.getAvailableActions().actions.none { it is SelectMoveType })
     }
 
@@ -99,7 +101,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             *boneHead(1.d6),
         )
         assertNull(state.activePlayer)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         assertTrue(player.hasStatusEffect(PlayerStatusEffectType.DISTRACTED))
         assertTrue(rules.isDistracted(player))
     }
@@ -115,7 +117,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             2.d6
         )
         assertEquals(player,state.activePlayer)
-        assertFalse(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertFalse(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         assertTrue(controller.getAvailableActions().actions.any { it is SelectMoveType })
     }
 
@@ -128,7 +130,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             *takeRoot(1.d6),
         )
         assertEquals(player,state.activePlayer)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         assertTrue(controller.getAvailableActions().actions.none { it is SelectMoveType })
     }
 
@@ -148,7 +150,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(Availability.HAS_ACTIVATED, player.available)
         assertEquals(0, awayTeam.turnData.blitzActions)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -166,7 +168,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(Availability.HAS_ACTIVATED, player.available)
         assertEquals(0, awayTeam.turnData.passActions)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -184,7 +186,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(Availability.HAS_ACTIVATED, player.available)
         assertEquals(0, awayTeam.turnData.handOffActions)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -203,7 +205,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(Availability.HAS_ACTIVATED, player.available)
         assertEquals(0, awayTeam.turnData.foulActions)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -218,7 +220,7 @@ class TakeRootTests: JervisGameBB2025Test() {
 
         assertNull(state.activePlayer)
         assertEquals(homeTeam, state.activeTeam)
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -237,7 +239,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         assertEquals(Availability.HAS_ACTIVATED, thrower.available)
         assertEquals(0, awayTeam.turnData.throwTeamMateActions)
-        assertTrue(thrower.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(thrower.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -356,12 +358,12 @@ class TakeRootTests: JervisGameBB2025Test() {
             *takeRoot(1.d6),
             EndAction
         )
-        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         controller.rollForward(
             *skipTurns(16)
         )
         assertEquals(2, state.halfNo)
-        assertFalse(player.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertFalse(player.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Test
@@ -378,7 +380,7 @@ class TakeRootTests: JervisGameBB2025Test() {
             DiceRollResults(1.d6, 1.d6), // Cannot Pushback before being Knocked Down
         )
         assertNull(state.activePlayer)
-        assertFalse(defender.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertFalse(defender.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
         defender.assertCoordinates(12, 5)
         defender.assertProne()
     }
@@ -399,7 +401,7 @@ class TakeRootTests: JervisGameBB2025Test() {
         )
         assertNull(state.activePlayer)
         defender.assertProne()
-        assertFalse(defender.hasStatusEffect(PlayerStatusEffectType.ROOTED))
+        assertFalse(defender.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED))
     }
 
     @Ignore

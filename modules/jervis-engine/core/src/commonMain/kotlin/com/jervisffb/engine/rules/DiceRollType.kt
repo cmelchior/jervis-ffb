@@ -29,6 +29,7 @@ enum class DiceRollType(val description: String) {
     CHOMP("Chomp"),
     COIN_TOSS("Coin Toss"), // Only used so we can map a Coin toss to a D2Result
     CROWD_TAKES_ACTION("Crowd Takes Action"), // Stalling
+    DESPERATE_MEASURES("Desperate Measures"),
     FAN_FACTOR("Fan Factor"),
     FOUL_APPEARANCE("Foul Appearance"),
     DAUNTLESS("Dauntless"),

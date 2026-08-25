@@ -27,7 +27,6 @@ import com.jervisffb.engine.common.context.HandOffContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.Catch
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.reports.ReportSkillUsed
@@ -97,7 +96,7 @@ object HandOffAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, context.thrower))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, context.thrower))
 
             // Check if adjacent to a possible receiver
             if (context.thrower.hasBall()) {
@@ -261,7 +260,7 @@ object HandOffAction : Procedure() {
             }
             val options = mutableListOf<GameActionDescriptor>()
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
             // End the action
             options.add(EndActionWhenReady)
             return options

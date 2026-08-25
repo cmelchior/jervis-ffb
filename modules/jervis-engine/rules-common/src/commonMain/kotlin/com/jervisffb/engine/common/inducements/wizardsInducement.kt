@@ -2,7 +2,7 @@ package com.jervisffb.engine.common.inducements
 
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
-import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.wizard.Wizard
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import kotlinx.serialization.Serializable
 

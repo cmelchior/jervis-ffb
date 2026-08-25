@@ -11,6 +11,9 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.bb2025.context.BB2025MultipleBlockContext
+import com.jervisffb.engine.bb2025.modifiers.eyeGouge
+import com.jervisffb.engine.bb2025.modifiers.isChomped
+import com.jervisffb.engine.bb2025.modifiers.isEyeGouged
 import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
@@ -23,6 +26,7 @@ import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -37,7 +41,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -120,7 +123,7 @@ object CreatePushChainStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val pushData = context.pushChain.last()
-            val defenderIsRooted = pushData.pushee.hasStatusEffect(PlayerStatusEffectType.ROOTED)
+            val defenderIsRooted = pushData.pushee.hasStatusEffect(PlayerStatusEffectTypeCommon.ROOTED)
             return when (defenderIsRooted) {
                 true -> compositeCommandOf(
                     SetContextProperty(PushContext.PushData::to, pushData, pushData.pushee.coordinates),
@@ -136,7 +139,7 @@ object CreatePushChainStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val pushData = context.pushChain.last()
-            val defenderIsChomped = pushData.pushee.hasStatusEffect(PlayerStatusEffectType.CHOMPED)
+            val defenderIsChomped = pushData.pushee.isChomped()
             return when (defenderIsChomped) {
                 true -> compositeCommandOf(
                     SetContextProperty(PushContext.PushData::to, pushData, pushData.pushee.coordinates),
@@ -294,7 +297,7 @@ object CreatePushChainStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasEyeGouge = context.firstPusher.isSkillAvailable(SkillType.EYE_GOUGE)
-            val defenderIsGougedAlready = context.firstPushee.statusEffects.any { it.type == PlayerStatusEffectType.EYE_GOUGE }
+            val defenderIsGougedAlready = context.firstPushee.isEyeGouged()
             val standFirmUsed = context.pushChain.first().usedStandFirm
             return when (context.isFirstBlock && !standFirmUsed && hasEyeGouge && !defenderIsGougedAlready) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)

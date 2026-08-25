@@ -2,27 +2,40 @@ package com.jervisffb.engine.bb2025
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.bb2025.commands.ResetShadowingSkill
 import com.jervisffb.engine.bb2025.commands.SetWasOnPitchDuringDrive
 import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025
+import com.jervisffb.engine.bb2025.procedures.AnimalSavageryStep
 import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
+import com.jervisffb.engine.bb2025.procedures.BoneHeadRoll
+import com.jervisffb.engine.bb2025.procedures.GameDrive
+import com.jervisffb.engine.bb2025.procedures.ReallyStupidRoll
+import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
+import com.jervisffb.engine.bb2025.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
+import com.jervisffb.engine.bb2025.procedures.actions.foul.BeingSentOff
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ChainsawFoulStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.bb2025.procedures.actions.move.JumpStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.LeapStep
+import com.jervisffb.engine.bb2025.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.bb2025.procedures.actions.move.PogoStep
 import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.procedures.actions.pass.HailMaryPassStep
 import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
 import com.jervisffb.engine.bb2025.procedures.injury.BB2025KnockedDown
+import com.jervisffb.engine.bb2025.procedures.injury.PatchUpPlayer
+import com.jervisffb.engine.bb2025.procedures.injury.RiskingInjuryRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.BrilliantCoachingReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
-import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.bb2025.skills.Leader
 import com.jervisffb.engine.bb2025.skills.LoneFouler
 import com.jervisffb.engine.bb2025.skills.SecretWeapon
@@ -37,6 +50,7 @@ import com.jervisffb.engine.bb2025.tables.BB2025StandardKickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.bb2025.tables.BB7ArgueTheCallTable
+import com.jervisffb.engine.bb2025.tables.BB7DesperateMeasuresTable
 import com.jervisffb.engine.bb2025.tables.BB7KickOffEventTable
 import com.jervisffb.engine.bb2025.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.bb2025.tables.BB7StandardInjuryTable
@@ -45,10 +59,12 @@ import com.jervisffb.engine.bb2025.tables.StandardPrayersToNuffleTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.planner.CommonActionPlanner
 import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.tables.DisabledCasualtyTable
 import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
@@ -63,10 +79,11 @@ import com.jervisffb.engine.model.getSkillOrNull
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
-import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
+import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.RulesParameters
 import com.jervisffb.engine.rules.RulesParametersHolder
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.GameType
@@ -115,7 +132,108 @@ abstract class BB2025Rules(
         // In BB2025, Distracted is modeled as a condition on a player.
         // Note that the status effect and lack of tackle zones are modeled
         // independently.
-        return player.statusEffects.any { it.type == PlayerStatusEffectType.DISTRACTED }
+        return player.statusEffects.any { it.type == PlayerStatusEffectType2025.DISTRACTED }
+    }
+
+    override fun isSkillAvailable(player: Player, type: SkillType): Boolean {
+        return player.getSkillOrNull(type)?.let { skill ->
+
+            // Check for Distracted
+            val notWorkingWhenDistracted = player.statusEffects.any { it.type == PlayerStatusEffectType2025.DISTRACTED } && !skill.workWithoutTackleZones
+            if (notWorkingWhenDistracted) {
+                return false
+            }
+
+            // Check for missing tackle zones (not sure this is possible without being distracted in BB2025)
+            val notWorkingWithNoTackleZones = player.intermediateState == null
+                && player.state == PlayerPitchState.STANDING
+                && !player.hasTackleZones
+                && !skill.workWithoutTackleZones
+            if (notWorkingWithNoTackleZones) {
+                return false
+            }
+
+            // Check for Prone state
+            // TODO Is a Stunned player considered Prone or are they completely separate?
+            val state = player.state
+            val isProne = (state == PlayerPitchState.PRONE || state == PlayerPitchState.STUNNED || state == PlayerPitchState.STUNNED_OWN_TURN)
+            if (isProne && !skill.workWhenProne) {
+                return@let false
+            }
+            return !skill.used
+        } ?: false
+    }
+
+    override fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
+        if (state.endActionImmediately()) {
+            return null
+        }
+
+        // A dev-mode edit can move the active player to the dugout while the
+        // activation procedure is still on the move-selection node. There are no
+        // movement options for a player that is not on the pitch, and checking this
+        // here avoids accessing Player.coordinates for a dugout player.
+        if (!player.location.isOnPitch(this)) {
+            return null
+        }
+        val options = mutableListOf<MoveType>()
+
+        // Stand up
+        if (player.state == PlayerPitchState.PRONE) {
+            options.add(MoveType.STAND_UP)
+        }
+
+        // Rooted or Chomped players cannot leave their current square, so exit early.
+        val isRooted = player.statusEffects.any { it.type == PlayerStatusEffectTypeCommon.ROOTED }
+        val isChomped = player.statusEffects.any { it.type == PlayerStatusEffectType2025.CHOMPED }
+        if (isRooted || isChomped) {
+            return when (options.isNotEmpty()) {
+                true -> SelectMoveType(options)
+                false -> null
+            }
+        }
+
+        // Normal move (with a potential rush)
+        // Sprint is still optional, but here we assume it will be used if needed
+        val extraSprintRush = if (player.isSkillAvailable(SkillType.SPRINT)) SPRINT_EXTRA_RUSHES else 0
+        if (player.movesLeft + player.rushesLeft + extraSprintRush >= 1 && isStanding(player)) {
+            options.add(MoveType.STANDARD)
+        }
+
+        // Jump, if next to a prone player and space on the opposite side
+        val hasMoveLeft = player.movesLeft + player.rushesLeft + extraSprintRush >= JUMP_DISTANCE && isStanding(player)
+        val legalJumpSquares = player.coordinates.getSurroundingCoordinates(this, distance = 1)
+            .mapNotNull { state.pitch[it].player }
+            .filter { !isStanding(it) }
+            .any {
+                // A jumping player can only jump to the same squares you would normally push the player
+                // to. See page 56 in the BB2025 rulebook.
+                getPushOptions(player, it).any { coords ->
+                    coords.isOnPitch(this) && state.pitch[coords].isUnoccupied()
+                }
+            }
+
+        if (hasMoveLeft && legalJumpSquares) {
+            options.add(MoveType.JUMP)
+        }
+
+        // Leap and Pogo
+        val allSquares = player.coordinates.getSurroundingCoordinates(this, distance = JUMP_DISTANCE)
+        val adjacentSquares = player.coordinates.getSurroundingCoordinates(this, distance = 1)
+        val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.pitch[it].isUnoccupied() }
+        if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
+            options.add(MoveType.LEAP)
+        }
+        if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.POGO_STICK)) {
+            options.add(MoveType.POGO)
+        }
+
+        return if (options.isNotEmpty()) SelectMoveType(options) else null
+    }
+
+    override fun canOfferAssist(assister: Player, target: Player): Boolean {
+        if (assister.statusEffects.any { it.type == PlayerStatusEffectType2025.EYE_GOUGE }) return false
+        return super.canOfferAssist(assister, target)
     }
 
     override fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
@@ -272,10 +390,20 @@ abstract class BB2025Rules(
     @Transient override val passStep: Procedure = BB2025PassStep
     @Transient override val throwPlayerStep: Procedure = BB2025ThrowPlayerStep
     @Transient override val applyInducementsStep: Procedure = BB2025ApplyInducements
-    @Transient override val cheeringFansStep: Procedure = BB2025CheeringFans
     @Transient override val chainsawFoulStep: Procedure = ChainsawFoulStep
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
     @Transient override val rushRoll: Procedure = RushRoll
+    @Transient override val gameDrive: Procedure = GameDrive
+    @Transient override val beingSentOff: Procedure = BeingSentOff
+    @Transient override val movePlayerIntoSquare: Procedure = MovePlayerIntoSquare
+    @Transient override val patchUpPlayer: Procedure = PatchUpPlayer
+    @Transient override val riskingInjuryRoll: Procedure = RiskingInjuryRoll
+    @Transient override val dodgeRoll: Procedure = DodgeRoll
+    @Transient override val takeRootRoll: Procedure = TakeRootRoll
+    @Transient override val boneHeadRoll: Procedure = BoneHeadRoll
+    @Transient override val reallyStupidRoll: Procedure = ReallyStupidRoll
+    @Transient override val unchannelledFuryRoll: Procedure = UnchannelledFuryRoll
+    @Transient override val animalSavageryStep: Procedure = AnimalSavageryStep
     @Transient override val argueTheCallRoll: Procedure = ArgueTheCallRoll
 
     override val rightStuffMaxStrength: Int = Int.MAX_VALUE
@@ -345,6 +473,7 @@ abstract class BB2025Rules(
             prayersToNufflePriceForUnderdog = 50_000,
             prayersToNuffleEnabledForUnderdogDuringPregame = false,
             prayersToNuffleTable = StandardPrayersToNuffleTable,
+            desperateMeasuresTable = BB7DesperateMeasuresTable,
             weatherTable = BB2025StandardWeatherTable,
             injuryTable = BB2025StandardInjuryTable,
             stuntyInjuryTable = BB2025StuntyInjuryTable,

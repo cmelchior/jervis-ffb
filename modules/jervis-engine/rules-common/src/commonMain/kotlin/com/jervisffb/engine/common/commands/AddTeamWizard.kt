@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.commands
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.wizard.Wizard
 
 class AddTeamWizard(private val team: Team, private val wizard: Wizard) : Command {
     override fun execute(state: Game) {

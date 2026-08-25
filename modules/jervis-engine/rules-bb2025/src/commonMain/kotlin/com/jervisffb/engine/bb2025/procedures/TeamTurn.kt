@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -54,7 +55,6 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
 
 /**
  * Procedure for controlling the active teams turn.
@@ -95,7 +95,7 @@ object TeamTurn : Procedure() {
     // TODO Some special effects will trigger at the start of a team turn. This should happen here.
     object UseSpecialEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
+            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_OWN_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
         override fun onExitNode(state: Game, rules: Rules): Command {

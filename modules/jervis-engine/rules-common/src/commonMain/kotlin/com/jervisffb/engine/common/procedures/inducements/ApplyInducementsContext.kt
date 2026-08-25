@@ -12,4 +12,5 @@ data class ApplyInducementsContext(
     val team: Team,
     val inducements: InducementsSelected,
     val rollForPrayers: Int = 0,
+    val rollForDesperateMeasures: Int = 0,
 ) : ProcedureContext

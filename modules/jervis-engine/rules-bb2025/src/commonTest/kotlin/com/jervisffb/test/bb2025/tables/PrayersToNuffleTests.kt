@@ -39,6 +39,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
 import com.jervisffb.engine.rules.common.tables.IronManStatModifier
+import com.jervisffb.engine.utils.containsInstance
 import com.jervisffb.teams.THE_BLACK_GOBBO
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
@@ -51,7 +52,6 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.utils.assertStanding
-import com.jervisffb.test.utils.containsInstance
 import com.jervisffb.test.utils.hasSkill
 import com.jervisffb.test.utils.putProne
 import kotlin.test.BeforeTest

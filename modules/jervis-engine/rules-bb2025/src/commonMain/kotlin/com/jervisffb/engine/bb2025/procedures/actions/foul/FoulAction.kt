@@ -21,7 +21,6 @@ import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.FoulContext
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.common.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.common.procedures.getResetPlayerTemporaryModifiersCommands
 import com.jervisffb.engine.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.common.reports.ReportFoulingPlayer
@@ -83,7 +82,7 @@ object FoulAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // Check if adjacent to target of the Foul
             val foulContext= state.getContext<FoulContext>()
@@ -186,7 +185,7 @@ object FoulAction : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val options = mutableListOf<GameActionDescriptor>()
-            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+            options.addIfNotNull(rules.calculateMoveTypesAvailable(state, state.activePlayer!!))
             options.add(EndActionWhenReady)
             return options
         }

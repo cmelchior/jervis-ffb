@@ -2,8 +2,10 @@ package com.jervisffb.engine.bb2020
 
 import com.jervisffb.engine.bb2020.inducements.BB2020InducementType
 import com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements
+import com.jervisffb.engine.bb2020.inducements.infamouscoach.JosefBugman
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
 import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
 import com.jervisffb.engine.common.inducements.SimpleInducement
 import com.jervisffb.engine.common.inducements.StandardMercenaryInducement
@@ -13,6 +15,7 @@ import com.jervisffb.engine.model.inducements.settings.Inducement
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
+import kotlin.collections.listOf
 
 val DEFAULT_INDUCEMENTS_BB2020: Map<InducementType, Inducement<*>> = buildMap {
     CommonInducementType.entries.forEach { type ->
@@ -22,7 +25,19 @@ val DEFAULT_INDUCEMENTS_BB2020: Map<InducementType, Inducement<*>> = buildMap {
             CommonInducementType.DESPERATE_MEASURES -> SimpleInducement(type, "Desperate Measures", 5, 50_000, false)
             CommonInducementType.EXTRA_TEAM_TRAINING -> SimpleInducement(type, "Extra Team Training", 8, 100_000, true)
             CommonInducementType.HALFLING_MASTER_CHEF -> SimpleInducement(type, "Hafling Master Chef", 1, 300_000, true, specialRulesModifier = mapOf(RegionalSpecialRule.HAFLING_THIMBLE_CUP to 1 / 3f))
-            CommonInducementType.INFAMOUS_COACHING_STAFF -> InfamousCoachingStaffsInducementGroup(max = 2, enabled = true)
+            CommonInducementType.INFAMOUS_COACHING_STAFF -> InfamousCoachingStaffsInducementGroup(
+                max = 2,
+                enabled = true,
+                items = listOf(
+                    InfamousCoachingStaffInducement(
+                        JosefBugman(),
+                        1,
+                        100_000,
+                        named = true,
+                        enabled = true,
+                    ),
+                )
+            )
             CommonInducementType.MORTUARY_ASSISTANT -> SimpleInducement(type, "Mortuary Assistant", 1, 100_000, true, requirements = setOf(RegionalSpecialRule.SYLVANIAN_SPOTLIGHT))
             CommonInducementType.PART_TIME_ASSISTANT_COACH -> SimpleInducement(type, "Part-time Assistant Coaches", 1, 20_000, true)
             CommonInducementType.PLAGUE_DOCTOR -> SimpleInducement(type, "Plague Doctor", 1, 100_000, true, requirements = setOf(TeamSpecialRule.FAVOURED_OF_NURGLE))

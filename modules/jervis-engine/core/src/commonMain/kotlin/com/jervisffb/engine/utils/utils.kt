@@ -306,6 +306,10 @@ inline fun <reified T: Any> List<*>.singleInstanceOfOrNull(): T? {
     return singleOrNull { it is T } as T?
 }
 
+inline fun <reified T: Any?> List<Any?>.containsInstance(): Boolean {
+    return this.any { it is T }
+}
+
 /**
  * Format dice rolls and modifiers into a nice looking String that can be used for log output
  */

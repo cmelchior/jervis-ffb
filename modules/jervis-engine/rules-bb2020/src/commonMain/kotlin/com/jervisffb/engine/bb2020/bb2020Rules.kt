@@ -2,14 +2,27 @@ package com.jervisffb.engine.bb2020
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.bb2020.inducements.BB2020InducementType
+import com.jervisffb.engine.bb2020.procedures.AnimalSavageryStep
+import com.jervisffb.engine.bb2020.procedures.BoneHeadRoll
+import com.jervisffb.engine.bb2020.procedures.GameDrive
+import com.jervisffb.engine.bb2020.procedures.ReallyStupidRoll
+import com.jervisffb.engine.bb2020.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.bb2020.procedures.actions.block.StandardBlockStep
+import com.jervisffb.engine.bb2020.procedures.actions.foul.ArgueTheCallRoll
+import com.jervisffb.engine.bb2020.procedures.actions.foul.BeingSentOff
+import com.jervisffb.engine.bb2020.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.bb2020.procedures.actions.move.JumpStep
+import com.jervisffb.engine.bb2020.procedures.actions.move.MovePlayerIntoSquare
+import com.jervisffb.engine.bb2020.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
 import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
 import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020FallingOver
 import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020KnockedDown
-import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2020.procedures.table.injury.PatchUpPlayer
+import com.jervisffb.engine.bb2020.procedures.table.injury.RiskingInjuryRoll
 import com.jervisffb.engine.bb2020.skills.Leader
 import com.jervisffb.engine.bb2020.tables.BB2020ArgueTheCallTable
 import com.jervisffb.engine.bb2020.tables.BB2020CasualtyTable
@@ -20,6 +33,7 @@ import com.jervisffb.engine.bb2020.tables.BB2020StandardKickOffEventTable
 import com.jervisffb.engine.bb2020.tables.BB2020StandardPrayersToNuffleTable
 import com.jervisffb.engine.bb2020.tables.BB2020StandardWeatherTable
 import com.jervisffb.engine.bb2020.tables.BB2020StuntyInjuryTable
+import com.jervisffb.engine.bb2020.tables.BB7DesperateMeasuresTable
 import com.jervisffb.engine.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.bb2020.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.bb2020.tables.BB7StandardInjuryTable
@@ -27,10 +41,12 @@ import com.jervisffb.engine.bb2020.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.modifiers.isRooted
 import com.jervisffb.engine.common.planner.CommonActionPlanner
 import com.jervisffb.engine.common.procedures.DeviateRoll
 import com.jervisffb.engine.common.tables.DisabledCasualtyTable
 import com.jervisffb.engine.common.tables.DisabledLastingInjuryTable
+import com.jervisffb.engine.common.utils.endActionImmediately
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
@@ -43,9 +59,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
+import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.RulesParameters
 import com.jervisffb.engine.rules.RulesParametersHolder
+import com.jervisffb.engine.rules.SPRINT_EXTRA_RUSHES
 import com.jervisffb.engine.rules.bb2020.procedures.BB2020TheKickOffEvent
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
@@ -97,6 +115,92 @@ abstract class BB2020Rules(
     override fun isDistracted(player: Player): Boolean {
         // Distracted is not a concept in BB2020, so we always return false.
         return false
+    }
+
+    override fun isSkillAvailable(player: Player, type: SkillType): Boolean {
+        return player.getSkillOrNull(type)?.let { skill ->
+            val state = player.state
+
+            // Check for distracted state
+            val isDistracted = !player.hasTackleZones && !skill.workWithoutTackleZones && state == PlayerPitchState.STANDING
+            if (isDistracted) {
+                return false
+            }
+
+            // Check for Prone state
+            // TODO Is a Stunned player considered Prone or are they completely separate?
+            val isProne = (state == PlayerPitchState.PRONE || state == PlayerPitchState.STUNNED || state == PlayerPitchState.STUNNED_OWN_TURN)
+            if (isProne && !skill.workWhenProne) {
+                return@let false
+            }
+            return !skill.used
+        } ?: false
+
+    }
+
+    override fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
+        if (state.endActionImmediately()) {
+            return null
+        }
+
+        // A dev-mode edit can move the active player to the dugout while the
+        // activation procedure is still on the move-selection node. There are no
+        // movement options for a player that is not on the pitch, and checking this
+        // here avoids accessing Player.coordinates for a dugout player.
+        if (!player.location.isOnPitch(this)) {
+            return null
+        }
+        val options = mutableListOf<MoveType>()
+
+        // Stand up
+        if (player.state == PlayerPitchState.PRONE) {
+            options.add(MoveType.STAND_UP)
+        }
+
+        // Rooted players cannot leave their current square, so exit early.
+        if (player.isRooted()) {
+            return when (options.isNotEmpty()) {
+                true -> SelectMoveType(options)
+                false -> null
+            }
+        }
+
+        // Normal move (with a potential rush)
+        // Sprint is still optional, but here we assume it will be used if needed
+        val extraSprintRush = if (player.isSkillAvailable(SkillType.SPRINT)) SPRINT_EXTRA_RUSHES else 0
+        if (player.movesLeft + player.rushesLeft + extraSprintRush >= 1 && isStanding(player)) {
+            options.add(MoveType.STANDARD)
+        }
+
+        // Jump, if next to a prone player and space on the opposite side
+        val hasMoveLeft = player.movesLeft + player.rushesLeft + extraSprintRush >= JUMP_DISTANCE && isStanding(player)
+        val legalJumpSquares = player.coordinates.getSurroundingCoordinates(this, distance = 1)
+            .mapNotNull { state.pitch[it].player }
+            .filter { !isStanding(it) }
+            .any {
+                // A jumping player can only jump to the same squares you would normally push the player
+                // to. See page 45 in the rulebook.
+                getPushOptions(player, it).any { coords ->
+                    coords.isOnPitch(this) && state.pitch[coords].isUnoccupied()
+                }
+            }
+
+        if (hasMoveLeft && legalJumpSquares) {
+            options.add(MoveType.JUMP)
+        }
+
+        // Leap and Pogo
+        val allSquares = player.coordinates.getSurroundingCoordinates(this, distance = JUMP_DISTANCE)
+        val adjacentSquares = player.coordinates.getSurroundingCoordinates(this, distance = 1)
+        val legalLeapSquares = (allSquares - adjacentSquares.toSet()).any { state.pitch[it].isUnoccupied() }
+        if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.LEAP)) {
+            options.add(MoveType.LEAP)
+        }
+        if (hasMoveLeft && legalLeapSquares && player.isSkillAvailable(SkillType.POGO_STICK)) {
+            options.add(MoveType.POGO)
+        }
+
+        return if (options.isNotEmpty()) SelectMoveType(options) else null
     }
 
     override fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
@@ -255,6 +359,7 @@ abstract class BB2020Rules(
             prayersToNufflePriceForUnderdog = 50_000,
             prayersToNuffleEnabledForUnderdogDuringPregame = true,
             prayersToNuffleTable = BB2020StandardPrayersToNuffleTable,
+            desperateMeasuresTable = BB7DesperateMeasuresTable,
             weatherTable = BB2020StandardWeatherTable,
             injuryTable = BB2020StandardInjuryTable,
             stuntyInjuryTable = BB2020StuntyInjuryTable,
@@ -299,7 +404,6 @@ abstract class BB2020Rules(
     @Transient override val teamTurn: Procedure = BB2020TeamTurn
     @Transient override val passStep: Procedure = BB2020PassStep
     @Transient override val throwPlayerStep: Procedure = BB2020ThrowPlayerStep
-    @Transient override val cheeringFansStep: Procedure = BB2020CheeringFans
 
     // Not supported in BB2020 right now, so just ignore them
     // We should probably refactor the rules, so we do not need them here.
@@ -314,6 +418,17 @@ abstract class BB2020Rules(
     @Transient override val chainsawFoulStep: Procedure = DummyProcedure
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
     @Transient override val rushRoll: Procedure = RushRoll
+    @Transient override val gameDrive: Procedure = GameDrive
+    @Transient override val beingSentOff: Procedure = BeingSentOff
+    @Transient override val movePlayerIntoSquare: Procedure = MovePlayerIntoSquare
+    @Transient override val patchUpPlayer: Procedure = PatchUpPlayer
+    @Transient override val riskingInjuryRoll: Procedure = RiskingInjuryRoll
+    @Transient override val dodgeRoll: Procedure = DodgeRoll
+    @Transient override val takeRootRoll: Procedure = DummyProcedure
+    @Transient override val boneHeadRoll: Procedure = BoneHeadRoll
+    @Transient override val reallyStupidRoll: Procedure = ReallyStupidRoll
+    @Transient override val unchannelledFuryRoll: Procedure = UnchannelledFuryRoll
+    @Transient override val animalSavageryStep: Procedure = AnimalSavageryStep
     @Transient override val argueTheCallRoll: Procedure = ArgueTheCallRoll
 
 
@@ -414,6 +529,7 @@ class BB72020Rules(
             casualtyTable = DisabledCasualtyTable,
             lastingInjuryTable = DisabledLastingInjuryTable,
             prayersToNuffleTable = BB7PrayersToNuffleTable,
+            desperateMeasuresTable = BB7DesperateMeasuresTable,
             useApothecaryBehavior = UseApothecaryBehavior.BB7,
             inducements = InducementSettings(
                 topDogTopUpLimitFromTreasury = Int.MAX_VALUE,
