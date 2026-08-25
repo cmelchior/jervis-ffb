@@ -10,12 +10,12 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
-import com.jervisffb.engine.bb2025.context.BB2025MultipleBlockContext
+import com.jervisffb.engine.bb2025.context.MultipleBlockContext2025
 import com.jervisffb.engine.bb2025.modifiers.eyeGouge
 import com.jervisffb.engine.bb2025.modifiers.isChomped
 import com.jervisffb.engine.bb2025.modifiers.isEyeGouged
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.bb2025.procedures.actions.block.PushBack2025
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -53,7 +53,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * A Pushback is split into multiple phases to support both normal blocks and
  * Multiple Block as their order of resolution differs.
  *
- * See [BB2025PushBack] and [MultipleBlockAction] for more details on each.
+ * See [PushBack2025] and [MultipleBlockAction] for more details on each.
  *
  * Developer's Commentary:
  * When determining a step in the push chain, it involves a number of skills
@@ -105,11 +105,11 @@ object CreatePushChainStep: Procedure() {
             val pushContext = state.getContext<PushContext>()
             buildCompositeCommand {
                 if (blockContext.isUsingMultiBlock) {
-                    val multipleBlockContext = state.getContext<BB2025MultipleBlockContext>()
+                    val multipleBlockContext = state.getContext<MultipleBlockContext2025>()
                     val property = if (multipleBlockContext.activeDefender == 0) {
-                        BB2025MultipleBlockContext::defender1PushChain
+                        MultipleBlockContext2025::defender1PushChain
                     } else {
-                        BB2025MultipleBlockContext::defender2PushChain
+                        MultipleBlockContext2025::defender2PushChain
                     }
                     add(SetContextProperty(property, multipleBlockContext, pushContext))
                 }

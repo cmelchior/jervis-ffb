@@ -15,8 +15,8 @@ import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.bb2025.context.AlwaysHungryContext
 import com.jervisffb.engine.bb2025.context.SwoopContext
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025KnockedDown
+import com.jervisffb.engine.bb2025.procedures.injury.FallingOver2025
+import com.jervisffb.engine.bb2025.procedures.injury.KnockedDown2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -446,7 +446,7 @@ object ThrowPlayerStep: Procedure(), ChanceObservationHandler {
                 UpdateContext(throwContext.copy(fallOverWhenLanding = true))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2025
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
@@ -653,7 +653,7 @@ object ThrowPlayerStep: Procedure(), ChanceObservationHandler {
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver2025
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }

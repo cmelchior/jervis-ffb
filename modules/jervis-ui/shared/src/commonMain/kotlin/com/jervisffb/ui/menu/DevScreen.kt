@@ -33,7 +33,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
-import com.jervisffb.engine.bb2025.BB72025Rules
+import com.jervisffb.engine.bb2025.BB7Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.challenge.Challenge
 import com.jervisffb.engine.model.Game
@@ -203,7 +203,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     private fun createDevHotseatBB7ScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
-        val rules = BB72025Rules().toBuilder().run {
+        val rules = BB7Rules2025().toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED

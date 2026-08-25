@@ -18,7 +18,7 @@ class Pro(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill, RerollSource {
+) : Skill2020, RerollSource {
     override val type: SkillType = SkillType.PRO
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

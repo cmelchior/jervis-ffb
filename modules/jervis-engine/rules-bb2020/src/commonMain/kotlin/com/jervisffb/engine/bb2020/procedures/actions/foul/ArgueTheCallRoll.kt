@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.bb2020.tables.BB2020PrayerToNuffleTableResult
+import com.jervisffb.engine.bb2020.tables.PrayerToNuffleTableResult2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.UpdateContext
@@ -72,7 +72,7 @@ object ArgueTheCallRoll: Procedure(), ChanceObservationHandler {
                 // While weirdly worded "Friends with the Ref" just means that roll 5
                 // can be changed to "Well, When You Put It Like That..."
                 val nextNodeCommand = if (
-                    team.activePrayersToNuffle.contains(BB2020PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF)
+                    team.activePrayersToNuffle.contains(PrayerToNuffleTableResult2020.FRIENDS_WITH_THE_REF)
                     && d6.value == 5
                 ) {
                     GotoNode(ResolveFriendsWithTheReferences)

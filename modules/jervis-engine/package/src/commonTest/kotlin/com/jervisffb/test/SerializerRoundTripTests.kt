@@ -1,8 +1,8 @@
 package com.jervisffb.test
 
-import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.BB7Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
-import com.jervisffb.engine.bb2025.BB72025Rules
+import com.jervisffb.engine.bb2025.BB7Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.JervisSerialization.jervisEngineSerializerModule
@@ -39,10 +39,10 @@ class SerializerRoundTripTests {
 
     @Test
     fun bb7_bb2020_rulesRoundTrip() {
-        val original: Rules = BB72020Rules()
+        val original: Rules = BB7Rules2020()
         val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
         val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
-        assertTrue(restored is BB72020Rules, "Restored should be StandardBB2020Rules, was $restored")
+        assertTrue(restored is BB7Rules2020, "Restored should be StandardBB2020Rules, was $restored")
         assertEquals(original.name, restored.name)
         assertEquals(original.baseVersion, restored.baseVersion)
     }
@@ -59,10 +59,10 @@ class SerializerRoundTripTests {
 
     @Test
     fun bb7_bb2025_rulesRoundTrip() {
-        val original: Rules = BB72025Rules()
+        val original: Rules = BB7Rules2025()
         val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(Rules::class), original)
         val restored: Rules = json.decodeFromJsonElement(PolymorphicSerializer(Rules::class), serialized)
-        assertTrue(restored is BB72025Rules, "Restored should be BB72025Rules, was $restored")
+        assertTrue(restored is BB7Rules2025, "Restored should be BB7Rules2025, was $restored")
         assertEquals(original.name, restored.name)
         assertEquals(original.baseVersion, restored.baseVersion)
     }

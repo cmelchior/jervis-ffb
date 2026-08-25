@@ -27,8 +27,8 @@ import com.jervisffb.engine.bb2025.procedures.injury.SteadyFootingRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.AlertDefense
-import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.Charge
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.CheeringFans2025
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.DodgySnack
 import com.jervisffb.engine.bb2025.skills.HypnoticGazeRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
@@ -211,7 +211,7 @@ class SupportedDiceRollTests {
             DiceRollType.CATCH -> CatchRoll
             DiceRollType.CHAINSAW -> ChainsawRoll
             DiceRollType.CHARGE -> Charge
-            DiceRollType.CHEERING_FANS -> BB2025CheeringFans
+            DiceRollType.CHEERING_FANS -> CheeringFans2025
             DiceRollType.CHOMP -> ChompRoll
             DiceRollType.COIN_TOSS -> DetermineKickingTeamStep
             DiceRollType.DAUNTLESS -> DauntlessRoll

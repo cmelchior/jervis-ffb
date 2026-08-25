@@ -26,7 +26,7 @@ import com.jervisffb.engine.common.context.SolidDefenseContext
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
-import com.jervisffb.engine.common.tables.CommonKickOffEventResult
+import com.jervisffb.engine.common.tables.KickOffEventResultCommon
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -213,8 +213,8 @@ object SolidDefense : Procedure(), ChanceObservationHandler {
         val context = state.getContext<KickOffEventContext>()
         val type = context.result
         return when (type) {
-            CommonKickOffEventResult.SOLID_DEFENSE if state.rules.gameType != GameType.BB7 -> 3
-            CommonKickOffEventResult.SOLID_DEFENSE if state.rules.gameType == GameType.BB7 -> 1
+            KickOffEventResultCommon.SOLID_DEFENSE if state.rules.gameType != GameType.BB7 -> 3
+            KickOffEventResultCommon.SOLID_DEFENSE if state.rules.gameType == GameType.BB7 -> 1
             else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.description}")
         }
     }

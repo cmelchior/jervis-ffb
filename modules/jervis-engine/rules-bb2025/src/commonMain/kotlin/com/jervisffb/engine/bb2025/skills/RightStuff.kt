@@ -16,7 +16,7 @@ class RightStuff(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     val maxStrength = Int.MAX_VALUE // In BB2025, there is no Strength limit unlike BB2020
     override val type: SkillType = SkillType.RIGHT_STUFF
     override val value: Unit? = null

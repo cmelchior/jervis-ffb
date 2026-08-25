@@ -17,7 +17,7 @@ class Loner(
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val value: Int = 4,
     override val expiresAt: Duration,
-) : BB2025IntSkill {
+) : IntSkill2025 {
     override val type: SkillType = SkillType.LONER
     override val skillId: SkillId = type.idTarget(value)
     override val name: String = "${type.description}(${value}+)"

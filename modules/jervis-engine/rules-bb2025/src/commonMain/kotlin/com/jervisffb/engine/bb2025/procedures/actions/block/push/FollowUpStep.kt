@@ -7,8 +7,8 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.bb2025.modifiers.isChomped
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.bb2025.procedures.actions.block.PushBack2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -39,7 +39,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * A Pushback is split into multiple phases to support both normal blocks and
  * Multiple Block as their order of resolution differs.
  *
- * See [BB2025PushBack] and [MultipleBlockAction] for more details on each.
+ * See [PushBack2025] and [MultipleBlockAction] for more details on each.
  */
 object FollowUpStep: Procedure() {
     override val initialNode: Node = IsFollowUpAvailable

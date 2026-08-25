@@ -1,6 +1,6 @@
 package com.jervisffb.engine.bb2020.skills
 
-import com.jervisffb.engine.bb2020.skills.BB2020Skill
+import com.jervisffb.engine.bb2020.skills.Skill2020
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -16,7 +16,7 @@ class Block(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill {
+) : Skill2020 {
     override val type: SkillType = SkillType.BLOCK
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

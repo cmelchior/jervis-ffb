@@ -86,7 +86,7 @@ object LeapRoll : D6WithRerollProcedure() {
         override fun nextNodeCommand(): Command = GotoNode(ChooseToUseDivingTackleAfterReRoll)
     }
 
-    override val UseRerollSource = CommonUseRerollSource(
+    override val UseRerollSource = UseRerollSourceCommon(
         rerollDiceNode = ReRollDie,
         noRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     )

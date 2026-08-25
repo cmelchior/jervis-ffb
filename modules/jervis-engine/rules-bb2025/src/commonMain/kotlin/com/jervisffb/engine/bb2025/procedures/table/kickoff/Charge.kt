@@ -17,7 +17,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
-import com.jervisffb.engine.bb2025.tables.BB2025KickOffEventResult
+import com.jervisffb.engine.bb2025.tables.KickOffEventResult2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -172,7 +172,7 @@ object Charge : Procedure(), ChanceObservationHandler {
     }
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<KickOffEventContext>()
-        if (context.result != BB2025KickOffEventResult.CHARGE) {
+        if (context.result != KickOffEventResult2025.CHARGE) {
             INVALID_GAME_STATE("Wrong Kick-off Event: ${context.result}")
         }
     }

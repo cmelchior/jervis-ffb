@@ -11,7 +11,7 @@ class MightyBlow(
     override val category: SkillCategory = SkillCategory.STRENGTH,
     override val value: Int = 1,
     override val expiresAt: Duration,
-) : BB2020IntSkill {
+) : IntSkill2020 {
     override val type: SkillType = SkillType.MIGHTY_BLOW
     override val skillId: SkillId = type.idAdjustment(value)
     override val name: String = "${type.description}(+$value)"

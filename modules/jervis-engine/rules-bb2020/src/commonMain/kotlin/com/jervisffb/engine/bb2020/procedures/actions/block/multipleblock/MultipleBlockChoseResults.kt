@@ -7,8 +7,8 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.MultipleBlockContext2020
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -34,9 +34,9 @@ object MultipleBlockChoseResults: Procedure() {
     // TODO It isn't guaranteded that it is the blocker team that selects the dice.
     // We might need to have both attacker and defender choose dice
     object AttackerSelectBlockResults : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BB2020MultipleBlockContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext2020>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val roll1 = context.roll1!!
             val roll2 = context.roll2!!
             return listOf(
@@ -49,7 +49,7 @@ object MultipleBlockChoseResults: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDicePool<DBlockResult, DBlockResult>(action) { pool1Die, pool2Die ->
-                val context = state.getContext<BB2020MultipleBlockContext>()
+                val context = state.getContext<MultipleBlockContext2020>()
                 val updatedRoll1 = context.roll1!!.setSelectedDieResult(pool1Die)
                 val updatedRoll2 = context.roll2!!.setSelectedDieResult(pool2Die)
                 return compositeCommandOf(

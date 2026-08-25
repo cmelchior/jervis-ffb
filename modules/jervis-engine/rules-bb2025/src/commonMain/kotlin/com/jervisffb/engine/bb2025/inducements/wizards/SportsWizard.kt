@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 // See page 149 in the BB2025 rulebook
 @Serializable
-class SportsWizard: BB2025Wizard {
+class SportsWizard: Wizard2025 {
     override val id: WizardId = WizardId("SportsWizard")
     override val name: String = "Sports Wizard"
     override val spells: List<Spell> = listOf(

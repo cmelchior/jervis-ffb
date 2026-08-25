@@ -16,7 +16,7 @@ class PutTheBootIn(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.DEVIOUS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     override val type: SkillType = SkillType.PUT_THE_BOOT_IN
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

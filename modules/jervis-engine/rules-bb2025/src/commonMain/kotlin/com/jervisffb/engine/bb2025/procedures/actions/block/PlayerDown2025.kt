@@ -1,0 +1,74 @@
+package com.jervisffb.engine.bb2025.procedures.actions.block
+
+import com.jervisffb.engine.bb2025.context.MultipleBlockContext2025
+import com.jervisffb.engine.bb2025.procedures.injury.KnockedDown2025
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.reports.ReportPlayerDownResult
+import com.jervisffb.engine.fsm.ComputationNode
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.ParentNode
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
+
+/**
+ * Resolve a "Player Down!" selected as a block result.
+ *
+ * If this is part of a Multiple Block, the attacker is not actually knocked
+ * down yet. Only skills that affect "Player Down!" will be handled, and if the
+ * player is still knocked down, they will be marked for it, but not actually
+ * knocked down yet.
+ *
+ * See page 62 in the BB2025 rulebook.
+ */
+object PlayerDown2025: Procedure() {
+    override val initialNode: Node = CheckForMultipleBlock
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BlockContext>()
+        val injuryContext = RiskingInjuryContext(
+            player = context.attacker,
+            causedBy = context.defender,
+            isPartOfMultipleBlock = context.isUsingMultiBlock
+        )
+        return AddContext(injuryContext)
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return compositeCommandOf(
+            RemoveContext<RiskingInjuryContext>(),
+            ReportPlayerDownResult(state.getContext<BlockContext>().attacker)
+        )
+    }
+
+    object CheckForMultipleBlock: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BlockContext>()
+            val isDuringMultipleBlock = context.isUsingMultiBlock
+            return when (isDuringMultipleBlock) {
+                true -> {
+                    val multiContext = state.getContext<MultipleBlockContext2025>()
+                    compositeCommandOf(
+                        UpdateContext(multiContext.copy(attackerKnockedDown = true)),
+                        ExitProcedure(),
+                    )
+                }
+                false -> GotoNode(ResolvePlayerDown)
+            }
+        }
+    }
+
+    object ResolvePlayerDown: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2025
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
+        }
+    }
+}

@@ -3,7 +3,7 @@ package com.jervisffb.fumbbl.net.adapter.impl.block
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020BothDown
+import com.jervisffb.engine.bb2020.procedures.actions.block.BothDown2020
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
@@ -74,10 +74,10 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
         val defender = fumbblGame.getPlayerById(report.defenderId.id)!!
         if (report.blockResult == BOTH_DOWN) {
             if (attacker.skillArray.contains("Block")) {
-                newActions.add(Confirm, BB2020BothDown.AttackerChooseToUseBlock)
+                newActions.add(Confirm, BothDown2020.AttackerChooseToUseBlock)
             }
             if (defender.skillArray.contains("Block")) {
-                newActions.add(Confirm, BB2020BothDown.AttackerChooseToUseBlock)
+                newActions.add(Confirm, BothDown2020.AttackerChooseToUseBlock)
             }
         }
     }

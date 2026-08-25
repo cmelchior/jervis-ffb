@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDicePoolResult
-import com.jervisffb.engine.bb2025.context.BB2025MultipleBlockContext
+import com.jervisffb.engine.bb2025.context.MultipleBlockContext2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -36,9 +36,9 @@ object MultipleBlockChoseResults: Procedure() {
     // TODO It isn't guaranteded that it is the blocker team that selects the dice.
     // We might need to have both attacker and defender choose dice
     object AttackerSelectBlockResults : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BB2025MultipleBlockContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext2025>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2025MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2025>()
             val roll1 = context.roll1!!
             val roll2 = context.roll2!!
             return listOf(
@@ -51,7 +51,7 @@ object MultipleBlockChoseResults: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDicePool<DBlockResult, DBlockResult>(action) { pool1Die, pool2Die ->
-                val context = state.getContext<BB2025MultipleBlockContext>()
+                val context = state.getContext<MultipleBlockContext2025>()
                 val updatedRoll1 = context.roll1!!.setSelectedDieResult(pool1Die)
                 val updatedRoll2 = context.roll2!!.setSelectedDieResult(pool2Die)
                 return compositeCommandOf(

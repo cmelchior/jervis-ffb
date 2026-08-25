@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.BrilliantCoachingReroll2020
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerDogoutState
@@ -97,8 +97,8 @@ class ArgueTheCallTests: JervisGameBB2020Test() {
             )
         )
         assertEquals(5, homeTeam.rerolls.size)
-        assertEquals(1, homeTeam.rerolls.filterIsInstance< BB2020BrilliantCoachingReroll>().size)
-        assertEquals(0, awayTeam.rerolls.filterIsInstance<BB2020BrilliantCoachingReroll>().size)
+        assertEquals(1, homeTeam.rerolls.filterIsInstance< BrilliantCoachingReroll2020>().size)
+        assertEquals(0, awayTeam.rerolls.filterIsInstance<BrilliantCoachingReroll2020>().size)
     }
 
 

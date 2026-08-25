@@ -27,12 +27,12 @@ data class StandardMercenaryInducement(
     val extraCost: Int = 30_000,
     val skillCost: Int = 50_000,
 ): TeamPlayerInducement<StandardMercenaryInducement.Builder> {
-    override val type: InducementType = CommonInducementType.STANDARD_MERCENARY_PLAYERS
+    override val type: InducementType = InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
     override val name: String = "Mercenary Players"
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: StandardMercenaryInducement): CommonTeamPlayerInducementBuilder {
+    class Builder(inducement: StandardMercenaryInducement): TeamPlayerInducementBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
@@ -56,7 +56,7 @@ data class MercenaryInducement(
     val extraCost: Int = 30_000,
     val skillCost: Int = 50_000,
 ): SingleInducement<MercenaryInducement.Builder> {
-    override val type: InducementType = CommonInducementType.STANDARD_MERCENARY_PLAYERS
+    override val type: InducementType = InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
     override val name: String = "Mercenary ${position.title}"
     override val requirements: Set<SpecialRules> = emptySet()
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap()
@@ -66,8 +66,8 @@ data class MercenaryInducement(
     override val enabled: Boolean = true
     override fun toBuilder() = Builder(this)
 
-    class Builder(mercenaryInducement: MercenaryInducement): CommonSingleInducementBuilder {
-        override val type: InducementType = CommonInducementType.STANDARD_MERCENARY_PLAYERS
+    class Builder(mercenaryInducement: MercenaryInducement): SingleInducementBuilderCommon {
+        override val type: InducementType = InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
         override val name: String = "Mercenary "
         override var max: Int = mercenaryInducement.max
         override var price: Int = mercenaryInducement.defaultPrice

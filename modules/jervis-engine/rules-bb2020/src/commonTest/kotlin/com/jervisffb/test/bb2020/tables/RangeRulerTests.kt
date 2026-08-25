@@ -1,6 +1,6 @@
 package com.jervisffb.test.bb2020.tables
 
-import com.jervisffb.engine.bb2020.tables.BB2020RangeRuler
+import com.jervisffb.engine.bb2020.tables.RangeRuler2020
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.tables.Range
@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 
 class RangeRulerTests: JervisGameBB2020Test() {
 
-    private val ruler = BB2020RangeRuler
+    private val ruler = RangeRuler2020
 
     @Test
     fun passingPlayer() {

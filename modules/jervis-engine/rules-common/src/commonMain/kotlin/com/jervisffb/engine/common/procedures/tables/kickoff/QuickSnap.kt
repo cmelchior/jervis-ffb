@@ -23,7 +23,7 @@ import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportQuickSnapResult
-import com.jervisffb.engine.common.tables.CommonKickOffEventResult
+import com.jervisffb.engine.common.tables.KickOffEventResultCommon
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -195,10 +195,10 @@ object QuickSnap : Procedure(), ChanceObservationHandler {
     //
     private fun getExtraPlayersCount(state: Game): Int {
         val context = state.getContext<KickOffEventContext>()
-        val type = context.result as? CommonKickOffEventResult ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
+        val type = context.result as? KickOffEventResultCommon ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
         return when (type) {
-            CommonKickOffEventResult.QUICK_SNAP if state.rules.gameType != GameType.BB7 -> 3
-            CommonKickOffEventResult.QUICK_SNAP if state.rules.gameType == GameType.BB7 -> 1
+            KickOffEventResultCommon.QUICK_SNAP if state.rules.gameType != GameType.BB7 -> 3
+            KickOffEventResultCommon.QUICK_SNAP if state.rules.gameType == GameType.BB7 -> 1
             else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.description}")
         }
     }

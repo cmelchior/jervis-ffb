@@ -27,13 +27,13 @@ data class StarPlayersInducementGroup(
             requirements = THE_BLACK_GOBBO.playsFor.toSet(),
         ),
     )
-): CommonInducementGroup<StarPlayersInducementGroup.Builder, StarPlayerInducement.Builder, StarPlayerInducement> {
-    override val type: InducementType = CommonInducementType.STAR_PLAYERS
+): InducementGroupCommon<StarPlayersInducementGroup.Builder, StarPlayerInducement.Builder, StarPlayerInducement> {
+    override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
     override val name: String = "Star Players"
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: StarPlayersInducementGroup): CommonInducementGroupBuilder {
+    class Builder(inducement: StarPlayersInducementGroup): InducementGroupBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
@@ -58,12 +58,12 @@ data class StarPlayerInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<StarPlayerInducement.Builder> {
-    override val type: InducementType = CommonInducementType.STAR_PLAYERS
+    override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
     override val name: String = starPlayer.title
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: StarPlayerInducement): CommonSingleInducementBuilder {
-        override val type: InducementType = CommonInducementType.STAR_PLAYERS
+    class Builder(inducement: StarPlayerInducement): SingleInducementBuilderCommon {
+        override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
         override val name: String = inducement.name
         val starPlayer: StarPlayerPosition = inducement.starPlayer
         override var max: Int = inducement.max

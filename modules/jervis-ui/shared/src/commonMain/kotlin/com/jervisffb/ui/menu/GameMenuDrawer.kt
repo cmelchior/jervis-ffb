@@ -68,7 +68,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.markings.PlayerMarking
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
-import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
+import com.jervisffb.ui.menu.dice.DiceColorConfig2025
 import com.jervisffb.ui.menu.dice.DiceColorSettingsPanel
 import com.jervisffb.ui.menu.player_markings.PlayerMarkingEditPanel
 import com.jervisffb.ui.menu.player_markings.PlayerMarkingEditorState
@@ -427,7 +427,7 @@ fun GameMenuDrawer(
                     }
                     is DiceColorSection -> {
                         DrawerSectionHeader("Dice Colors", topPadding = 0.dp)
-                        DiceColorSettingsPanel(BB2025DiceColorConfig)
+                        DiceColorSettingsPanel(DiceColorConfig2025)
                     }
                     is PlayerMarkingsSection -> {
                         when (val editor = editingPlayerMarking) {

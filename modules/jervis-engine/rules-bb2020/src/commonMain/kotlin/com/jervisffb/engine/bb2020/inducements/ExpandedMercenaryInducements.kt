@@ -20,12 +20,12 @@ data class ExpandedMercenaryInducements(
     override val max: Int = 3,
     override val enabled: Boolean = true,
 ): TeamPlayerInducement<ExpandedMercenaryInducements.Builder> {
-    override val type: InducementType = BB2020InducementType.EXPANDED_MERCENARY_PLAYERS
+    override val type: InducementType = InducementType2020.EXPANDED_MERCENARY_PLAYERS
     override val name: String = "Expanded Mercenary Players"
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: ExpandedMercenaryInducements): BB2020TeamPlayerInducementBuilder {
+    class Builder(inducement: ExpandedMercenaryInducements): TeamPlayerInducementBuilder2020 {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max

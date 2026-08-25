@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class JosefBugman: InfamousCoachingStaff {
-    override val type: InfamousCoachingStaffType = BB2020InfamousCoachingStaffType.JOSEF_BUGMAN
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.JOSEF_BUGMAN
     override val name: String = "Josef Bugman"
     override val price: Int = 100_000
     override val specialRules = listOf(
@@ -25,7 +25,7 @@ class JosefBugman: InfamousCoachingStaff {
 // See page 15 in the Deathzone rulebook
 @Serializable
 class KariColdsteel: InfamousCoachingStaff {
-    override val type: InfamousCoachingStaffType = BB2020InfamousCoachingStaffType.KARI_COLDSTEEL
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.KARI_COLDSTEEL
     override val name: String = "Kari Coldsteel"
     override val price: Int = 50_000
     override val specialRules = listOf(
@@ -47,7 +47,7 @@ class KariColdsteel: InfamousCoachingStaff {
 // See page 16 in the Deathzone rulebook
 @Serializable
 class PapaSkullbones: InfamousCoachingStaff {
-    override val type: InfamousCoachingStaffType = BB2020InfamousCoachingStaffType.PAPA_SKULLBONES
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.PAPA_SKULLBONES
     override val name: String = "Papa Skullbones"
     override val price: Int = 80_000
     override val specialRules = listOf(PlayerSpecialRule.IF_YOU_WANT_THE_JOB_DONE)

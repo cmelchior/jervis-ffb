@@ -16,7 +16,7 @@ class AlwaysHungry(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     override val type: SkillType = SkillType.ALWAYS_HUNGRY
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

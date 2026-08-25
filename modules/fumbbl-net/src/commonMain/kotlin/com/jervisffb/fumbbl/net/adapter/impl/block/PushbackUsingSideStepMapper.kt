@@ -2,7 +2,7 @@ package com.jervisffb.fumbbl.net.adapter.impl.blitz
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.PitchSquareSelected
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushStepInitialMoveSequence2020
 import com.jervisffb.engine.model.Game
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
@@ -39,7 +39,7 @@ object PushbackUsingSideStepMapper: CommandActionMapper {
         } as FieldModelRemovePushbackSquare
         val target = cmd.value.coordinate
 
-        newActions.add(Confirm, BB2020PushStepInitialMoveSequence.DecideToUseSidestep)
-        newActions.add(PitchSquareSelected(target.x, target.y), BB2020PushStepInitialMoveSequence.SelectPushDirection)
+        newActions.add(Confirm, PushStepInitialMoveSequence2020.DecideToUseSidestep)
+        newActions.add(PitchSquareSelected(target.x, target.y), PushStepInitialMoveSequence2020.SelectPushDirection)
     }
 }

@@ -113,7 +113,7 @@ import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
-import com.jervisffb.ui.menu.dice.BB2025DiceColorConfig
+import com.jervisffb.ui.menu.dice.DiceColorConfig2025
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
@@ -1446,7 +1446,7 @@ private fun DiceButton(
         }
     }
 
-    val diceConfig = remember(diceRollType) { BB2025DiceColorConfig.configFor(diceRollType) }
+    val diceConfig = remember(diceRollType) { DiceColorConfig2025.configFor(diceRollType) }
     val settingsFlow = remember(diceConfig) {
         SETTINGS_MANAGER
             .observeStringKey(diceConfig.settingsKey, diceConfig.defaultColor.name)

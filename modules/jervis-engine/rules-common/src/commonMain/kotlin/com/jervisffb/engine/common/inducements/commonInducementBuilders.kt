@@ -7,14 +7,14 @@ import com.jervisffb.engine.model.inducements.settings.SingleInducementBuilder
 import com.jervisffb.engine.model.inducements.settings.TeamPlayerInducementBuilder
 
 // Top-level interface for all common inducement groups
-sealed interface CommonInducementGroup<GB: InducementGroupBuilder, IB: SingleInducementBuilder, I: SingleInducement<IB>>
+sealed interface InducementGroupCommon<GB: InducementGroupBuilder, IB: SingleInducementBuilder, I: SingleInducement<IB>>
 : InducementGroup<GB, IB, I>
 
 // Top-level builder interface for all common inducement groups.
-sealed interface CommonInducementGroupBuilder: InducementGroupBuilder
+sealed interface InducementGroupBuilderCommon: InducementGroupBuilder
 
 // Top-level builder interface for all common single inducements.
-sealed interface CommonSingleInducementBuilder: SingleInducementBuilder
+sealed interface SingleInducementBuilderCommon: SingleInducementBuilder
 
 // Top-level interface for common inducements that are "normal" team players.
-sealed interface CommonTeamPlayerInducementBuilder: TeamPlayerInducementBuilder
+sealed interface TeamPlayerInducementBuilderCommon: TeamPlayerInducementBuilder

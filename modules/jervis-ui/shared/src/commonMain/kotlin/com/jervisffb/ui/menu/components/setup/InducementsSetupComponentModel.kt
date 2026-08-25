@@ -5,28 +5,28 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.InducementSettings
-import com.jervisffb.engine.bb2020.inducements.BB2020InducementGroupBuilder
-import com.jervisffb.engine.bb2020.inducements.BB2020InducementType
-import com.jervisffb.engine.bb2020.inducements.BB2020SingleInducementBuilder
-import com.jervisffb.engine.bb2020.inducements.BB2020TeamPlayerInducementBuilder
 import com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements
-import com.jervisffb.engine.bb2025.inducements.BB2025InducementGroupBuilder
-import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
-import com.jervisffb.engine.bb2025.inducements.BB2025SingleInducementBuilder
-import com.jervisffb.engine.bb2025.inducements.BB2025TeamPlayerInducementBuilder
+import com.jervisffb.engine.bb2020.inducements.InducementGroupBuilder2020
+import com.jervisffb.engine.bb2020.inducements.InducementType2020
+import com.jervisffb.engine.bb2020.inducements.SingleInducementBuilder2020
+import com.jervisffb.engine.bb2020.inducements.TeamPlayerInducementBuilder2020
+import com.jervisffb.engine.bb2025.inducements.InducementGroupBuilder2025
+import com.jervisffb.engine.bb2025.inducements.InducementType2025
+import com.jervisffb.engine.bb2025.inducements.SingleInducementBuilder2025
+import com.jervisffb.engine.bb2025.inducements.TeamPlayerInducementBuilder2025
 import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
-import com.jervisffb.engine.common.inducements.CommonInducementGroupBuilder
-import com.jervisffb.engine.common.inducements.CommonInducementType
-import com.jervisffb.engine.common.inducements.CommonSingleInducementBuilder
-import com.jervisffb.engine.common.inducements.CommonTeamPlayerInducementBuilder
+import com.jervisffb.engine.common.inducements.InducementGroupBuilderCommon
+import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
 import com.jervisffb.engine.common.inducements.MercenaryInducement
 import com.jervisffb.engine.common.inducements.SimpleInducement
+import com.jervisffb.engine.common.inducements.SingleInducementBuilderCommon
 import com.jervisffb.engine.common.inducements.StandardMercenaryInducement
 import com.jervisffb.engine.common.inducements.StarPlayerInducement
 import com.jervisffb.engine.common.inducements.StarPlayersInducementGroup
+import com.jervisffb.engine.common.inducements.TeamPlayerInducementBuilderCommon
 import com.jervisffb.engine.common.inducements.WizardInducement
 import com.jervisffb.engine.common.inducements.WizardsInducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementBuilder
@@ -78,17 +78,17 @@ class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder,
         updateEnabled(inducementsInCategory, type, enabled)
 
         // Expanded Mercenaries replace the standard rules and vice versa.
-        if (enabled && type == CommonInducementType.STANDARD_MERCENARY_PLAYERS) {
+        if (enabled && type == InducementTypeCommon.STANDARD_MERCENARY_PLAYERS) {
             updateEnabled(
                 this.inducements[HEADER_DEATH_ZONE]!!,
-                BB2020InducementType.EXPANDED_MERCENARY_PLAYERS,
+                InducementType2020.EXPANDED_MERCENARY_PLAYERS,
                 false
             )
         }
-        if (enabled && type == BB2020InducementType.EXPANDED_MERCENARY_PLAYERS) {
+        if (enabled && type == InducementType2020.EXPANDED_MERCENARY_PLAYERS) {
             updateEnabled(
                 this.inducements[HEADER_RULEBOOK]!!,
-                CommonInducementType.STANDARD_MERCENARY_PLAYERS,
+                InducementTypeCommon.STANDARD_MERCENARY_PLAYERS,
                 false
             )
         }
@@ -131,24 +131,24 @@ class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder,
             inducements[HEADER_RULEBOOK] = rulebookInducements
 
             // Define inducements from the rule book
-            rulebookInducements.add(this[BB2025InducementType.PRAYERS_TO_NUFFLE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.PART_TIME_ASSISTANT_COACH]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.TEMP_AGENCY_CHEERLEADER]!!.toDataObject())
-            rulebookInducements.add(this[BB2025InducementType.TEAM_MASCOT]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WEATHER_MAGE]!!.toDataObject())
-            rulebookInducements.add(this[BB2025InducementType.BLITZERS_BEST_KEGS]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.BRIBE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.EXTRA_TEAM_TRAINING]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.MORTUARY_ASSISTANT]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.PLAGUE_DOCTOR]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.RIOTOUS_ROOKIE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WANDERING_APOTHECARY]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.HALFLING_MASTER_CHEF]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.BIASED_REFEREE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.INFAMOUS_COACHING_STAFF]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.STANDARD_MERCENARY_PLAYERS]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.STAR_PLAYERS]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WIZARD]!!.toDataObject())
+            rulebookInducements.add(this[InducementType2025.PRAYERS_TO_NUFFLE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.PART_TIME_ASSISTANT_COACH]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.TEMP_AGENCY_CHEERLEADER]!!.toDataObject())
+            rulebookInducements.add(this[InducementType2025.TEAM_MASCOT]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WEATHER_MAGE]!!.toDataObject())
+            rulebookInducements.add(this[InducementType2025.BLITZERS_BEST_KEGS]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.BRIBE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.EXTRA_TEAM_TRAINING]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.MORTUARY_ASSISTANT]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.PLAGUE_DOCTOR]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.RIOTOUS_ROOKIE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WANDERING_APOTHECARY]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.HALFLING_MASTER_CHEF]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.BIASED_REFEREE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.INFAMOUS_COACHING_STAFF]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.STANDARD_MERCENARY_PLAYERS]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.STAR_PLAYERS]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WIZARD]!!.toDataObject())
         }
     }
 
@@ -165,38 +165,38 @@ class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder,
             inducements[HEADER_DEATH_ZONE] = deathZoneInducements
 
             // Define inducements from the rule book
-            rulebookInducements.add(this[CommonInducementType.TEMP_AGENCY_CHEERLEADER]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.PART_TIME_ASSISTANT_COACH]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WEATHER_MAGE]!!.toDataObject())
-            rulebookInducements.add(this[BB2020InducementType.BLOODWEISER_KEG]!!.toDataObject())
-            rulebookInducements.add(this[BB2020InducementType.SPECIAL_PLAY]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.BRIBE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WANDERING_APOTHECARY]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.MORTUARY_ASSISTANT]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.PLAGUE_DOCTOR]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.RIOTOUS_ROOKIE]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.HALFLING_MASTER_CHEF]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.STANDARD_MERCENARY_PLAYERS]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.STAR_PLAYERS]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.INFAMOUS_COACHING_STAFF]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.WIZARD]!!.toDataObject())
-            rulebookInducements.add(this[CommonInducementType.BIASED_REFEREE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.TEMP_AGENCY_CHEERLEADER]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.PART_TIME_ASSISTANT_COACH]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WEATHER_MAGE]!!.toDataObject())
+            rulebookInducements.add(this[InducementType2020.BLOODWEISER_KEG]!!.toDataObject())
+            rulebookInducements.add(this[InducementType2020.SPECIAL_PLAY]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.BRIBE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WANDERING_APOTHECARY]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.MORTUARY_ASSISTANT]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.PLAGUE_DOCTOR]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.RIOTOUS_ROOKIE]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.HALFLING_MASTER_CHEF]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.STANDARD_MERCENARY_PLAYERS]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.STAR_PLAYERS]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.INFAMOUS_COACHING_STAFF]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.WIZARD]!!.toDataObject())
+            rulebookInducements.add(this[InducementTypeCommon.BIASED_REFEREE]!!.toDataObject())
 
             // Define inducements from DeathZone
-            deathZoneInducements.add(this[BB2020InducementType.WAAAGH_DRUMMER]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.CAVORTING_NURGLINGS]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.HALFLING_HOTPOT]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.MASTER_OF_BALLISTICS]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.EXPANDED_MERCENARY_PLAYERS]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.GIANT]!!.toDataObject())
-            deathZoneInducements.add(this[BB2020InducementType.DESPERATE_MEASURES]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.WAAAGH_DRUMMER]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.CAVORTING_NURGLINGS]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.HALFLING_HOTPOT]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.MASTER_OF_BALLISTICS]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.EXPANDED_MERCENARY_PLAYERS]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.GIANT]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType2020.DESPERATE_MEASURES]!!.toDataObject())
         }
     }
 }
 
 private fun InducementBuilder.toDataObject(): InducementData {
     val price: Int? = when (this) {
-        is CommonSingleInducementBuilder -> {
+        is SingleInducementBuilderCommon -> {
             when (this) {
                 is MercenaryInducement.Builder -> null
                 is BiasedRefereeInducement.Builder -> null
@@ -206,7 +206,7 @@ private fun InducementBuilder.toDataObject(): InducementData {
                 is WizardInducement.Builder -> null
             }
         }
-        is CommonInducementGroupBuilder -> {
+        is InducementGroupBuilderCommon -> {
             when (this) {
                 is BiasedRefereesInducementGroup.Builder -> null
                 is InfamousCoachingStaffsInducementGroup.Builder -> null
@@ -214,29 +214,29 @@ private fun InducementBuilder.toDataObject(): InducementData {
                 is WizardsInducementGroup.Builder -> null
             }
         }
-        is CommonTeamPlayerInducementBuilder -> {
+        is TeamPlayerInducementBuilderCommon -> {
             when (this) {
                 is StandardMercenaryInducement.Builder -> null
             }
         }
-        is BB2020SingleInducementBuilder -> {
+        is SingleInducementBuilder2020 -> {
             error("Unsupported inducement builder type: $this")
         }
-        is BB2020InducementGroupBuilder -> {
+        is InducementGroupBuilder2020 -> {
             error("Unsupported inducement builder type: $this")
         }
-        is BB2020TeamPlayerInducementBuilder -> {
+        is TeamPlayerInducementBuilder2020 -> {
             when (this) {
                 is ExpandedMercenaryInducements.Builder -> null
             }
         }
-        is BB2025SingleInducementBuilder -> {
+        is SingleInducementBuilder2025 -> {
             error("Unsupported inducement builder type: $this")
         }
-        is BB2025InducementGroupBuilder -> {
+        is InducementGroupBuilder2025 -> {
             error("Unsupported inducement builder type: $this")
         }
-        is BB2025TeamPlayerInducementBuilder -> {
+        is TeamPlayerInducementBuilder2025 -> {
             error("Unsupported inducement builder type: $this")
         }
         else -> error("Unknown inducement builder type: $this")

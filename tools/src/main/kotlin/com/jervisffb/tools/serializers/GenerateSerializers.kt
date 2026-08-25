@@ -84,14 +84,14 @@ private val ignored = setOf(
 )
 
 private val nonSerializableAbstractRules = setOf(
-    "com.jervisffb.engine.bb2020.BB2020Rules",
-    "com.jervisffb.engine.bb2025.BB2025Rules",
+    "com.jervisffb.engine.bb2020.Rules2020",
+    "com.jervisffb.engine.bb2025.Rules2025",
 )
 
 private fun customRulesSerializerFor(type: KClass<*>): String? = when (type.qualifiedName) {
     "com.jervisffb.engine.bb2020.StandardBB2020Rules" -> "com.jervisffb.engine.bb2020.StandardBB2020RulesSerializer"
     "com.jervisffb.engine.bb2020.FumbblBB2020Rules" -> "com.jervisffb.engine.bb2020.FumbblBB2020RulesSerializer"
-    "com.jervisffb.engine.bb2020.BB72020Rules" -> "com.jervisffb.engine.bb2020.BB72020RulesSerializer"
+    "com.jervisffb.engine.bb2020.BB7Rules2020" -> "com.jervisffb.engine.bb2020.BB7RulesSerializer2020"
     "com.jervisffb.engine.bb2025.StandardBB2025Rules" -> "com.jervisffb.engine.bb2025.StandardBB2025RulesSerializer"
     else -> null
 }

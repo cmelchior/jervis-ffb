@@ -1,11 +1,11 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.actions.BlockDice
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020BothDown
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PlayerDown
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Pow
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushBack
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.block.BothDown2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.PlayerDown2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Pow2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushBack2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Stumble2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.common.context.BlockContext
@@ -32,11 +32,11 @@ object StandardBlockApplyResult: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             // Select sub procedure based on the result of the die.
             return when (state.getContext<BlockContext>().result.blockResult) {
-                BlockDice.PLAYER_DOWN -> BB2020PlayerDown
-                BlockDice.BOTH_DOWN -> BB2020BothDown
-                BlockDice.PUSH_BACK -> BB2020PushBack
-                BlockDice.STUMBLE -> BB2020Stumble
-                BlockDice.POW -> BB2020Pow
+                BlockDice.PLAYER_DOWN -> PlayerDown2020
+                BlockDice.BOTH_DOWN -> BothDown2020
+                BlockDice.PUSH_BACK -> PushBack2020
+                BlockDice.STUMBLE -> Stumble2020
+                BlockDice.POW -> Pow2020
             }
         }
 

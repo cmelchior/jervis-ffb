@@ -15,14 +15,14 @@ import kotlinx.serialization.Serializable
 object BB7PrayersToNuffleTable: PrayersToNuffleTable {
     override val entries =
         mapOf(
-            1 to BB2025PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR,
-            2 to BB2025PrayerToNuffleTableResult.STILETTO,
-            3 to BB2025PrayerToNuffleTableResult.IRON_MAN,
-            4 to BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS,
-            5 to BB2025PrayerToNuffleTableResult.BLESSING_OF_NUFFLE,
-            6 to BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH,
-            7 to BB2025PrayerToNuffleTableResult.UNDER_SCRUTINY,
-            8 to BB2025PrayerToNuffleTableResult.INTENSIVE_TRAINING,
+            1 to PrayerToNuffleTableResult2025.TREACHEROUS_TRAPDOOR,
+            2 to PrayerToNuffleTableResult2025.STILETTO,
+            3 to PrayerToNuffleTableResult2025.IRON_MAN,
+            4 to PrayerToNuffleTableResult2025.KNUCKLE_DUSTERS,
+            5 to PrayerToNuffleTableResult2025.BLESSING_OF_NUFFLE,
+            6 to PrayerToNuffleTableResult2025.MOLES_UNDER_THE_PITCH,
+            7 to PrayerToNuffleTableResult2025.UNDER_SCRUTINY,
+            8 to PrayerToNuffleTableResult2025.INTENSIVE_TRAINING,
         )
 
     override val die: Dice = Dice.D8
@@ -30,7 +30,7 @@ object BB7PrayersToNuffleTable: PrayersToNuffleTable {
     /**
      * Roll on the Prayers of Nuffle table and return the result.
      */
-    override fun roll(die: DieResult): BB2025PrayerToNuffleTableResult {
+    override fun roll(die: DieResult): PrayerToNuffleTableResult2025 {
         if (die !is D8Result) INVALID_ACTION(die, "Wrong die type: ${die::class}")
         return entries[die.value] ?: INVALID_GAME_STATE("${die.value} was not found in the Prayers To Nuffle table")
     }

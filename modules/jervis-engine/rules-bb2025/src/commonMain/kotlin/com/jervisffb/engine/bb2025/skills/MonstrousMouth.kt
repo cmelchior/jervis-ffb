@@ -20,7 +20,7 @@ class MonstrousMouth(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.MUTATIONS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill, SpecialActionProvider {
+) : Skill2025, SpecialActionProvider {
     override val type: SkillType = SkillType.MONSTROUS_MOUTH
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

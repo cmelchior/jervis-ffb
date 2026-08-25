@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.bb2020.skills.SureFeet
 import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
 import com.jervisffb.engine.model.Game
@@ -53,7 +53,7 @@ object RushRollMapper: CommandActionMapper {
                         .first { it is SelectRerollOption }
                         .let { it as SelectRerollOption }
                     val selectedOption = when (fumbblSource) {
-                        "Team ReRoll" -> rerollOptions.options.first { it.getRerollSource(state) is BB2020StandardTeamReroll }
+                        "Team ReRoll" -> rerollOptions.options.first { it.getRerollSource(state) is StandardTeamReroll2020 }
                         "Sure Feet" -> rerollOptions.options.first { it.getRerollSource(state) is SureFeet }
                         else -> INVALID_GAME_STATE("No matching reroll: $rerollOptions")
                     }

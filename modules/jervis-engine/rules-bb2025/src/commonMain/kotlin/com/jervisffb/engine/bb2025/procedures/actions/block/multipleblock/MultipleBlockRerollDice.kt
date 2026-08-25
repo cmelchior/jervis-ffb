@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.bb2025.context.BB2025MultipleBlockContext
+import com.jervisffb.engine.bb2025.context.MultipleBlockContext2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
@@ -35,12 +35,12 @@ object MultipleBlockRerollDice: Procedure() {
     override val initialNode: Node = ReRollSourceOrAcceptRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<BB2025MultipleBlockContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<MultipleBlockContext2025>()
 
     object ReRollSourceOrAcceptRoll : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BB2025MultipleBlockContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext2025>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2025MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2025>()
             val rerolls = context.rolls.flatMapIndexed { index: Int, actionDiceRoll: MultipleBlockDiceRoll ->
                 if (!actionDiceRoll.hasAcceptedResult()) {
                     actionDiceRoll.getRerollOptions(rules, context.attacker, index)
@@ -54,7 +54,7 @@ object MultipleBlockRerollDice: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2025MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2025>()
             return when (action) {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> {
@@ -81,12 +81,12 @@ object MultipleBlockRerollDice: Procedure() {
      */
     object ReRollDie : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val context = state.getContext<BB2025MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2025>()
             return context.getRerollDiceProcedure()
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2025MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2025>()
             val updatedBlockTypeCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
                 updatedBlockTypeCommand,

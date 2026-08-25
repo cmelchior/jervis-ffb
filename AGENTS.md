@@ -38,7 +38,7 @@ Three layers:
 1. **`GameEngineController`** — driver. Exposes `getAvailableActions()` and
    `handleAction(action)`. Does not care where actions come from.
 2. **Rules layer** — `Rules` subclasses (`StandardBB2020Rules`,
-   `StandardBB2025Rules`, `BB72020Rules`, ...) plus `Procedure`/`Node` classes
+   `StandardBB2025Rules`, `BB7Rules2020`, ...) plus `Procedure`/`Node` classes
    under `engine/rules/**/procedures/`. **Stateless** — all mutations happen
    via `Command` objects so state can be replayed/undone.
 3. **Game state** — the `Game` class in `engine/model/` holds the full
@@ -82,15 +82,15 @@ following approach:
 2. Add the rule-specific implementation in the rules module where it makes 
    sense. To make it easier to catch changes in the UI, there should always 
    exists a sealed interface in the given module. Its name should be the 
-   module name + `core` interface name. Examples:
+   `core` interface name + module name. Examples:
 
     ```kotlin
     // In `rules-common`
-    interface CommonWizard: Wizard
+    interface WizardCommon: Wizard
     // In `rules-bb2020`
-    interface BB2020Wizard: Wizard
+    interface Wizard2020: Wizard
     // In `rules-bb2025`
-    interface BB2025Wizard: Wizard
+    interface Wizard2025: Wizard
     ```
 
 3. Implementing the concept in that module should then inherit from the sealed
@@ -98,7 +98,7 @@ following approach:
 
     ```kotlin
     // Wizard in BB2025
-    data class SportsWizard(val name: String): BB2025Wizard
+    data class SportsWizard(val name: String): Wizard2025
     ```
 
 4. The UI layer should then have a pattern that looks like this:
@@ -106,13 +106,13 @@ following approach:
     ```kotlin
     fun renderWizard(wiz: Wizard) {
         when (wiz) {
-            is CommonWizard -> when (wiz) {
+            is WizardCommon -> when (wiz) {
                    // Handle all cases using exhausitive when
             }
-            is BB2020Wizard -> when (wiz) {
+            is Wizard2020 -> when (wiz) {
                 // Handle all cases using exhausitive when
             } 
-            is BB2025Wizard -> when (wiz) {
+            is Wizard2025 -> when (wiz) {
                 // Handle all cases using exhausitive when
             }
             else -> error("Unknown wizard: $wiz") 

@@ -391,7 +391,7 @@ object DodgeRoll: D6WithRerollProcedure() {
     }
 
     // Needs to be below ReRollDie due to initialization order issues.
-    override val UseRerollSource = CommonUseRerollSource(
+    override val UseRerollSource = UseRerollSourceCommon(
         rerollDiceNode = ReRollDie,
         noRerollCommand = { GotoNode(ChooseToUseDivingTackleAfterReRoll) }
     )

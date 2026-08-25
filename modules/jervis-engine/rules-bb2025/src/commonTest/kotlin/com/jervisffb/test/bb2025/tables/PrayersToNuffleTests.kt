@@ -12,13 +12,13 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SkillSelected
-import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
+import com.jervisffb.engine.bb2025.inducements.InducementType2025
 import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.skills.Loner
 import com.jervisffb.engine.bb2025.skills.MightyBlow
 import com.jervisffb.engine.bb2025.skills.Stab
-import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
-import com.jervisffb.engine.common.inducements.CommonInducementSelection
+import com.jervisffb.engine.bb2025.tables.PrayerToNuffleTableResult2025
+import com.jervisffb.engine.common.inducements.InducementSelectionCommon
 import com.jervisffb.engine.common.modifiers.RushModifier
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.ext.d16
@@ -103,15 +103,15 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun rerollPrayerIfAlreadyActive() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 2)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 2)
             ),
             1.d16, // First roll
             1.d16, // Second roll
             2.d16 // Rerolla
         )
         assertEquals(2, awayTeam.activePrayersToNuffle.size)
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.TREACHEROUS_TRAPDOOR))
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.TREACHEROUS_TRAPDOOR))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.FRIENDS_WITH_THE_REF))
         assertEquals(0, homeTeam.activePrayersToNuffle.size)
     }
 
@@ -125,7 +125,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun friendsWithTheRef() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             2.d16, // Roll Friends with the Ref
             *startGameAfterInducements(),
@@ -133,7 +133,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         // Put player on home team on the ground so they can be fouled
         homeTeam[1.playerNo].state = PlayerPitchState.PRONE
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.FRIENDS_WITH_THE_REF))
 
         // Foul player and roll 5 to trigger the prayer
         controller.rollForward(
@@ -151,7 +151,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         controller.rollForward(
             *skipTurns(15) // Will also end the half
         )
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.FRIENDS_WITH_THE_REF))
     }
 
     @Test
@@ -165,7 +165,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             3.d16, // Roll Stiletto
         )
@@ -178,7 +178,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements(),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.STILETTO))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.hasSkill<Stab>())
         val stabSkill = player.getSkill(SkillType.STAB)
@@ -190,7 +190,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *skipTurns(16) // Will also end the half
         )
         assertTrue(player.hasSkill<Stab>())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.STILETTO))
     }
 
     // Not available to Star Players or players already with Stab
@@ -204,14 +204,14 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         assertEquals(13, awayTeam.size)
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             3.d16, // Roll Stiletto
             *startGameAfterInducements()
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.STILETTO))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.STILETTO))
     }
 
     @Test
@@ -225,7 +225,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             4.d16, // Roll Iron Man
         )
@@ -238,7 +238,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements(),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.IRON_MAN))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(10, player.armorValue)
@@ -253,14 +253,14 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.size)
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             4.d16, // Roll Iron Man, no one can have it
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
         assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.IRON_MAN))
         assertEquals(0, awayTeam.count { it.statModifiers.containsInstance<IronManStatModifier>() })
     }
 
@@ -273,13 +273,13 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             4.d16, // Roll Iron Man
             PlayerSelected("A1".playerId), // Give it to A1
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.IRON_MAN))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.IRON_MAN))
         assertTrue(player.armourModifiers.containsInstance<IronManStatModifier>())
         assertEquals(11, player.armorValue)
     }
@@ -295,7 +295,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             5.d16, // Roll Knuckle Dusters
         )
@@ -308,7 +308,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements(),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.KNUCKLE_DUSTERS))
         val player = state.getPlayerById("A1".playerId)
         val mightyBlowSkill = player.getSkill(SkillType.MIGHTY_BLOW)
         assertTrue(mightyBlowSkill.isTemporary)
@@ -319,7 +319,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *skipTurns(16) // Will also end the half
         )
         assertTrue(player.hasSkill<MightyBlow>())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.KNUCKLE_DUSTERS))
     }
 
     @Test
@@ -333,21 +333,21 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         assertEquals(2, awayTeam.size)
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             5.d16, // Roll Iron Man, no one can have it
         )
 
         // Team is marked as having the prayer, even if no one could actually get it
         assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.KNUCKLE_DUSTERS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.KNUCKLE_DUSTERS))
     }
 
     @Test
     fun badHabits() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             6.d16, // Roll Bad Habits.
             2.d3, // Number of players affected
@@ -362,14 +362,14 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BAD_HABITS))
         assertEquals(2, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
 
         // Does not go away after the drive (unlike in BB2020)
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BAD_HABITS))
         assertEquals(2, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
@@ -384,7 +384,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             6.d16, // Roll Bad Habits.
             2.d3, // Number of players affected
@@ -399,7 +399,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BAD_HABITS))
         assertEquals(1, homeTeam.count { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
@@ -411,14 +411,14 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             6.d16, // Roll Bad Habits.
             2.d3, // Number of players affected
             *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BAD_HABITS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BAD_HABITS))
         assertTrue(homeTeam.none { it.hasSkill<Loner>() && it.getSkill(SkillType.LONER).value == 2 })
     }
 
@@ -426,7 +426,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun greasyCleats() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             7.d16, // Roll Greasy Cleats
         )
@@ -440,7 +440,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements(),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.GREASY_CLEATS))
         assertTrue(player.moveModifiers.containsInstance<GreasyCleatsStatModifier>())
         assertEquals(5, player.move)
 
@@ -448,7 +448,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         controller.rollForward(
             *skipTurns(16) // Will also end the half
         )
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.GREASY_CLEATS))
         assertTrue(player.moveModifiers.containsInstance<GreasyCleatsStatModifier>())
     }
 
@@ -459,13 +459,13 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         assertEquals(1, homeTeam.size)
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             7.d16, // Roll Greasy Cleats, no one can have it
         )
 
         assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.GREASY_CLEATS))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.GREASY_CLEATS))
         assertEquals(0, homeTeam.count { it.statModifiers.containsInstance<IronManStatModifier>() })
     }
 
@@ -480,7 +480,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             8.d16, // Roll Blessing of Nuffle
         )
@@ -493,7 +493,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *startGameAfterInducements(),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BLESSING_OF_NUFFLE))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BLESSING_OF_NUFFLE))
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.getSkill(SkillType.PRO).isTemporary)
 
@@ -513,28 +513,28 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             8.d16, // Roll Blessing of Nuffle. Will be ignored.
             *startGameAfterInducements()
         )
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.BLESSING_OF_NUFFLE))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.BLESSING_OF_NUFFLE))
     }
 
     @Test
     fun molesUnderThePitch() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             9.d16, // Roll Moles under the Pitch.
             *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.MOLES_UNDER_THE_PITCH))
         assertFalse(awayTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
 
-        assertFalse(homeTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffleTableResult2025.MOLES_UNDER_THE_PITCH))
         assertTrue(homeTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
 
         // Prayer and effects will not be removed after the half
@@ -542,7 +542,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *skipTurns(16)
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.MOLES_UNDER_THE_PITCH))
         assertTrue(homeTeam.hasFeature(TeamFeatureType.MOLES_UNDER_THE_PITCH))
     }
 
@@ -550,7 +550,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun molesUnderThePitch_affectRushing() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             9.d16, // Roll Moles under the Pitch.
             *startGameAfterInducements()
@@ -578,14 +578,14 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun molesUnderThePitch_onlyAffectOneTeam() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             9.d16, // Roll Moles under the Pitch.
             *startGameAfterInducements()
         )
 
         // Manually add for away team
-        homeTeam.activePrayersToNuffle.add(BB2025PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH)
+        homeTeam.activePrayersToNuffle.add(PrayerToNuffleTableResult2025.MOLES_UNDER_THE_PITCH)
         awayTeam.addFeature(TeamFeature.molesUnderThePitch(Duration.END_OF_GAME))
 
         // Reduce movement so we trigger rushing straight away
@@ -650,13 +650,13 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun underScrutiny() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             15.d16, // Roll Under Scrutiny
             *startGameAfterInducements()
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.UNDER_SCRUTINY))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.UNDER_SCRUTINY))
         assertFalse(awayTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
         assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
 
@@ -665,7 +665,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             *skipTurns(16)
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.UNDER_SCRUTINY))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.UNDER_SCRUTINY))
         assertFalse(awayTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
         assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
     }
@@ -674,7 +674,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun underScrutiny_triggerOnArmourBroken() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             15.d16, // Roll Under Scrutiny
             *startGameAfterInducements(),
@@ -702,7 +702,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
     fun intensiveTraining() {
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             16.d16, // Roll Intensive Training.
         )
@@ -716,7 +716,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             SkillSelected(SkillType.BLOCK.id()),
         )
 
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.INTENSIVE_TRAINING))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.INTENSIVE_TRAINING))
         val skill = player.getSkill(SkillType.BLOCK)
         assertTrue(skill.isTemporary)
         assertEquals(Duration.END_OF_GAME, skill.expiresAt)
@@ -730,13 +730,13 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
 
         controller.rollForward(
             *buyInducements(
-                CommonInducementSelection.Simple(BB2025InducementType.PRAYERS_TO_NUFFLE, 1)
+                InducementSelectionCommon.Simple(InducementType2025.PRAYERS_TO_NUFFLE, 1)
             ),
             16.d16, // Roll Intensive Training, but no player can receive it.
         )
 
         assertEquals(DetermineKickingTeamStep.SelectCoinSide, controller.currentNode())
-        assertTrue(awayTeam.hasPrayer(BB2025PrayerToNuffleTableResult.INTENSIVE_TRAINING))
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffleTableResult2025.INTENSIVE_TRAINING))
     }
 
 }

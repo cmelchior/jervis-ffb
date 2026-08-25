@@ -9,7 +9,7 @@ import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
-import com.jervisffb.resources.bb2025.BB2025StandaloneStandardTeams
+import com.jervisffb.resources.bb2025.StandaloneStandardTeams2025
 import com.jervisffb.ui.game.model.ModelRef
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -36,7 +36,7 @@ class P2PClientNetworkAdapterTests {
 
     // Reuse a bundled team, so the team id is realistic.
     private val hostTeam: SerializedTeam =
-        BB2025StandaloneStandardTeams.defaultTeams.getValue("human-starter-team-bb2025.jrt").team
+        StandaloneStandardTeams2025.defaultTeams.getValue("human-starter-team-bb2025.jrt").team
 
     private fun syncMessage(homeTeam: SerializedTeam?) = GameStateSyncMessage(
         rules = rules,

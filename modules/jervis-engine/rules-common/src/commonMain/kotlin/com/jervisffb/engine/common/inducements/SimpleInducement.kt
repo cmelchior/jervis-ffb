@@ -29,7 +29,7 @@ data class SimpleInducement(
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(private val inducement: SimpleInducement): CommonSingleInducementBuilder {
+    class Builder(private val inducement: SimpleInducement): SingleInducementBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max

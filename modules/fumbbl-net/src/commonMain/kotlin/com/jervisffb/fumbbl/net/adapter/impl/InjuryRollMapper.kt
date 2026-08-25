@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.SelectDirection
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushStepInitialMoveSequence2020
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.common.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.common.procedures.tables.injury.InjuryRoll
@@ -42,10 +42,10 @@ object InjuryRollMapper: CommandActionMapper {
             newActions.add(
                 action = { state: Game, rules: Rules ->
                     // Any of them will push the player of the field
-                    val action = BB2020PushStepInitialMoveSequence.SelectPushDirection.getAvailableActions(state, rules).single() as SelectDirection
+                    val action = PushStepInitialMoveSequence2020.SelectPushDirection.getAvailableActions(state, rules).single() as SelectDirection
                     DirectionSelected(action.directions.random())
                 },
-                expectedNode = BB2020PushStepInitialMoveSequence.SelectPushDirection
+                expectedNode = PushStepInitialMoveSequence2020.SelectPushDirection
             )
         }
 

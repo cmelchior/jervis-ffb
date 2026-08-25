@@ -17,7 +17,7 @@ class DirtyPlayer(
     override val category: SkillCategory = SkillCategory.DEVIOUS,
     override val value: Int = 1,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025IntSkill {
+) : IntSkill2025 {
     override val type: SkillType = SkillType.DIRTY_PLAYER
     override val skillId: SkillId = type.idAdjustment(value)
     override val name: String = buildString {

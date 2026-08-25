@@ -5,15 +5,15 @@ package com.jervisffb.ui.game.state.actionwheel
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020BothDown
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.block.BothDown2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushStepInitialMoveSequence2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Stumble2020
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.bb2025.context.SwoopContext
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025BothDown
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025Stumble
+import com.jervisffb.engine.bb2025.procedures.actions.block.BothDown2025
 import com.jervisffb.engine.bb2025.procedures.actions.block.HitAndRunStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.PileDriverStep
+import com.jervisffb.engine.bb2025.procedures.actions.block.Stumble2025
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.UseStripBallStep
@@ -26,8 +26,8 @@ import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBal
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopStep
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025KnockedDown
+import com.jervisffb.engine.bb2025.procedures.injury.FallingOver2025
+import com.jervisffb.engine.bb2025.procedures.injury.KnockedDown2025
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
 import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.common.context.BlitzActionContext
@@ -160,7 +160,7 @@ abstract class UseSkillWheelController(skill: SkillType) : YesNoAnswerWheelContr
 
 object FollowUpWheelController: YesNoAnswerWheelController() {
     override val nodes: Set<Node> = setOf(
-        BB2020PushStepInitialMoveSequence.DecideToFollowUp,
+        PushStepInitialMoveSequence2020.DecideToFollowUp,
         FollowUpStep.ChooseToFollowUp,
     )
 
@@ -190,18 +190,18 @@ object UseBigHandWheelController: UseSkillWheelController(SkillType.BIG_HAND) {
 
 object UseBlockWheelController: UseSkillWheelController(SkillType.BLOCK) {
     override val nodes: Set<Node> = setOf(
-        BB2020BothDown.AttackerChooseToUseBlock,
-        BB2020BothDown.DefenderChooseToUseBlock,
-        BB2025BothDown.AttackerChooseToUseBlock,
-        BB2025BothDown.DefenderChooseToUseBlock
+        BothDown2020.AttackerChooseToUseBlock,
+        BothDown2020.DefenderChooseToUseBlock,
+        BothDown2025.AttackerChooseToUseBlock,
+        BothDown2025.DefenderChooseToUseBlock
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
-            BB2020BothDown.AttackerChooseToUseBlock -> context.attacker.coordinates
-            BB2020BothDown.DefenderChooseToUseBlock -> context.defender.coordinates
-            BB2025BothDown.AttackerChooseToUseBlock -> context.attacker.coordinates
-            BB2025BothDown.DefenderChooseToUseBlock -> context.attacker.coordinates
+            BothDown2020.AttackerChooseToUseBlock -> context.attacker.coordinates
+            BothDown2020.DefenderChooseToUseBlock -> context.defender.coordinates
+            BothDown2025.AttackerChooseToUseBlock -> context.attacker.coordinates
+            BothDown2025.DefenderChooseToUseBlock -> context.attacker.coordinates
             else -> error("Unsupported node: $currentNode")
         }
     }
@@ -249,18 +249,18 @@ object UseHitAndRunWheelController: UseSkillWheelController(SkillType.HIT_AND_RU
 
 object UseWrestleWheelController: UseSkillWheelController(SkillType.WRESTLE) {
     override val nodes: Set<Node> = setOf(
-        BB2020BothDown.AttackerChooseToUseWrestle,
-        BB2020BothDown.DefenderChooseToUseWrestle,
-        BB2025BothDown.AttackerChooseToUseWrestle,
-        BB2025BothDown.DefenderChooseToUseWrestle
+        BothDown2020.AttackerChooseToUseWrestle,
+        BothDown2020.DefenderChooseToUseWrestle,
+        BothDown2025.AttackerChooseToUseWrestle,
+        BothDown2025.DefenderChooseToUseWrestle
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val context = state.getContext<BothDownContext>()
         return when (val currentNode = state.stack.currentNode()) {
-            BB2020BothDown.AttackerChooseToUseWrestle -> context.attacker.coordinates
-            BB2020BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
-            BB2025BothDown.AttackerChooseToUseWrestle -> context.attacker.coordinates
-            BB2025BothDown.DefenderChooseToUseWrestle -> context.defender.coordinates
+            BothDown2020.AttackerChooseToUseWrestle -> context.attacker.coordinates
+            BothDown2020.DefenderChooseToUseWrestle -> context.defender.coordinates
+            BothDown2025.AttackerChooseToUseWrestle -> context.attacker.coordinates
+            BothDown2025.DefenderChooseToUseWrestle -> context.defender.coordinates
             else -> error("Unsupported node: $currentNode")
         }
     }
@@ -289,7 +289,7 @@ object UseSafePassWheelController: UseSkillWheelController(SkillType.SAFE_PASS) 
 
 object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
     override val nodes: Set<Node> = setOf(
-        BB2020PushStepInitialMoveSequence.DecideToUseSidestep,
+        PushStepInitialMoveSequence2020.DecideToUseSidestep,
         CreatePushChainStep.DecideToUseSidestep,
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
@@ -300,8 +300,8 @@ object UseSidestepWheelController: UseSkillWheelController(SkillType.SIDESTEP) {
 
 object UseDodgeWheelController: UseSkillWheelController(SkillType.DODGE) {
     override val nodes: Set<Node> = setOf(
-        BB2020Stumble.ChooseToUseDodge,
-        BB2025Stumble.ChooseToUseDodge,
+        Stumble2020.ChooseToUseDodge,
+        Stumble2025.ChooseToUseDodge,
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val defender = state.getContext<StumbleContext>().defender
@@ -322,8 +322,8 @@ object UseTwoHeadsWheelController: UseSkillWheelController(SkillType.TWO_HEADS) 
 
 object UseTackleWheelController: UseSkillWheelController(SkillType.TACKLE) {
     override val nodes: Set<Node> = setOf(
-        BB2020Stumble.ChooseToUseTackle,
-        BB2025Stumble.ChooseToUseTackle
+        Stumble2020.ChooseToUseTackle,
+        Stumble2025.ChooseToUseTackle
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         val attacker = state.getContext<StumbleContext>().attacker
@@ -434,8 +434,8 @@ object UseStandFirmWheelController: UseSkillWheelController(SkillType.STAND_FIRM
 
 object UseSteadyFootingWheelController: UseSkillWheelController(SkillType.STEADY_FOOTING) {
     override val nodes: Set<Node> = setOf(
-        BB2025KnockedDown.ChooseToUseSteadyFooting,
-        BB2025FallingOver.ChooseToUseSteadyFooting
+        KnockedDown2025.ChooseToUseSteadyFooting,
+        FallingOver2025.ChooseToUseSteadyFooting
     )
     override fun getActionWheelCenter(state: Game): PitchCoordinate {
         return state.getContext<RiskingInjuryContext>().player.coordinates

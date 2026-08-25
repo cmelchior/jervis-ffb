@@ -235,6 +235,6 @@ internal fun createRulesSetupComponentModel(
     rulesBuilder: RulesParameterBuilder,
     parent: GameConfigurationContainerComponentModel,
 ): RulesSetupComponentModel = when (rulesBuilder.gameVersion) {
-    GameVersion.BB2020 -> BB2020RulesSetupComponentModel(rulesBuilder, parent)
-    GameVersion.BB2025 -> BB2025RulesSetupComponentModel(rulesBuilder, parent)
+    GameVersion.BB2020 -> RulesSetupComponentModel2020(rulesBuilder, parent)
+    GameVersion.BB2025 -> RulesSetupComponentModel2025(rulesBuilder, parent)
 }

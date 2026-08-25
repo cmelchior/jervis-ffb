@@ -10,8 +10,8 @@ import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
-import com.jervisffb.engine.common.inducements.CommonInducementSelection
-import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.inducements.InducementSelectionCommon
+import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
 import com.jervisffb.engine.common.inducements.MercenaryInducement
@@ -82,7 +82,7 @@ private fun createCommonRandomInducements(random: Random, team: Team, availableG
     var done = false
     var usedGold = 0
     val selectedInducements = mutableListOf<InducementSelection<*>>()
-    val availableTypes = CommonInducementType.entries.toMutableSet()
+    val availableTypes = InducementTypeCommon.entries.toMutableSet()
     while (!done && availableTypes.isNotEmpty()) {
         // val inducement = settings.entries.random(random)
         val nextType = availableTypes.random(random)
@@ -99,7 +99,7 @@ private fun createCommonRandomInducements(random: Random, team: Team, availableG
                 if (usedGold + (price * count) > availableGold) {
                     done = true
                 } else {
-                    selectedInducements.add(CommonInducementSelection.Simple(inducement.type, count))
+                    selectedInducements.add(InducementSelectionCommon.Simple(inducement.type, count))
                 }
                 usedGold += (price * count)
             }

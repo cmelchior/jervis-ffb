@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.bb2025.tables.BB2025PrayerToNuffleTableResult
+import com.jervisffb.engine.bb2025.tables.PrayerToNuffleTableResult2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -239,7 +239,7 @@ object TeamTurn : Procedure() {
             val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
             val activeTeamResetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_OWN_TEAM_TURN)
 
-            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(BB2025PrayerToNuffleTableResult.THROW_A_ROCK)
+            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffleTableResult2025.THROW_A_ROCK)
             val nextNodeCommand = when (throwRockActive) {
                 true -> GotoNode(CheckForThrowARock)
                 false -> ExitProcedure()

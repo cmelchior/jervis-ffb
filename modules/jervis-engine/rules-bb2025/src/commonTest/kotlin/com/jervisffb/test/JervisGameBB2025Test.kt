@@ -4,7 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
-import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.ext.d6
@@ -30,7 +30,7 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameBB2025Test {
 
-    open val rules: BB2025Rules = StandardBB2025Rules().update {
+    open val rules: Rules2025 = StandardBB2025Rules().update {
         undoActionBehavior = UndoActionBehavior.ALLOWED
     }
     protected lateinit var state: Game

@@ -6,15 +6,15 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 
-sealed interface BB2020TeamReroll: TeamReroll {
+sealed interface TeamReroll2020: TeamReroll {
     override val rerollProcedure: Procedure
-        get() = BB2020UseTeamReroll
+        get() = UseTeamReroll2020
 }
 
 /**
  * Class representing a regular team reroll that are part of the roster.
  */
-class BB2020StandardTeamReroll(override val teamId: TeamId, val index: Int) : BB2020TeamReroll {
+class StandardTeamReroll2020(override val teamId: TeamId, val index: Int) : TeamReroll2020 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
@@ -28,7 +28,7 @@ class BB2020StandardTeamReroll(override val teamId: TeamId, val index: Int) : BB
  * Class representing the reroll gained by rolling Brilliant Coaching on the
  * Kick-off Event Table.
  */
-class BB2020BrilliantCoachingReroll(override val teamId: TeamId) : BB2020TeamReroll {
+class BrilliantCoachingReroll2020(override val teamId: TeamId) : TeamReroll2020 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false // Because it only last for the current Drive
     override val duration = Duration.END_OF_DRIVE

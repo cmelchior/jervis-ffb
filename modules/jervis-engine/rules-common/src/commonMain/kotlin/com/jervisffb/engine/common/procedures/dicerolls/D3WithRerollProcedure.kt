@@ -56,7 +56,7 @@ abstract class D3WithRerollProcedure: Procedure(), ChanceObservationHandler {
     abstract val ChooseReRollSource: AbstractChooseRerollSource
     // Use and Choose any potential reroll type.
     // Implementation Note: Use `lazy` to work around initialization order issues.
-    open val UseRerollSource: ParentNode by lazy { CommonUseRerollSource(ReRollDie) }
+    open val UseRerollSource: ParentNode by lazy { UseRerollSourceCommon(ReRollDie) }
     // Use the reroll and set the dice that can be rerolled
     // Reroll the dice set by `UseRerollSource`
     abstract val ReRollDie: ActionNode
@@ -273,7 +273,7 @@ abstract class D3WithRerollProcedure: Procedure(), ChanceObservationHandler {
         }
     }
 
-    class CommonUseRerollSource(private val rerollDiceNode: ActionNode): ParentNode() {
+    class UseRerollSourceCommon(private val rerollDiceNode: ActionNode): ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getRerollContextOrNull()
             return context?.source?.rerollProcedure ?: error("Missing reroll procedure for D3WithReroll: $context")

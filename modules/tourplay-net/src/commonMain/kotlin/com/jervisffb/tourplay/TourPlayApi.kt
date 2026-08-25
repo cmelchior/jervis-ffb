@@ -37,8 +37,8 @@ class TourPlayApi {
         try {
             val rosterData = loadTeamFromTourPlay(rosterId)
             val mapper = when (rules.baseVersion) {
-                GameVersion.BB2020 -> BB2020Mapper()
-                GameVersion.BB2025 -> BB2025Mapper()
+                GameVersion.BB2020 -> Mapper2020()
+                GameVersion.BB2025 -> Mapper2025()
             }
             val jervisRoster = mapper.convertToJervisRoster(rules, rosterData)
             val jervisTeam = mapper.convertToJervisTeam(rules, jervisRoster, rosterData)

@@ -32,7 +32,7 @@ class Brawler(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.STRENGTH,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill, RerollSource {
+) : Skill2025, RerollSource {
     override val type: SkillType = SkillType.BRAWLER
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

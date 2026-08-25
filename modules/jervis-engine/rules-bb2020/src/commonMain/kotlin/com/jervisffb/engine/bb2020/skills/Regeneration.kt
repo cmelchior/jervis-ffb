@@ -10,7 +10,7 @@ class Regeneration(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill {
+) : Skill2020 {
     override val type: SkillType = SkillType.REGENERATION
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

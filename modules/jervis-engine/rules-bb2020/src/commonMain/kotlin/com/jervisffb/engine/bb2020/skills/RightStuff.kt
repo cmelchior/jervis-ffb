@@ -15,7 +15,7 @@ class RightStuff(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill {
+) : Skill2020 {
     val maxStrength = 3 // A Player with Right Stuff can only be thrown if they have a strength of 3 or less.
     override val type: SkillType = SkillType.RIGHT_STUFF
     override val value: Unit? = null

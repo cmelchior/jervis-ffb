@@ -66,7 +66,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
     abstract val ChooseReRollSource: AbstractChooseRerollSource
     // Use and Choose any potential reroll type.
     // Implementation Note: Use `lazy` to work around initialization order issues.
-    open val UseRerollSource: ParentNode by lazy { CommonUseRerollSource(ReRollDie) }
+    open val UseRerollSource: ParentNode by lazy { UseRerollSourceCommon(ReRollDie) }
     // Use the reroll and set the dice that can be rerolled
     // Reroll the dice set by `UseRerollSource`
     abstract val ReRollDie: ActionNode
@@ -294,7 +294,7 @@ abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
      * 2. We can immediately jump to the next node without adding any other
      *    [Command] objects.
      */
-    class CommonUseRerollSource(
+    class UseRerollSourceCommon(
         private val rerollDiceNode: ActionNode,
         private val noRerollCommand: () -> Command = { ExitProcedure() }
     ): ParentNode() {

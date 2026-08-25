@@ -10,8 +10,8 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
-import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020FallingOver
-import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020KnockedDown
+import com.jervisffb.engine.bb2020.procedures.table.injury.FallingOver2020
+import com.jervisffb.engine.bb2020.procedures.table.injury.KnockedDown2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -354,7 +354,7 @@ object ThrowPlayerStep: Procedure() {
                 UpdateContext(throwContext.copy(knockedDownWhenLanding = true))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2020
         override fun onExitNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowTeamMateContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
@@ -562,7 +562,7 @@ object ThrowPlayerStep: Procedure() {
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver2020
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }
@@ -584,7 +584,7 @@ object ThrowPlayerStep: Procedure() {
                 AddContext(RiskingInjuryContext(thrownPlayer, mode = RiskingInjuryMode.BAD_LANDING))
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020KnockedDown
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2020
         override fun onExitNode(state: Game, rules: Rules): Command {
             return exitPlayingGoingDownNode(state)
         }

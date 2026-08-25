@@ -6,7 +6,7 @@ import com.jervisffb.engine.rules.common.tables.DesperateMeasuresEvent
 /**
  * List all possible outcomes of Desperate Measures in BB2025.
  */
-enum class BB2025DesperateMeasuresTableResult(
+enum class DesperateMeasuresTableResult2025(
     override val label: String,
     override val createCard: () -> DesperateMeasures
 ): DesperateMeasuresEvent {

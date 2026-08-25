@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.context.BreatheFireContext
 import com.jervisffb.engine.bb2025.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025PlacedProne
+import com.jervisffb.engine.bb2025.procedures.injury.PlacedProne2025
 import com.jervisffb.engine.bb2025.reports.ReportBreatheFireResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -210,7 +210,7 @@ object BreatheFireStep: Procedure() {
             )
             return AddContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025PlacedProne
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PlacedProne2025
         override fun onExitNode(state: Game, rules: Rules): Command {
             val injuryContext = state.getContext<RiskingInjuryContext>()
             val breatheContext = state.getContext<BreatheFireContext>()

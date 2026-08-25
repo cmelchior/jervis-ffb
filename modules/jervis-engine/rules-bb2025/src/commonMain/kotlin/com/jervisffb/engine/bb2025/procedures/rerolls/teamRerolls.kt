@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
 
-sealed interface BB2025TeamReroll: TeamReroll {
+sealed interface TeamReroll2025: TeamReroll {
     override val rerollProcedure: Procedure
         get() = UseTeamReroll
 }
@@ -14,7 +14,7 @@ sealed interface BB2025TeamReroll: TeamReroll {
 /**
  * Class representing a regular team reroll that are part of the roster.
  */
-class StandardTeamReroll(override val teamId: TeamId, val index: Int) : BB2025TeamReroll {
+class StandardTeamReroll(override val teamId: TeamId, val index: Int) : TeamReroll2025 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
@@ -31,7 +31,7 @@ class StandardTeamReroll(override val teamId: TeamId, val index: Int) : BB2025Te
  * Note, the availability of this reroll is determined by more complex rules.
  * These rules are handled in the relevant procedures.
  */
-class LeaderTeamReroll(override val teamId: TeamId) : BB2025TeamReroll {
+class LeaderTeamReroll(override val teamId: TeamId) : TeamReroll2025 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
@@ -45,7 +45,7 @@ class LeaderTeamReroll(override val teamId: TeamId) : BB2025TeamReroll {
  * Class representing the reroll gained by rolling Brilliant Coaching on the
  * Kick-off Event Table.
  */
-class BrilliantCoachingReroll(override val teamId: TeamId) : BB2025TeamReroll {
+class BrilliantCoachingReroll(override val teamId: TeamId) : TeamReroll2025 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false // Because it only last for the current Drive
     override val duration = Duration.END_OF_DRIVE
@@ -58,7 +58,7 @@ class BrilliantCoachingReroll(override val teamId: TeamId) : BB2025TeamReroll {
 /**
  * Class representing the reroll provided by the Team Mascot inducement
  */
-class TeamMascotReroll(override val teamId: TeamId) : BB2025TeamReroll {
+class TeamMascotReroll(override val teamId: TeamId) : TeamReroll2025 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-mascot")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.END_OF_GAME
@@ -75,7 +75,7 @@ class TeamMascotReroll(override val teamId: TeamId) : BB2025TeamReroll {
 /**
  * Class representing the reroll provided by the Extra Team Training inducement.
  */
-class ExtraTeamTrainingReroll(override val teamId: TeamId, index: Int) : BB2025TeamReroll {
+class ExtraTeamTrainingReroll(override val teamId: TeamId, index: Int) : TeamReroll2025 {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-extra-team-training-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.END_OF_GAME

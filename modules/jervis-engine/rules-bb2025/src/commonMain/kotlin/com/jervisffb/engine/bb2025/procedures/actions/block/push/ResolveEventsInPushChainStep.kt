@@ -1,8 +1,8 @@
 package com.jervisffb.engine.bb2025.procedures.actions.block.push
 
 import com.jervisffb.engine.bb2025.context.ResolvePushChainEventsContext
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025PushBack
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.bb2025.procedures.actions.block.PushBack2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -42,7 +42,7 @@ import com.jervisffb.engine.rules.Rules
  * player's part of the Push Chain created in [CreatePushChainStep], and moved
  * in [MovePlayersInPushChainStep]. This happens after the choice to follow up.
  *
- * See [BB2025PushBack] and [MultipleBlockAction] for more details on each case.
+ * See [PushBack2025] and [MultipleBlockAction] for more details on each case.
  *
  * Developer's Commentary:
  * The order in which events in a push chain is resolved in a Push Chain is not

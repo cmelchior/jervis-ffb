@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2020.actions
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.PitchCoordinate
@@ -123,7 +123,7 @@ class DodgeTests: JervisGameBB2020Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(12, 4),
             1.d6, // Fail dodge
-            TeamRerollSelected<BB2020StandardTeamReroll>(),
+            TeamRerollSelected<StandardTeamReroll2020>(),
             4.d6 // Succeed
         )
         val player = awayTeam["A1".playerId]

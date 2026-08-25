@@ -58,7 +58,7 @@ collide. `@SerialName` works identically under array polymorphism.
 ## Step 1 — Stable tokens (`@SerialName`)
 
 Seed each token from the current simple class name (e.g. `@SerialName("EndTurn")`,
-`@SerialName("D6Result")`, `@SerialName("BB2020StandardInjuryTable")`). Three groups:
+`@SerialName("D6Result")`, `@SerialName("StandardInjuryTable2020")`). Three groups:
 
 - **~111 module-registered concrete classes** — every `subclass(X::class)` in the four
   generated module files. The annotation lives on the *class declaration* (the module
@@ -74,9 +74,9 @@ Seed each token from the current simple class name (e.g. `@SerialName("EndTurn")
   `SerialDescriptor("com.jervisffb.engine.rules.StandardBB2020Rules", …)` →
   `SerialDescriptor("StandardBB2020Rules", …)` in
   `rules-bb2020/.../rules/bb2020Rules.kt` (`StandardBB2020RulesSerializer`,
-  `FumbblBB2020RulesSerializer`, `BB72020RulesSerializer`) and
+  `FumbblBB2020RulesSerializer`, `BB7RulesSerializer2020`) and
   `rules-bb2025/.../rules/bb2025rules.kt` (`StandardBB2025RulesSerializer`). The
-  abstract `BB2020Rules`/`BB2025Rules` stay non-`@Serializable` (Kotlin 2.4
+  abstract `Rules2020`/`Rules2025` stay non-`@Serializable` (Kotlin 2.4
   `SyntheticAccessorLowering` workaround) — only the string changes.
 
 **Bootstrap:** add a one-off cell to `tools/GenerateSerializers.ipynb` (already uses
@@ -102,7 +102,7 @@ keeping the wire value.
 - `JervisGameFile.kt`: `JervisMetaData(val fileFormat: Int, val gameVersion: GameVersion)`.
   Derive the version from `controller.rules.baseVersion` (games), `team.version` (teams);
   add a `gameVersion` parameter to the roster/setup builders (a raw `Roster` has no version
-  field — supply it from the `BB2020StandaloneRosters`/`BB2025StandaloneRosters` /
+  field — supply it from the `StandaloneRosters2020`/`StandaloneRosters2025` /
   `DefaultSetups` context).
 - `JervisSerialization.kt`: replace the single `jsonFormat` with per-version maps and a
   `fun json(v: GameVersion): Json` accessor:
@@ -195,7 +195,7 @@ diffs), with a `printGolden()` helper to regenerate on intentional change.
 - **`@SerialName` on class declarations (repeating):** `core/.../actions/GameAction.kt`,
   `core/.../serialize/JervisGameFile.kt`, and concrete classes across `core/.../model/**`,
   `core/.../rules/builder/**`, `core/.../model/inducements/**`; `rules-common/.../**`
-  (`Fireball`/`Zap`/`CommonPathFinder`); every class named in `bb2020Serializers.kt` /
+  (`Fireball`/`Zap`/`PathFinderCommon`); every class named in `bb2020Serializers.kt` /
   `bb2025Serializers.kt` (tables, skill settings, team actions, wizards);
   `jervis-net/.../messages/ClientMessage.kt` + `ServerMessage.kt` leaves.
 - **Custom serializer descriptor strings (4):** `rules-bb2020/.../rules/bb2020Rules.kt`,

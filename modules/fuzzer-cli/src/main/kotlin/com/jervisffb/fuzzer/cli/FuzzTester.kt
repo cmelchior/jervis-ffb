@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.BB7Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.common.actions.createRandomAction
@@ -135,7 +135,7 @@ fun runBB2025Standard(seed: Long, enableStatistics: Boolean) {
 @Suppress("UNUSED_PARAMETER")
 fun runBB2020BB7(gameNo: Int, seed: Long, enableStatistics: Boolean) {
     val random = Random(seed)
-    val rules = BB72020Rules().toBuilder().run {
+    val rules = BB7Rules2020().toBuilder().run {
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
     }

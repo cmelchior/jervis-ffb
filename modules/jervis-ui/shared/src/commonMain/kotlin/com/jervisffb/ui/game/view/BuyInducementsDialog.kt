@@ -70,8 +70,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
-import com.jervisffb.engine.common.inducements.CommonInducementGroup
-import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.inducements.InducementGroupCommon
+import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffsInducementGroup
 import com.jervisffb.engine.common.inducements.SimpleInducement
@@ -261,7 +261,7 @@ fun BuyInducementsDialog(
                                         showStats = group is StarPlayersInducementGroup,
                                         skillsLabel = run {
                                             val title = when {
-                                                group is CommonInducementGroup -> {
+                                                group is InducementGroupCommon -> {
                                                     when (group) {
                                                         is StarPlayersInducementGroup -> "Skills & Traits"
                                                         is BiasedRefereesInducementGroup,
@@ -345,8 +345,8 @@ fun BuyInducementsDialog(
                                         teamColor = teamColor,
                                         label = "Add ${singularGroupName(mercSettings)}",
                                         onAdd = {
-                                            lastTouchedGroup = CommonInducementType.STANDARD_MERCENARY_PLAYERS
-                                            vm.openDrawer(CommonInducementType.STANDARD_MERCENARY_PLAYERS)
+                                            lastTouchedGroup = InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
+                                            vm.openDrawer(InducementTypeCommon.STANDARD_MERCENARY_PLAYERS)
                                         },
                                     )
                                 }
@@ -654,7 +654,7 @@ private fun addRowIndexFor(vm: BuyInducementsViewModel, type: InducementType): I
             index += mercs.size
             lastIdx
         } else -1
-        if (type == CommonInducementType.STANDARD_MERCENARY_PLAYERS) {
+        if (type == InducementTypeCommon.STANDARD_MERCENARY_PLAYERS) {
             return if (!vm.isMercenaryLimitReached()) index else lastMercIndex
         }
     }
@@ -667,7 +667,7 @@ private fun singularGroupName(group: TeamPlayerInducement<*>): String {
 
 private fun singularGroupName(group: InducementGroup<*, *, *>): String {
     return when {
-        group is CommonInducementGroup<*, *, *> -> {
+        group is InducementGroupCommon<*, *, *> -> {
             when (group) {
                 is BiasedRefereesInducementGroup -> "Biased Referee"
                 is InfamousCoachingStaffsInducementGroup -> "Infamous Coaching Staff"
@@ -774,7 +774,7 @@ private fun InducementDrawerContent(
     teamColor: Color,
     isHomeTeam: Boolean,
 ) {
-    val isMercenary = activeType == CommonInducementType.STANDARD_MERCENARY_PLAYERS
+    val isMercenary = activeType == InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
     val group = vm.groupInducements.firstOrNull { it.type == activeType }
     val title = when {
         isMercenary -> vm.mercenaryInducement?.let { titleWithRange(it.name, it.max) } ?: ""

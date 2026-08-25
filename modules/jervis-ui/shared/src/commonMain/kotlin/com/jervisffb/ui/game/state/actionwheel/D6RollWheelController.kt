@@ -6,9 +6,9 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.safeDiceRollCast
-import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2020.procedures.table.kickoff.CheeringFans2020
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
-import com.jervisffb.engine.bb2025.procedures.table.kickoff.BB2025CheeringFans
+import com.jervisffb.engine.bb2025.procedures.table.kickoff.CheeringFans2025
 import com.jervisffb.engine.bb2025.procedures.table.kickoff.DodgySnack
 import com.jervisffb.engine.common.context.BeingSentOffContext
 import com.jervisffb.engine.common.context.RecoverKnockedOutPlayersContext
@@ -119,11 +119,11 @@ abstract class D6RollWheelController: ActionWheelDialogController() {
 
 object CheeringFansKickingTeamRollWheelController: D6RollWheelController() {
     override val buttonIdPrefix: String = "cheering-fans-kicking-team"
-    override val rollDiceNode: Node = BB2020CheeringFans.KickingTeamRollDie
+    override val rollDiceNode: Node = CheeringFans2020.KickingTeamRollDie
     override val diceRollType: DiceRollType = DiceRollType.CHEERING_FANS
     override val nodes: Set<Node> = setOf(
-        BB2020CheeringFans.KickingTeamRollDie,
-        BB2025CheeringFans.KickingTeamRollDie
+        CheeringFans2020.KickingTeamRollDie,
+        CheeringFans2025.KickingTeamRollDie
     )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half
@@ -138,11 +138,11 @@ object CheeringFansKickingTeamRollWheelController: D6RollWheelController() {
 
 object CheeringFansReceivingTeamRollWheelController: D6RollWheelController() {
     override val buttonIdPrefix: String = "cheering-fans-receiving-team"
-    override val rollDiceNode: Node = BB2020CheeringFans.ReceivingTeamRollDie
+    override val rollDiceNode: Node = CheeringFans2020.ReceivingTeamRollDie
     override val diceRollType: DiceRollType = DiceRollType.CHEERING_FANS
     override val nodes: Set<Node> = setOf(
-        BB2020CheeringFans.ReceivingTeamRollDie,
-        BB2025CheeringFans.ReceivingTeamRollDie
+        CheeringFans2020.ReceivingTeamRollDie,
+        CheeringFans2025.ReceivingTeamRollDie
     )
 
     // There is no "real" center for this, so we place it in the middle of the Kicking Team Half

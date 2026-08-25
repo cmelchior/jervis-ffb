@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2020.BB72020Rules
+import com.jervisffb.engine.bb2020.BB7Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.SetupTeamContext
@@ -86,7 +86,7 @@ class NetworkFuzzTester {
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             try {
-                runRandomGame(seed, BB72020Rules())
+                runRandomGame(seed, BB7Rules2020())
             } catch (ex: Throwable) {
                 fail("Game $gameNo (seed: $seed) crashed with exception:\n${ex.stackTraceToString()}")
             }

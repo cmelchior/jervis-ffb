@@ -1,4 +1,5 @@
 # Contributing to Jervis FFB
+
 This document covers how to build, test, and run the various parts of the Jervis 
 project.
 
@@ -6,6 +7,7 @@ For a more in-depth technical and architectural background, see the documents
 under [`docs/`](docs/). 
 
 ## Requirements
+
 Development requirements are:
 - Java 21
 - Git on the commandline
@@ -23,6 +25,7 @@ first time. This should be fixed after the first build.
 ## How To Build
 
 ### Building Game Clients
+
 A local desktop game client can be started using:
 
 ```shell
@@ -45,6 +48,7 @@ and installed using Xcode. Use the project file found here
 You might need to supply your own signature under "Signing & Capabilities".
 
 ### Building Documentation Website
+
 The documentation website is built by installing Zensical:
 
 ```shell
@@ -81,6 +85,7 @@ Useful variants when iterating:
   ```
   
 ### Fuzz Tester
+
 For non-trivial changes to the rule engine, also consider running the fuzz
 tester. It lives in the `:modules:fuzzer-cli` module and runs random games
 against the engine to force crashes or inconsistent state. See
@@ -132,7 +137,32 @@ registered using `polymorphic { ... }`. Calling this task, does this
 automatically if the top-level type is listed as a root in 
 `GenerateSerializers.kt`.
 
+## Naming Classes
+
+When adding support for new rules, there is often a hierarchy to the classes as
+Jervis needs to support multiple versions. It looks something like this:
+
+```
+1. `com.jervis.engine.SomeTopLevelInterface`
+2. `com.jervis.engine.common.SomeTopLevelInterfaceCommon`
+3. `com.jervis.engine.bb2020.SomeTopLevelInterface2020`
+4. `com.jervis.engine.bb2025.SomeTopLevelInterface2025`
+```
+
+The reason for this naming scheme is the following:
+
+- Using the same name across multiple packages makes it harder to reason 
+  about code in the middle of a class.
+
+- Adding the version as a suffix rather than prefix, is because you often 
+  remember the top-level interface name, so when searching for that, the 
+  auto-complete in IntelliJ groups things in a nicer way.
+
+- Not all classes need this suffix. Mostly it is used for model classes and not
+  procedures, but this isn't a hard rule.
+
 ## Formatting code
+
 The project uses [ktlint](https://github.com/pinterest/ktlint) via the Gradle
 plugin. `ktlintCheck` runs as part of `./gradlew check` and CI will fail on
 style violations.
@@ -180,6 +210,7 @@ update the Gradle Wrapper to the latest version, run the following command:
 ```
 
 ## Updating UI resources
+
 The Jervis client borrows a large portion of its icons and sounds from the
 [FUMBBL client](https://github.com/christerk/ffb) (used with permission — see
 [FUMBBL attribution](https://fumbbl.com/p/attribution)). These assets live
@@ -215,6 +246,7 @@ loaded from the network can be added to[`icons-extra.ini`](modules/jervis-ui/sha
 using the same `url=local/path` format.
 
 ## AI Agents
+
 AI Agents have been used during the development of this repository, and 
 contributions created using these are fine as well, with one warning: It is 
 expected that any PR has actually been reviewed by a human. "AI-slop" will 
@@ -236,6 +268,7 @@ Some notes when using these:
   framework features.
 
 ## PR checklist
+
 Before creating a PR against Jervis, run through the following steps:
 
 1. `./gradlew ktlintFormat`

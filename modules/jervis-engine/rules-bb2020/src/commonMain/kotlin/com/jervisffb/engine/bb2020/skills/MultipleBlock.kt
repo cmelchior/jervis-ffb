@@ -14,7 +14,7 @@ class MultipleBlock(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.STRENGTH,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2020Skill, SpecialActionProvider {
+) : Skill2020, SpecialActionProvider {
     override val type: SkillType = SkillType.MULTIPLE_BLOCK
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

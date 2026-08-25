@@ -6,9 +6,9 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.engine.bb2020.tables.BB2020KickOffEventResult
-import com.jervisffb.engine.bb2025.procedures.BB2025TheKickOffEvent
-import com.jervisffb.engine.bb2025.tables.BB2025KickOffEventResult
+import com.jervisffb.engine.bb2020.tables.KickOffEventResult2020
+import com.jervisffb.engine.bb2025.procedures.TheKickOffEvent2025
+import com.jervisffb.engine.bb2025.tables.KickOffEventResult2025
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.Catch
 import com.jervisffb.engine.common.procedures.CatchRoll
@@ -18,7 +18,7 @@ import com.jervisffb.engine.common.procedures.TheKickOffEvent
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.common.tables.CommonKickOffEventResult
+import com.jervisffb.engine.common.tables.KickOffEventResultCommon
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.BB2020TheKickOffEvent
+import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent2020
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.icons_animation_kickoff_kick_off_blitz
@@ -86,7 +86,7 @@ object AnimationFactory {
         )
         val firstBounce = (stack.singleCurrentNode(Bounce.RollDirection) && !stack.containsNode(Catch.CatchFailed))
         val isResolvingLanding = stack.containsNode(TheKickOffEvent.ResolveBallLanding)
-        val touchBack = (stack.currentNode() == BB2020TheKickOffEvent.TouchBack) || (stack.currentNode() == BB2025TheKickOffEvent.TouchBack)
+        val touchBack = (stack.currentNode() == TheKickOffEvent2020.TouchBack) || (stack.currentNode() == TheKickOffEvent2025.TouchBack)
         if (
             (firstCatch && !firstBounce && isResolvingLanding)
             || (!firstCatch && firstBounce && isResolvingLanding)
@@ -149,32 +149,32 @@ object AnimationFactory {
             val roll = (action as DiceRollResults).rolls.map { it as D6Result }
             val result = state.rules.kickOffEventTable.roll(roll.first(), roll.last())
             val image = when (result) {
-                is CommonKickOffEventResult -> {
+                is KickOffEventResultCommon -> {
                     when (result) {
-                        CommonKickOffEventResult.BRILLIANT_COACHING ->  Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
-                        CommonKickOffEventResult.CHANGING_WEATHER -> null
-                        CommonKickOffEventResult.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
-                        CommonKickOffEventResult.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
-                        CommonKickOffEventResult.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
-                        CommonKickOffEventResult.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
-                        CommonKickOffEventResult.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
-                        CommonKickOffEventResult.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
-                        CommonKickOffEventResult.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
+                        KickOffEventResultCommon.BRILLIANT_COACHING ->  Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                        KickOffEventResultCommon.CHANGING_WEATHER -> null
+                        KickOffEventResultCommon.GET_THE_REF -> Res.drawable.icons_animation_kickoff_kick_off_get_the_ref
+                        KickOffEventResultCommon.HIGH_KICK -> Res.drawable.icons_animation_kickoff_kick_off_high_kick
+                        KickOffEventResultCommon.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
+                        KickOffEventResultCommon.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
+                        KickOffEventResultCommon.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
+                        KickOffEventResultCommon.SOLID_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence
+                        KickOffEventResultCommon.TIME_OUT -> Res.drawable.icons_animation_kickoff_kick_off_timeout
                     }
                 }
-                is BB2020KickOffEventResult -> {
+                is KickOffEventResult2020 -> {
                     when (result) {
-                        BB2020KickOffEventResult.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                        BB2020KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
-                        BB2020KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
+                        KickOffEventResult2020.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                        KickOffEventResult2020.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_cheering_fans
+                        KickOffEventResult2020.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                     }
                 }
-                is BB2025KickOffEventResult -> {
+                is KickOffEventResult2025 -> {
                     when (result) {
-                        BB2025KickOffEventResult.ALERT_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence // TODO: Fix this
-                        BB2025KickOffEventResult.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
-                        BB2025KickOffEventResult.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
-                        BB2025KickOffEventResult.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
+                        KickOffEventResult2025.ALERT_DEFENSE -> Res.drawable.icons_animation_kickoff_kick_off_solid_defence // TODO: Fix this
+                        KickOffEventResult2025.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
+                        KickOffEventResult2025.CHEERING_FANS -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
+                        KickOffEventResult2025.DODGY_SNACK -> Res.drawable.icons_animation_kickoff_kick_off_dodgy_snack
                     }
                 }
                 else -> error("Unsupport kick-off event: $result")

@@ -25,7 +25,7 @@ class Pro(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill, RerollSource {
+) : Skill2025, RerollSource {
     val successTarget = 3 // What to roll to succeed
     override val type: SkillType = SkillType.PRO
     override val value: Unit? = null

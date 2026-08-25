@@ -40,7 +40,7 @@ abstract class DiceColorConfig {
  * For now, all dice roll types must be configured, but it should probably be extended to allowing
  * disabling some of them for the rulesets where they don't make sense.
  */
-object BB2025DiceColorConfig : DiceColorConfig() {
+object DiceColorConfig2025 : DiceColorConfig() {
 
     private val d6Colors = listOf(
         DiceColor.BLACK,

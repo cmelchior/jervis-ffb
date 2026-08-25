@@ -1,8 +1,8 @@
 package com.jervisffb.ui.game.state.indicators
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.MultipleBlockContext2020
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -24,7 +24,7 @@ object BlockStatusIndicator: PitchStatusIndicator {
         acc: UiSnapshotAccumulator
     ) {
         val blockContext = state.getContextOrNull<BlockContext>()
-        val multipleBlockContext = state.getContextOrNull<BB2020MultipleBlockContext>()
+        val multipleBlockContext = state.getContextOrNull<MultipleBlockContext2020>()
         val players = mutableListOf<Player>()
         if (multipleBlockContext != null) {
             multipleBlockContext.defender1?.let { players.add(it) }

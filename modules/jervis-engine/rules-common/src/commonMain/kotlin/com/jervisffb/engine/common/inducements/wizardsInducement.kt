@@ -15,13 +15,13 @@ data class WizardsInducementGroup(
     override val max: Int = 1,
     override val enabled: Boolean,
     override val items: List<WizardInducement> = listOf()
-): CommonInducementGroup<WizardsInducementGroup.Builder, WizardInducement.Builder, WizardInducement> {
+): InducementGroupCommon<WizardsInducementGroup.Builder, WizardInducement.Builder, WizardInducement> {
     override val name: String = "Wizard"
-    override val type: InducementType = CommonInducementType.WIZARD
+    override val type: InducementType = InducementTypeCommon.WIZARD
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: WizardsInducementGroup): CommonInducementGroupBuilder {
+    class Builder(inducement: WizardsInducementGroup): InducementGroupBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
@@ -46,12 +46,12 @@ data class WizardInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<WizardInducement.Builder> {
-    override val type: InducementType = CommonInducementType.WIZARD
+    override val type: InducementType = InducementTypeCommon.WIZARD
     override val name: String = wizard.name
     override fun toBuilder() = Builder(this)
 
-    class Builder(wizardInducement: WizardInducement): CommonSingleInducementBuilder {
-        override val type: InducementType = CommonInducementType.WIZARD
+    class Builder(wizardInducement: WizardInducement): SingleInducementBuilderCommon {
+        override val type: InducementType = InducementTypeCommon.WIZARD
         override val name: String = wizardInducement.wizard.name
         val wizard: Wizard = wizardInducement.wizard
         override var max: Int = wizardInducement.max

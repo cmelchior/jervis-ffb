@@ -12,8 +12,8 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
 import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.MultipleBlockContext2020
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -49,9 +49,9 @@ object MultipleBlockResolveInjuries: Procedure() {
     // TODO It isn't guaranteed that it is the blocker team that selects the dice.
     // We might need to have both attacker and defender choose dice
     object SelectDefender : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BB2020MultipleBlockContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext2020>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val defender1Injury = context.defender1InjuryContext
             val defender2Injury = context.defender2InjuryContext
 
@@ -67,7 +67,7 @@ object MultipleBlockResolveInjuries: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return when (action) {
                 Continue -> {
                     if (context.attackerInjuryContext.isNotEmpty()) {
@@ -78,7 +78,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                 }
                 else -> {
                     castAction<PlayerSelected>(action) { playerSelected ->
-                        val context = state.getContext<BB2020MultipleBlockContext>()
+                        val context = state.getContext<MultipleBlockContext2020>()
                         val selectedPlayer = playerSelected.getPlayer(state)
                         val index = when (selectedPlayer) {
                             context.defender1 -> 0
@@ -97,7 +97,7 @@ object MultipleBlockResolveInjuries: Procedure() {
 
     object PatchUpSelectedDefender: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val injuryContext = when (context.activeDefender) {
                 0 -> context.defender1InjuryContext!!
                 1 -> context.defender2InjuryContext!!
@@ -107,7 +107,7 @@ object MultipleBlockResolveInjuries: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val updatedContext = when (context.activeDefender) {
                 0 -> context.copy(defender1InjuryContext = null, activeDefender = null)
                 1 -> context.copy(defender2InjuryContext = null, activeDefender = null)
@@ -123,11 +123,11 @@ object MultipleBlockResolveInjuries: Procedure() {
     // TODO Make it possible to select which injury to patch first. Right now we only resolve one injury
     object PatchUpAttacker: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return if (context.attackerInjuryContext.isEmpty()) ExitProcedureNode else null
         }
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return AddContext(context.attackerInjuryContext.first())
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.patchUpPlayer

@@ -12,7 +12,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.actions.SelectSkill
-import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2020.procedures.table.kickoff.CheeringFans2020
 import com.jervisffb.engine.bb2025.procedures.actions.foul.ArgueTheCallRoll
 import com.jervisffb.engine.common.context.CoinTossContext
 import com.jervisffb.engine.common.context.FoulContext
@@ -107,11 +107,11 @@ object DialogFactory {
                     MultipleChoiceUserInputDialog.createCasualtyRollDialog(id, rules, player)
                 }
 
-                BB2020CheeringFans.KickingTeamRollDie -> {
+                CheeringFans2020.KickingTeamRollDie -> {
                     MultipleChoiceUserInputDialog.createCheeringFansRollDialog(id, controller.state.kickingTeam)
                 }
 
-                BB2020CheeringFans.ReceivingTeamRollDie -> {
+                CheeringFans2020.ReceivingTeamRollDie -> {
                     MultipleChoiceUserInputDialog.createCheeringFansRollDialog(id, controller.state.receivingTeam)
                 }
 

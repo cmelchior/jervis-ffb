@@ -19,7 +19,7 @@ class Hatred(
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val value: PlayerKeyword?,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025KeywordSkill {
+) : KeywordSkill2025 {
     override val type: SkillType = SkillType.HATRED
     override val skillId: SkillId = type.id()
     override val name: String = "${type.description}(${value?.description ?: "None"})"

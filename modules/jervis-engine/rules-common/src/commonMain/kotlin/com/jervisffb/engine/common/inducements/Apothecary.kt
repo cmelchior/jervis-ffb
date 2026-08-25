@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.inducements
 import com.jervisffb.engine.model.inducements.Apothecary
 
 /** Interface capturing all apothecaries available across BB2020 and BB20205 */
-sealed interface CommonApothecary: Apothecary
+sealed interface ApothecaryCommon: Apothecary
 
 /**
  * Class representing the standard apothecary that can be bought as part of a
@@ -13,7 +13,7 @@ sealed interface CommonApothecary: Apothecary
  */
 data class StandardApothecary(
     override var used: Boolean,
-): CommonApothecary {
+): ApothecaryCommon {
     override val name: String = "Apothecary"
 }
 
@@ -25,7 +25,7 @@ data class StandardApothecary(
  */
 data class WanderingApothecary(
     override var used: Boolean,
-): CommonApothecary {
+): ApothecaryCommon {
     override val name: String = "Wandering Apothecary"
 }
 
@@ -36,6 +36,6 @@ data class WanderingApothecary(
  */
 data class PlagueDoctor(
     override var used: Boolean = false,
-): CommonApothecary {
+): ApothecaryCommon {
     override val name: String = "Plague Doctor"
 }

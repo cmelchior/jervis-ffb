@@ -4,8 +4,8 @@ import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020BothDown
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.block.BothDown2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Stumble2020
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
@@ -81,16 +81,16 @@ object BlitzChooseBlockResultMapper: CommandActionMapper {
             // Always use Tackle (I think there are a few cases where Fumbbl will ask for this)
             // Fix this when we encounter them
             if (fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)?.skillArray?.contains("Tackle") == true) {
-                newActions.add(Confirm, BB2020Stumble.ChooseToUseTackle)
+                newActions.add(Confirm, Stumble2020.ChooseToUseTackle)
             }
         }
 
         if (selectedBlockDie.blockResult == BlockDice.BOTH_DOWN) {
             if (fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)?.skillArray?.contains("Block") == true) {
-                newActions.add(Confirm, BB2020BothDown.AttackerChooseToUseBlock)
+                newActions.add(Confirm, BothDown2020.AttackerChooseToUseBlock)
             }
             if (fumbblGame.getPlayerById(report.defenderId.id)?.skillArray?.contains("Block") == true) {
-                newActions.add(Confirm, BB2020BothDown.DefenderChooseToUseBlock)
+                newActions.add(Confirm, BothDown2020.DefenderChooseToUseBlock)
             }
         }
     }

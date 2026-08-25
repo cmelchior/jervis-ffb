@@ -461,7 +461,7 @@ object TeamMascotRoll: Procedure(), ChanceObservationHandler {
         val reroll = this
         val tests = buildList {
             when (reroll) {
-                is BB2025TeamReroll -> {
+                is TeamReroll2025 -> {
                     when (reroll) {
                         is BrilliantCoachingReroll,
                         is ExtraTeamTrainingReroll,

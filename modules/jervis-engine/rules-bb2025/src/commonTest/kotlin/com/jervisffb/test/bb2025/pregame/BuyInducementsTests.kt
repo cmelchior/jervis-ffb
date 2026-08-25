@@ -3,11 +3,11 @@ package com.jervisffb.test.bb2020.pregame
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.SelectInducements
-import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
+import com.jervisffb.engine.bb2025.inducements.InducementType2025
 import com.jervisffb.engine.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.bb2025.procedures.rerolls.ExtraTeamTrainingReroll
-import com.jervisffb.engine.common.inducements.CommonInducementSelection
-import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.common.inducements.InducementSelectionCommon
+import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.utils.InvalidActionException
@@ -81,7 +81,7 @@ class BuyInducementsTests: JervisGameBB2025Test() {
         rollForwardToInducements()
         controller.rollForward(
             InducementsSelected(
-                listOf(CommonInducementSelection.Simple(BB2025InducementType.BLITZERS_BEST_KEGS, 2))
+                listOf(InducementSelectionCommon.Simple(InducementType2025.BLITZERS_BEST_KEGS, 2))
             )
         )
         assertEquals(2, homeTeam.blitzersBestKegs)
@@ -97,7 +97,7 @@ class BuyInducementsTests: JervisGameBB2025Test() {
         assertFailsWith<InvalidActionException> {
             controller.rollForward(
                 InducementsSelected(
-                    listOf(CommonInducementSelection.Simple(BB2025InducementType.BLITZERS_BEST_KEGS, 2))
+                    listOf(InducementSelectionCommon.Simple(InducementType2025.BLITZERS_BEST_KEGS, 2))
                 )
             )
         }
@@ -114,7 +114,7 @@ class BuyInducementsTests: JervisGameBB2025Test() {
         assertEquals(100_000, awayTeam.pettyCash)
         controller.rollForward(
             InducementsSelected(
-                listOf(CommonInducementSelection.Simple(BB2025InducementType.BLITZERS_BEST_KEGS, 2))
+                listOf(InducementSelectionCommon.Simple(InducementType2025.BLITZERS_BEST_KEGS, 2))
             )
         )
         assertEquals(2, awayTeam.blitzersBestKegs)
@@ -134,9 +134,9 @@ class BuyInducementsTests: JervisGameBB2025Test() {
         controller.rollForward(
             InducementsSelected(
                 listOf(
-                    CommonInducementSelection.Simple(BB2025InducementType.TEAM_MASCOT, 1),
-                    CommonInducementSelection.Simple(CommonInducementType.WEATHER_MAGE, 1),
-                    CommonInducementSelection.Simple(CommonInducementType.EXTRA_TEAM_TRAINING, 1),
+                    InducementSelectionCommon.Simple(InducementType2025.TEAM_MASCOT, 1),
+                    InducementSelectionCommon.Simple(InducementTypeCommon.WEATHER_MAGE, 1),
+                    InducementSelectionCommon.Simple(InducementTypeCommon.EXTRA_TEAM_TRAINING, 1),
                 )
             )
         )
@@ -160,7 +160,7 @@ class BuyInducementsTests: JervisGameBB2025Test() {
         assertFailsWith<InvalidActionException> {
             controller.rollForward(
                 InducementsSelected(
-                    listOf(CommonInducementSelection.Simple(CommonInducementType.EXTRA_TEAM_TRAINING, 2))
+                    listOf(InducementSelectionCommon.Simple(InducementTypeCommon.EXTRA_TEAM_TRAINING, 2))
                 )
             )
         }
@@ -179,7 +179,7 @@ class BuyInducementsTests: JervisGameBB2025Test() {
             controller.rollForward(
                 InducementsSelected(
                     listOf(
-                        CommonInducementSelection.Simple(BB2025InducementType.BLITZERS_BEST_KEGS, 4),
+                        InducementSelectionCommon.Simple(InducementType2025.BLITZERS_BEST_KEGS, 4),
                     )
                 )
             )

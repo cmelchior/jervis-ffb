@@ -1,14 +1,14 @@
 package com.jervisffb.ui.game.view
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushStepInitialMoveSequence2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Stumble2020
 import com.jervisffb.engine.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
-import com.jervisffb.engine.bb2020.procedures.table.kickoff.BB2020CheeringFans
+import com.jervisffb.engine.bb2020.procedures.table.kickoff.CheeringFans2020
 import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025BothDown
+import com.jervisffb.engine.bb2025.procedures.actions.block.BothDown2025
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
@@ -170,8 +170,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ArmourRoll.ChooseToUseClaws to SkillType.CLAWS,
             ArmourRoll.ChooseToUseIronHardSkin to SkillType.IRON_HARD_SKIN,
             ArmourRoll.ChooseToUseLoneFouler to SkillType.LONE_FOULER,
-            BB2025BothDown.AttackerChooseToUseWrestle to SkillType.WRESTLE,
-            BB2025BothDown.DefenderChooseToUseWrestle to SkillType.WRESTLE,
+            BothDown2025.AttackerChooseToUseWrestle to SkillType.WRESTLE,
+            BothDown2025.DefenderChooseToUseWrestle to SkillType.WRESTLE,
             BlitzAction.ChooseToUseSprintForBlocking to SkillType.SPRINT,
             Catch.ChooseToUseDivingCatch to SkillType.DIVING_CATCH,
             ChainsawFoulStep.ChooseToUseChainsaw to SkillType.CHAINSAW,
@@ -226,8 +226,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ArgueTheCallRollBB2025.RollDie to "Roll D6 to Argue the Call",
             BadHabits.RollDie to "Roll D3 for Bad Habits",
             BB7KickOffDeviateRoll.RollDice to "Roll D8 + 2D6 (Lowest) to Deviate the Ball",
-            BB2020CheeringFans.KickingTeamRollDie to "Roll D6 for Cheering Fans",
-            BB2020CheeringFans.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
+            CheeringFans2020.KickingTeamRollDie to "Roll D6 for Cheering Fans",
+            CheeringFans2020.ReceivingTeamRollDie to "Roll D6 for Cheering Fans",
             BribeRoll.RollDie to "Roll D6 to use Bribe",
             BoneHeadRollBB2020.ReRollDie to "Re-roll D6 to avoid Bone Head",
             BoneHeadRollBB2020.RollDie to "Roll D6 for Bone Head",
@@ -481,7 +481,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Safe Pass"
                 }
             },
-            BB2020Stumble.ChooseToUseTackle to { isActiveClient, _, state ->
+            Stumble2020.ChooseToUseTackle to { isActiveClient, _, state ->
                 val context = state.getContext<BlockContext>()
                 when (isActiveClient) {
                     true -> "Use Tackle to knock down ${context.defender.name}?"
@@ -500,7 +500,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                     false -> "Waiting for opponent to use Tackle"
                 }
             },
-            BB2020PushStepInitialMoveSequence.DecideToFollowUp to { isActiveClient, _, _ ->
+            PushStepInitialMoveSequence2020.DecideToFollowUp to { isActiveClient, _, _ ->
                 when (isActiveClient) {
                     true -> "Follow up?"
                     false -> "Waiting for opponent to use to follow up or not"

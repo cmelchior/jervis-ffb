@@ -16,7 +16,7 @@ class SafePairOfHands(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.AGILITY,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     override val type: SkillType = SkillType.SAFE_PAIR_OF_HANDS
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

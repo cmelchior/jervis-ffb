@@ -10,38 +10,38 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 abstract class DirtyTrick: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.DIRTY_TRICK
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.DIRTY_TRICK
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
 
 @Serializable
 abstract class RandomEvent: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.RANDOM_EVENT
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.RANDOM_EVENT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
 @Serializable
 abstract class MagicalMemorabilia: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.MAGIC_MEMORABILIA
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.MAGIC_MEMORABILIA
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
 @Serializable
 abstract class HeroicFeat: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.HEROIC_FEAT
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.HEROIC_FEAT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
 @Serializable
 abstract class BenefitOfTraining: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.HEROIC_FEAT
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.HEROIC_FEAT
     override var used: Boolean = false
     override var isActive: Boolean = false
 }
 @Serializable
 abstract class MiscellaneousMayhem: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2020SpecialPlayCardCategory.MISCELLANEOUS_MAYHEM
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2020.MISCELLANEOUS_MAYHEM
     override var used: Boolean = false
     override var isActive: Boolean = false
 }

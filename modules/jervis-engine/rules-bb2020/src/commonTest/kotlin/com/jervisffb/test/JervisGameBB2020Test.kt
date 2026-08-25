@@ -1,7 +1,7 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.bb2020.BB2020Rules
+import com.jervisffb.engine.bb2020.Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.model.Game
@@ -19,7 +19,7 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameBB2020Test {
 
-    open val rules: BB2020Rules = StandardBB2020Rules().update {
+    open val rules: Rules2020 = StandardBB2020Rules().update {
         undoActionBehavior = UndoActionBehavior.ALLOWED
     }
     protected open lateinit var state: Game

@@ -1,7 +1,7 @@
 package com.jervisffb.engine.bb2020.procedures.actions.move
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.bb2020.tables.BB2020PrayerToNuffleTableResult
+import com.jervisffb.engine.bb2020.tables.PrayerToNuffleTableResult2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.modifiers.RushModifier
@@ -38,10 +38,10 @@ object RushRoll: D6WithRerollProcedure() {
         if (state.weather == Weather.BLIZZARD) {
             modifiers.add(RushModifier.BLIZZARD)
         }
-        if (state.homeTeam.activePrayersToNuffle.contains(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH)) {
+        if (state.homeTeam.activePrayersToNuffle.contains(PrayerToNuffleTableResult2020.MOLES_UNDER_THE_PITCH)) {
             modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH_HOME)
         }
-        if (state.awayTeam.activePrayersToNuffle.contains(BB2020PrayerToNuffleTableResult.MOLES_UNDER_THE_PITCH)) {
+        if (state.awayTeam.activePrayersToNuffle.contains(PrayerToNuffleTableResult2020.MOLES_UNDER_THE_PITCH)) {
             modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH_AWAY)
         }
         return if (modifiers.isNotEmpty()) {

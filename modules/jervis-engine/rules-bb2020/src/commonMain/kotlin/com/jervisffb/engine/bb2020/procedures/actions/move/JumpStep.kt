@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.PitchSquareSelected
-import com.jervisffb.engine.bb2020.procedures.table.injury.BB2020FallingOver
+import com.jervisffb.engine.bb2020.procedures.table.injury.FallingOver2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -323,7 +323,7 @@ object JumpStep : Procedure() {
             val context = state.getContext<MoveContext>()
             return AddContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2020FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver2020
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(

@@ -16,7 +16,7 @@ class SteadyFooting(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     override val type: SkillType = SkillType.STEADY_FOOTING
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

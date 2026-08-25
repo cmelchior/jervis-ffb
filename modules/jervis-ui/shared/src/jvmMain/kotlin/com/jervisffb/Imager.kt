@@ -40,7 +40,7 @@ object Imager {
                     onBufferOverflow = BufferOverflow.SUSPEND,
                 )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
-//            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
+//            val controller = GameController(Rules2020, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
             val controller = GameEngineController(state)
             // App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }

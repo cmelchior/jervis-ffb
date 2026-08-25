@@ -3,7 +3,7 @@ package com.jervisffb.test.bb2025
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
@@ -30,7 +30,7 @@ import kotlin.test.assertTrue
  */
 class ExtraTimeTests: JervisGameBB2025Test() {
 
-    override val rules: BB2025Rules = StandardBB2025Rules().update {
+    override val rules: Rules2025 = StandardBB2025Rules().update {
         hasExtraTime = true
         turnsInExtraTime = 8
     }

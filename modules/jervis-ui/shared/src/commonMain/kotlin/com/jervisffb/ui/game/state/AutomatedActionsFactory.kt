@@ -29,11 +29,11 @@ import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020PushStepInitialMoveSequence
-import com.jervisffb.engine.bb2020.procedures.actions.block.BB2020Stumble
 import com.jervisffb.engine.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.bb2020.procedures.actions.block.PushStepInitialMoveSequence2020
+import com.jervisffb.engine.bb2020.procedures.actions.block.Stumble2020
 import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
-import com.jervisffb.engine.bb2025.procedures.actions.block.BB2025Stumble
+import com.jervisffb.engine.bb2025.procedures.actions.block.Stumble2025
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.CreatePushChainStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.FollowUpStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.push.UseStripBallStep
@@ -46,8 +46,8 @@ import com.jervisffb.engine.bb2025.procedures.actions.pass.PassStep
 import com.jervisffb.engine.bb2025.procedures.actions.securetheball.SecureTheBallStep
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowTeammateAccuracyRoll
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025KnockedDown
+import com.jervisffb.engine.bb2025.procedures.injury.FallingOver2025
+import com.jervisffb.engine.bb2025.procedures.injury.KnockedDown2025
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamCaptainRoll
 import com.jervisffb.engine.bb2025.procedures.rerolls.UseBrawlerReroll
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
@@ -179,7 +179,7 @@ class AutomatedActionsFactory(
             val loc = (actions.first() as SelectPitchLocation).squares.first()
             return PitchSquareSelected(loc.coordinate)
         }
-        if (actions.size == 1 && actions.first() is SelectPitchLocation && actions.first().createAll().size == 1 && currentNode is BB2020PushStepInitialMoveSequence.SelectPushDirection) {
+        if (actions.size == 1 && actions.first() is SelectPitchLocation && actions.first().createAll().size == 1 && currentNode is PushStepInitialMoveSequence2020.SelectPushDirection) {
             val loc = (actions.first() as SelectPitchLocation).squares.first()
             return PitchSquareSelected(loc.coordinate)
         }
@@ -241,7 +241,7 @@ class AutomatedActionsFactory(
                 else -> error("Unexpected action: $action")
             }
         }
-        if (currentNode is BB2020PushStepInitialMoveSequence.DecideToFollowUp && actions.size == 1) {
+        if (currentNode is PushStepInitialMoveSequence2020.DecideToFollowUp && actions.size == 1) {
             return when (val action = actions.first()) {
                 is ConfirmWhenReady -> Confirm
                 is CancelWhenReady -> Cancel
@@ -322,10 +322,10 @@ class AutomatedActionsFactory(
             return Confirm
         }
 
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == BB2020Stumble.ChooseToUseTackle)) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == Stumble2020.ChooseToUseTackle)) {
             return Confirm
         }
-        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == BB2025Stumble.ChooseToUseTackle)) {
+        if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_TACKLE_ON_STUMBLE) && (currentNode == Stumble2025.ChooseToUseTackle)) {
             return Confirm
         }
 
@@ -362,8 +362,8 @@ class AutomatedActionsFactory(
 
         if (menuViewModel.isFeatureEnabled(Feature.ALWAYS_USE_STEADY_FOOTING)
             && (
-                currentNode == BB2025FallingOver.ChooseToUseSteadyFooting
-                    || currentNode == BB2025KnockedDown.ChooseToUseSteadyFooting
+                currentNode == FallingOver2025.ChooseToUseSteadyFooting
+                    || currentNode == KnockedDown2025.ChooseToUseSteadyFooting
             )
         ) {
             return Confirm

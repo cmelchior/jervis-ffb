@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
@@ -51,7 +51,7 @@ object BlitzChooseRerollMapper: CommandActionMapper {
             action = { state: Game, rules: Rules ->
                 StandardBlockChooseReroll.ReRollSourceOrAcceptRoll.getAvailableActions(state, rules)
                     .first { it is SelectRerollOption }
-                    .let { (it as SelectRerollOption).options.first { option -> option.getRerollSource(state) is BB2020StandardTeamReroll } }
+                    .let { (it as SelectRerollOption).options.first { option -> option.getRerollSource(state) is StandardTeamReroll2020 } }
                     .let { option ->
                         RerollOptionSelected(
                             DiceRerollOption(

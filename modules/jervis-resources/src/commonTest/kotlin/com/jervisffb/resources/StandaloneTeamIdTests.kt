@@ -2,10 +2,10 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.TeamBuilder
 import com.jervisffb.engine.serialization.JervisTeamFile
-import com.jervisffb.resources.bb2020.BB2020StandaloneBB7Teams
-import com.jervisffb.resources.bb2020.BB2020StandaloneStandardTeams
-import com.jervisffb.resources.bb2025.BB2025StandaloneBB7Teams
-import com.jervisffb.resources.bb2025.BB2025StandaloneStandardTeams
+import com.jervisffb.resources.bb2020.StandaloneBB7Teams2020
+import com.jervisffb.resources.bb2020.StandaloneStandardTeams2020
+import com.jervisffb.resources.bb2025.StandaloneBB7Teams2025
+import com.jervisffb.resources.bb2025.StandaloneStandardTeams2025
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -20,10 +20,10 @@ import kotlin.test.assertTrue
 class StandaloneTeamIdTests {
 
     private val allTeams: Map<String, JervisTeamFile> = buildMap {
-        putAll(BB2020StandaloneStandardTeams.defaultTeams)
-        putAll(BB2020StandaloneBB7Teams.defaultTeams)
-        putAll(BB2025StandaloneStandardTeams.defaultTeams)
-        putAll(BB2025StandaloneBB7Teams.defaultTeams)
+        putAll(StandaloneStandardTeams2020.defaultTeams)
+        putAll(StandaloneBB7Teams2020.defaultTeams)
+        putAll(StandaloneStandardTeams2025.defaultTeams)
+        putAll(StandaloneBB7Teams2025.defaultTeams)
     }
 
     // By convention, all jervis starter teams start begin with "jervis-".

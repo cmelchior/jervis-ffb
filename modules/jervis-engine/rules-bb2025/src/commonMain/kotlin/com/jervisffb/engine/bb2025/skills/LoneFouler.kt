@@ -28,7 +28,7 @@ class LoneFouler(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.DEVIOUS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill, RerollSource {
+) : Skill2025, RerollSource {
     override val type: SkillType = SkillType.LONE_FOULER
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

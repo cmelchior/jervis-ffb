@@ -11,7 +11,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
  *
  * Note, for skills that replace blocks, the procedure being referenced is the Standalone
  * variant. Special skills that can be used as part of a Multiple Block
- * are defined in [com.jervisffb.engine.rules.bb2020.model.context.BB2020MultipleBlockContext] and will
+ * are defined in [com.jervisffb.engine.rules.bb2020.model.context.MultipleBlockContext2020] and will
  * be handled separately there.
  */
 interface SpecialActionProvider {

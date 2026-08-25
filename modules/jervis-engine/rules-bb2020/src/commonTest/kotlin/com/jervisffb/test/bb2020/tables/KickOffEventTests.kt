@@ -38,7 +38,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import com.jervisffb.engine.bb2020.tables.BB2020PrayerToNuffleTableResult as CommonPrayerToNuffleTableResult
+import com.jervisffb.engine.bb2020.tables.PrayerToNuffleTableResult2020 as PrayerToNuffleTableResultCommon
 
 /**
  * This class is testing all the results on the Kick-off Event Table.
@@ -316,8 +316,8 @@ class KickOffEventTests: JervisGameBB2020Test() {
                 bounce = null
             ),
         )
-        assertTrue(homeTeam.activePrayersToNuffle.contains(CommonPrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
-        assertFalse(awayTeam.activePrayersToNuffle.contains(CommonPrayerToNuffleTableResult.FRIENDS_WITH_THE_REF))
+        assertTrue(homeTeam.activePrayersToNuffle.contains(PrayerToNuffleTableResultCommon.FRIENDS_WITH_THE_REF))
+        assertFalse(awayTeam.activePrayersToNuffle.contains(PrayerToNuffleTableResultCommon.FRIENDS_WITH_THE_REF))
     }
 
     @Test

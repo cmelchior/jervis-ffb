@@ -15,9 +15,9 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.bb2020.inducements.BB2020InducementType
-import com.jervisffb.engine.bb2025.inducements.BB2025InducementType
-import com.jervisffb.engine.common.inducements.CommonInducementType
+import com.jervisffb.engine.bb2020.inducements.InducementType2020
+import com.jervisffb.engine.bb2025.inducements.InducementType2025
+import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Direction.Companion.DOWN
@@ -599,48 +599,48 @@ class IconFactory internal constructor(
 
     fun getInducementIcon(type: InducementType): DrawableResource? {
         return when {
-            type is CommonInducementType -> {
+            type is InducementTypeCommon -> {
                 when (type) {
-                    CommonInducementType.BIASED_REFEREE -> null
-                    CommonInducementType.BRIBE -> null
-                    CommonInducementType.DESPERATE_MEASURES -> null
-                    CommonInducementType.EXTRA_TEAM_TRAINING -> null
-                    CommonInducementType.HALFLING_MASTER_CHEF -> null
-                    CommonInducementType.INFAMOUS_COACHING_STAFF -> null
-                    CommonInducementType.MORTUARY_ASSISTANT -> null
-                    CommonInducementType.PART_TIME_ASSISTANT_COACH -> null
-                    CommonInducementType.PLAGUE_DOCTOR -> null
-                    CommonInducementType.RIOTOUS_ROOKIE -> null
-                    CommonInducementType.STANDARD_MERCENARY_PLAYERS -> null
-                    CommonInducementType.STAR_PLAYERS -> null
-                    CommonInducementType.TEMP_AGENCY_CHEERLEADER -> null
-                    CommonInducementType.WANDERING_APOTHECARY -> Res.drawable.jervis_inducement_apothercary
-                    CommonInducementType.WEATHER_MAGE -> null
-                    CommonInducementType.WIZARD -> null
+                    InducementTypeCommon.BIASED_REFEREE -> null
+                    InducementTypeCommon.BRIBE -> null
+                    InducementTypeCommon.DESPERATE_MEASURES -> null
+                    InducementTypeCommon.EXTRA_TEAM_TRAINING -> null
+                    InducementTypeCommon.HALFLING_MASTER_CHEF -> null
+                    InducementTypeCommon.INFAMOUS_COACHING_STAFF -> null
+                    InducementTypeCommon.MORTUARY_ASSISTANT -> null
+                    InducementTypeCommon.PART_TIME_ASSISTANT_COACH -> null
+                    InducementTypeCommon.PLAGUE_DOCTOR -> null
+                    InducementTypeCommon.RIOTOUS_ROOKIE -> null
+                    InducementTypeCommon.STANDARD_MERCENARY_PLAYERS -> null
+                    InducementTypeCommon.STAR_PLAYERS -> null
+                    InducementTypeCommon.TEMP_AGENCY_CHEERLEADER -> null
+                    InducementTypeCommon.WANDERING_APOTHECARY -> Res.drawable.jervis_inducement_apothercary
+                    InducementTypeCommon.WEATHER_MAGE -> null
+                    InducementTypeCommon.WIZARD -> null
                 }
             }
-            type is BB2020InducementType -> {
+            type is InducementType2020 -> {
                 when (type) {
-                    BB2020InducementType.BLOODWEISER_KEG -> Res.drawable.jervis_inducement_keg
-                    BB2020InducementType.SPECIAL_PLAY -> null
-                    BB2020InducementType.WAAAGH_DRUMMER -> null
-                    BB2020InducementType.CAVORTING_NURGLINGS -> null
-                    BB2020InducementType.DWARFEN_RUNESMITH -> null
-                    BB2020InducementType.HALFLING_HOTPOT -> null
-                    BB2020InducementType.MASTER_OF_BALLISTICS -> null
-                    BB2020InducementType.EXPANDED_MERCENARY_PLAYERS -> null
-                    BB2020InducementType.GIANT -> null
-                    BB2020InducementType.DESPERATE_MEASURES -> null
-                    BB2020InducementType.BRETONNIAN_PASTRIES -> null
-                    BB2020InducementType.BRETONNIAN_DAMSEL -> null
-                    BB2020InducementType.CANOPIC_JAR -> null
+                    InducementType2020.BLOODWEISER_KEG -> Res.drawable.jervis_inducement_keg
+                    InducementType2020.SPECIAL_PLAY -> null
+                    InducementType2020.WAAAGH_DRUMMER -> null
+                    InducementType2020.CAVORTING_NURGLINGS -> null
+                    InducementType2020.DWARFEN_RUNESMITH -> null
+                    InducementType2020.HALFLING_HOTPOT -> null
+                    InducementType2020.MASTER_OF_BALLISTICS -> null
+                    InducementType2020.EXPANDED_MERCENARY_PLAYERS -> null
+                    InducementType2020.GIANT -> null
+                    InducementType2020.DESPERATE_MEASURES -> null
+                    InducementType2020.BRETONNIAN_PASTRIES -> null
+                    InducementType2020.BRETONNIAN_DAMSEL -> null
+                    InducementType2020.CANOPIC_JAR -> null
                 }
             }
-            type is BB2025InducementType -> {
+            type is InducementType2025 -> {
                 when (type) {
-                    BB2025InducementType.BLITZERS_BEST_KEGS -> Res.drawable.jervis_inducement_keg
-                    BB2025InducementType.PRAYERS_TO_NUFFLE -> null
-                    BB2025InducementType.TEAM_MASCOT -> null
+                    InducementType2025.BLITZERS_BEST_KEGS -> Res.drawable.jervis_inducement_keg
+                    InducementType2025.PRAYERS_TO_NUFFLE -> null
+                    InducementType2025.TEAM_MASCOT -> null
                 }
             }
             else -> error("Unknown inducement type: $type")

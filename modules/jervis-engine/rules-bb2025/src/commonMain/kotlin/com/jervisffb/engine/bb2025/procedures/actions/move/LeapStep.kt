@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
-import com.jervisffb.engine.bb2025.procedures.injury.BB2025FallingOver
+import com.jervisffb.engine.bb2025.procedures.injury.FallingOver2025
 import com.jervisffb.engine.bb2025.skills.TentaclesStep
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -404,7 +404,7 @@ object LeapStep : Procedure() {
             )
             return AddContext(injuryContext)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BB2025FallingOver
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver2025
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome, the player's action ends in a turnover
             return compositeCommandOf(

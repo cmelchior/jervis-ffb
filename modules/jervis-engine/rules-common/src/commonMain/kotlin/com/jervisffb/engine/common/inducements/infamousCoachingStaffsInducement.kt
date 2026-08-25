@@ -15,12 +15,12 @@ data class InfamousCoachingStaffsInducementGroup(
     override val max: Int,
     override val enabled: Boolean,
     override val items: List<InfamousCoachingStaffInducement>
-): CommonInducementGroup<InfamousCoachingStaffsInducementGroup.Builder, InfamousCoachingStaffInducement.Builder, InfamousCoachingStaffInducement> {
-    override val type: InducementType = CommonInducementType.INFAMOUS_COACHING_STAFF
+): InducementGroupCommon<InfamousCoachingStaffsInducementGroup.Builder, InfamousCoachingStaffInducement.Builder, InfamousCoachingStaffInducement> {
+    override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
     override val name: String = "Infamous Coaching Staff"
     override fun toBuilder() = Builder(this)
 
-    class Builder(private val inducement: InfamousCoachingStaffsInducementGroup): CommonInducementGroupBuilder {
+    class Builder(private val inducement: InfamousCoachingStaffsInducementGroup): InducementGroupBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
@@ -47,14 +47,14 @@ data class InfamousCoachingStaffInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList(),
 ): SingleInducement<InfamousCoachingStaffInducement.Builder> {
-    override val type: InducementType = CommonInducementType.INFAMOUS_COACHING_STAFF
+    override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
     override val name: String = staff.name
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: InfamousCoachingStaffInducement): CommonSingleInducementBuilder {
+    class Builder(inducement: InfamousCoachingStaffInducement): SingleInducementBuilderCommon {
         val staff: InfamousCoachingStaff = inducement.staff
-        override val type: InducementType = CommonInducementType.INFAMOUS_COACHING_STAFF
+        override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
         override val name: String = inducement.name
         override var max: Int = inducement.max
         override var price: Int = inducement.defaultPrice

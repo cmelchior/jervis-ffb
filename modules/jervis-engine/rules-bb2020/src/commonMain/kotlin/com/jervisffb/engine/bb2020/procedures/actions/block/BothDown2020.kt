@@ -1,0 +1,261 @@
+package com.jervisffb.engine.bb2020.procedures.actions.block
+
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.bb2020.procedures.table.injury.KnockedDown2020
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContext
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.UpdateContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BlockContext
+import com.jervisffb.engine.common.context.BothDownContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
+import com.jervisffb.engine.common.reports.ReportBothDownResult
+import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.ParentNode
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerPitchState
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.utils.INVALID_ACTION
+
+/**
+ * Resolve a "Both Down" selected as a block result.
+ * See page 57 in the rulebook.
+ *
+ * Developer's Commentary:
+ * The order of choosing skills is unclear from the rules. In this implementation,
+ * we have chosen that the defender goes first. It is somewhat arbitrary, but
+ * means that the order of checking is:
+ *
+ * 1. Defender chooses to use Wrestle
+ * 2. Attacker chooses to use Wrestle
+ * 3. Defender chooses to use block
+ * 4. Attacker chooses to use block
+ */
+object BothDown2020: Procedure() {
+    override val initialNode: Node = DefenderChooseToUseWrestle
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val blockContext = state.getContext<BlockContext>()
+        return AddContext(
+            BothDownContext(
+                blockContext.attacker,
+                blockContext.defender,
+            )
+        )
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BothDownContext>()
+        return compositeCommandOf(
+            ReportBothDownResult(context),
+            RemoveContext(context)
+        )
+    }
+
+    object DefenderChooseToUseWrestle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            // TODO Figure out how to check for Wrestle
+            val hasWrestle = false
+            return when (hasWrestle) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useWrestle = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            return compositeCommandOf(
+                UpdateContext(context.copy(defenderUsesWrestle = useWrestle)),
+                GotoNode(AttackerChooseToUseWrestle)
+            )
+        }
+    }
+
+    object AttackerChooseToUseWrestle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            // TODO Figure out how to check for Wrestle
+            val hasWrestle = false
+            return when (hasWrestle) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useWrestle = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            val updatedContext = context.copy(attackerUsesWrestle = useWrestle)
+            return compositeCommandOf(
+                UpdateContext(updatedContext),
+                if (updatedContext.attackerUsesWrestle || updatedContext.defenderUsesWrestle) {
+                    GotoNode(ResolveBothDown)
+                } else {
+                    GotoNode(DefenderChooseToUseBlock)
+                }
+            )
+        }
+    }
+
+    object DefenderChooseToUseBlock: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            val hasBlock = context.defender.getSkillOrNull(SkillType.BLOCK) != null
+            return when (hasBlock) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useBlock = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            return compositeCommandOf(
+                UpdateContext(context.copy(defenderUsesBlock = useBlock)),
+                GotoNode(AttackerChooseToUseBlock)
+            )
+        }
+    }
+
+    object AttackerChooseToUseBlock: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            val hasBlock = (context.attacker.getSkillOrNull(SkillType.BLOCK) != null)
+            return when (hasBlock) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useBlock = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            return compositeCommandOf(
+                UpdateContext(context.copy(attackUsesBlock = useBlock)),
+                GotoNode(ResolveBothDown)
+            )
+        }
+    }
+
+    object ResolveBothDown: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+
+            // If Wrestle was used, both players are just placed prone and nothing more happens.
+            // Otherwise check if one or both players need to roll injury
+            return if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
+                compositeCommandOf(
+                    SetPlayerState(context.attacker, PlayerPitchState.PRONE, hasTackleZones = false),
+                    SetPlayerState(context.defender, PlayerPitchState.PRONE, hasTackleZones = false),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(ResolveDefenderInjury)
+            }
+        }
+    }
+
+    object ResolveDefenderInjury: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            return if (!context.defenderUsesBlock) {
+                GotoNode(RollDefenderInjury)
+            } else {
+                GotoNode(ResolveAttackerInjury)
+            }
+        }
+    }
+
+    object RollDefenderInjury: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
+            val context = state.getContext<BothDownContext>()
+            return AddContext(
+                RiskingInjuryContext(
+                    player = context.defender,
+                    causedBy = context.attacker,
+                    isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+                )
+            )
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2020
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return GotoNode(ResolveAttackerInjury)
+        }
+    }
+
+    object ResolveAttackerInjury: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            return if (!context.attackUsesBlock) {
+                GotoNode(RollAttackerInjury)
+            } else {
+                ExitProcedure()
+            }
+        }
+    }
+
+    object RollAttackerInjury: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
+            val context = state.getContext<BothDownContext>()
+            return AddContext(
+                RiskingInjuryContext(
+                    player = context.attacker,
+                    causedBy = context.defender,
+                    isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+                )
+            )
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown2020
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // Attacker went down, so its turn ends immediately, commonly because it is a turnover,
+            // but if it happened during a kick-off blitz, it just ends the Blitz.
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
+        }
+    }
+}

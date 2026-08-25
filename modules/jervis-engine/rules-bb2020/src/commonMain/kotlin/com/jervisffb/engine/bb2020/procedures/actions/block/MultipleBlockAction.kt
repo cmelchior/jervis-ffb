@@ -28,7 +28,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.context.BB2020MultipleBlockContext
+import com.jervisffb.engine.common.context.MultipleBlockContext2020
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.ThrowIn
@@ -158,16 +158,16 @@ object MultipleBlockAction: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val activeContext = state.getContext<ActivatePlayerContext>()
         return AddContext(
-            BB2020MultipleBlockContext(
+            MultipleBlockContext2020(
                 attacker = activeContext.player
             )
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<BB2020MultipleBlockContext>()
+        val context = state.getContext<MultipleBlockContext2020>()
         return compositeCommandOf(
             UpdateContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = !context.actionAborted)),
-            RemoveContext<BB2020MultipleBlockContext>()
+            RemoveContext<MultipleBlockContext2020>()
         )
     }
 
@@ -182,7 +182,7 @@ object MultipleBlockAction: Procedure() {
     object SelectDefenderOrAbortActionOrContinueBlock: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val attacker = context.attacker
             val defender1 = context.defender1
             val defender2 = context.defender2
@@ -215,7 +215,7 @@ object MultipleBlockAction: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return when (action) {
                 Cancel -> {
                     compositeCommandOf(
@@ -289,8 +289,8 @@ object MultipleBlockAction: Procedure() {
     object SelectBlockTypeAgainstSelectedDefender: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val attacker = state.getContext<BB2020MultipleBlockContext>().attacker
-            val defender = state.getContext<BB2020MultipleBlockContext>().getActiveDefender() ?: INVALID_GAME_STATE("No active defender: ${state.getContext<BB2020MultipleBlockContext>()}")
+            val attacker = state.getContext<MultipleBlockContext2020>().attacker
+            val defender = state.getContext<MultipleBlockContext2020>().getActiveDefender() ?: INVALID_GAME_STATE("No active defender: ${state.getContext<MultipleBlockContext2020>()}")
             val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
             return listOf(
                 SelectBlockType(availableBlockTypes),
@@ -298,7 +298,7 @@ object MultipleBlockAction: Procedure() {
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return when (action) {
                 is PlayerDeselected -> {
                     val player = action.getPlayer(state)
@@ -336,7 +336,7 @@ object MultipleBlockAction: Procedure() {
             return getEnterBlockTypeNodeCommands(state, 0)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return context.getRollDiceProcedure()
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -357,7 +357,7 @@ object MultipleBlockAction: Procedure() {
             return getEnterBlockTypeNodeCommands(state, 1)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return context.getRollDiceProcedure()
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -399,14 +399,14 @@ object MultipleBlockAction: Procedure() {
     object SelectPlayerToResolve: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return listOf(
                 SelectPlayer.fromPlayers(listOf(context.defender1!!, context.defender2!!)),
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<PlayerSelected>(action) { playerSelected ->
-                val context = state.getContext<BB2020MultipleBlockContext>()
+                val context = state.getContext<MultipleBlockContext2020>()
                 val activeDefenderIndex = when (val player = playerSelected.getPlayer(state)) {
                     context.defender1 -> 0
                     context.defender2 -> 1
@@ -444,16 +444,16 @@ object MultipleBlockAction: Procedure() {
      */
     object ResolveFirstPlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return getEnterBlockTypeNodeCommands(state, context.activeDefender!!)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return context.getResolveBlockResultProcedure()
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val nextDefender = when (context.activeDefender) {
                 0 -> 1
                 1 -> 0
@@ -465,8 +465,8 @@ object MultipleBlockAction: Procedure() {
                 RemoveContextUsingType(contextClass),
                 SetTurnOver(null),
                 updateMultipleBlockContextCommand,
-                SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, nextDefender),
-                SetContextProperty(BB2020MultipleBlockContext::postponeTurnOver, context, state.turnOver),
+                SetContextProperty(MultipleBlockContext2020::activeDefender, context, nextDefender),
+                SetContextProperty(MultipleBlockContext2020::postponeTurnOver, context, state.turnOver),
                 GotoNode(ResolveSecondPlayer)
             )
         }
@@ -478,23 +478,23 @@ object MultipleBlockAction: Procedure() {
      */
     object ResolveSecondPlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return getEnterBlockTypeNodeCommands(state, context.activeDefender!!)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return context.getResolveBlockResultProcedure()
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val contextClass = context.getContextForCurrentBlock()::class
             val updatedMultiBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
                 RemoveContextUsingType(contextClass),
                 SetTurnOver(context.postponeTurnOver),
                 updatedMultiBlockContextCommand,
-                SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, null),
+                SetContextProperty(MultipleBlockContext2020::activeDefender, context, null),
                 GotoNode(ResolveInjuries)
             )
         }
@@ -514,9 +514,9 @@ object MultipleBlockAction: Procedure() {
     // TODO
     object ResolveBlock1Trapdoors: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return compositeCommandOf(
-                SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, 1),
+                SetContextProperty(MultipleBlockContext2020::activeDefender, context, 1),
                 GotoNode(ResolveBlock2Trapdoors)
             )
         }
@@ -525,9 +525,9 @@ object MultipleBlockAction: Procedure() {
     // TODO
     object ResolveBlock2Trapdoors: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             return compositeCommandOf(
-                SetContextProperty(BB2020MultipleBlockContext::activeDefender, context, 0),
+                SetContextProperty(MultipleBlockContext2020::activeDefender, context, 0),
                 GotoNode(CheckBlock1Touchdowns)
             )
         }
@@ -542,19 +542,19 @@ object MultipleBlockAction: Procedure() {
     // TODO Losts of overlap with checking scoring in PushStepResolveSingleBlockPushChain. Can they be combined somehow?
     object CheckBlock1Touchdowns: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
-            val context = state.getContext<BB2020MultipleBlockContext>().defender1PushChain
+            val context = state.getContext<MultipleBlockContext2020>().defender1PushChain
             val pushStep = context?.pushChain?.firstOrNull { checkPlayerForTouchdown(it) }
             return if (pushStep == null) CheckBlock2Touchdowns else null
         }
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>().defender1PushChain!!
+            val context = state.getContext<MultipleBlockContext2020>().defender1PushChain!!
             val push = context.pushChain.first { checkPlayerForTouchdown(it) }
             val player = push.pushee
             return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context =  state.getContext<BB2020MultipleBlockContext>().defender1PushChain!!
+            val context =  state.getContext<MultipleBlockContext2020>().defender1PushChain!!
             // Mark the step we just checked as complete.
             val pushData: PushContext.PushData = context.pushChain.firstNotNullOf { el ->
                 if (checkPlayerForTouchdown(el)) el else null
@@ -569,19 +569,19 @@ object MultipleBlockAction: Procedure() {
 
     object CheckBlock2Touchdowns: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
-            val context = state.getContext<BB2020MultipleBlockContext>().defender2PushChain
+            val context = state.getContext<MultipleBlockContext2020>().defender2PushChain
             val pushStep = context?.pushChain?.firstOrNull { checkPlayerForTouchdown(it) }
             return if (pushStep == null) ResolveBlock1DefendersBallEvents else null
         }
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>().defender2PushChain!!
+            val context = state.getContext<MultipleBlockContext2020>().defender2PushChain!!
             val push = context.pushChain.first { checkPlayerForTouchdown(it) }
             val player = push.pushee
             return AddContext(ScoringATouchDownContext(player))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context =  state.getContext<BB2020MultipleBlockContext>().defender2PushChain!!
+            val context =  state.getContext<MultipleBlockContext2020>().defender2PushChain!!
             // Mark the step we just checked as complete.
             val pushData: PushContext.PushData = context.pushChain.firstNotNullOf { el ->
                 if (checkPlayerForTouchdown(el)) el else null
@@ -597,7 +597,7 @@ object MultipleBlockAction: Procedure() {
     object ResolveBlock1DefendersBallEvents: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             // Figure out if this is a push block or the defender went down in the square
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val pushData = context.defender1PushChain
             val handleBallCommand = if (pushData == null) {
                 // If there is no push, the defender could only be Knocked Down in their starting square
@@ -615,7 +615,7 @@ object MultipleBlockAction: Procedure() {
     object ResolveBlock2DefendersBallEvents: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             // Figure out if this is a push block or the defender went down in the square
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val pushData = context.defender2PushChain
             val handleBallCommand = if (pushData == null) {
                 // If there is no push, the defender could only be Knocked Down in their starting square
@@ -633,7 +633,7 @@ object MultipleBlockAction: Procedure() {
     object BounceCurrentBall : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val nextNode = when (context.defender1BallsHandled) {
                 false -> ResolveBlock1DefendersBallEvents
                 true -> ResolveBlock2DefendersBallEvents
@@ -657,7 +657,7 @@ object MultipleBlockAction: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules) = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BB2020MultipleBlockContext>()
+            val context = state.getContext<MultipleBlockContext2020>()
             val nextNodeCommand = when (context.defender1BallsHandled) {
                 false -> GotoNode(ResolveBlock1DefendersBallEvents)
                 true -> GotoNode(ResolveBlock2DefendersBallEvents)
@@ -678,7 +678,7 @@ object MultipleBlockAction: Procedure() {
      * a sub procedure for a specific block type.
      */
     private fun getEnterBlockTypeNodeCommands(state: Game, activeDefender: Int): Command {
-        val context = state.getContext<BB2020MultipleBlockContext>()
+        val context = state.getContext<MultipleBlockContext2020>()
         val updatedContext = context.copy(activeDefender = activeDefender)
         return compositeCommandOf(
             UpdateContext(updatedContext),
@@ -688,10 +688,10 @@ object MultipleBlockAction: Procedure() {
 
     /**
      * Return the commands needed to clear the context from a specific sub procedure,
-     * as well as making sure that [BB2020MultipleBlockContext] is updated.
+     * as well as making sure that [MultipleBlockContext2020] is updated.
      */
     private fun getLeaveBlockTypeNodeCommands(state: Game): Command {
-        val context = state.getContext<BB2020MultipleBlockContext>()
+        val context = state.getContext<MultipleBlockContext2020>()
         val updateMultipleBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
         val contextClass = context.getContextForCurrentBlock()::class
         return compositeCommandOf(

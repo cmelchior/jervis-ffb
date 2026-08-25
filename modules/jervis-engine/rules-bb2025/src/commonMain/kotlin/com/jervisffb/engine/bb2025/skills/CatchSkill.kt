@@ -21,7 +21,7 @@ class CatchSkill(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.AGILITY,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill, D6StandardSkillReroll {
+) : Skill2025, D6StandardSkillReroll {
     override val type: SkillType = SkillType.CATCH
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

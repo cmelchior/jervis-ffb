@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.bb2020.skills.BreakTackle
 import com.jervisffb.engine.common.modifiers.BreakTackleModifier
 import com.jervisffb.engine.ext.d6
@@ -83,7 +83,7 @@ class BreakTackleTests: JervisGameBB2020Test() {
             PitchSquareSelected(PitchCoordinate(14, 5)),
             DiceRollResults(2.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
-            TeamRerollSelected<BB2020StandardTeamReroll>(),
+            TeamRerollSelected<StandardTeamReroll2020>(),
             DiceRollResults(3.d6), // Dodge roll, should now succeed (but only with Break Tackle)
         )
         player.assertCoordinates(14, 5)

@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -170,7 +170,7 @@ class HandOffActionTests: JervisGameBB2020Test() {
             SmartMoveTo(14, 7),
             PlayerSelected("A3".playerId), // Target of hand-off
             5.d6, // Fail catch (3 marks)
-            TeamRerollSelected<BB2020StandardTeamReroll>(),
+            TeamRerollSelected<StandardTeamReroll2020>(),
             6.d6 // Catch it
         )
         assertTrue(awayTeam["A3".playerId].hasBall())

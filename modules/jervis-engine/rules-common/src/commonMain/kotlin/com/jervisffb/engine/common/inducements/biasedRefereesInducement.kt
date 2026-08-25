@@ -14,13 +14,13 @@ data class BiasedRefereesInducementGroup(
     override val max: Int = 1,
     override val enabled: Boolean,
     override val items: List<BiasedRefereeInducement> = emptyList()
-): CommonInducementGroup<BiasedRefereesInducementGroup.Builder, BiasedRefereeInducement.Builder, BiasedRefereeInducement> {
+): InducementGroupCommon<BiasedRefereesInducementGroup.Builder, BiasedRefereeInducement.Builder, BiasedRefereeInducement> {
     override val name: String = "Biased Referee"
-    override val type: InducementType = CommonInducementType.BIASED_REFEREE
+    override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
 
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: BiasedRefereesInducementGroup): CommonInducementGroupBuilder {
+    class Builder(inducement: BiasedRefereesInducementGroup): InducementGroupBuilderCommon {
         override val type: InducementType = inducement.type
         override val name: String = inducement.name
         override var max: Int = inducement.max
@@ -46,13 +46,13 @@ data class BiasedRefereeInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<BiasedRefereeInducement.Builder> {
-    override val type: InducementType = CommonInducementType.BIASED_REFEREE
+    override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
     override val name: String = referee.name
     override fun toBuilder() = Builder(this)
 
-    class Builder(inducement: BiasedRefereeInducement): CommonSingleInducementBuilder {
+    class Builder(inducement: BiasedRefereeInducement): SingleInducementBuilderCommon {
         val referee: BiasedReferee = inducement.referee
-        override val type: InducementType = CommonInducementType.BIASED_REFEREE
+        override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
         override val name: String = referee.name
         override var max: Int = inducement.max
         override var price: Int = inducement.defaultPrice

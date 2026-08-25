@@ -1,14 +1,14 @@
 package com.jervisffb.ui.game.mappings
 
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020BrilliantCoachingReroll
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020TeamReroll
-import com.jervisffb.engine.bb2025.procedures.rerolls.BB2025TeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.BrilliantCoachingReroll2020
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
+import com.jervisffb.engine.bb2020.procedures.rerolls.TeamReroll2020
 import com.jervisffb.engine.bb2025.procedures.rerolls.BrilliantCoachingReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.ExtraTeamTrainingReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotReroll
+import com.jervisffb.engine.bb2025.procedures.rerolls.TeamReroll2025
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 
 // Map all engine team rerolls to UI rerolls
@@ -22,13 +22,13 @@ enum class UiTeamReroll {
     companion object : UiMapping<TeamReroll, UiTeamReroll> {
         override fun mapFrom(el: TeamReroll): UiTeamReroll {
             return when (el) {
-                is BB2020TeamReroll -> {
+                is TeamReroll2020 -> {
                     when (el) {
-                        is BB2020BrilliantCoachingReroll -> BRILLIANT_COACHING
-                        is BB2020StandardTeamReroll -> TEAM
+                        is BrilliantCoachingReroll2020 -> BRILLIANT_COACHING
+                        is StandardTeamReroll2020 -> TEAM
                     }
                 }
-                is BB2025TeamReroll -> {
+                is TeamReroll2025 -> {
                     when (el) {
                         is BrilliantCoachingReroll -> BRILLIANT_COACHING
                         is ExtraTeamTrainingReroll -> EXTRA_TRAINING

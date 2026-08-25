@@ -141,7 +141,7 @@ data class MultipleBlockDiceRoll(
  * it exposes an API that makes it possible to access rolls using list
  * indexes.
  */
-data class BB2020MultipleBlockContext(
+data class MultipleBlockContext2020(
     val attacker: Player,
     val defender1: Player? = null,
     val defender2: Player? = null,
@@ -194,7 +194,7 @@ data class BB2020MultipleBlockContext(
         }
     }
 
-    fun copyAndUpdateHasAcceptedResult(index: Int, hasAcceptedResult: Boolean): BB2020MultipleBlockContext {
+    fun copyAndUpdateHasAcceptedResult(index: Int, hasAcceptedResult: Boolean): MultipleBlockContext2020 {
         return when (index) {
             0 -> copy(roll1 = roll1!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
             1 -> copy(roll2 = roll2!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
@@ -304,8 +304,8 @@ data class BB2020MultipleBlockContext(
     fun addInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): Command {
         return when (player) {
             attacker -> AddContextListItem(attackerInjuryContext, injuryContext)
-            defender1 -> SetContextProperty(BB2020MultipleBlockContext::defender1InjuryContext, this, injuryContext)
-            defender2 -> SetContextProperty(BB2020MultipleBlockContext::defender2InjuryContext, this, injuryContext)
+            defender1 -> SetContextProperty(MultipleBlockContext2020::defender1InjuryContext, this, injuryContext)
+            defender2 -> SetContextProperty(MultipleBlockContext2020::defender2InjuryContext, this, injuryContext)
             else -> throw IllegalArgumentException("Invalid player: $player")
         }
     }
@@ -314,7 +314,7 @@ data class BB2020MultipleBlockContext(
      * Sets the block type for the current active defender.
      * This also c
      */
-    fun copyAndSetBlockTypeForActiveDefender(type: BlockType): BB2020MultipleBlockContext {
+    fun copyAndSetBlockTypeForActiveDefender(type: BlockType): MultipleBlockContext2020 {
         val defender = when (activeDefender) {
             0 -> defender1!!
             1 -> defender2!!

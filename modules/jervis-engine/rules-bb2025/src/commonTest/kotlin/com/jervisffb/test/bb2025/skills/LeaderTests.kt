@@ -12,7 +12,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.bb2025.BB2025Rules
+import com.jervisffb.engine.bb2025.Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.bb2025.procedures.rerolls.LeaderTeamReroll
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
@@ -65,7 +65,7 @@ import kotlin.test.assertTrue
  */
 class LeaderTests: JervisGameBB2025Test() {
 
-    override val rules: BB2025Rules = StandardBB2025Rules().update {
+    override val rules: Rules2025 = StandardBB2025Rules().update {
         hasExtraTime = true
         turnsInExtraTime = 8
     }

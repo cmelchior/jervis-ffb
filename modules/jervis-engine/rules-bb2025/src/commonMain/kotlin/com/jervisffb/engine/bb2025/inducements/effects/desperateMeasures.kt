@@ -21,7 +21,7 @@ import com.jervisffb.engine.bb2025.procedures.inducements.desperatemeasures.YouD
  */
 @Serializable
 abstract class DesperateMeasures: SpecialPlayCard {
-    override val type: SpecialPlayCardCategory = BB2025SpecialPlayCardCategory.DESPERATE_MEASURES
+    override val type: SpecialPlayCardCategory = SpecialPlayCardCategory2025.DESPERATE_MEASURES
     // Desperate Measure "cards" are removed as soon as they are used.
     // Their effects will outlive the card itself.
     override val duration: Duration = Duration.IMMEDIATE

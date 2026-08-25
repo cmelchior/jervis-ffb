@@ -14,7 +14,7 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
-import com.jervisffb.engine.bb2020.procedures.rerolls.BB2020StandardTeamReroll
+import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -268,7 +268,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             PlayerSelected("A13".playerId),
             PitchSquareSelected(11, 4), // Quick Pass - No modifiers
             4.d6,
-            TeamRerollSelected<BB2020StandardTeamReroll>(),
+            TeamRerollSelected<StandardTeamReroll2020>(),
             *loner(4.d6),
             5.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter
@@ -288,7 +288,7 @@ class ThrowTeamMateActionTests: JervisGameBB2020Test() {
             PlayerSelected("A13".playerId),
             PitchSquareSelected(8, 4), // -1 Short Pass
             2.d6,
-            TeamRerollSelected<BB2020StandardTeamReroll>(),
+            TeamRerollSelected<StandardTeamReroll2020>(),
             *loner(4.d6),
             3.d6,
             DiceRollResults(4.d8, 4.d8, 4.d8), // Always scatter

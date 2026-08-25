@@ -1,7 +1,7 @@
 package com.jervisffb.engine.bb2020.tables
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.common.tables.CommonKickOffEventResult
+import com.jervisffb.engine.common.tables.KickOffEventResultCommon
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.rules.common.tables.KickOffTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -15,17 +15,17 @@ object BB7KickOffEventTable: KickOffTable {
     override val name: String = "BB7 Kick-Off Table"
     override val entries: Map<Int, KickOffEvent> =
         mapOf(
-            2 to CommonKickOffEventResult.GET_THE_REF,
-            3 to CommonKickOffEventResult.TIME_OUT,
-            4 to CommonKickOffEventResult.SOLID_DEFENSE,
-            5 to CommonKickOffEventResult.HIGH_KICK,
-            6 to BB2020KickOffEventResult.CHEERING_FANS,
-            7 to CommonKickOffEventResult.BRILLIANT_COACHING,
-            8 to CommonKickOffEventResult.CHANGING_WEATHER,
-            9 to CommonKickOffEventResult.QUICK_SNAP,
-            10 to BB2020KickOffEventResult.BLITZ,
-            11 to CommonKickOffEventResult.OFFICIOUS_REF,
-            12 to CommonKickOffEventResult.PITCH_INVASION,
+            2 to KickOffEventResultCommon.GET_THE_REF,
+            3 to KickOffEventResultCommon.TIME_OUT,
+            4 to KickOffEventResultCommon.SOLID_DEFENSE,
+            5 to KickOffEventResultCommon.HIGH_KICK,
+            6 to KickOffEventResult2020.CHEERING_FANS,
+            7 to KickOffEventResultCommon.BRILLIANT_COACHING,
+            8 to KickOffEventResultCommon.CHANGING_WEATHER,
+            9 to KickOffEventResultCommon.QUICK_SNAP,
+            10 to KickOffEventResult2020.BLITZ,
+            11 to KickOffEventResultCommon.OFFICIOUS_REF,
+            12 to KickOffEventResultCommon.PITCH_INVASION,
         )
 
     override fun roll(

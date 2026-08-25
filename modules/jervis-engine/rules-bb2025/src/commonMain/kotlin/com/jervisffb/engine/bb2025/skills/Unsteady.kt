@@ -16,7 +16,7 @@ class Unsteady(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val expiresAt: Duration = Duration.PERMANENT,
-) : BB2025Skill {
+) : Skill2025 {
     override val type: SkillType = SkillType.UNSTEADY
     override val value: Unit? = null
     override val skillId: SkillId = type.id()

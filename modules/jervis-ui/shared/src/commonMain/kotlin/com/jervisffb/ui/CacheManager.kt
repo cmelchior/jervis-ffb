@@ -9,10 +9,10 @@ import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.engine.serialization.JervisSetupFile
 import com.jervisffb.engine.serialization.JervisTeamFile
 import com.jervisffb.resources.DefaultSetups
-import com.jervisffb.resources.bb2020.BB2020StandaloneBB7Teams
-import com.jervisffb.resources.bb2020.BB2020StandaloneStandardTeams
-import com.jervisffb.resources.bb2025.BB2025StandaloneBB7Teams
-import com.jervisffb.resources.bb2025.BB2025StandaloneStandardTeams
+import com.jervisffb.resources.bb2020.StandaloneBB7Teams2020
+import com.jervisffb.resources.bb2020.StandaloneStandardTeams2020
+import com.jervisffb.resources.bb2025.StandaloneBB7Teams2025
+import com.jervisffb.resources.bb2025.StandaloneStandardTeams2025
 import com.jervisffb.utils.FileManager
 import io.ktor.http.Url
 import kotlinx.serialization.json.Json
@@ -36,11 +36,11 @@ object CacheManager {
     }
 
     suspend fun createInitialTeamFiles() {
-        (BB2020StandaloneStandardTeams.defaultTeams + BB2020StandaloneBB7Teams.defaultTeams).forEach { (fileName, roster) ->
+        (StandaloneStandardTeams2020.defaultTeams + StandaloneBB7Teams2020.defaultTeams).forEach { (fileName, roster) ->
             val json = jsonSerializer.encodeToString(roster).encodeToByteArray()
             FILE_MANAGER.writeFile(teamsCacheRoot, fileName, json)
         }
-        (BB2025StandaloneStandardTeams.defaultTeams + BB2025StandaloneBB7Teams.defaultTeams).forEach { (fileName, roster) ->
+        (StandaloneStandardTeams2025.defaultTeams + StandaloneBB7Teams2025.defaultTeams).forEach { (fileName, roster) ->
             val json = jsonSerializer.encodeToString(roster).encodeToByteArray()
             FILE_MANAGER.writeFile(teamsCacheRoot, fileName, json)
         }
