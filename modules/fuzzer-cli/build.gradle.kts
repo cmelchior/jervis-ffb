@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.clikt)
     implementation(libs.coroutines)
     implementation(libs.kermit)
+    testImplementation(kotlin("test"))
 }
 
 application {
