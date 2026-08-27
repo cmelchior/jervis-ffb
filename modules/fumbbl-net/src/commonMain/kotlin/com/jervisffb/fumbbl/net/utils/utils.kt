@@ -77,6 +77,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
                 when (it) {
                     SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
                     SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
+                    SpecialRule.BRAWLIN_BRUTES -> TeamSpecialRule.BRAWLIN_BRUTES
                     SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
                     SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
                     SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
@@ -161,20 +162,26 @@ private fun extractField(field: FumbblField): Pitch {
 private fun mapFumbblPositionName(positionName: String): String = when (positionName) {
     "Anointed Blitzer" -> "Tomb Kings Blitzer"
     "Anointed Thrower" -> "Tomb Kings Thrower"
+    "Bloodborn Marauder" -> "Bloodborn Marauder Lineman"
     "Chaos Dwarf Flamesmith" -> "Flamesmith"
     "Dwarf Blocker Lineman" -> "Dwarf Lineman"
+    "Eagle Warrior" -> "Eagle Warrior Linewoman"
     "Elf Blitzer" -> "Blitzer"
     "Elf Catcher" -> "Catcher"
     "Elf Lineman" -> "Lineman"
     "Elf Thrower" -> "Thrower"
+    "High Elf Lineman" -> "Lineman"
     "Hobgoblin Sneaky Stabba" -> "Sneaky Stabba"
     "Human Blitzer" -> "Blitzer"
     "Human Catcher" -> "Catcher"
     "Human Thrower" -> "Thrower"
     "Minotaur" -> "Enslaved Minotaur"
+    "Piranha Warrior" -> "Piranha Warrior Blitzer"
+    "Python Warrior" -> "Python Warrior Thrower"
     "Skaven Clanrat" -> "Skaven Clanrat Lineman"
     "Skaven Thrower" -> "Thrower"
     "Skink Lineman" -> "Skink Runner Lineman"
+    "Troll" -> "Untrained Troll"
     else -> positionName
 }
 
