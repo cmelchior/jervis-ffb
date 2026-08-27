@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.common.tables
 
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
 
 /**
@@ -8,5 +9,5 @@ import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
  */
 interface DesperateMeasuresEvent {
     val label: String
-    val createCard: () -> SpecialPlayCard
+    val createCard: (Team) -> SpecialPlayCard
 }

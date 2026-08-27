@@ -13,7 +13,6 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -26,6 +25,7 @@ import com.jervisffb.test.followUp
 import com.jervisffb.test.standardBlock
 import com.jervisffb.test.useApothecary
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertKnockedOut
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStanding
@@ -101,7 +101,7 @@ class PileDriverTests: JervisGameBB2025Test() {
             Cancel, // Do not argue the call
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerDogoutState.BANNED, attacker.state)
+        attacker.assertBanned()
         defender.assertProne()
     }
 

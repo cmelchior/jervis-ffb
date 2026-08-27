@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.inducements.Timing
  */
 interface Wizard {
     val id: WizardId
+    val type: WizardType
     val name: String
     val used: Boolean
         get() = spells.firstOrNull { it.used } != null

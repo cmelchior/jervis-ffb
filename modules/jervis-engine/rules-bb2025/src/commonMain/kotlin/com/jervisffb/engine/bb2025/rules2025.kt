@@ -13,6 +13,7 @@ import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.BoneHeadRoll
 import com.jervisffb.engine.bb2025.procedures.GameDrive
 import com.jervisffb.engine.bb2025.procedures.ReallyStupidRoll
+import com.jervisffb.engine.bb2025.procedures.SetupTeam
 import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
 import com.jervisffb.engine.bb2025.procedures.TheKickOffEvent2025
 import com.jervisffb.engine.bb2025.procedures.UnchannelledFuryRoll
@@ -127,6 +128,35 @@ import com.jervisffb.engine.bb2025.procedures.inducements.ApplyInducements as BB
 abstract class Rules2025(
     val parameters: RulesParametersHolder
 ) : AbstractRules(parameters) {
+
+    override fun isPlayerAvailableForSetup(player: Player): Boolean {
+        return player.statusEffects.none {
+            when (val type = it.type) {
+                is PlayerStatusEffectTypeCommon -> {
+                    when (type) {
+                        PlayerStatusEffectTypeCommon.BANNED -> true
+                        PlayerStatusEffectTypeCommon.FAINTED -> true
+                        PlayerStatusEffectTypeCommon.ROOTED -> false
+                        PlayerStatusEffectTypeCommon.BLOOD_LUST -> false
+                        PlayerStatusEffectTypeCommon.HYPNOTIC_GAZE -> false
+                    }
+                }
+                is PlayerStatusEffectType2025 -> {
+                    when (type) {
+                        PlayerStatusEffectType2025.DISTRACTED -> false
+                        PlayerStatusEffectType2025.CHOMPED -> false
+                        PlayerStatusEffectType2025.EYE_GOUGE -> false
+                        PlayerStatusEffectType2025.DODGY_SNACK -> true
+                        PlayerStatusEffectType2025.HANGOVER -> true
+                        PlayerStatusEffectType2025.DOPED -> true
+                        PlayerStatusEffectType2025.GRUDGE_MATCH -> false
+                        PlayerStatusEffectType2025.SET_PIECE -> false
+                    }
+                }
+                else -> INVALID_GAME_STATE("Unsupported type: $type")
+            }
+        }
+    }
 
     override fun isDistracted(player: Player): Boolean {
         // In BB2025, Distracted is modeled as a condition on a player.
@@ -390,6 +420,7 @@ abstract class Rules2025(
     @Transient override val passStep: Procedure = BB2025PassStep
     @Transient override val throwPlayerStep: Procedure = BB2025ThrowPlayerStep
     @Transient override val applyInducementsStep: Procedure = BB2025ApplyInducements
+    @Transient override val setupTeam: Procedure = SetupTeam
     @Transient override val chainsawFoulStep: Procedure = ChainsawFoulStep
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll
     @Transient override val rushRoll: Procedure = RushRoll

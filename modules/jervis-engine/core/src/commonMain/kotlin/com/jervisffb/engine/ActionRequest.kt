@@ -37,6 +37,7 @@ import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.InducementEffectSelected
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -57,6 +58,7 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectForgoActivation
+import com.jervisffb.engine.actions.SelectInducementEffect
 import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
@@ -183,6 +185,11 @@ data class ActionRequest(
             }
             is ForegoActivationSelected -> {
                 actions.any { it is SelectForgoActivation && it.players.contains(action.player) }
+            }
+            is InducementEffectSelected -> {
+                actions.singleInstanceOfOrNull<SelectInducementEffect>()?.options.orEmpty()
+                    .map { it.id }
+                    .contains(action.effect)
             }
             is InducementsSelected -> {
                 if (actions.none { it is SelectInducements }) {

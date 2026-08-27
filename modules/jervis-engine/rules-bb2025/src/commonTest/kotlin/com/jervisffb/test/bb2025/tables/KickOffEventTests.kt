@@ -49,6 +49,7 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertCoordinates
+import com.jervisffb.test.utils.assertReserves
 import com.jervisffb.test.utils.assertStunned
 import kotlin.collections.orEmpty
 import kotlin.test.Test
@@ -817,7 +818,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.location.isOnPitch(rules))
-        assertTrue(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
+        assertFalse(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
         assertTrue(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
         assertTrue(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
     }
@@ -839,7 +840,8 @@ class KickOffEventTests: JervisGameBB2025Test() {
         )
         val player = state.getPlayerById("A1".playerId)
         assertFalse(player.location.isOnPitch(rules))
-        assertEquals(PlayerDogoutState.DODGY_SNACK, player.state)
+        player.assertReserves()
+        assertTrue(player.hasStatusEffect(PlayerStatusEffectType.DODGY_SNACK))
         assertFalse(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
         assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
     }
@@ -863,7 +865,9 @@ class KickOffEventTests: JervisGameBB2025Test() {
         val player = state.getPlayerById("A1".playerId)
         assertFalse(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
         assertFalse(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
-        assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })    }
+        assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
+        player.assertReserves()
+    }
 
     @Test
     fun dodgySnack_bothTeams() {

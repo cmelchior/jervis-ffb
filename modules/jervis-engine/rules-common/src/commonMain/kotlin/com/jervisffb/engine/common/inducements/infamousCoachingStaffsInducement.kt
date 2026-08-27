@@ -1,6 +1,6 @@
 package com.jervisffb.engine.common.inducements
 
-import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
+import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
 import com.jervisffb.engine.rules.common.roster.SpecialRules
@@ -38,7 +38,7 @@ data class InfamousCoachingStaffsInducementGroup(
  */
 @Serializable
 data class InfamousCoachingStaffInducement(
-    val staff: InfamousCoachingStaff,
+    val staff: InfamousCoachingStaffType,
     override val max: Int,
     override val defaultPrice: Int,
     val named: Boolean, // Is "named" in the context of the rules, i.e. has special restrictions in League Play
@@ -48,12 +48,12 @@ data class InfamousCoachingStaffInducement(
     override val teamNameModifier: List<Pair<String, Float>> = emptyList(),
 ): SingleInducement<InfamousCoachingStaffInducement.Builder> {
     override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
-    override val name: String = staff.name
+    override val name: String = staff.label
 
     override fun toBuilder() = Builder(this)
 
     class Builder(inducement: InfamousCoachingStaffInducement): SingleInducementBuilderCommon {
-        val staff: InfamousCoachingStaff = inducement.staff
+        val staff: InfamousCoachingStaffType = inducement.staff
         override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
         override val name: String = inducement.name
         override var max: Int = inducement.max

@@ -7,7 +7,6 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.skills.SneakyGit
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -15,6 +14,7 @@ import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -67,7 +67,7 @@ class SneakyGitTests: JervisGameBB2025Test() {
             Cancel // Do not argue the call
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerDogoutState.BANNED, fouler.state)
+        fouler.assertBanned()
         assertEquals(homeTeam, state.activeTeam)
     }
 
@@ -87,7 +87,7 @@ class SneakyGitTests: JervisGameBB2025Test() {
             Cancel // Do not argue the call
         )
         assertNull(state.activePlayer)
-        assertEquals(PlayerDogoutState.BANNED, fouler.state)
+        fouler.assertBanned()
         assertEquals(homeTeam, state.activeTeam)
     }
 

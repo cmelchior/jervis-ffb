@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.actions.SelectInducementEffect
 import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.CheeringFans2020
@@ -25,7 +26,6 @@ import com.jervisffb.engine.common.procedures.DetermineKickingTeamStep
 import com.jervisffb.engine.common.procedures.FanFactorRolls
 import com.jervisffb.engine.common.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.common.procedures.ScatterRoll
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.common.procedures.WeatherRoll
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
@@ -39,6 +39,7 @@ import com.jervisffb.engine.common.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.common.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.common.procedures.tables.prayers.IntensiveTraining
 import com.jervisffb.engine.common.procedures.tables.weather.SwelteringHeat
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
@@ -50,8 +51,10 @@ import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.LocalPitchDataWrapper
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
 import com.jervisffb.engine.bb2020.procedures.actions.foul.BeingSentOff as BeingSentOffBB2020
 import com.jervisffb.engine.bb2020.procedures.table.injury.PatchUpPlayer as PatchUpPlayerBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 import com.jervisffb.engine.bb2025.procedures.actions.foul.BeingSentOff as BeingSentOffBB2025
 import com.jervisffb.engine.bb2025.procedures.injury.PatchUpPlayer as PatchUpPlayerBB2025
 
@@ -73,6 +76,9 @@ object DialogFactory {
     ): UserInputDialog? {
         val rules = controller.rules
         val id = controller.nextActionIndex()
+
+        createInducementEffectDialog(request, controller.state)?.let { return it }
+
         val userInput: UserInputDialog? =
             when (val currentNode = controller.state.stack.currentNode()) {
 
@@ -234,7 +240,8 @@ object DialogFactory {
                     SingleChoiceInputDialog.createTouchdownScoredDialog(id, controller.state.getContext<ScoringATouchDownContext>().player)
                 }
 
-                is SetupTeam.InformOfInvalidSetup -> {
+                is SetupTeamBB2020.InformOfInvalidSetup,
+                is SetupTeamBB2025.InformOfInvalidSetup -> {
                     SingleChoiceInputDialog.createInvalidSetupDialog(id, controller.state.getContext<SetupTeamContext>().team)
                 }
 
@@ -269,4 +276,17 @@ object DialogFactory {
             }
         }
     }
+}
+
+internal fun createInducementEffectDialog(
+    request: ActionRequest,
+    state: Game,
+): SingleChoiceInputDialog? {
+    val descriptor = request.getOrNull<SelectInducementEffect>() ?: return null
+    return SingleChoiceInputDialog.createSelectInducementEffectDialog(
+        actionId = request.id,
+        state = state,
+        actions = descriptor.createAll() + Cancel,
+        owner = request.team ?: error("SelectInducementEffect requires an action owner"),
+    )
 }

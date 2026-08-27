@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -14,9 +15,19 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.view.JervisTheme
 
 @Composable
-fun SmallHeader(title: String, topPadding: Dp = 0.dp, bottomPadding: Dp = 0.dp) {
+fun SmallHeader(
+    title: String,
+    topPadding: Dp = 0.dp,
+    bottomPadding: Dp = 0.dp,
+    backgroundColor: Color = JervisTheme.rulebookRed
+) {
     Text(
-        modifier = Modifier.fillMaxWidth().padding(bottom = bottomPadding, top = topPadding).background(JervisTheme.rulebookRed).padding(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = bottomPadding, top = topPadding)
+            .background(backgroundColor)
+            .padding(4.dp)
+        ,
         text = title.uppercase(),
         fontSize = 14.sp,
         lineHeight = 1.0.em,

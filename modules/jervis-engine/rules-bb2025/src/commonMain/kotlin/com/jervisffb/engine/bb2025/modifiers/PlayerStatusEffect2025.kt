@@ -10,6 +10,7 @@ fun PlayerStatusEffect.Companion.chomped(causedBy: Player) = OwnedPlayerStatusEf
 fun PlayerStatusEffect.Companion.distracted() = SimplePlayerStatusEffect(PlayerStatusEffectType2025.DISTRACTED, Duration.START_OF_ACTIVATION)
 fun PlayerStatusEffect.Companion.dodgySnack() = SimplePlayerStatusEffect(PlayerStatusEffectType2025.DODGY_SNACK, Duration.END_OF_DRIVE)
 fun PlayerStatusEffect.Companion.eyeGouge() = SimplePlayerStatusEffect(PlayerStatusEffectType2025.EYE_GOUGE, Duration.START_OF_ACTIVATION)
+fun PlayerStatusEffect.Companion.hangover(duration: Duration) = SimplePlayerStatusEffect(PlayerStatusEffectType2025.HANGOVER, duration)
 
 fun Player.isChomped(): Boolean = statusEffects.any { it.type == PlayerStatusEffectType2025.CHOMPED }
 fun Player.isEyeGouged(): Boolean = statusEffects.any { it.type == PlayerStatusEffectType2025.EYE_GOUGE }

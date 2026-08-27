@@ -1,8 +1,8 @@
 package com.jervisffb.engine.bb2025
 
 import com.jervisffb.engine.bb2025.inducements.InducementType2025
-import com.jervisffb.engine.bb2025.inducements.biasedreferee.DodgyLeagueRep
-import com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard
+import com.jervisffb.engine.bb2025.inducements.biasedreferee.BiasedRefereeType2025
+import com.jervisffb.engine.bb2025.inducements.wizards.WizardType2025
 import com.jervisffb.engine.common.inducements.BiasedRefereeInducement
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
 import com.jervisffb.engine.common.inducements.InducementTypeCommon
@@ -30,7 +30,7 @@ val DEFAULT_INDUCEMENTS_BB2025: Map<InducementType, Inducement<*>> = buildMap {
                 enabled = true,
                 items = listOf(
                     BiasedRefereeInducement(
-                        referee = DodgyLeagueRep(),
+                        referee = BiasedRefereeType2025.DODGY_LEAGUE_REP,
                         max = 1,
                         defaultPrice = 120_000,
                         named = false,
@@ -62,7 +62,7 @@ val DEFAULT_INDUCEMENTS_BB2025: Map<InducementType, Inducement<*>> = buildMap {
                 enabled = true,
                 items = listOf(
                     WizardInducement(
-                        wizard = SportsWizard(),
+                        wizard = WizardType2025.SPORTS_WIZARD,
                         max = 1,
                         defaultPrice = 150_000,
                         named = false,

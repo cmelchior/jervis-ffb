@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectRandomPlayers
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -20,6 +21,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
 import com.jervisffb.engine.common.context.OfficiousRefContext
+import com.jervisffb.engine.common.modifiers.banned
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
 import com.jervisffb.engine.common.reports.ReportGameProgress
@@ -35,6 +37,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
@@ -259,8 +262,9 @@ object OfficiousRef : Procedure(), ChanceObservationHandler {
     private fun createPlayerChangeCommands(player: Player, d6: D6Result): Command {
         return when (d6.value) {
             1 -> compositeCommandOf(
-                SetPlayerState(player, PlayerDogoutState.BANNED),
                 SetPlayerLocation(player, Dogout),
+                SetPlayerState(player, PlayerDogoutState.RESERVE),
+                AddPlayerStatusEffect(player, PlayerStatusEffect.banned()),
                 ReportGameProgress("${player.name} angered the Ref and was Sent-off")
             )
             else -> compositeCommandOf(

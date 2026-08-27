@@ -1,8 +1,8 @@
 package com.jervisffb.fumbbl.net.adapter.impl.setup
 
 import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -10,6 +10,8 @@ import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.ModelChangeId
 import com.jervisffb.fumbbl.net.model.TurnMode
 import com.jervisffb.fumbbl.net.utils.FumbblGame
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 object EndReceivingTeamSetupMapper: CommandActionMapper {
     override fun isApplicable(
@@ -32,7 +34,10 @@ object EndReceivingTeamSetupMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        newActions.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
+        val setupNode = when (jervisGame.rules.baseVersion) {
+            GameVersion.BB2020 -> SetupTeamBB2020.SelectPlayerOrEndSetup
+            GameVersion.BB2025 -> SetupTeamBB2025.SelectPlayerOrEndSetup
+        }
+        newActions.add(EndSetup, setupNode)
     }
 }
-

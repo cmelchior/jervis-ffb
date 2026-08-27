@@ -51,6 +51,7 @@ import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertStanding
 import com.jervisffb.test.utils.hasSkill
 import com.jervisffb.test.utils.putProne
@@ -694,7 +695,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
             Cancel, // Do not argue the call
         )
 
-        assertEquals(PlayerDogoutState.BANNED, homeTeam["H1".playerId].state)
+        homeTeam["H1".playerId].assertBanned()
         assertTrue(homeTeam.hasFeature(TeamFeatureType.UNDER_SCRUTINY))
     }
 

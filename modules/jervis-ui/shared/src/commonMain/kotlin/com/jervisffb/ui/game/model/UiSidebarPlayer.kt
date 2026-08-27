@@ -16,4 +16,5 @@ data class UiSidebarPlayer(
     val isActive get() = player.isActive
     val isGoingDown get() = player.isGoingDown
     val hasActivated get() = player.hasActivated
+    val statusEffects get() = player.statusEffects
 }

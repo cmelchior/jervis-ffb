@@ -259,14 +259,14 @@ object DodgySnack : Procedure(), ChanceObservationHandler {
     private fun createPlayerChangeCommands(player: Player, d6: D6Result): Command {
         return when (d6.value) {
             1 -> compositeCommandOf(
-                SetPlayerState(player, PlayerDogoutState.DODGY_SNACK),
                 SetPlayerLocation(player, Dogout),
+                SetPlayerState(player, PlayerDogoutState.RESERVE),
+                AddPlayerStatusEffect(player, PlayerStatusEffect.dodgySnack()),
                 ReportGameProgress("${player.name} ate a bad snack and spends the drive on the lavatory")
             )
             else -> compositeCommandOf(
                 AddPlayerStatModifier(player, KickoffStatModifier.DODGY_SNACK_MA),
                 AddPlayerStatModifier(player, KickoffStatModifier.DODGY_SNACK_AV),
-                AddPlayerStatusEffect(player, PlayerStatusEffect.dodgySnack()),
                 ReportGameProgress("${player.name} ate a bad snack and does not feel well (-1 MA/AV)"),
             )
         }

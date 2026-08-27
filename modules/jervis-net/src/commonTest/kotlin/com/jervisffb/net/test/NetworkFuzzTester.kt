@@ -10,7 +10,6 @@ import com.jervisffb.engine.bb2020.BB7Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.SetupTeamContext
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
@@ -54,6 +53,8 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.seconds
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 /**
  * This class can be used to fuzz-test a P2P game. It is mostly relevant for
@@ -287,7 +288,10 @@ class NetworkFuzzTester {
     private fun getSetupAction(controller: GameEngineController): GameAction?  {
         val state = controller.state
         val stack = controller.state.stack
-        return if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        return if (!stack.isEmpty()
+            && (stack.currentNode() == SetupTeamBB2020.SelectPlayerOrEndSetup
+                || stack.currentNode() == SetupTeamBB2025.SelectPlayerOrEndSetup)
+        ) {
             val context = state.getContext<SetupTeamContext>()
             val compositeActions = mutableListOf<GameAction>()
             if (context.team.isHomeTeam()) {

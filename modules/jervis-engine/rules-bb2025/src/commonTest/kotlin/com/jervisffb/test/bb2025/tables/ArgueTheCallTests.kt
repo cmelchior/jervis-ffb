@@ -7,9 +7,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.bb2025.procedures.rerolls.BrilliantCoachingReroll
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
-import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
@@ -18,6 +16,7 @@ import com.jervisffb.test.defaultKickOffAwayTeam
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStanding
 import kotlin.test.BeforeTest
@@ -60,11 +59,12 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
 
     @Test
     fun iDontCare() {
+        val fouler = awayTeam["A6".playerId]
         homeTeam["H1".playerId].state = PlayerPitchState.PRONE
         assertEquals(1, awayTeam.turnData.foulActions)
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
-            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
@@ -72,8 +72,7 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
             3.d6 // Roll "I Don't Care"
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerDogoutState.BANNED, awayTeam["A6".playerId].state)
-        assertEquals(Dogout, awayTeam["A6".playerId].location)
+        fouler.assertBanned()
         assertFalse(awayTeam.coachBanned)
     }
 
@@ -123,8 +122,7 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
             DiceRollResults(2.d6, 2.d6), // Caught again by the ref. Is sent off without being offered the chance to argue
         )
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerDogoutState.BANNED, awayTeam["A1".playerId].state)
-        assertEquals(Dogout, awayTeam["A1".playerId].location)
+        awayTeam["A1".playerId].assertBanned()
     }
 
     // In BB2020, a banned coach caused a -1 on Brilliant Coaching, in BB2025
@@ -151,8 +149,8 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
             *skipTurns(15),
         )
         // Unban players (to avoid breaking setup)
-        awayTeam["A1".playerId].state = PlayerDogoutState.RESERVE
-        awayTeam["A6".playerId].state = PlayerDogoutState.RESERVE
+        awayTeam["A1".playerId].statusEffects.clear()
+        awayTeam["A6".playerId].statusEffects.clear()
         controller.rollForward(
             *defaultSetup(homeFirst = false),
         )

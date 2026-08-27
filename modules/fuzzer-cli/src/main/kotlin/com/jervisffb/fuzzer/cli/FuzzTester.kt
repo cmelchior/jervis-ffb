@@ -11,7 +11,6 @@ import com.jervisffb.engine.bb2020.StandardBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.SetupTeamContext
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Game
@@ -47,6 +46,8 @@ import kotlin.collections.forEach
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.time.Clock
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 fun runFuzzTest(
     games: Int,
@@ -155,7 +156,10 @@ fun runBB2020BB7(gameNo: Int, seed: Long, enableStatistics: Boolean) {
 private fun getSetupAction(controller: GameEngineController): GameAction? {
     val state = controller.state
     val stack = controller.state.stack
-    return if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+    return if (!stack.isEmpty()
+        && (stack.currentNode() == SetupTeamBB2020.SelectPlayerOrEndSetup
+            || stack.currentNode() == SetupTeamBB2025.SelectPlayerOrEndSetup)
+    ) {
         val context = state.getContext<SetupTeamContext>()
         val compositeActions = mutableListOf<GameAction>()
         if (context.team.isHomeTeam()) {

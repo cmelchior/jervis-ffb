@@ -3,6 +3,7 @@ package com.jervisffb.engine.bb2025.skills
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.commands.RemoveTeamReroll
 import com.jervisffb.engine.common.commands.SetTeamRerollEnabled
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
@@ -81,23 +82,21 @@ class Leader(
                 .all { player ->
                     val isInDogout = (player.location == Dogout)
                     val removedState = when (player.state) {
-                        PlayerDogoutState.RESERVE,
-                        PlayerDogoutState.KNOCKED_OUT,
                         PlayerDogoutState.DEAD,
-                        PlayerDogoutState.FAINTED,
-                        PlayerDogoutState.DODGY_SNACK,
-                        PlayerPitchState.STANDING,
+                        PlayerDogoutState.KNOCKED_OUT,
+                        PlayerDogoutState.RESERVE,
                         PlayerPitchState.PRONE,
+                        PlayerPitchState.STANDING,
                         PlayerPitchState.STUNNED,
                         PlayerPitchState.STUNNED_OWN_TURN -> false
 
                         PlayerDogoutState.BADLY_HURT,
                         PlayerDogoutState.LASTING_INJURY,
                         PlayerDogoutState.SERIOUSLY_HURT,
-                        PlayerDogoutState.SERIOUS_INJURY,
-                        PlayerDogoutState.BANNED -> true
+                        PlayerDogoutState.SERIOUS_INJURY -> true
                     }
-                    isInDogout && removedState
+                    val isBanned = player.statusEffects.any { it.type == PlayerStatusEffectTypeCommon.BANNED }
+                    isInDogout && (removedState || isBanned)
                 }
             return when {
                 leaderOnPitch -> null

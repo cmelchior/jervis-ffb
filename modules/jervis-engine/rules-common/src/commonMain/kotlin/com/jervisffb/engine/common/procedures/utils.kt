@@ -196,6 +196,7 @@ private fun gatherResetPlayerTemporaryModifiersCommands(
     val removableTemporaryEffects = player.statusEffects
         .filter { it.duration == duration }
         .map { RemovePlayerStatusEffect(player, it) }
+
     builder.addAll(removableTemporaryEffects)
 }
 

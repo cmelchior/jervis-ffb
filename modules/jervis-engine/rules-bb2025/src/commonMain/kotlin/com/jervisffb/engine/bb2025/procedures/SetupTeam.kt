@@ -1,4 +1,4 @@
-package com.jervisffb.engine.common.procedures
+package com.jervisffb.engine.bb2025.procedures
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
@@ -70,7 +70,7 @@ object SetupTeam : Procedure() {
                 context.team.filter {
                     val inReserve = (it.location == Dogout && it.state == PlayerDogoutState.RESERVE)
                     val onPitch = (it.location is PitchCoordinate && it.state == PlayerPitchState.STANDING)
-                    inReserve || onPitch
+                    rules.isPlayerAvailableForSetup(it) && (inReserve || onPitch)
                 }.let { players ->
                     if (players.isNotEmpty()) {
                         SelectPlayer.fromPlayers(players)

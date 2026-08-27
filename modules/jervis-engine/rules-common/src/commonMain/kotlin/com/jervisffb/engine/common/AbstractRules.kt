@@ -70,7 +70,11 @@ abstract class AbstractRules(
 
     override fun isSetupValid(state: Game, team: Team): List<SetupRule> {
         val isHomeTeam = team.isHomeTeam()
-        val inReserve: List<Player> = team.filter { it.state == PlayerDogoutState.RESERVE && !it.location.isOnPitch(this) }
+        val inReserve: List<Player> = team.filter {
+            it.state == PlayerDogoutState.RESERVE
+                && !it.location.isOnPitch(this)
+                && isPlayerAvailableForSetup(it)
+        }
         val onField: List<Player> = team.filter { it.state == PlayerPitchState.STANDING && it.location.isOnPitch(this) }
         val totalAvailablePlayers: Int = inReserve.size + onField.size
 
@@ -256,22 +260,17 @@ abstract class AbstractRules(
 
     override fun isInjuried(player: Player): Boolean {
         return when (player.state) {
-            PlayerDogoutState.BANNED,
-            PlayerDogoutState.DODGY_SNACK,
-            PlayerDogoutState.FAINTED,
-            PlayerPitchState.PRONE,
             PlayerDogoutState.RESERVE,
+            PlayerPitchState.PRONE,
             PlayerPitchState.STANDING,
             PlayerPitchState.STUNNED,
-            PlayerPitchState.STUNNED_OWN_TURN,
-            -> false
+            PlayerPitchState.STUNNED_OWN_TURN -> false
             PlayerDogoutState.BADLY_HURT,
             PlayerDogoutState.DEAD,
             PlayerDogoutState.KNOCKED_OUT,
             PlayerDogoutState.LASTING_INJURY,
             PlayerDogoutState.SERIOUSLY_HURT,
-            PlayerDogoutState.SERIOUS_INJURY,
-            -> true
+            PlayerDogoutState.SERIOUS_INJURY -> true
         }
     }
 

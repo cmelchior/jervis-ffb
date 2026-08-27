@@ -40,6 +40,8 @@ enum class PlayerPitchState(override val label: String) : PlayerState {
  */
 @Serializable
 enum class PlayerDogoutState(override val label: String) : PlayerState {
+    // All special states, like Banned, Fainted, etc. are also put in Reserves,
+    // but can be filtered later based on their SpecialStatusEffectType
     RESERVE("Reserve"),
     KNOCKED_OUT("Knocked Out"),
     BADLY_HURT("Badly Hurt"),
@@ -47,9 +49,6 @@ enum class PlayerDogoutState(override val label: String) : PlayerState {
     SERIOUSLY_HURT("Seriously Hurt"),
     SERIOUS_INJURY("Serious Injury"),
     DEAD("DEAD"),
-    FAINTED("Fainted"), // From Sweltering Heat
-    BANNED("Banned"), // From being sent off by the Ref
-    DODGY_SNACK("Dodgy Snack"), // Miss the drive from Dodgy Snack
 }
 
 

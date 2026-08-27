@@ -3,9 +3,9 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.procedures.SetupTeam
 import com.jervisffb.engine.bb2025.skills.SecretWeapon
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId

@@ -35,6 +35,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.InducementEffectSelected
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -116,6 +117,7 @@ fun ActionSelector(
                             is PlayersSelected -> "Selected Players: $action"
                             is PassTypeSelected -> action.type.toString()
                             is AdminGameAction -> error("Not supported")
+                            is InducementEffectSelected -> "Inducement: ${action.effect.value}"
                         }
                     Text(text, fontSize = 10.sp)
                 }

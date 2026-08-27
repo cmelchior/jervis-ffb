@@ -1,6 +1,7 @@
 package com.jervisffb.engine.bb2020.inducements.infamouscoach
 
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachAbility
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
@@ -11,7 +12,8 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-class JosefBugman: InfamousCoachingStaff {
+class JosefBugman(private val team: TeamId): InfamousCoachingStaff {
+    constructor(team: Team): this(team.id)
     override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.JOSEF_BUGMAN
     override val name: String = "Josef Bugman"
     override val price: Int = 100_000
@@ -24,7 +26,8 @@ class JosefBugman: InfamousCoachingStaff {
 
 // See page 15 in the Deathzone rulebook
 @Serializable
-class KariColdsteel: InfamousCoachingStaff {
+class KariColdsteel(private val team: TeamId): InfamousCoachingStaff {
+    constructor(team: Team): this(team.id)
     override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.KARI_COLDSTEEL
     override val name: String = "Kari Coldsteel"
     override val price: Int = 50_000
@@ -46,13 +49,14 @@ class KariColdsteel: InfamousCoachingStaff {
 
 // See page 16 in the Deathzone rulebook
 @Serializable
-class PapaSkullbones: InfamousCoachingStaff {
+class PapaSkullbones(private val team: TeamId): InfamousCoachingStaff {
+    constructor(team: Team): this(team.id)
     override val type: InfamousCoachingStaffType = InfamousCoachingStaffType2020.PAPA_SKULLBONES
     override val name: String = "Papa Skullbones"
     override val price: Int = 80_000
     override val specialRules = listOf(PlayerSpecialRule.IF_YOU_WANT_THE_JOB_DONE)
     override val specialAbilities: List<InfamousCoachAbility> = listOf(
-        ByThePowerOfTheGoods()
+        ByThePowerOfTheGoods(team)
     )
 
     override fun isAvailable(team: Team): Boolean {

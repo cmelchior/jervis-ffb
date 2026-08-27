@@ -8,8 +8,12 @@ import kotlinx.serialization.Serializable
 enum class PlayerStatusEffectTypeCommon(
     override val label: String
 ): PlayerStatusEffectType {
+    BANNED("Banned"),
+    FAINTED("Fainted"),
     ROOTED("Rooted"),
     BLOOD_LUST("Blood Lust"), // Player failed a Blood Lust roll
+    HYPNOTIC_GAZE("Hypnotic Gaze"), // Player is affected by Hypnotic Gaze
 }
 
 fun Player.hasBloodLust() = statusEffects.any { it.type == PlayerStatusEffectTypeCommon.BLOOD_LUST }
+fun Player.isFainted() = statusEffects.any { it.type == PlayerStatusEffectTypeCommon.FAINTED }

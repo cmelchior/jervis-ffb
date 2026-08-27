@@ -6,6 +6,7 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.ApplyInducementEffectsContext
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.fsm.ComputationNode
@@ -13,6 +14,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import kotlin.math.abs
@@ -94,7 +96,24 @@ object PreGame : Procedure() {
     object DetermineKickingTeam : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = DetermineKickingTeamStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return GotoNode(CheckForInducementEffects)
+        }
+    }
+
+    object CheckForInducementEffects: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = ApplyInducementEffectsContext(
+                phase = Timing.BEFORE_FIRST_SETUP,
+                team = null,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ApplyInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<ApplyInducementEffectsContext>(),
+                ExitProcedure()
+            )
         }
     }
 }

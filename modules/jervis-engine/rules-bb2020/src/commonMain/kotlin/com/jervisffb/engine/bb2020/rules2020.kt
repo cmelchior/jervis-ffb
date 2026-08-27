@@ -5,10 +5,12 @@ import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.bb2020.inducements.InducementType2020
+import com.jervisffb.engine.bb2020.modifiers.PlayerStatusEffectType2020
 import com.jervisffb.engine.bb2020.procedures.AnimalSavageryStep
 import com.jervisffb.engine.bb2020.procedures.BoneHeadRoll
 import com.jervisffb.engine.bb2020.procedures.GameDrive
 import com.jervisffb.engine.bb2020.procedures.ReallyStupidRoll
+import com.jervisffb.engine.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.bb2020.procedures.UnchannelledFuryRoll
 import com.jervisffb.engine.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.bb2020.procedures.actions.foul.ArgueTheCallRoll
@@ -41,6 +43,7 @@ import com.jervisffb.engine.bb2020.tables.StuntyInjuryTable2020
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.AbstractRules
 import com.jervisffb.engine.common.inducements.InducementTypeCommon
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.modifiers.isRooted
 import com.jervisffb.engine.common.planner.ActionPlannerCommon
 import com.jervisffb.engine.common.procedures.DeviateRoll
@@ -111,6 +114,30 @@ import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn as BB2020TeamTurn
 abstract class Rules2020(
     val parameters: RulesParametersHolder
 ) : AbstractRules(parameters) {
+
+    override fun isPlayerAvailableForSetup(player: Player): Boolean {
+        return player.statusEffects.none {
+            when (val type = it.type) {
+                is PlayerStatusEffectTypeCommon -> {
+                    when (type) {
+                        PlayerStatusEffectTypeCommon.BANNED -> true
+                        PlayerStatusEffectTypeCommon.FAINTED -> true
+                        PlayerStatusEffectTypeCommon.ROOTED -> false
+                        PlayerStatusEffectTypeCommon.BLOOD_LUST -> false
+                        PlayerStatusEffectTypeCommon.HYPNOTIC_GAZE -> false
+                    }
+                }
+                is PlayerStatusEffectType2020 -> {
+                    when (type) {
+                        PlayerStatusEffectType2020.BONE_HEAD -> true
+                        PlayerStatusEffectType2020.REALLY_STUPID -> true
+                        PlayerStatusEffectType2020.UNCHANNELLED_FURY -> true
+                    }
+                }
+                else -> INVALID_GAME_STATE("Unsupported type: $type")
+            }
+        }
+    }
 
     override fun isDistracted(player: Player): Boolean {
         // Distracted is not a concept in BB2020, so we always return false.
@@ -404,6 +431,7 @@ abstract class Rules2020(
     @Transient override val teamTurn: Procedure = BB2020TeamTurn
     @Transient override val passStep: Procedure = BB2020PassStep
     @Transient override val throwPlayerStep: Procedure = BB2020ThrowPlayerStep
+    @Transient override val setupTeam: Procedure = SetupTeam
 
     // Not supported in BB2020 right now, so just ignore them
     // We should probably refactor the rules, so we do not need them here.

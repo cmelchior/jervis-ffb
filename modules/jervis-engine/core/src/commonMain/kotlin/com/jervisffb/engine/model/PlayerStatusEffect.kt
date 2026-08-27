@@ -16,7 +16,7 @@ sealed interface PlayerStatusEffect {
 @Serializable
 data class SimplePlayerStatusEffect(
     override val type: PlayerStatusEffectType,
-    override val duration: Duration
+    override val duration: Duration,
 ) : PlayerStatusEffect
 
 @Serializable

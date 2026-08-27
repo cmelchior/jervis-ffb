@@ -19,6 +19,8 @@ val bb2025SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2025.inducements.effects.SetPiece::class)
         subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage::class)
         subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.wizards.Fireball::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
         polymorphic(com.jervisffb.engine.bb2025.inducements.effects.DesperateMeasures::class) {
             subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
             subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch::class)
@@ -49,9 +51,21 @@ val bb2025SerializerModule = SerializersModule {
                 subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDope::class)
             }
         }
+        polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.wizards.Fireball::class)
+            subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+        }
     }
     polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.biasedreferee.DodgyLeagueRep::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.biasedreferee.BiasedRefereeType2025::class)
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2025.inducements.biasedreferee.BiasedRefereeType2025.DODGY_LEAGUE_REP::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2025.inducements.biasedreferee.BiasedRefereeType2025.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
     }
     polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin::class)
@@ -76,11 +90,23 @@ val bb2025SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.settings.InducementType::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.InducementType2025::class)
     }
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.wizards.Fireball::class)
+        subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+    }
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard::class)
         polymorphic(com.jervisffb.engine.bb2025.inducements.wizards.Wizard2025::class) {
             subclass(com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard::class)
         }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.WizardType::class) {
+        subclass(com.jervisffb.engine.bb2025.inducements.wizards.WizardType2025::class)
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2025.inducements.wizards.WizardType2025.SPORTS_WIZARD::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.wizard.WizardType>,
+            com.jervisffb.engine.bb2025.inducements.wizards.WizardType2025.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.wizard.WizardType>
+        )
     }
     polymorphic(com.jervisffb.engine.rules.Rules::class) {
         subclass(com.jervisffb.engine.bb2025.BB7Rules2025::class)

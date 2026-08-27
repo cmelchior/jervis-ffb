@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -25,11 +26,14 @@ import com.jervisffb.engine.common.commands.SetCoachBanned
 import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.BeingSentOffContext
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
+import com.jervisffb.engine.common.modifiers.banned
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.EndOfDriveSequence
 import com.jervisffb.engine.common.procedures.actions.foul.BribeRoll
 import com.jervisffb.engine.common.reports.ReportBribeResult
 import com.jervisffb.engine.common.reports.ReportBribeUsed
+import com.jervisffb.engine.common.reports.ReportPlayerStatusEffect
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -43,6 +47,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
@@ -182,8 +187,10 @@ object BeingSentOff: Procedure() {
                             )
                         }
                         addAll(
-                            SetPlayerState(player, PlayerDogoutState.BANNED),
                             SetPlayerLocation(player, Dogout),
+                            SetPlayerState(player, PlayerDogoutState.RESERVE),
+                            AddPlayerStatusEffect(player, PlayerStatusEffect.banned()),
+                            ReportPlayerStatusEffect(player, PlayerStatusEffectTypeCommon.BANNED)
                         )
                     })
                 }

@@ -80,7 +80,7 @@ object DesperateMeasuresRoll : Procedure(), ChanceObservationHandler {
                                     rolledEvents = context.rolledEvents.add(result)
                                 )
                             ),
-                            AddSpecialPlayCard(context.team, result.createCard()),
+                            AddSpecialPlayCard(context.team, result.createCard(context.team)),
                         )
                         when (context.rollsRemaining > 1) {
                             true -> add(GotoNode(RollDie))

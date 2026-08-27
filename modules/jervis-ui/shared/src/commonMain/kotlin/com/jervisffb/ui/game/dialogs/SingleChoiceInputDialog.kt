@@ -23,6 +23,7 @@ import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.InducementEffectSelected
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -95,6 +96,7 @@ data class SingleChoiceInputDialog(
                 is PlayersSelected -> "Select Players: $action"
                 is PassTypeSelected -> action.type.name
                 is AdminGameAction -> error("Not supported")
+                is InducementEffectSelected -> action.getEffect(state).name
             }
         }
 
@@ -196,6 +198,22 @@ data class SingleChoiceInputDialog(
                 owner = team,
                 width = DialogSize.SMALL,
                 movable = false
+            )
+
+        fun createSelectInducementEffectDialog(
+            actionId: GameActionId,
+            state: Game,
+            actions: List<GameAction>,
+            owner: Team,
+        ): SingleChoiceInputDialog =
+            create(
+                title = "Select Inducement to Use",
+                message = "",
+                actions = actions,
+                actionId = actionId,
+                state = state,
+                owner = owner,
+                movable = true,
             )
 
         fun createInvalidSetupDialog(actionId: GameActionId, team: Team): SingleChoiceInputDialog =

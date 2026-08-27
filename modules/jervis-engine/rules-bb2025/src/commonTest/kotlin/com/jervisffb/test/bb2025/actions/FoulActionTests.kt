@@ -12,9 +12,7 @@ import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
-import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.utils.singleInstanceOf
@@ -24,6 +22,7 @@ import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertProne
 import com.jervisffb.test.utils.assertStunned
 import com.jervisffb.test.utils.putProne
@@ -160,11 +159,12 @@ class FoulActionTests: JervisGameBB2025Test() {
 
     @Test
     fun sentOffDoubleArmourRoll() {
+        val fouler = awayTeam["A6".playerId]
         homeTeam["H1".playerId].putProne()
         assertEquals(1, awayTeam.turnData.foulActions)
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
-            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
@@ -172,17 +172,17 @@ class FoulActionTests: JervisGameBB2025Test() {
         )
         homeTeam["H1".playerId].assertProne()
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerDogoutState.BANNED, awayTeam["A6".playerId].state)
-        assertEquals(Dogout, awayTeam["A6".playerId].location)
+        fouler.assertBanned()
     }
 
     @Test
     fun sentOffDoubleInjuryRoll() {
+        val fouler = awayTeam["A6".playerId]
         homeTeam["H1".playerId].putProne()
         assertEquals(1, awayTeam.turnData.foulActions)
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
-            *activatePlayer("A6", PlayerStandardActionType.FOUL),
+            *activatePlayer(fouler, PlayerStandardActionType.FOUL),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(5.d6, 6.d6), // Break armour
@@ -191,8 +191,7 @@ class FoulActionTests: JervisGameBB2025Test() {
         )
         homeTeam["H1".playerId].assertStunned()
         assertEquals(homeTeam, state.activeTeam)
-        assertEquals(PlayerDogoutState.BANNED, awayTeam["A6".playerId].state)
-        assertEquals(Dogout, awayTeam["A6".playerId].location)
+        fouler.assertBanned()
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.jervisffb.engine.common.inducements
 
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
-import com.jervisffb.engine.model.inducements.wizard.Wizard
+import com.jervisffb.engine.model.inducements.wizard.WizardType
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import kotlinx.serialization.Serializable
 
@@ -32,12 +32,12 @@ data class WizardsInducementGroup(
 }
 
 /**
- * This class represents a single Wizard inducement. To be  available, it
+ * This class represents a single Wizard inducement. To be available, it
  * should be added in [WizardsInducementGroup.items].
  */
 @Serializable
 data class WizardInducement(
-    val wizard: Wizard,
+    val wizard: WizardType,
     override val max: Int,
     override val defaultPrice: Int,
     val named: Boolean, // Is "named" in the context of the rules, i.e. has special restrictions in League Play
@@ -46,14 +46,14 @@ data class WizardInducement(
     override val specialRulesModifier: Map<SpecialRules, Float> = emptyMap(),
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<WizardInducement.Builder> {
+    override val name: String = wizard.label
     override val type: InducementType = InducementTypeCommon.WIZARD
-    override val name: String = wizard.name
     override fun toBuilder() = Builder(this)
 
     class Builder(wizardInducement: WizardInducement): SingleInducementBuilderCommon {
         override val type: InducementType = InducementTypeCommon.WIZARD
-        override val name: String = wizardInducement.wizard.name
-        val wizard: Wizard = wizardInducement.wizard
+        override val name: String = wizardInducement.name
+        val wizard: WizardType = wizardInducement.wizard
         override var max: Int = wizardInducement.max
         override var price: Int = wizardInducement.defaultPrice
         var named: Boolean = wizardInducement.named

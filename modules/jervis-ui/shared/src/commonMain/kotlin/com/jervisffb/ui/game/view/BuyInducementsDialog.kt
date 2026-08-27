@@ -81,6 +81,7 @@ import com.jervisffb.engine.common.inducements.WizardInducement
 import com.jervisffb.engine.common.inducements.WizardsInducementGroup
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.settings.InducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement
@@ -277,6 +278,7 @@ fun BuyInducementsDialog(
                                 }
                                 itemsIndexed(cartItems, key = { _, item -> "cart-${item.key}" }) { index, item ->
                                     GroupCartRow(
+                                        team = dialog.team,
                                         rowNo = index,
                                         item = item,
                                         teamColor = teamColor,
@@ -1023,6 +1025,7 @@ private fun ColumnScope.StarPlayerTable(
 
 @Composable
 private fun GroupCartRow(
+    team: Team,
     rowNo: Int,
     item: GroupItemView,
     teamColor: Color,
@@ -1055,7 +1058,7 @@ private fun GroupCartRow(
         is InfamousCoachingStaffInducement -> AbilityRow(
             rowNo = rowNo,
             name = item.name,
-            abilities = abilitiesFor(inducement),
+            abilities = abilitiesFor(team, inducement),
             cost = item.price,
             teamColor = teamColor,
             trailing = trailing,
@@ -1091,7 +1094,7 @@ private fun ColumnScope.AbilityGroupTable(
         )
         LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
             itemsIndexed(items, key = { _, it -> "ability-${it.key}" }) { index, item ->
-                val abilities = abilitiesFor(item.inducement)
+                val abilities = abilitiesFor(vm.gameController.getAvailableActions().team!!, item.inducement)
                 val selected = vm.isInCart(item.key)
                 val canAdd = !vm.isGroupFull(group) && vm.canAfford(item.inducement)
                 AbilityRow(
@@ -1124,11 +1127,11 @@ private fun ColumnScope.AbilityGroupTable(
     }
 }
 
-private fun abilitiesFor(inducement: com.jervisffb.engine.model.inducements.settings.SingleInducement<*>): List<String> {
+private fun abilitiesFor(team: Team, inducement: com.jervisffb.engine.model.inducements.settings.SingleInducement<*>): List<String> {
     return when (inducement) {
-        is WizardInducement -> inducement.wizard.spells.map { it.name }
-        is BiasedRefereeInducement -> inducement.referee.specialRules.map { it.description }
-        is InfamousCoachingStaffInducement -> inducement.staff.specialRules.map { it.description }
+        is WizardInducement -> inducement.wizard.create(team).spells.map { it.name }
+        is BiasedRefereeInducement -> inducement.referee.create(team).specialAbilities.map { it.name }
+        is InfamousCoachingStaffInducement -> inducement.staff.create(team).specialAbilities.map { it.name }
         else -> emptyList()
     }
 }

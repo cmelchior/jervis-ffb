@@ -2,8 +2,11 @@ package com.jervisffb.test
 
 import com.jervisffb.engine.bb2020.BB7Rules2020
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.bb2020.inducements.wizards.WizardType2020
 import com.jervisffb.engine.bb2025.BB7Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
+import com.jervisffb.engine.bb2025.inducements.wizards.WizardType2025
+import com.jervisffb.engine.model.inducements.wizard.WizardType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialization.JervisSerialization.jervisEngineSerializerModule
 import kotlinx.serialization.PolymorphicSerializer
@@ -25,6 +28,22 @@ class SerializerRoundTripTests {
         useArrayPolymorphism = true
         allowStructuredMapKeys = true
         serializersModule = jervisEngineSerializerModule
+    }
+
+    @Test
+    fun bb2020_wizardTypeEnumRoundTrip() {
+        val original: WizardType = WizardType2020.HIRELING_SPORTS_WIZARD
+        val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(WizardType::class), original)
+        val restored: WizardType = json.decodeFromJsonElement(PolymorphicSerializer(WizardType::class), serialized)
+        assertEquals(original, restored)
+    }
+
+    @Test
+    fun bb2025_wizardTypeEnumRoundTrip() {
+        val original: WizardType = WizardType2025.SPORTS_WIZARD
+        val serialized: JsonElement = json.encodeToJsonElement(PolymorphicSerializer(WizardType::class), original)
+        val restored: WizardType = json.decodeFromJsonElement(PolymorphicSerializer(WizardType::class), serialized)
+        assertEquals(original, restored)
     }
 
     @Test

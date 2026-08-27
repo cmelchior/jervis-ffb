@@ -10,8 +10,9 @@ import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025
 import com.jervisffb.engine.common.context.SetupTeamContext
-import com.jervisffb.engine.common.procedures.SetupTeam
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerPitchState
@@ -19,6 +20,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialization.JervisSerialization
 import com.jervisffb.engine.serialization.JervisSetupFile
@@ -48,6 +50,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 // Map between "Automated Actions" (features) and their corresponding settings keys.
 enum class Feature(val settingsKey: String) {
@@ -324,14 +328,19 @@ class MenuViewModel {
             return
         }
 
+        val specialStatuses: Set<PlayerStatusEffectType> = setOf(
+            PlayerStatusEffectTypeCommon.FAINTED,
+            PlayerStatusEffectType2025.DODGY_SNACK,
+            PlayerStatusEffectType2025.HANGOVER,
+        )
         val rules = game.rules
         val setupActions = setup.formation.flatMap { (playerNo, relativeCoordinate) ->
             // Ignore player setup if either player or coordinate is not valid
             val playerAvailable = (
                 team.noToPlayer.contains(playerNo)
                     && ((team[playerNo].state == PlayerDogoutState.RESERVE) || (team[playerNo].state == PlayerPitchState.STANDING))
+                    && team[playerNo].statusEffects.none { it.type in specialStatuses }
             )
-
             // Map to pitch coordinate
             val pitchCoordinate = when (team.isHomeTeam()) {
                 true -> {
@@ -367,7 +376,9 @@ class MenuViewModel {
 
                 // In some cases, a player was already selected when starting a setup.
                 // So we need to take that into account as well.
-                if (controller?.currentNode() == SetupTeam.PlacePlayer) {
+                if (controller?.currentNode() == SetupTeamBB2020.PlacePlayer
+                    || controller?.currentNode() == SetupTeamBB2025.PlacePlayer
+                ) {
                     val deselectAction = when (context.currentPlayer!!.location) {
                         Dogout -> DogoutSelected
                         is PitchCoordinate -> PitchSquareSelected(context.currentPlayer!!.coordinates)

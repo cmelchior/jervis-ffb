@@ -1,5 +1,7 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Player
@@ -7,6 +9,7 @@ import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -177,10 +180,18 @@ class SidebarViewModel(
 
     val playerStatCardFlow: Flow<UiPlayerCard?> = gameViewModel.playerStatCardFlowFor(team)
 
+    private val specialStatuses: Set<PlayerStatusEffectType> = setOf(
+        PlayerStatusEffectTypeCommon.FAINTED,
+        PlayerStatusEffectType2025.DODGY_SNACK,
+        PlayerStatusEffectType2025.HANGOVER,
+    )
+
     /** Standard Reserves keep their position when moving between the pitch and the dogout. */
     val reserves: Flow<UiSidebarData> = dogoutFlow
         .map { (_, players) ->
-            val reservePlayers = players.filter { it.player.state == PlayerDogoutState.RESERVE }
+            val reservePlayers = players
+                .filter { it.player.state == PlayerDogoutState.RESERVE }
+                .filter { it.player.statusEffects.none { it in specialStatuses } }
             UiSidebarData.fixed(team, reservePlayers)
         }
 
@@ -192,11 +203,8 @@ class SidebarViewModel(
         PlayerDogoutState.LASTING_INJURY,
     )
     val dead: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.DEAD)
-    val banned: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.BANNED)
-    val special: Flow<UiSidebarData> = mapToCompactView(
-        PlayerDogoutState.FAINTED,
-        PlayerDogoutState.DODGY_SNACK,
-    )
+    val banned: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.RESERVE, requiredStatusEffects = setOf(PlayerStatusEffectTypeCommon.BANNED))
+    val special: Flow<UiSidebarData> = mapToCompactView(PlayerDogoutState.RESERVE, requiredStatusEffects = specialStatuses)
 
     /** The injury sections of the dogout, in the order they should be rendered. */
     val injurySections: List<SidebarSection> = listOf(
@@ -218,10 +226,17 @@ class SidebarViewModel(
 
     fun dismissFixedCard() = gameViewModel.dismissPlayerStatCard()
 
-    private fun mapToCompactView(vararg states: PlayerState): Flow<UiSidebarData> {
+    private fun mapToCompactView(vararg states: PlayerState, requiredStatusEffects: Set<PlayerStatusEffectType> = emptySet()): Flow<UiSidebarData> {
         return dogoutFlow
             .map { (_, players) ->
-                val matchingPlayers = players.filter { states.contains(it.state) }
+                val matchingPlayers = players
+                    .filter { states.contains(it.state) }
+                    .filter {
+                        when (requiredStatusEffects.isNotEmpty()) {
+                            true -> it.statusEffects.any { effect -> effect in requiredStatusEffects }
+                            false -> true
+                        }
+                    }
                 UiSidebarData.compact(matchingPlayers)
             }
     }

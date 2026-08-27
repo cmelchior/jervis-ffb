@@ -6,8 +6,8 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.bb2025.procedures.SetupTeam
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.common.procedures.TheKickOff
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId

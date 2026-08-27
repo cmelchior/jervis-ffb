@@ -2,7 +2,7 @@ package com.jervisffb.test.bb2025.inducements
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.common.procedures.SetupTeam
+import com.jervisffb.engine.bb2025.procedures.SetupTeam
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.inducements.Bribe

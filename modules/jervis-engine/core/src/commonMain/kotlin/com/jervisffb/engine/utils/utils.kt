@@ -37,6 +37,7 @@ import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.InducementEffectSelected
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -56,6 +57,7 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectForgoActivation
+import com.jervisffb.engine.actions.SelectInducementEffect
 import com.jervisffb.engine.actions.SelectInducements
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
@@ -106,29 +108,30 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
             CancelWhenReady -> false
             ConfirmWhenReady -> false
             ContinueWhenReady -> false
-            is DeselectPlayer -> false
             EndActionWhenReady -> false
             EndSetupWhenReady -> false
             EndTurnWhenReady -> false
+            SelectCoinSide -> false
+            SelectDogout -> false
+            TossCoin -> true
+            is DeselectPlayer -> false
             is RollDice -> true
             is SelectBlockType -> false
-            SelectCoinSide -> false
             is SelectDicePoolResult -> false
             is SelectDirection -> false
-            SelectDogout -> false
-            is SelectPitchLocation -> false
+            is SelectForgoActivation -> false
+            is SelectInducementEffect -> false
             is SelectInducements -> false
             is SelectMoveType -> false
             is SelectNoReroll -> false
+            is SelectPassType -> false
+            is SelectPitchLocation -> false
             is SelectPlayer -> false
             is SelectPlayerAction -> false
+            is SelectPlayers -> false
             is SelectRandomPlayers -> true
             is SelectRerollOption -> false
             is SelectSkill -> false
-            TossCoin -> true
-            is SelectForgoActivation -> false
-            is SelectPlayers -> false
-            is SelectPassType -> false
         }
     }
     if (randomActions.contains(true) && randomActions.contains(false)) {
@@ -143,16 +146,21 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
  */
 fun GameAction.isRandomAction(): Boolean {
     return when (this) {
+        Cancel -> false
+        Confirm -> false
+        Continue -> false
+        DogoutSelected -> false
+        EndAction -> false
+        EndSetup -> false
+        EndTurn -> false
+        Revert -> false
+        Undo -> false
+        is AdminGameAction -> false
         is BlockTypeSelected -> false
         is CalculatedAction -> false // Is only used by tests
-        Cancel -> false
         is CoinSideSelected -> false
         is CoinTossResult -> true
         is CompositeGameAction -> false // Composites should only contain deterministic actions
-        Confirm -> false
-        Continue -> false
-        is DicePoolResultsSelected -> false
-        is DiceRollResults -> true
         is D12Result -> true
         is D16Result -> true
         is D20Result -> true
@@ -162,27 +170,23 @@ fun GameAction.isRandomAction(): Boolean {
         is D6Result -> true
         is D8Result ->  true
         is DBlockResult -> true
+        is DicePoolResultsSelected -> false
+        is DiceRollResults -> true
         is DirectionSelected -> false
-        DogoutSelected -> false
-        EndAction -> false
-        EndSetup -> false
-        EndTurn -> false
-        is PitchSquareSelected -> false
+        is ForegoActivationSelected -> false
+        is InducementEffectSelected -> false
         is InducementsSelected -> false
         is MoveTypeSelected -> false
         is NoRerollSelected -> false
+        is PassTypeSelected -> false
+        is PitchSquareSelected -> false
         is PlayerActionSelected -> false
         is PlayerDeselected -> false
         is PlayerSelected -> false
+        is PlayersSelected -> false
         is RandomPlayersSelected -> true
         is RerollOptionSelected -> false
         is SkillSelected -> false
-        Undo -> false
-        Revert -> false
-        is ForegoActivationSelected -> false
-        is PlayersSelected -> false
-        is PassTypeSelected -> false
-        is AdminGameAction -> false
     }
 }
 
@@ -226,6 +230,19 @@ inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): No
     throw InvalidActionException(customMessage?.let {
         customMessage
     } ?: "Invalid action selected: $action")
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun requireGameState(bool: Boolean) {
+    if (!bool) {
+        INVALID_GAME_STATE()
+    }
+}
+
+inline fun requireGameState(bool: Boolean, lazyMessage: () -> String) {
+    if (!bool) {
+        INVALID_GAME_STATE(lazyMessage())
+    }
 }
 
 fun <T : Any?> MutableStateFlow<T>.safeTryEmit(value: T) {

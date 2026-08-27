@@ -10,7 +10,6 @@ import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.common.actions.createRandomAction
 import com.jervisffb.engine.common.context.SetupTeamContext
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerNo
@@ -30,6 +29,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 class RandomActionProvider(
     val clientMode: TeamActionMode,
@@ -156,7 +157,10 @@ class RandomActionProvider(
             && rules.maxPlayersOnPitch == 7
             && rules.maxPlayersInWideZone == 1
 
-        if ((isBB11SupportedPitch || isBB7SupportedPitch) && !stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        if ((isBB11SupportedPitch || isBB7SupportedPitch) && !stack.isEmpty()
+            && (stack.currentNode() == SetupTeamBB2020.SelectPlayerOrEndSetup
+                || stack.currentNode() == SetupTeamBB2025.SelectPlayerOrEndSetup)
+        ) {
             val context = state.getContext<SetupTeamContext>()
             val compositeActions = mutableListOf<GameAction>()
             if (context.team.isHomeTeam()) {

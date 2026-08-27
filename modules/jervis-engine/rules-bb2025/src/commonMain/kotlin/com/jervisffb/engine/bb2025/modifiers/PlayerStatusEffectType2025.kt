@@ -10,7 +10,9 @@ enum class PlayerStatusEffectType2025(
     DISTRACTED("Distracted"),
     CHOMPED("Chomped"),
     EYE_GOUGE("Eye Gouge"),
-    DODGY_SNACK("Dodgy Snack"), // This is just a marker. Stat decreases are added separately
+    // This is just a marker that determines if the player has to skip the drive.
+    // Stat decreases are tracked separately
+    DODGY_SNACK("Dodgy Snack"),
 
     HANGOVER("Hangover"), // Marker for Desperate Measures "Hangover"
     DOPED("Doped"), // Marker for a failed Desperate Measures "You Dope!"

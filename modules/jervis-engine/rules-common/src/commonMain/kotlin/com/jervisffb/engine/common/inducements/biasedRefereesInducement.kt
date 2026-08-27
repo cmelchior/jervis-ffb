@@ -1,6 +1,6 @@
 package com.jervisffb.engine.common.inducements
 
-import com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee
+import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
 import com.jervisffb.engine.rules.common.roster.SpecialRules
@@ -37,7 +37,7 @@ data class BiasedRefereesInducementGroup(
  */
 @Serializable
 data class BiasedRefereeInducement(
-    val referee: BiasedReferee,
+    val referee: BiasedRefereeType,
     override val max: Int,
     override val defaultPrice: Int,
     val named: Boolean, // Is "named" in the context of the rules, i.e. has special restrictions in League Play
@@ -47,13 +47,13 @@ data class BiasedRefereeInducement(
     override val teamNameModifier: List<Pair<String, Float>> = emptyList()
 ): SingleInducement<BiasedRefereeInducement.Builder> {
     override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
-    override val name: String = referee.name
+    override val name: String = referee.label
     override fun toBuilder() = Builder(this)
 
     class Builder(inducement: BiasedRefereeInducement): SingleInducementBuilderCommon {
-        val referee: BiasedReferee = inducement.referee
+        val referee: BiasedRefereeType = inducement.referee
         override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
-        override val name: String = referee.name
+        override val name: String = referee.label
         override var max: Int = inducement.max
         override var price: Int = inducement.defaultPrice
         var named: Boolean = inducement.named

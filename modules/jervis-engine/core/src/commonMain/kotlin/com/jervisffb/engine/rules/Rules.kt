@@ -68,6 +68,13 @@ interface Rules : RulesParameters {
     fun isSetupValid(state: Game, team: Team): List<SetupRule>
 
     /**
+     * Returns whether a player can be selected during setup. Players prevented
+     * from participating in the drive must not count as available when the
+     * setup is validated.
+     */
+    fun isPlayerAvailableForSetup(player: Player): Boolean = true
+
+    /**
      * Returns whether the given location is in the valid setup area for a given
      * team. While this is described as a bit different between Standard and
      * BB7, it generalizes to the area up to the team's Line of Scrimmage.
@@ -483,6 +490,8 @@ interface Rules : RulesParameters {
     val throwPlayerStep: Procedure
     /** The procedure resolving Apply Inducements. BB2025-only; BB2020 uses `DummyProcedure`. */
     val applyInducementsStep: Procedure
+    /** The procedure for setting up a team before a drive. */
+    val setupTeam: Procedure
     /** The root procedure for a full game. Shared across all rulesets; supplied by AbstractRules. */
     val fullGameStep: Procedure
     /** How to select the player kicking the ball during Kick Off */

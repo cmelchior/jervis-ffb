@@ -1,6 +1,7 @@
 package com.jervisffb.engine.bb2025.tables
 
 import com.jervisffb.engine.bb2025.inducements.effects.DesperateMeasures
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.common.tables.DesperateMeasuresEvent
 
 /**
@@ -8,14 +9,14 @@ import com.jervisffb.engine.rules.common.tables.DesperateMeasuresEvent
  */
 enum class DesperateMeasuresTableResult2025(
     override val label: String,
-    override val createCard: () -> DesperateMeasures
+    override val createCard: (Team) -> DesperateMeasures
 ): DesperateMeasuresEvent {
-    YOU_DOPE("You Dope", createCard = { com.jervisffb.engine.bb2025.inducements.effects.YouDope() }),
-    RAZZLE_DAZZLE("Razzle Dazzle", createCard = { com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle() }),
-    HANGOVER("Hangover", createCard = { com.jervisffb.engine.bb2025.inducements.effects.Hangover() }),
-    GRUDGE_MATCH("Grudge Match", createCard = { com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch() }),
-    SET_PIECE("Set Piece", createCard = { com.jervisffb.engine.bb2025.inducements.effects.SetPiece() }),
-    SPORTS_ESPIONAGE("Sports Espionage", createCard = { com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage() }),
-    DISCARDED_BANANA_SKIN("Discarded Banana Skin", createCard = { com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin() }),
-    MAGIC_SCROLL("Magic Scroll", createCard = { com.jervisffb.engine.bb2025.inducements.effects.MagicScroll() });
+    YOU_DOPE("You Dope", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.YouDope(team.id) }),
+    RAZZLE_DAZZLE("Razzle Dazzle", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.RazzleDazzle(team.id) }),
+    HANGOVER("Hangover", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.Hangover(team.id) }),
+    GRUDGE_MATCH("Grudge Match", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatch(team.id) }),
+    SET_PIECE("Set Piece", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.SetPiece(team.id) }),
+    SPORTS_ESPIONAGE("Sports Espionage", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.SportsEspionage(team.id) }),
+    DISCARDED_BANANA_SKIN("Discarded Banana Skin", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkin(team.id) }),
+    MAGIC_SCROLL("Magic Scroll", createCard = { team -> com.jervisffb.engine.bb2025.inducements.effects.MagicScroll(team.id) });
 }

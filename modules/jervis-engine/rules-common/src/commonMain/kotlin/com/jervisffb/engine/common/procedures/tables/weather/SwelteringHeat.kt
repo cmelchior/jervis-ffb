@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectRandomPlayers
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -19,9 +20,11 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.probabiliy.AddChanceObservation
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
+import com.jervisffb.engine.common.modifiers.fainted
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.reports.ReportDiceRoll
-import com.jervisffb.engine.common.reports.ReportPlayerInjury
+import com.jervisffb.engine.common.reports.ReportPlayerStatusEffect
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -33,9 +36,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.SwelteringHeatContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.Dogout
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.tables.weather.ReportNoSwelteringHeatRoll
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import kotlin.math.min
 
@@ -106,10 +111,12 @@ object SwelteringHeat : Procedure(), ChanceObservationHandler {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castAction<RandomPlayersSelected>(action) {
                 val playersRemoved = it.getPlayers(state).flatMap { player ->
+                    val effect = PlayerStatusEffect.fainted(Duration.END_OF_DRIVE)
                     listOf(
-                        SetPlayerState(player, PlayerDogoutState.FAINTED),
                         SetPlayerLocation(player, Dogout),
-                        ReportPlayerInjury(player, PlayerDogoutState.FAINTED),
+                        SetPlayerState(player, PlayerDogoutState.RESERVE),
+                        AddPlayerStatusEffect(player, effect),
+                        ReportPlayerStatusEffect(player, PlayerStatusEffectTypeCommon.FAINTED),
                     )
                 }.toTypedArray()
                 return compositeCommandOf(
@@ -171,9 +178,10 @@ object SwelteringHeat : Procedure(), ChanceObservationHandler {
             return castAction<RandomPlayersSelected>(action) {
                 val playersRemoved = it.getPlayers(state).flatMap { player ->
                     listOf(
-                        SetPlayerState(player, PlayerDogoutState.FAINTED),
                         SetPlayerLocation(player, Dogout),
-                        ReportPlayerInjury(player, PlayerDogoutState.FAINTED),
+                        SetPlayerState(player, PlayerDogoutState.RESERVE),
+                        AddPlayerStatusEffect(player, PlayerStatusEffect.fainted(Duration.END_OF_DRIVE)),
+                        ReportPlayerStatusEffect(player, PlayerStatusEffectTypeCommon.FAINTED),
                     )
                 }.toTypedArray()
                 return compositeCommandOf(

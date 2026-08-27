@@ -43,7 +43,7 @@ object StartOfDriveSequence : Procedure() {
                 ReportSetupKickingTeam(state.kickingTeam),
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
+        override fun getChildProcedure(state: Game, rules: Rules) = rules.setupTeam
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<SetupTeamContext>(),
@@ -53,7 +53,7 @@ object StartOfDriveSequence : Procedure() {
     }
 
     object SetupReceivingTeam : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
+        override fun getChildProcedure(state: Game, rules: Rules) = rules.setupTeam
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 AddContext(SetupTeamContext(state.receivingTeam)),

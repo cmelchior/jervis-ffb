@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2020
 
 import com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements
 import com.jervisffb.engine.bb2020.inducements.InducementType2020
-import com.jervisffb.engine.bb2020.inducements.infamouscoach.JosefBugman
+import com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020
 import com.jervisffb.engine.common.inducements.BiasedRefereesInducementGroup
 import com.jervisffb.engine.common.inducements.InducementTypeCommon
 import com.jervisffb.engine.common.inducements.InfamousCoachingStaffInducement
@@ -30,7 +30,7 @@ val DEFAULT_INDUCEMENTS_BB2020: Map<InducementType, Inducement<*>> = buildMap {
                 enabled = true,
                 items = listOf(
                     InfamousCoachingStaffInducement(
-                        JosefBugman(),
+                        InfamousCoachingStaffType2020.JOSEF_BUGMAN,
                         1,
                         100_000,
                         named = true,

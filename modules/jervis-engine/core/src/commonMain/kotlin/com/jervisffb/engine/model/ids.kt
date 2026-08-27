@@ -137,6 +137,11 @@ value class TeamId(val value: String = "") {
     }
 }
 
+// Identifier for a single wizard. Must be unique within a game.
 @Serializable
 @JvmInline
 value class WizardId(val value: String)
+
+@Serializable
+@JvmInline
+value class InducementEffectId(val value: String)

@@ -1,6 +1,8 @@
 package com.jervisffb.engine.bb2025.inducements.effects
 
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.InducementEffectId
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.card.SpecialPlayCardCategory
@@ -36,7 +38,8 @@ abstract class DesperateMeasures: SpecialPlayCard {
  * See page 15 in Spike 22.
  */
 @Serializable
-class YouDope: DesperateMeasures() {
+class YouDope(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-you-dope")
     override val name: String = "You Dope!"
     override val triggers: List<Timing> = listOf(Timing.AFTER_SETUP)
     override val procedure: Procedure = HandleYouDopeProcedure
@@ -47,7 +50,8 @@ class YouDope: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class RazzleDazzle: DesperateMeasures() {
+class RazzleDazzle(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-razzle-dazzle")
     override val name: String = "Razzle-Dazzle"
     override val triggers: List<Timing> = listOf(Timing.ACTIVATE_PLAYER)
     override val procedure: Procedure = HandleRazzleDazzleProcedure
@@ -58,7 +62,8 @@ class RazzleDazzle: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class Hangover: DesperateMeasures() {
+class Hangover(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-hangover")
     override val name: String = "Hangover"
     override val triggers: List<Timing> = listOf(Timing.BEFORE_FIRST_SETUP)
     override val procedure: Procedure = HandleHangoverProcedure
@@ -69,7 +74,8 @@ class Hangover: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class GrudgeMatch: DesperateMeasures() {
+class GrudgeMatch(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-grudge-match")
     override val name: String = "Grudge Match"
     override val triggers: List<Timing> = listOf(Timing.ACTIVATE_PLAYER)
     override val procedure: Procedure = HandleGrudgeMatchProcedure
@@ -80,7 +86,8 @@ class GrudgeMatch: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class SetPiece: DesperateMeasures() {
+class SetPiece(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-set-piece")
     override val name: String = "Set Piece"
     override val triggers: List<Timing> = listOf(Timing.PERFORM_PASS_ACTION)
     override val procedure: Procedure = HandleSetPieceProcedure
@@ -91,7 +98,8 @@ class SetPiece: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class SportsEspionage: DesperateMeasures() {
+class SportsEspionage(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-sports-espionage")
     override val name: String = "Sports Espionage"
     override val triggers: List<Timing> = listOf(Timing.AFTER_TURNOVER)
     override val procedure: Procedure = HandleSportsEspionageProcedure
@@ -102,7 +110,8 @@ class SportsEspionage: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class DiscardedBananaSkin: DesperateMeasures() {
+class DiscardedBananaSkin(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-discarded-banana-skin")
     override val name: String = "Discarded Banana Skin"
     override val triggers: List<Timing> = listOf(Timing.ENTER_TACKLEZONE)
     override val procedure: Procedure = HandleDiscardedBananaSkinProcedure
@@ -113,7 +122,8 @@ class DiscardedBananaSkin: DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class MagicScroll: DesperateMeasures() {
+class MagicScroll(private val team: TeamId): DesperateMeasures() {
+    override val id = InducementEffectId("${team.value}-magic-scroll")
     override val name: String = "Magic Scroll"
     override val triggers: List<Timing> = listOf(Timing.BEFORE_SETUP)
     override val procedure: Procedure = HandleMagicScrollProcedure

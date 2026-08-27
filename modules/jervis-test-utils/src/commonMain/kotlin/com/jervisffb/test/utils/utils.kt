@@ -12,6 +12,7 @@ import com.jervisffb.engine.bb2025.modifiers.distracted
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -253,7 +254,15 @@ fun Player.assertReserves() {
  * Test Helper, checking if a player is in the Banned box.
  */
 fun Player.assertBanned() {
-    assertEquals(PlayerDogoutState.BANNED, state)
+    assertEquals(PlayerDogoutState.RESERVE, state)
+    assertTrue(hasStatusEffect(PlayerStatusEffectTypeCommon.BANNED))
+    assertNull(intermediateState)
+    assertEquals(Dogout, location)
+}
+
+fun Player.assertFainted() {
+    assertEquals(PlayerDogoutState.RESERVE, state)
+    assertTrue(hasStatusEffect(PlayerStatusEffectTypeCommon.FAINTED))
     assertNull(intermediateState)
     assertEquals(Dogout, location)
 }

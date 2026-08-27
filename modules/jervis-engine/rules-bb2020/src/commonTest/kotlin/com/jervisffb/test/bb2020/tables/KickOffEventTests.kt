@@ -31,6 +31,7 @@ import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.assertBanned
 import com.jervisffb.test.utils.assertCoordinates
 import com.jervisffb.test.utils.assertStunned
 import kotlin.test.Ignore
@@ -628,8 +629,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
         )
         val awayPlayer = state.getPlayerById("A1".playerId)
         val homePlayer = state.getPlayerById("H1".playerId)
-        assertEquals(PlayerDogoutState.BANNED, awayPlayer.state)
-        assertEquals(Dogout, awayPlayer.location)
+        awayPlayer.assertBanned()
         homePlayer.assertStunned()
     }
 
@@ -662,7 +662,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
             )
         )
         val awayPlayer = state.getPlayerById("A1".playerId)
-        assertEquals(PlayerDogoutState.BANNED, awayPlayer.state)
+        awayPlayer.assertBanned()
         assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
     }
 

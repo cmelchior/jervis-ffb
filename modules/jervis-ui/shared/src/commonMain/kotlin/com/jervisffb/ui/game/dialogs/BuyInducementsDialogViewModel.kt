@@ -21,12 +21,12 @@ import com.jervisffb.engine.common.inducements.WizardInducement
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.WizardId
 import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
 import com.jervisffb.engine.model.inducements.settings.InducementGroup
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
+import com.jervisffb.engine.model.inducements.wizard.WizardType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.sprites.SpriteSource
@@ -50,7 +50,7 @@ sealed interface CartKey {
     val type: InducementType
 
     data class Simple(override val type: InducementType) : CartKey
-    data class Wizard(val id: WizardId) : CartKey {
+    data class Wizard(val wizardType: WizardType) : CartKey {
         override val type: InducementType = InducementTypeCommon.WIZARD
     }
     data class BiasedReferee(val refereeType: BiasedRefereeType) : CartKey {
@@ -406,9 +406,9 @@ class BuyInducementsViewModel(
 
     private fun cartKeyFor(inducement: SingleInducement<*>): CartKey? {
         return when (inducement) {
-            is WizardInducement -> CartKey.Wizard(inducement.wizard.id)
-            is BiasedRefereeInducement -> CartKey.BiasedReferee(inducement.referee.type)
-            is InfamousCoachingStaffInducement -> CartKey.InfamousCoach(inducement.staff.type)
+            is WizardInducement -> CartKey.Wizard(inducement.wizard)
+            is BiasedRefereeInducement -> CartKey.BiasedReferee(inducement.referee)
+            is InfamousCoachingStaffInducement -> CartKey.InfamousCoach(inducement.staff)
             is StarPlayerInducement -> CartKey.StarPlayer(inducement.starPlayer.id)
             else -> null
         }
@@ -416,7 +416,7 @@ class BuyInducementsViewModel(
 
     private fun buildSelection(inducement: SingleInducement<*>): InducementSelection<*>? {
         return when (val key = cartKeyFor(inducement)) {
-            is CartKey.Wizard -> InducementSelectionCommon.Wizard(key.id)
+            is CartKey.Wizard -> InducementSelectionCommon.Wizard(key.wizardType)
             is CartKey.BiasedReferee -> InducementSelectionCommon.BiasedReferee(key.refereeType)
             is CartKey.InfamousCoach -> InducementSelectionCommon.InfamousCoach(key.coachType)
             is CartKey.StarPlayer -> InducementSelectionCommon.StarPlayer(key.position)

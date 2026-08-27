@@ -15,6 +15,8 @@ val bb2020SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
         subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
         subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.ByThePowerOfTheGoods::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.wizards.Fireball::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
         polymorphic(com.jervisffb.engine.bb2020.inducements.effects.DirtyTrick::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
         }
@@ -34,6 +36,10 @@ val bb2020SerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachAbility::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.ByThePowerOfTheGoods::class)
         }
+        polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.wizards.Fireball::class)
+            subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+        }
     }
     polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.JormTheOgre::class)
@@ -41,6 +47,34 @@ val bb2020SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.StandardBiasedReferee::class)
         subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.TheThrundlefootTriplets::class)
         subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.ThoronKorensson::class)
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020::class)
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.JORM_THE_OGRE::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.RANULF_RED_HOKULI::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.STANDARD::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.THE_THRUNDLEFOOT_TRIPLETS::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.THORON_KORENSSON::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>,
+            com.jervisffb.engine.bb2020.inducements.biasedreferee.BiasedRefereeType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType>
+        )
     }
     polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
@@ -57,6 +91,24 @@ val bb2020SerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.KariColdsteel::class)
         subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.PapaSkullbones::class)
     }
+    polymorphic(com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020::class)
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.JOSEF_BUGMAN::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>,
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.KARI_COLDSTEEL::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>,
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>
+        )
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.PAPA_SKULLBONES::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>,
+            com.jervisffb.engine.bb2020.inducements.infamouscoach.InfamousCoachingStaffType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType>
+        )
+    }
     polymorphic(com.jervisffb.engine.model.inducements.settings.Inducement::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
         polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
@@ -69,11 +121,23 @@ val bb2020SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.ExpandedMercenaryInducements::class)
     }
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.wizards.Fireball::class)
+        subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+    }
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)
         polymorphic(com.jervisffb.engine.bb2020.inducements.wizards.Wizard2020::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)
         }
+    }
+    polymorphic(com.jervisffb.engine.model.inducements.wizard.WizardType::class) {
+        subclass(com.jervisffb.engine.bb2020.inducements.wizards.WizardType2020::class)
+        @Suppress("UNCHECKED_CAST")
+        subclass(
+            com.jervisffb.engine.bb2020.inducements.wizards.WizardType2020.HIRELING_SPORTS_WIZARD::class as kotlin.reflect.KClass<com.jervisffb.engine.model.inducements.wizard.WizardType>,
+            com.jervisffb.engine.bb2020.inducements.wizards.WizardType2020.serializer() as kotlinx.serialization.KSerializer<com.jervisffb.engine.model.inducements.wizard.WizardType>
+        )
     }
     polymorphic(com.jervisffb.engine.rules.Rules::class) {
         subclass(com.jervisffb.engine.bb2020.BB7Rules2020::class, com.jervisffb.engine.bb2020.BB7RulesSerializer2020)

@@ -3,7 +3,9 @@ package com.jervisffb.engine.bb2020.inducements.wizards
 import com.jervisffb.engine.model.inducements.wizard.Wizard
 
 /** Interface capturing all Wizards available in BB2020 */
-sealed interface Wizard2020: Wizard
+sealed interface Wizard2020: Wizard {
+    override val type: WizardType2020
+}
 
 // BB2020
 // Done - HIRELING_SPORTS_WIZARD("Hireling Sports-Wizard", named = false), // See page 94 in the rulebook

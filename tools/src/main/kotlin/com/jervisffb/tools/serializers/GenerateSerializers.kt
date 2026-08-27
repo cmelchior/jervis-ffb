@@ -39,8 +39,10 @@ private val roots = listOf(
     com.jervisffb.engine.model.SkillValue::class,
     com.jervisffb.engine.model.inducements.InducementEffect::class,
     com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class,
+    com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType::class,
     com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class,
     com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff::class,
+    com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType::class,
     com.jervisffb.engine.model.inducements.settings.Inducement::class,
     com.jervisffb.engine.model.inducements.settings.InducementGroup::class,
     com.jervisffb.engine.model.inducements.settings.InducementType::class,
@@ -48,6 +50,7 @@ private val roots = listOf(
     com.jervisffb.engine.model.inducements.settings.TeamPlayerInducement::class,
     com.jervisffb.engine.model.inducements.wizard.Spell::class,
     com.jervisffb.engine.model.inducements.wizard.Wizard::class,
+    com.jervisffb.engine.model.inducements.wizard.WizardType::class,
     com.jervisffb.engine.model.locations.Location::class,
     com.jervisffb.engine.model.modifiers.PlayerStatusEffect::class,
     com.jervisffb.engine.rules.Rules::class,
@@ -96,6 +99,9 @@ private fun customRulesSerializerFor(type: KClass<*>): String? = when (type.qual
     else -> null
 }
 
+private fun KClass<*>.enumClassForEntry(): KClass<*>? =
+    java.superclass?.takeIf { it.isEnum }?.kotlin
+
 private fun discover(): List<Node> = ClassGraph()
     .enableAllInfo()
     .acceptPackages("com.jervisffb.engine")
@@ -139,11 +145,21 @@ private fun Node.emit(builder: StringBuilder, bucket: String, indent: Int) {
     val child = " ".repeat((indent + 1) * 4)
     builder.appendLine("${current}polymorphic(${type.qualifiedName}::class) {")
     leaves.filter { bucket(it) == bucket }.forEach {
-        val serializer = customRulesSerializerFor(it)
-        if (serializer == null) {
-            builder.appendLine("${child}subclass(${it.qualifiedName}::class)")
+        val enumClass = it.enumClassForEntry()
+        if (enumClass != null) {
+            // Enum entries with class bodies are distinct runtime classes. Reuse the enum serializer for them.
+            builder.appendLine("${child}@Suppress(\"UNCHECKED_CAST\")")
+            builder.appendLine("${child}subclass(")
+            builder.appendLine("${child}    ${it.qualifiedName}::class as kotlin.reflect.KClass<${type.qualifiedName}>,")
+            builder.appendLine("${child}    ${enumClass.qualifiedName}.serializer() as kotlinx.serialization.KSerializer<${type.qualifiedName}>")
+            builder.appendLine("${child})")
         } else {
-            builder.appendLine("${child}subclass(${it.qualifiedName}::class, $serializer)")
+            val serializer = customRulesSerializerFor(it)
+            if (serializer == null) {
+                builder.appendLine("${child}subclass(${it.qualifiedName}::class)")
+            } else {
+                builder.appendLine("${child}subclass(${it.qualifiedName}::class, $serializer)")
+            }
         }
     }
     children.filterNot { it.type.qualifiedName in nonSerializableAbstractRules }

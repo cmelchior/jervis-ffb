@@ -608,11 +608,12 @@ book.
 - [x] Different Injury Table
 - [x] Different Stunty Injury Table
 - [ ] Different Prayers To Nuffle table
-  - [ ] Treacheours Trapdoors
-  - [ ] Stiletto
-  - [ ] Iron Man
-  - [ ] Knuckle Dusters
-  - [ ] Blessing of Nuffle
-  - [ ] Moles Under the Pitch
-  - [ ] Under Scrutiny
-  - [ ] Intensive Training
+- [ ] Desperate Measures
+  - [ ] You Dope
+  - [ ] Razzle-Dazzle
+  - [x] Hangover
+  - [ ] Grudge Match
+  - [ ] Set Piece
+  - [ ] Sports Espionage
+  - [ ] Discarded Banana Skin
+  - [ ] Magic Scroll

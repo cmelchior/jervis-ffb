@@ -34,6 +34,7 @@ val coreSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.actions.EndSetup::class)
         subclass(com.jervisffb.engine.actions.EndTurn::class)
         subclass(com.jervisffb.engine.actions.ForegoActivationSelected::class)
+        subclass(com.jervisffb.engine.actions.InducementEffectSelected::class)
         subclass(com.jervisffb.engine.actions.InducementsSelected::class)
         subclass(com.jervisffb.engine.actions.MovePlayer::class)
         subclass(com.jervisffb.engine.actions.MoveTypeSelected::class)

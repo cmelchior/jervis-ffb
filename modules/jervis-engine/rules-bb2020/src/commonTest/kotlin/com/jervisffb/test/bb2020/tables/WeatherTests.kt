@@ -13,6 +13,7 @@ import com.jervisffb.engine.common.context.PassContext
 import com.jervisffb.engine.common.modifiers.AccuracyModifier
 import com.jervisffb.engine.common.modifiers.CatchModifier
 import com.jervisffb.engine.common.modifiers.PickupModifier
+import com.jervisffb.engine.common.modifiers.PlayerStatusEffectTypeCommon
 import com.jervisffb.engine.common.modifiers.RushModifier
 import com.jervisffb.engine.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.ext.d3
@@ -20,12 +21,10 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerDogoutState
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.common.actions.PassType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -43,6 +42,7 @@ import com.jervisffb.test.pickup
 import com.jervisffb.test.recoverPlayers
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.throwBall
+import com.jervisffb.test.utils.assertFainted
 import com.jervisffb.test.utils.putInKnockedOut
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -86,11 +86,10 @@ class WeatherTests: JervisGameBB2020Test() {
             homeTeam[PlayerNo(2)],
             awayTeam[PlayerNo(1)],
         ).forEach { player ->
-            assertEquals(PlayerDogoutState.FAINTED, player.state, "Player $player")
-            assertEquals(Dogout, player.location, "Player $player")
+            player.assertFainted()
         }
-        assertEquals(2, homeTeam.filter { it.state == PlayerDogoutState.FAINTED }.size)
-        assertEquals(1, awayTeam.filter { it.state == PlayerDogoutState.FAINTED }.size)
+        assertEquals(2, homeTeam.filter { it.hasStatusEffect(PlayerStatusEffectTypeCommon.FAINTED) }.size)
+        assertEquals(1, awayTeam.filter { it.hasStatusEffect(PlayerStatusEffectTypeCommon.FAINTED) }.size)
     }
 
     @Test
@@ -151,8 +150,8 @@ class WeatherTests: JervisGameBB2020Test() {
             2.d3, // Away Heat roll
             RandomPlayersSelected(listOf("A1".playerId)),
         )
-        assertEquals(1, homeTeam.filter { it.state == PlayerDogoutState.FAINTED }.size)
-        assertEquals(1, awayTeam.filter { it.state == PlayerDogoutState.FAINTED }.size)
+        assertEquals(1, homeTeam.filter { it.hasStatusEffect(PlayerStatusEffectTypeCommon.FAINTED) }.size)
+        assertEquals(1, awayTeam.filter { it.hasStatusEffect(PlayerStatusEffectTypeCommon.FAINTED) }.size)
         assertEquals(Weather.SWELTERING_HEAT, state.weather)
         assertEquals(2, state.halfNo) // We are at the start of 2nd drive.
     }

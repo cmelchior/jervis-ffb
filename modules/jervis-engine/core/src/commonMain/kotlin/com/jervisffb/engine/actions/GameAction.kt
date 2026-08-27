@@ -11,10 +11,12 @@ import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.InducementEffectId
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.inducements.InducementEffect
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.ActionType
@@ -24,6 +26,7 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.statistics.probability.Probability
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
 import kotlin.math.pow
@@ -566,7 +569,7 @@ data class SkillSelected(val skill: SkillId): GameAction
  *
  * The downside is that the UI is required to know a lot of the details about
  * how inducements work. The game controller will still validate the inducements
- * using the [InducementsSelected.isValid] method, but it will validate all of
+ * using the [Rules.isInducementsValid] method, but it will validate all of
  * them in one go.
  *
  * Developer's Commentary:
@@ -588,6 +591,40 @@ data class InducementsSelected(val inducements: List<InducementSelection<*>>) : 
         return inducements.sumOf {
             it.getPrice(team)
         }
+    }
+}
+
+@Serializable
+data class InducementEffectSelected(val effect: InducementEffectId) : GameAction {
+    // Returns the selected inducement effect.
+    // If it couldn't be found, an exception is thrown
+    fun getEffect(state: Game): InducementEffect {
+        val awayEffect = getEffectOrNull(state.awayTeam)
+        return when (awayEffect != null) {
+            true -> awayEffect
+            false -> getEffect(state.homeTeam)
+        }
+    }
+
+    fun getEffect(team: Team): InducementEffect {
+        return getEffectOrNull(team) ?: INVALID_GAME_STATE("Could not find inducement for ${team.name}: $effect")
+    }
+
+    fun getEffectOrNull(team: Team): InducementEffect? {
+        team.wizards.forEach { wizard ->
+            wizard.spells.forEach { spell ->
+                if (spell.id == effect) {
+                    return spell
+                }
+            }
+        }
+        team.specialPlayCards.forEach { card ->
+            if (card.id == effect) {
+                return card
+            }
+        }
+
+        return null
     }
 }
 

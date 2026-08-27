@@ -13,6 +13,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.UiFocusStyle
@@ -45,6 +46,7 @@ data class UiPitchPlayer(
     val isActive: Boolean,
     val isGoingDown: Boolean,
     val hasActivated: Boolean,
+    val statusEffects: List<PlayerStatusEffectType> = emptyList(),
     val positionalSkills: List<SkillType> = emptyList(),
     val gainedSkills: List<SkillType> = emptyList(),
     val dice: Int = 0, // Show block dice decorator
@@ -75,6 +77,7 @@ data class UiPitchPlayer(
                 || model.intermediateState == PlayerIntermediateState.FALLEN_OVER
         ),
         hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnPitch(model.team.game.rules),
+        statusEffects = model.statusEffects.map { it.type },
         positionalSkills = model.skills.map { it.type },
         gainedSkills = model.extraSkills.map { it.type },
         focusStyle = focusStyle,

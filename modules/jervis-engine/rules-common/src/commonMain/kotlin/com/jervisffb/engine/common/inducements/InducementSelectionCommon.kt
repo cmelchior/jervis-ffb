@@ -3,10 +3,10 @@ package com.jervisffb.engine.common.inducements
 import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.model.WizardId
 import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeType
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaffType
 import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.model.inducements.wizard.WizardType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.roster.Position
 import kotlinx.serialization.Serializable
@@ -19,10 +19,11 @@ object InducementSelectionCommon {
     }
 
     @Serializable
-    data class Wizard(val id: WizardId) : InducementSelection<WizardInducement> {
+    data class Wizard(val wizard: WizardType) : InducementSelection<WizardInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.WIZARD
-        override fun getSettings(rules: Rules): WizardInducement = (rules.inducements[type] as WizardsInducementGroup).items.first { it.wizard.id == id }
+        override fun getSettings(rules: Rules): WizardInducement = (rules.inducements[type] as WizardsInducementGroup).items
+            .first { it.wizard == wizard }
 
     }
 
@@ -38,7 +39,7 @@ object InducementSelectionCommon {
     data class InfamousCoach(val coachType: InfamousCoachingStaffType) : InducementSelection<InfamousCoachingStaffInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
-        override fun getSettings(rules: Rules): InfamousCoachingStaffInducement = (rules.inducements[type] as InfamousCoachingStaffsInducementGroup).items.first { it.staff.type == coachType }
+        override fun getSettings(rules: Rules): InfamousCoachingStaffInducement = (rules.inducements[type] as InfamousCoachingStaffsInducementGroup).items.first { it.staff == coachType }
 
     }
 

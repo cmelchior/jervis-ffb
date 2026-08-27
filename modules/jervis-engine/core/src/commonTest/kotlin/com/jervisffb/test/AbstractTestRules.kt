@@ -136,6 +136,7 @@ open class AbstractTestRules: Rules {
     override val passStep: Procedure = DummyProcedure
     override val throwPlayerStep: Procedure = DummyProcedure
     override val applyInducementsStep: Procedure = DummyProcedure
+    override val setupTeam: Procedure = DummyProcedure
     override val fullGameStep: Procedure = DummyProcedure
     override val kickOffStep: Procedure = DummyProcedure
     override val useApothecaryStep: Procedure = DummyProcedure

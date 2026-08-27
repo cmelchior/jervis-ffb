@@ -1,5 +1,7 @@
 package com.jervisffb.engine.bb2025.inducements.biasedreferee
 
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee
 import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeAbility
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
@@ -10,9 +12,10 @@ import kotlinx.serialization.Serializable
  * See page XXX in the BB2025 rulebook.
  */
 @Serializable
-class DodgyLeagueRep: BiasedReferee {
-    override val type: BiasedRefereeType = BiasedRefereeType.DODGY_LEAGUE_REP
-    override val name: String = BiasedRefereeType.DODGY_LEAGUE_REP.label
+class DodgyLeagueRep(private val team: TeamId): BiasedReferee {
+    constructor(team: Team): this(team.id)
+    override val type: BiasedRefereeType2025 = BiasedRefereeType2025.DODGY_LEAGUE_REP
+    override val name: String = BiasedRefereeType2025.DODGY_LEAGUE_REP.label
     override val specialRules = listOf(
         PlayerSpecialRule.I_DID_NOT_SEE_A_THING,
         PlayerSpecialRule.CLOSE_SCRUTINY,

@@ -8,6 +8,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.inducements.InducementEffect
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.DiceRollType
@@ -17,6 +18,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.rerolls.DiceRerollOption
 import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
+import kotlin.collections.emptyList
 import kotlin.random.Random
 
 /**
@@ -125,6 +127,20 @@ data class SelectInducements(
         return InducementsSelected(emptyList())
     }
     override fun createAll(): List<GameAction> = emptyList()
+}
+
+data class SelectInducementEffect(
+    val options: List<InducementEffect>
+) : GameActionDescriptor {
+    override val size: Int = 1
+    override fun createRandom(random: Random): GameAction {
+        return InducementEffectSelected(options.random(random).id)
+    }
+    override fun createAll(): List<GameAction> {
+        return options.map {
+            InducementEffectSelected(it.id)
+        }
+    }
 }
 
 data object TossCoin : GameActionDescriptor {

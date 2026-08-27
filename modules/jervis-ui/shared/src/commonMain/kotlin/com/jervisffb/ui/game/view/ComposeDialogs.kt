@@ -1,7 +1,9 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,14 +48,17 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.jervis.generated.SettingsKeys
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.InducementEffectSelected
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.shared.generated.resources.Res
@@ -66,6 +71,7 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.PrimarySkillSelectionDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.wheel.isHiding
+import com.jervisffb.ui.game.mappings.UiInducementEffect
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.NoActionWheel.animationOnly
@@ -93,6 +99,13 @@ fun SingleSelectUserActionDialog(
     dialog: SingleChoiceInputDialog,
     vm: DialogsViewModel,
 ) {
+    val inducementChoiceGroups = dialog.groupInducementEffectChoices()
+    val cancelChoice = dialog.actionDescriptions.firstOrNull { (action, _) -> action == Cancel }
+    val dialogColor = when (dialog.owner?.isHomeTeam() ?: true) {
+        true -> JervisTheme.rulebookRed
+        false -> JervisTheme.rulebookBlue
+    }
+
     JervisDialog(
         title = dialog.title,
         icon = { JervisLogo() },
@@ -100,23 +113,46 @@ fun SingleSelectUserActionDialog(
         draggable = dialog.moveable,
         backgroundScrim = false,
         centerOnPitch = vm.screenViewModel,
-        dialogColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue,
-        content = { inputFieldTextColor, textColor ->
-            Text(
-                modifier = Modifier.weight(1f),
-                text = dialog.message,
-                color = textColor
-            )
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Row(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 0.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    dialog.actionDescriptions.forEach { (action, description) ->
-                        when (action) {
+        dialogColor = dialogColor,
+        content = { _, textColor ->
+            when (inducementChoiceGroups.isNotEmpty()) {
+                true -> {
+                    if (dialog.message.isNotBlank()) {
+                        Text(
+                            text = dialog.message,
+                            color = textColor,
+                        )
+                    }
+                    InducementEffectChoiceList(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 0.dp),
+                        groups = inducementChoiceGroups,
+                        dialog = dialog,
+                        vm = vm,
+                        textColor = textColor,
+                        dialogColor = dialogColor,
+                    )
+                }
+
+                false -> {
+                    if (dialog.message.isNotBlank()) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = dialog.message,
+                            color = textColor,
+                        )
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd,
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = 16.dp, bottom = 0.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            dialog.actionDescriptions.forEach { (action, description) ->
+                                when (action) {
 //                            is CoinSideSelected -> {
 //                                CoinButton(
 //                                    modifier = Modifier.offset(y = 4.dp),
@@ -149,38 +185,153 @@ fun SingleSelectUserActionDialog(
 //                                    dropShadow = false,
 //                                )
 //                            }
-                            is DBlockResult -> {
+                                    is DBlockResult -> {
 
-                            }
-                            is DieResult -> {
-                                val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
-                                    GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id -> vm.userActionSelected(id, action) }
+                                    }
+
+                                    is DieResult -> {
+                                        val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
+                                            GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                                                vm.userActionSelected(id, action)
+                                            }
+                                        }
+                                        DialogDiceButton(
+                                            modifier = Modifier.offset(y = 4.dp),
+                                            die = action,
+                                            isSelected = false,
+                                            onClick = onClickCallback,
+                                            useSelectedColorAsHover = true,
+                                        )
+                                    }
+
+                                    else -> {
+                                        val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
+                                            GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                                                vm.userActionSelected(id, action)
+                                            }
+                                        }
+                                        JervisButton(
+                                            modifier = Modifier.offset(y = 8.dp),
+                                            text = description,
+                                            onClick = onClickCallback,
+                                            buttonColor = if (dialog.owner?.isAwayTeam() == true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue,
+                                        )
+                                    }
                                 }
-                                DialogDiceButton(
-                                    modifier = Modifier.offset(y = 4.dp),
-                                    die = action,
-                                    isSelected = false,
-                                    onClick = onClickCallback,
-                                    useSelectedColorAsHover = true
-                                )
-                            }
-                            else -> {
-                                val onClickCallback = remember(vm.screenViewModel.uiState.gameController, dialog.nextActionId) {
-                                    GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id -> vm.userActionSelected(id, action) }
-                                }
-                                JervisButton(
-                                    modifier = Modifier.offset(y = 8.dp),
-                                    text = description,
-                                    onClick = onClickCallback,
-                                    buttonColor = if (dialog.owner?.isAwayTeam() == true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue,
-                                )
                             }
                         }
                     }
                 }
             }
-        }
+        },
+        buttons = when {
+            inducementChoiceGroups.isNotEmpty() && cancelChoice != null -> {
+                {
+                    val (action, description) = cancelChoice
+                    val onClickCallback = remember(
+                        vm.screenViewModel.uiState.gameController,
+                        dialog.nextActionId,
+                        action,
+                    ) {
+                        GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                            vm.userActionSelected(id, action)
+                        }
+                    }
+                    JervisButton(
+                        modifier = Modifier.offset(y = 8.dp),
+                        text = description,
+                        onClick = onClickCallback,
+                        buttonColor = if (dialog.owner?.isAwayTeam() == true) {
+                            JervisTheme.rulebookRed
+                        } else {
+                            JervisTheme.rulebookBlue
+                        },
+                    )
+                }
+            }
+
+            else -> null
+        },
     )
+}
+
+internal data class InducementEffectChoice(
+    val action: InducementEffectSelected,
+    val description: String,
+)
+
+internal data class InducementEffectChoiceGroup(
+    val category: UiInducementEffect,
+    val choices: List<InducementEffectChoice>,
+)
+
+internal fun SingleChoiceInputDialog.groupInducementEffectChoices(): List<InducementEffectChoiceGroup> {
+    val team = owner ?: return emptyList()
+    return actionDescriptions
+        .mapNotNull { (action, description) ->
+            val selection = action as? InducementEffectSelected ?: return@mapNotNull null
+            val category = UiInducementEffect.mapFrom(selection.getEffect(team))
+            category to InducementEffectChoice(selection, description)
+        }
+        .groupBy(keySelector = { it.first }, valueTransform = { it.second })
+        .map { (category, choices) -> InducementEffectChoiceGroup(category, choices) }
+}
+
+@Composable
+private fun InducementEffectChoiceList(
+    groups: List<InducementEffectChoiceGroup>,
+    dialog: SingleChoiceInputDialog,
+    vm: DialogsViewModel,
+    textColor: Color,
+    dialogColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        groups.forEachIndexed { groupIndex, group ->
+            // Still unclear if we want headers here or not :thinking:
+            //    if (groupIndex > 0) {
+            //        Spacer(modifier = Modifier.height(16.dp))
+            //    }
+            //    SmallHeader(group.category.categoryLabel, backgroundColor = dialogColor)
+            //    JervisDialogHeader(group.category.categoryLabel, dialogColor)
+            //    TitleBorder(dialogColor)
+            // Spacer(modifier = Modifier.height(4.dp))
+            group.choices.forEachIndexed { choiceIndex, choice ->
+                val onClickCallback = remember(
+                    vm.screenViewModel.uiState.gameController,
+                    dialog.nextActionId,
+                    choice.action,
+                ) {
+                    GuardedAction(vm.screenViewModel.uiState.gameController, dialog.nextActionId) { id ->
+                        vm.userActionSelected(id, choice.action)
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = when (choiceIndex % 2) {
+                                0 -> Color.Transparent
+                                else -> JervisTheme.rulebookPaperMediumDark
+                            },
+                        )
+                        .clickable(onClick = onClickCallback)
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "${group.category.categoryLabel}: ",
+                        color = textColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = choice.description,
+                        color = textColor,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)

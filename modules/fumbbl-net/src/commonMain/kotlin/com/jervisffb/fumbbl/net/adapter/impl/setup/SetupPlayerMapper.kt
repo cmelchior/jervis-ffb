@@ -3,9 +3,9 @@ package com.jervisffb.fumbbl.net.adapter.impl.setup
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.common.procedures.SetupTeam
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -15,6 +15,8 @@ import com.jervisffb.fumbbl.net.model.TurnMode
 import com.jervisffb.fumbbl.net.model.change.FieldModelSetPlayerCoordinate
 import com.jervisffb.fumbbl.net.model.change.FieldModelSetPlayerState
 import com.jervisffb.fumbbl.net.utils.FumbblGame
+import com.jervisffb.engine.bb2020.procedures.SetupTeam as SetupTeamBB2020
+import com.jervisffb.engine.bb2025.procedures.SetupTeam as SetupTeamBB2025
 
 // Moving a player for setting up a drive
 // This is also being called when starting the half. Not sure why FUMBBL does this,
@@ -45,11 +47,23 @@ object SetupPlayerMapper: CommandActionMapper {
         val playerId = (command.modelChangeList.first() as FieldModelSetPlayerState).key
         var coordinates = (command.modelChangeList[1] as FieldModelSetPlayerCoordinate).value!!
         val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))
-        newActions.add(PlayerSelected(selectedPlayer), SetupTeam.SelectPlayerOrEndSetup)
-        if (coordinates.x < 0 || coordinates.y > 25) {
-            newActions.add(DogoutSelected, SetupTeam.PlacePlayer)
-        } else {
-            newActions.add(PitchSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
+        when (jervisGame.rules.baseVersion) {
+            GameVersion.BB2020 -> {
+                newActions.add(PlayerSelected(selectedPlayer), SetupTeamBB2020.SelectPlayerOrEndSetup)
+                if (coordinates.x < 0 || coordinates.y > 25) {
+                    newActions.add(DogoutSelected, SetupTeamBB2020.PlacePlayer)
+                } else {
+                    newActions.add(PitchSquareSelected(coordinates.x, coordinates.y), SetupTeamBB2020.PlacePlayer)
+                }
+            }
+            GameVersion.BB2025 -> {
+                newActions.add(PlayerSelected(selectedPlayer), SetupTeamBB2025.SelectPlayerOrEndSetup)
+                if (coordinates.x < 0 || coordinates.y > 25) {
+                    newActions.add(DogoutSelected, SetupTeamBB2025.PlacePlayer)
+                } else {
+                    newActions.add(PitchSquareSelected(coordinates.x, coordinates.y), SetupTeamBB2025.PlacePlayer)
+                }
+            }
         }
     }
 }

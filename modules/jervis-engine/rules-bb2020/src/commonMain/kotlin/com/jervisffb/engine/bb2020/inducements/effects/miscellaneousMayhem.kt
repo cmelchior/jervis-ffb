@@ -4,6 +4,9 @@ import com.jervisffb.engine.bb2020.procedures.inducements.dirtytricks.SpotTheSne
 import com.jervisffb.engine.common.context.ActivateInducementContext
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.InducementEffectId
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
@@ -12,7 +15,9 @@ import kotlinx.serialization.Serializable
 
 // Miscellaneous Mayhem: Assassination Attempt - See Special Plays Card Pack
 @Serializable
-class AssassinationAttempt: MiscellaneousMayhem() {
+class AssassinationAttempt(private val team: TeamId): MiscellaneousMayhem() {
+    constructor(team: Team): this(team.id)
+    override val id: InducementEffectId = InducementEffectId("${team.value}-assissination-attempt")
     override val name: String = "Assassination Attempt"
     override val duration: Duration = Duration.IMMEDIATE
     override val triggers: List<Timing> = listOf(Timing.END_OF_OPPONENT_TURN)
