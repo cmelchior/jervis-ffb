@@ -690,6 +690,18 @@ class P2PNetworkTests {
     }
 
     @Test
+    fun serverAcceptsActionFromARevertedClientGeneration() {
+        startGame { homeConn, awayConn ->
+            // The client has reverted locally, but the authoritative server has not. Their
+            // generations differ while the shared action counter still identifies the same step.
+            homeConn.send(GameActionMessage(GameActionId(1, 2), 1.d3))
+            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+                assertEquals(GameActionId(1), message.serverIndex)
+            }
+        }
+    }
+
+    @Test
     fun serverSendsErrorIfActionIsWrongType() {
         startGame { homeConn, awayConn ->
             // The Home team is expected to send a fan factor roll, but sends another event (but with the

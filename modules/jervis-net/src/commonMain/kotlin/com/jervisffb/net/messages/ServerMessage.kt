@@ -210,6 +210,7 @@ sealed interface ServerError: ServerMessage {
 
 @Serializable
 sealed interface GameActionServerError: ServerError {
+    // Which game action id caused the error
     val actionId: GameActionId
 }
 

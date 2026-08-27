@@ -16,10 +16,26 @@ import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.utils.jervisLogger
-import com.jervisffb.utils.singleThreadDispatcher
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
+
+// Events are kept in the order they were received from the server.
+private sealed interface P2PServerEvent {
+    // A game action sent by the server that will move the local state forward.
+    data class ServerGameAction(
+        val serverIndex: GameActionId,
+        val action: GameAction,
+    ) : P2PServerEvent
+
+    // The server rejected a game action created optimistically by this client.
+    data class RejectedAction(
+        // ID of the action that was rejected by the server.
+        val rejectedActionId: GameActionId,
+    ) : P2PServerEvent
+}
 
 /**
  * This [UiActionProvider] is the primary action provider for P2P games and are responsible for switching
@@ -37,17 +53,17 @@ class P2PActionProvider(
         val LOG = jervisLogger()
     }
 
-    var lastServerActionIndex: GameActionId = GameActionId(-1)
     private var sharedData: LocalPitchDataWrapper? = null
 
-    // For now, this only track Revert's from the server. Game Sync messages are handled
-    // by just calling `userActionSelected`. Server Reverts will be run after all queued up
-    // messages from the server has been sent. This avoids the race condition where the server
-    // stats sending back Revert in the middle of queue up client actions.
-    private val serverActionScope = CoroutineScope(singleThreadDispatcher("ServerRevertScope"))
-    private val revertServerActionsQueue = Channel<QueuedActionsGenerator>(capacity = Int.MAX_VALUE)
-    private val queuedServerActions = mutableListOf<GameAction>()
-    private var handlingServerRevert = false // Set during `prepareForNextAction`. If `true`, the action will not be sent to the server again
+    // Server events are kept separate from local provider actions and consumed
+    // in the order they are received. A server action can arrive before the
+    // rejection of the conflicting local action; therefore, that action stays
+    // at the head while Revert actions moves the engine back to a state that
+    // will accept that server action.
+    private val serverEvents = Channel<P2PServerEvent>(capacity = Channel.UNLIMITED)
+    private val queuedServerEvents = mutableListOf<P2PServerEvent>()
+    private var handlingServerAction = false
+    private var handlingServerRevert = false
 
     override var currentProvider: UiActionProvider = homeProvider
         private set
@@ -66,13 +82,7 @@ class P2PActionProvider(
     override fun startHandler() {
         networkAdapter.addMessageHandler(object: AbstractClintNetworkMessageHandler() {
             override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) {
-                // TODO Should this be moved into RemoteActionProvider somehow?
-                lastServerActionIndex = serverIndex
-                if (producer == engine.state.awayTeam.coach.id) { // TODO Is this check always correct?
-                    awayProvider.userActionSelected(serverIndex, action)
-                } else {
-                    homeProvider.userActionSelected(serverIndex, action)
-                }
+                queueServerAction(serverIndex, action)
             }
 
             override fun onServerError(error: ServerError) {
@@ -85,13 +95,8 @@ class P2PActionProvider(
                 // for the future.
                 when (error) {
                     is GameActionServerError -> {
-                        // TODO This does not seem to work?
                         LOG.i { "Queuing up Revert of action: ${error.actionId}" }
-                        serverActionScope.launch {
-                            revertServerActionsQueue.send { controller: GameEngineController ->
-                                QueuedActionsResult(Revert)
-                            }
-                        }
+                        queueRejectedAction(error.actionId)
                     }
                     else -> { /* Ignore */ }
                 }
@@ -101,19 +106,20 @@ class P2PActionProvider(
         awayProvider.startHandler()
     }
 
+    override fun stopHandler() {
+        homeProvider.stopHandler()
+        awayProvider.stopHandler()
+        super.stopHandler()
+    }
+
     override fun actionHandled(team: Team?, action: GameAction) {
-        // If we are handling a server Undo, we are trying to get the client into the correct
-        // state. This means we do not want to send any events to the server during this period.
-        if (handlingServerRevert) return
+        // Actions received from the server, including a local Revert, must never be sent back.
+        if (handlingServerAction) return
 
         val clientActionIndex = engine.currentActionId()
-        // Should only send this if the event is truly from this client and not just a sync message
-        // TODO lastServerActionIndex seems to be out of sync
-        LOG.d("Sending message to server ($clientActionIndex > $lastServerActionIndex): $action")
-        if (clientActionIndex > lastServerActionIndex) {
-            actionScope.launch {
-                networkAdapter.sendActionToServer(clientActionIndex, action)
-            }
+        LOG.d("Sending message to server ($clientActionIndex): $action")
+        actionScope.launch {
+            networkAdapter.sendActionToServer(clientActionIndex, action)
         }
     }
 
@@ -124,6 +130,8 @@ class P2PActionProvider(
     }
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+        handlingServerAction = false
+        handlingServerRevert = false
         currentProvider = if (actions.team?.isAwayTeam() == true) {
             awayProvider
         } else {
@@ -131,18 +139,10 @@ class P2PActionProvider(
         }
         currentProvider.prepareForNextAction(controller, actions)
         if (!currentProvider.hasQueuedActions()) {
-            while (true) {
-                val item = revertServerActionsQueue.tryReceive()
-                if (item.isSuccess) {
-                    item.getOrThrow()(controller)?.actions?.forEach { action ->
-                        queuedServerActions.add(action)
-                    }
-                } else {
-                    break
-                }
-            }
+            drainServerEvents()
+            discardReconciledRejections()
+            handlingServerRevert = firstServerEventRequiresRevert(controller.nextActionIndex())
         }
-        handlingServerRevert = queuedServerActions.isNotEmpty()
     }
 
     override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
@@ -155,22 +155,137 @@ class P2PActionProvider(
         if (!handlingServerRevert) {
             currentProvider.decorateSelectedAction(action, acc)
 
-            // If the local `engine` is behind`, we know we are handling a
-            // server-generated action, which we always want to animate.
-            if (engine.nextActionIndex() <= lastServerActionIndex) {
+            if (handlingServerAction) {
                 acc.actionWasSelectedWithoutUserInput = true
             }
         }
     }
 
     override suspend fun getAction(id: GameActionId): GameAction {
-        if (handlingServerRevert) {
-            val action = queuedServerActions.removeFirst()
-            LOG.i { "Handling revert: $handlingServerRevert -> $action" }
-            return action
-        } else {
-            LOG.i { "GetAction($currentProvider)" }
+        // Finish a locally queued action sequence before reacting to the server. This keeps
+        // generated multi-action paths atomic from the UI's perspective; any rejected actions
+        // are reverted immediately afterwards.
+        if (currentProvider.hasQueuedActions()) {
             return currentProvider.getAction(id)
+        }
+
+        drainServerEvents()
+        takeServerAction(id)?.let { return it }
+
+        return coroutineScope {
+            val providerAction = async { currentProvider.getAction(id) }
+            try {
+                var selectedAction: GameAction? = null
+                while (selectedAction == null) {
+                    selectedAction = takeServerAction(id) ?: select {
+                        // The select is intentionally biased toward the authoritative server when
+                        // both it and the local provider have an action ready.
+                        serverEvents.onReceive { event ->
+                            queuedServerEvents.add(event)
+                            null
+                        }
+                        providerAction.onAwait { action ->
+                            handlingServerAction = false
+                            handlingServerRevert = false
+                            action
+                        }
+                    }
+                }
+                selectedAction
+            } finally {
+                // If a server event won, any local selection for this now-obsolete action id must
+                // not leak into the new timeline.
+                providerAction.cancel()
+            }
+        }
+    }
+
+    internal fun queueServerAction(serverIndex: GameActionId, action: GameAction) {
+        check(serverEvents.trySend(P2PServerEvent.ServerGameAction(serverIndex, action)).isSuccess) {
+            "Unable to queue synchronized server action $serverIndex: $action"
+        }
+    }
+
+    internal fun queueRejectedAction(actionId: GameActionId) {
+        check(serverEvents.trySend(P2PServerEvent.RejectedAction(actionId)).isSuccess) {
+            "Unable to queue server rejection for action $actionId"
+        }
+    }
+
+    private fun drainServerEvents() {
+        while (true) {
+            val event = serverEvents.tryReceive()
+            when (event.isSuccess) {
+                true ->queuedServerEvents.add(event.getOrThrow())
+                false -> return
+            }
+        }
+    }
+
+    private fun takeServerAction(id: GameActionId): GameAction? {
+        while (true) {
+            discardReconciledRejections()
+            val event = queuedServerEvents.firstOrNull() ?: return null
+
+            when (event) {
+                is P2PServerEvent.RejectedAction -> {
+                    handlingServerAction = true
+                    handlingServerRevert = true
+                    LOG.i { "Reverting rejected action: ${event.rejectedActionId}" }
+                    return Revert
+                }
+                is P2PServerEvent.ServerGameAction -> {
+                    when {
+                        event.serverIndex.counter < id.counter -> {
+                            val actionIsStillApplied = engine.history.any { delta ->
+                                delta.id.counter == event.serverIndex.counter
+                            }
+                            if (!actionIsStillApplied) {
+                                LOG.w { "Ignoring outdated synchronized action ${event.serverIndex}: ${event.action}" }
+                                queuedServerEvents.removeFirst()
+                                continue
+                            }
+
+                            handlingServerAction = true
+                            handlingServerRevert = true
+                            LOG.i {
+                                "Reverting local timeline for synchronized action " +
+                                    "${event.serverIndex}: ${event.action}"
+                            }
+                            return Revert
+                        }
+                        event.serverIndex.counter > id.counter -> return null
+                        else -> {
+                            queuedServerEvents.removeFirst()
+                            handlingServerAction = true
+                            handlingServerRevert = event.action is Revert
+                            LOG.i { "Handling synchronized action ${event.serverIndex}: ${event.action}" }
+                            return event.action
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun discardReconciledRejections() {
+        while (true) {
+            val rejection = queuedServerEvents.firstOrNull() as? P2PServerEvent.RejectedAction ?: return
+            val rejectedActionIsStillApplied = engine.history.any { delta ->
+                delta.id == rejection.rejectedActionId
+            }
+            if (rejectedActionIsStillApplied) return
+
+            LOG.d { "Ignoring rejection for reconciled action: ${rejection.rejectedActionId}" }
+            queuedServerEvents.removeFirst()
+        }
+    }
+
+    private fun firstServerEventRequiresRevert(id: GameActionId): Boolean {
+        return when (val event = queuedServerEvents.firstOrNull()) {
+            is P2PServerEvent.RejectedAction -> true
+            is P2PServerEvent.ServerGameAction -> event.serverIndex.counter < id.counter
+            null -> false
         }
     }
 
@@ -187,6 +302,11 @@ class P2PActionProvider(
     }
 
     override fun hasQueuedActions(): Boolean {
-        return queuedServerActions.isNotEmpty()
+        discardReconciledRejections()
+        return currentProvider.hasQueuedActions() || when (val event = queuedServerEvents.firstOrNull()) {
+            is P2PServerEvent.RejectedAction -> true
+            is P2PServerEvent.ServerGameAction -> event.serverIndex.counter <= engine.nextActionIndex().counter
+            null -> false
+        }
     }
 }

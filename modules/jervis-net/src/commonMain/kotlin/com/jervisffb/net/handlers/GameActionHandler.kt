@@ -29,7 +29,10 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
         if (game == null) {
             session.out.sendError(
                 connection,
-                OutOfOrderGameActionServerError(message.clientIndex,"Game is not initialized yet. Please wait for the GameStarted event to be sent.")
+                OutOfOrderGameActionServerError(
+                    message.clientIndex,
+                    "Game is not initialized yet. Please wait for the GameStarted event to be sent.",
+                ),
             )
             return
         }
@@ -69,7 +72,12 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
 
         try {
             val expectedDeltaId = session.game!!.nextActionIndex()
-            if (message.clientIndex != expectedDeltaId) {
+            // Revert actions are local to a client: the server only sends
+            // GameActionServerErrors. So a servers GameActionId.generation does
+            // not change when a client corrects its timeline. The counter
+            // is the shared ordering component and is therefore what the server
+            // validates.
+            if (message.clientIndex.counter != expectedDeltaId.counter) {
                 session.out.sendError(
                     connection,
                     OutOfOrderGameActionServerError(message.clientIndex,"Expected $expectedDeltaId, but received ${message.clientIndex}.")
