@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class SpecialRule(override val id: String) : FumbblEnum {
     BADLANDS_BRAWL("Badlands Brawl"),
     BRIBERY_AND_CORRUPTION("Bribery and Corruption"),
+    BRAWLIN_BRUTES("Brawlin' Brutes"),
     ELVEN_KINGDOMS_LEAGUE("Elven Kingdoms League"),
     FAVOURED_OF_KHORNE("Favoured of Khorne"),
     FAVOURED_OF_NURGLE("Favoured of Nurgle"),
