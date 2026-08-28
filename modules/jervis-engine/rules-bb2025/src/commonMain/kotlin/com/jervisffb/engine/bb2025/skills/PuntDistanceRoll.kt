@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2025.skills
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.common.context.PuntContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -22,7 +22,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * See page 135 in the BB2025 rulebook.
  * See [PuntDirectionRoll] for rolling for the direction.
  */
-object PuntDistanceRoll : D6WithRerollProcedure() {
+object PuntDistanceRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.PUNT_DISTANCE
     override val initialNode: Node get() = RollDie
     override fun getActionOwner(state: Game): Player = state.getContext<PuntContext>().punter

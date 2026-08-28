@@ -8,7 +8,7 @@ import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.UnchannelledFuryRollContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -24,7 +24,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Procedure for rolling for Unchannelled Fury in BB2025.
  */
-object UnchannelledFuryRoll : D6WithRerollProcedure() {
+object UnchannelledFuryRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.UNCHANNELLED_FURY
     override val initialNode: Node get() = RollDie
 

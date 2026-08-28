@@ -1,10 +1,14 @@
 package com.jervisffb.engine.bb2025.procedures.rerolls
 
+import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.rerolls.TeamReroll
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTest
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTestEffect
 
 sealed interface TeamReroll2025: TeamReroll {
     override val rerollProcedure: Procedure
@@ -69,6 +73,15 @@ class TeamMascotReroll(override val teamId: TeamId) : TeamReroll2025 {
 
     companion object {
         val TARGET: Int = 4
+    }
+
+    override fun getChanceRerollTest(): ChanceRerollTest {
+        return ChanceRerollTest(
+            rollType = DiceRollType.TEAM_MASCOT,
+            dieSides = D6Result.SIDES,
+            successTarget = TARGET,
+            effect = ChanceRerollTestEffect.ALLOWS_REROLL,
+        )
     }
 }
 

@@ -15,7 +15,7 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -42,7 +42,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * result is stored in [PogoRollContext] and it is up to the caller of the
  * procedure to choose the appropriate action depending on the outcome.
  */
-object PogoRoll : D6WithRerollProcedure() {
+object PogoRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.POGO
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

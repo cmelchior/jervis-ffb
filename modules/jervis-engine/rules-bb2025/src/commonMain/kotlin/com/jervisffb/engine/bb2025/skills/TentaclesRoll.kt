@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.modifiers.DefensiveTentaclesModifier
 import com.jervisffb.engine.common.modifiers.OffensiveTentaclesModifier
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -26,7 +26,7 @@ import com.jervisffb.engine.utils.sum
  * The result is stored in [TentaclesRollContext]] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
-object TentaclesRoll : D6WithRerollProcedure() {
+object TentaclesRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.TENTACLES
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

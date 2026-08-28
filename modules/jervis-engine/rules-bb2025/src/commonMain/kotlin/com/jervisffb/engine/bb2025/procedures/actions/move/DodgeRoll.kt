@@ -28,7 +28,7 @@ import com.jervisffb.engine.common.commands.SetCurrentBall
 import com.jervisffb.engine.common.modifiers.BreakTackleModifier
 import com.jervisffb.engine.common.modifiers.MarkedModifier
 import com.jervisffb.engine.common.procedures.Bounce
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportDodgeResult
 import com.jervisffb.engine.common.reports.ReportSkillUsed
@@ -105,7 +105,7 @@ import kotlinx.collections.immutable.toPersistentList
  * Break Tackle and Prehensile Tail. In this case, it doesn't matter since they
  * are both "free", but in other cases it might.
  */
-object DodgeRoll: D6WithRerollProcedure() {
+object DodgeRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.DODGE
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

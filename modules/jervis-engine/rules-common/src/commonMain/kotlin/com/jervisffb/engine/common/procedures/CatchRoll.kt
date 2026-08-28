@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.procedures
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.context.CatchContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -22,7 +22,7 @@ import com.jervisffb.engine.rules.common.testAgainstAgility
  * in [CatchContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
-object CatchRoll : D6WithRerollProcedure() {
+object CatchRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.CATCH
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

@@ -55,8 +55,8 @@ Rules shared between BB2025 and BB2020 are placed in `engine/rules/common`.
 
 Some guidelines when creating new procedures:
 
-- Dice rolls should be implemented using `D3WithRerollProcedure`/
-  `D6WithRerollProcedure` when applicable
+- Dice rolls should be implemented using `D3WithPlayerRerollProcedure`/
+  `D6WithPlayerRerollProcedure` when applicable
 - Avoid using `ComputationNode` if possible. `ParentNode` has `skipNodeFor`
   for the most common scenario where ComputationNodes are used.
 - ActionNodes do not need to have extensive input checking, outside casting to 

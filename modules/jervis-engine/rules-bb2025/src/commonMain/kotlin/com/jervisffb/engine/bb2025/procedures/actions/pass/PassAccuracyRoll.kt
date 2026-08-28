@@ -17,7 +17,7 @@ import com.jervisffb.engine.common.context.PassContext
 import com.jervisffb.engine.common.modifiers.AccuracyModifier
 import com.jervisffb.engine.common.modifiers.DisturbingPresenceModifier
 import com.jervisffb.engine.common.procedures.actions.pass.PassingType
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -65,7 +65,7 @@ import kotlinx.collections.immutable.toPersistentList
  *
  * So for this roll, we only ask once after rolling the first die.
  */
-object PassAccuracyRoll: D6WithRerollProcedure() {
+object PassAccuracyRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ACCURACY
     override val initialNode: Node get() = ChooseToUseNervesOfSteel
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command {

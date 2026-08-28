@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.procedures.rerolls
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.context.ProRollContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * Procedure controlling the Pro roll, i.e., when a player with the Pro
  * skill wants to re-roll a die.
  */
-object ProRoll: D6WithRerollProcedure() {
+object ProRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.PRO
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

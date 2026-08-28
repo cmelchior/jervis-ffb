@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.procedures.rerolls
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.context.LonerRollContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -20,7 +20,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
  * Procedure controlling the Loner roll, i.e., when a player with the Loner
  * skill wants to use a Team re-roll.
  */
-object LonerRoll: D6WithRerollProcedure() {
+object LonerRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.LONER
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

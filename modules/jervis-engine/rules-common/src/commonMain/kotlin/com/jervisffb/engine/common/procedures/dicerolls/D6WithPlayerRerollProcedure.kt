@@ -48,18 +48,13 @@ import kotlinx.collections.immutable.toPersistentList
  * Shared logic for Procedures that are handling a single D6 roll with
  * re-roll options for players.
  *
- * TODO Consolidate this with [D3WithRerollProcedure]
+ * TODO Consolidate this with [D3WithPlayerRerollProcedure]
  *
  * WARNING: Be careful with storing commands in abstract nodes. If these
  * commands have mutable state (like logs), they risk being inconsistent and
  * will crash the game engine.
- *
- * Right now, there is only a single procedure that does the same for Teams,
- * `com.jervisffb.engine.bb2025.procedures.rerolls.TeamMascotRoll`. This
- * procedure implements the same nodes as found here, so any changes should
- * be mirrored there.
  */
-abstract class D6WithRerollProcedure: Procedure(), ChanceObservationHandler {
+abstract class D6WithPlayerRerollProcedure: Procedure(), ChanceObservationHandler {
     // Roll initial dice
     abstract val RollDie: ActionNode
     // Select re-roll source or no reroll to keep result

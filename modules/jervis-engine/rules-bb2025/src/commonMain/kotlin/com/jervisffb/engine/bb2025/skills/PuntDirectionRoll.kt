@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2025.skills
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.common.context.PuntContext
-import com.jervisffb.engine.common.procedures.dicerolls.D3WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D3WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -22,7 +22,7 @@ import com.jervisffb.engine.rules.common.procedures.D3DieRoll
  * See page 135 in the BB2025 rulebook.
  * See [PuntDistanceRoll] for rolling for the distance.
  */
-object PuntDirectionRoll : D3WithRerollProcedure() {
+object PuntDirectionRoll : D3WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.PUNT_DIRECTION
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules) = null

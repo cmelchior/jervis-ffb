@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.context.ActivatePlayerContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -25,7 +25,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * If the roll is failed, the current action ends immediately. This is handled
  * here, so callers of this procedure just need to exit as quickly as possible.
  */
-object FoulAppearanceRoll: D6WithRerollProcedure() {
+object FoulAppearanceRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.FOUL_APPEARANCE
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

@@ -17,7 +17,7 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.modifiers.LeapModifier
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -45,7 +45,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * result is stored in [LeapRollContext] and it is up to the caller of the
  * procedure to choose the appropriate action depending on the outcome.
  */
-object LeapRoll : D6WithRerollProcedure() {
+object LeapRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.LEAP
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

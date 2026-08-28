@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.JumpUpRollContext
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.modifiers.JumpUpModifier
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -24,7 +24,7 @@ import com.jervisffb.engine.rules.common.testAgainstAgility
  * The result is stored in [com.jervisffb.engine.bb2025.context.JumpUpRollContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object JumpUpRoll: D6WithRerollProcedure() {
+object JumpUpRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.JUMP_UP
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

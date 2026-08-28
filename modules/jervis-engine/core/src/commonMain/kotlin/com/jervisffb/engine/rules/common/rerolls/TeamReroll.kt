@@ -7,6 +7,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.statistics.probability.observation.ChanceRerollTest
 
 /**
  * Interface describing all types of Team Rerolls.
@@ -54,5 +55,12 @@ interface TeamReroll : RerollSource {
         wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
         return listOf(DiceRerollOption(this.id, value))
+    }
+
+    // If using this reroll is associated with a die, the chance description should
+    // be returned here. Note, this only account for intrinsic rolls, not rolls
+    // caused by other skills. E.g., Team Mascot, but not a Team Reroll used with Loner.
+    fun getChanceRerollTest(): ChanceRerollTest? {
+        return null
     }
 }

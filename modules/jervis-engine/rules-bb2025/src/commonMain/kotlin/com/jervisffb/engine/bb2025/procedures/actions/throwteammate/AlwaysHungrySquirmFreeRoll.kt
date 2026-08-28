@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.throwteammate
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.AlwaysHungryContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -15,7 +15,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
-object AlwaysHungrySquirmFreeRoll: D6WithRerollProcedure() {
+object AlwaysHungrySquirmFreeRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ALWAYS_HUNGRY_EAT_ATTEMPT
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

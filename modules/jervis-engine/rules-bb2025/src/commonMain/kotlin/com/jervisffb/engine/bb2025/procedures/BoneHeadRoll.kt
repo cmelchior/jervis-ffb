@@ -2,7 +2,6 @@ package com.jervisffb.engine.bb2025.procedures
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.modifiers.distracted
-import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -12,7 +11,7 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.commands.SetHasTackleZones
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.BoneHeadRollContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -28,7 +27,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Procedure for rolling for Bone Head in BB2025.
  */
-object BoneHeadRoll : D6WithRerollProcedure() {
+object BoneHeadRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.BONE_HEAD
     override val initialNode: Node get() = RollDie
 

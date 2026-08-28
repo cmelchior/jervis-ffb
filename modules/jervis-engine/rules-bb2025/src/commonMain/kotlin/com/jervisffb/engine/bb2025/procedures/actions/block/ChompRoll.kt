@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.block
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.ChompContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -22,7 +22,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * The result is stored in [com.jervisffb.engine.bb2025.context.ChompContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object ChompRoll: D6WithRerollProcedure() {
+object ChompRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.CHOMP
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

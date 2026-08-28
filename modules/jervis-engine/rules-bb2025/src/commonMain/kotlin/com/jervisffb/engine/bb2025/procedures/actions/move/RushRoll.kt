@@ -4,7 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.modifiers.RushModifier
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -29,7 +29,7 @@ import com.jervisffb.engine.utils.sum
  * This procedure is only responsible for the actual dice roll. The parent
  * procedure must handle the result of the roll, it is not handled here.
  */
-object RushRoll: D6WithRerollProcedure() {
+object RushRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.RUSH
     override val initialNode: Node get() = RollDie
 

@@ -6,7 +6,7 @@ import com.jervisffb.engine.common.context.ThrowTeamMateContext
 import com.jervisffb.engine.common.modifiers.DisturbingPresenceModifier
 import com.jervisffb.engine.common.modifiers.QualityModifier
 import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowPlayerResult
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -32,7 +32,7 @@ import kotlinx.collections.immutable.toPersistentList
  * The result is stored in [ThrowTeamMateContext] and it is up
  * to the caller to determine what to do with the result.
  */
-object QualityRoll: D6WithRerollProcedure() {
+object QualityRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.QUALITY
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

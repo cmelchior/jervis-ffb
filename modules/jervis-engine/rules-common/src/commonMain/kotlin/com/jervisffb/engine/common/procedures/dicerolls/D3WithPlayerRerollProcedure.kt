@@ -47,9 +47,9 @@ import kotlinx.collections.immutable.toPersistentList
  * Shared logic for Procedures that are handling a single D3 roll with
  * re-roll options.
  *
- * TODO Consolidate this with [D6WithRerollProcedure]
+ * TODO Consolidate this with [D6WithPlayerRerollProcedure]
  */
-abstract class D3WithRerollProcedure: Procedure(), ChanceObservationHandler {
+abstract class D3WithPlayerRerollProcedure: Procedure(), ChanceObservationHandler {
     // Roll initial dice
     abstract val RollDie: ActionNode
     // Select re-roll source or no reroll to keep result

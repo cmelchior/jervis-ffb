@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.rerolls
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.TeamCaptainRollContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -15,7 +15,7 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
-object TeamCaptainRoll: D6WithRerollProcedure() {
+object TeamCaptainRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.TEAM_CAPTAIN
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

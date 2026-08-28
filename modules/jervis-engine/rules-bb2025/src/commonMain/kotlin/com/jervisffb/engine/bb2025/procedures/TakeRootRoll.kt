@@ -10,7 +10,7 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.TakeRootRollContext
 import com.jervisffb.engine.common.modifiers.rooted
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportFailedTakeRoot
 import com.jervisffb.engine.fsm.Node
@@ -26,7 +26,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 /**
  * Procedure for rolling for Take Root in BB2025.
  */
-object TakeRootRoll : D6WithRerollProcedure() {
+object TakeRootRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.TAKE_ROOT
     override val initialNode: Node get() = RollDie
 

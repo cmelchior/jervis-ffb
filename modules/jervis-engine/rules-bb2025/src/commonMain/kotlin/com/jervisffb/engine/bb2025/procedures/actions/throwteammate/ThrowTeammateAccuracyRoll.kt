@@ -16,7 +16,7 @@ import com.jervisffb.engine.common.modifiers.AccuracyModifier
 import com.jervisffb.engine.common.modifiers.DisturbingPresenceModifier
 import com.jervisffb.engine.common.modifiers.QualityModifier
 import com.jervisffb.engine.common.procedures.actions.throwteammate.ThrowPlayerResult
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
@@ -46,7 +46,7 @@ import kotlinx.collections.immutable.toPersistentList
  * The result is stored in [ThrowTeamMateContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object ThrowTeammateAccuracyRoll: D6WithRerollProcedure() {
+object ThrowTeammateAccuracyRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.ACCURACY
     override val initialNode: Node = ChooseToUseStrongArm
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command {

@@ -35,7 +35,7 @@ import com.jervisffb.engine.statistics.probability.observation.ChanceResultId
  * This file contains various helper methods for creating or updating
  * [ChanceObservation] objects.
  *
- * Primarily used by [D6WithRerollProcedure] or [D3WithRerollProcedure].
+ * Primarily used by [D6WithPlayerRerollProcedure] or [D3WithPlayerRerollProcedure].
  */
 
 /**

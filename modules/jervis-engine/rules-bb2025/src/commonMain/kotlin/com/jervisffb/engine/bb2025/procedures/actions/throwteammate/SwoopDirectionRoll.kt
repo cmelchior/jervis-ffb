@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.throwteammate
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.bb2025.context.SwoopContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D3WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D3WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -21,7 +21,7 @@ import com.jervisffb.engine.rules.common.procedures.D3DieRoll
  * The result is stored in [com.jervisffb.engine.bb2025.context.SwoopContext]] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
-object SwoopDirectionRoll : D3WithRerollProcedure() {
+object SwoopDirectionRoll : D3WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.SWOOP_DIRECTION
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

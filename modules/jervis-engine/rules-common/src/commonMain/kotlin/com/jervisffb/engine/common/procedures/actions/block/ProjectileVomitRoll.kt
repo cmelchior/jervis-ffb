@@ -3,7 +3,7 @@ package com.jervisffb.engine.common.procedures.actions.block
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.common.context.ProjectileVomitContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -22,7 +22,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * The result is stored in [com.jervisffb.engine.common.context.ProjectileVomitContext] and it is up to the caller to
  * determine what to do with the result.
  */
-object ProjectileVomitRoll: D6WithRerollProcedure() {
+object ProjectileVomitRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.PROJECTILE_VOMIT
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

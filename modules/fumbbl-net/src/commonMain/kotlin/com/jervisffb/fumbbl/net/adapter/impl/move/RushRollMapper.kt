@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.bb2020.procedures.rerolls.StandardTeamReroll2020
 import com.jervisffb.engine.bb2020.skills.SureFeet
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -65,6 +65,6 @@ object RushRollMapper: CommandActionMapper {
         }
     }
 
-    private fun fumbblRushRoll(rules: Rules): D6WithRerollProcedure =
-        rules.rushRoll as D6WithRerollProcedure
+    private fun fumbblRushRoll(rules: Rules): D6WithPlayerRerollProcedure =
+        rules.rushRoll as D6WithPlayerRerollProcedure
 }

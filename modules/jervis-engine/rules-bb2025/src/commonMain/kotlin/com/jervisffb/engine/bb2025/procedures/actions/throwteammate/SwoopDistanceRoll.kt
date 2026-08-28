@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.throwteammate
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.SwoopContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -21,7 +21,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * The result is stored in [com.jervisffb.engine.bb2025.context.SwoopContext]] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
-object SwoopDistanceRoll : D6WithRerollProcedure() {
+object SwoopDistanceRoll : D6WithPlayerRerollProcedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<SwoopContext>()
     }

@@ -7,7 +7,7 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.context.StandingUpRollContext
 import com.jervisffb.engine.common.modifiers.HelpingHandsModifier
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ComputationNode
@@ -31,7 +31,7 @@ import com.jervisffb.engine.utils.sum
  * in [com.jervisffb.engine.common.context.StandingUpRollContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
-object StandingUpRoll : D6WithRerollProcedure() {
+object StandingUpRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.STANDING_UP
     override val initialNode: Node = UseTimmber
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

@@ -3,7 +3,7 @@ package com.jervisffb.engine.bb2025.procedures.actions.securetheball
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.bb2025.context.SecureTheBallRollContext
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -23,7 +23,7 @@ import com.jervisffb.engine.utils.sum
  * The result is stored in [SecureTheBallRollContext]] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
-object SecureTheBallRoll : D6WithRerollProcedure() {
+object SecureTheBallRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.SECURE_THE_BALL
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

@@ -2,7 +2,7 @@ package com.jervisffb.engine.bb2025.procedures.injury
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
@@ -21,7 +21,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
  * The result is stored in [SteadyFootingRoll]] and it is up to the caller of
  * the procedure to choose the appropriate action depending on the outcome.
  */
-object SteadyFootingRoll : D6WithRerollProcedure() {
+object SteadyFootingRoll : D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.STEADY_FOOTING
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null

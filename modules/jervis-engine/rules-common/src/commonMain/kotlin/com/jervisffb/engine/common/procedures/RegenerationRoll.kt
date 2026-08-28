@@ -19,7 +19,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetApothecaryUsed
 import com.jervisffb.engine.common.commands.SetMortuaryAssistantUsed
 import com.jervisffb.engine.common.context.RiskingInjuryContext
-import com.jervisffb.engine.common.procedures.dicerolls.D6WithRerollProcedure
+import com.jervisffb.engine.common.procedures.dicerolls.D6WithPlayerRerollProcedure
 import com.jervisffb.engine.common.procedures.dicerolls.RerollData
 import com.jervisffb.engine.common.reports.ReportApothecaryUsed
 import com.jervisffb.engine.common.reports.ReportDiceRoll
@@ -49,7 +49,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * during the player's team's own turn — see NAF interpretation), a Mortuary
  * Assistant, or a Plague Doctor inducement.
  */
-object RegenerationRoll: D6WithRerollProcedure() {
+object RegenerationRoll: D6WithPlayerRerollProcedure() {
     override val rollType: DiceRollType = DiceRollType.REGENERATION
     override val initialNode: Node get() = RollDie
     override fun onEnterRollProcedure(state: Game, rules: Rules): Command? = null
