@@ -42,6 +42,26 @@ class ClientNetworkManagerReconnectTests {
         }
     }
 
+    private class ConnectionStateHandler : AbstractClintNetworkMessageHandler() {
+        val states = mutableListOf<String>()
+        val connected = CompletableDeferred<Unit>()
+        val disconnected = CompletableDeferred<Unit>()
+
+        override fun onConnecting() {
+            states.add("connecting")
+        }
+
+        override fun onConnected() {
+            states.add("connected")
+            connected.complete(Unit)
+        }
+
+        override fun onDisconnected(reason: CloseReason) {
+            states.add("disconnected")
+            disconnected.complete(Unit)
+        }
+    }
+
     private fun freePort(): Int = ServerSocket(0).use { it.localPort }
 
     private fun createServer(port: Int, hostTeam: Team) = LightServer(
@@ -69,6 +89,35 @@ class ClientNetworkManagerReconnectTests {
             teamIfHost = null,
             handler = handler,
         )
+    }
+
+    @Test
+    fun connectionStaysConnectingUntilTheServerResponds(): Unit = runBlocking {
+        val port = freePort()
+        val hostTeam = createDefaultHomeTeamBB2025(rules)
+        val adapter = P2PClientNetworkAdapter()
+        val handler = ConnectionStateHandler()
+        val server = createServer(port, hostTeam)
+        server.start()
+
+        try {
+            joinAs(adapter, port, "client", handler)
+            withTimeout(timeout) { handler.connected.await() }
+            assertEquals(listOf("connecting", "connected"), handler.states)
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun failedConnectionNeverReportsConnected(): Unit = runBlocking {
+        val adapter = P2PClientNetworkAdapter()
+        val handler = ConnectionStateHandler()
+
+        joinAs(adapter, freePort(), "client", handler)
+        withTimeout(timeout) { handler.disconnected.await() }
+
+        assertEquals(listOf("connecting", "disconnected"), handler.states)
     }
 
     @Test

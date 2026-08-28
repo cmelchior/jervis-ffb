@@ -1,15 +1,19 @@
 package com.jervisffb.ui.menu.p2p.client
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
@@ -17,6 +21,7 @@ import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.shared.generated.resources.jervis_frontpage_elf_vs_skeleton
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.SidebarMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
@@ -80,6 +85,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val view
 @Composable
 private fun PageContent(viewModel: P2PClientScreenModel) {
     val currentPage by viewModel.currentPage.collectAsState()
+    val connectingToHost by viewModel.isConnectingToHost.collectAsState()
     val reconnecting by viewModel.networkAdapter.reconnecting.collectAsState()
     val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
@@ -103,12 +109,25 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
                     },
                     onCancel = { viewModel.joinHostModel.disconnectFromHost() },
                 )
-                1 -> SelectP2PTeamScreen(
-                    viewModel = viewModel.selectTeamModel.componentModel,
-                    isHost = false,
-                    confirmTitle = "Next",
-                    onNext = { viewModel.teamSelectionDone() }
-                )
+                1 -> Crossfade(
+                    targetState = connectingToHost,
+                    label = "Connecting to host",
+                ) { connecting ->
+                    when (connecting) {
+                        true -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text("Connecting", color = JervisTheme.contentTextColor)
+                        }
+                        false -> SelectP2PTeamScreen(
+                            viewModel = viewModel.selectTeamModel.componentModel,
+                            isHost = false,
+                            confirmTitle = "Next",
+                            onNext = { viewModel.teamSelectionDone() }
+                        )
+                    }
+                }
                 2 -> StartP2PGamePage(
                     viewModel.networkAdapter.homeTeam,
                     viewModel.networkAdapter.awayTeam,

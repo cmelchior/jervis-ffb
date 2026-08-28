@@ -41,6 +41,7 @@ import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -64,6 +65,9 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
     // Which page are currently being shown
     val totalPages = 3
     val currentPage = MutableStateFlow(0) // 0-indexed
+
+    private val _isConnectingToHost = MutableStateFlow(false)
+    val isConnectingToHost: StateFlow<Boolean> = _isConnectingToHost
 
     // Page 1: Join Host
     val joinHostModel = JoinHostScreenModel(menuViewModel, this)
@@ -220,9 +224,17 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
         }
     }
 
-    // Called when the Client has succcesfully connected to the Host server.
-    fun hostJoinedDone() {
-        workflow.handleClientStateChange(P2PClientState.SELECT_TEAM)
+    fun hostJoinStarted() {
+        _isConnectingToHost.value = true
+        gotoNextPage(1)
+    }
+
+    fun hostJoinFailed(message: String) {
+        joinHostModel.reset(message)
+        if (!_isConnectingToHost.value) return
+        _isConnectingToHost.value = false
+        networkAdapter.cancelJoin()
+        goBackToPage(0)
     }
 
     fun teamSelectionDone() {
@@ -421,11 +433,14 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
                     throw ex
                 } catch (ex: Throwable) {
                     LOG.e { "[P2PClientScreen] Failed state change: $currentState -> $newState\n${ex.stackTraceToString()}" }
-                    menuViewModel.showErrorDialog(
-                        title = "Could not start the game",
-                        message = ex.message,
-                        error = ex,
-                    )
+                    when (_isConnectingToHost.value) {
+                        true -> hostJoinFailed("Failed to join host: ${ex.message ?: ex::class.simpleName}")
+                        false -> menuViewModel.showErrorDialog(
+                            title = "Could not start the game",
+                            message = ex.message,
+                            error = ex,
+                        )
+                    }
                 }
             }
         }
@@ -439,9 +454,13 @@ class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: 
                     when (newState) {
                         P2PClientState.SELECT_TEAM -> {
                             prepareTeamSelection()
-                            gotoNextPage(1)
+                            _isConnectingToHost.value = false
+                            if (currentPage.value != 1) {
+                                gotoNextPage(1)
+                            }
                         }
                         P2PClientState.ACCEPT_GAME -> {
+                            _isConnectingToHost.value = false
                             gotoNextPage(2)
                             lockCompletedSteps()
                         }

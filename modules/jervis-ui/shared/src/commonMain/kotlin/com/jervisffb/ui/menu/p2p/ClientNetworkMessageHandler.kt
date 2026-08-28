@@ -185,7 +185,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         val newConnection = JervisClientWebSocketConnection(id, gameUrl, coachName)
         connection = newConnection
         newConnection.start()
-        updateState(Connected)
+        updateState(Connecting)
         // Both coroutines work off `newConnection` rather than the field, so they can only ever
         // act on the connection they were started for.
         connectionJob = scope.launch {
@@ -198,10 +198,16 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
             }
             launch {
                 failSafely("reading messages for $coachName") {
+                    var connectedReported = false
                     // Stop as soon as a handler has failed. `handleMessage` runs on this
                     // coroutine, so the flag is always set before the next message is read.
                     while (abortedConnection !== newConnection) {
                         val message: ServerMessage = newConnection.receiveOrNull() ?: break
+                        if (!connectedReported) {
+                            connectedReported = true
+                            updateState(Connected)
+                            if (abortedConnection === newConnection) break
+                        }
                         LOG.d { "[Client-$coachName] Received message: $message" }
                         handleMessage(message)
                     }

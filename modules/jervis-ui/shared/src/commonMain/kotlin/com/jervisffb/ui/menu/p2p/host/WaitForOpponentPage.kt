@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.p2p.host
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -44,79 +45,88 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
     val localUrl: String by viewModel.localGameUrl.collectAsState()
     val globalUrlError by viewModel.globalGameUrlError.collectAsState()
     val serverShuttingDown by viewModel.isServerShuttingDown.collectAsState()
+    val connectingToServer by viewModel.isConnectingToServer.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
-            WaitForOpponentHeader(serverShuttingDown)
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    value = if (globalUrlError.isNullOrEmpty()) globalUrl else (globalUrlError ?: ""),
-                    onValueChange = { },
-                    readOnly = true,
-                    isError = globalUrlError != null,
-                    singleLine = true,
-                    label = { Text("Game URL (Global URL)") },
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
-                        .size(48.dp)
-                        .offset(x = 4.dp)
-                        .clip(shape = RoundedCornerShape(4.dp))
-                        .clickable {
-                            viewModel.userCopyUrlToClipboard(globalUrl)
+        Crossfade(
+            targetState = connectingToServer,
+            label = "Connecting to game server",
+        ) { connecting ->
+            when (connecting) {
+                true -> Text("Connecting", color = JervisTheme.contentTextColor)
+                false -> Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
+                    WaitForOpponentHeader(serverShuttingDown)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = if (globalUrlError.isNullOrEmpty()) globalUrl else (globalUrlError ?: ""),
+                            onValueChange = { },
+                            readOnly = true,
+                            isError = globalUrlError != null,
+                            singleLine = true,
+                            label = { Text("Game URL (Global URL)") },
+                        )
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
+                                .size(48.dp)
+                                .offset(x = 4.dp)
+                                .clip(shape = RoundedCornerShape(4.dp))
+                                .clickable {
+                                    viewModel.userCopyUrlToClipboard(globalUrl)
+                                }
+                            ,
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
+                                colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
+                                painter = painterResource(Res.drawable.jervis_icon_menu_copy),
+                                contentDescription = "Copy URL",
+                            )
                         }
-                    ,
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
-                        colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.jervis_icon_menu_copy),
-                        contentDescription = "Copy URL",
-                    )
-                }
-            }
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    value = localUrl,
-                    onValueChange = { },
-                    readOnly = true,
-                    singleLine = true,
-                    label = { Text("Game URL (Local Network URL)") },
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
-                        .size(48.dp)
-                        .offset(x = 4.dp)
-                        .clip(shape = RoundedCornerShape(4.dp))
-                        .clickable {
-                            viewModel.userCopyUrlToClipboard(localUrl)
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = localUrl,
+                            onValueChange = { },
+                            readOnly = true,
+                            singleLine = true,
+                            label = { Text("Game URL (Local Network URL)") },
+                        )
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
+                                .size(48.dp)
+                                .offset(x = 4.dp)
+                                .clip(shape = RoundedCornerShape(4.dp))
+                                .clickable {
+                                    viewModel.userCopyUrlToClipboard(localUrl)
+                                }
+                            ,
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
+                                colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
+                                painter = painterResource(Res.drawable.jervis_icon_menu_copy),
+                                contentDescription = "Copy URL",
+                            )
                         }
-                    ,
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
-                        colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.jervis_icon_menu_copy),
-                        contentDescription = "Copy URL",
-                    )
-                }
-            }
-            // Hide connection information text while the server is shutting down. It no longer serves a purpose.
-            if (!serverShuttingDown) {
-                Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Depending on where your opponent is connecting from, send them one of the two URLs above. Note that network setups can be tricky, so it's possible neither will work. If that happens… well, you're on your own to figure out which IP address to use. Sorry!",
-                        color = JervisTheme.contentTextColor,
-                    )
+                    }
+                    // Hide connection information text while the server is shutting down. It no longer serves a purpose.
+                    if (!serverShuttingDown) {
+                        Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Depending on where your opponent is connecting from, send them one of the two URLs above. Note that network setups can be tricky, so it's possible neither will work. If that happens… well, you're on your own to figure out which IP address to use. Sorry!",
+                                color = JervisTheme.contentTextColor,
+                            )
+                        }
+                    }
                 }
             }
         }

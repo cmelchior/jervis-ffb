@@ -12,6 +12,7 @@ import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import io.ktor.http.Url
 import io.ktor.websocket.CloseReason
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -108,43 +109,47 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     }
 
     fun clientJoinGame() {
+        val joiningUrl = gameUrl.value
+        joinMessage.value = "Joining $joiningUrl..."
+        joinError.value = ""
+        joinState.value = JoinState.JOINING
+        model.hostJoinStarted()
         menuViewModel.navigatorContext.launch {
-            val joiningUrl = gameUrl.value
-            joinMessage.value = "Joining $joiningUrl..."
-            joinState.value = JoinState.JOINING
-            val coachName = coachSetupModel.coachName.value
-            val coachType = coachSetupModel.coachType.value
-            SETTINGS_MANAGER.set(SettingsKeys.JERVIS_DEFAULT_CLIENT_COACH_NAME, coachName)
-            model.networkAdapter.joinHost(
-                gameUrl = joiningUrl,
-                coachName = coachName,
-                coachType = coachType,
-                gameId = GameId(gameId.value),
-                teamIfHost = null,
-                handler = object: AbstractClintNetworkMessageHandler() {
-                    override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
-                        joinError.value = ""
-                        joinMessage.value = "Joined ${gameUrl.value} as $coachName"
-                        joinState.value = JoinState.JOINED
-                        model.userJoinOrContinue()
-                    }
-                    override fun onDisconnected(reason: CloseReason) {
-                        val errorMsg = when (reason.code) {
-                            JervisExitCode.CLIENT_CLOSING.code -> "" // Not a real error
-                            JervisExitCode.SERVER_CLOSING.code -> "Host closed the server."
-                            JervisExitCode.GAME_NOT_ACCEPTED.code -> reason.message
-                            else -> "Failed to join host [${reason.code}]: ${reason.message}"
+            try {
+                val coachName = coachSetupModel.coachName.value
+                val coachType = coachSetupModel.coachType.value
+                SETTINGS_MANAGER.set(SettingsKeys.JERVIS_DEFAULT_CLIENT_COACH_NAME, coachName)
+                model.networkAdapter.joinHost(
+                    gameUrl = joiningUrl,
+                    coachName = coachName,
+                    coachType = coachType,
+                    gameId = GameId(gameId.value),
+                    teamIfHost = null,
+                    handler = object : AbstractClintNetworkMessageHandler() {
+                        override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
+                            joinError.value = ""
+                            joinMessage.value = "Joined ${gameUrl.value} as $coachName"
+                            joinState.value = JoinState.JOINED
+                            model.userJoinOrContinue()
                         }
 
-                        // We might already have reset optimistically
-                        if (joinState.value != JoinState.READY_JOIN) {
-                            joinMessage.value = ""
-                            joinError.value = errorMsg
-                            joinState.value = JoinState.READY_JOIN
+                        override fun onDisconnected(reason: CloseReason) {
+                            val errorMsg = when (reason.code) {
+                                JervisExitCode.CLIENT_CLOSING.code -> "" // Not a real error
+                                JervisExitCode.SERVER_CLOSING.code -> "Host closed the server."
+                                JervisExitCode.GAME_NOT_ACCEPTED.code -> reason.message
+                                else -> "Failed to join host [${reason.code}]: ${reason.message}"
+                            }
+
+                            model.hostJoinFailed(errorMsg)
                         }
                     }
-                }
-            )
+                )
+            } catch (ex: CancellationException) {
+                throw ex
+            } catch (ex: Throwable) {
+                model.hostJoinFailed("Failed to join host: ${ex.message ?: ex::class.simpleName}")
+            }
         }
     }
 

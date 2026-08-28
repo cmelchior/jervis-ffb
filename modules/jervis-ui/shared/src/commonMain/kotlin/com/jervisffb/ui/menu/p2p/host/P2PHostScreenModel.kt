@@ -65,6 +65,8 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         private val JOIN_OWN_SERVER_TIMEOUT = 10.seconds
     }
 
+    private data class ServerConnectionError(val title: String, val message: String)
+
     // Handles all state transitions
     var workflow: Workflow = Workflow()
 
@@ -104,6 +106,10 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     // needs to explain why nothing is happening.
     val isServerShuttingDown: StateFlow<Boolean>
         field = MutableStateFlow(false)
+
+    private val _isConnectingToServer = MutableStateFlow(false)
+    val isConnectingToServer: StateFlow<Boolean> = _isConnectingToServer
+    private var pageBeforeConnectingToServer: Int? = null
 
     // Page 4: Accept game
     val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
@@ -152,12 +158,9 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         workflow.handleHostStateChange(P2PHostState.WAIT_FOR_CLIENT)
     }
 
-    // Starts the server on the Host and join it immediately. Returns `false` if
-    // the server could not be started, e.g. because the port is already in use.
-    // In that case an error dialog has already been shown to the hosting coach,
-    // and the caller must leave the screen on the page it came from rather
-    // than advancing to "Wait For Opponent".
-    private suspend fun startServer(): Boolean {
+    // Starts the server on the Host and joins it immediately. Expected connection failures are
+    // returned so the workflow can return to the previous page before showing the error.
+    private suspend fun startServer(): ServerConnectionError? {
         val team = selectedTeam.value?.teamData ?: error("Only on-client teams supported for now")
         val port = setupGameModel.port.value ?: error("Missing port")
         val newServer = if (saveGameData != null) {
@@ -194,12 +197,10 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
             throw ex
         } catch (ex: Throwable) {
             LOG.e { "[P2PHostScreen] Could not start the server on port $port:\n${ex.stackTraceToString()}" }
-            resetServer()
-            menuViewModel.showErrorDialog(
+            return ServerConnectionError(
                 title = "Could not start the game server",
                 message = "Port $port is not available. Check that no other program (or game) is using it.",
             )
-            return false
         }
         networkAdapter.joinHost(
             gameUrl = "ws://127.0.0.1:$port/joinGame?id=${setupGameModel.gameName.value}",
@@ -221,14 +222,12 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         } != null
         if (!joinedOwnServer) {
             LOG.e { "[P2PHostScreen] Timed out joining our own server on port $port" }
-            resetServer()
-            menuViewModel.showErrorDialog(
+            return ServerConnectionError(
                 title = "Could not join the game server",
                 message = "The server started on port $port, but did not accept the host. Try again.",
             )
-            return false
         }
-        return true
+        return null
     }
 
     fun userAcceptGame(gameAccepted: Boolean) {
@@ -299,6 +298,27 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
             sidebarEntries[index] = sidebarEntries[index].copy(state = SidebarEntryState.NOT_READY)
         }
         currentPage.value = previousPage
+    }
+
+    private fun startConnectingToServer() {
+        check(pageBeforeConnectingToServer == null)
+        pageBeforeConnectingToServer = currentPage.value
+        _isConnectingToServer.value = true
+        gotoNextPage(2)
+    }
+
+    private fun serverConnectionSucceeded() {
+        pageBeforeConnectingToServer = null
+        _isConnectingToServer.value = false
+    }
+
+    private suspend fun serverConnectionFailed(error: ServerConnectionError) {
+        val previousPage = pageBeforeConnectingToServer ?: return
+        pageBeforeConnectingToServer = null
+        goBackToPage(previousPage)
+        _isConnectingToServer.value = false
+        menuViewModel.showErrorDialog(title = error.title, message = error.message)
+        resetServer()
     }
 
     private fun resetRulesSelection() {
@@ -437,9 +457,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
     }
 
     // Go into "Waiting for Opponent" screen from either "Setup" or "Select Team".
-    // Returns `false` if the server could not be started, in which case the
-    // hosting coach has already been told why. See [startServer].
-    private suspend fun prepareWaitingForOpponent(): Boolean {
+    private suspend fun prepareWaitingForOpponent(): ServerConnectionError? {
         globalGameUrl.value = "Fetching..."
         localGameUrl.value = "Fetching..."
         menuViewModel.backgroundContext.launch {
@@ -479,7 +497,15 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
                     throw ex
                 } catch (ex: Throwable) {
                     LOG.e { "[P2PHostScreen] Failed state change: $currentState -> $newState\n${ex.stackTraceToString()}" }
-                    menuViewModel.showErrorDialog("Error while setting up the P2P game.", error = ex)
+                    when (pageBeforeConnectingToServer) {
+                        null -> menuViewModel.showErrorDialog("Error while setting up the P2P game.", error = ex)
+                        else -> serverConnectionFailed(
+                            ServerConnectionError(
+                                title = "Error while setting up the P2P game",
+                                message = ex.message ?: ex::class.simpleName ?: "Unknown error",
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -498,9 +524,14 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
                             gotoNextPage(1)
                         }
                         P2PHostState.WAIT_FOR_CLIENT -> {
+                            startConnectingToServer()
                             prepareSaveFile()
-                            if (!prepareWaitingForOpponent()) return
-                            gotoNextPage(2)
+                            val error = prepareWaitingForOpponent()
+                            if (error != null) {
+                                serverConnectionFailed(error)
+                                return
+                            }
+                            serverConnectionSucceeded()
                         }
                         else -> unsupportedStateChange(newState)
                     }
@@ -513,8 +544,13 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
                             goBackToPage(0)
                         }
                         P2PHostState.WAIT_FOR_CLIENT -> {
-                            if (!prepareWaitingForOpponent()) return
-                            gotoNextPage(2)
+                            startConnectingToServer()
+                            val error = prepareWaitingForOpponent()
+                            if (error != null) {
+                                serverConnectionFailed(error)
+                                return
+                            }
+                            serverConnectionSucceeded()
                         }
                         else -> unsupportedStateChange(newState)
                     }
