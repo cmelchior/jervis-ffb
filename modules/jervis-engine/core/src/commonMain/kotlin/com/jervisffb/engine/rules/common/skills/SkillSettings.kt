@@ -52,7 +52,7 @@ abstract class SkillSettings {
 
     /** Will match strings that return the format exposed by [SkillId.serialize] */
     @Transient
-    private val skillIdRegex = "(^[a-zA-Z_]+)(\\((.+)\\))?$".toRegex()
+    private val skillIdRegex = "(^[a-zA-Z_]+)(\\((.+)\\))?([+-]\\d+)?$".toRegex()
 
     /**
      * Converts a string to the appropriate [SkillId], or return `null` if the skill name could not be mapped
@@ -79,15 +79,19 @@ abstract class SkillSettings {
      * Converts a string to the appropriate [SkillId], or return `null` if the skill name could not be mapped
      * to a supported skill in this ruleset.
      *
-     * [serializedSkillId] is expected to have a similar format to [SkillId.serialize], example: "MIGHTY_BLOW(+1)"
+     * [serializedSkillId] is expected to have a similar format to [SkillId.serialize], example: "MIGHTY_BLOW(+1)".
+     * Note that [SkillId.serialize] emits valued skills with an adjustment as a bare signed suffix,
+     * e.g. "MIGHTY_BLOW+1" — both the parenthesized and bare suffix forms are accepted here so
+     * serialized team data round-trips through [com.jervisffb.engine.serialization.SerializedTeam]
+     * without silently dropping the skill.
      */
     fun getSkillId(serializedSkillId: String): SkillId? {
         // Split name into name and a value
         return skillIdRegex.matchEntire(serializedSkillId)?.let { match ->
             // Should be equal to the enum name for the SkillType, e.g. "BLOCK" for SkillType.BLOCK
             val name = match.groups[1]?.value?.trim() ?: error("Failed to find skill name in string: $serializedSkillId")
-            // The "int" value for a skill. e.g. "MIGHTY_BLOW(+1)"
-            val value = match.groups[3]?.value
+            // The "int" value for a skill. e.g. "MIGHTY_BLOW(+1)" or the bare suffix form "MIGHTY_BLOW+1"
+            val value = match.groups[3]?.value ?: match.groups[4]?.value
             val skillValue = extractValueType(value)
             skillCache.keys.firstOrNull { type -> type.name == name }?.let { skillType ->
                 SkillId(skillType, skillValue)
