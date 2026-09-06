@@ -1,6 +1,7 @@
 package tourplay.rest
 
 import com.jervisffb.engine.bb2020.FumbblBB2020Rules
+import com.jervisffb.engine.bb2025.BB7Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.serialization.SerializedTeam
@@ -44,5 +45,12 @@ class TourPlayRestApiTests {
         assertEquals("Hafenland Capers", team.name)
     }
 
-
+    // Test for https://github.com/cmelchior/jervis-ffb/issues/80 (BB7 Team)
+    @Test
+    fun load227396() = runBlocking {
+        val rules = BB7Rules2025()
+        val file = api.loadRoster(227396, rules)
+        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
+        assertEquals("Bretonnridge Brawlers", team.name)
+    }
 }

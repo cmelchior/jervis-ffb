@@ -188,10 +188,10 @@ public data class Player(
 
 @Serializable
 public data class CoachRank(
-    public val rankOverall: Int,
-    public val previousRankOverall: Int,
-    public val rankRegional: Int,
-    public val previousRankRegional: Int,
+    public val rankOverall: Int? = null,
+    public val previousRankOverall: Int? = null,
+    public val rankRegional: Int? = null,
+    public val previousRankRegional: Int? = null,
     public val score: Double,
 )
 
