@@ -149,10 +149,17 @@ object BlockAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<BlockActionContext>().attacker
             val availableBlockTypes = getAvailableBlockType(attacker, true)
-            return listOf(
-                com.jervisffb.engine.actions.SelectBlockType(availableBlockTypes),
-                EndActionWhenReady
-            )
+            // This node is only reached as the mandatory Frenzy second block
+            // (see ResolveBlock.onExitNode), so ending the action here must not
+            // be offered once Frenzy has been marked used — mirroring
+            // BlitzAction.SelectBlockType, which omits the cancel option.
+            val isSecondFrenzyBlock = (attacker.getSkillOrNull(SkillType.FRENZY)?.used == true)
+            return buildList {
+                add(com.jervisffb.engine.actions.SelectBlockType(availableBlockTypes))
+                if (!isSecondFrenzyBlock) {
+                    add(EndActionWhenReady)
+                }
+            }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
