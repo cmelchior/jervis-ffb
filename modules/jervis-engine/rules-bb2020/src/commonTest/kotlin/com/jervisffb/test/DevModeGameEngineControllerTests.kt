@@ -212,4 +212,18 @@ class DevModeGameEngineControllerTests {
         assertEquals(originalCoordinates, ball.coordinates)
         assertEquals(originalState, ball.state)
     }
+
+    @Test
+    fun playerEditsInInitialActionsAreReplayedWhenTheRulesAllowThem() {
+        val rules = devModeRules()
+        val state = createDefaultGameStateBB2020(rules)
+        val edit = SetPlayerState(PlayerId("H1"), state = PlayerPitchState.PRONE, x = 5, y = 10)
+
+        val controller = GameEngineController(state, initialActions = listOf(edit))
+        controller.startManualMode()
+
+        val player = controller.state.homeTeam[PlayerId("H1")]
+        assertEquals(PlayerPitchState.PRONE, player.state)
+        assertEquals(PitchCoordinate(5, 10), player.location)
+    }
 }

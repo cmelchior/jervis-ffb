@@ -504,8 +504,8 @@ class GameEngineController(
 
     private fun processSingleAdminAction(action: AdminGameAction): Command {
         if (
-            (!rules.allowPlayerEditsDuringGame && !initializing)
-            || (initializing && !allowAdminActionsInInitialActions)
+            !rules.allowPlayerEditsDuringGame &&
+            !(initializing && allowAdminActionsInInitialActions)
         ) {
             INVALID_ACTION(action, "Player edits are not allowed during this game.")
         }
