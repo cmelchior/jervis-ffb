@@ -134,7 +134,9 @@ object FollowUpStep: Procedure() {
             val forcedFollowUp = (followUpStatus == FollowUpStatus.MUST_FOLLOW_UP)
             return buildCompositeCommand {
                 if (manualFollowUp || forcedFollowUp) {
-                    add(SetContextProperty(PushContext::followsUp, pushContext, manualFollowUp))
+                    // The pusher is moving in both cases (Frenzy and Taunt force
+                    // the follow-up), so the flag must be true whenever we move.
+                    add(SetContextProperty(PushContext::followsUp, pushContext, true))
                     add(SetPlayerLocation(pushContext.firstPusher, pushContext.pushChain.first().from))
                 }
                 // The parent procedure is responsible for delegating to the next
