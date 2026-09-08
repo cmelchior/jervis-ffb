@@ -406,7 +406,7 @@ public data class LastMatch(
     public val inscriptionLocal: InscriptionLocal,
     public val inscriptionVisitor: InscriptionVisitor,
     public val groupName: String,
-    public val groupsCount: Int,
+    public val groupsCount: Int? = null,
     public val phaseType: Int,
     public val system: Int,
     public val roundName: String? = null,
