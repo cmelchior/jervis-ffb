@@ -11,7 +11,6 @@ import com.jervisffb.engine.bb2020.skills.DivingTackle
 import com.jervisffb.engine.bb2020.skills.Dodge
 import com.jervisffb.engine.bb2020.skills.Frenzy
 import com.jervisffb.engine.bb2020.skills.Horns
-import com.jervisffb.engine.bb2020.skills.Leader
 import com.jervisffb.engine.bb2020.skills.Leap
 import com.jervisffb.engine.bb2020.skills.Loner
 import com.jervisffb.engine.bb2020.skills.MightyBlow
@@ -281,11 +280,6 @@ class SkillSettings2020: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.LEADER -> {
-                    addNoValueEntry("Leader", type, SkillCategory.PASSING) { player, category, expiresAt ->
-                        Leader(player, category, expiresAt)
-                    }
-                }
                 SkillType.NERVES_OF_STEEL -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
                     // TODO()
@@ -551,6 +545,9 @@ class SkillSettings2020: SkillSettings() {
                 SkillType.GIVE_AND_GO,
                 SkillType.HATRED,
                 SkillType.INSIGNIFICANT,
+                // Leader depends on a Leader team reroll, which only exists in BB2025.
+                // See `Rules2020.createLeaderTeamReroll`.
+                SkillType.LEADER,
                 SkillType.LETHAL_FLIGHT,
                 SkillType.LONE_FOULER,
                 SkillType.MY_BALL,
