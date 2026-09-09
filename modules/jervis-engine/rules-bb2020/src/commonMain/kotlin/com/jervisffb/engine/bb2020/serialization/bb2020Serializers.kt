@@ -23,6 +23,9 @@ val bb2020SerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.bb2020.inducements.effects.MiscellaneousMayhem::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
         }
+        polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+        }
         polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.effects.AssassinationAttempt::class)
             subclass(com.jervisffb.engine.bb2020.inducements.effects.SpotTheSneak::class)
@@ -39,6 +42,9 @@ val bb2020SerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
             subclass(com.jervisffb.engine.bb2020.inducements.wizards.Fireball::class)
             subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+            polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+                subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+            }
         }
     }
     polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
@@ -124,6 +130,9 @@ val bb2020SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.Fireball::class)
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+        polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+            subclass(com.jervisffb.engine.bb2020.inducements.wizards.Zap::class)
+        }
     }
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2020.inducements.wizards.HirelingSportsWizard::class)

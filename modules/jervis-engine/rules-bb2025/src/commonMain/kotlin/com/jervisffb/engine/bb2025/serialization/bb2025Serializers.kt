@@ -31,6 +31,9 @@ val bb2025SerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.bb2025.inducements.effects.SportsEspionageCard::class)
             subclass(com.jervisffb.engine.bb2025.inducements.effects.YouDopeCard::class)
         }
+        polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+        }
         polymorphic(com.jervisffb.engine.model.inducements.card.SpecialPlayCard::class) {
             subclass(com.jervisffb.engine.bb2025.inducements.effects.DiscardedBananaSkinCard::class)
             subclass(com.jervisffb.engine.bb2025.inducements.effects.GrudgeMatchCard::class)
@@ -54,6 +57,9 @@ val bb2025SerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
             subclass(com.jervisffb.engine.bb2025.inducements.wizards.Fireball::class)
             subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+            polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+                subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+            }
         }
     }
     polymorphic(com.jervisffb.engine.model.inducements.biasedreferee.BiasedReferee::class) {
@@ -93,6 +99,9 @@ val bb2025SerializerModule = SerializersModule {
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Spell::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.wizards.Fireball::class)
         subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+        polymorphic(com.jervisffb.engine.common.procedures.inducements.spells.ZapSpell::class) {
+            subclass(com.jervisffb.engine.bb2025.inducements.wizards.Zap::class)
+        }
     }
     polymorphic(com.jervisffb.engine.model.inducements.wizard.Wizard::class) {
         subclass(com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard::class)
