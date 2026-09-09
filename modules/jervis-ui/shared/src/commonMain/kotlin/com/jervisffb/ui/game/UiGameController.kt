@@ -46,6 +46,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
@@ -88,6 +89,7 @@ import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnKickingTeamRoll
 import com.jervisffb.ui.game.state.actionwheel.DodgySnackEffectOnReceivingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgySnackKickingTeamRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.DodgySnackReceivingTeamRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.FireballWheelController
 import com.jervisffb.ui.game.state.actionwheel.FollowUpWheelController
 import com.jervisffb.ui.game.state.actionwheel.FoulAppearanceWheelController
 import com.jervisffb.ui.game.state.actionwheel.HomeTeamFanFactorRoll
@@ -180,6 +182,7 @@ import com.jervisffb.ui.game.state.actionwheel.UseTwoHeadsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseVeryLongLegsWheelController
 import com.jervisffb.ui.game.state.actionwheel.UseWrestleWheelController
 import com.jervisffb.ui.game.state.actionwheel.WeatherRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.ZapWheelController
 import com.jervisffb.ui.game.state.decorators.CancelDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
@@ -321,6 +324,7 @@ class UiGameController(
         DeviateRollWheelController,
         DodgeWheelController,
         DodgeBB2020WheelController,
+        FireballWheelController,
         FoulAppearanceWheelController,
         HypnoticGazeWheelController,
         InterceptionWheelController,
@@ -353,6 +357,7 @@ class UiGameController(
         TeamCaptainWheelController,
         TeamMascotWheelController,
         TentaclesWheelController,
+        ZapWheelController,
 
         StandardBlockRollWheelController,
         StandardBlockChooseResultOrRerollWheelController,
@@ -847,7 +852,7 @@ class UiGameController(
     /**
      * Method responsible for updating the UI state based on recent changes in the [Game] model.
      */
-    private fun addBaseGameStateChanges(state: Game, actions: ActionRequest, delta: GameDelta, acc: UiSnapshotAccumulator) {
+    private suspend fun addBaseGameStateChanges(state: Game, actions: ActionRequest, delta: GameDelta, acc: UiSnapshotAccumulator) {
         val focus = focusProvider?.getFocus(state) ?: UiFocus.NONE
 
         // Update the persistent UI decorations before starting
@@ -865,13 +870,11 @@ class UiGameController(
 
         // This will reset the player state and the data class should ensure equality is
         // checked correctly using the auto-generated `equals()`
-        state.homeTeam.forEach { player ->
-            acc.addOrUpdatePlayer(
-                player.id,
-                UiPitchPlayer(player, focusStyle = focus.players[player.id]),
-            )
-        }
-        state.awayTeam.forEach { player ->
+        (state.homeTeam + state.awayTeam).forEach { player ->
+            // A player can change appearance mid-game, e.g., when turned into a Frog by the
+            // "Zap!" spell, so make sure their current sprite is cached before the UI asks
+            // for it. This is a no-op for the sprites already loaded before the game started.
+            ICON_FACTORY.loadPlayerSprite(player)
             acc.addOrUpdatePlayer(
                 player.id,
                 UiPitchPlayer(player, focusStyle = focus.players[player.id]),

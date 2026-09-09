@@ -401,6 +401,14 @@ private fun TeamFeaturesRow(
                             leftSide = leftSide
                         )
                     }
+
+                    UiTeamFeatureType.WIZARD -> {
+                        TeamFeature(
+                            value = feature.value,
+                            icon = ICON_FACTORY.getWizardIcon(height),
+                            leftSide = leftSide
+                        )
+                    }
                 }
             }
         }

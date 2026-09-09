@@ -148,10 +148,19 @@ book.
     - [ ] (In)famous Coaching Staff
         - [ ] Josef Bugman
         - [ ] How many others(???)
-    - [ ] Wizard
-        - [ ] Hireling Sports-Wizard
-        - [ ] How many others(???)
-        - [ ] Works during Charge!
+    - [x] Wizard
+        - [x] Hireling Sports-Wizard
+        - [x] Works during Charge!
+        - [x] Fireball
+          - [x] 4+ to hit
+          - [x] Hit all targets in square.
+          - [x] Stunned/Prone players are not Knocked Down
+        - [x] Zap
+          - [x] 1-3 does not work
+          - [x] 4-6 work
+          - [x] Apothecary doesn't work
+          - [x] Always badly hurt on casualty
+          - [x] Returns to reserves at end of drive
     - [ ] Biased Referee
         - [ ] Biased Referee
         - [ ] How many others(???)

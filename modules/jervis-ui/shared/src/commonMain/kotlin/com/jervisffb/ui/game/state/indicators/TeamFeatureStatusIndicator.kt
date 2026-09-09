@@ -92,6 +92,19 @@ object TeamFeatureStatusIndicator: PitchStatusIndicator {
             )
         }
 
+        // Wizards
+        val wizards = team.wizards.count { !it.used }
+        if (wizards > 0) {
+            featureList.add(
+                UiTeamFeature(
+                    name = "Wizard",
+                    value = wizards,
+                    type = UiTeamFeatureType.WIZARD,
+                    used = false
+                )
+            )
+        }
+
         return teamInfo.copy(
             featureList = teamInfo.featureList.addAll(featureList)
         )

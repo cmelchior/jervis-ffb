@@ -10,7 +10,6 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.bb2025.tables.PrayerToNuffleTableResult2025
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -27,13 +26,12 @@ import com.jervisffb.engine.common.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.common.commands.SetSpecialActionSkillUsed
 import com.jervisffb.engine.common.commands.SetTurnMarker
 import com.jervisffb.engine.common.commands.UpdateTurnOver
-import com.jervisffb.engine.common.context.ActivateInducementContext
 import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.SelectInducementEffectsContext
+import com.jervisffb.engine.common.procedures.ActivateInducementEffectsStep
 import com.jervisffb.engine.common.procedures.ForegoActivation
 import com.jervisffb.engine.common.procedures.getResetPlayerAvailabilityCommands
 import com.jervisffb.engine.common.procedures.getResetTeamTemporaryModifiersCommands
-import com.jervisffb.engine.common.procedures.inducements.ActivateInducements
-import com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.common.reports.ReportEndingTurn
 import com.jervisffb.engine.common.reports.ReportStartingTurn
 import com.jervisffb.engine.fsm.ActionNode
@@ -67,7 +65,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  *   that haven't activated must forego their activation.
  */
 object TeamTurn : Procedure() {
-    override val initialNode: Node = SelectPlayerOrEndTurn
+    override val initialNode: Node = CheckForInducementEffectsStartOwnTurn
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val turn = state.activeTeamOrThrow().turnMarker + 1
         // TODO Check for stalling players at this point.
@@ -92,15 +90,20 @@ object TeamTurn : Procedure() {
         )
     }
 
-    // TODO Some special effects will trigger at the start of a team turn. This should happen here.
-    object UseSpecialEffects: ParentNode() {
+    object CheckForInducementEffectsStartOwnTurn: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_OWN_TURN))
+            val context = SelectInducementEffectsContext(
+                phase = Timing.START_OF_OWN_TURN,
+                team = state.activeTeam,
+            )
+            return AddContext(context)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO Do we need to check for anything here? Could we have a turn-over already?
-            return GotoNode(SelectPlayerOrEndTurn)
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(SelectPlayerOrEndTurn)
+            )
         }
     }
 
@@ -205,10 +208,62 @@ object TeamTurn : Procedure() {
         }
     }
 
+    // It isn't well-defined in which order things happen at the end of the turn.
+    // E.g. it is unclear if Special Play Cards like Assassination Attempt trigger before or
+    // after Throw a Rock and when temporary skills or abilities are moved.
+    //
+    // For now, we choose the (somewhat arbitrary) order:
+    //
+    // - Play any applicable Special Play Cards or Wizard spells.
+    // - Temporary Skills/Characteristics are removed
+    // - Stunned Players are now prone
+    //
+    // Developer's Commentary:
+    // For now, we just keep this node as an entry point for "end-of-turn" things.
+    // It can probably be removed once we have a better understanding of the
+    // order of things.
     object ResolveEndOfTurn : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            // TODO Implement end-of-turn things
-            //  - Players stunned at the beginning of the turn are now prone
+            return GotoNode(CheckForInducementEffectsOwnTurn)
+        }
+    }
+
+    object CheckForInducementEffectsOwnTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OWN_TURN,
+                team = state.activeTeam,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(CheckForInducementEffectsOpponentTurn)
+            )
+        }
+    }
+
+    object CheckForInducementEffectsOpponentTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OPPONENT_TURN,
+                team = state.activeTeam!!.otherTeam(),
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(ResetPlayersStateAndAbilities)
+            )
+        }
+    }
+
+    object ResetPlayersStateAndAbilities: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
 
             val turnOverStunnedPlayersCommands = state.activeTeamOrThrow()
                 .filter { it.state == PlayerPitchState.STUNNED }
@@ -226,24 +281,9 @@ object TeamTurn : Procedure() {
             // looks odd.
             val resetPlayerAvailabilityCommands = getResetPlayerAvailabilityCommands(state, rules)
 
-            // It isn't well-defined in which order things happen at the end of the turn.
-            // E.g. it is unclear if Special Play Cards like Assassination Attempt trigger before or
-            // after Throw a Rock and when temporary skills or abilities are moved.
-            //
-            // For now we choose the (somewhat arbitrary) order:
-            //
-            // - Prayers Of Nuffle (Throw a Rock)
-            // - Special Play Cards
-            // - Temporary Skills/Characteristics are removed
-            // - Stunned Players are now prone
+            // Remove temporary modifiers that expires at the end of a team turn.
             val resetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_TURN)
             val activeTeamResetCommands = getResetTeamTemporaryModifiersCommands(state, Duration.END_OF_OWN_TEAM_TURN)
-
-            val throwRockActive = state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffleTableResult2025.THROW_A_ROCK)
-            val nextNodeCommand = when (throwRockActive) {
-                true -> GotoNode(CheckForThrowARock)
-                false -> ExitProcedure()
-            }
 
             return compositeCommandOf(
                 *progressStunnedCommands,
@@ -251,15 +291,8 @@ object TeamTurn : Procedure() {
                 *resetPlayerAvailabilityCommands,
                 *resetCommands,
                 *activeTeamResetCommands,
-                nextNodeCommand
+                ExitProcedure()
             )
-        }
-    }
-
-    object CheckForThrowARock : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveThrowARock
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
         }
     }
 

@@ -294,6 +294,7 @@ data class TargetSquare(
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
         DIRECTION,
+        FIREBALL,
         HIT_AND_RUN,
         JUMP,
         KICK,
@@ -303,7 +304,7 @@ data class TargetSquare(
         RUSH,
         SETUP,
         STAND_UP,
-        THROW_TARGET
+        THROW_TARGET,
     }
 
     companion object {

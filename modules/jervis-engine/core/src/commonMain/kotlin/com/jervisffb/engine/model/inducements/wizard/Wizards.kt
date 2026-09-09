@@ -13,14 +13,15 @@ interface Wizard {
     val type: WizardType
     val name: String
     val used: Boolean
-        get() = spells.firstOrNull { it.used } != null
+        get() = spells.any { it.used }
     val spells: List<Spell>
 
     /**
      * Returns the available spell at a given timing event.
      */
     fun getAvailableSpells(timing: Timing): List<Spell> {
-        return spells.filter { !it.used && it.triggers.contains(timing) }
+        if (used) return emptyList()
+        return spells.filter { it.triggers.contains(timing) }
     }
 }
 

@@ -1,5 +1,6 @@
 package com.jervisffb.test.bb2025.tables
 
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementEffectSelected
@@ -7,7 +8,9 @@ import com.jervisffb.engine.actions.InducementSelection
 import com.jervisffb.engine.actions.InducementsSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.bb2025.inducements.effects.Hangover
+import com.jervisffb.engine.bb2025.inducements.effects.HangoverCard
+import com.jervisffb.engine.bb2025.inducements.effects.MagicScrollCard
+import com.jervisffb.engine.bb2025.inducements.wizards.SportsWizard
 import com.jervisffb.engine.bb2025.modifiers.PlayerStatusEffectType2025
 import com.jervisffb.engine.bb2025.procedures.SetupTeam
 import com.jervisffb.engine.common.inducements.InducementSelectionCommon
@@ -60,7 +63,7 @@ class DesperateMeasuresTests: JervisGameBB72025Test() {
             *defaultDetermineKickingTeam(),
         )
         assertTrue(controller.getAvailableActions().contains<CancelWhenReady>())
-        val hangover = assertIs<Hangover>(awayTeam.specialPlayCards.single())
+        val hangover = assertIs<HangoverCard>(awayTeam.specialPlayCards.single())
         controller.rollForward(
             InducementEffectSelected(hangover.id),
             PlayerSelected(player.id),
@@ -84,7 +87,7 @@ class DesperateMeasuresTests: JervisGameBB72025Test() {
             3.d8,
         )
 
-        val hangover = assertIs<Hangover>(awayTeam.specialPlayCards.single())
+        val hangover = assertIs<HangoverCard>(awayTeam.specialPlayCards.single())
         assertEquals(listOf(Timing.BEFORE_FIRST_SETUP), hangover.triggers)
     }
 
@@ -95,9 +98,7 @@ class DesperateMeasuresTests: JervisGameBB72025Test() {
 
         player.assertReserves()
         assertTrue(player.hasStatusEffect(PlayerStatusEffectType2025.HANGOVER))
-        assertFalse(
-            controller.getAvailableActions().get<SelectPlayer>().players.contains(player.id)
-        )
+        assertFalse(controller.getAvailableActions().get<SelectPlayer>().players.contains(player.id))
         assertEquals(SetupTeam.SelectPlayerOrEndSetup, controller.currentNode())
 
         startFirstDriveWithoutHungoverPlayer()
@@ -120,9 +121,42 @@ class DesperateMeasuresTests: JervisGameBB72025Test() {
 
         player.assertReserves()
         assertFalse(player.hasStatusEffect(PlayerStatusEffectType2025.HANGOVER))
-        assertTrue(
-            controller.getAvailableActions().get<SelectPlayer>().players.contains(player.id)
-        )
+        assertTrue(controller.getAvailableActions().get<SelectPlayer>().players.contains(player.id))
         assertEquals(SetupTeam.SelectPlayerOrEndSetup, controller.currentNode())
+    }
+
+    @Test
+    fun magicScroll() {
+        controller.rollForward(
+            *buyInducements(
+                InducementSelectionCommon.Simple(InducementTypeCommon.DESPERATE_MEASURES, 1)
+            ),
+            8.d8,
+            *defaultDetermineKickingTeam(),
+        )
+
+        val magicScroll = assertIs<MagicScrollCard>(awayTeam.specialPlayCards.single())
+        controller.rollForward(InducementEffectSelected(magicScroll.id))
+        assertTrue(awayTeam.specialPlayCards.isEmpty())
+        assertIs<SportsWizard>(awayTeam.wizards.single())
+    }
+
+    @Test
+    fun magicScroll_canBeUsedAtEverySetup() {
+        controller.rollForward(
+            *buyInducements(
+                InducementSelectionCommon.Simple(InducementTypeCommon.DESPERATE_MEASURES, 1)
+            ),
+            8.d8,
+            *defaultDetermineKickingTeam(),
+            Cancel,
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(),
+            *skipTurns(rules.turnsPrHalf * 2),
+        )
+        val magicScroll = assertIs<MagicScrollCard>(awayTeam.specialPlayCards.single())
+        controller.rollForward(InducementEffectSelected(magicScroll.id))
+        assertTrue(awayTeam.specialPlayCards.isEmpty())
+        assertIs<SportsWizard>(awayTeam.wizards.single())
     }
 }

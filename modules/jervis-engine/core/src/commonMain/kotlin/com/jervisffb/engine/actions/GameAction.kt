@@ -623,6 +623,20 @@ data class InducementEffectSelected(val effect: InducementEffectId) : GameAction
                 return card
             }
         }
+        team.infamousCoachingStaff.forEach { staff ->
+            staff.specialAbilities.forEach { ability ->
+                if (ability.id == effect) {
+                    return ability
+                }
+            }
+        }
+        team.biasedReferees.forEach { referee ->
+            referee.specialAbilities.forEach { ability ->
+                if (ability.id == effect) {
+                    return ability
+                }
+            }
+        }
 
         return null
     }

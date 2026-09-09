@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.sprites.SpriteSource
 import com.jervisffb.ui.game.UiFocusStyle
 import com.jervisffb.ui.menu.GameScreenModel
 
@@ -43,6 +44,9 @@ data class UiPitchPlayer(
     val state: PlayerState,
     val isOnHomeTeam: Boolean,
     val position: Position,
+    // The sprite the player is currently shown with. This can change during the
+    // game, e.g., by using the "Zap!" spell.
+    val sprite: SpriteSource?,
     val isActive: Boolean,
     val isGoingDown: Boolean,
     val hasActivated: Boolean,
@@ -71,6 +75,7 @@ data class UiPitchPlayer(
         state = model.state,
         isOnHomeTeam = model.isOnHomeTeam(),
         position = model.position,
+        sprite = model.icon?.sprite,
         isActive = (model.available == Availability.IS_ACTIVE),
         isGoingDown = (
             model.intermediateState == PlayerIntermediateState.KNOCKED_DOWN

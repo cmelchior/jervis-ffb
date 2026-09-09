@@ -14,4 +14,5 @@ enum class RiskingInjuryMode {
     STAB, // Armour/Injury is rolled as part of a Stab
     PROJECTILE_VOMIT, // Armour/Injury is rolled as part of a Projectile Vomit attack
     CHAINSAW, // Armour/Injury is rolled as part of a Chainsaw attack
+    FIREBALL, // Armour/Injury is rolled as part of a Fireball
 }

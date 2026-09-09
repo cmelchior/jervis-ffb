@@ -46,7 +46,6 @@ class DauntlessTests: JervisGameBB2025Test() {
         attacker.apply {
             strength = 1
             baseStrength = 1
-            strengthModifiers.clear()
             addSkill(SkillType.DAUNTLESS)
         }
         val defender = state.getPlayerById("H1".playerId)
@@ -76,7 +75,6 @@ class DauntlessTests: JervisGameBB2025Test() {
         attacker.apply {
             strength = 1
             baseStrength = 1
-            strengthModifiers.clear()
             addSkill(SkillType.DAUNTLESS)
         }
         val defender = state.getPlayerById("H1".playerId)
@@ -109,7 +107,6 @@ class DauntlessTests: JervisGameBB2025Test() {
         attacker.apply {
             strength = 1
             baseStrength = 1
-            strengthModifiers.clear()
             addSkill(SkillType.DAUNTLESS)
             addSkill(SkillType.HORNS)
         }
@@ -159,7 +156,6 @@ class DauntlessTests: JervisGameBB2025Test() {
         attacker.apply {
             strength = 1
             baseStrength = 1
-            strengthModifiers.clear()
             addSkill(SkillType.DAUNTLESS)
         }
         val defender = state.getPlayerById("H1".playerId)
@@ -188,7 +184,7 @@ class DauntlessTests: JervisGameBB2025Test() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.apply {
             baseStrength = 2
-            strengthModifiers.add(StatModifier(
+            addStatModifier(StatModifier(
                 type = StatModifier.Type.ST,
                 modifier = 2,
                 description = "Temporary modifier",
@@ -200,7 +196,7 @@ class DauntlessTests: JervisGameBB2025Test() {
         val defender = state.getPlayerById("H1".playerId)
         defender.apply {
             baseStrength = 6
-            strengthModifiers.add(StatModifier(
+            addStatModifier(StatModifier(
                 type = StatModifier.Type.ST,
                 modifier = -2,
                 description = "Temporary modifier",

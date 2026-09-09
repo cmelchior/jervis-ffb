@@ -840,6 +840,57 @@ The behavior was clarified in Designer's Commentary May 2026 to the following:
 - If you recover Team Mascot, you must still roll for it the next time it is 
   used.
 
+## Page 149 - Sports-Wizard
+
+Wizard spells trigger end-of-turn, but it is unclear if a Charge kickoff-event
+is included in that. 
+
+The argument hangs on how "...he selected players may then be activated one 
+at a time, exactly as if it was their team's Turn.." are interpreted.
+
+However, as Team Rerolls has been FAQ'ed to be available, Jervis assumes that
+the same argument can be used for Wizards. Jervis thus allows Wizard spells to
+trigger when the Charge ends.
+
+Additionally, it is unclear if team re-rolls will work on Fireball or Zap! 
+rolls. However, since they are not explicitly expected on page 33, and as the 
+team is still active during "end-of-turn", Jervis will allow using team rerolls
+on these rolls.
+
+!!! bloodbowl "Designer's Commentary May 2026"
+    
+    Explicitely declares that Team Rerolls are allowed during Charge!.
+    
+
+### ZAP!
+
+When turning a player into a Frog, it is an open question what happens to 
+temporary effects and skills? Are they transferred to the Frog or not? If not,
+how is the "lifetime" of those effects handled?
+
+Some corner-case:
+
+1. Player affected by Dodgy Snacks (-1 MA/MV) is transformed.
+2. A Distracted player is transformed.
+3. A player affected by Blessing of Nuffle (gains Pro).
+4. A Chomped player is transformed.
+5. A Stunned player is transformed.
+
+None of this is addressed by either rulebook, FAQ or previous editions, so 
+Jervis has chosen the (somewhat arbitrary) interpretation:
+
+1. All temporary effects: Conditions, Stat Modifiers and Skills are kept on the
+   frog. Examples: Distracted, Stunned, Chomped, Pro/Mighty Blow/Stab from 
+   Prayers to Nuffle.
+
+2. All player level-ups, i.e., permanent skills or stat modifiers, are lost when
+   a frog.
+
+3. Any Star Player Points received while a Frog are still gained by the Player. 
+
+This is mostly to avoid confusion about the lifetime of these conditions. By
+keeping them on the Frog, they just continue to operate a normal.
+
 ## Page 155 - Team Captain
 
 A few edge cases are unclear about how to handle Team Captain.

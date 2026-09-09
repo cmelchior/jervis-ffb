@@ -57,6 +57,8 @@ import com.jervisffb.engine.common.procedures.actions.foul.BribeRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.actions.move.StandingUpRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.FireballRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.ZapRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.common.procedures.rerolls.ProRoll
 import com.jervisffb.engine.common.procedures.tables.injury.ArmourRoll
@@ -129,6 +131,7 @@ class SupportedDiceRollTests {
             DiceRollType.DODGY_SNACK_EFFECT,
             DiceRollType.DODGY_SNACK_ROLL_OFF,
             DiceRollType.FAN_FACTOR,
+            DiceRollType.FIREBALL,
             DiceRollType.FOUL_APPEARANCE,
             DiceRollType.HYPNOTIC_GAZE,
             DiceRollType.INJURY,
@@ -176,7 +179,8 @@ class SupportedDiceRollTests {
             DiceRollType.THROW_A_ROCK,
             DiceRollType.TREACHEROUS_TRAPDOOR,
             DiceRollType.UNCHANNELLED_FURY,
-            DiceRollType.WEATHER -> true
+            DiceRollType.WEATHER,
+            DiceRollType.ZAP -> true
 
             DiceRollType.DESPERATE_MEASURES,
             DiceRollType.BLITZ,
@@ -184,7 +188,6 @@ class SupportedDiceRollTests {
             DiceRollType.CROWD_TAKES_ACTION,
             DiceRollType.PASSING_INTERFERENCE,
             DiceRollType.QUALITY -> false
-
         }
     }
 
@@ -220,6 +223,7 @@ class SupportedDiceRollTests {
             DiceRollType.DODGY_SNACK_EFFECT -> DodgySnack
             DiceRollType.DODGY_SNACK_ROLL_OFF -> DodgySnack
             DiceRollType.FAN_FACTOR -> FanFactorRolls
+            DiceRollType.FIREBALL -> FireballRoll
             DiceRollType.FOUL_APPEARANCE -> FoulAppearanceRoll
             DiceRollType.HYPNOTIC_GAZE -> HypnoticGazeRoll
             DiceRollType.INJURY -> InjuryRoll
@@ -268,6 +272,7 @@ class SupportedDiceRollTests {
             DiceRollType.TREACHEROUS_TRAPDOOR -> MovePlayerIntoSquare
             DiceRollType.UNCHANNELLED_FURY -> UnchannelledFuryRoll
             DiceRollType.WEATHER -> WeatherRoll
+            DiceRollType.ZAP -> ZapRoll
 
             DiceRollType.DESPERATE_MEASURES,
             DiceRollType.BLOODLUST,

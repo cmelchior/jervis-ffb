@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.bb2025.inducements.effects.Hangover
+import com.jervisffb.engine.bb2025.inducements.effects.HangoverCard
 import com.jervisffb.engine.bb2025.modifiers.hangover
 import com.jervisffb.engine.bb2025.reports.ReportHangover
 import com.jervisffb.engine.commands.AddPlayerStatusEffect
@@ -15,7 +15,7 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.common.commands.RemoveSpecialPlayCard
-import com.jervisffb.engine.common.context.ApplyInducementEffectsContext
+import com.jervisffb.engine.common.context.ResolveInducementEffectsContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -40,25 +40,22 @@ object Hangover: Procedure() {
     override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<ApplyInducementEffectsContext>()
-        val team = context.selectedTeam ?: INVALID_GAME_STATE("Missing team")
-        val card = context.selectedTeam?.specialPlayCards?.find { it is Hangover } ?: INVALID_GAME_STATE("Missing hangover inducement")
+        val context = state.getContext<ResolveInducementEffectsContext>()
+        val team = context.team
+        val card = team.specialPlayCards.find { it is HangoverCard } ?: INVALID_GAME_STATE("Missing hangover inducement")
         return RemoveSpecialPlayCard(team, card)
     }
     override fun isValid(state: Game, rules: Rules) {
-        val context = state.getContext<ApplyInducementEffectsContext>()
-        requireGameState(context.selectedInducement is Hangover) { "Wrong inducement: $context" }
+        val context = state.getContext<ResolveInducementEffectsContext>()
+        requireGameState(context.inducement is HangoverCard) { "Wrong inducement: $context" }
     }
 
     object SelectPlayer: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team {
-            return state.getContext<ApplyInducementEffectsContext>().selectedTeam ?: INVALID_GAME_STATE("Missing team")
-        }
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ResolveInducementEffectsContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<ApplyInducementEffectsContext>()
-            val team = context.selectedTeam?.otherTeam() ?: INVALID_GAME_STATE("Missing team")
+            val context = state.getContext<ResolveInducementEffectsContext>()
             // All players can be used
-            val eligiblePlayers = team.toList()
+            val eligiblePlayers = context.team.otherTeam().toList()
             return when (eligiblePlayers.isNotEmpty()) {
                 true -> listOf(com.jervisffb.engine.actions.SelectPlayer.fromPlayers(eligiblePlayers))
                 false -> listOf(ContinueWhenReady)

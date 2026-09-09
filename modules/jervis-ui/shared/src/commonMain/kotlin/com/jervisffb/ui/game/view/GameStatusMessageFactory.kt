@@ -90,6 +90,8 @@ import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.FireballRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.ZapRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.common.procedures.rerolls.ProRoll
 import com.jervisffb.engine.common.procedures.rerolls.UseProReroll
@@ -259,6 +261,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             DodgySnack.RollForReceivingTemSelectedPlayer to "Roll D6 for Effect of Dodgy Snack",
             FanFactorRolls.SetFanFactorForAwayTeam to "Roll D3 for Fan Factor",
             FanFactorRolls.SetFanFactorForHomeTeam to "Roll D3 for Fan Factor",
+            FireballRoll.ReRollDie to "Re-roll D6 to hit with Fireball",
+            FireballRoll.RollDie to "Roll D6 to hit with Fireball",
             FoulAppearanceRoll.ReRollDie to "Re-roll D6 for Foul Appearance",
             FoulAppearanceRoll.RollDie to "Roll D6 for Foul Appearance",
             HypnoticGazeRoll.ReRollDie to "Re-roll D6 for Hypnotic Gaze",
@@ -328,6 +332,8 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             UnchannelledFuryRollBB2025.ReRollDie to "Re-roll D6 to avoid Unchannelle Fury",
             UnchannelledFuryRollBB2025.RollDie to "Roll D6 for Unchannelled Fury",
             WeatherRoll.RollWeatherDice to "Roll 2D6 for the Weather",
+            ZapRoll.ReRollDie to "Re-roll D6 to turn the player into a Frog",
+            ZapRoll.RollDie to "Roll D6 to turn the player into a Frog",
             com.jervisffb.engine.bb2020.procedures.actions.throwteammate.ThrowPlayerStep.BouncePlayer to "Roll D8 to Bounce the Player",
             PassAccuracyRoll.ReRollDie to "Re-roll D6 to Pass the Ball",
             PassAccuracyRoll.RollDie to "Roll D6 to Pass the Ball",
@@ -348,6 +354,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             DauntlessRoll.ChooseReRollSource to "Accept Dauntless Result or Reroll D6?",
             DodgeRollBB2020.ChooseReRollSource to "Accept Dodge Result or Reroll D6?",
             DodgeRollBB2025.ChooseReRollSource to "Accept Dodge Result or Reroll D6?",
+            FireballRoll.ChooseReRollSource to "Accept Fireball Result or Re-roll D6?",
             FoulAppearanceRoll.ChooseReRollSource to "Accept Foul Appearance Result or Reroll D6?",
             HypnoticGazeRoll.ChooseReRollSource to "Accept Hypnotic Gaze Result or Reroll D6?",
             JumpRoll.ChooseReRollSource to "Accept Jump Result or Reroll D6?",
@@ -377,6 +384,7 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
             ThrowTeammateAccuracyRoll.ChooseReRollSource to "Accept Accuracy Result or Reroll D6?",
             UnchannelledFuryRollBB2020.ChooseReRollSource to "Accept Unchannelled Fury Result or Reroll D6?",
             UnchannelledFuryRollBB2025.ChooseReRollSource to "Accept Unchannelled Fury Result or Reroll D6?",
+            ZapRoll.ChooseReRollSource to "Accept Zap! Result or Re-roll D6?",
             PassAccuracyRoll.ChooseReRollSource to "Accept Pass Result or Reroll D6?",
         )
 

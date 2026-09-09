@@ -6,8 +6,8 @@ import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.common.context.ApplyInducementEffectsContext
 import com.jervisffb.engine.common.context.PrayersToNuffleRollContext
+import com.jervisffb.engine.common.context.SelectInducementEffectsContext
 import com.jervisffb.engine.common.procedures.inducements.BuyInducements
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -102,16 +102,16 @@ object PreGame : Procedure() {
 
     object CheckForInducementEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = ApplyInducementEffectsContext(
+            val context = SelectInducementEffectsContext(
                 phase = Timing.BEFORE_FIRST_SETUP,
                 team = null,
             )
             return AddContext(context)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ApplyInducementEffectsStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                RemoveContext<ApplyInducementEffectsContext>(),
+                RemoveContext<SelectInducementEffectsContext>(),
                 ExitProcedure()
             )
         }

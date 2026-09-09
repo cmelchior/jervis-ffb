@@ -59,6 +59,10 @@ import com.jervisffb.engine.common.procedures.actions.block.FoulAppearanceRoll
 import com.jervisffb.engine.common.procedures.actions.block.ProjectileVomitRoll
 import com.jervisffb.engine.common.procedures.actions.move.JumpRoll
 import com.jervisffb.engine.common.procedures.actions.throwteammate.LandingRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.FireBallContext
+import com.jervisffb.engine.common.procedures.inducements.spells.FireballRoll
+import com.jervisffb.engine.common.procedures.inducements.spells.ZapContext
+import com.jervisffb.engine.common.procedures.inducements.spells.ZapRoll
 import com.jervisffb.engine.common.procedures.rerolls.LonerRoll
 import com.jervisffb.engine.common.procedures.rerolls.ProRoll
 import com.jervisffb.engine.fsm.Node
@@ -915,5 +919,44 @@ object PuntDistanceWheelController : D6WithRerollWheelController() {
     override fun getOriginalRoll(state: Game): D6Result {
         val context = state.getContext<PuntContext>()
         return context.distanceRoll?.originalRoll!!
+    }
+}
+
+object FireballWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "fireball"
+    override val diceRollType: DiceRollType = DiceRollType.FIREBALL
+    override val rollDiceNode: Node = FireballRoll.RollDie
+    override val chooseRerollSourceNode: Node = FireballRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = FireballRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        val context = state.getContext<FireBallContext>()
+        // The player being rolled for only moves from `potentialPlayers` to `rolls`
+        // once the die has been rolled.
+        val player = when (state.stack.currentNode()) {
+            rollDiceNode -> context.potentialPlayers.lastOrNull()
+            else -> context.rolls.lastOrNull()?.player
+        }
+        return player?.coordinates ?: context.target
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        return state.getContext<FireBallContext>().rolls.last().roll.originalRoll
+    }
+}
+
+object ZapWheelController : D6WithRerollWheelController() {
+    override val buttonIdPrefix: String = "zap"
+    override val diceRollType: DiceRollType = DiceRollType.ZAP
+    override val rollDiceNode: Node = ZapRoll.RollDie
+    override val chooseRerollSourceNode: Node = ZapRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = ZapRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate {
+        return state.getContext<ZapContext>().target.coordinates
+    }
+
+    override fun getOriginalRoll(state: Game): D6Result {
+        return state.getContext<ZapContext>().roll!!.originalRoll
     }
 }

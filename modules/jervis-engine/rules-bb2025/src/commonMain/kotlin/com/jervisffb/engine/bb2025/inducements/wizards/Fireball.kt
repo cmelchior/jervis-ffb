@@ -15,7 +15,7 @@ class Fireball(val wizard: WizardId) : Spell {
     override val name: String = "Fireball"
     override var used: Boolean = false
     override val triggers = listOf(
-        Timing.START_OF_OPPONENT_TURN,
+        Timing.END_OF_OWN_TURN,
         Timing.END_OF_OPPONENT_TURN
     )
     override val procedure: Procedure = FireBallProcedure

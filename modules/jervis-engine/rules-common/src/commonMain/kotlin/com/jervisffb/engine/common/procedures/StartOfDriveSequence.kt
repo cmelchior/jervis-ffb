@@ -8,6 +8,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetActiveTeam
 import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.SelectInducementEffectsContext
 import com.jervisffb.engine.common.context.SetupTeamContext
 import com.jervisffb.engine.common.reports.ReportSetupKickingTeam
 import com.jervisffb.engine.common.reports.ReportSetupReceivingTeam
@@ -16,6 +17,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 
@@ -26,13 +28,14 @@ import com.jervisffb.engine.rules.common.procedures.DummyProcedure
  * See page 79 for Leader.
  *
  * The sequence is:
- * 1. Setups: Kicking Team, then Receiving Team.
- * 2. Kick-Off.
- * 3. Roll for Master Chef (if start of half)
- * 4. Kick-Off Event
+ * 1. Resolve inducement effects that trigger before setup.
+ * 2. Setups: Kicking Team, then Receiving Team.
+ * 3. Kick-Off.
+ * 4. Roll for Master Chef (if start of half)
+ * 5. Kick-Off Event
  */
 object StartOfDriveSequence : Procedure() {
-    override val initialNode: Node = SetupKickingTeam
+    override val initialNode: Node = CheckForInducementEffects
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
@@ -69,12 +72,21 @@ object StartOfDriveSequence : Procedure() {
     }
 
     object CheckForInducementEffects: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            TODO("Not yet implemented")
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            return AddContext(
+                SelectInducementEffectsContext(
+                    phase = Timing.BEFORE_SETUP,
+                    team = null,
+                )
+            )
         }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(SetupKickingTeam)
+            )
         }
     }
 

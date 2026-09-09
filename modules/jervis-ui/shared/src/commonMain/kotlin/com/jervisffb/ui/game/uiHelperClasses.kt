@@ -16,6 +16,7 @@ enum class UiTeamFeatureType {
     BRIBE,
     CHEERING_FANS_OFFENSIVE_ASSIST,
     TEAM_CAPTAIN,
+    WIZARD,
     UNKNOWN,
 }
 

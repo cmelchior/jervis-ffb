@@ -15,6 +15,7 @@ import com.jervisffb.engine.common.commands.AddBribe
 import com.jervisffb.engine.common.commands.AddMortuaryAssistant
 import com.jervisffb.engine.common.commands.AddPlagueDoctor
 import com.jervisffb.engine.common.commands.AddTeamReroll
+import com.jervisffb.engine.common.commands.AddTeamWizard
 import com.jervisffb.engine.common.commands.AddWanderingApothecary
 import com.jervisffb.engine.common.commands.AddWeatherMage
 import com.jervisffb.engine.common.commands.SetBlitzersBestKegs
@@ -128,7 +129,10 @@ object ApplyInducements : Procedure() {
                             }
                         }
                         is InducementSelectionCommon.StarPlayer ->  { /* Not supported yet */ }
-                        is InducementSelectionCommon.Wizard ->  { /* Not supported yet */ }
+                        is InducementSelectionCommon.Wizard ->  {
+                            val wizard = inducement.wizard.create(team)
+                            add(AddTeamWizard(team, wizard))
+                        }
                     }
                 }
                 if (updatedContext != context) {

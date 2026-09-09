@@ -29,6 +29,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -71,8 +72,11 @@ object UseBB7Apothecary: Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
+            // An Apothecary cannot treat a Frog created by the "Zap!" spell.
+            // See page 149 in the BB2025 rulebook.
+            val isFrog = context.player.keywords.contains(PlayerKeyword.FROG)
             val hasApothecary = context.player.team.teamApothecaries.count { it is StandardApothecary && !it.used } > 0
-            return when (hasApothecary) {
+            return when (hasApothecary && !isFrog) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }

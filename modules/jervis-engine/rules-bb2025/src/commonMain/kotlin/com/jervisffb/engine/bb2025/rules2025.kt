@@ -111,10 +111,10 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import com.jervisffb.engine.bb2025.procedures.TeamTurn as BB2025TeamTurn
-import com.jervisffb.engine.bb2025.procedures.actions.pass.PassStep as BB2025PassStep
-import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep as BB2025ThrowPlayerStep
-import com.jervisffb.engine.bb2025.procedures.inducements.ApplyInducements as BB2025ApplyInducements
+import com.jervisffb.engine.bb2025.procedures.TeamTurn as TeamTurn2025
+import com.jervisffb.engine.bb2025.procedures.actions.pass.PassStep as PassStep2025
+import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.ThrowPlayerStep as ThrowPlayerStep2025
+import com.jervisffb.engine.bb2025.procedures.inducements.ApplyInducements as ApplyInducements2025
 
 /**
  * Top-level class for all variants of the 2025 Blood Bowl rules.
@@ -416,10 +416,10 @@ abstract class Rules2025(
     @Transient override val tentaclesStep: Procedure = TentaclesStep
     @Transient override val hitAndRunStep: Procedure = HitAndRunStep
     @Transient override val hailMaryPassStep: Procedure = HailMaryPassStep
-    @Transient override val teamTurn: Procedure = BB2025TeamTurn
-    @Transient override val passStep: Procedure = BB2025PassStep
-    @Transient override val throwPlayerStep: Procedure = BB2025ThrowPlayerStep
-    @Transient override val applyInducementsStep: Procedure = BB2025ApplyInducements
+    @Transient override val teamTurn: Procedure = TeamTurn2025
+    @Transient override val passStep: Procedure = PassStep2025
+    @Transient override val throwPlayerStep: Procedure = ThrowPlayerStep2025
+    @Transient override val applyInducementsStep: Procedure = ApplyInducements2025
     @Transient override val setupTeam: Procedure = SetupTeam
     @Transient override val chainsawFoulStep: Procedure = ChainsawFoulStep
     @Transient override val kickOffDeviateRollStep: Procedure = DeviateRoll

@@ -6,6 +6,8 @@ The TODO list is by no means exhaustive, it is just a place to dump things as
 they come up.
 
 ## Todo List
+- [ ] Fireball animation
+- [ ] Zap animation
 - [ ] Monstrous Mouth Action Icon
 - [ ] Punt Action Icon
 - [ ] Hail Mary Pass Icon
@@ -82,6 +84,7 @@ they come up.
 
 ## Design ideas
 
+- [ ] Can https://nufflezone.com/en/blood-bowl-teams/ be used as roster icons?
 - [ ] Experiment with an action system similar to BB3 (round action circle around player)
 - [ ] Think about an UI that can work across Desktop: 16:9 and iPad 4:3.
 - [ ] Is it worth exploring an isometric view (to make it more immersive)? 

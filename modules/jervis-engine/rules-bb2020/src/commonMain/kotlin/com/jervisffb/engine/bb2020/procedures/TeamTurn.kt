@@ -23,11 +23,11 @@ import com.jervisffb.engine.common.commands.SetPlayerAvailability
 import com.jervisffb.engine.common.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.common.commands.SetTurnMarker
 import com.jervisffb.engine.common.commands.UpdateTurnOver
-import com.jervisffb.engine.common.context.ActivateInducementContext
 import com.jervisffb.engine.common.context.ActivatePlayerContext
+import com.jervisffb.engine.common.context.SelectInducementEffectsContext
+import com.jervisffb.engine.common.procedures.ActivateInducementEffectsStep
 import com.jervisffb.engine.common.procedures.getResetPlayerAvailabilityCommands
 import com.jervisffb.engine.common.procedures.getResetTeamTemporaryModifiersCommands
-import com.jervisffb.engine.common.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.common.reports.ReportEndingTurn
 import com.jervisffb.engine.common.reports.ReportStartingTurn
 import com.jervisffb.engine.fsm.ActionNode
@@ -73,17 +73,6 @@ object TeamTurn : Procedure() {
             SetCanUseTeamRerolls(false),
             ReportEndingTurn(state.activeTeamOrThrow(), state.activeTeamOrThrow().turnMarker, state.turnOver),
         )
-    }
-
-    object UseSpecialEffects: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            return AddContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_OWN_TURN))
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO Do we need to check for anything here? Could we have a turn-over already?
-            return GotoNode(SelectPlayerOrEndTurn)
-        }
     }
 
     // According to the rules, you cannot take back activating a player, but that feels needlessly restrictive.
@@ -196,6 +185,40 @@ object TeamTurn : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = com.jervisffb.engine.common.procedures.tables.prayers.ResolveThrowARock
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
+        }
+    }
+
+    object CheckForInducementEffectsOwnTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OWN_TURN,
+                team = state.activeTeam,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(CheckForInducementEffectsOpponentTurn)
+            )
+        }
+    }
+
+    object CheckForInducementEffectsOpponentTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OPPONENT_TURN,
+                team = state.activeTeam!!.otherTeam(),
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                ExitProcedure()
+            )
         }
     }
 

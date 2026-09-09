@@ -18,7 +18,6 @@ enum class Timing {
     PERFORM_PASS_ACTION,
     AFTER_TURNOVER,
     ENTER_TACKLEZONE,
-    END_OF_ANY_TURN,
     END_OF_OWN_TURN, // After own turn "has ended(?)"
     END_OF_OPPONENT_TURN, // After "opponent's turn has ended(?)"
 

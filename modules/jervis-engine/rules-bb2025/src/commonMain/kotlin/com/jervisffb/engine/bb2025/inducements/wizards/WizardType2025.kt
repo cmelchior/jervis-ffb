@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class WizardType2025(override val label: String): WizardType {
-    SPORTS_WIZARD("Sports Wizard") {
+    SPORTS_WIZARD("Sports-Wizard") {
         override fun create(team: Team): Wizard = SportsWizard(team)
     }
 }

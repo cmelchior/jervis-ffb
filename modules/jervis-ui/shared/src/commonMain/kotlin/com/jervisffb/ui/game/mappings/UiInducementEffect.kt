@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.mappings
 
 import com.jervisffb.engine.bb2020.inducements.effects.SpecialPlayCardCategory2020
 import com.jervisffb.engine.bb2025.inducements.effects.SpecialPlayCardCategory2025
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.InducementEffect
 import com.jervisffb.engine.model.inducements.biasedreferee.BiasedRefereeAbility
 import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
@@ -10,16 +11,48 @@ import com.jervisffb.engine.model.inducements.wizard.Spell
 
 enum class UiInducementEffect(val categoryLabel: String) {
     WIZARD("Wizard"),
-    RANDOM_EVENT("Random Event"),
-    DIRTY_TRICK("Dirty Trick"),
-    MAGIC_MEMORABILIA("Magic Memorabilia"),
-    HEROIC_FEAT("Heroic Feat"),
-    BENEFIT_OF_TRAINING("Benefit of Training"),
-    MISCELLANEOUS_MAYHEM("Miscellaneous Mayhem"),
+    RANDOM_EVENT("Special Play Card"),
+    DIRTY_TRICK("Special Play Card"),
+    MAGIC_MEMORABILIA("Special Play Card"),
+    HEROIC_FEAT("Special Play Card"),
+    BENEFIT_OF_TRAINING("Special Play Card"),
+    MISCELLANEOUS_MAYHEM("Special Play Card"),
     DESPERATE_MEASURES("Desperate Measures"),
     INFAMOUS_COACHING_STAFF("Infamous Coaching Staff"),
     BIASED_REFEREE("Biased Referee"),
     ;
+
+    fun getSubLabel(
+        effect: InducementEffect,
+        team: Team,
+    ): String? {
+        return when (this) {
+            WIZARD -> team.wizards
+                .firstOrNull { wizard -> wizard.spells.any { it.id == effect.id } }
+                ?.type
+                ?.label
+                ?: error("Could not find wizard for inducement effect: $effect")
+
+            RANDOM_EVENT,
+            DIRTY_TRICK,
+            MAGIC_MEMORABILIA,
+            HEROIC_FEAT,
+            BENEFIT_OF_TRAINING,
+            MISCELLANEOUS_MAYHEM -> (effect as SpecialPlayCard).type.label
+
+            DESPERATE_MEASURES -> null
+
+            INFAMOUS_COACHING_STAFF -> team.infamousCoachingStaff
+                .firstOrNull { staff -> staff.specialAbilities.any { it.id == effect.id } }
+                ?.name
+                ?: error("Could not find infamous coaching staff for inducement effect: $effect")
+
+            BIASED_REFEREE -> team.biasedReferees
+                .firstOrNull { referee -> referee.specialAbilities.any { it.id == effect.id } }
+                ?.name
+                ?: error("Could not find biased referee for inducement effect: $effect")
+        }
+    }
 
     companion object : UiMapping<InducementEffect, UiInducementEffect> {
         override fun mapFrom(el: InducementEffect): UiInducementEffect {

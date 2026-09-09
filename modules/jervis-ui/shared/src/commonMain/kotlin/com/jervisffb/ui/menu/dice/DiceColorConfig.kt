@@ -94,6 +94,7 @@ object DiceColorConfig2025 : DiceColorConfig() {
             DiceRollType.DODGY_SNACK_EFFECT -> DiceRollTypeConfig(rollType, "Dodgy Snack Effect", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.DODGY_SNACK_ROLL_OFF -> DiceRollTypeConfig(rollType, "Dodgy Snack Roll-Off", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.FAN_FACTOR -> DiceRollTypeConfig(rollType, "Fan Factor", d3, d6Colors, DiceColor.WHITE)
+            DiceRollType.FIREBALL -> DiceRollTypeConfig(rollType, "Fireball", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.FOUL_APPEARANCE -> DiceRollTypeConfig(rollType, "Foul Appearance", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.HYPNOTIC_GAZE -> DiceRollTypeConfig(rollType, "Hypnotic Gaze", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.INJURY -> DiceRollTypeConfig(rollType, "Injury", d6, d6Colors, DiceColor.BLUE)
@@ -144,6 +145,7 @@ object DiceColorConfig2025 : DiceColorConfig() {
             DiceRollType.TREACHEROUS_TRAPDOOR -> DiceRollTypeConfig(rollType, "Treacherous Trapdoor", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.UNCHANNELLED_FURY -> DiceRollTypeConfig(rollType, "Unchannelled Fury", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.WEATHER -> DiceRollTypeConfig(rollType, "Weather", d6, d6Colors, DiceColor.WHITE)
+            DiceRollType.ZAP -> DiceRollTypeConfig(rollType, "Zap!", d6, d6Colors, DiceColor.DEFAULT)
         }
     }
 }

@@ -4,7 +4,9 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectPitchLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.EndPlayerTransformation
 import com.jervisffb.engine.commands.RemovePlayerSkill
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillRerollUsed
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.common.commands.RemovePlayerStatModifier
@@ -18,13 +20,12 @@ import com.jervisffb.engine.common.commands.SetSpecialPlayCardActive
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.model.inducements.card.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachAbility
 import com.jervisffb.engine.model.inducements.infamouscoach.InfamousCoachingStaff
-import com.jervisffb.engine.model.inducements.wizard.Spell
-import com.jervisffb.engine.model.inducements.wizard.Wizard
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.JUMP_DISTANCE
 import com.jervisffb.engine.rules.Rules
@@ -198,6 +199,22 @@ private fun gatherResetPlayerTemporaryModifiersCommands(
         .map { RemovePlayerStatusEffect(player, it) }
 
     builder.addAll(removableTemporaryEffects)
+
+    // Turn the player back to normal if a transformation expires (e.g., a
+    // Frog reverts end of drive).
+    player.transformation
+        ?.takeIf { it.expiresAt == duration }
+        ?.let {
+            builder.add(EndPlayerTransformation(player))
+            // If the transformed player was a Frog that was a Casualty, they are moved
+            // back into reserves, when the transformation reverts.
+            // See page 149 in the BB2025 rulebook.
+            val isFrog = player.keywords.contains(PlayerKeyword.FROG)
+            val isCasualty = (player.state == PlayerDogoutState.BADLY_HURT) // Frogs are always only Badly Hurt
+            if (isFrog && isCasualty) {
+                builder.add(SetPlayerState(player, PlayerDogoutState.RESERVE))
+            }
+        }
 }
 
 /**
@@ -276,19 +293,6 @@ private fun gatherResetTeamTemporaryModifiersCommands(
         .filter { it.duration == duration }
         .map { RemoveTeamFeature(team, it) }
     builder.addAll(teamFeatures)
-}
-
-/**
- * Returns all available spells across all wizards
- */
-fun List<Wizard>.getAvailableSpells(trigger: Timing): List<Spell> {
-    return this.flatMap { it.getAvailableSpells(trigger) }
-}
-
-fun List<SpecialPlayCard>.getAvailableCards(trigger: Timing, state: Game, rules: Rules): List<SpecialPlayCard> {
-    return this
-        .filter { it.triggers.contains(trigger) && !it.used }
-        .filter { it.isApplicable(state, rules) }
 }
 
 fun List<InfamousCoachingStaff>.getAvailableAbilities(trigger: Timing, state: Game, rules: Rules): List<InfamousCoachAbility> {

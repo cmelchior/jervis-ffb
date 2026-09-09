@@ -2,7 +2,6 @@ package com.jervisffb.engine.rules
 
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
-import com.jervisffb.engine.model.IntRangeSerializer
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.rules.builder.BallSelectorRule
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -26,6 +25,7 @@ import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.engine.rules.common.tables.RangeRuler
 import com.jervisffb.engine.rules.common.tables.WeatherTable
+import com.jervisffb.engine.serialization.IntRangeSerializer
 import kotlinx.serialization.Serializable
 
 /**

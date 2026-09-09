@@ -38,6 +38,8 @@ import com.jervisffb.engine.common.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.common.commands.SetTurnOver
 import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.ChargeContext
+import com.jervisffb.engine.common.context.SelectInducementEffectsContext
+import com.jervisffb.engine.common.procedures.ActivateInducementEffectsStep
 import com.jervisffb.engine.common.procedures.ForegoActivation
 import com.jervisffb.engine.common.procedures.dicerolls.createFinalAtLeastObservation
 import com.jervisffb.engine.common.procedures.getResetPlayerAvailabilityCommands
@@ -60,6 +62,7 @@ import com.jervisffb.engine.model.context.ForegoActivationContext
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
@@ -321,11 +324,51 @@ object Charge : Procedure(), ChanceObservationHandler {
         }
     }
 
+    // A Charge is treated as a normal team turn, so effects that trigger at the
+    // end of a turn, like Wizard spells, also trigger when the Charge ends.
+    // See "Page 149 - Sports-Wizard" in `website/bb2025/bb2025-base-rules.md`.
     object ResolveEndOfTurn : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            return GotoNode(CheckForInducementEffectsOwnTurn)
+        }
+    }
 
-            // TODO Implement end-of-turn things
-            //  - Players stunned at the beginning of the turn are now prone
+    object CheckForInducementEffectsOwnTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OWN_TURN,
+                team = state.kickingTeam,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(CheckForInducementEffectsOpponentTurn)
+            )
+        }
+    }
+
+    object CheckForInducementEffectsOpponentTurn: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = SelectInducementEffectsContext(
+                phase = Timing.END_OF_OPPONENT_TURN,
+                team = state.receivingTeam,
+            )
+            return AddContext(context)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducementEffectsStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<SelectInducementEffectsContext>(),
+                GotoNode(ResetPlayersStateAndAbilities)
+            )
+        }
+    }
+
+    object ResetPlayersStateAndAbilities : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
 
             val progressStunnedCommands = state.kickingTeam
                 .filter { it.state == PlayerPitchState.STUNNED_OWN_TURN }

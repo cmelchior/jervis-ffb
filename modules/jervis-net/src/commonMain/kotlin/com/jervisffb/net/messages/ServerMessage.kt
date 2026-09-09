@@ -158,7 +158,11 @@ data class GameNotFoundMessage(val gameId: String): ServerMessage
  * @param action the action to send
  */
 @Serializable
-data class SyncGameActionMessage(val producer: CoachId, val serverIndex: GameActionId, val action: GameAction): ServerMessage
+data class SyncGameActionMessage(
+    val producer: CoachId,
+    val serverIndex: GameActionId,
+    val action: GameAction
+): ServerMessage
 
 @Serializable
 data class TeamData(

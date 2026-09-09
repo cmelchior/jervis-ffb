@@ -6,6 +6,7 @@ enum class ArmourModifier(override val modifier: Int, override val description: 
     ARM_BAR(1, "Arm Bar"),
     CHAINSAW(3, "Chainsaw"),
     DIRTY_PLAYER(1, "Dirty Player"),
+    FIREBALL(1, "Fireball"),
     MARKED(1, "Marked"),
     LETHAL_FLIGHT(1, "Lethal Flight"),
 }

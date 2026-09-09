@@ -546,6 +546,7 @@ abstract class AbstractRules(
             DiceRollType.CHOMP,
             DiceRollType.DAUNTLESS,
             DiceRollType.DODGE,
+            DiceRollType.FIREBALL,
             DiceRollType.FOUL_APPEARANCE,
             DiceRollType.HYPNOTIC_GAZE,
             DiceRollType.JUMP,
@@ -575,7 +576,8 @@ abstract class AbstractRules(
             DiceRollType.TEAM_MASCOT,
             DiceRollType.TENTACLES,
             DiceRollType.TREACHEROUS_TRAPDOOR,
-            DiceRollType.UNCHANNELLED_FURY -> true
+            DiceRollType.UNCHANNELLED_FURY,
+            DiceRollType.ZAP -> true
         }
     }
 

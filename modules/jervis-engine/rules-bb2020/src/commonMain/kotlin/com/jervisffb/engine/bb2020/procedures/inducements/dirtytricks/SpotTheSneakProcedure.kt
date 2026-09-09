@@ -1,9 +1,11 @@
 package com.jervisffb.engine.bb2020.procedures.inducements.dirtytricks
 
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.common.context.ActivateInducementContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.common.context.ResolveInducementEffectsContext
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
@@ -19,32 +21,16 @@ import com.jervisffb.engine.rules.Rules
 object SpotTheSneakProcedure: Procedure() {
     override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        TODO()
-    }
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<ActivateInducementContext>()
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<ResolveInducementEffectsContext>()
 
     object SelectPlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ResolveInducementEffectsContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            TODO("Not yet implemented")
+            return listOf(ContinueWhenReady)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
-        }
-    }
-
-    object PlacePlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            TODO("Not yet implemented")
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            return ExitProcedure()
         }
     }
 }

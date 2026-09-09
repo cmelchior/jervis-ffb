@@ -262,7 +262,13 @@ internal data class InducementEffectChoice(
 
 internal data class InducementEffectChoiceGroup(
     val category: UiInducementEffect,
+    val subLabel: String?,
     val choices: List<InducementEffectChoice>,
+)
+
+private data class InducementEffectChoiceGroupKey(
+    val category: UiInducementEffect,
+    val subLabel: String?,
 )
 
 internal fun SingleChoiceInputDialog.groupInducementEffectChoices(): List<InducementEffectChoiceGroup> {
@@ -270,11 +276,22 @@ internal fun SingleChoiceInputDialog.groupInducementEffectChoices(): List<Induce
     return actionDescriptions
         .mapNotNull { (action, description) ->
             val selection = action as? InducementEffectSelected ?: return@mapNotNull null
-            val category = UiInducementEffect.mapFrom(selection.getEffect(team))
-            category to InducementEffectChoice(selection, description)
+            val effect = selection.getEffect(team)
+            val category = UiInducementEffect.mapFrom(effect)
+            val groupKey = InducementEffectChoiceGroupKey(
+                category = category,
+                subLabel = category.getSubLabel(effect, team),
+            )
+            groupKey to InducementEffectChoice(selection, description)
         }
         .groupBy(keySelector = { it.first }, valueTransform = { it.second })
-        .map { (category, choices) -> InducementEffectChoiceGroup(category, choices) }
+        .map { (groupKey, choices) ->
+            InducementEffectChoiceGroup(
+                category = groupKey.category,
+                subLabel = groupKey.subLabel,
+                choices = choices,
+            )
+        }
 }
 
 @Composable
@@ -320,9 +337,23 @@ private fun InducementEffectChoiceList(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "${group.category.categoryLabel}: ",
+                        text = buildString {
+                            // Do not show the main category if a sub-label exists
+                            // We do this because we assume that there will not be
+                            // many inducements to choose from.
+                            if (group.subLabel.isNullOrBlank()) {
+                                append(group.category.categoryLabel)
+                                if (!group.subLabel.isNullOrBlank()) {
+                                    append(" – ")
+                                }
+                            }
+                            group.subLabel?.let {
+                                append(it)
+                            }
+                            append(": ")
+                        },
                         color = textColor,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = choice.description,

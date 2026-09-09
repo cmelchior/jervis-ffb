@@ -54,6 +54,11 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * See page 40 in the BB2025 rulebook.
  */
 object KnockedDown2025: Procedure() {
+    val validModes = listOf(
+        RiskingInjuryMode.KNOCKED_DOWN,
+        RiskingInjuryMode.BAD_LANDING,
+        RiskingInjuryMode.FIREBALL,
+    )
     override val initialNode: Node = ChooseToUseSteadyFooting
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -62,8 +67,8 @@ object KnockedDown2025: Procedure() {
         if (context.player.intermediateState == PlayerIntermediateState.KNOCKED_DOWN) {
             INVALID_GAME_STATE("Player is already knocked down: ${context.player.intermediateState}")
         }
-        if (context.mode != RiskingInjuryMode.KNOCKED_DOWN && context.mode != RiskingInjuryMode.BAD_LANDING) {
-            INVALID_GAME_STATE("Player needs to have a bad landing or be knocked down to use this procedure: ${context.mode}")
+        if (context.mode !in validModes) {
+            INVALID_GAME_STATE("Injury is not using a valid mode for this procedure: ${context.mode}")
         }
     }
 

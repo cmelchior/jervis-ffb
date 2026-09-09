@@ -1,13 +1,11 @@
 package com.jervisffb.engine.bb2020.inducements.effects
 
 import com.jervisffb.engine.bb2020.procedures.inducements.dirtytricks.SpotTheSneakProcedure
-import com.jervisffb.engine.common.context.ActivateInducementContext
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.InducementEffectId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -26,7 +24,7 @@ class AssassinationAttempt(private val team: TeamId): MiscellaneousMayhem() {
     override fun isApplicable(state: Game, rules: Rules): Boolean {
         // This card is only available if a player on the opponents team was stalling
         // during the turn.
-        val context = state.getContext<ActivateInducementContext>()
-        return context.team.otherTeam().count { it.isStalling } > 0
+        val team = state.getTeam(team)
+        return team.otherTeam().count { it.isStalling } > 0
     }
 }

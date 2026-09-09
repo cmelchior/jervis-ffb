@@ -7,6 +7,7 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetPlayerIntermediateState
@@ -24,6 +25,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerDogoutState
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -171,10 +173,18 @@ object RiskingInjuryRoll: Procedure() {
                     )
                 }
                 InjuryResult.CASUALTY -> {
-                    if (context.player.hasSkill(SkillType.REGENERATION)) {
-                        GotoNode(RollForRegeneration)
-                    } else {
-                        GotoNode(RollForCasualty)
+                    when {
+                        // A Frog created by the "Zap!" spell, does not roll on the Casualty Table.
+                        // They are always just Badly Hurt. See page 149 in the BB2025 rulebook.
+                        context.player.keywords.contains(PlayerKeyword.FROG) -> {
+                            compositeCommandOf(
+                                UpdateContext(context.copy(casualtyResult = CasualtyResult.BADLY_HURT)),
+                                SetPlayerState(context.player, PlayerDogoutState.BADLY_HURT),
+                                GotoNode(CheckApothecary),
+                            )
+                        }
+                        context.player.hasSkill(SkillType.REGENERATION) -> GotoNode(RollForRegeneration)
+                        else -> GotoNode(RollForCasualty)
                     }
                 }
                 null -> INVALID_GAME_STATE("Missing injury result")

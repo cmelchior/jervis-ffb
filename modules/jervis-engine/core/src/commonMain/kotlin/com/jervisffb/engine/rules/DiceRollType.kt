@@ -31,6 +31,7 @@ enum class DiceRollType(val description: String) {
     CROWD_TAKES_ACTION("Crowd Takes Action"), // Stalling
     DESPERATE_MEASURES("Desperate Measures"),
     FAN_FACTOR("Fan Factor"),
+    FIREBALL("Fireball"),
     FOUL_APPEARANCE("Foul Appearance"),
     DAUNTLESS("Dauntless"),
     DODGE("Dodge"),
@@ -85,5 +86,6 @@ enum class DiceRollType(val description: String) {
     PROJECTILE_VOMIT("Projectile Vomit"),
     PUNT_DIRECTION("Punt Direction"),
     PUNT_DISTANCE("Punt Distance"),
+    ZAP("Zap!"),
     WEATHER("Weather"),
 }

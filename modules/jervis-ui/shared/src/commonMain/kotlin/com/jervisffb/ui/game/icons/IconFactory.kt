@@ -77,6 +77,7 @@ import com.jervisffb.shared.generated.resources.jervis_icon_leader_reroll
 import com.jervisffb.shared.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.shared.generated.resources.jervis_inducement_apothercary
 import com.jervisffb.shared.generated.resources.jervis_inducement_keg
+import com.jervisffb.shared.generated.resources.jervis_inducement_wizard
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.PlayerSpriteFallbackGenerator.generatePlayerSprite
 import com.jervisffb.ui.game.model.UiPitchPlayer
@@ -414,7 +415,7 @@ class IconFactory internal constructor(
 
     fun getPlayerIcon(player: UiPitchPlayer): ImageBitmap {
         val isActive = player.isActive
-        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player.id, player.isOnHomeTeam)
+        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player)
         if (teamResources.players.contains(playerSpriteKey)) {
             return if (isActive) {
                 teamResources.players[playerSpriteKey]!!.active
@@ -597,6 +598,13 @@ class IconFactory internal constructor(
         return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
     }
 
+    @Composable
+    fun getWizardIcon(size: Dp): ImageBitmap {
+        val sizePx = with(LocalDensity.current) { size.toPx() }
+        val res = painterResource(Res.drawable.jervis_inducement_wizard)
+        return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
+    }
+
     fun getInducementIcon(type: InducementType): DrawableResource? {
         return when {
             type is InducementTypeCommon -> {
@@ -689,7 +697,7 @@ class IconFactory internal constructor(
         }
     }
 
-    suspend fun loadPlayerSprite(player: Player, isOnHomeTeam: Boolean): PlayerSprite {
+    suspend fun loadPlayerSprite(player: Player, isOnHomeTeam: Boolean = player.isOnHomeTeam()): PlayerSprite {
         return loadPlayerSprite(player, isOnHomeTeam, teamResources)
     }
 
@@ -698,7 +706,7 @@ class IconFactory internal constructor(
         isOnHomeTeam: Boolean,
         cache: TeamResourcesCache,
     ): PlayerSprite {
-        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player.id, isOnHomeTeam)
+        val playerSpriteKey = TeamResourcesCache.PlayerSpriteKey(player.id, isOnHomeTeam, player.icon?.sprite)
         cache.players[playerSpriteKey]?.let { return it }
         val playerSprite = player.icon?.sprite
         val sprite = if (playerSprite == null) {

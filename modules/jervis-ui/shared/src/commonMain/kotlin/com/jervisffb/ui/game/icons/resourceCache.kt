@@ -11,6 +11,7 @@ import com.jervisffb.engine.sprites.SpriteLocation
 import com.jervisffb.engine.sprites.SpriteSource
 import com.jervisffb.shared.generated.resources.Res
 import com.jervisffb.ui.CacheManager
+import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.viewmodel.PitchDetails
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.utils.scalePixels
@@ -204,12 +205,19 @@ internal class TeamResourcesCache(
     saveOnDiskCachedImage: suspend (Url, ImageBitmap) -> Unit = CacheManager::saveImage,
 ) : AbstractResourcesCache(httpClient, getCachedOnDiskImage, saveOnDiskCachedImage) {
 
-    // A long-lived app might have players from the same team act as both home and away players.
-    // So the cache needs to be able to distinguish between them.
+    // A long-lived app might have players from the same team act as both home
+    // and away players. So the cache needs to be able to distinguish between
+    // them.
+    //
+    // A player's appearance can also change during a game, e.g., using the
+    // "Zap!" spell, so `sprite` is part of the key as well.
     data class PlayerSpriteKey(
         val id: PlayerId,
         val isOnHomeTeam: Boolean,
-    )
+        val sprite: SpriteSource?,
+    ) {
+        constructor(player: UiPitchPlayer) : this(player.id, player.isOnHomeTeam, player.sprite)
+    }
 
     private val fumbblCache: MutableMap<String, Url> = fumbblCache.toMutableMap()
     val players: MutableMap<PlayerSpriteKey, PlayerSprite> = mutableMapOf()

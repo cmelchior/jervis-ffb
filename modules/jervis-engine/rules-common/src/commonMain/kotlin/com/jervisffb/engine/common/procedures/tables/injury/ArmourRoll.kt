@@ -105,6 +105,9 @@ import kotlinx.collections.immutable.toPersistentList
  *
  * Fall Over:
  * 1. Arm Bar (If in the middle of a Dodge, Jump or Leap)
+ *
+ * Knocked Down (Fireball):
+ * 1. Fireball modifier
  */
 object ArmourRoll: Procedure(), ChanceObservationHandler {
     override val initialNode: Node = RollDice
@@ -334,6 +337,12 @@ object ArmourRoll: Procedure(), ChanceObservationHandler {
                     modifiers.add(MightyBlowArmourModifier(modifier = 1))
                 }
             }
+
+            // Fireball
+            if (context.mode == RiskingInjuryMode.FIREBALL) {
+                modifiers.add(ArmourModifier.FIREBALL)
+            }
+
             return compositeCommandOf(
                 if (forceUseClaws) ReportSkillUsed(context.causedBy!!, SkillType.CLAWS) else null,
                 if (forceUseMightyBlow) ReportSkillUsed(context.causedBy!!, SkillType.MIGHTY_BLOW) else null,
@@ -362,6 +371,7 @@ object ArmourRoll: Procedure(), ChanceObservationHandler {
                 RiskingInjuryMode.FOUL -> GotoNode(ChooseTouseChainsaw)
                 RiskingInjuryMode.FALLING_OVER -> GotoNode(CheckIfArmBarIsApplicable)
                 // None of these have skills that can affect the armour roll
+                RiskingInjuryMode.FIREBALL,
                 RiskingInjuryMode.BAD_LANDING,
                 RiskingInjuryMode.HIT_BY_ROCK,
                 RiskingInjuryMode.PLACED_PRONE,
@@ -369,6 +379,7 @@ object ArmourRoll: Procedure(), ChanceObservationHandler {
                 RiskingInjuryMode.PUSHED_INTO_CROWD,
                 RiskingInjuryMode.CHAINSAW, // Attacked by the Chainsaw. Modifier was added in `AddMandatoryModifiers`
                 RiskingInjuryMode.STAB -> ExitProcedure()
+
             }
         }
     }

@@ -38,7 +38,7 @@ abstract class DesperateMeasures: SpecialPlayCard {
  * See page 15 in Spike 22.
  */
 @Serializable
-class YouDope(private val team: TeamId): DesperateMeasures() {
+class YouDopeCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-you-dope")
     override val name: String = "You Dope!"
     override val triggers: List<Timing> = listOf(Timing.AFTER_SETUP)
@@ -50,7 +50,7 @@ class YouDope(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class RazzleDazzle(private val team: TeamId): DesperateMeasures() {
+class RazzleDazzleCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-razzle-dazzle")
     override val name: String = "Razzle-Dazzle"
     override val triggers: List<Timing> = listOf(Timing.ACTIVATE_PLAYER)
@@ -62,7 +62,7 @@ class RazzleDazzle(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class Hangover(private val team: TeamId): DesperateMeasures() {
+class HangoverCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-hangover")
     override val name: String = "Hangover"
     override val triggers: List<Timing> = listOf(Timing.BEFORE_FIRST_SETUP)
@@ -74,7 +74,7 @@ class Hangover(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class GrudgeMatch(private val team: TeamId): DesperateMeasures() {
+class GrudgeMatchCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-grudge-match")
     override val name: String = "Grudge Match"
     override val triggers: List<Timing> = listOf(Timing.ACTIVATE_PLAYER)
@@ -86,7 +86,7 @@ class GrudgeMatch(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class SetPiece(private val team: TeamId): DesperateMeasures() {
+class SetPieceCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-set-piece")
     override val name: String = "Set Piece"
     override val triggers: List<Timing> = listOf(Timing.PERFORM_PASS_ACTION)
@@ -98,7 +98,7 @@ class SetPiece(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class SportsEspionage(private val team: TeamId): DesperateMeasures() {
+class SportsEspionageCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-sports-espionage")
     override val name: String = "Sports Espionage"
     override val triggers: List<Timing> = listOf(Timing.AFTER_TURNOVER)
@@ -110,7 +110,7 @@ class SportsEspionage(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class DiscardedBananaSkin(private val team: TeamId): DesperateMeasures() {
+class DiscardedBananaSkinCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-discarded-banana-skin")
     override val name: String = "Discarded Banana Skin"
     override val triggers: List<Timing> = listOf(Timing.ENTER_TACKLEZONE)
@@ -122,7 +122,7 @@ class DiscardedBananaSkin(private val team: TeamId): DesperateMeasures() {
  * See page 15 in Spike 22.
  */
 @Serializable
-class MagicScroll(private val team: TeamId): DesperateMeasures() {
+class MagicScrollCard(private val team: TeamId): DesperateMeasures() {
     override val id = InducementEffectId("${team.value}-magic-scroll")
     override val name: String = "Magic Scroll"
     override val triggers: List<Timing> = listOf(Timing.BEFORE_SETUP)

@@ -138,13 +138,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                     player.extraSkills.addAll(data.extraSkills.map { rules.createSkill(player, it, Duration.PERMANENT) })
                     player.extraSpecialRules.addAll(data.extraSpecialRules)
                     data.statModifiers.forEach {
-                        when (it.type) {
-                            StatModifier.Type.AV -> player.armourModifiers.add(it)
-                            StatModifier.Type.MA -> player.moveModifiers.add(it)
-                            StatModifier.Type.PA -> player.passingModifiers.add(it)
-                            StatModifier.Type.AG -> player.agilityModifiers.add(it)
-                            StatModifier.Type.ST -> player.strengthModifiers.add(it)
-                        }
+                        player.addStatModifier(it)
                     }
                 })
             }
