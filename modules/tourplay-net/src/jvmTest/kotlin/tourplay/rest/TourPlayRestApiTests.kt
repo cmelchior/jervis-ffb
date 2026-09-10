@@ -53,4 +53,12 @@ class TourPlayRestApiTests {
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
         assertEquals("Bretonnridge Brawlers", team.name)
     }
+
+    @Test
+    fun load176917() = runBlocking {
+        val rules = StandardBB2025Rules()
+        val file = api.loadRoster(176917, rules)
+        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
+        assertEquals("Khazra’s Den 26", team.name)
+    }
 }

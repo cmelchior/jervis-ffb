@@ -15,7 +15,7 @@ import kotlin.collections.List
 @Serializable
 public data class TourPlayRoster(
     public val id: Int,
-    public val imageFile: String,
+    public val imageFile: String? = null,
     public val apothecary: Boolean,
     public val assistantCoaches: Int,
     public val cheerLeaders: Int,
