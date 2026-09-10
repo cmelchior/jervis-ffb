@@ -113,7 +113,13 @@ internal abstract class AbstractResourcesCache(
             }
             val image = when (response.status.isSuccess()) {
                 true -> Image.makeFromEncoded(response.readRawBytes()).toComposeImageBitmap()
-                false -> null
+                false -> {
+                    // Callers silently fall back to a generated placeholder when this
+                    // returns `null`, so log it. Otherwise, a proxy that starts rejecting
+                    // requests just looks like a missing icon mapping.
+                    loggerInstance.w { "Loading image from network failed with ${response.status}: $url" }
+                    null
+                }
             }
             if (image != null) {
                 saveCachedImage(url, image)

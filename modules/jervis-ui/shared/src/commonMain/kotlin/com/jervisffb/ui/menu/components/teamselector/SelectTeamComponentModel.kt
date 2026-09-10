@@ -12,6 +12,7 @@ import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.ICON_FACTORY
+import com.jervisffb.ui.TOURPLAY_ICON_MAPPING
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.model.ModelRef
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -39,7 +40,7 @@ class SelectTeamComponentModel(
     }
 
     val fumbblApi = FumbblApi()
-    val tourplayApi = TourPlayApi()
+    val tourplayApi = TourPlayApi(TOURPLAY_ICON_MAPPING)
 
     var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())

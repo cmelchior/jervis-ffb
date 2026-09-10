@@ -273,9 +273,10 @@ Before creating a PR against Jervis, run through the following steps:
 
 1. `./gradlew ktlintFormat`
 2. `./gradlew jvmTest`
-3. If you touched both `engine/rules/bb2020/` and `engine/rules/bb2025/`, verify
+3. If you touched the FUMBBL icon files, `./gradlew checkTourPlayIcons`
+4. If you touched both `engine/rules/bb2020/` and `engine/rules/bb2025/`, verify
    the change is mirrored consistently across both rulesets.
-4. All changes that add to or change the rules implementation should have 
+5. All changes that add to or change the rules implementation should have 
    associated unit tests in `modules/jervis-engine/src/commonTest/` 
-5. Do not commit generated files under `build/` or resource copies produced by
+6. Do not commit generated files under `build/` or resource copies produced by
    `updateFFBResources` unless updating those resources is the point of the PR.

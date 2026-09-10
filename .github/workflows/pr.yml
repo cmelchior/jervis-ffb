@@ -31,6 +31,12 @@ jobs:
     permissions:
       contents: read
 
+  check-tourplay-icons:
+    needs: [ setup ]
+    uses: ./.github/workflows/tourplay-icons.yml
+    permissions:
+      contents: read
+
   fuzzer:
     needs: [ setup ]
     uses: ./.github/workflows/fuzzer.yml

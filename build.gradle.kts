@@ -202,7 +202,7 @@ tasks.register<Copy>("copyFFBIconsIni") {
     group = "Jervis Tasks"
     dependsOn("cloneFFBRepo")
     val sourceFile = file("${layout.buildDirectory.get().asFile.absolutePath}/ffb-repo/ffb-client/src/main/resources-live/icons.ini")
-    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/src/commonMain/composeResources/files/fumbbl")
+    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/shared/src/commonMain/composeResources/files/fumbbl")
     onlyIf {
         if (!sourceFile.exists()) {
             throw GradleException("Source file does not exist: ${sourceFile.absolutePath}")
@@ -278,7 +278,7 @@ tasks.register<Copy>("updateFFBResources") {
     dependsOn("flattenFFBResources", "copyFFBIconsIni")
 
     val tempDir = file("${layout.buildDirectory.get().asFile.absolutePath}/ffb-resources")
-    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/src/commonMain/composeResources")
+    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/shared/src/commonMain/composeResources")
 
     onlyIf {
         if (!tempDir.exists()) {
@@ -291,4 +291,110 @@ tasks.register<Copy>("updateFFBResources") {
         include("**/*") // Include all files
     }
     into(targetDir) // Move files into the final destination
+}
+
+// The TourPlay icon mapping is keyed on the same FUMBBL URLs as
+// `files/fumbbl/icons.ini`, so the files silently drift apart whenever FUMBBL
+// adds, replaces or removes an icon. This task guards against that by requiring
+// every FUMBBL icon to be listed in the TourPlay file for its kind - either
+// mapped to a TourPlay position or left with an empty value to mark it as
+// xdeliberately unmapped.
+tasks.register("checkTourPlayIcons") {
+    description = "Verify that the TourPlay icon mapping covers every FUMBBL player icon"
+    group = "verification"
+
+    val resourceDir = layout.projectDirectory.dir("modules/jervis-ui/shared/src/commonMain/composeResources/files")
+    val fumbblIcons = resourceDir.file("fumbbl/icons.ini").asFile
+    val fumbblExtraIcons = resourceDir.file("fumbbl/icons-extra.ini").asFile
+    val tourPlayIcons = mapOf(
+        "iconsets" to resourceDir.file("tourplay/icons-iconsets.ini").asFile,
+        "portraits" to resourceDir.file("tourplay/icons-portraits.ini").asFile,
+    )
+    inputs.files(fumbblIcons, fumbblExtraIcons, *tourPlayIcons.values.toTypedArray())
+
+    doLast {
+        fun readEntries(file: File): List<Pair<String, String>> {
+            if (!file.exists()) {
+                throw GradleException("Icon mapping file does not exist: ${file.absolutePath}")
+            }
+            return file.readLines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") }
+                .map { line ->
+                    val separator = line.indexOf('=')
+                    if (separator == -1) {
+                        throw GradleException("Malformed entry in ${file.name}, expected `url=value`: $line")
+                    }
+                    line.substring(0, separator) to line.substring(separator + 1)
+                }
+        }
+
+        // Must match how `TourPlayIconMapping` builds its lookup keys.
+        fun normalize(name: String): String = name.filter { it.isLetterOrDigit() }.lowercase()
+        fun keyOf(entry: String): String =
+            entry.split("/", limit = 2).joinToString("/") { normalize(it) }
+
+        val fumbblPaths: Map<String, String> = (readEntries(fumbblIcons) + readEntries(fumbblExtraIcons)).toMap()
+        val errors = mutableListOf<String>()
+        var total = 0
+        var mapped = 0
+
+        tourPlayIcons.forEach { (kind, file) ->
+            val prefix = "players/$kind/"
+            val entries = readEntries(file)
+            total += entries.size
+            mapped += entries.count { it.second.isNotBlank() }
+
+            val duplicates = entries.groupBy { it.first }.filterValues { it.size > 1 }.keys
+            if (duplicates.isNotEmpty()) {
+                errors += "${duplicates.size} URL(s) listed more than once in ${file.name}:\n" +
+                    duplicates.sorted().joinToString("\n") { "  $it" }
+            }
+
+            val listed = entries.mapTo(mutableSetOf()) { it.first }
+            val expected = fumbblPaths.filterValues { it.startsWith(prefix) }
+            val missing = expected.keys.filterNot { it in listed }
+            if (missing.isNotEmpty()) {
+                errors += "${missing.size} FUMBBL $kind have no entry in ${file.name}. Add a line for " +
+                    "each, mapping it to a TourPlay position or leaving the value empty if it has none:\n" +
+                    missing.sortedBy { expected.getValue(it) }
+                        .joinToString("\n") { "  $it=  # ${expected.getValue(it)}" }
+            }
+
+            // Entries for the other kind belong in the sibling file, not this one.
+            val wrongKind = entries.map { it.first }.distinct().filterNot { it in expected }
+            if (wrongKind.isNotEmpty()) {
+                errors += "${wrongKind.size} entry/entries in ${file.name} are not a FUMBBL " +
+                    "`$prefix` image and should be removed or moved to the sibling file:\n" +
+                    wrongKind.sorted().joinToString("\n") { "  $it  # ${fumbblPaths[it] ?: "unknown to FUMBBL"}" }
+            }
+
+            // A TourPlay position can only render one image per kind, so two FUMBBL icons
+            // claiming it means one of them is silently ignored at runtime.
+            val claims = mutableMapOf<String, MutableSet<String>>()
+            entries.forEach { (url, positions) ->
+                val path = fumbblPaths[url] ?: return@forEach
+                positions.split(",")
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .forEach { position -> claims.getOrPut(keyOf(position)) { mutableSetOf() }.add(path) }
+            }
+            val conflicts = claims.filterValues { it.size > 1 }
+            if (conflicts.isNotEmpty()) {
+                errors += "${conflicts.size} TourPlay position(s) are claimed by more than one FUMBBL $kind:\n" +
+                    conflicts.entries.sortedBy { it.key }
+                        .joinToString("\n") { (key, paths) -> "  $key: ${paths.sorted().joinToString(", ")}" }
+            }
+        }
+
+        if (errors.isNotEmpty()) {
+            throw GradleException("The TourPlay icon mapping is out of sync with the FUMBBL icon files.\n\n" +
+                errors.joinToString("\n\n"))
+        }
+
+        logger.lifecycle(
+            "TourPlay icon mapping is in sync with the FUMBBL icon files: " +
+                "$total images, $mapped mapped to a TourPlay position."
+        )
+    }
 }

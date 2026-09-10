@@ -34,6 +34,12 @@ jobs:
     permissions:
       contents: read
 
+  check-tourplay-icons:
+    needs: [ setup ]
+    uses: ./.github/workflows/tourplay-icons.yml
+    permissions:
+      contents: read
+
   fuzzer:
     needs: [ setup ]
     uses: ./.github/workflows/fuzzer.yml
@@ -43,7 +49,7 @@ jobs:
       contents: read
 
   publication:
-    needs: [ setup, test, fuzzer, check-serializers ]
+    needs: [ setup, test, fuzzer, check-serializers, check-tourplay-icons ]
     uses: ./.github/workflows/publication.yml
     with:
       commit_count: ${{ needs.setup.outputs.commit_count }}

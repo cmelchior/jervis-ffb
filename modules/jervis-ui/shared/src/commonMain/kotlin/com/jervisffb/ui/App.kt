@@ -19,6 +19,8 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervis.generated.resetSettings
 import com.jervisffb.BuildConfig
+import com.jervisffb.shared.generated.resources.Res
+import com.jervisffb.tourplay.TourPlayIconMapping
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -40,6 +42,7 @@ val FILE_MANAGER = FileManager()
 val SETTINGS_MANAGER: SettingsManager = SettingsManager()
 val PLAYER_MARKINGS_MANAGER = PlayerMarkingsManager(SETTINGS_MANAGER)
 val ICON_FACTORY = IconFactory(getHttpClient())
+val TOURPLAY_ICON_MAPPING = TourPlayIconMapping()
 
 suspend fun initApplication() {
     initializePlatform()
@@ -68,6 +71,15 @@ suspend fun initApplication() {
     // Populate FUMBBL image mapping, so `IconFactory` knows where to download
     // images from.
     ICON_FACTORY.initializeFumbblMapping()
+
+    // Populate the TourPlay mapping, so teams imported from TourPlay can reuse
+    // the FUMBBL player icons.
+    TOURPLAY_ICON_MAPPING.initialize(
+        fumbblIcons = Res.readBytes("files/fumbbl/icons.ini").decodeToString(),
+        fumbblExtraIcons = Res.readBytes("files/fumbbl/icons-extra.ini").decodeToString(),
+        tourPlayIconSets = Res.readBytes("files/tourplay/icons-iconsets.ini").decodeToString(),
+        tourPlayPortraits = Res.readBytes("files/tourplay/icons-portraits.ini").decodeToString(),
+    )
 
     // Initialize setup cache
     Setups.initialize()

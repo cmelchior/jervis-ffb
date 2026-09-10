@@ -15,8 +15,12 @@ import kotlinx.serialization.json.Json
 
 /**
  * Wrapper around the TourPlay REST API: https://tourplay.net
+ *
+ * [iconMapping] contains the mapping between TourPlay positions and FUMBBL
+ * icons/portraits. The mapping is allowed to not be initialized, but will
+ * result in all players using generated sprites and default portraits.
  */
-class TourPlayApi {
+class TourPlayApi(private val iconMapping: TourPlayIconMapping = TourPlayIconMapping()) {
 
     companion object {
         val LOG = jervisLogger()
@@ -37,8 +41,8 @@ class TourPlayApi {
         try {
             val rosterData = loadTeamFromTourPlay(rosterId)
             val mapper = when (rules.baseVersion) {
-                GameVersion.BB2020 -> Mapper2020()
-                GameVersion.BB2025 -> Mapper2025()
+                GameVersion.BB2020 -> Mapper2020(iconMapping)
+                GameVersion.BB2025 -> Mapper2025(iconMapping)
             }
             val jervisRoster = mapper.convertToJervisRoster(rules, rosterData)
             val jervisTeam = mapper.convertToJervisTeam(rules, jervisRoster, rosterData)

@@ -10,8 +10,11 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.sprites.SingleSprite
+import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.tourplay.TourPlayApi.Companion.LOG
+import com.jervisffb.tourplay.api.LineUpMaster
 import com.jervisffb.tourplay.api.TourPlayRoster
+import com.jervisffb.tourplay.api.positionShortHand
 
 /**
  * Subclasses of [JervisMapper] are responsible for mapping a team from TourPlay
@@ -19,8 +22,11 @@ import com.jervisffb.tourplay.api.TourPlayRoster
  *
  * For now, we have one for each ruleset, but it is unclear if that is actually
  * needed.
+ *
+ * [icons] contains the configuration needed for mapping TourPlay positions to
+ * the FUMBBL artwork used for them.
  */
-abstract class JervisMapper {
+abstract class JervisMapper(private val icons: TourPlayIconMapping) {
 
     abstract fun convertToJervisRoster(rules: Rules, roster: TourPlayRoster): Roster
     abstract fun convertToJervisTeam(rules: Rules, jervisRoster: Roster, team: TourPlayRoster): SerializedTeam
@@ -121,6 +127,32 @@ abstract class JervisMapper {
     }
 
     /**
+     * Find the icon set to use for a TourPlay position. TourPlay does not have
+     * artwork we can use, so we borrow FUMBBL's. Positions with no FUMBBL
+     * counterpart fall back to a sprite generated from the position's
+     * shorthand.
+     *
+     * See [extractPositionPortrait]
+     */
+    protected fun extractPositionIcon(roster: TourPlayRoster, position: LineUpMaster): SpriteSheet {
+        return icons.getSprite(roster.rosterMaster.name, position.position)
+            ?: SpriteSheet.generated(position.positionShortHand)
+    }
+
+    /**
+     * Find the portrait to use for a TourPlay position. Similar to player
+     * sprites, TourPlay does not have any portraits, so we use FUMBBL's
+     * instead or fallback to a default portrait if no FUMBBL counterpart is
+     * found.
+     *
+     * See [extractPositionIcon]
+     */
+    protected fun extractPositionPortrait(roster: TourPlayRoster, position: LineUpMaster): SingleSprite {
+        return icons.getPortrait(roster.rosterMaster.name, position.position)
+            ?: SingleSprite.embedded(DEFAULT_PORTRAIT)
+    }
+
+    /**
      * Convert the TourPlay team emblem to a Jervis Roster Logo.
      */
     protected fun extractRosterLogo(roster: TourPlayRoster): RosterLogo {
@@ -129,14 +161,23 @@ abstract class JervisMapper {
         // Example URL: https://tourplay.b-cdn.net/emblems/214739_x3_k1uigi5y0hfr.avif
         // Note, it looks like the x3 part of the name cannot be modified, and is probably a legacy modifier
         val emblemBaseUrl = "https://tourplay.b-cdn.net/emblems"
-        return RosterLogo(
-            large = SingleSprite.url("$emblemBaseUrl/${roster.imageFile}"),
-            small = SingleSprite.url("$emblemBaseUrl/${roster.imageFile}"),
-        )
+        return when (roster.imageFile != null) {
+            true -> {
+                RosterLogo(
+                    large = SingleSprite.url("$emblemBaseUrl/${roster.imageFile}"),
+                    small = SingleSprite.url("$emblemBaseUrl/${roster.imageFile}"),
+                )
+            }
+            false -> RosterLogo.NONE
+        }
     }
 
     private fun Int.splitFlags(): List<Int> =
         (0 until Int.SIZE_BITS)
             .map { 1 shl it }
             .filter { this and it != 0 }
+
+    private companion object {
+        const val DEFAULT_PORTRAIT = "jervis/portraits/default_portrait.png"
+    }
 }

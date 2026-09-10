@@ -15,21 +15,16 @@ import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.serialization.PlayerUiData
 import com.jervisffb.engine.serialization.SerializedPlayer
 import com.jervisffb.engine.serialization.SerializedTeam
-import com.jervisffb.engine.sprites.SingleSprite
-import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.tourplay.api.TourPlayRoster
-import com.jervisffb.tourplay.api.positionShortHand
 
 /**
  * Class responsible for mapping BB2025 TourPlay teams to Jervis.
  */
-class Mapper2025: JervisMapper() {
+class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
     override fun convertToJervisRoster(rules: Rules, roster: TourPlayRoster): Roster {
         val positions = roster.rosterMaster.lineUpMasters.map { position ->
-            // TODO How to map from TourPlay to FUMBBL Icons / Portraits?
-            // As a temporary solution. We need some place holders
-            val iconRef = SpriteSheet.generated(position.positionShortHand)
-            val portraitRef = SingleSprite.embedded("jervis/portraits/default_portrait.png")
+            val iconRef = extractPositionIcon(roster, position)
+            val portraitRef = extractPositionPortrait(roster, position)
             RosterPosition(
                 id = PositionId(position.id.toString()),
                 quantity = position.quantity,
