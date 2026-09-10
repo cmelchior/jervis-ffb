@@ -146,6 +146,7 @@ object FireBallProcedure: Procedure() {
             val moreTargets = fireballContext.potentialPlayers.isNotEmpty()
 
             return compositeCommandOf(
+                RemoveContext(context),
                 when (wasStanding && !isStandingAfterHit && !state.isTurnOver()) {
                     true -> SetTurnOver(TurnOver.STANDARD)
                     false -> null

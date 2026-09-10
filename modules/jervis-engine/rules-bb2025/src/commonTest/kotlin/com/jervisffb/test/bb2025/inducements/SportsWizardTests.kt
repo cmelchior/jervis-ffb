@@ -50,6 +50,7 @@ import com.jervisffb.test.ext.undoActions
 import com.jervisffb.test.giveBallToPlayer
 import com.jervisffb.test.skipTurns
 import com.jervisffb.test.steadyFootingRoll
+import com.jervisffb.test.utils.assertActive
 import com.jervisffb.test.utils.assertActiveTeam
 import com.jervisffb.test.utils.assertBadlyHurt
 import com.jervisffb.test.utils.assertCoordinates
@@ -319,6 +320,17 @@ class SportsWizardTests: JervisGameBB2025Test() {
         controller.rollForward(4.d6) // H8 is hit
         standingPlayer.assertKnockedDown()
         assertEquals(TurnOver.STANDARD, state.turnOver)
+    }
+
+    @Test
+    fun zap_cancelSelectingPlayer() {
+        controller.rollForward(
+            EndTurn,
+            InducementEffectSelected(zapSpell.id),
+            Cancel, // Do not select a player
+            Cancel, // Do not select any other inducements
+        )
+        homeTeam.assertActive()
     }
 
     @Test

@@ -31,6 +31,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -54,13 +55,18 @@ data class ZapContext(
 object ZapProcedure: Procedure() {
     override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val inducementContext = state.getContext<ResolveInducementEffectsContext>()
-        val zapContext = state.getContext<ZapContext>()
-        return compositeCommandOf(
-            SetInducementEffectUsed(inducementContext.inducement, used = (zapContext.roll != null)),
-            RemoveContext(zapContext)
-        )
+        val zapContext = state.getContextOrNull<ZapContext>()
+        return when (zapContext != null) {
+            true -> {
+                compositeCommandOf(
+                    SetInducementEffectUsed(inducementContext.inducement, used = (zapContext.roll != null)),
+                    RemoveContext(zapContext)
+                )
+            }
+            false -> null
+        }
     }
     override fun isValid(state: Game, rules: Rules) {
         state.getContext<ResolveInducementEffectsContext>().let {
@@ -108,7 +114,7 @@ object ZapProcedure: Procedure() {
                         add(ReportZapResult(context))
                         // The player keeps their identity while transformed, so every reference
                         // to them stays valid. See `PlayerTransformation`.
-                        context.spell.getFrogPositionData(context.target)?.let { frogPosition ->
+                        context.spell.getFrogPositionData(context.target).let { frogPosition ->
                             add(TransformPlayer(context.target, frogPosition, Duration.END_OF_DRIVE))
                         }
                         when (context.target.hasBall()) {
