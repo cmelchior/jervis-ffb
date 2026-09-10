@@ -74,7 +74,7 @@ public data class RosterMaster(
     public val teamSpecialRules: Int,
     public val selectableTeamSpecialRules: Int,
     public val tier: Int,
-    public val maxBigGuys: Int,
+    public val maxBigGuys: Int? = null,
     public val leagues: Int = 0,
     public val selectableLeagues: Int = 0,
     public val id: Int,
@@ -347,8 +347,8 @@ public data class LineUp(
 public data class LineUpMaster1(
     public val iconClass: String,
     public val position: String,
-    public val skillDouble: Int,
-    public val skillNormal: Int,
+    public val skillDouble: Int? = null,
+    public val skillNormal: Int? = null,
     public val ag: Int,
     public val av: Int,
     public val ma: Int,
@@ -453,7 +453,7 @@ public data class Player2(
 public data class ApplicationUser(
     public val userNameToShow: String,
     public val avatarUrl: String,
-    public val country: String,
+    public val country: String? = null,
 )
 
 @Serializable

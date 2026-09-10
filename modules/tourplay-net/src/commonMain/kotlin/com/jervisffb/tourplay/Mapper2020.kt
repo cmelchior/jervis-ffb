@@ -56,6 +56,7 @@ class Mapper2020(icons: TourPlayIconMapping): JervisMapper(icons) {
                 portrait = portraitRef,
             )
         }
+        val leagueRules = convertLeagueSpecialRules(roster.rosterMaster.leagues)
         val specialRules = convertRosterSpecialRules(roster.rosterMaster.teamSpecialRules)
         val logo = extractRosterLogo(roster)
         return Roster(
@@ -65,7 +66,7 @@ class Mapper2020(icons: TourPlayIconMapping): JervisMapper(icons) {
             numberOfRerolls = 8, // Is there a limit?
             rerollCost = roster.rosterMaster.prizeReRoll,
             allowApothecary = roster.rosterMaster.apothecary,
-            leagues = emptyList(),
+            leagues = leagueRules,
             specialRules = specialRules,
             positions = positions,
             logo = logo,

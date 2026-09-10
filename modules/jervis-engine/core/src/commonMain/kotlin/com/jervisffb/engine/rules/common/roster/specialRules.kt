@@ -38,6 +38,7 @@ enum class TeamSpecialRule(override val description: String): SpecialRules {
     FAVOURED_OF_TZEENTCH("Favoured of Tzeentch"),
     LOW_COST_LINEMEN("Low Cost Linemen"),
     MASTERS_OF_UNDEATH("Masters of Undeath"),
+    SWARMING("Swarming"),
     TEAM_CAPTAIN("Team Captain"),
 }
 

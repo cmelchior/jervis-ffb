@@ -70,9 +70,48 @@ abstract class JervisMapper(private val icons: TourPlayIconMapping) {
         }
     }
 
-    protected fun convertRosterSpecialRules(specialRulesFlag: Int): List<SpecialRules> {
+    protected fun convertLeagueSpecialRules(leagueFlags: Int): List<RegionalSpecialRule> {
+        if (leagueFlags == 0) return emptyList()
         // TourPlay describes their name mapping in the `en.json` file (use Chrome Dev View)
-        // This was extracted on 19/08/2025
+        // This was extracted on 10/09/2026:
+        //    "LEAGUE": {
+        //        "1": "Badlands Brawl",
+        //        "2": "Elven Kingdoms League",
+        //        "4": "Halfling Thimble Cup",
+        //        "8": "Lustrian Superleague",
+        //        "16": "Old World Classic",
+        //        "32": "Sylvanian Spotlight",
+        //        "64": "Underworld Challenge",
+        //        "128": "Worlds Edge Superleague",
+        //        "256": "Woodland League",
+        //        "512": "Chaos Clash"
+        //    },
+        return leagueFlags.splitFlags().mapNotNull { flag ->
+            when (flag) {
+                // Regional special rules
+                1 -> RegionalSpecialRule.BADLANDS_BRAWL
+                2 -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
+                4 -> RegionalSpecialRule.HAFLING_THIMBLE_CUP // Note: enum uses HAFLING (as defined)
+                8 -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
+                16 -> RegionalSpecialRule.OLD_WORLD_CLASSIC
+                32 -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
+                64 -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
+                128 -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
+                256 -> RegionalSpecialRule.WOODLAND_LEAGUE
+                512 -> RegionalSpecialRule.CHAOS_CLASH
+                else -> {
+                    LOG.d { "Could not map special rule flag: $flag" }
+                    null
+                }
+            }
+        }
+    }
+
+    protected fun convertRosterSpecialRules(specialRulesFlag: Int): List<SpecialRules> {
+        if (specialRulesFlag == 0) return emptyList()
+        // TourPlay describes their name mapping in the `en.json` file (use Chrome Dev View)
+        // This was extracted on 10/09/2026:
+        //    "TEAM_SPECIAL_RULE": {
         //        "1": "Badlands Brawl",
         //        "2": "Elven Kingdoms League",
         //        "4": "Halfling Thimble Cup",
@@ -92,7 +131,11 @@ abstract class JervisMapper(private val icons: TourPlayIconMapping) {
         //        "65536": "Vampire Lord",
         //        "15872": "Favoured of...",
         //        "146944": "Favoured of...",
-        //        "131072": "Favoured of Hashut"
+        //        "131072": "Favoured of Hashut",
+        //        "262144": "Brawlin' Brutes",
+        //        "524288": "Team Captain",
+        //        "1048576": "Swarming"
+        //    },
         return specialRulesFlag.splitFlags().mapNotNull { flag ->
             when (flag) {
                 // Regional special rules
@@ -116,8 +159,11 @@ abstract class JervisMapper(private val icons: TourPlayIconMapping) {
                 32768 -> TeamSpecialRule.MASTERS_OF_UNDEATH
                 //        "65536": "Vampire Lord",
                 //        "15872": "Favoured of...",
-                131072 -> TeamSpecialRule.FAVOURED_OF_HASHUT
                 //        "146944": "Favoured of...",
+                131072 -> TeamSpecialRule.FAVOURED_OF_HASHUT
+                262144 -> TeamSpecialRule.BRAWLIN_BRUTES
+                524288 -> TeamSpecialRule.TEAM_CAPTAIN
+                1048576 -> TeamSpecialRule.SWARMING
                 else -> {
                     LOG.d { "Could not map special rule flag: $flag" }
                     null

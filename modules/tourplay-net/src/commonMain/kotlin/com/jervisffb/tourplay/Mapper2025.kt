@@ -55,6 +55,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
                 portrait = portraitRef,
             )
         }
+        val leagueRules = convertLeagueSpecialRules(roster.rosterMaster.leagues)
         val specialRules = convertRosterSpecialRules(roster.rosterMaster.teamSpecialRules)
         val logo = extractRosterLogo(roster)
         return Roster(
@@ -64,7 +65,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             numberOfRerolls = 8, // Is there a limit?
             rerollCost = roster.rosterMaster.prizeReRoll,
             allowApothecary = roster.rosterMaster.apothecary,
-            leagues = emptyList(),
+            leagues = leagueRules,
             specialRules = specialRules,
             positions = positions,
             logo = logo,
@@ -84,8 +85,9 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             // Right now we just assume that the FUMBBL team matches the given game type
             // We probably need to refine this later.
             type = rules.gameType,
-            players = team.lineUps.map { player ->
-                val position = jervisRoster.positions.first { it.id.value == player.lineUpMaster.id.toString() }
+            players = team.lineUps.mapNotNull { player ->
+                val position = jervisRoster.positions.firstOrNull { it.id.value == player.lineUpMaster.id.toString() }
+                    ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.lineUpMaster.id}")
                 SerializedPlayer(
                     id = PlayerId(player.id.toString()),
                     name = player.name,
