@@ -16,6 +16,7 @@ enum class PlayerKeyword(override val description: String) : Keyword {
     BLOCKER("Blocker"),
     CATCHER("Catcher"),
     CONSTRUCT("Construct"),
+    DRYAD("Dryad"),
     DWARF("Dwarf"),
     ELF("Elf"),
     FROG("Frog"),
@@ -35,6 +36,7 @@ enum class PlayerKeyword(override val description: String) : Keyword {
     SKELETON("Skeleton"),
     SPAWN("Spawn"),
     SPECIAL("Special"),
+    SPITE("Spite"),
     SQUIRREL("Squirrel"),
     SNAKEMAN("Snakeman"),
     SKINK("Skink"),
@@ -49,6 +51,7 @@ enum class PlayerKeyword(override val description: String) : Keyword {
     WEREWOLF("Werewolf"),
     WRAITH("Wraith"),
     ZOMBIE("Zombie"),
+    ZOAT("Zoat"),
 }
 
 enum class SkillKeyword(override val description: String) : Keyword {
