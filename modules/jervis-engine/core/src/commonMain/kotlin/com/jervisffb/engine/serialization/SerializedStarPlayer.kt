@@ -2,7 +2,7 @@ package com.jervisffb.engine.serialization
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.sprites.SpriteSource
 import kotlinx.serialization.Serializable
@@ -25,7 +25,7 @@ class SerializedStarPlayer(
     val passing: Int?,
     val armorValue: Int,
     val skills: List<SkillId>,
-    val playsFor: List<RegionalSpecialRule>,
+    val playsFor: List<SpecialRules>,
     val icon: SpriteSource?,
     val portrait: SpriteSource?,
 ) {
