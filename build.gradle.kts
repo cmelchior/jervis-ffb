@@ -28,7 +28,7 @@ enum class ReleaseType {
     SNAPSHOT, DEV, PROD
 }
 
-val releaseType = when (properties["jervis.releaseType"]) {
+val releaseType = when (findProperty("jervis.releaseType")) {
     "snapshot" -> ReleaseType.SNAPSHOT
     "dev" -> ReleaseType.DEV
     "prod" -> ReleaseType.PROD
@@ -39,13 +39,37 @@ val gitHash: Provider<String> = providers.exec {
     commandLine("git", "rev-parse", "--short",  "HEAD")
 }.standardOutput.asText.map { it.trim() }
 
+// Runs a git command, returning an empty string instead of failing the build if
+// git cannot answer.
+fun gitOrEmpty(vararg command: String): Provider<String> {
+    val output = providers.exec {
+        commandLine("git", *command)
+        isIgnoreExitValue = true
+    }
+    return output.result.zip(output.standardOutput.asText) { result, text ->
+        if (result.exitValue == 0) text.trim() else ""
+    }
+}
+
+// Number of commits, which we use as the patch version.
+//
+// In most cases, GitHub Actions only checks out a single shallow ref, so it
+// cannot count the history itself, which is why we read it using the GitHub API
+// in `.github/workflows/setup.yml` and parse it around in
+// `JERVIS_COMMIT_COUNT`.
+//
+// If `JERVIS_COMMIT_COUNT` is not present, we try to read it from `origin/main`
+// (which is where we do releases from), but this ref is not available for pull
+// requests, which is why we fall back to first HEAD and then 0. This should
+// be fine as this value doesn't have much meaning for pull requests.
 val gitCommitCount: Provider<String> = System.getenv("JERVIS_COMMIT_COUNT")
+    ?.takeIf { it.isNotBlank() }
     ?.let { providers.provider { it } }
-    ?: providers.exec {
-        // We only use for release versions, and since we only do releases from
-        // `main` we just use that branch directly.
-        commandLine("git", "rev-list", "--count", "origin/main")
-    }.standardOutput.asText.map { it.trim() }
+    ?: gitOrEmpty("rev-list", "--count", "origin/main")
+        .flatMap { mainCount ->
+            if (mainCount.isNotBlank()) providers.provider { mainCount } else gitOrEmpty("rev-list", "--count", "HEAD")
+        }
+        .map { it.ifBlank { "0" } }
 
 val gitHashLong: Provider<String> = providers.exec {
     commandLine("git", "rev-parse",  "HEAD")
