@@ -2,6 +2,10 @@ name: Check TourPlay Icons
 
 on:
   workflow_call:
+    inputs:
+      commit_count:
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -9,6 +13,8 @@ permissions:
 jobs:
   check-tourplay-icons:
     runs-on: ubuntu-latest
+    env:
+      JERVIS_COMMIT_COUNT: ${{ inputs.commit_count }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
