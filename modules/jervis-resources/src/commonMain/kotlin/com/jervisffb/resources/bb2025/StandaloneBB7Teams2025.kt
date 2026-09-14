@@ -5,6 +5,7 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialization.JervisMetaData
 import com.jervisffb.engine.serialization.buildTeamFile
@@ -111,6 +112,7 @@ object StandaloneBB7Teams2025 {
                 id = TeamId("jervis-chaos-dwarf-bb7-boneheader-starter1-bb2025")
                 name = "Bonehead Starter #1"
                 type = GameType.BB7
+                league = RegionalSpecialRule.BADLANDS_BRAWL
                 addPlayer("Cd1-bb7-1".playerId, "Zhorak Brasshoof", 1.playerNo, BULL_CENTAUR_BLITZERS)
                 addPlayer("Cd1-bb7-2".playerId, "Drazhak Ashhorn", 2.playerNo, BULL_CENTAUR_BLITZERS)
                 addPlayer("Cd1-bb7-3".playerId, "Skabnash", 3.playerNo, HOBGOBLIN_LINEMEN)
@@ -134,6 +136,7 @@ object StandaloneBB7Teams2025 {
                 id = TeamId("jervis-chaos-dwarf-bb7-boneheader-starter2-bb2025")
                 name = "Bonehead Starter #2"
                 type = GameType.BB7
+                league = RegionalSpecialRule.BADLANDS_BRAWL
                 addPlayer("Cd2-bb7-1".playerId, "Rakhul the Chained", 1.playerNo, ENSLAVED_MINOTAUR)
                 addPlayer("Cd2-bb7-2".playerId, "Azgorth Emberhoof", 2.playerNo, BULL_CENTAUR_BLITZERS)
                 addPlayer("Cd2-bb7-3".playerId, "Snivlak", 3.playerNo, HOBGOBLIN_LINEMEN)
