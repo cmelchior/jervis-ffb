@@ -53,7 +53,7 @@ val DEFAULT_INDUCEMENTS_BB2025: Map<InducementType, Inducement<*>> = buildMap {
             InducementTypeCommon.PLAGUE_DOCTOR -> SimpleInducement(type, "Plague Doctor", 1, 100_000, true, requirements = setOf(TeamSpecialRule.FAVOURED_OF_NURGLE))
             InducementTypeCommon.RIOTOUS_ROOKIE -> SimpleInducement(type, "Riotous Rookies", 1, 150_000, true, requirements = setOf(TeamSpecialRule.LOW_COST_LINEMEN))
             InducementTypeCommon.STANDARD_MERCENARY_PLAYERS -> StandardMercenaryInducement(enabled = true)
-            InducementTypeCommon.STAR_PLAYERS -> StarPlayersInducementGroup(max = 2, enabled = true)
+            InducementTypeCommon.STAR_PLAYERS -> StarPlayersInducementGroup(max = 2, enabled = true, items = STAR_PLAYER_INDUCEMENTS_BB2025)
             InducementTypeCommon.TEMP_AGENCY_CHEERLEADER -> SimpleInducement(type, "Temp Agency Cheerleaders", 5, 5_000, true)
             InducementTypeCommon.WANDERING_APOTHECARY -> SimpleInducement(type, "Wandering Apothecaries", 2, 100_000, true)
             InducementTypeCommon.WEATHER_MAGE -> SimpleInducement(type, "Weather Mage", 1, 25_000, true)

@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,6 +43,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,8 +56,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -120,6 +117,7 @@ fun BuyInducementsDialog(
     dialog: BuyInducementsDialog,
     dialogsVm: DialogsViewModel,
 ) {
+    val disabledAlpha = 0.4f
     val vm = remember(dialog) { BuyInducementsViewModel(dialogsVm.screenViewModel.uiState.gameController, dialog) }
     val isHomeTeam = dialog.team.isHomeTeam()
     val teamColor = if (isHomeTeam) JervisTheme.homeTeamColor else JervisTheme.awayTeamColor
@@ -245,6 +243,7 @@ fun BuyInducementsDialog(
                                     lastTouchedGroup = null
                                     vm.changeSimpleCount(inducement, -1)
                                 },
+                                disabledAlpha = disabledAlpha
                             )
                         }
 
@@ -333,6 +332,7 @@ fun BuyInducementsDialog(
                                                 description = "Remove ${entry.displayName}",
                                                 onClick = { vm.removeMercenary(entry.id) },
                                                 buttonColor = teamColor,
+                                                disabledAlpha = disabledAlpha
                                             )
                                         },
                                         costOverride = entry.price,
@@ -455,6 +455,7 @@ private fun SimpleInducementRow(
     teamColor: Color,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    disabledAlpha: Float
 ) {
     Row(
         modifier = Modifier
@@ -513,6 +514,7 @@ private fun SimpleInducementRow(
             onClick = onIncrease,
             enabled = count < inducement.max && canAffordMore,
             buttonColor = teamColor,
+            disabledAlpha = disabledAlpha
         )
         Text(
             modifier = Modifier.width(48.dp),
@@ -528,6 +530,7 @@ private fun SimpleInducementRow(
             onClick = onDecrease,
             enabled = count > 0,
             buttonColor = teamColor,
+            disabledAlpha = disabledAlpha
         )
     }
 }
@@ -731,11 +734,7 @@ private fun RenderInducementIcon(
         }
         val bitmap = image
         if (bitmap != null) {
-            Image(
-                bitmap = bitmap,
-                contentDescription = name,
-                modifier = Modifier.size(size),
-            )
+            PlayerSpriteIcon(bitmap = bitmap, contentDescription = name, standardSize = size)
             return
         }
     }
@@ -843,7 +842,7 @@ private fun InducementDrawerContent(
                             teamColor = teamColor,
                             isHomeTeam = isHomeTeam,
                             isSelected = selected,
-                            canAdd = !vm.isGroupFull(group) && vm.canAfford(item.inducement),
+                            canAdd = vm.canAddToGroup(group, item),
                             onToggle = { vm.toggleGroupItem(item) },
                         )
                     }
@@ -851,6 +850,32 @@ private fun InducementDrawerContent(
             }
         }
     }
+}
+
+private const val STANDARD_SPRITE_FRAME_PX = 30f
+private const val BIG_GUY_SPRITE_FRAME_PX = 40f
+
+/**
+ * Render a player sprite at the size it has relative to other players, the same way the
+ * pitch does it. [standardSize] is the size given to a standard player; smaller sprites,
+ * like the ones used by Akhorne The Squirrel or Dribl & Drull, and larger ones, like Big
+ * Guys, scale from there.
+ *
+ * FUMBBL sprite sheets encode a player's physical size in the size of a single frame:
+ * standard players are 30x30 px, Big Guys 40x40 and "small" players 20x20. Scaling every
+ * frame into a box of the same size would therefore make them all look alike.
+ */
+@Composable
+private fun PlayerSpriteIcon(bitmap: ImageBitmap, contentDescription: String?, standardSize: Dp) {
+    // Guards against sprites that are larger than a Big Guy, which would otherwise
+    // break the layout they are rendered into.
+    val maxSize = standardSize * (BIG_GUY_SPRITE_FRAME_PX / STANDARD_SPRITE_FRAME_PX)
+    val spriteSize = (standardSize * (bitmap.width / STANDARD_SPRITE_FRAME_PX)).coerceAtMost(maxSize)
+    Image(
+        modifier = Modifier.size(spriteSize),
+        bitmap = bitmap,
+        contentDescription = contentDescription,
+    )
 }
 
 private fun titleWithRange(name: String, max: Int): String {
@@ -862,9 +887,15 @@ private fun titleWithRange(name: String, max: Int): String {
 }
 
 private val positionIconColWidth = 40.dp
+// The size a standard player's icon gets in the position tables. Picked so a Big Guy,
+// the largest sprite we expect, fills `positionIconColWidth` exactly.
+private val positionIconStandardSize = 30.dp
 private val positionNameColWidth = 140.dp
 private val positionStatColWidth = 30.dp
 private val positionCostColWidth = 60.dp
+// Matches NumberChangeButton's footprint (12.dp padding + 36.dp icon), so rows
+// without an action button keep their columns aligned with rows that have one.
+private val numberChangeButtonSize = 60.dp
 
 // View responsible for creating a new mercenary. This includes selecting a
 // position and optional skill.
@@ -985,40 +1016,83 @@ private fun ColumnScope.StarPlayerTable(
     Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
         PositionTableHeader(teamColor, showAction = true)
         LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            // One item pr. inducement, not pr. player, so a pair stays a single entry.
             itemsIndexed(items, key = { _, it -> "star-${it.key}" }) { index, item ->
                 val star = item.inducement as? StarPlayerInducement ?: return@itemsIndexed
                 val selected = vm.isInCart(item.key)
-                val canAdd = !vm.isGroupFull(group) && vm.canAfford(item.inducement)
-                PositionTableRow(
+                StarPlayerRows(
                     rowNo = index,
-                    position = star.starPlayer,
-                    positionSkillList = star.starPlayer.skills,
-                    extraSkillList = emptyList(),
-                    displayName = star.starPlayer.title,
-                    isSelected = false,
+                    inducement = star,
+                    price = item.price,
                     teamColor = teamColor,
                     isHomeTeam = isHomeTeam,
-                    onClick = null,
                     trailing = {
-                        if (selected) {
-                            NumberChangeButton(
+                        when (selected) {
+                            true -> NumberChangeButton(
                                 icon = Res.drawable.jervis_icon_menu_minus,
-                                description = "Remove ${star.starPlayer.title}",
+                                description = "Remove ${star.name}",
                                 onClick = { vm.toggleGroupItem(item) },
                                 buttonColor = teamColor,
                             )
-                        } else {
-                            NumberChangeButton(
+                            false -> NumberChangeButton(
                                 icon = Res.drawable.jervis_icon_menu_plus,
-                                description = "Add ${star.starPlayer.title}",
+                                description = "Add ${star.name}",
                                 onClick = { vm.toggleGroupItem(item) },
-                                enabled = canAdd,
+                                enabled = vm.canAddToGroup(group, item),
                                 buttonColor = teamColor,
                             )
                         }
                     },
                 )
             }
+        }
+    }
+}
+
+/**
+ * Renders a Star Player inducement as one row pr. player. Star Players that must be
+ * hired as a pair, like Grak & Crumbleberry, share a single stripe, price and action
+ * button, so they read as the single purchase they are.
+ */
+@Composable
+private fun StarPlayerRows(
+    rowNo: Int,
+    inducement: StarPlayerInducement,
+    price: Int,
+    teamColor: Color,
+    isHomeTeam: Boolean,
+    trailing: (@Composable () -> Unit)?,
+) {
+    // Only pairs with their own rulebook title add anything here. For "Dribl & Drull"
+    // the derived name would just repeat the two row names.
+    val pairLabel = inducement.titleOverride?.takeIf { inducement.playerCount > 1 }
+    Column {
+        inducement.players.forEachIndexed { index, player ->
+            val isFirst = (index == 0)
+            // The combined price and the action button belong to the inducement, so they
+            // are only rendered on the first player's row. Later rows get a placeholder of
+            // the same width so the columns stay aligned.
+            val rowTrailing: (@Composable () -> Unit)? = when {
+                isFirst -> trailing
+                trailing != null -> ({ Spacer(Modifier.width(numberChangeButtonSize)) })
+                else -> null
+            }
+            PositionTableRow(
+                // Sharing `rowNo` keeps both halves of a pair on the same zebra stripe.
+                rowNo = rowNo,
+                position = player,
+                positionSkillList = player.skills,
+                extraSkillList = emptyList(),
+                displayName = player.title,
+                subLabel = pairLabel,
+                isSelected = false,
+                teamColor = teamColor,
+                isHomeTeam = isHomeTeam,
+                onClick = null,
+                costOverride = price,
+                showCost = isFirst,
+                trailing = rowTrailing,
+            )
         }
     }
 }
@@ -1041,16 +1115,12 @@ private fun GroupCartRow(
         )
     }
     when (val inducement = item.inducement) {
-        is StarPlayerInducement -> PositionTableRow(
+        is StarPlayerInducement -> StarPlayerRows(
             rowNo = rowNo,
-            position = inducement.starPlayer,
-            positionSkillList = inducement.starPlayer.skills,
-            extraSkillList = emptyList(),
-            displayName = inducement.starPlayer.title,
-            isSelected = false,
+            inducement = inducement,
+            price = item.price,
             teamColor = teamColor,
             isHomeTeam = isHomeTeam,
-            onClick = null,
             trailing = trailing,
         )
         is WizardInducement,
@@ -1096,7 +1166,7 @@ private fun ColumnScope.AbilityGroupTable(
             itemsIndexed(items, key = { _, it -> "ability-${it.key}" }) { index, item ->
                 val abilities = abilitiesFor(vm.gameController.getAvailableActions().team!!, item.inducement)
                 val selected = vm.isInCart(item.key)
-                val canAdd = !vm.isGroupFull(group) && vm.canAfford(item.inducement)
+                val canAdd = vm.canAddToGroup(group, item)
                 AbilityRow(
                     rowNo = index,
                     name = item.name,
@@ -1275,6 +1345,8 @@ private fun PositionTableRow(
     costOverride: Int? = null,
     subLabel: String? = null,
     enabled: Boolean = true,
+    showCost: Boolean = true,
+    disabledAlpha: Float = 0.4f
 ) {
     val gameVersion = GameVersion.BB2025 // Used to render skills
     val baseSkillNames = remember(position) {
@@ -1283,7 +1355,7 @@ private fun PositionTableRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .alpha(if (enabled) 1f else 0.4f)
+            .alpha(if (enabled) 1f else disabledAlpha)
             .background(
                 color = when {
                     isSelected -> teamColor.copy(alpha = 0.25f)
@@ -1339,7 +1411,10 @@ private fun PositionTableRow(
         }
         Text(
             modifier = Modifier.width(positionCostColWidth),
-            text = formatCurrency(costOverride ?: position.cost),
+            text = when (showCost) {
+                true -> formatCurrency(costOverride ?: position.cost)
+                false -> ""
+            },
             fontSize = 14.sp,
             color = JervisTheme.contentTextColor,
             textAlign = TextAlign.Center,
@@ -1359,16 +1434,15 @@ private fun MercenaryPositionIcon(position: Position, isHomeTeam: Boolean, teamC
         bitmap = iconSource?.let { ICON_FACTORY.loadPlayerIcon(it, isHomeTeam) }
     }
     Box(
-        modifier = Modifier.width(positionIconColWidth).padding(2.dp),
+        modifier = Modifier.size(positionIconColWidth),
         contentAlignment = Alignment.Center,
     ) {
         val current = bitmap
         if (current != null) {
-            Image(
-                modifier = Modifier.aspectRatio(1f).fillMaxSize().graphicsLayer(scaleX = 2f, scaleY = 2f),
+            PlayerSpriteIcon(
                 bitmap = current,
                 contentDescription = position.title,
-                contentScale = ContentScale.None,
+                standardSize = positionIconStandardSize,
             )
         } else {
             Box(
@@ -1462,8 +1536,18 @@ private fun PurchasedInducementBadge(entry: CartEntryView, isHomeTeam: Boolean, 
         TeamFeature(
             value = entry.count,
             content = {
-                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                    InducementBadgeIcon(entry.type, entry.name, entry.iconSource, isHomeTeam, teamColor)
+                // Star Players hired as a pair are a single purchase, so they share one
+                // badge. Keep the icons tighter together than the spacing between badges,
+                // so the pair still reads as one entry.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    entry.icons.forEach { icon ->
+                        key(icon.source) {
+                            InducementBadgeIcon(entry.type, icon.name, icon.source, isHomeTeam, teamColor)
+                        }
+                    }
                 }
             },
             leftSide = false,

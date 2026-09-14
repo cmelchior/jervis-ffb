@@ -101,8 +101,8 @@ val LIZARDMEN_TEAM_TEST_BB2025 = Roster(
     numberOfRerolls = 8,
     rerollCost = 70_000,
     allowApothecary = true,
-    leagues = emptyList(),
-    specialRules = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
+    leagues = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
+    specialRules = emptyList(),
     positions = listOf(
         SKINK_RUNNER_LINEMEN,
         CHAMELEON_SKINKS,

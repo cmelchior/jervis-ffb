@@ -46,7 +46,7 @@ interface SingleInducement<T: SingleInducementBuilder>: Inducement<T> {
      */
     fun getPrice(team: Team): Int {
         val specialRuleModifier = specialRulesModifier.firstNotNullOfOrNull {
-            when (team.specialRules.contains(it.key)) {
+            when (team.allSpecialRules.contains(it.key)) {
                 true -> it.value
                 false -> null
             }

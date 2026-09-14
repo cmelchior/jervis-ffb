@@ -44,6 +44,20 @@ class Team(
     // which star players are available.
     var league: RegionalSpecialRule? = null
 
+    // Which special rules apply to the team. For BB2020, this includes both
+    // regional and team rules. For BB2025, it is only team special rules.
+    val specialRules = mutableSetOf<SpecialRules>()
+
+    // Special Rules + League the team is playing in. BB2020 rosters put the
+    // regional rule straight into `specialRules`, while BB2025 rosters select
+    // one from `Roter.leagues` and store it in `league` as it can restrict
+    // which team players are available.
+    val allSpecialRules: Set<SpecialRules>
+        get() = buildSet {
+            addAll(specialRules)
+            league?.let { add(it) }
+        }
+
     // All players on the team
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
@@ -81,7 +95,6 @@ class Team(
     // Team value (in total amount, e.g 100.000, not 100 K)
     var teamValue: Int = 0
     var currentTeamValue: Int = 0
-    val specialRules = mutableListOf<SpecialRules>()
     // This just tracks the prayer itself, and not any effects it might have
     // caused. E.g., if Iron Man added the Mighty Blow skill to a player, a
     // temporary skill was added to that player. Which is cleaned up separately.

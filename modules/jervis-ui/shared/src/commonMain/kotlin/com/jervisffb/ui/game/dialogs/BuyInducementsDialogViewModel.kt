@@ -59,7 +59,7 @@ sealed interface CartKey {
     data class InfamousCoach(val coachType: InfamousCoachingStaffType) : CartKey {
         override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
     }
-    data class StarPlayer(val position: PositionId) : CartKey {
+    data class StarPlayer(val positions: List<PositionId>) : CartKey {
         override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
     }
     // Mercenary entries are unique per addition — two mercenaries of the same position
@@ -147,6 +147,12 @@ data class GroupItemView(
     val iconSource: SpriteSource?,
 )
 
+/**
+ * A single icon on a cart badge. [name] is only used for the fallback letter when the
+ * sprite cannot be loaded, so it should name whatever the icon stands for.
+ */
+data class CartEntryIcon(val name: String, val source: SpriteSource?)
+
 // Class representing inducements in the "Cart", i.e. when they are visible to
 // the left of the "Buy" button at the bottom of the inducement selection dialog.
 data class CartEntryView(
@@ -156,7 +162,8 @@ data class CartEntryView(
     val tooltipName: String,
     val count: Int,
     val totalPrice: Int,
-    val iconSource: SpriteSource?,
+    // Usually a single icon. Star Players hired as a pair have one pr. player.
+    val icons: List<CartEntryIcon>,
 )
 
 class BuyInducementsViewModel(
@@ -221,7 +228,7 @@ class BuyInducementsViewModel(
                 tooltipName = inducement.name,
                 count = selection.count,
                 totalPrice = selection.getPrice(team),
-                iconSource = null,
+                icons = listOf(CartEntryIcon(inducement.name, null)),
             )
         }
         groupInducements.forEach { group ->
@@ -235,7 +242,7 @@ class BuyInducementsViewModel(
                     tooltipName = item.name,
                     count = selection.count,
                     totalPrice = selection.getPrice(team),
-                    iconSource = item.iconSource(),
+                    icons = item.badgeIcons(),
                 )
             }
         }
@@ -251,7 +258,7 @@ class BuyInducementsViewModel(
                 tooltipName = tooltip,
                 count = 1,
                 totalPrice = merc.price,
-                iconSource = merc.position.icon,
+                icons = listOf(CartEntryIcon(merc.displayName, merc.position.icon)),
             )
         }
         out.asReversed()
@@ -360,11 +367,10 @@ class BuyInducementsViewModel(
 
     fun groupItemsInCart(group: InducementGroup<*, *, *>): List<GroupItemView> {
         return group.items.mapNotNull { item ->
-            val key = cartKeyFor(item) ?: return@mapNotNull null
-            if (cart.containsKey(key)) {
-                GroupItemView(key, item.name, item.getPrice(team), item, item.iconSource())
-            } else {
-                null
+            val view = groupItemViewFor(item) ?: return@mapNotNull null
+            when (cart.containsKey(view.key)) {
+                true -> view
+                false -> null
             }
         }
     }
@@ -373,24 +379,31 @@ class BuyInducementsViewModel(
         return group.items
             .filter { it.enabled }
             .filter { it.availableToTeam() }
-            .mapNotNull { item ->
-                val key = cartKeyFor(item) ?: return@mapNotNull null
-                GroupItemView(key, item.name, item.getPrice(team), item, item.iconSource())
-            }
+            .mapNotNull { groupItemViewFor(it) }
     }
 
     fun isInCart(key: CartKey): Boolean = cart.containsKey(key)
 
+    // A Star Player pair is a single choice, so this counts entries rather than players.
     fun isGroupFull(group: InducementGroup<*, *, *>): Boolean {
-        return groupItemsInCart(group).size >= group.max
+        return cart.keys.count { it.type == group.type } >= group.max
+    }
+
+    fun canAddToGroup(group: InducementGroup<*, *, *>, item: GroupItemView): Boolean {
+        return !isGroupFull(group) && canAfford(item.inducement)
     }
 
     fun toggleGroupItem(item: GroupItemView) {
         val key = item.key
-        if (cart.containsKey(key)) {
-            cart.remove(key)
-        } else {
-            cart[key] = buildSelection(item.inducement) ?: return
+        when (cart.containsKey(key)) {
+            true -> cart.remove(key)
+            false -> {
+                // The view disables the add button, but don't rely on that to keep the
+                // cart within the group's limit and the team's budget.
+                val group = settings[key.type] as? InducementGroup<*, *, *> ?: return
+                if (!canAddToGroup(group, item)) return
+                cart[key] = buildSelection(item.inducement) ?: return
+            }
         }
     }
 
@@ -404,12 +417,23 @@ class BuyInducementsViewModel(
 
     fun submit(): InducementsSelected = InducementsSelected(cart.values.toList())
 
+    private fun groupItemViewFor(inducement: SingleInducement<*>): GroupItemView? {
+        val key = cartKeyFor(inducement) ?: return null
+        return GroupItemView(
+            key = key,
+            name = inducement.name,
+            price = inducement.getPrice(team),
+            inducement = inducement,
+            iconSource = inducement.iconSource(),
+        )
+    }
+
     private fun cartKeyFor(inducement: SingleInducement<*>): CartKey? {
         return when (inducement) {
             is WizardInducement -> CartKey.Wizard(inducement.wizard)
             is BiasedRefereeInducement -> CartKey.BiasedReferee(inducement.referee)
             is InfamousCoachingStaffInducement -> CartKey.InfamousCoach(inducement.staff)
-            is StarPlayerInducement -> CartKey.StarPlayer(inducement.starPlayer.id)
+            is StarPlayerInducement -> CartKey.StarPlayer(inducement.playerIds)
             else -> null
         }
     }
@@ -419,19 +443,29 @@ class BuyInducementsViewModel(
             is CartKey.Wizard -> InducementSelectionCommon.Wizard(key.wizardType)
             is CartKey.BiasedReferee -> InducementSelectionCommon.BiasedReferee(key.refereeType)
             is CartKey.InfamousCoach -> InducementSelectionCommon.InfamousCoach(key.coachType)
-            is CartKey.StarPlayer -> InducementSelectionCommon.StarPlayer(key.position)
+            is CartKey.StarPlayer -> InducementSelectionCommon.StarPlayer(key.positions)
             else -> null
         }
     }
 
     private fun SingleInducement<*>.availableToTeam(): Boolean {
-        return requirements.isEmpty() || team.specialRules.any { it in requirements }
+        return requirements.isEmpty() || team.allSpecialRules.any { it in requirements }
     }
 
+    // The icon for the compact group row, which only ever shows a single one.
     private fun SingleInducement<*>.iconSource(): SpriteSource? {
         return when (this) {
-            is StarPlayerInducement -> starPlayer.icon
+            is StarPlayerInducement -> players.first().icon
             else -> null
+        }
+    }
+
+    // The icons for the cart badge. A Star Player pair is a single purchase that hires
+    // two players, so it gets one badge with an icon for each of them.
+    private fun SingleInducement<*>.badgeIcons(): List<CartEntryIcon> {
+        return when (this) {
+            is StarPlayerInducement -> players.map { CartEntryIcon(it.title, it.icon) }
+            else -> listOf(CartEntryIcon(name, null))
         }
     }
 }

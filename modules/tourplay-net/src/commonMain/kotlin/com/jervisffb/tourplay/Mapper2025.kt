@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.serialization.PlayerUiData
 import com.jervisffb.engine.serialization.SerializedPlayer
 import com.jervisffb.engine.serialization.SerializedTeam
@@ -87,13 +88,20 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             type = rules.gameType,
             players = team.lineUps.mapNotNull { player ->
                 val position = jervisRoster.positions.firstOrNull { it.id.value == player.lineUpMaster.id.toString() }
+                    // A hired Star Player is not part of the roster TourPlay sends us,
+                    // so they are looked up among the Star Players the ruleset offers as
+                    // inducements. TourPlay only identifies them by name.
+                    ?: rules.inducements.findStarPlayer(player.lineUpMaster.position)
                     ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.lineUpMaster.id}")
                 SerializedPlayer(
                     id = PlayerId(player.id.toString()),
                     name = player.name,
                     number = player.number.playerNo,
                     position = position.id,
-                    type = PlayerType.STANDARD, // Unclear if this is always true?
+                    type = when (position) {
+                        is StarPlayerPosition -> PlayerType.STAR_PLAYER
+                        else -> PlayerType.STANDARD // Unclear if this is always true?
+                    },
                     statModifiers = emptyList(), // How are these defined?
                     extraSkills = player.skills.mapNotNull {
                         convertTourPlaySkillToSkillId(rules, it.skillMaster.name)
@@ -111,7 +119,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             },
             roster = jervisRoster,
             rerolls = team.reRolls,
-            apothecaries = if (team.apothecary) 1 else 0,
+            apothecaries = if (team.apothecary == true) 1 else 0,
             cheerleaders = team.cheerLeaders,
             assistantCoaches = team.assistantCoaches,
             treasury = team.treasury,
@@ -119,6 +127,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             teamValue = team.teamValue * 1000, // TourPlay tracks Team Value as its "short hand" value
             currentTeamValue = team.teamValue * 1000, // Unclear if this is current or something else?
             specialRules = jervisRoster.specialRules,
+            league = convertSelectedLeague(team.league),
             teamLogo = jervisRoster.logo,
         )
     }

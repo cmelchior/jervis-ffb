@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.ChallengeId
 import com.jervisffb.engine.model.DicePoolId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PositionId
 
 // Easy conversion of types
 
@@ -23,3 +24,5 @@ inline val String.playerId: PlayerId
 inline val Int.playerNo: PlayerNo
     get() = PlayerNo(this)
 
+inline val Int.positionId: PositionId
+    get() = PositionId(this.toString())

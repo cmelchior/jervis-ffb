@@ -4,6 +4,7 @@ import com.jervisffb.engine.bb2020.FumbblBB2020Rules
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
@@ -14,7 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RestApiTest {
+class FumbblRestApiTest {
 
     private lateinit var api: FumbblApi
 
@@ -38,8 +39,8 @@ class RestApiTest {
         val rules = StandardBB2025Rules()
         val file = api.loadTeam(1261198, rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals(team.name, "Plane of Tuskars Sandstorm")
-
+        assertEquals("Plane of Tuskars Sandstorm", team.name)
+        assertEquals(RegionalSpecialRule.SYLVANIAN_SPOTLIGHT, team.league)
         val player = team[3.playerNo]
         val position = player.position
         assertEquals("Niu", player.name)
@@ -50,6 +51,15 @@ class RestApiTest {
         assertTrue(position.skills.any { it.type == SkillType.DECAY })
         assertTrue(position.skills.any { it.type == SkillType.REGENERATION })
         assertTrue(player.extraSkills.any { it.type == SkillType.BREAK_TACKLE })
+    }
+
+    @Test
+    fun loadTeamWithMultipleLeagueOptions() = runBlocking {
+        val rules = StandardBB2025Rules()
+        val file = api.loadTeam(1304817, rules)
+        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
+        assertEquals("Chamaquitos Bbox", team.name)
+        assertEquals(RegionalSpecialRule.BADLANDS_BRAWL, team.league)
     }
 
     @Test

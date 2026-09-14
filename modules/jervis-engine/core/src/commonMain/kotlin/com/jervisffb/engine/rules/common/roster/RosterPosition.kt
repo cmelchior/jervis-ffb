@@ -38,7 +38,6 @@ data class RosterPosition(
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,
 ) : Position {
-    override val playsFor: List<RegionalSpecialRule> = emptyList()
 
     override fun createPlayer(
         rules: Rules,

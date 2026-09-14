@@ -28,6 +28,7 @@ import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -185,7 +186,7 @@ private fun createRandomTeamBB2025(rules: Rules, random: Random, prefix: String)
         numberOfRerolls = 8,
         rerollCost = 50_000,
         allowApothecary = true,
-        leagues = emptyList(),
+        leagues = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
         specialRules = emptyList(),
         positions = emptyList(),
         logo = RosterLogo.NONE,

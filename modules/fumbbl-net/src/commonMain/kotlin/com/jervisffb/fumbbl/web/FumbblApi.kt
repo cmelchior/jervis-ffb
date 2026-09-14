@@ -1,6 +1,8 @@
 package com.jervisffb.fumbbl.web
 
+import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.ext.positionId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerLevel
 import com.jervisffb.engine.model.PlayerSize
@@ -10,11 +12,13 @@ import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.SpecialRules
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
@@ -29,7 +33,6 @@ import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.fumbbl.net.utils.convertFumbblSkillToSkillId
 import com.jervisffb.fumbbl.web.api.AuthResult
 import com.jervisffb.fumbbl.web.api.CoachSearchResult
-import com.jervisffb.fumbbl.web.api.CurrentMatchResult
 import com.jervisffb.fumbbl.web.api.FumbblePlayerDetails
 import com.jervisffb.fumbbl.web.api.FumbbleRosterDetails
 import com.jervisffb.fumbbl.web.api.FumbbleTeamDetails
@@ -45,6 +48,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.collections.emptyList
 import kotlin.io.encoding.Base64
 
@@ -120,10 +128,6 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     suspend fun getCoachId(coachName: String): Long? {
         val result: List<CoachSearchResult> = client.get("$BASE_URL/coach/search/$coachName").body()
         return result.firstOrNull { it.name.equals(coachName, ignoreCase = true) }?.id
-    }
-
-    suspend fun getCurrentMatches(): List<CurrentMatchResult> {
-        TODO()
     }
 
     /**
@@ -228,7 +232,18 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             )
         }
 
-        val specialRules = convertRosterSpecialRules(roster.specialRules)
+        val allSpecialRules = convertRosterSpecialRules(roster.specialRules)
+        // A BB2025 team selects the league it plays in from `Roster.leagues`, while
+        // BB2020 treats the regional rules as team special rules and grants all of them.
+        // FUMBBL uses the BB2020 model, so they have to be moved across for BB2025.
+        val leagues = when (rules.baseVersion) {
+            GameVersion.BB2020 -> emptyList()
+            GameVersion.BB2025 -> allSpecialRules.filterIsInstance<RegionalSpecialRule>()
+        }
+        val specialRules = when (rules.baseVersion) {
+            GameVersion.BB2020 -> allSpecialRules
+            GameVersion.BB2025 -> allSpecialRules.filter { it !is RegionalSpecialRule }
+        }
 
         // All FUMBBL Team logos are rather small, so we use their largest logo
         // for all variants.
@@ -244,7 +259,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             numberOfRerolls = 8, // Is there a limit?
             rerollCost = roster.rerollCost,
             allowApothecary = (roster.apothecary.equals("yes", ignoreCase = true)),
-            leagues = emptyList(),
+            leagues = leagues,
             specialRules = specialRules,
             positions = positions,
             logo = logo,
@@ -259,7 +274,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             val teamSpecialRule = TeamSpecialRule.entries.firstOrNull {
                 it.description == (fumbblRule.option ?: fumbblRule.name)
             }
-            // For now we just ignore mappings we do not recognize. The way FUMBBL represents Special Rules is
+            // For now, we just ignore mappings we do not recognize. The way FUMBBL represents Special Rules
             // seems to be pretty complex, so need to understand the nuances better.
             val rule = regionalSpecialRule ?: teamSpecialRule
             if (rule == null) {
@@ -300,6 +315,59 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         // - How are stat increases defined?
         // - Skills (Answer: Looks like the "Skills" array contains both starting + earned skills)
         // - How are injuries defined? Especially niggling and miss next game?
+
+        val allSpecialRules: List<SpecialRules> = if (team.specialRules is JsonObject) {
+
+            // FUMBBL does not specifically track which league a team plays in, they are just part of their special rules.
+            // So we need to extract it here.
+            //
+            // In BB2025, the selected league is found in a JSON Object at index[2]
+            // which contains a "selectedLeague" boolean. If `false` this special rule
+            // is not used. We assume that all other rules are used.
+            team.specialRules.mapNotNull { (key, value) ->
+                // The semantics of all these values (7) are a bit obscure, so their meaning
+                // is mostly guesswork at this point.
+                val options = value as JsonArray
+
+                // We only disallow special rules, if we are strictly sure that they are not
+                // selected. This policy probably isn't 100% sound, but does make it easier
+                // to figure out what is going on when debugging.
+                val isUsed = when (val leagueObj = options.getOrNull(2)) {
+                    is JsonObject -> {
+                        @OptIn(ExperimentalStdlibApi::class)
+                        leagueObj.getOrElseIfMissing("selectedLeague") {
+                            JsonPrimitive(true)
+                        }.jsonPrimitive.booleanOrNull ?: true
+                    }
+                    else -> true
+                }
+                when (isUsed) {
+                    true -> {
+                        // Lookup special rules based on their name
+                        val regionalSpecialRule: SpecialRules? = RegionalSpecialRule.entries.firstOrNull { it.description == key }
+                        val teamSpecialRule: SpecialRules? = TeamSpecialRule.entries.firstOrNull { it.description == key }
+                        regionalSpecialRule ?: teamSpecialRule ?: error("Could not find matching special rule: $key")
+                    }
+
+                    false -> null
+                }
+            }
+        } else {
+            emptyList()
+        }
+
+        // Break apart the special rules based on the game version
+        val (league, specialRules) = when (rules.baseVersion) {
+            GameVersion.BB2020 -> {
+                null to allSpecialRules
+            }
+            GameVersion.BB2025 -> {
+                val league: RegionalSpecialRule = allSpecialRules.single { it is RegionalSpecialRule } as RegionalSpecialRule
+                val teamRules = allSpecialRules.filter { it is TeamSpecialRule }
+                league to teamRules
+            }
+        }
+
         return SerializedTeam(
             id = TeamId(team.id.toString()),
             name = team.name,
@@ -308,19 +376,34 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             // We probably need to refine this later.
             type = rules.gameType,
             players = team.players.map { player ->
-                val position = jervisRoster.get(PositionId(player.positionId.toString()))
+                val position = jervisRoster.getOrNull(player.positionId.positionId)
+                    // A Star Player is not part of a roster, so they are looked up among
+                    // the Star Players the ruleset offers as inducements.
+                    ?: rules.inducements.findStarPlayer(player.position)
+                    ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.positionId}")
+
+                val type: PlayerType = when (position) {
+                    is StarPlayerPosition -> PlayerType.STAR_PLAYER
+                    else -> PlayerType.STANDARD // Unclear if this is always true?
+                }
+
+                val level: PlayerLevel = when (position) {
+                    is StarPlayerPosition -> PlayerLevel.LEGEND
+                    else -> PlayerLevel.ROOKIE // Unclear how this is defined
+                }
+
                 SerializedPlayer(
                     id = PlayerId(player.id.toString()),
                     name = player.name,
                     number = player.number.playerNo,
                     position = position.id,
-                    type = PlayerType.STANDARD, // Unclear if this is always true?
+                    type = type,
                     statModifiers = emptyList(), // How are these defined?
                     extraSkills = extractExtraSkills(rules, player.skills, position).map { it.serialize() },
                     nigglingInjuries = 0, // Unclear how these are defined
                     missNextGame = false, // Unclear how these are defined
                     starPlayerPoints = player.record.spp,
-                    level = PlayerLevel.ROOKIE, // Unclear how this is defined
+                    level = level,
                     cost = position.cost + player.skillCosts.sum(),
                     icon = PlayerUiData(
                         sprite = position.icon,
@@ -337,7 +420,8 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             fanFactor = team.fanFactor,
             teamValue = team.teamValue,
             currentTeamValue = team.currentTeamValue,
-            specialRules = jervisRoster.specialRules,
+            specialRules = specialRules,
+            league = league,
             teamLogo = jervisRoster.logo,
         )
     }

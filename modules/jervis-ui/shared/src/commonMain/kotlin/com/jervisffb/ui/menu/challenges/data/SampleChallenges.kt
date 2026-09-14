@@ -85,9 +85,10 @@ private fun ChallengeBuilder.addGameData(data: GameFileData) {
 object SampleChallenges {
 
     private val LOG = jervisLogger()
+    val challengeVersion = "v4"
 
     private val challengeData: List<Pair<String, (GameFileData) -> ChallengePresentation>> = listOf(
-        "https://jervis.ilios.dk/uploads/challenges/v3/ma8_vs_wide_los.jrg" to { data: GameFileData ->
+        "https://jervis.ilios.dk/uploads/challenges/$challengeVersion/ma8_vs_wide_los.jrg" to { data: GameFileData ->
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("ma8_vs_wide_los")).apply {
                     name = "MA8 vs. Wide LOS (Easy)"
@@ -113,7 +114,7 @@ object SampleChallenges {
             )
         },
 
-        "https://jervis.ilios.dk/uploads/challenges/v3/ma9_vs_push_denial.jrg" to { data ->
+        "https://jervis.ilios.dk/uploads/challenges/$challengeVersion/ma9_vs_push_denial.jrg" to { data ->
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("ma9_vs_push_denial")).apply {
                     name = "MA9 vs. Push Denial (Difficult)"
@@ -139,7 +140,7 @@ object SampleChallenges {
             )
         },
 
-        "https://jervis.ilios.dk/uploads/challenges/v3/short_way_around.jrg" to { data ->
+        "https://jervis.ilios.dk/uploads/challenges/$challengeVersion/short_way_around.jrg" to { data ->
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("dodge-this")).apply {
                     name = "The Short Way Around"
@@ -166,7 +167,7 @@ object SampleChallenges {
                 userVote = false,
             )
         },
-        "https://jervis.ilios.dk/uploads/challenges/v3/prevent_the_td.jrg" to { data ->
+        "https://jervis.ilios.dk/uploads/challenges/$challengeVersion/prevent_the_td.jrg" to { data ->
             ChallengePresentation(
                 challenge = ChallengeBuilder(ChallengeId("prevent-the-td")).apply {
                     name = "Prevent the TD!"

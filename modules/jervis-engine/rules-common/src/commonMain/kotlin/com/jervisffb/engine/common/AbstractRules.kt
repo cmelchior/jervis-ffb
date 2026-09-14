@@ -646,6 +646,13 @@ abstract class AbstractRules(
                 if (!inducementSettings.enabled) {
                     errors.add(InducementNotEnabled(inducement.type))
                 }
+                // A selection can name something that doesn't exist in this ruleset, e.g. only
+                // one half of a Star Player pair. Both `getPrice` and `isAvailableToTeam` throw
+                // on those, so report it and move on before either is called.
+                if (inducement.getSettingsOrNull(rules) == null) {
+                    errors.add(InducementNotFound(inducement.type))
+                    continue
+                }
                 // Ideally, all inducements of the same type should be in a single InducementSelection,
                 // but right now this is not enforced, so here we track it across multiple selections.
                 val updatedCount = (typeCount.getOrElse(inducement.type) { 0 } + inducement.count)

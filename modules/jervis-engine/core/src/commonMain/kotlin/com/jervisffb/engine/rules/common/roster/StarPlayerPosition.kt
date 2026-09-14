@@ -36,7 +36,13 @@ data class StarPlayerPosition(
     override val skills: List<SkillId>,
     override val specialRules: List<PlayerSpecialRule>,
     override val keywords: List<PlayerKeyword>,
-    override val playsFor: List<RegionalSpecialRule>,
+    /**
+     * If set, this position can only play for teams with one of the given
+     * special rules. Usually a [RegionalSpecialRule], but a few Star Players
+     * are tied to a [TeamSpecialRule] instead, e.g. Bilerot Vomitflesh and
+     * "Favoured of Nurgle".
+     */
+    val playsFor: List<SpecialRules>,
     override val size: PlayerSize,
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,

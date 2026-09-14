@@ -146,7 +146,7 @@ private fun TeamTableDivider() {
 private fun SpecialRulesSection(
     version: GameVersion,
     league: RegionalSpecialRule?,
-    specialRules: List<SpecialRules>
+    specialRules: Collection<SpecialRules>
 ) {
     Row(modifier = Modifier.height(IntrinsicSize.Min).background(JervisTheme.rulebookPaperMediumDark)) {
         Column(

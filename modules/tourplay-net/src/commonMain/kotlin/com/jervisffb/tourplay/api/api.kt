@@ -16,7 +16,7 @@ import kotlin.collections.List
 public data class TourPlayRoster(
     public val id: Int,
     public val imageFile: String? = null,
-    public val apothecary: Boolean,
+    public val apothecary: Boolean? = null,
     public val assistantCoaches: Int,
     public val cheerLeaders: Int,
     public val fanFactor: Int,

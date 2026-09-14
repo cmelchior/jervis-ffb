@@ -141,8 +141,8 @@ val HUMAN_TEAM_TEST_BB2025 = Roster(
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
-    leagues = emptyList(),
-    specialRules = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
+    leagues = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
+    specialRules = emptyList(),
     positions = listOf(
         HUMAN_LINEMAN,
         HUMAN_THROWER,
