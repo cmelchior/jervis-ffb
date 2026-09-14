@@ -14,14 +14,61 @@ suspend fun WebSocketSession.sendMessage(message: ServerMessage) {
 }
 
 suspend fun WebSocketSession.close(code: JervisExitCode, error: Throwable) {
-    this.close(code, error.stackTraceToString())
+    this.close(code, error.message ?: error::class.simpleName ?: "WebSocket connection failed.")
 }
 
 suspend fun WebSocketSession.close(code: JervisExitCode, message: String) {
-    // Control frames in WebSockets (including Close), must be less than 125B.
-    // So make sure the message is less than that.
-    // See https://datatracker.ietf.org/doc/html/rfc6455#section-5.5
-    val truncatedMessage = if (message.length > 122) (message.substring(0, 119) + "...") else message
-    this.close(CloseReason(code.code, truncatedMessage))
+    this.close(code.toCloseReason(message))
 }
 
+/**
+ * Creates a [CloseReason] with a UTF-8 truncated message to ensure compliance with RFC 6455
+ * control frame payload length limits (at most 123 bytes for reason string).
+ */
+fun JervisExitCode.toCloseReason(message: String): CloseReason {
+    return CloseReason(this.code, message.truncateUtf8(123))
+}
+
+/**
+ * Truncate a string so that its UTF-8 encoded byte representation does not
+ * exceed [maxBytes]. If truncated, [suffix] is appended.
+ */
+fun String.truncateUtf8(maxBytes: Int = 123, suffix: String = "..."): String {
+    if (this.length <= maxBytes && this.utf8Cut(maxBytes) == this.length) return this
+
+    // We need to truncate the string to ensure that there is room for the suffix.
+    // If the suffix alone doesn't fit, keep as much of the message as the limit allows instead.
+    val targetBytes = maxBytes - suffix.encodeToByteArray().size
+    if (targetBytes <= 0) return this.substring(0, this.utf8Cut(maxBytes))
+    return this.substring(0, this.utf8Cut(targetBytes)) + suffix
+}
+
+/**
+ * Returns the highest index `i` for which `substring(0, i)` encodes to at most [maxBytes] UTF-8
+ * bytes, i.e. [length] if the whole string fits. Surrogate pairs are always kept or dropped as
+ * a unit, so the result never splits one.
+ */
+private fun String.utf8Cut(maxBytes: Int): Int {
+    var bytes = 0
+    var i = 0
+    while (i < this.length) {
+        val char = this[i]
+        var charCount = 1
+        val byteCount = when {
+            char.code < 0x80 -> 1
+            char.code < 0x800 -> 2
+            char.isHighSurrogate() && i + 1 < this.length && this[i + 1].isLowSurrogate() -> {
+                charCount = 2
+                4
+            }
+            // Any other BMP Char, including an unpaired surrogate. The latter is encoded as a
+            // replacement character, which is 1-3 bytes depending on the platform, so
+            // overestimate rather than risk exceeding [maxBytes].
+            else -> 3
+        }
+        if (bytes + byteCount > maxBytes) return i
+        bytes += byteCount
+        i += charCount
+    }
+    return this.length
+}

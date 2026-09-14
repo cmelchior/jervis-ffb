@@ -216,10 +216,8 @@ class JervisClientWebSocketConnection(
         error: Throwable,
         exitCode: JervisExitCode = JervisExitCode.UNEXPECTED_ERROR,
     ) {
-        val closeReason = CloseReason(
-            exitCode.code,
-            error.message ?: error::class.simpleName ?: "WebSocket connection failed."
-        )
+        val rawMessage = error.message ?: error::class.simpleName ?: "WebSocket connection failed."
+        val closeReason = exitCode.toCloseReason(rawMessage)
         val ownsUnexpectedShutdown = lifecycleMutex.withLock {
             !closeRequested && jervisCloseReason.complete(closeReason)
         }
@@ -268,7 +266,7 @@ class JervisClientWebSocketConnection(
         currentSession?.incoming?.cancel()
 
         // If the server terminated the connection, this is a no-op and the server close reason wins.
-        jervisCloseReason.complete(CloseReason(exitCode.code, message))
+        jervisCloseReason.complete(exitCode.toCloseReason(message))
         incomingChannel.cancel(cause = CancellationException("Client is closing."))
         outgoingChannel.close()
         job?.cancelAndJoin()
