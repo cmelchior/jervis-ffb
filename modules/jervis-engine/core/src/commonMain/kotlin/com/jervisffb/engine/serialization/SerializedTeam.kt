@@ -118,7 +118,7 @@ data class SerializedTeam(
                 teamData.league.let { savedLeague ->
                     // Leagues are only required in BB2025. They are not used in BB2020, but we will accept them being set here.
                     if (version == GameVersion.BB2025 && !teamData.roster.leagues.contains(savedLeague)) {
-                        error("Team is using a league not supported: $savedLeague is not in ${teamData.roster.leagues.joinToString { it.description }}")
+                        error("Team (${teamData.name}) is using a league not supported: $savedLeague is not in ${teamData.roster.leagues.joinToString { it.description }}")
                     }
                     league = savedLeague
                 }
