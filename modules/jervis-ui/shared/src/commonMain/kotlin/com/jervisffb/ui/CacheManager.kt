@@ -15,6 +15,8 @@ import com.jervisffb.resources.bb2025.StandaloneBB7Teams2025
 import com.jervisffb.resources.bb2025.StandaloneStandardTeams2025
 import com.jervisffb.utils.FileManager
 import io.ktor.http.Url
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okio.Path
 import org.jetbrains.skia.EncodedImageFormat
@@ -62,11 +64,11 @@ object CacheManager {
             }
     }
 
-    suspend fun loadTeams(): List<JervisTeamFile> {
-        return fileManager.getFilesWithExtension(teamsCacheRoot, FILE_EXTENSION_TEAM_FILE).map { file ->
+    fun loadTeams(): Flow<JervisTeamFile> = flow {
+        fileManager.getFilesWithExtension(teamsCacheRoot, FILE_EXTENSION_TEAM_FILE).forEach { file ->
             val fileContent = fileManager.getFile(file.toString()) ?: throw IllegalStateException("Could not find: $file")
             val json = fileContent.decodeToString()
-            jsonSerializer.decodeFromString<JervisTeamFile>(json)
+            emit(jsonSerializer.decodeFromString<JervisTeamFile>(json))
         }
     }
 

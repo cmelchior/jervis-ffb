@@ -20,6 +20,8 @@ import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -63,25 +65,28 @@ class SelectTeamComponentModel(
 
     private fun loadTeamList(rules: Rules) {
         menuViewModel.backgroundContext.launch {
-            val teams =  CacheManager.loadTeams().mapNotNull { teamFile ->
-                try {
-                    val teamData = teamFile.team
-                    val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
-                    val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
-                    getTeamInfo(teamFile, team)
-                } catch (ex: Exception) {
-                    // How to handle teams not being able to load?
-                    LOG.e("Failed to load team: ${ex.message}")
-                    null
+            loadingTeams.value = true
+            availableTeams.value = emptyList()
+            try {
+                CacheManager.loadTeams().collect { teamFile ->
+                    try {
+                        val teamData = teamFile.team
+                        val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
+                        val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
+                        if (team.type == rules.gameType && team.version == rules.baseVersion) {
+                            val teamInfo = getTeamInfo(teamFile, team)
+                            availableTeams.update { teams ->
+                                (teams + teamInfo).sortedBy { it.teamName }
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        // How to handle teams not being able to load?
+                        LOG.e("Failed to load team: ${ex.message}")
+                    }
                 }
+            } finally {
+                loadingTeams.value = false
             }
-            teams
-                .filter {
-                    it.type == rules.gameType && it.version == rules.baseVersion
-                }
-                .let {
-                    availableTeams.value = it.sortedBy { it.teamName }
-                }
         }
     }
 

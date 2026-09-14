@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.menu.components.JervisLinearProgressIndicator
 import com.jervisffb.ui.menu.components.JervisOutlinedTextField
 import com.jervisffb.ui.menu.components.TeamCard
 import com.jervisffb.ui.menu.components.TeamInfo
@@ -33,6 +34,7 @@ fun SelectTeamComponent(
 ) {
     val unavailableTeam by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
+    val loadingTeams by viewModel.loadingTeams.collectAsState()
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
 
     // If a filter is provided, filter the available teams based on matching team or roster name.
@@ -71,8 +73,15 @@ fun SelectTeamComponent(
                 onValueChange = { filter = it },
                 label = "Filter",
             )
-            when (normalizedFilter.isNotBlank() && visibleTeams.isEmpty()) {
-                true -> {
+            if (loadingTeams) {
+                JervisLinearProgressIndicator(
+                    modifier = Modifier
+                        .width(visibleGridWidth)
+                        .padding(bottom = gridSpacing),
+                )
+            }
+            when {
+                normalizedFilter.isNotBlank() && visibleTeams.isEmpty() && !loadingTeams -> {
                     Box(
                         modifier = Modifier.fillMaxWidth().weight(1f),
                         contentAlignment = Alignment.Center,
@@ -83,7 +92,7 @@ fun SelectTeamComponent(
                         )
                     }
                 }
-                false -> {
+                else -> {
                     LazyVerticalGrid(
                         columns = GridCells.FixedSize(gridCellSize),
                         modifier = Modifier.fillMaxWidth().weight(1f),
