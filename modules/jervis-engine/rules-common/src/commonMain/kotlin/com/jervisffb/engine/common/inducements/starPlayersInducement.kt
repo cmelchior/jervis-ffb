@@ -3,6 +3,7 @@ package com.jervisffb.engine.common.inducements
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.model.inducements.settings.SingleInducement
+import com.jervisffb.engine.model.inducements.settings.StarPlayersProvider
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import kotlinx.serialization.Serializable
@@ -63,7 +64,7 @@ data class StarPlayersInducementGroup(
 @Serializable
 data class StarPlayerInducement(
     /** The Star Players hired by this inducement, in the order they should be shown. */
-    val players: List<StarPlayerPosition>,
+    override val players: List<StarPlayerPosition>,
     override val max: Int,
     override val defaultPrice: Int,
     override val enabled: Boolean,
@@ -76,7 +77,7 @@ data class StarPlayerInducement(
      * from [players].
      */
     val titleOverride: String? = null,
-): SingleInducement<StarPlayerInducement.Builder> {
+): SingleInducement<StarPlayerInducement.Builder>, StarPlayersProvider {
     override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
     override val name: String = titleOverride ?: players.joinToString(" & ") { it.title }
     val playerIds: List<PositionId> = players.map { it.id }

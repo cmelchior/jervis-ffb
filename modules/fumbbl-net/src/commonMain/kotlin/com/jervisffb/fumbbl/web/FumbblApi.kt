@@ -1,6 +1,8 @@
 package com.jervisffb.fumbbl.web
 
+import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.ext.positionId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerLevel
 import com.jervisffb.engine.model.PlayerSize
@@ -16,6 +18,7 @@ import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.SpecialRules
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.serialization.FILE_FORMAT_VERSION
@@ -373,19 +376,34 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             // We probably need to refine this later.
             type = rules.gameType,
             players = team.players.map { player ->
-                val position = jervisRoster.get(PositionId(player.positionId.toString()))
+                val position = jervisRoster.getOrNull(player.positionId.positionId)
+                    // A Star Player is not part of a roster, so they are looked up among
+                    // the Star Players the ruleset offers as inducements.
+                    ?: rules.inducements.findStarPlayer(player.position)
+                    ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.positionId}")
+
+                val type: PlayerType = when (position) {
+                    is StarPlayerPosition -> PlayerType.STAR_PLAYER
+                    else -> PlayerType.STANDARD // Unclear if this is always true?
+                }
+
+                val level: PlayerLevel = when (position) {
+                    is StarPlayerPosition -> PlayerLevel.LEGEND
+                    else -> PlayerLevel.ROOKIE // Unclear how this is defined
+                }
+
                 SerializedPlayer(
                     id = PlayerId(player.id.toString()),
                     name = player.name,
                     number = player.number.playerNo,
                     position = position.id,
-                    type = PlayerType.STANDARD, // Unclear if this is always true?
+                    type = type,
                     statModifiers = emptyList(), // How are these defined?
                     extraSkills = extractExtraSkills(rules, player.skills, position).map { it.serialize() },
                     nigglingInjuries = 0, // Unclear how these are defined
                     missNextGame = false, // Unclear how these are defined
                     starPlayerPoints = player.record.spp,
-                    level = PlayerLevel.ROOKIE, // Unclear how this is defined
+                    level = level,
                     cost = position.cost + player.skillCosts.sum(),
                     icon = PlayerUiData(
                         sprite = position.icon,

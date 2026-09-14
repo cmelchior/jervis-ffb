@@ -45,7 +45,7 @@ data class SerializedTeam(
      * separate from [specialRules] because the team selects it from the leagues its
      * roster plays in.
      */
-    val league: RegionalSpecialRule?,
+    val league: RegionalSpecialRule? = null,
     val teamLogo: RosterLogo?
 ) {
     companion object {
@@ -84,11 +84,17 @@ data class SerializedTeam(
                 this.coach = coach
 
                 teamData.players.forEach { playerData ->
+                    // While Star Players are strictly only hired during the Buy Inducements phase, Jervis do
+                    // allow teams to have them up front as we might be loading team state "mid-game". Star Players
+                    // are not part of the roster and thus needs to be looked up in the inducements.
+                    val position = teamData.roster.getOrNull(playerData.position)
+                        ?: rules.inducements.findStarPlayer(playerData.position)
+                        ?: error("Position not found: ${playerData.position}")
                     addPlayer(
                         playerData.id,
                         playerData.name,
                         playerData.number,
-                        teamData.roster[playerData.position],
+                        position,
                         playerData.extraSkills.mapNotNull { skillDescription ->
                             // TODO For now, we just ignore skills we do not support
                             rules.skillSettings.getSkillId(skillDescription).also { skillId ->

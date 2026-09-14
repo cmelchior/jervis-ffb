@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialization.PlayerUiData
 import com.jervisffb.engine.sprites.RosterLogo
@@ -141,7 +142,10 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                     id = data.id,
                     name = data.name,
                     number = data.number,
-                    type = PlayerType.STANDARD,
+                    type = when (data.type) {
+                        is StarPlayerPosition -> PlayerType.STAR_PLAYER
+                        else -> PlayerType.STANDARD
+                    },
                     icon = data.icon,
                 ).also { player ->
                     player.extraSkills.addAll(data.extraSkills.map { rules.createSkill(player, it, Duration.PERMANENT) })

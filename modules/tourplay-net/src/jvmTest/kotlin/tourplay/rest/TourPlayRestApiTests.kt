@@ -114,17 +114,6 @@ class TourPlayRestApiTests {
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
         assertEquals("ScrewCrew", team.name)
     }
-
-    // On 10th of September 2026, this team had a star player.
-    // Ignore the test for now as Star Players are not supported yet.
-    @Ignore
-    @Test
-    fun load224536() = runBlocking {
-        val rules = StandardBB2025Rules()
-        val file = api.loadRoster(224536, rules)
-        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals("Admin Team", team.name)
-    }
 }
 
 private val iconMapping: TourPlayIconMapping by lazy {

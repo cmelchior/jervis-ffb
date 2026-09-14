@@ -33,6 +33,13 @@ data class Roster(
     val logo: RosterLogo,
 ) {
     operator fun get(id: PositionId): Position {
-        return positions.firstOrNull { it.id == id } ?: error("Position not found: $id")
+        return getOrNull(id) ?: error("Position not found: $id")
     }
+
+    /**
+     * Returns the position with the given [id], or `null` if the roster doesn't have
+     * it. Positions a team can only get through inducements, i.e. Star Players, are
+     * never part of a roster.
+     */
+    fun getOrNull(id: PositionId): Position? = positions.firstOrNull { it.id == id }
 }
