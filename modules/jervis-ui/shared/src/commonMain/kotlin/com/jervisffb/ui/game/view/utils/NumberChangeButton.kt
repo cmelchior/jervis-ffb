@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.jervisffb.ui.game.view.BuyInducementsDialog
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.rulebookBlue
+import com.jervisffb.ui.utils.applyIf
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -30,6 +33,8 @@ fun NumberChangeButton(
     enabled: Boolean = true,
     buttonColor: Color = rulebookBlue,
     shape: Shape = RoundedCornerShape(4.dp),
+    // Matches the alpha the surrounding inducement rows use for their disabled state.
+    disabledAlpha: Float = 0.4f
 ) {
 //    Button(
 //        modifier = modifier
@@ -46,10 +51,21 @@ fun NumberChangeButton(
 //        enabled = enabled,
 //    ) {
     Image(
+        /**
+         * Keep the 12.dp padding + 36.dp size in sync with `numberChangeButtonSize` in
+         * [BuyInducementsDialog], which reserves the same footprint for rows without
+         * a button.
+         */
         modifier = Modifier
             .padding(12.dp)
             .size(36.dp)
-            .clickable(onClick = onClick)
+            .alpha(
+                when (enabled) {
+                    true -> 1f
+                    false -> disabledAlpha
+                }
+            )
+            .applyIf(enabled) { clickable(onClick = onClick) }
         ,
         painter = painterResource(icon),
         contentDescription = description,

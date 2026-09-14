@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
@@ -39,6 +40,12 @@ data class SerializedTeam(
     val teamValue: Int,
     val currentTeamValue: Int,
     val specialRules: List<SpecialRules>,
+    /**
+     * Which league the team plays in. Only set for BB2025 teams, where it is kept
+     * separate from [specialRules] because the team selects it from the leagues its
+     * roster plays in.
+     */
+    val league: RegionalSpecialRule?,
     val teamLogo: RosterLogo?
 ) {
     companion object {
@@ -46,22 +53,23 @@ data class SerializedTeam(
 
         fun serialize(team: Team): SerializedTeam {
             return SerializedTeam(
-                team.id,
-                team.name,
-                team.version,
-                team.type,
-                team.map { SerializedPlayer.serialize(it) },
-                team.roster,
-                team.rerolls.count { it.duration == Duration.PERMANENT },
-                team.teamApothecaries.size,
-                team.teamCheerleaders,
-                team.teamAssistantCoaches,
-                team.treasury,
-                team.fanFactor,
-                team.teamValue,
-                team.currentTeamValue,
-                team.specialRules,
-                team.teamLogo
+                id = team.id,
+                name = team.name,
+                version = team.version,
+                type = team.type,
+                players = team.map { SerializedPlayer.serialize(it) },
+                roster = team.roster,
+                rerolls = team.rerolls.count { it.duration == Duration.PERMANENT },
+                apothecaries = team.teamApothecaries.size,
+                cheerleaders = team.teamCheerleaders,
+                assistantCoaches = team.teamAssistantCoaches,
+                treasury = team.treasury,
+                fanFactor = team.fanFactor,
+                teamValue = team.teamValue,
+                currentTeamValue = team.currentTeamValue,
+                specialRules = team.specialRules.toList(),
+                league = team.league,
+                teamLogo = team.teamLogo
             )
         }
 
@@ -101,6 +109,13 @@ data class SerializedTeam(
                 teamValue = teamData.teamValue
                 currentTeamValue = teamData.currentTeamValue
                 specialRules.addAll(teamData.specialRules)
+                teamData.league.let { savedLeague ->
+                    // Leagues are only required in BB2025. They are not used in BB2020, but we will accept them being set here.
+                    if (version == GameVersion.BB2025 && !teamData.roster.leagues.contains(savedLeague)) {
+                        error("Team is using a league not supported: $savedLeague is not in ${teamData.roster.leagues.joinToString { it.description }}")
+                    }
+                    league = savedLeague
+                }
                 teamLogo = teamData.teamLogo
             }
         }

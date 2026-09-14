@@ -1,5 +1,7 @@
-package com.jervisffb.resources.bb2025
+package com.jervisffb.engine.bb2025
 
+import com.jervisffb.engine.common.inducements.StarPlayerInducement
+import com.jervisffb.engine.common.inducements.starPlayerInducements
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
@@ -153,22 +155,25 @@ import com.jervisffb.engine.rules.common.skills.SkillType.WRESTLE
 import com.jervisffb.engine.rules.common.skills.SkillType.YOINK
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.engine.sprites.SpriteSheet
-import com.jervisffb.resources.iconRootPath
-import com.jervisffb.resources.portraitRootPath
+import com.jervisffb.engine.sprites.iconRootPath
+import com.jervisffb.engine.sprites.portraitRootPath
 import kotlinx.collections.immutable.toPersistentList
 
 /**
- * This file contains all Star Players available in the BB2025 ruleset.
+ * This file contains all Star Players available in the BB2025 ruleset, and the
+ * inducements used to hire them.
  *
  * Developer's Commentary:
- * TODO: Star Players that must be hired as a pair, like Dribl & Drull, are
- *  modelled as two independent positions since the engine has no concept of
- *  hiring two players as one inducement yet.
+ * Star Players that must be hired as a pair, like Dribl & Drull, are still two
+ * independent positions here. They are linked by a single [StarPlayerInducement],
+ * created with [StarPlayerInducement.pair], which is what defines their
+ * combined cost.
  *
  * Star player icons and portraits was lifted from:
  * - https://fumbbl.com/p/stars (HTML page)
  * - `curl https://fumbbl.com/api/roster/get/5160` (JSON list of star players)
  */
+
 val AKHORNE_THE_SQUIRREL_BB2025 = StarPlayerPosition(
     id = PositionId("akhorne-the-squirrel"),
     title = "Akhorne The Squirrel",
@@ -386,9 +391,11 @@ val CRUMBLEBERRY_BB2025 = StarPlayerPosition(
     id = PositionId("crumbleberry"),
     title = "Crumbleberry",
     shortHand = "Cu",
-    // Crumbleberry must be hired together with Grak for a combined cost of 250,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 250_000,
+    // Crumbleberry must be hired together with Grak for a combined cost
+    // of 250,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 125_000,
     move = 5, strength = 2, agility = 3, passing = 5, armorValue = 7,
     skills = listOf(
         DODGE.id(),
@@ -437,9 +444,11 @@ val DRIBL_BB2025 = StarPlayerPosition(
     id = PositionId("dribl"),
     title = "Dribl",
     shortHand = "Dr",
-    // Dribl must be hired together with Drull for a combined cost of 230,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 230_000,
+    // Dribl must be hired together with Drull for a combined cost
+    // of 230,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 115_000,
     move = 8, strength = 2, agility = 3, passing = 4, armorValue = 8,
     skills = listOf(
         DIRTY_PLAYER.id(),
@@ -463,9 +472,11 @@ val DRULL_BB2025 = StarPlayerPosition(
     id = PositionId("drull"),
     title = "Drull",
     shortHand = "Du",
-    // Drull must be hired together with Dribl for a combined cost of 230,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 230_000,
+    // Drull must be hired together with Dribl for a combined cost
+    // of 230,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 115_000,
     move = 8, strength = 2, agility = 3, passing = 4, armorValue = 8,
     skills = listOf(
         DODGE.id(),
@@ -625,9 +636,11 @@ val GRAK_BB2025 = StarPlayerPosition(
     id = PositionId("grak"),
     title = "Grak",
     shortHand = "Gr",
-    // Grak must be hired together with Crumbleberry for a combined cost of 250,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 250_000,
+    // Grak must be hired together with Crumbleberry for a combined cost
+    // of 250,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 125_000,
     move = 5, strength = 5, agility = 4, passing = 4, armorValue = 10,
     skills = listOf(
         BONE_HEAD.id(),
@@ -1076,9 +1089,11 @@ val LUCIEN_SWIFT_BB2025 = StarPlayerPosition(
     id = PositionId("lucien-swift"),
     title = "Lucien Swift",
     shortHand = "Ls",
-    // Lucien Swift must be hired together with Valen Swift for a combined cost of 300,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 300_000,
+    // Lucien Swift must be hired together with Valen Swift for a combined cost
+    // of 300,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 150_000,
     move = 7, strength = 3, agility = 2, passing = 3, armorValue = 9,
     skills = listOf(
         BLOCK.id(),
@@ -1567,9 +1582,11 @@ val VALEN_SWIFT_BB2025 = StarPlayerPosition(
     id = PositionId("valen-swift"),
     title = "Valen Swift",
     shortHand = "Vs",
-    // Valen Swift must be hired together with Lucien Swift for a combined cost of 300,000.
-    // Hiring pairs isn't supported yet, so for now both halves list the full price.
-    cost = 300_000,
+    // Valen Swift must be hired together with Lucien Swift for a combined cost
+    // of 300,000. That price lives on the `StarPlayerInducement` linking the
+    // two. Here we just half the cost for each as that most accurately describe
+    // the price for each.
+    cost = 150_000,
     move = 7, strength = 3, agility = 2, passing = 2, armorValue = 9,
     skills = listOf(
         ACCURATE.id(),
@@ -1795,3 +1812,16 @@ val STAR_PLAYERS = listOf(
     ZOLCATH_THE_ZOAT_BB2025,
     ZZHARG_MADEYE_BB2025,
 )
+
+// Star Players that must be hired together, for a single combined cost. "The Swift Twins"
+// is the only pair whose rulebook name isn't just the two player names joined, so it is the
+// only one that needs an explicit title.
+private val STAR_PLAYER_PAIRS_BB2025 = listOf(
+    StarPlayerInducement.pair(DRIBL_BB2025, DRULL_BB2025, 230_000),
+    StarPlayerInducement.pair(GRAK_BB2025, CRUMBLEBERRY_BB2025, 250_000),
+    StarPlayerInducement.pair(LUCIEN_SWIFT_BB2025, VALEN_SWIFT_BB2025, 300_000, "The Swift Twins"),
+)
+
+/** The Star Players a BB2025 team can hire, as inducements. See [DEFAULT_INDUCEMENTS_BB2025]. */
+val STAR_PLAYER_INDUCEMENTS_BB2025: List<StarPlayerInducement> =
+    starPlayerInducements(STAR_PLAYERS, STAR_PLAYER_PAIRS_BB2025)

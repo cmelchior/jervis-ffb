@@ -4,6 +4,7 @@ import com.jervisffb.engine.bb2020.FumbblBB2020Rules
 import com.jervisffb.engine.bb2025.BB7Rules2025
 import com.jervisffb.engine.bb2025.StandardBB2025Rules
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.serialization.SerializedTeam
 import com.jervisffb.engine.sprites.SpriteLocation
 import com.jervisffb.tourplay.TourPlayApi
@@ -86,6 +87,24 @@ class TourPlayRestApiTests {
         val file = api.loadRoster(176917, rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
         assertEquals("Khazra’s Den 26", team.name)
+    }
+
+    @Test
+    fun teamLoaderKeepsTheSelectedLeague() = runBlocking {
+        // TourPlay tracks which league a team plays in, and that decides which Star
+        // Players it may hire. Both rosters here only play in a single league, but taking
+        // the team's own choice is what makes rosters playing in several, e.g. Chaos
+        // Dwarf, import correctly.
+        listOf(
+            176917L to RegionalSpecialRule.CHAOS_CLASH,
+            170509L to RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE,
+        ).forEach { (id, league) ->
+            val rules = StandardBB2025Rules()
+            val file = api.loadRoster(id, rules)
+            val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
+            assertEquals(league, team.league, team.name)
+            assertTrue(league in team.allSpecialRules, team.name)
+        }
     }
 
     @Test

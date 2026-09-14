@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.bb2025.THE_BLACK_GOBBO_BB2025
 import com.jervisffb.engine.bb2025.inducements.InducementType2025
 import com.jervisffb.engine.bb2025.procedures.actions.move.RushRoll
 import com.jervisffb.engine.bb2025.skills.Loner
@@ -40,7 +41,6 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.GreasyCleatsStatModifier
 import com.jervisffb.engine.rules.common.tables.IronManStatModifier
 import com.jervisffb.engine.utils.containsInstance
-import com.jervisffb.teams.THE_BLACK_GOBBO
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultDetermineKickingTeam
@@ -95,7 +95,7 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         return Player(
             rules,
             id = "away-starplayer".playerId,
-            position = THE_BLACK_GOBBO,
+            position = THE_BLACK_GOBBO_BB2025,
             type = PlayerType.STAR_PLAYER
         )
     }

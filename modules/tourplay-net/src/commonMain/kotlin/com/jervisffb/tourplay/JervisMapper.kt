@@ -107,6 +107,19 @@ abstract class JervisMapper(private val icons: TourPlayIconMapping) {
         }
     }
 
+    /**
+     * Map the league a team has selected. TourPlay stores it as a single flag from the
+     * same set as [convertLeagueSpecialRules].
+     */
+    protected fun convertSelectedLeague(leagueFlag: Int?): RegionalSpecialRule? {
+        val leagues = convertLeagueSpecialRules(leagueFlag ?: 0)
+        return when (leagues.size) {
+            0 -> null
+            1 -> leagues.single()
+            else -> error("Expected a single league, but got: $leagues")
+        }
+    }
+
     protected fun convertRosterSpecialRules(specialRulesFlag: Int): List<SpecialRules> {
         if (specialRulesFlag == 0) return emptyList()
         // TourPlay describes their name mapping in the `en.json` file (use Chrome Dev View)

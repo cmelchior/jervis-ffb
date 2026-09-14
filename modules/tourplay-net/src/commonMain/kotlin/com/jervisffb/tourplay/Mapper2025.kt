@@ -119,6 +119,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             teamValue = team.teamValue * 1000, // TourPlay tracks Team Value as its "short hand" value
             currentTeamValue = team.teamValue * 1000, // Unclear if this is current or something else?
             specialRules = jervisRoster.specialRules,
+            league = convertSelectedLeague(team.league),
             teamLogo = jervisRoster.logo,
         )
     }

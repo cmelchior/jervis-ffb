@@ -15,8 +15,8 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
-import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialization.PlayerUiData
 import com.jervisffb.engine.sprites.RosterLogo
@@ -56,9 +56,18 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
     var currentTeamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
-    // For now, just use sensible defaults for the league
-    var league = roster.leagues.singleOrNull() ?: roster.leagues.firstOrNull()
-    val specialRules = mutableListOf<SpecialRules>()
+    // Which league the team plays in. Only used in BB2025, where it decides which
+    // Star Players the team may hire. A roster that only plays in a single league
+    // defaults to it, while rosters playing in more than one, e.g. Chaos Dwarf,
+    // must have one selected. `null` means the team hasn't picked one yet.
+    var league: RegionalSpecialRule? = roster.leagues.singleOrNull()
+        set(value) {
+            if (value != null && !roster.leagues.contains(value)) {
+                throw IllegalArgumentException("${roster.name} does not play in ${value.description}, only: ${roster.leagues}")
+            }
+            field = value
+        }
+    val specialRules = roster.specialRules.toMutableSet()
     var teamLogo: RosterLogo? = null
     var apothecaries: Int = 0
         set(value) {

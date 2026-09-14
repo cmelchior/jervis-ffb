@@ -15,15 +15,15 @@ object InducementSelectionCommon {
 
     @Serializable
     data class Simple(override val type: InducementType, override val count: Int) : InducementSelection<SimpleInducement> {
-        override fun getSettings(rules: Rules): SimpleInducement = rules.inducements[type] as SimpleInducement
+        override fun getSettingsOrNull(rules: Rules): SimpleInducement? = rules.inducements[type] as? SimpleInducement
     }
 
     @Serializable
     data class Wizard(val wizard: WizardType) : InducementSelection<WizardInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.WIZARD
-        override fun getSettings(rules: Rules): WizardInducement = (rules.inducements[type] as WizardsInducementGroup).items
-            .first { it.wizard == wizard }
+        override fun getSettingsOrNull(rules: Rules): WizardInducement? = (rules.inducements[type] as WizardsInducementGroup).items
+            .firstOrNull { it.wizard == wizard }
 
     }
 
@@ -32,24 +32,33 @@ object InducementSelectionCommon {
     data class BiasedReferee(val referee: BiasedRefereeType) : InducementSelection<BiasedRefereeInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.BIASED_REFEREE
-        override fun getSettings(rules: Rules): BiasedRefereeInducement = (rules.inducements[type] as BiasedRefereesInducementGroup).items.first { it.referee == referee }
+        override fun getSettingsOrNull(rules: Rules): BiasedRefereeInducement? = (rules.inducements[type] as BiasedRefereesInducementGroup).items.firstOrNull { it.referee == referee }
     }
 
     @Serializable
     data class InfamousCoach(val coachType: InfamousCoachingStaffType) : InducementSelection<InfamousCoachingStaffInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.INFAMOUS_COACHING_STAFF
-        override fun getSettings(rules: Rules): InfamousCoachingStaffInducement = (rules.inducements[type] as InfamousCoachingStaffsInducementGroup).items.first { it.staff == coachType }
+        override fun getSettingsOrNull(rules: Rules): InfamousCoachingStaffInducement? = (rules.inducements[type] as InfamousCoachingStaffsInducementGroup).items.firstOrNull { it.staff == coachType }
 
     }
 
-
+    /**
+     * A single Star Player inducement (this can include multiple players).
+     * [positions] lists every player it hires, so for e.g., Grak & Crumbleberry,
+     * it holds both of them. The list must match [StarPlayerInducement.playerIds]
+     * exactly, which is how the inducement is looked up again.
+     */
     @Serializable
-    data class StarPlayer(val position: PositionId) : com.jervisffb.engine.actions.InducementSelection<StarPlayerInducement> {
+    data class StarPlayer(val positions: List<PositionId>) : InducementSelection<StarPlayerInducement> {
+        constructor(position: PositionId): this(listOf(position))
+
+        // A pair is a single purchase at a single combined price, and counts as a single
+        // Star Player choice even though it brings two players.
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.STAR_PLAYERS
-        override fun getSettings(rules: Rules): StarPlayerInducement = (rules.inducements[type] as StarPlayersInducementGroup).items.first { it.starPlayer.id == position }
-
+        override fun getSettingsOrNull(rules: Rules): StarPlayerInducement? =
+            (rules.inducements[type] as StarPlayersInducementGroup).items.firstOrNull { it.playerIds == positions }
     }
 
     @Serializable
@@ -59,7 +68,7 @@ object InducementSelectionCommon {
     ) : InducementSelection<MercenaryInducement> {
         override val count: Int = 1
         override val type: InducementType = InducementTypeCommon.STANDARD_MERCENARY_PLAYERS
-        override fun getSettings(rules: Rules): MercenaryInducement {
+        override fun getSettingsOrNull(rules: Rules): MercenaryInducement {
             val groupSettings = (rules.inducements[type] as StandardMercenaryInducement)
             return MercenaryInducement(
                 position,
