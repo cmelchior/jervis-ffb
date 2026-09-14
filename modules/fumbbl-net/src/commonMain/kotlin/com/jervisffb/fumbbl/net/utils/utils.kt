@@ -25,17 +25,35 @@ import com.jervisffb.resources.bb2020.LIZARDMEN_TEAM_BB2020
 import com.jervisffb.resources.bb2020.ORC_TEAM_BB2020
 import com.jervisffb.resources.bb2020.SKAVEN_TEAM_BB2020
 import com.jervisffb.resources.bb2025.AMAZON_TEAM_BB2025
+import com.jervisffb.resources.bb2025.BLACK_ORC_TEAM_BB2025
+import com.jervisffb.resources.bb2025.BRETONNIAN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.CHAOS_CHOSEN_TEAM_BB2025
 import com.jervisffb.resources.bb2025.CHAOS_DWARF_TEAM_BB2025
+import com.jervisffb.resources.bb2025.CHAOS_RENEGADE_TEAM_BB2025
+import com.jervisffb.resources.bb2025.DARK_ELF_TEAM_BB2025
 import com.jervisffb.resources.bb2025.DWARF_TEAM_BB2025
 import com.jervisffb.resources.bb2025.ELVEN_UNION_TEAM_BB2025
+import com.jervisffb.resources.bb2025.GNOME_TEAM_BB2025
+import com.jervisffb.resources.bb2025.GOBLIN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.HALFLING_TEAM_BB2025
 import com.jervisffb.resources.bb2025.HIGH_ELF_TEAM_BB2025
 import com.jervisffb.resources.bb2025.HUMAN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.IMPERIAL_NOBILITY_TEAM_BB2025
 import com.jervisffb.resources.bb2025.KHORNE_TEAM_BB2025
 import com.jervisffb.resources.bb2025.LIZARDMEN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.NECROMANTIC_HORROR_TEAM_BB2025
+import com.jervisffb.resources.bb2025.NORSE_TEAM_BB2025
 import com.jervisffb.resources.bb2025.NURGLE_TEAM_BB2025
+import com.jervisffb.resources.bb2025.OGRE_TEAM_BB2025
+import com.jervisffb.resources.bb2025.OLD_WORLD_ALLIANCE_TEAM_BB2025
 import com.jervisffb.resources.bb2025.ORC_TEAM_BB2025
+import com.jervisffb.resources.bb2025.SHAMBLING_UNDEAD_TEAM_BB2025
 import com.jervisffb.resources.bb2025.SKAVEN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.SNOTLING_TEAM_BB2025
 import com.jervisffb.resources.bb2025.TOMB_KINGS_TEAM_BB2025
+import com.jervisffb.resources.bb2025.UNDERWORLD_DENIZENS_TEAM_BB2025
+import com.jervisffb.resources.bb2025.VAMPIRE_TEAM_BB2025
+import com.jervisffb.resources.bb2025.WOOD_ELF_TEAM_BB2025
 
 typealias FumbblGame = com.jervisffb.fumbbl.net.model.Game
 typealias FumbblTeam = com.jervisffb.fumbbl.net.model.Team
@@ -134,17 +152,35 @@ private fun extractRoster(rules: Rules, roster: FumbblRoster): Roster {
     val bb2025 = rules.baseVersion == GameVersion.BB2025
     return when (roster.rosterName) {
         "Amazon" -> if (bb2025) AMAZON_TEAM_BB2025 else AMAZON_TEAM_BB2020
+        "Black Orc" -> if (bb2025) BLACK_ORC_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Bretonnian" -> if (bb2025) BRETONNIAN_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Chaos Chosen" -> if (bb2025) CHAOS_CHOSEN_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Chaos Dwarf" -> if (bb2025) CHAOS_DWARF_TEAM_BB2025 else CHAOS_DWARF_TEAM_BB2020
+        "Chaos Renegade" -> if (bb2025) CHAOS_RENEGADE_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Dark Elf" -> if (bb2025) DARK_ELF_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Dwarf" -> DWARF_TEAM_BB2025 // Dwarf is BB2025-only in Jervis
         "Elven Union" -> if (bb2025) ELVEN_UNION_TEAM_BB2025 else ELVEN_UNION_TEAM_BB2020
+        "Gnome" -> if (bb2025) GNOME_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Goblin" -> if (bb2025) GOBLIN_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Halfling" -> if (bb2025) HALFLING_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "High Elf" -> HIGH_ELF_TEAM_BB2025 // High Elf is BB2025-only in Jervis
         "Human" -> if (bb2025) HUMAN_TEAM_BB2025 else HUMAN_TEAM_BB2020
+        "Imperial Nobility" -> if (bb2025) IMPERIAL_NOBILITY_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Khorne" -> if (bb2025) KHORNE_TEAM_BB2025 else KHORNE_TEAM_BB2020
         "Lizardmen" -> if (bb2025) LIZARDMEN_TEAM_BB2025 else LIZARDMEN_TEAM_BB2020
+        "Necromantic Horror" -> if (bb2025) NECROMANTIC_HORROR_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Norse" -> if (bb2025) NORSE_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Nurgle" -> NURGLE_TEAM_BB2025 // Nurgle is BB2025-only in Jervis
+        "Ogre" -> if (bb2025) OGRE_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Old World Alliance" -> if (bb2025) OLD_WORLD_ALLIANCE_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Orc" -> if (bb2025) ORC_TEAM_BB2025 else ORC_TEAM_BB2020
+        "Shambling Undead" -> if (bb2025) SHAMBLING_UNDEAD_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Skaven" -> if (bb2025) SKAVEN_TEAM_BB2025 else SKAVEN_TEAM_BB2020
+        "Snotling" -> if (bb2025) SNOTLING_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         "Tomb Kings" -> TOMB_KINGS_TEAM_BB2025 // Tomb Kings is BB2025-only in Jervis
+        "Underworld Denizens" -> if (bb2025) UNDERWORLD_DENIZENS_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Vampire" -> if (bb2025) VAMPIRE_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
+        "Wood Elf" -> if (bb2025) WOOD_ELF_TEAM_BB2025 else TODO("Missing BB2020 team: ${roster.rosterName}")
         else -> TODO("Missing team: ${roster.rosterName}")
     }
 }
@@ -199,5 +235,4 @@ fun convertFumbblSkillToSkillId(rules: Rules, fumbblSkillName: String): SkillId?
     }
     return rules.skillSettings.getSkillIdFromNiceDescription(normalizedSkillName)
 }
-
 

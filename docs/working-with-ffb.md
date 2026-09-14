@@ -111,6 +111,18 @@ TODO:
 The current implementation of Standalone mode seems to be broken when it comes to
 the roster XML format. It looks like the definition of icons has changed.
 
+Some relevant URLs:
+```
+# BB2025 Ruleset
+https://fumbbl.com/api/ruleset/get/3906
+
+# All BB2025 Rosters
+https://fumbbl.com/api/roster/list/3906
+
+# Roster Information (id found in roster list)
+https://fumbbl.com/api/roster/get/8604
+```
+
 ## Development Environment
 
 - If launching from IntelliJ, set working directory for the server to `ffb-server`, 

@@ -1,6 +1,5 @@
 package com.jervisffb.fumbbl.web
 
-import com.jervisffb.engine.ext.dicePoolId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.ext.positionId
 import com.jervisffb.engine.model.PlayerId
