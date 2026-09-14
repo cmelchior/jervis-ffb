@@ -115,5 +115,8 @@ val ELVEN_UNION_TEAM_BB2025 = Roster(
         ELVEN_CATCHER,
         ELVEN_BLITZER
     ),
-    logo = RosterLogo.NONE
+    logo = RosterLogo(
+        large = SingleSprite.fumbbl("486271"),
+        small = SingleSprite.fumbbl("486271")
+    )
 )

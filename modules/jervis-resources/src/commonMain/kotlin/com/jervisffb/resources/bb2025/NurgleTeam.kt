@@ -154,5 +154,8 @@ val NURGLE_TEAM_BB2025 = Roster(
         TeamSpecialRule.FAVOURED_OF_NURGLE,
         TeamSpecialRule.BRAWLIN_BRUTES,
     ),
-    logo = RosterLogo.NONE
+    logo = RosterLogo(
+        large = SingleSprite.fumbbl("486325"),
+        small = SingleSprite.fumbbl("486325")
+    )
 )

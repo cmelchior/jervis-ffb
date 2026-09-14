@@ -185,5 +185,8 @@ val CHAOS_DWARF_TEAM_BB2025 = Roster(
     ),
     leagues = listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.CHAOS_CLASH),
     specialRules = listOf(TeamSpecialRule.FAVOURED_OF_HASHUT),
-    logo = RosterLogo.NONE
+    logo = RosterLogo(
+        large = SingleSprite.fumbbl("486253"),
+        small = SingleSprite.fumbbl("486253")
+    )
 )

@@ -119,5 +119,8 @@ val TOMB_KINGS_TEAM_BB2025 = Roster(
     ),
     leagues = listOf(RegionalSpecialRule.SYLVANIAN_SPOTLIGHT),
     specialRules = listOf(TeamSpecialRule.MASTERS_OF_UNDEATH),
-    logo = RosterLogo.NONE
+    logo = RosterLogo(
+        large = SingleSprite.fumbbl("486301"),
+        small = SingleSprite.fumbbl("486301")
+    )
 )

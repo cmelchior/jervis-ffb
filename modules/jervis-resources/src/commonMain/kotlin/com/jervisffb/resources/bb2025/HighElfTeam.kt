@@ -118,5 +118,8 @@ val HIGH_ELF_TEAM_BB2025 = Roster(
     ),
     leagues = listOf(RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE),
     specialRules = emptyList(),
-    logo = RosterLogo.NONE
+    logo = RosterLogo(
+        large = SingleSprite.fumbbl("486289"),
+        small = SingleSprite.fumbbl("486289")
+    )
 )
