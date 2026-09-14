@@ -111,7 +111,7 @@ class Mapper2025(icons: TourPlayIconMapping): JervisMapper(icons) {
             },
             roster = jervisRoster,
             rerolls = team.reRolls,
-            apothecaries = if (team.apothecary) 1 else 0,
+            apothecaries = if (team.apothecary == true) 1 else 0,
             cheerleaders = team.cheerLeaders,
             assistantCoaches = team.assistantCoaches,
             treasury = team.treasury,
