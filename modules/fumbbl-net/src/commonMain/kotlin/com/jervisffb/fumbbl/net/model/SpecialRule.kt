@@ -18,6 +18,7 @@ enum class SpecialRule(override val id: String) : FumbblEnum {
     LOW_COST_LINEMEN("Low Cost Linemen"),
     LUSTRIAN_SUPERLEAGUE("Lustrian Superleague"),
     MASTERS_OF_UNDEATH("Masters of Undeath"),
+    SWARMING("Swarming"),
     OLD_WORLD_CLASSIC("Old World Classic"),
     SYLVANIAN_SPOTLIGHT("Sylvanian Spotlight"),
     UNDERWORLD_CHALLENGE("Underworld Challenge"),

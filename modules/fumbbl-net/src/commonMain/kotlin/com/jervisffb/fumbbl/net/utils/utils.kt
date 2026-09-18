@@ -77,6 +77,32 @@ fun Game.Companion.fromFumbblState(rules: Rules, game: FumbblGame): Game {
 }
 
 /**
+ * Map a FUMBBL wire special rule to its Jervis equivalent. FUMBBL tracks a
+ * team's league selection as just another special rule; the split into
+ * league vs. team rules happens in [selectLeague].
+ */
+internal fun mapFumbblSpecialRule(rule: SpecialRule): SpecialRules = when (rule) {
+    SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
+    SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
+    SpecialRule.BRAWLIN_BRUTES -> TeamSpecialRule.BRAWLIN_BRUTES
+    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
+    SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
+    SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
+    SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRule.FAVOURED_OF_SLAANESH
+    SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRule.FAVOURED_OF_TZEENTCH
+    SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED
+    SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRule.HAFLING_THIMBLE_CUP
+    SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRule.LOW_COST_LINEMEN
+    SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
+    SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
+    SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
+    SpecialRule.SWARMING -> TeamSpecialRule.SWARMING
+    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
+    SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
+    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
+}
+
+/**
  * Split mapped special rules into the BB2025 league selection and the
  * remaining team rules.
  *
@@ -125,27 +151,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
         // Replays only carry it implicitly as one of the team's special rules,
         // so split it out here — leaving it inside `specialRules` produces
         // teams that fail to load (`league not supported: null`).
-        val (league, teamRules) = selectLeague(rules.baseVersion, roster, team.specialRules.map {
-            when (it) {
-                SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
-                SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
-                SpecialRule.BRAWLIN_BRUTES -> TeamSpecialRule.BRAWLIN_BRUTES
-                SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
-                SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
-                SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
-                SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRule.FAVOURED_OF_SLAANESH
-                SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRule.FAVOURED_OF_TZEENTCH
-                SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED
-                SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRule.HAFLING_THIMBLE_CUP
-                SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRule.LOW_COST_LINEMEN
-                SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
-                SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
-                SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
-                SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
-                SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
-                SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
-            }
-        })
+        val (league, teamRules) = selectLeague(rules.baseVersion, roster, team.specialRules.map { mapFumbblSpecialRule(it) })
         if (league != null) {
             this.league = league
         }
