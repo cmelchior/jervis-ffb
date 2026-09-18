@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
@@ -75,6 +76,62 @@ fun Game.Companion.fromFumbblState(rules: Rules, game: FumbblGame): Game {
     return Game(rules, homeTeam, awayTeam)
 }
 
+/**
+ * Map a FUMBBL wire special rule to its Jervis equivalent. FUMBBL tracks a
+ * team's league selection as just another special rule; the split into
+ * league vs. team rules happens in [selectLeague].
+ */
+internal fun mapFumbblSpecialRule(rule: SpecialRule): SpecialRules = when (rule) {
+    SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
+    SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
+    SpecialRule.BRAWLIN_BRUTES -> TeamSpecialRule.BRAWLIN_BRUTES
+    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
+    SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
+    SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
+    SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRule.FAVOURED_OF_SLAANESH
+    SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRule.FAVOURED_OF_TZEENTCH
+    SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED
+    SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRule.HAFLING_THIMBLE_CUP
+    SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRule.LOW_COST_LINEMEN
+    SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
+    SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
+    SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
+    SpecialRule.SWARMING -> TeamSpecialRule.SWARMING
+    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
+    SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
+    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
+}
+
+/**
+ * Split mapped special rules into the BB2025 league selection and the
+ * remaining team rules.
+ *
+ * FUMBBL does not track the league selection explicitly — it is just one of
+ * the team's special rules — so for BB2025 it is recovered from the mapped
+ * rules here. When the replay data carries no league, single-league rosters
+ * stay unambiguous (the team builder defaults to it) and only multi-league
+ * rosters are left without one, which then fails loudly on load instead of
+ * silently playing in the wrong league. BB2020 has no leagues, so every rule
+ * is kept in `specialRules`.
+ */
+internal fun selectLeague(
+    version: GameVersion,
+    roster: Roster,
+    mappedRules: List<SpecialRules>,
+): Pair<RegionalSpecialRule?, List<SpecialRules>> {
+    if (version != GameVersion.BB2025) {
+        return null to mappedRules
+    }
+    val teamRules = mappedRules.filterIsInstance<TeamSpecialRule>()
+    val regionalRules = mappedRules.filterIsInstance<RegionalSpecialRule>()
+    val league = when {
+        regionalRules.size == 1 -> regionalRules.single()
+        regionalRules.isEmpty() -> null
+        else -> error("Multiple leagues found in replay data: ${regionalRules.joinToString { it.description }} (roster: ${roster.name})")
+    }
+    return league to teamRules
+}
+
 private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
     val roster = extractRoster(rules, team.roster)
     return teamBuilder(rules, roster) {
@@ -90,29 +147,15 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
         this.fanFactor = team.fanFactor
         this.teamValue = team.teamValue
         this.dedicatedFans = team.dedicatedFans
-        team.specialRules.forEach {
-            val specialRule =
-                when (it) {
-                    SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
-                    SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
-                    SpecialRule.BRAWLIN_BRUTES -> TeamSpecialRule.BRAWLIN_BRUTES
-                    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE
-                    SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
-                    SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
-                    SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRule.FAVOURED_OF_SLAANESH
-                    SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRule.FAVOURED_OF_TZEENTCH
-                    SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED
-                    SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRule.HAFLING_THIMBLE_CUP
-                    SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRule.LOW_COST_LINEMEN
-                    SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
-                    SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
-                    SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
-                    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
-                    SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
-                    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
-                }
-            this.specialRules.add(specialRule)
+        // BB2025 teams select the league they play in from `Roster.leagues`.
+        // Replays only carry it implicitly as one of the team's special rules,
+        // so split it out here — leaving it inside `specialRules` produces
+        // teams that fail to load (`league not supported: null`).
+        val (league, teamRules) = selectLeague(rules.baseVersion, roster, team.specialRules.map { mapFumbblSpecialRule(it) })
+        if (league != null) {
+            this.league = league
         }
+        teamRules.forEach { this.specialRules.add(it) }
         team.players.forEach { fumbblPlayer: FumbblPlayer ->
             val fumbblPosition = team.roster.positions.firstOrNull { it.positionId == fumbblPlayer.positionId }
             if (fumbblPosition == null) {
@@ -120,6 +163,10 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
             }
             val position = roster.positions.firstOrNull { it.titleSingular == fumbblPosition.positionName }
                 ?: roster.positions.firstOrNull { it.titleSingular == mapFumbblPositionName(fumbblPosition.positionName) }
+                // Star Players are not part of the roster, so they are looked up among
+                // the Star Players the ruleset offers as inducements, mirroring the
+                // other loading paths (FumbblApi, SerializedTeam).
+                ?: rules.inducements.findStarPlayer(fumbblPosition.positionName)
             if (position == null) {
                 throw IllegalStateException(
                     "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",
