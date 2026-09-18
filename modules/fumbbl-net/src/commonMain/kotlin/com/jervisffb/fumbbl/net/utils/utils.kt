@@ -163,6 +163,10 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
             }
             val position = roster.positions.firstOrNull { it.titleSingular == fumbblPosition.positionName }
                 ?: roster.positions.firstOrNull { it.titleSingular == mapFumbblPositionName(fumbblPosition.positionName) }
+                // Star Players are not part of the roster, so they are looked up among
+                // the Star Players the ruleset offers as inducements, mirroring the
+                // other loading paths (FumbblApi, SerializedTeam).
+                ?: rules.inducements.findStarPlayer(fumbblPosition.positionName)
             if (position == null) {
                 throw IllegalStateException(
                     "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",
