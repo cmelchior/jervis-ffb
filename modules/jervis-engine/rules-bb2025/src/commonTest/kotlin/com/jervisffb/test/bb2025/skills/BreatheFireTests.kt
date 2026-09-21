@@ -160,6 +160,26 @@ class BreatheFireTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun naturalSixKnocksDownStrongTarget() {
+        val attacker = state.getPlayerById("A1".playerId)
+        attacker.addSkill(SkillType.BREATHE_FIRE)
+        val defender = state.getPlayerById("H1".playerId)
+        defender.apply {
+            baseStrength = 5
+            strength = 5
+        }
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerSpecialActionType.BREATHE_FIRE),
+            PlayerSelected(defender),
+            *breatheFireRoll(6.d6),
+            DiceRollResults(3.d6, 6.d6),
+            DiceRollResults(1.d6, 1.d6),
+        )
+        assertNull(state.activePlayer)
+        defender.assertStunned()
+    }
+
+    @Test
     fun breatheNoEffect() {
         val attacker = state.getPlayerById("A1".playerId)
         attacker.addSkill(SkillType.BREATHE_FIRE)
