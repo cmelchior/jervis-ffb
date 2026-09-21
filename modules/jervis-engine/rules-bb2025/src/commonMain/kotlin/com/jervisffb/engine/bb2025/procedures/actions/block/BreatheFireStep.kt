@@ -154,7 +154,7 @@ object BreatheFireStep: Procedure() {
             val modifier = if (defender.strength >= 5) -1 else 0
             val d6Result = diceRoll.value + modifier
             val breathFireResult = when {
-                d6Result == 6 -> BreatheFireResult.TARGET_KNOCKED_DOWN
+                diceRoll.value == 6 -> BreatheFireResult.TARGET_KNOCKED_DOWN
                 d6Result >= 4 -> BreatheFireResult.TARGET_PLACED_PRONE
                 d6Result in 2..3 -> BreatheFireResult.NO_EFFECT
                 d6Result <= 1 -> BreatheFireResult.ATTACKER_KNOCKED_DOWN
