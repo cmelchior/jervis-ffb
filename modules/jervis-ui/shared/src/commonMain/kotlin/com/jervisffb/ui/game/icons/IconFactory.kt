@@ -231,7 +231,11 @@ class IconFactory internal constructor(
         initializationMutex.withLock {
             if (initializedStaticResources != null) return@withLock
 
-            val scaleFactor = density.density.toInt()
+            // In the browser, density is represented using `window.devicePixelRatio`.
+            // When zooming out in the browser window, this value can go below 1,
+            // which would cause a crash. To prevent this, we set a hard lower limit
+            // of 1.
+            val scaleFactor = density.density.toInt().coerceAtLeast(1)
             val newCache = StaticResourcesCache(scaleFactor, httpClient)
             PitchDetails.entries.forEach { pitch ->
                 newCache.loadPitch(pitch)
