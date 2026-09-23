@@ -319,7 +319,7 @@ object DodgeRoll: D6WithPlayerRerollProcedure() {
             val dodgingPlayerHasDodge = context.player.isSkillAvailable(SkillType.DODGE)
             val playersWithTackle = context.startingSquare.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false).mapNotNull {
                 val player = state.pitch[it].player
-                if (player != null && player.isSkillAvailable(SkillType.TACKLE)) {
+                if (player != null && player.team != context.player.team && player.isSkillAvailable(SkillType.TACKLE)) {
                     player
                 } else {
                     null
