@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.bb2025.procedures.rerolls.StandardTeamReroll
 import com.jervisffb.engine.bb2025.skills.Dodge
@@ -31,7 +32,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-
 /**
  * Class testing usage of the [Tackle] skill.
  */
@@ -72,6 +72,29 @@ class TackleTests: JervisGameBB2025Test() {
         )
         // Dodge reroll is not available
         assertFalse(controller.getAvailableActions().get<SelectRerollOption>().options.any { it.getRerollSource(state) is Dodge })
+        controller.rollForward(
+            TeamRerollSelected<StandardTeamReroll>(),
+            6.d6,
+            EndAction,
+        )
+        awayTeam["A1".playerId].assertStanding()
+    }
+
+    @Test
+    fun doNotOfferTackleFromATeamMate() {
+        // A2 is adjacent to A1's starting square but is on the SAME team. It is
+        // never a legal Tackle target, so the node must not offer it at all.
+        awayTeam["A2".playerId].addSkill(SkillType.TACKLE)
+        awayTeam["A1".playerId].addSkill(SkillType.DODGE)
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.MOVE),
+            *moveTo(14, 5),
+            1.d6, // Fail Dodge
+        )
+        val actions = controller.getAvailableActions()
+        assertFalse(actions.contains<SelectPlayer>())
+        // No Tackle was applied, so the Dodge re-roll stays available.
+        assertTrue(actions.get<SelectRerollOption>().options.any { it.getRerollSource(state) is Dodge })
         controller.rollForward(
             TeamRerollSelected<StandardTeamReroll>(),
             6.d6,
