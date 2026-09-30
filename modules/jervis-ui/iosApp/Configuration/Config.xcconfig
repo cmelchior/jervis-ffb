@@ -1,3 +1,12 @@
 TEAM_ID=
 BUNDLE_ID=com.jervisffb
 APP_NAME=Jervis Fantasy Football
+
+// Authentication defaults. Put real local values in the ignored
+// Auth.xcconfig file; the optional include lets unconfigured builds succeed.
+JERVIS_SUPABASE_URL=
+JERVIS_SUPABASE_PUBLISHABLE_KEY=
+JERVIS_GOOGLE_WEB_CLIENT_ID=
+JERVIS_GOOGLE_IOS_CLIENT_ID=
+JERVIS_GOOGLE_IOS_REVERSED_CLIENT_ID=
+#include? "Auth.xcconfig"

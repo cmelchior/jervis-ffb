@@ -29,6 +29,8 @@ import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
+import com.jervisffb.ui.auth.JervisAuthService
+import com.jervisffb.ui.auth.JervisAuthentication
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -131,7 +133,9 @@ data class ReportIssueDialogData(
  * View Model controlling the full Jervis Menu System. This probably has too much responsibility right now,
  * but we do need something that cuts across a lot of concerns since the menu can impact all parts of the UI.
  */
-class MenuViewModel {
+class MenuViewModel(
+    val authService: JervisAuthService = JervisAuthentication.service,
+) {
     companion object {
         val LOG = jervisLogger()
     }
@@ -154,6 +158,9 @@ class MenuViewModel {
     val p2pHostAvaiable: Boolean = canBeHost()
 
     val isSettingsDialogVisible: StateFlow<Boolean>
+        field = MutableStateFlow(false)
+
+    val isAuthenticationDialogVisible: StateFlow<Boolean>
         field = MutableStateFlow(false)
 
     val isAboutDialogVisible: StateFlow<Boolean>
@@ -179,6 +186,7 @@ class MenuViewModel {
     var enableAutomatedActions by mutableStateOf(true)
 
     init {
+        authService.initialize()
         try {
             if (SETTINGS_MANAGER.hasKey(PROP_UNCAUGHT_ERROR_TITLE)) {
                 val dialogData = ReportIssueDialogData(
@@ -260,6 +268,10 @@ class MenuViewModel {
 
     fun openSettings(bool: Boolean = true) {
         isSettingsDialogVisible.value = bool
+    }
+
+    fun openAuthentication(bool: Boolean = true) {
+        isAuthenticationDialogVisible.value = bool
     }
 
     fun openNotImplementedYet(title: String, visible: Boolean = true) {

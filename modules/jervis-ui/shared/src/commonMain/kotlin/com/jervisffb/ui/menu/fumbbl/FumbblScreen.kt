@@ -43,6 +43,8 @@ import com.jervisffb.ui.menu.p2p.host.BoxHeader
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.utils.openUrlInBrowser
 
+private const val SHOW_FUMBBL_AUTHENTICATION_IN_TOP_BAR = false
+
 class FumbblScreen(private val menuViewModel: MenuViewModel, private val viewModel: FumbblScreenModel) : Screen {
     @Composable
     override fun Content() {
@@ -62,12 +64,14 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
 
         },
         topMenuRightContent = {
-            val isLoggedIn: Boolean by viewModel.isLoggedIn.collectAsState()
-            val label = when (isLoggedIn) {
-                true -> viewModel.coachName.value
-                false -> "Login".uppercase()
+            if (SHOW_FUMBBL_AUTHENTICATION_IN_TOP_BAR) {
+                val isLoggedIn: Boolean by viewModel.isLoggedIn.collectAsState()
+                val label = when (isLoggedIn) {
+                    true -> viewModel.coachName.value
+                    false -> "Login".uppercase()
+                }
+                TopbarButton(label, onClick = { viewModel.authMenubarActionInitiated() })
             }
-            TopbarButton(label, onClick = { viewModel.authMenubarActionInitiated() })
         },
         sidebarContent = {
             Column(

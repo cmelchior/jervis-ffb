@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -47,6 +48,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -66,6 +68,7 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisTooltipArea
 import com.jervisffb.ui.menu.components.JervisTooltipPlacement
+import com.jervisffb.ui.menu.components.auth.AuthTopbarButton
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.applyIf
@@ -122,6 +125,7 @@ fun MenuScreenWithSidebarAndTitle(
                     topMenuRightContent?.let {
                         it(this)
                     }
+                    AuthTopbarButton(menuViewModel)
                     TopbarButton(
                         Res.drawable.jervis_icon_menu_settings,
                         "Settings",
@@ -226,12 +230,17 @@ fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: ()
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TopbarButton(title: String, onClick: () -> Unit) {
+fun TopbarButton(
+    title: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
     var isHovered by remember { mutableStateOf(false) }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(shape = RoundedCornerShape(4.dp))
             .height(48.dp)
+            .widthIn(max = 220.dp)
             .alpha(if (isHovered) 1f else 0.8f)
             .clickable { onClick() }
             .onPointerEvent(PointerEventType.Enter) { isHovered = true }
@@ -243,6 +252,8 @@ fun TopbarButton(title: String, onClick: () -> Unit) {
         Text(
             lineHeight = 1.0.em,
             text = title.uppercase(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Medium,
             color = JervisTheme.white
         )

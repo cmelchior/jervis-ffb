@@ -65,6 +65,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreen
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.menu.components.auth.AuthTopbarButton
 import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
@@ -175,6 +176,7 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
                         TopbarButton(
                             "Dev Options",
                             onClick = { viewModel.gotoDevModeScreen(navigator) })
+                        AuthTopbarButton(menuViewModel)
                         TopbarButton(
                             Res.drawable.jervis_icon_menu_settings,
                             "Settings",

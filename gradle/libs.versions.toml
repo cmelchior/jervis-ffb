@@ -15,6 +15,7 @@ jgit = "7.2.0.202503040940-r" # https://github.com/eclipse-jgit/jgit
 kermit = "2.1.0" # https://github.com/touchlab/Kermit
 kotlin = "2.4.20" # https://github.com/JetBrains/kotlin
 ktor = "3.5.2" # https://github.com/ktorio/ktor
+kmpauth = "3.0.6" # https://github.com/mirzemehdi/KMPAuth
 ktlint = "12.2.0" # https://plugins.gradle.org/plugin/org.jlleitschuh.gradle.ktlint
 material3 = "1.9.0" # https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3
 minimalJson = "0.9.5" # https://github.com/ralfstx/minimal-json
@@ -24,6 +25,7 @@ okio = "3.17.0" # https://github.com/square/okio
 reflections = "0.10.2" # https://github.com/ronmamo/reflections
 serialization = "1.11.0" # https://github.com/Kotlin/kotlinx.serialization
 settings = "1.3.0" # https://github.com/russhwolf/multiplatform-settings
+supabase = "3.8.0" # https://github.com/supabase-community/supabase-kt
 voyager = "1.1.0-beta03" # https://github.com/adrielcafe/voyager
 
 [libraries]
@@ -46,9 +48,13 @@ kotlinx-browser = { group = "org.jetbrains.kotlinx", name = "kotlinx-browser", v
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "immutableCollections" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+kmpauth-google = { group = "io.github.mirzemehdi", name = "kmpauth-google", version.ref = "kmpauth" }
+kmpauth-supabase = { group = "io.github.mirzemehdi", name = "kmpauth-supabase", version.ref = "kmpauth" }
+kmpauth-uihelper = { group = "io.github.mirzemehdi", name = "kmpauth-uihelper", version.ref = "kmpauth" }
 ktor-client-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
+ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
@@ -68,6 +74,7 @@ settings = { group = "com.russhwolf", name = "multiplatform-settings", version.r
 settings-coroutines = { group = "com.russhwolf", name = "multiplatform-settings-coroutines", version.ref = "settings" }
 settings-noarg = { group = "com.russhwolf", name = "multiplatform-settings-no-arg", version.ref = "settings" }
 settings-observable = { group = "com.russhwolf", name = "multiplatform-settings-make-observable", version.ref = "settings" }
+supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt", version.ref = "supabase" }
 voyager-bottom-sheet-navigator = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
 voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }

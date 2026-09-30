@@ -29,6 +29,7 @@ import com.jervisffb.shared.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.components.auth.AuthTopbarButton
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.containsBelowBaselineChars
@@ -65,6 +66,7 @@ fun MenuScreenWithTitle(
                 ) {
                     TopbarButton(Res.drawable.jervis_icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
                     Spacer(modifier = Modifier.weight(1f))
+                    AuthTopbarButton(menuViewModel)
                     TopbarButton(Res.drawable.jervis_icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
                 }
             }

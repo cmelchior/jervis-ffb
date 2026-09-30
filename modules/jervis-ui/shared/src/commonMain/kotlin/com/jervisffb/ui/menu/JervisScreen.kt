@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.NotImplementedYetDialogComponent
 import com.jervisffb.ui.menu.components.about.AboutDialogComponent
+import com.jervisffb.ui.menu.components.auth.AuthenticationDialogComponent
 import com.jervisffb.ui.menu.components.error.ErrorDialogComponent
 import com.jervisffb.ui.menu.components.issues.CreateIssueDialogComponent
 import com.jervisffb.ui.menu.components.settings.SettingsDialogComponent
@@ -19,6 +20,7 @@ fun JervisScreen(menuViewModel: MenuViewModel, content: @Composable () -> Unit) 
         content()
         AboutDialogComponent(menuViewModel)
         SettingsDialogComponent(menuViewModel)
+        AuthenticationDialogComponent(menuViewModel)
         ErrorDialogComponent(menuViewModel)
         CreateIssueDialogComponent(menuViewModel)
         NotImplementedYetDialogComponent(menuViewModel)

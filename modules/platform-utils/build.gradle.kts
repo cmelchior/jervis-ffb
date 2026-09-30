@@ -11,6 +11,12 @@ group = "com.jervisffb"
 @Suppress("UNCHECKED_CAST")
 version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
+fun authConfigValue(propertyName: String, environmentName: String): String =
+    providers.gradleProperty(propertyName)
+        .orElse(providers.environmentVariable(environmentName))
+        .orElse("")
+        .get()
+
 @Suppress("UNCHECKED_CAST")
 buildConfig {
     packageName("com.jervisffb")
@@ -18,6 +24,13 @@ buildConfig {
     buildConfigField("gitHash", (rootProject.ext["gitHash"] as Provider<String>).get())
     buildConfigField("gitHashLong", (rootProject.ext["gitHashLong"] as Provider<String>).get())
     buildConfigField("gitHistory", (rootProject.ext["gitHistory"] as Provider<String>).get())
+    buildConfigField("supabaseUrl", authConfigValue("jervis.supabase.url", "JERVIS_SUPABASE_URL"))
+    buildConfigField(
+        "supabasePublishableKey",
+        authConfigValue("jervis.supabase.publishableKey", "JERVIS_SUPABASE_PUBLISHABLE_KEY"),
+    )
+    buildConfigField("googleWebClientId", authConfigValue("jervis.google.webClientId", "JERVIS_GOOGLE_WEB_CLIENT_ID"))
+    buildConfigField("googleIosClientId", authConfigValue("jervis.google.iosClientId", "JERVIS_GOOGLE_IOS_CLIENT_ID"))
     useKotlinOutput { internalVisibility = false }
 }
 

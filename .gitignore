@@ -7,6 +7,15 @@
 .kotlin/
 build/
 
+# Keep SwiftPM resolution locks, but ignore generated manifests and checkouts.
+/.swiftpm-locks/**
+!/.swiftpm-locks/*/
+!/.swiftpm-locks/*/swiftImport/
+!/.swiftpm-locks/*/swiftImport/Package.resolved
+
+# Local Supabase and Google OAuth values used by the iOS app
+/modules/jervis-ui/iosApp/Configuration/Auth.xcconfig
+
 # AI folders
 # Eventually we might want to keep some of these, but
 # for now do not persist them.
@@ -14,6 +23,15 @@ build/
 .mcp/
 .agents/skills/
 skills-lock.json
+
+# Supabase
+.branches
+.temp
+.env.keys
+.env.local
+.env.*.local
+# Secrets for config.toml's env() references. `.env.example` stays committed.
+/serverTools/supabase/.env
 
 # The tools folder should be built for each platform, so do not commit build artifacts
 tools/fumbblcli.jar

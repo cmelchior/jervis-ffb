@@ -11,7 +11,7 @@ under [`docs/`](docs/).
 Development requirements are:
 - Java 21
 - Git on the commandline
-- Xcode 16.2 (if building for iPad)
+- Xcode 16.4 (if building for iPad)
 - The project has been developed in IntelliJ IDEA, while optional, it will
   provide a better experience.
 
@@ -46,6 +46,52 @@ If this run configuration is not available, the iPad version can also be built
 and installed using Xcode. Use the project file found here
 [`modules/jervis-ui/iosApp/iosApp.xcodeproj`](modules/jervis-ui/iosApp/iosApp.xcodeproj).
 You might need to supply your own signature under "Signing & Capabilities".
+
+### Authentication configuration
+
+Google Cloud: APIs & Services > OAuth consent screen > Clients
+
+Jervis authentication uses Supabase Auth through `supabase-kt` and KMPAuth.
+Unconfigured builds remain usable, but the Login dialog reports that
+authentication is unavailable. Configure builds with Gradle properties or the
+equivalent environment variables:
+
+| Gradle property | Environment variable |
+| --- | --- |
+| `jervis.supabase.url` | `JERVIS_SUPABASE_URL` |
+| `jervis.supabase.publishableKey` | `JERVIS_SUPABASE_PUBLISHABLE_KEY` |
+| `jervis.google.webClientId` | `JERVIS_GOOGLE_WEB_CLIENT_ID` |
+| `jervis.google.iosClientId` | `JERVIS_GOOGLE_IOS_CLIENT_ID` |
+
+Use only the Supabase publishable/anon key in client builds, never a
+service-role key. In the Supabase dashboard, enable Email/Password with email
+confirmation and enable Google using the same Google web OAuth client. Set the
+project Site URL to the page that should receive confirmation and password
+recovery links. Jervis currently requests recovery emails but does not complete
+recovery links inside the app.
+
+The server side of this, including how auth emails are sent, is configured in
+[`serverTools/supabase/config.toml`](serverTools/supabase/config.toml) and
+described in [docs/working-with-supabase.md](docs/working-with-supabase.md).
+
+In Google Cloud, create a web OAuth client and add
+`http://localhost:8765/callback` as an authorized redirect URI for Desktop.
+Add each web deployment origin as an authorized JavaScript origin. For iOS,
+also create an OAuth client for the Jervis bundle identifier.
+
+For local iOS builds, create the ignored file
+`modules/jervis-ui/iosApp/Configuration/Auth.xcconfig`:
+
+```text
+JERVIS_SUPABASE_URL = https:/$()/your-project.supabase.co
+JERVIS_SUPABASE_PUBLISHABLE_KEY = your-publishable-key
+JERVIS_GOOGLE_WEB_CLIENT_ID = your-web-client-id.apps.googleusercontent.com
+JERVIS_GOOGLE_IOS_CLIENT_ID = your-ios-client-id.apps.googleusercontent.com
+JERVIS_GOOGLE_IOS_REVERSED_CLIENT_ID = com.googleusercontent.apps.your-ios-client-id
+```
+
+The unusual Supabase URL spelling prevents `//` from being parsed as an
+xcconfig comment; Xcode expands `$()` to produce the normal `https://` URL.
 
 ### Building Documentation Website
 

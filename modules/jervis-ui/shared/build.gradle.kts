@@ -81,6 +81,10 @@ kotlin {
                 api(libs.bundles.voyager)
                 api(libs.kotlinx.collections.immutable)
                 api(libs.jsonserialization)
+                implementation(libs.kmpauth.google)
+                implementation(libs.kmpauth.supabase)
+                implementation(libs.kmpauth.uihelper)
+                implementation(libs.supabase.auth)
                 val composeVersion = libs.versions.compose.get()
                 val material3Version = libs.versions.material3.get()
                 api("org.jetbrains.compose.components:components-resources:$composeVersion")
@@ -99,6 +103,7 @@ kotlin {
                 implementation("javazoom.vorbisspi:vorbisspi:1.0.3")
                 implementation("com.jcraft:jorbis:0.0.17")
                 implementation("org.tritonus:tritonus_share:0.0.1")
+                implementation(libs.ktor.client.okhttp)
             }
         }
         val jvmTest = getByName("jvmTest") {
@@ -110,7 +115,11 @@ kotlin {
                 runtimeOnly(compose.desktop.currentOs)
             }
         }
-        val wasmJsMain = getByName("wasmJsMain")
+        val wasmJsMain = getByName("wasmJsMain") {
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
+        }
         val iosArm64Main = getByName("iosArm64Main")
         val iosSimulatorArm64Main = getByName("iosSimulatorArm64Main")
         val iosMain = create("iosMain") {
@@ -118,6 +127,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
+                implementation(libs.ktor.client.darwin)
             }
         }
     }

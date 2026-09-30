@@ -43,7 +43,7 @@ compose.desktop {
 
             // androidx.datastore requires sun.misc.Unsafe
             // See https://github.com/JetBrains/compose-multiplatform/issues/2686#issuecomment-1413429842
-            modules("jdk.unsupported")
+            modules("jdk.unsupported", "jdk.httpserver")
             macOS {
                 bundleID = "com.jervisffb"
                 iconFile.set(rootProject.file("logo/logo.icns"))
