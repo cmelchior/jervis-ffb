@@ -23,7 +23,11 @@ import kotlinx.coroutines.channels.Channel
 // If the id doesn't match the current action, it is ignored.
 data class AsyncGameAction(
     val id: GameActionId, // The index that the GameEngineController expects next
-    val action: GameAction
+    // Next game action being sent to the game engine.
+    val action: GameAction,
+    // If `action` is part of a list of events, the remaining actions are described
+    // by the QueuedActionsResult and can be removed as one.
+    val remainingActions: QueuedActionsResult? = null,
 )
 
 typealias QueuedActionsGenerator = (GameEngineController) -> QueuedActionsResult?
@@ -119,18 +123,20 @@ abstract class UiActionProvider {
 
     // Helper that unifies waiting for the correct game action and handle it when it doesn't happen.
     suspend fun waitForNextAction(id: GameActionId): GameAction {
-        var action: GameAction? = null
-        while (action == null) {
+        return waitForNextActionSelection(id).action
+    }
+
+    protected suspend fun waitForNextActionSelection(id: GameActionId): AsyncGameAction {
+        while (true) {
             val generatedAction = actionSelectedChannel.receive()
             when {
-                generatedAction.id == id -> action = generatedAction.action
+                generatedAction.id == id -> return generatedAction
                 generatedAction.id > id -> error("Future action id received: ${generatedAction.id} > $id")
                 generatedAction.id < id -> {
                     LOG.w { "Outdated action received: ${generatedAction.id} < $id: ${generatedAction.action}" }
                 }
             }
         }
-        return action
     }
 
     companion object {

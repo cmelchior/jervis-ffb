@@ -33,7 +33,6 @@ import com.jervisffb.ui.menu.LocalPitchDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -204,27 +203,36 @@ open class ManualActionProvider(
             action
         } ?: run {
             lastActionWasAutomaticallySelected = false
-            waitForNextAction(id)
+            val selection = waitForNextActionSelection(id)
+            selection.remainingActions?.let { remaining ->
+                delayBetweenActions = remaining.delayBetweenActions
+                queuedActions.addAll(remaining.actions.mapIndexed { index, action ->
+                    AsyncGameAction(id + index + 1, action)
+                })
+            }
+            selection.action
         }
     }
 
     override fun userActionSelected(id: GameActionId, action: GameAction) {
-        if (actionSelectedChannel.trySend(AsyncGameAction(id, action)).isFailure) {
+        sendActionSelection(AsyncGameAction(id, action))
+    }
+
+    private fun sendActionSelection(selection: AsyncGameAction) {
+        if (actionSelectedChannel.trySend(selection).isFailure) {
             error("Unable to send action to channel. Is the channel closed?")
         }
     }
 
     override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         if (actions.isEmpty()) throw IllegalArgumentException("Action list must contain at least one action")
-        // Store all events to be sent and sent the first one to be processed
-        queuedActions.addAll(actions.mapIndexed { index, action ->
-            AsyncGameAction(startingId + index, action)
-        })
-        delayBetweenActions = delayEvent
-        actionScope.launch {
-            val action = queuedActions.removeFirst()
-            actionSelectedChannel.send(action)
-        }
+        // Only getAction() may add the remaining actions to the queue, after validating
+        // the first action's id. Duplicate or stale UI callbacks must discard the whole sequence.
+        sendActionSelection(AsyncGameAction(
+            startingId,
+            actions.first(),
+            QueuedActionsResult(actions.drop(1), delayEvent),
+        ))
     }
 
     private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): PitchActionDecorator<GameActionDescriptor>? {
