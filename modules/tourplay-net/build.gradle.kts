@@ -48,7 +48,11 @@ kotlin {
             }
         }
         val jvmMain = getByName("jvmMain")
-        val jvmTest = getByName("jvmTest")
+        val jvmTest = getByName("jvmTest") {
+            dependencies {
+                implementation(libs.ktor.client.mock)
+            }
+        }
         val wasmJsMain = getByName("wasmJsMain")
         val iosArm64Main = getByName("iosArm64Main")
         val iosSimulatorArm64Main = getByName("iosSimulatorArm64Main")

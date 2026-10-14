@@ -8,13 +8,8 @@ import com.jervisffb.fumbbl.net.model.FieldModel
 import com.jervisffb.fumbbl.net.model.GameOptions
 import com.jervisffb.fumbbl.net.model.GameResult
 import com.jervisffb.fumbbl.net.model.InducementSet
-import com.jervisffb.fumbbl.net.model.Player as FumbblPlayer
-import com.jervisffb.fumbbl.net.model.Game as FumbblGame
-import com.jervisffb.fumbbl.net.model.PlayerType as FumbblPlayerType
-import com.jervisffb.fumbbl.net.model.Roster as FumbblRoster
 import com.jervisffb.fumbbl.net.model.RosterPlayer
 import com.jervisffb.fumbbl.net.model.SpecialRule
-import com.jervisffb.fumbbl.net.model.Team as FumbblTeam
 import com.jervisffb.fumbbl.net.model.TeamResult
 import com.jervisffb.fumbbl.net.model.TurnData
 import com.jervisffb.fumbbl.net.model.TurnMode
@@ -23,6 +18,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import com.jervisffb.fumbbl.net.model.Game as FumbblGame
+import com.jervisffb.fumbbl.net.model.Player as FumbblPlayer
+import com.jervisffb.fumbbl.net.model.PlayerType as FumbblPlayerType
+import com.jervisffb.fumbbl.net.model.Roster as FumbblRoster
+import com.jervisffb.fumbbl.net.model.Team as FumbblTeam
 
 /**
  * Star Players hired into a replay team are not part of the team roster, so
