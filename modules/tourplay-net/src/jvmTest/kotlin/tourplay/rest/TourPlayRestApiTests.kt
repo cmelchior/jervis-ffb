@@ -13,6 +13,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
@@ -22,6 +23,7 @@ import java.io.File
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -35,40 +37,40 @@ class TourPlayRestApiTests {
     }
 
     @Test
-    fun teamLoader() = runBlocking {
+    fun loadsBB2020Roster() = runBlocking {
         val rules = FumbblBB2020Rules()
-        val file = api.loadRoster(44442, rules)
+        val file = api.loadRoster("86aa5433e61a461f866d2c8203090aca", rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals(team.name, "Lustrian Hurricanes")
+        assertEquals("Sub Saurios", team.name)
     }
 
     @Test
-    fun teamLoader2() = runBlocking {
+    fun loadsBB2020VampireRoster() = runBlocking {
         val rules = FumbblBB2020Rules()
-        val file = api.loadRoster(131784, rules)
+        val file = api.loadRoster("14e5ed87c5574692a488e6f9cd0310ab", rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals(team.name, "Gramps' Vamps")
+        assertEquals("Sin Reflejos", team.name)
     }
 
-    // Test for https://github.com/cmelchior/jervis-ffb/issues/61
     @Test
-    fun load214739() = runBlocking {
+    fun loadsBB2025Roster() = runBlocking {
         val rules = StandardBB2025Rules()
-        val file = api.loadRoster(214739, rules)
+        val file = api.loadRoster(ROSTER_ID, rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals("Hafenland Capers", team.name)
+        assertEquals("Saphery Spelldrivers", team.name)
+        assertEquals(ROSTER_UUID, team.id.value)
     }
 
     // Test for https://github.com/cmelchior/jervis-ffb/issues/62
     @Test
     fun teamLoaderUsesFumbblIcons() = runBlocking {
-        // Old World Alliance and Chaos Chosen between them cover roster-qualified entries,
-        // bare entries and positions renamed between BB2020 and BB2025.
+        // Cover roster-qualified entries, bare entries and positions renamed between
+        // BB2020 and BB2025.
         listOf(
-            214739L to "Old World Alliance",
-            176917L to "Chaos Chosen"
-        ).forEach { (id, roster) ->
-            val rules = StandardBB2025Rules()
+            Triple("2d1966f888eb4003b7a32a28eb38039a", "Old World Alliance", FumbblBB2020Rules()),
+            Triple(ROSTER_ID, "High Elf", StandardBB2025Rules()),
+            Triple("0698842076fc4b94b886408a5ac02774", "Nurgle", StandardBB2025Rules())
+        ).forEach { (id, roster, rules) ->
             val file = api.loadRoster(id, rules)
             val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
             assertEquals(roster, team.roster.name)
@@ -80,21 +82,12 @@ class TourPlayRestApiTests {
         }
     }
 
-    // Test for https://github.com/cmelchior/jervis-ffb/issues/80 (BB7 Team)
     @Test
-    fun load227396() = runBlocking {
+    fun loadsBB7Roster() = runBlocking {
         val rules = BB7Rules2025()
-        val file = api.loadRoster(227396, rules)
+        val file = api.loadRoster("10813ca2c16e49a7a0a0b5222ffe7adf", rules)
         val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals("Bretonnridge Brawlers", team.name)
-    }
-
-    @Test
-    fun load176917() = runBlocking {
-        val rules = StandardBB2025Rules()
-        val file = api.loadRoster(176917, rules)
-        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals("Khazra’s Den 26", team.name)
+        assertEquals("Vestsylvansk Gymnastikforening", team.name)
     }
 
     @Test
@@ -104,8 +97,8 @@ class TourPlayRestApiTests {
         // the team's own choice is what makes rosters playing in several, e.g. Chaos
         // Dwarf, import correctly.
         listOf(
-            176917L to RegionalSpecialRule.CHAOS_CLASH,
-            170509L to RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE,
+            "0698842076fc4b94b886408a5ac02774" to RegionalSpecialRule.CHAOS_CLASH,
+            ROSTER_ID to RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE,
         ).forEach { (id, league) ->
             val rules = StandardBB2025Rules()
             val file = api.loadRoster(id, rules)
@@ -113,14 +106,6 @@ class TourPlayRestApiTests {
             assertEquals(league, team.league, team.name)
             assertTrue(league in team.allSpecialRules, team.name)
         }
-    }
-
-    @Test
-    fun load170509() = runBlocking {
-        val rules = StandardBB2025Rules()
-        val file = api.loadRoster(170509, rules)
-        val team = SerializedTeam.deserialize(rules, file.getOrThrow().team, Coach.UNKNOWN)
-        assertEquals("ScrewCrew", team.name)
     }
 
     @Test
@@ -137,8 +122,8 @@ class TourPlayRestApiTests {
             }
         }) { api ->
             val rules = StandardBB2025Rules()
-            api.loadRoster(1, rules).getOrThrow()
-            api.loadRoster(2, rules).getOrThrow()
+            api.loadRoster(ROSTER_ID, rules).getOrThrow()
+            api.loadRoster(ANOTHER_ROSTER_ID, rules).getOrThrow()
             assertEquals(3, requests)
         }
     }
@@ -162,8 +147,8 @@ class TourPlayRestApiTests {
             }
         }) { api ->
             val rules = StandardBB2025Rules()
-            api.loadRoster(1, rules).getOrThrow()
-            api.loadRoster(2, rules).getOrThrow()
+            api.loadRoster(ROSTER_ID, rules).getOrThrow()
+            api.loadRoster(ANOTHER_ROSTER_ID, rules).getOrThrow()
             assertEquals(4, requests)
         }
     }
@@ -185,7 +170,7 @@ class TourPlayRestApiTests {
                 }
             }
         }) { api ->
-            api.loadRoster(1, StandardBB2025Rules()).getOrThrow()
+            api.loadRoster(ROSTER_ID, StandardBB2025Rules()).getOrThrow()
             assertEquals(3, requests)
         }
     }
@@ -197,9 +182,9 @@ class TourPlayRestApiTests {
             requests++
             respond("Access denied.", HttpStatusCode.Forbidden, headersOf("X-TP-PoW-Challenge", OBFUSCATED_CHALLENGE))
         }) { api ->
-            val result = api.loadRoster(1, StandardBB2025Rules())
+            val result = api.loadRoster(ROSTER_ID, StandardBB2025Rules())
             assertTrue(result.isFailure)
-            assertEquals("Loading roster: 1 failed with status: 403 Forbidden", result.exceptionOrNull()?.message)
+            assertEquals("Loading roster: $ROSTER_ID failed with status: 403 Forbidden", result.exceptionOrNull()?.message)
             assertEquals(3, requests)
         }
     }
@@ -212,7 +197,7 @@ class TourPlayRestApiTests {
                 requests++
                 respond("Access denied.", status)
             }) { api ->
-                assertTrue(api.loadRoster(1, StandardBB2025Rules()).isFailure)
+                assertTrue(api.loadRoster(ROSTER_ID, StandardBB2025Rules()).isFailure)
                 assertEquals(1, requests)
             }
         }
@@ -233,9 +218,37 @@ class TourPlayRestApiTests {
                 requests++
                 respond("Access denied.", HttpStatusCode.Forbidden, headersOf("X-TP-PoW-Challenge", challenge))
             }) { api ->
-                assertTrue(api.loadRoster(1, StandardBB2025Rules()).isFailure)
+                assertTrue(api.loadRoster(ROSTER_ID, StandardBB2025Rules()).isFailure)
                 assertEquals(1, requests, challenge)
             }
+        }
+    }
+
+    @Test
+    fun acceptsUuidRosterIds() = runBlocking {
+        listOf(ROSTER_ID).forEach { rosterId ->
+            withApi({ request ->
+                assertEquals("https://tourplay.net/api/rosters/$ROSTER_ID", request.url.toString())
+                assertEquals("https://tourplay.net/en/blood-bowl/roster/$ROSTER_ID", request.headers[HttpHeaders.Referrer])
+                respond(ROSTER_JSON)
+            }) { api ->
+                val team = api.loadRoster(rosterId, StandardBB2025Rules()).getOrThrow().team
+                assertEquals(ROSTER_ID, team.id.value.replace("-", "").lowercase())
+            }
+        }
+    }
+
+    @Test
+    fun reportsUnexpectedHtmlResponse() = runBlocking {
+        var requests = 0
+        withApi({
+            requests++
+            respond("<!doctype html><html></html>", headers = headersOf(HttpHeaders.ContentType, ContentType.Text.Html.toString()))
+        }) { api ->
+            val result = api.loadRoster(ROSTER_ID, StandardBB2025Rules())
+            val error = assertIs<IllegalStateException>(result.exceptionOrNull())
+            assertTrue(error.message!!.contains("TourPlay returned HTML instead of roster JSON"))
+            assertEquals(1, requests)
         }
     }
 
@@ -251,6 +264,9 @@ class TourPlayRestApiTests {
     }
 
     companion object {
+        private const val ROSTER_ID = "b1f1dbdc77b746948d273ce3977ddff6"
+        private const val ROSTER_UUID = "b1f1dbdc-77b7-4694-8d27-3ce3977ddff6"
+        private const val ANOTHER_ROSTER_ID = "23ae793222f6429d9f7054fdfac1c70f"
         private const val OBFUSCATED_CHALLENGE = "=FZPzvpQxzj6kyNW4vM2T0aTWsIVVQ3XHWJ6hc+eIvvkKdxq3Lf8+eiu6Fhw"
         private const val LEGACY_CHALLENGE = "dGVzdC1ub25jZS4yMDAwMDAwMDAwLjIuMTUudGVzdC1zaWduYXR1cmU="
         private const val FRESH_CHALLENGE = "nmRP6w5BxTp6Nydv4Xr2XEpYPzlWHkXcIac68QCELU+j91CpqD/4UdS86thw"
@@ -258,7 +274,7 @@ class TourPlayRestApiTests {
         private const val FRESH_PROOF_COOKIE = "tp-pow=fresh-nonce.2000000000.2.25.test-signature"
         private val ROSTER_JSON = """
             {
-                "id": 1,
+                "id": "$ROSTER_ID",
                 "assistantCoaches": 0, "cheerLeaders": 0, "fanFactor": 1,
                 "ruleSet": 4, "necromancer": false, "reRolls": 2,
                 "shortTeamName": "Test", "teamColor": "000000",

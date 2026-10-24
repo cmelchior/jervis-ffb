@@ -163,9 +163,8 @@ class SelectTeamComponentModel(
         onSuccess: () -> Unit,
         onError: (String, Throwable?) -> Unit,
     ) {
-        val teamId = teamId.toLongOrNull()
-        if (teamId == null) {
-            onError("Team ID does not look like a valid number", null)
+        if (!TourPlayApi.isValidRosterId(teamId)) {
+            onError("Use the roster ID from the current TourPlay roster URL", null)
             return
         }
         menuViewModel.backgroundContext.launch {

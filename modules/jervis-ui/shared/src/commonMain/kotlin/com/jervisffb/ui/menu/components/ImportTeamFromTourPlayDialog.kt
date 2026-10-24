@@ -21,11 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import com.jervisffb.ui.menu.utils.JervisLogo
 
@@ -61,12 +61,12 @@ fun ImportTeamFromTourPlayDialog(
                 Column(
                     modifier = Modifier.padding(bottom = 8.dp),
                 ){
-                    Text("Enter the roster ID (found in the roster URL):")
+                    Text("Enter the roster ID (found in the current roster URL):")
                     Spacer(modifier = Modifier.height(8.dp))
                     TextField(
                         value = inputText,
-                        onValueChange = { inputText = it },
-                        isError = !inputText.isDigitsOnly(),
+                        onValueChange = { inputText = it.trim() },
+                        isError = inputText.isNotBlank() && !TourPlayApi.isValidRosterId(inputText),
                         placeholder = { Text("Roster ID") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -107,7 +107,7 @@ fun ImportTeamFromTourPlayDialog(
                             error = errorWrapper!!.second!!,
                         )
                     },
-                    enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
+                    enabled = !isLoading && TourPlayApi.isValidRosterId(inputText.trim()),
                     buttonColor = JervisTheme.rulebookBlue,
                     textColor = buttonTextColor
                 )
@@ -129,7 +129,7 @@ fun ImportTeamFromTourPlayDialog(
                         },
                     )
                 },
-                enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
+                enabled = !isLoading && TourPlayApi.isValidRosterId(inputText),
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor
             )

@@ -12,8 +12,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +69,11 @@ class TourPlayApi(
         const val MAX_RETRIES = 2
         val LOG = jervisLogger()
         val BASE_URL = "https://tourplay.net/api"
+        // It is unclear exactly what kind of ID the TourPlay API uses, but this
+        // encodes the pattern seen so far.
+        private val ROSTER_ID = Regex("[0-9a-ff]{32}")
+
+        fun isValidRosterId(rosterId: String): Boolean = ROSTER_ID.matches(rosterId)
     }
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -78,11 +85,15 @@ class TourPlayApi(
      * inside Jervis games.
      */
     suspend fun loadRoster(
-        rosterId: Long,
+        rosterId: String,
         rules: Rules,
     ): Result<JervisTeamFile> {
         try {
-            val rosterData = loadTeamFromTourPlay(rosterId)
+            val normalizedRosterId = rosterId.trim()
+            require(isValidRosterId(normalizedRosterId)) {
+                "Invalid TourPlay roster ID: $rosterId. Use the ID from the current roster URL. Numeric IDs are no longer supported."
+            }
+            val rosterData = loadTeamFromTourPlay(normalizedRosterId)
             val mapper = when (rules.baseVersion) {
                 GameVersion.BB2020 -> Mapper2020(iconMapping)
                 GameVersion.BB2025 -> Mapper2025(iconMapping)
@@ -101,7 +112,7 @@ class TourPlayApi(
         }
     }
 
-    private suspend fun loadTeamFromTourPlay(teamId: Long): TourPlayRoster {
+    private suspend fun loadTeamFromTourPlay(teamId: String): TourPlayRoster {
         val response = proofMutex.withLock {
             var response = requestTeam(teamId)
             var retries = 0
@@ -117,6 +128,9 @@ class TourPlayApi(
             response
         }
         if (response.status.isSuccess()) {
+            check(response.contentType()?.match(ContentType.Text.Html) != true) {
+                "Loading roster: $teamId failed: TourPlay returned HTML instead of roster JSON. Check the current roster URL."
+            }
             val rosterAsJson = response.bodyAsText()
             return json.decodeFromString<TourPlayRoster>(rosterAsJson)
         } else {
@@ -124,7 +138,7 @@ class TourPlayApi(
         }
     }
 
-    private suspend fun requestTeam(teamId: Long, retry: Int = 0): HttpResponse {
+    private suspend fun requestTeam(teamId: String, retry: Int = 0): HttpResponse {
         return client.get("$BASE_URL/rosters/$teamId") {
             with(headers) {
                 append("Accept", "application/json, text/plain, */*")

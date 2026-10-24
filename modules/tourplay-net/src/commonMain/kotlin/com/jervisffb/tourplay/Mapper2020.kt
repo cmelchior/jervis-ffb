@@ -81,7 +81,7 @@ class Mapper2020(icons: TourPlayIconMapping): JervisMapper(icons) {
         // - How are stat increases defined?
         // - How are injuries defined? Especially niggling and miss next game?
         return SerializedTeam(
-            id = TeamId(team.id.toString()),
+            id = TeamId(team.id),
             name = team.teamName,
             version = GameVersion.BB2020,
             // Right now we just assume that the FUMBBL team matches the given game type

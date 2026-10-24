@@ -14,7 +14,7 @@ import kotlin.collections.List
 // Mappings for https://tourplay.net/api/rosters/<rosterId>
 @Serializable
 public data class TourPlayRoster(
-    public val id: Int,
+    public val id: String,
     public val imageFile: String? = null,
     public val apothecary: Boolean? = null,
     public val assistantCoaches: Int,
@@ -324,7 +324,7 @@ public data class LineUp(
     public val number: Int,
     public val pendingImprovements: Int,
     public val position: String,
-    public val rosterId: Int,
+    public val rosterId: String,
     public val sessions: Int,
     public val level: Int,
     public val skills: List<Skill3>,
@@ -399,7 +399,7 @@ public data class Skill3(
 
 @Serializable
 public data class LastMatch(
-    public val id: Int,
+    public val id: String,
     public val state: Long,
     public val statePostMatch: Int,
     public val scores: List<Score>,
@@ -436,7 +436,7 @@ public data class InscriptionLocal(
 
 @Serializable
 public data class Roster(
-    public val id: Int,
+    public val id: String,
     public val teamColor: String,
     public val teamName: String,
     public val teamRace: String,
@@ -464,7 +464,7 @@ public data class InscriptionVisitor(
 
 @Serializable
 public data class Roster1(
-    public val id: Int,
+    public val id: String,
     public val teamColor: String,
     public val teamName: String,
     public val teamRace: String,
