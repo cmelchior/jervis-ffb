@@ -468,6 +468,10 @@ object BlitzAction : Procedure() {
                         )
                     }
                     else -> compositeCommandOf(
+                        // This will reset any temporary modifiers that was applied during the Block
+                        // Blitz is a composite action (move + block + move). Right now there are no
+                        // known Action modifiers that carry over that boundary.
+                        *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
                         UpdateContext(context.copy(hasBlocked = hasBlocked)),
                         GotoNode(RemainingMovesOrEndAction),
                     )
