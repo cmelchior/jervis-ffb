@@ -236,6 +236,28 @@ Stand Firm.
     so have no effect.
 
 
+## Page 128 - Frenzy
+Frenzy requires a push result before the second Block. 
+
+Stand Firm explicitly permits the second Block even though the defender does 
+not move. The reason seem to be that "Pushed Back" can trigger, but be ignored.
+This is slightly confusing since the dice roll is called "Push Back" and the 
+consequence is called "Pushed Back", but the rulebook is clear on this.
+
+Neither Rooted nor Chomped has their interaction with Frenzy described, but
+Jervis applies the same interpretation to them.
+
+This means the Rooted interpretation also follows the BB2020 FAQ, so while this
+hasn't been mirrored in the BB2025 FAQ, it feels more consistent. Extending it
+to Chomped is just a natural extension of Stand Firm and Rooted working the same
+way. Both players must still be Standing and adjacent.
+
+Jervis also retains the BB2020 FAQ ruling allowing Stab to replace the second
+Block, and offers other eligible Special Actions that replace a Block.
+
+As an Active Skill, Sprint remains optional when needed for the second Block.
+It is only required to Rush, if the player need to use their normal rushes.
+
 ## 128 - Fumblerooski
 From the rules, it is unclear how Fumblerooski interacts with other skills, as
 Fumblerooski will trigger on "they may choose to place the ball on the

@@ -116,6 +116,7 @@ object ResolveEventsInPushChainStep: Procedure() {
                             attackerResolved = true
                         )
                     ),
+                    GotoNode(ResolveBouncingBall),
                 )
             } else {
                 ExitProcedure()

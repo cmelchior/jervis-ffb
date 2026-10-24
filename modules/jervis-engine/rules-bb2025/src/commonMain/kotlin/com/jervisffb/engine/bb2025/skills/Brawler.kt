@@ -45,7 +45,7 @@ class Brawler(
     override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 
     override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")
-    override val rerollResetAt: Duration = Duration.END_OF_ACTION
+    override val rerollResetAt: Duration = Duration.END_OF_ACTIVATION
     override val rerollDescription: String = "Brawler Reroll"
     override var rerollUsed: Boolean = false
     override val rerollProcedure: Procedure = UseBrawlerReroll
