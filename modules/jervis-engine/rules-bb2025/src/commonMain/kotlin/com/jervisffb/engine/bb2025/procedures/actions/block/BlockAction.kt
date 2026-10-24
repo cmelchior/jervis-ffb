@@ -11,6 +11,7 @@ import com.jervisffb.engine.bb2025.context.BreatheFireContext
 import com.jervisffb.engine.bb2025.context.ChompContext
 import com.jervisffb.engine.bb2025.context.JumpUpRollContext
 import com.jervisffb.engine.bb2025.procedures.actions.block.singleblock.SingleStandardBlockStep
+import com.jervisffb.engine.bb2025.skills.Frenzy
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetSkillUsed
@@ -40,6 +41,7 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.getSkillOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.BlockType
@@ -279,33 +281,21 @@ object BlockAction : Procedure() {
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
 
-            // After the Push was resolved, if the target is still standing
-            // and the attacker has frenzy and was able to follow up, a
-            // second block is thrown
-            // TODO Should only trigger if a player was Pushed Back
-            val hasFrenzy = context.attacker.isSkillAvailable(SkillType.FRENZY)
-            val isNextToTarget = (
-                rules.isStanding(context.attacker) &&
-                    rules.isStanding(context.defender) &&
-                    context.attacker.coordinates
-                        .getSurroundingCoordinates(rules, distance = 1)
-                        .contains(context.defender.coordinates)
-            )
+            val mustBlockAgain = context.attacker.getSkillOrNull<Frenzy>()?.mustPerformSecondBlock(state) == true
 
-            return if (hasBlocked && hasFrenzy && isNextToTarget) {
-                compositeCommandOf(
-                    removeContextCommand,
-                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
-                    SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
-                    GotoNode(SelectBlockType),
-                )
-            } else {
-                compositeCommandOf(
-                    removeContextCommand,
-                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
-                    ExitProcedure()
-                )
-            }
+            return compositeCommandOf(
+                removeContextCommand,
+                UpdateContext(context.copy(hasBlocked = hasBlocked)),
+                when (mustBlockAgain) {
+                    true -> compositeCommandOf(
+                        // Each Frenzy Block is treated as a separate action
+                        *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
+                        SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
+                        GotoNode(SelectBlockType),
+                    )
+                    false -> ExitProcedure()
+                }
+            )
         }
     }
 

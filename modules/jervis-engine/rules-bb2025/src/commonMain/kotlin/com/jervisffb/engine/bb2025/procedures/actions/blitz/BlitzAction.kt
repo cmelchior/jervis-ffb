@@ -22,6 +22,7 @@ import com.jervisffb.engine.bb2025.context.ChompContext
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawBlockStep
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompStep
+import com.jervisffb.engine.bb2025.skills.Frenzy
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -63,6 +64,7 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.getSkillOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.rules.Rules
@@ -449,37 +451,28 @@ object BlitzAction : Procedure() {
                 null -> INVALID_GAME_STATE("Should never be null")
             }
 
-            // After the Push was resolved, if the target is still standing
-            // and the attacker has frenzy and was able to follow up, a
-            // second block is thrown
-            val hasFrenzy = context.attacker.isSkillAvailable(SkillType.FRENZY)
-            val isNextToTarget = rules.isStanding(context.defender!!)
-                && rules.isStanding(context.attacker)
-                && context.attacker.coordinates
-                    .getSurroundingCoordinates(rules, distance = 1)
-                    .contains(context.defender!!.coordinates)
+            val mustBlockAgain = context.attacker.getSkillOrNull<Frenzy>()?.mustPerformSecondBlock(state) == true
 
-            return if (state.endActionImmediately()) {
-                compositeCommandOf(
-                    removeContextCommand,
-                    ExitProcedure()
-                )
-            } else if (hasBlocked && hasFrenzy && isNextToTarget) {
-                val hasMoveLeft = context.attacker.estimatedMovesLeft(includeSprint = true) > 0
-                compositeCommandOf(
-                    removeContextCommand,
-                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
-                    SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
-                    if (hasMoveLeft) GotoNode(UseMoveToBlock) else GotoNode(RemainingMovesOrEndAction),
-                )
-            } else {
-                compositeCommandOf(
-                    removeContextCommand,
-                    UpdateContext(context.copy(hasBlocked = hasBlocked)),
-                    GotoNode(RemainingMovesOrEndAction),
-                    *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
-                )
-            }
+            return compositeCommandOf(
+                removeContextCommand,
+                when {
+                    state.endActionImmediately() -> ExitProcedure()
+                    mustBlockAgain -> {
+                        val hasMoveLeft = context.attacker.estimatedMovesLeft(includeSprint = true) > 0
+                        compositeCommandOf(
+                            // Each Frenzy Block is treated as a separate action
+                            *getResetPlayerTemporaryModifiersCommands(state, rules, context.attacker, Duration.END_OF_ACTION),
+                            UpdateContext(context.copy(hasBlocked = hasBlocked)),
+                            SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
+                            if (hasMoveLeft) GotoNode(UseMoveToBlock) else GotoNode(RemainingMovesOrEndAction),
+                        )
+                    }
+                    else -> compositeCommandOf(
+                        UpdateContext(context.copy(hasBlocked = hasBlocked)),
+                        GotoNode(RemainingMovesOrEndAction),
+                    )
+                }
+            )
         }
     }
 

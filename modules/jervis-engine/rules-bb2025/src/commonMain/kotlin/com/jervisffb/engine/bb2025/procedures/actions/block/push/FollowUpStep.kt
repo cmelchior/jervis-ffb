@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.bb2025.modifiers.isChomped
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.bb2025.procedures.actions.block.PushBack2025
+import com.jervisffb.engine.bb2025.skills.Frenzy
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -26,7 +27,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.getSkillOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -49,7 +50,7 @@ object FollowUpStep: Procedure() {
     object IsFollowUpAvailable: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            val isAvailable = calculateFollowUpStatus(context)
+            val isAvailable = calculateFollowUpStatus(context, state)
             return when (isAvailable) {
                 FollowUpStatus.OPTIONAL,
                 FollowUpStatus.MUST_FOLLOW_UP -> GotoNode(ChooseToUseFend)
@@ -96,7 +97,7 @@ object FollowUpStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val defenderHasTaunt = context.firstPushee.isSkillAvailable(SkillType.TAUNT)
-            val attackerHasFrenzy = context.firstPusher.hasSkill(SkillType.FRENZY)
+            val attackerHasFrenzy = context.firstPusher.getSkillOrNull<Frenzy>()?.forcesFollowUp(state) == true
             return if (!context.defenderIsUsingFend && !attackerHasFrenzy && defenderHasTaunt) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
@@ -120,7 +121,7 @@ object FollowUpStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().firstPusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
-            val followUpStatus = calculateFollowUpStatus(context)
+            val followUpStatus = calculateFollowUpStatus(context, state)
             return when (followUpStatus) {
                 FollowUpStatus.NOT_ALLOWED,
                 FollowUpStatus.MUST_FOLLOW_UP -> listOf(ContinueWhenReady)
@@ -129,7 +130,7 @@ object FollowUpStep: Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val pushContext = state.getContext<PushContext>()
-            val followUpStatus = calculateFollowUpStatus(pushContext)
+            val followUpStatus = calculateFollowUpStatus(pushContext, state)
             val manualFollowUp = (followUpStatus == FollowUpStatus.OPTIONAL) && (action == Confirm)
             val forcedFollowUp = (followUpStatus == FollowUpStatus.MUST_FOLLOW_UP)
             return buildCompositeCommand {
@@ -151,7 +152,7 @@ object FollowUpStep: Procedure() {
     // HELPER METHODS
     enum class FollowUpStatus { OPTIONAL, NOT_ALLOWED, MUST_FOLLOW_UP }
 
-    private fun calculateFollowUpStatus(context: PushContext): FollowUpStatus {
+    private fun calculateFollowUpStatus(context: PushContext, state: Game): FollowUpStatus {
         // The following rules are in effect:
         // - If the attacker used Frenzy, they must follow up if allowed.
         // - If the attacker used Multiple Block, they cannot follow up.
@@ -164,7 +165,8 @@ object FollowUpStep: Procedure() {
         val isRooted = context.firstPusher.isRooted()
         val isChomped = context.firstPusher.isChomped()
         val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend || context.isDefenderImmovable || isRooted || isChomped
-        val mustFollowUp = context.defenderIsUsingTaunt || context.isAttackerUsingFrenzy
+        val frenzyForcesFollowUp = context.firstPusher.getSkillOrNull<Frenzy>()?.forcesFollowUp(state) == true
+        val mustFollowUp = context.defenderIsUsingTaunt || frenzyForcesFollowUp
         return when {
             cannotFollowUp -> FollowUpStatus.NOT_ALLOWED
             mustFollowUp -> FollowUpStatus.MUST_FOLLOW_UP

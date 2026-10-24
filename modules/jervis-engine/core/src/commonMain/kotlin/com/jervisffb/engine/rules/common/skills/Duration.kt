@@ -22,7 +22,9 @@ enum class Duration {
     IMMEDIATE, // The effect expires immediately.
     START_OF_ACTIVATION, // The effect expires when the player is activated
     END_OF_ACTIVATION, // The effect expires at the end of the current players activation
-    END_OF_ACTION, // The effect expires at the end of the action, this also includes subactions, like the Block part of a Blitz.
+    // The effect expires at the end of the action, this also includes subactions like the Block part of a Blitz.
+    // Frenzy also treat each block as its own action.
+    END_OF_ACTION,
     END_OF_TURN, // The effect expires at the end of the current teams turn.
     END_OF_OWN_TEAM_TURN, // The effect expires at the end of this teams turns, either the current (if in progress) or if opponent turn, end of next regular team turn.
     END_OF_DRIVE, // The effect expires at the end of the current drive

@@ -220,26 +220,28 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
     - [x] Works on Pushback
     - [x] Does not trigger on Both Down
     - [x] Does not work when Distracted
-- [ ] Frenzy*
-    - [ ] Must take two blocks if player if able
-    - [ ] Works during Block and Blitz
-    - [ ] Horns work on both Frenzy Blocks
-    - [ ] Does not force the use of Sprint on the 2nd block
-    - [ ] 2nd Block can only be thrown if the target is Pushed Back.
-    - [ ] Cannot do 2nd Block on Rooted player
-    - [ ] 2nd Block can be another Special Action like Stab
-    - [ ] Must rush if needed
-    - [ ] 2nd block isn't taken in case of a touchdown
-    - [ ] Cannot take 2nd block if no more move/rushes left
-    - [ ] Works on Rooted player (even though they are not pushed back (FAQ)
-    - [ ] Works on Stand Firm player - No FAQ, but the same reasoning as for Rooted.
-    - [ ] Roll twice for Foul Appearance (FAQ)
-    - [ ] Frenzy 2nd block is not taken when defender is using Fend (as they cannot follow up)
-    - [ ] Works on players with the Foul Appearance trait
-    - [ ] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
-    - [ ] Foul Appearance must be rolled for both blocks. If failed on first block, 2nd block isn't happening
-    - [ ] Brawler will only work on one of the blocks (FAQ May 2026)
-    - [ ] Frenzy blocks twice on Chomped players
+- [x] Frenzy*
+    - [x] Must take two blocks if the player is able
+    - [x] Works during Block and Blitz
+    - [x] Horns work on both Frenzy Blocks without stacking
+    - [x] Does not force the use of Sprint on the 2nd block
+    - [x] 2nd Block requires a push result; Both Down with Block does not trigger it
+    - [x] Rooted attacker cannot follow up to take a 2nd Block against a pushed-away defender
+    - [x] 2nd Block can be another Special Action like Stab
+    - [x] Must rush if needed
+    - [x] 2nd block isn't taken in case of a touchdown
+    - [x] Cannot take 2nd block if no more move/rushes left
+    - [x] Works on Rooted player, even though they are not pushed back (BB2020 FAQ)
+    - [x] Works on Stand Firm player (explicitly allowed by the BB2025 skill description)
+    - [x] Roll twice for Foul Appearance (FAQ)
+    - [x] Frenzy 2nd block is not taken when Fend leaves the defender out of reach
+    - [x] Works on players with the Foul Appearance trait
+    - [x] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
+    - [x] Foul Appearance must be rolled for both blocks. If failed on first block, 2nd block isn't happening
+    - [x] Brawler will only work on one of the blocks (FAQ May 2026)
+    - [x] Frenzy blocks twice on Chomped players
+    - [x] Dauntless is rolled again for the 2nd block without retaining the first block's bonus
+    - [x] Does not work when Distracted
 - [x] Kick
   - [x] Usage is optional
   - [x] Reduces distance from D6 to D3
