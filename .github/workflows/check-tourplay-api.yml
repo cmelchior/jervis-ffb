@@ -1,0 +1,53 @@
+# The TourPlay API is changing rather frequently, in order to catch changes as
+# quickly as possible, we run nightly TourPlay integrations at 3:11 (CET).
+name: Check TourPlay API
+
+on:
+  schedule:
+    - cron: '11 3 * * *'
+      timezone: 'Europe/Copenhagen'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    uses: ./.github/workflows/setup.yml
+
+  test-tourplay-api:
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JERVIS_COMMIT_COUNT: ${{ needs.setup.outputs.commit_count }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run TourPlay REST API tests
+        # Always contact TourPlay, even when the code and cached outputs are unchanged.
+        run: ./gradlew :modules:tourplay-net:jvmTest --tests "tourplay.rest.TourPlayRestApiTests" --rerun --info
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tourplay-api-test-reports
+          path: |
+            modules/tourplay-net/build/reports/tests/jvmTest/
+            modules/tourplay-net/build/test-results/jvmTest/
+          retention-days: 7
