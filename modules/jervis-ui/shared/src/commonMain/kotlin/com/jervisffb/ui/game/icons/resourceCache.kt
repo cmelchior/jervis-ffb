@@ -29,7 +29,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okio.internal.commonToUtf8String
 import org.jetbrains.skia.Image
 
 /**
@@ -246,7 +245,7 @@ internal class TeamResourcesCache(
         }
 
         suspend fun loadMappingFile(path: String) {
-            Res.readBytes(path).commonToUtf8String().lines().forEach(::addMapping)
+            Res.readBytes(path).decodeToString().lines().forEach(::addMapping)
         }
 
         loadMappingFile("files/fumbbl/icons.ini")
