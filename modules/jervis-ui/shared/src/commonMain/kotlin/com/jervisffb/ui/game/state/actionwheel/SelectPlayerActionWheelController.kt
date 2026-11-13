@@ -1,9 +1,10 @@
 package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
@@ -12,6 +13,7 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.common.procedures.ActivatePlayer
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.PitchCoordinate
@@ -59,24 +61,7 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             val menuItem = ActionButtonData(
                 id = ButtonId("[${actions.id}] Stand Up & End Action"),
                 label = { "Stand Up & End Action" },
-                action = GuardedAction(acc) { id ->
-                    // If players need to stand up or roll for negatraits before standing
-                    // up we need wait for it.
-                    provider.registerQueuedActionGenerator { controller ->
-                        val availableActions = controller.getAvailableActions()
-                        val canMove = availableActions.contains(MoveType.STANDARD)
-                        val canEndAction = availableActions.contains<EndActionWhenReady>()
-                        if (canMove && canEndAction) {
-                            QueuedActionsResult(EndAction)
-                        } else {
-                            null
-                        }
-                    }
-                    provider.userActionSelected(
-                        id,
-                        CompositeGameAction(PlayerActionSelected(PlayerStandardActionType.MOVE), MoveTypeSelected(MoveType.STAND_UP))
-                    )
-                },
+                action = GuardedAction(acc) { id -> standUpAndEndAction(provider, id, activePlayer.id) },
                 icon = ActionIcon.STAND_UP_AND_END
             )
             wheelOptions.add(menuItem)
@@ -93,6 +78,41 @@ object SelectPlayerActionWheelController : ActionWheelDialogController() {
             hideWhenClickOutside = true
         )
         acc.addActionWheelEvent(wheelState)
+    }
+
+    /**
+     * Declare a Move action, then stand up and end the action as soon as the
+     * rules allow it.
+     *
+     * Nega-traits like Bone Head and Really Stupid are rolled after declaring
+     * the action, but before the player can stand up. Standing up might also
+     * require a roll. So only the Move action is sent straight away, while the
+     * rest is queued until the player is allowed to do it. If the activation
+     * ends before that, e.g., by failing one of these rolls, the queued actions
+     * are dropped, so they do not leak into a later activation.
+     */
+    internal fun standUpAndEndAction(provider: UiActionProvider, id: GameActionId, playerId: PlayerId) {
+        fun activationEnded(controller: GameEngineController) = controller.state.activePlayer?.id != playerId
+        provider.registerQueuedActionGenerator { controller ->
+            when {
+                activationEnded(controller) -> QueuedActionsResult(emptyList())
+                controller.getAvailableActions().contains(MoveType.STAND_UP) -> {
+                    QueuedActionsResult(MoveTypeSelected(MoveType.STAND_UP))
+                }
+                else -> null
+            }
+        }
+        provider.registerQueuedActionGenerator { controller ->
+            val availableActions = controller.getAvailableActions()
+            val canMove = availableActions.contains(MoveType.STANDARD)
+            val canEndAction = availableActions.contains<EndActionWhenReady>()
+            when {
+                activationEnded(controller) -> QueuedActionsResult(emptyList())
+                canMove && canEndAction -> QueuedActionsResult(EndAction)
+                else -> null
+            }
+        }
+        provider.userActionSelected(id, PlayerActionSelected(PlayerStandardActionType.MOVE))
     }
 
     // Temporary work-around while transition from PitchDecorator api
