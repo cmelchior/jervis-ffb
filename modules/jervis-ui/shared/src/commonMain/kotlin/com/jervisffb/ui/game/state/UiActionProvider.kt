@@ -30,6 +30,8 @@ data class AsyncGameAction(
     val remainingActions: QueuedActionsResult? = null,
 )
 
+// Generators run before each action. Return `null` to keep waiting, or a result to queue
+// its actions and unregister the generator. An empty result just unregisters the generator.
 typealias QueuedActionsGenerator = (GameEngineController) -> QueuedActionsResult?
 
 data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenActions: Boolean = false) {
