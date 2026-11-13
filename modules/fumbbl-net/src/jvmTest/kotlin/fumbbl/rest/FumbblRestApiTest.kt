@@ -46,11 +46,12 @@ class FumbblRestApiTest {
         assertEquals("Niu", player.name)
         assertEquals("Tomb Guardian", position.title)
         assertEquals(3, position.skills.size)
-        assertEquals(1, player.extraSkills.size)
+        assertEquals(2, player.extraSkills.size)
         assertTrue(position.skills.any { it.type == SkillType.BRAWLER })
         assertTrue(position.skills.any { it.type == SkillType.DECAY })
         assertTrue(position.skills.any { it.type == SkillType.REGENERATION })
         assertTrue(player.extraSkills.any { it.type == SkillType.BREAK_TACKLE })
+        assertTrue(player.extraSkills.any { it.type == SkillType.TACKLE })
     }
 
     @Test
