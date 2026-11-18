@@ -2,6 +2,7 @@ package com.jervisffb.engine
 
 import com.jervisffb.engine.actions.AddPlayerKeyword
 import com.jervisffb.engine.actions.AddPlayerSkill
+import com.jervisffb.engine.actions.AddPlayerStatusEffect
 import com.jervisffb.engine.actions.AdminGameAction
 import com.jervisffb.engine.actions.ChangePlayerBaseStat
 import com.jervisffb.engine.actions.CompositeGameAction
@@ -535,7 +536,7 @@ class GameEngineController(
             is SetPlayerState -> {
                 val player = action.getPlayer(state)
                 val location = action.location
-                val hasTackleZones = (action.state == PlayerPitchState.STANDING)
+                val hasTackleZones = action.hasTackleZones ?: (action.state == PlayerPitchState.STANDING)
                 if (location is OnPitchLocation) {
                     if (!location.isOnPitch(rules)) {
                         INVALID_ACTION(action, "Location is not on the pitch: $location")
@@ -551,6 +552,9 @@ class GameEngineController(
                     com.jervisffb.engine.commands.SetPlayerState(player, action.state, hasTackleZones),
                     com.jervisffb.engine.commands.SetPlayerLocation(player, location)
                 )
+            }
+            is AddPlayerStatusEffect -> {
+                com.jervisffb.engine.commands.AddPlayerStatusEffect(action.getPlayer(state), action.effect)
             }
             is MovePlayer -> {
                 val player = action.getPlayer(state)

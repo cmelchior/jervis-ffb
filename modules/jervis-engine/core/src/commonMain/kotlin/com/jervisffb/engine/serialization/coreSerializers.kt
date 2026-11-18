@@ -57,6 +57,7 @@ val coreSerializerModule = SerializersModule {
         polymorphic(com.jervisffb.engine.actions.AdminGameAction::class) {
             subclass(com.jervisffb.engine.actions.AddPlayerKeyword::class)
             subclass(com.jervisffb.engine.actions.AddPlayerSkill::class)
+            subclass(com.jervisffb.engine.actions.AddPlayerStatusEffect::class)
             subclass(com.jervisffb.engine.actions.ChangePlayerBaseStat::class)
             subclass(com.jervisffb.engine.actions.MovePlayer::class)
             subclass(com.jervisffb.engine.actions.RemovePlayerKeyword::class)
