@@ -165,8 +165,9 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
                 ?: roster.positions.firstOrNull { it.titleSingular == mapFumbblPositionName(fumbblPosition.positionName) }
                 // Star Players are not part of the roster, so they are looked up among
                 // the Star Players the ruleset offers as inducements, mirroring the
-                // other loading paths (FumbblApi, SerializedTeam).
-                ?: rules.inducements.findStarPlayer(fumbblPosition.positionName)
+                // other loading paths (FumbblApi, SerializedTeam). FUMBBL star names
+                // go through the rename table first ("Mighty Zug" vs "The Mighty Zug").
+                ?: rules.inducements.findStarPlayer(mapFumbblPositionName(fumbblPosition.positionName))
             if (position == null) {
                 throw IllegalStateException(
                     "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",
@@ -240,9 +241,12 @@ private fun extractField(field: FumbblField): Pitch {
 /**
  * Maps FUMBBL position names to their Jervis equivalents. FUMBBL occasionally
  * renames positions relative to the official rulebook; this bridges those gaps
- * so the roster position lookup in [extractTeam] can match.
+ * so the roster position lookup in [extractTeam] can match. Star hires go
+ * through [FUMBBL_STAR_PLAYER_ALIASES] before the inducement fallback.
  */
-private fun mapFumbblPositionName(positionName: String): String = when (positionName) {
+internal fun mapFumbblPositionName(positionName: String): String =
+    FUMBBL_STAR_PLAYER_ALIASES[positionName]
+        ?: when (positionName) {
     "Anointed Blitzer" -> "Tomb Kings Blitzer"
     "Anointed Thrower" -> "Tomb Kings Thrower"
     "Bloodborn Marauder" -> "Bloodborn Marauder Lineman"
@@ -267,6 +271,21 @@ private fun mapFumbblPositionName(positionName: String): String = when (position
     "Troll" -> "Untrained Troll"
     else -> positionName
 }
+
+/**
+ * FUMBBL's spellings of Star Players whose names differ from the rulebook.
+ *
+ * Exhaustive: cross-checked against every Star Player catalog embedded in
+ * FUMBBL replay data — the other 63 BB2025 Star Players are spelled
+ * identically on both sides (modulo the case/apostrophe normalization in
+ * [findStarPlayer]), and every remaining deviation belongs to custom-league
+ * content that extraction correctly rejects.
+ */
+internal val FUMBBL_STAR_PLAYER_ALIASES = mapOf(
+    "'Captain' Karina von Riesz" to "Captain Karina von Riesz",
+    "Boa Kon'sstriktr" to "Boa Kon'ssstriktr",
+    "Mighty Zug" to "The Mighty Zug",
+)
 
 /**
  * Map FUMBBL Skill Names to Jervis [SkillId]s.

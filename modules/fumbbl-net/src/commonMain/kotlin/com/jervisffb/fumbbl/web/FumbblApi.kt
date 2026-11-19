@@ -30,6 +30,7 @@ import com.jervisffb.engine.sprites.RosterLogo
 import com.jervisffb.engine.sprites.SingleSprite
 import com.jervisffb.engine.sprites.SpriteSheet
 import com.jervisffb.fumbbl.net.utils.convertFumbblSkillToSkillId
+import com.jervisffb.fumbbl.net.utils.mapFumbblPositionName
 import com.jervisffb.fumbbl.web.api.AuthResult
 import com.jervisffb.fumbbl.web.api.CoachSearchResult
 import com.jervisffb.fumbbl.web.api.FumbblePlayerDetails
@@ -377,8 +378,10 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             players = team.players.map { player ->
                 val position = jervisRoster.getOrNull(player.positionId.positionId)
                     // A Star Player is not part of a roster, so they are looked up among
-                    // the Star Players the ruleset offers as inducements.
-                    ?: rules.inducements.findStarPlayer(player.position)
+                    // the Star Players the ruleset offers as inducements. FUMBBL star
+                    // names go through the rename table first ("Mighty Zug" vs
+                    // "The Mighty Zug").
+                    ?: rules.inducements.findStarPlayer(mapFumbblPositionName(player.position))
                     ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.positionId}")
 
                 val type: PlayerType = when (position) {
