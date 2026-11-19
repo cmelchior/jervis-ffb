@@ -86,12 +86,16 @@ object Pow2025: Procedure() {
      * If this is just a single block, the entire sequence is handled now.
      */
     object ResolveDefenderKnockedDown: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? = when (state.getContext<PushContext>().firstPushee.location.isOnPitch(rules)) {
+            true -> null
+            false -> ExitProcedureNode
+        }
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
             val defender = context.firstPushee
             val injuryContext = RiskingInjuryContext(
                 player = defender,
-                causedBy = context.firstPusher,
+                causedBy = context.firstPusher.takeIf { it.team != context.firstPushee.team },
                 isPartOfMultipleBlock = context.isMultipleBlock
             )
             return AddContext(injuryContext)

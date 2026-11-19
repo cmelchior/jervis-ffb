@@ -3,17 +3,23 @@ package com.jervisffb.test.bb2025.skills
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.EndAction
+import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.bb2025.skills.Fend
+import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.ballAndChainDirectionRoll
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.standardBlock
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import com.jervisffb.test.utils.assertCoordinates
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -123,10 +129,26 @@ class FendTests: JervisGameBB2025Test() {
         assertTrue(rules.isStanding(defender))
     }
 
-    @Ignore
     @Test
     fun doesNotWorkAgainstBallChain() {
-        // TODO
+        val attacker = awayTeam["A1".playerId].apply {
+            addSkill(SkillType.BALL_AND_CHAIN)
+        }
+        val defender = homeTeam["H1".playerId].apply {
+            addSkill(SkillType.FEND)
+        }
+        controller.rollForward(
+            *activatePlayer(attacker, PlayerSpecialActionType.BALL_AND_CHAIN),
+            DirectionSelected(Direction.LEFT),
+            *ballAndChainDirectionRoll(2.d3),
+            3.dblock,
+            NoRerollSelected(),
+            SelectSingleBlockDieResult(),
+            DirectionSelected(Direction.LEFT), EndAction,
+        )
+        attacker.assertCoordinates(12, 5)
+        defender.assertCoordinates(11, 5)
+        assertNull(state.activePlayer)
     }
 
     @Ignore

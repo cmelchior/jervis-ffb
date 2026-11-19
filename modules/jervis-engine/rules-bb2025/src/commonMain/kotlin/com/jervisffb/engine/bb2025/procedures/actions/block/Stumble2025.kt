@@ -140,7 +140,7 @@ object Stumble2025: Procedure() {
             val blockContext = state.getContext<BlockContext>()
             val injuryContext = RiskingInjuryContext(
                 player = defender,
-                causedBy = blockContext.attacker,
+                causedBy = blockContext.attacker.takeIf { it.team != blockContext.defender.team },
                 isPartOfMultipleBlock = blockContext.isUsingMultiBlock
             )
             return AddContext(injuryContext)

@@ -6,8 +6,11 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.actions.safeDiceRollCast
 import com.jervisffb.engine.bb2020.tables.KickOffEventResult2020
+import com.jervisffb.engine.bb2025.context.BallAndChainContext
 import com.jervisffb.engine.bb2025.procedures.TheKickOffEvent2025
+import com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainDirectionRoll
 import com.jervisffb.engine.bb2025.tables.KickOffEventResult2025
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.Catch
@@ -138,6 +141,18 @@ object AnimationFactory {
     fun getPostActionAnimation(uiController: UiGameController, state: Game, action: GameAction): JervisAnimation? {
         if (action == Undo) return null
         val currentNode = state.currentProcedureState()?.currentNode()
+
+        if (currentNode == BallAndChainDirectionRoll.RollDie || currentNode == BallAndChainDirectionRoll.ReRollDie) {
+            val context = state.getContextOrNull<BallAndChainContext>() ?: return null
+            val direction = state.rules.throwIn(context.orientation, action.safeDiceRollCast<D3Result>())
+            val destination = context.origin.move(direction, 1)
+            return DirectionSelectedAnimation(
+                uiController = uiController,
+                coordinate = destination.takeIf { it.isOnPitch(state.rules) } ?: context.origin,
+                direction = direction,
+                previousCoordinate = context.destination?.let { it.takeIf { it.isOnPitch(state.rules) } ?: context.origin },
+            )
+        }
 
         // Animate KickOff Event Result
         // Right now we just "guess" that the rules do the same table lookup.

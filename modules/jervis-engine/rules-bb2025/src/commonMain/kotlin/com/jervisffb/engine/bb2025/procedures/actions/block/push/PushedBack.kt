@@ -94,6 +94,10 @@ object PushedBack: Procedure() {
     }
 
     object UseStripBall: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? = when (state.getContext<BlockContext>().policy.pushWithoutBlockDice) {
+            true -> ResolveEventsInPushChain
+            false -> null
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = UseStripBallStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ResolveEventsInPushChain)

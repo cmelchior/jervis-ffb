@@ -556,6 +556,7 @@ abstract class AbstractRules(
             DiceRollType.LONER,
             DiceRollType.PASS,
             DiceRollType.PICKUP,
+            DiceRollType.BALL_AND_CHAIN_DIRECTION,
             DiceRollType.PUNT_DIRECTION,
             DiceRollType.PUNT_DISTANCE,
             DiceRollType.POGO,

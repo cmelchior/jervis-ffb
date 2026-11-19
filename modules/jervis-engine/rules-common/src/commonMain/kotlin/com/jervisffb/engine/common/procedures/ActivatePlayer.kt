@@ -108,7 +108,10 @@ object ActivatePlayer : Procedure() {
                     PlayerStandardActionType.SECURE_THE_BALL -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.SECURE_THE_BALL)
                     PlayerStandardActionType.THROW_TEAM_MATE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.THROW_TEAM_MATE)
                     PlayerStandardActionType.SPECIAL -> null
-                    PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
+                    PlayerSpecialActionType.BALL_AND_CHAIN -> compositeCommandOf(
+                        SetSpecialActionSkillUsed(player, player.getSkill(SkillType.BALL_AND_CHAIN), true),
+                        SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.BALL_AND_CHAIN),
+                    )
                     PlayerSpecialActionType.BOMBARDIER -> TODO()
                     PlayerSpecialActionType.CHAINSAW -> {
                         compositeCommandOf(

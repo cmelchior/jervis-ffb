@@ -84,6 +84,7 @@ enum class DiceRollType(val description: String) {
     TREACHEROUS_TRAPDOOR("Treacherous Trapdoor"),
     UNCHANNELLED_FURY("Unchannelled Fury"),
     PROJECTILE_VOMIT("Projectile Vomit"),
+    BALL_AND_CHAIN_DIRECTION("Ball & Chain Direction"),
     PUNT_DIRECTION("Punt Direction"),
     PUNT_DISTANCE("Punt Distance"),
     ZAP("Zap!"),

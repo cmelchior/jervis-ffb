@@ -18,7 +18,7 @@ fun createPushContext(state: Game): PushContext {
         check(it.defender == blockContext.defender) { "BlockContext and StumbleContext out of sync:\n$blockContext\n$it" }
     }
     // TODO Are there any special skills that also knock players down?
-    val isKnockedDown = stumbleContext?.isDefenderDown() ?: (blockContext.result.blockResult == BlockDice.POW)
+    val isKnockedDown = !blockContext.policy.pushWithoutBlockDice && (stumbleContext?.isDefenderDown() ?: (blockContext.result.blockResult == BlockDice.POW))
 
     // Setup the context needed to resolve the full push include
     val newContext = PushContext(

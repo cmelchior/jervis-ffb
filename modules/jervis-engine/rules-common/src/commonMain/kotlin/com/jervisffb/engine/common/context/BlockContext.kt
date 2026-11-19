@@ -5,6 +5,7 @@ import com.jervisffb.engine.common.procedures.actions.block.calculateBlockDiceTo
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.rules.common.actions.BlockPolicy
 import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 
 /**
@@ -15,6 +16,7 @@ import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 data class BlockContext(
     val attacker: Player,
     val defender: Player,
+    val policy: BlockPolicy = StandardBlockPolicy(),
     val isBlitzing: Boolean = false,
     val isUsingJuggernaught: Boolean = false,
     val isUsingMultiBlock: Boolean = false,
@@ -48,3 +50,13 @@ data class BlockContext(
         }
     }
 }
+
+sealed interface BlockPolicyCommon : BlockPolicy
+
+/** Variations in a nested Block; defaults preserve a normal Block Action. */
+data class StandardBlockPolicy(
+    override val ignoreFoulAppearance: Boolean = false,
+    override val forceFollowUp: Boolean = false,
+    override val pushWithoutBlockDice: Boolean = false,
+    override val deferAttackerTouchdown: Boolean = false,
+) : BlockPolicyCommon

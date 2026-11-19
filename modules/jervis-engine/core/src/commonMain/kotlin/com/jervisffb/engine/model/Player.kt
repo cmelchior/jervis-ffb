@@ -63,7 +63,8 @@ interface Player {
     // Rolling for a Rush will modify this number.
     var movesLeft: Int
 
-    // How many rushes the player has left this turn
+    // How many rushes the player has left this turn.
+    // Using a rush will increment `movesLeft`.
     var rushesLeft: Int
 
     // When updating `baseStrength` and `strengthModifiers`, `strength` must also be updated.

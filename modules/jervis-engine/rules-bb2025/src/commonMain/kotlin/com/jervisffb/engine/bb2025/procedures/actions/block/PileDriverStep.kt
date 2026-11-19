@@ -8,19 +8,18 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.bb2025.procedures.injury.PlacedProne2025
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
-import com.jervisffb.engine.common.context.ActivatePlayerContext
 import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.FoulContext
+import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.procedures.actions.foul.FoulStep
+import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -60,7 +59,7 @@ object PileDriverStep : Procedure() {
             val isAttackerStanding = rules.isStanding(attacker)
             val isDefenderEligibleForFoul = defender.location.isOnPitch(rules) && (defender.state == PlayerPitchState.PRONE || defender.state == PlayerPitchState.STUNNED)
             val isAdjacentToDefender = attacker.location.isAdjacent(rules, defender.location)
-            val hasPileDriver = attacker.isSkillAvailable(SkillType.PILE_DRIVER)
+            val hasPileDriver = attacker.team != defender.team && attacker.isSkillAvailable(SkillType.PILE_DRIVER)
             return when (isAttackerStanding && isDefenderEligibleForFoul && isAdjacentToDefender && hasPileDriver) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -92,17 +91,24 @@ object PileDriverStep : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FoulStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             val foulContext = state.getContext<FoulContext>()
-            val activeContext = state.getContext<ActivatePlayerContext>()
-            return buildCompositeCommand {
-                add(RemoveContext(foulContext))
-                if (foulContext.fouler.location.isOnPitch(rules)) {
-                    addAll(
-                        SetPlayerState(foulContext.fouler, PlayerPitchState.PRONE, hasTackleZones = false),
-                        UpdateContext(activeContext.copy(activationEndsImmediately = true)),
-                    )
-                }
-                add(ExitProcedure())
-            }
+            return compositeCommandOf(
+                RemoveContext(foulContext),
+                when (foulContext.fouler.location.isOnPitch(rules)) {
+                    true -> GotoNode(PlaceAttackerProne)
+                    false -> ExitProcedure()
+                },
+            )
         }
+    }
+
+    object PlaceAttackerProne: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command = AddContext(RiskingInjuryContext(
+            player = state.getContext<BlockContext>().attacker,
+            mode = RiskingInjuryMode.PLACED_PRONE,
+        ))
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PlacedProne2025
+        override fun onExitNode(state: Game, rules: Rules): Command = compositeCommandOf(
+            RemoveContext<RiskingInjuryContext>(), ExitProcedure(),
+        )
     }
 }

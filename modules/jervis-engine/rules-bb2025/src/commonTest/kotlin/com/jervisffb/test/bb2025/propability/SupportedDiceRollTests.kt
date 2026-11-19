@@ -4,6 +4,7 @@ import com.jervisffb.engine.bb2025.procedures.BoneHeadRoll
 import com.jervisffb.engine.bb2025.procedures.ReallyStupidRoll
 import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
 import com.jervisffb.engine.bb2025.procedures.UnchannelledFuryRoll
+import com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainDirectionRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChompRoll
@@ -153,6 +154,7 @@ class SupportedDiceRollTests {
             DiceRollType.PRAYERS_TO_NUFFLE,
             DiceRollType.PRO,
             DiceRollType.PROJECTILE_VOMIT,
+            DiceRollType.BALL_AND_CHAIN_DIRECTION,
             DiceRollType.PUNT_DIRECTION,
             DiceRollType.PUNT_DISTANCE,
             DiceRollType.QUICK_SNAP,
@@ -245,6 +247,7 @@ class SupportedDiceRollTests {
             DiceRollType.PRAYERS_TO_NUFFLE -> PrayersToNuffleRoll
             DiceRollType.PRO -> ProRoll
             DiceRollType.PROJECTILE_VOMIT -> ProjectileVomitRoll
+            DiceRollType.BALL_AND_CHAIN_DIRECTION -> BallAndChainDirectionRoll
             DiceRollType.PUNT_DIRECTION -> PuntDirectionRoll
             DiceRollType.PUNT_DISTANCE -> PuntDistanceRoll
             DiceRollType.QUICK_SNAP -> QuickSnap

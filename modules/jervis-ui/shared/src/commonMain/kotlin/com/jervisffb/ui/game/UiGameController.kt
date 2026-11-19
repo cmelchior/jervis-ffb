@@ -49,6 +49,7 @@ import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.ui.ICON_FACTORY
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.animations.AnimationFactory
+import com.jervisffb.ui.game.animations.DirectionSelectedAnimation
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiPitchPlayer
 import com.jervisffb.ui.game.model.UiPitchSquare
@@ -64,6 +65,7 @@ import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.ArgueTheCallWheelController
 import com.jervisffb.ui.game.state.actionwheel.AwayTeamFanFactorRoll
 import com.jervisffb.ui.game.state.actionwheel.BadHabitsRollWheelController
+import com.jervisffb.ui.game.state.actionwheel.BallAndChainDirectionWheelController
 import com.jervisffb.ui.game.state.actionwheel.BoneHeadWheelController
 import com.jervisffb.ui.game.state.actionwheel.BounceBallRollWheelController
 import com.jervisffb.ui.game.state.actionwheel.BouncePlayerRollWheelController
@@ -196,6 +198,7 @@ import com.jervisffb.ui.game.state.decorators.SelectPitchLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayersDecorator
 import com.jervisffb.ui.game.state.decorators.SelectRandomPlayersDecorator
+import com.jervisffb.ui.game.state.indicators.BallAndChainDirectionArrowIndicator
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
@@ -293,6 +296,7 @@ class UiGameController(
     // Persistent UI decorations that need to be stored across actions
     val uiDecorations = UiPersistentGameIndicators()
     private val pitchStatusIndicators: List<PitchStatusIndicator> = listOf(
+        BallAndChainDirectionArrowIndicator,
         BallCarriedStatusIndicator,
         BallExitStatusIndicator,
         BallOnGroundStatusIndicator,
@@ -337,6 +341,7 @@ class UiGameController(
         PogoWheelController,
         ProWheelController,
         ProjectileVomitWheelController,
+        BallAndChainDirectionWheelController,
         PuntDirectionWheelController,
         PuntDistanceWheelController,
         ReallyStupidWheelController,
@@ -842,6 +847,12 @@ class UiGameController(
                 }
 
                 if (postActionAnimation != null) {
+                    if (postActionAnimation is DirectionSelectedAnimation) {
+                        postActionAnimation.previousCoordinate?.let { coordinate ->
+                            acc.updateSquare(coordinate) { it.copy(directionSelected = null) }
+                            acc.emitUiState()
+                        }
+                    }
                     animationFlow.emit(postActionAnimation)
                     awaitAnimationCompletion()
                 }

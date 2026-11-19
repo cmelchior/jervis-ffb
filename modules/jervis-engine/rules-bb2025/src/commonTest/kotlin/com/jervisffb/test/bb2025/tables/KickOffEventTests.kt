@@ -703,6 +703,21 @@ class KickOffEventTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun quickSnapAllowsBallAndChainPlayersToMoveOneSquare() {
+        val player = awayTeam["A6".playerId]
+        player.addSkill(SkillType.BALL_AND_CHAIN)
+        controller.rollForward(
+            *defaultBB2020Pregame(), *defaultSetup(),
+            *defaultKickOffHomeTeam(kickoffEvent = arrayOf(DiceRollResults(3.d6, 6.d6), 1.d3), bounce = null),
+        )
+        val origin = player.coordinates
+        assertTrue(player.id in controller.getAvailableActions().get<SelectPlayer>().players)
+        controller.rollForward(PlayerSelected(player), PitchSquareSelected(origin.move(Direction.LEFT, 1)))
+        assertEquals(origin.move(Direction.LEFT, 1), player.coordinates)
+        assertTrue(player.id !in controller.getAvailableActions().get<SelectPlayer>().players)
+    }
+
+    @Test
     fun quickSnap() {
         controller.rollForward(
             *defaultBB2020Pregame(),

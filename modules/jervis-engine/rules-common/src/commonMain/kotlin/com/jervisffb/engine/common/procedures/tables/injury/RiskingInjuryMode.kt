@@ -7,6 +7,7 @@ enum class RiskingInjuryMode {
     PUSHED_INTO_CROWD, // Or fallen through a Trapdoor
     FOUL,
     HIT_BY_ROCK,
+    HIT_WHILE_PRONE, // Armour-only hit against an already Prone or Stunned player
     // Player is injured after being thrown (normally the same as Falling Over),
     // but we need to know the difference in order to trigger turnovers
     // correctly.

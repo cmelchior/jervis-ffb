@@ -14,12 +14,14 @@ import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.common.commands.SetCurrentBall
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.context.RiskingInjuryContext
 import com.jervisffb.engine.common.context.ThrowInContext
 import com.jervisffb.engine.common.procedures.Bounce
 import com.jervisffb.engine.common.procedures.ThrowIn
 import com.jervisffb.engine.common.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.common.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.common.procedures.tables.prayers.TreacherousTrapdoor
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -28,6 +30,7 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.ScoringATouchDownContext
 import com.jervisffb.engine.model.context.getContext
@@ -158,12 +161,15 @@ object ResolveEventsInPushChainStep: Procedure() {
                 null
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            TODO("Not yet implemented")
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val player = state.getContext<ResolvePushChainEventsContext>().getCurrentPlayer()
+            return AddContext(MovePlayerIntoSquareContext(player, player.coordinates))
         }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.movePlayerIntoSquare
+        override fun onExitNode(state: Game, rules: Rules): Command = compositeCommandOf(
+            RemoveContext<MovePlayerIntoSquareContext>(),
+            GotoNode(ResolveCrowdInjury),
+        )
     }
 
     object ResolveCrowdInjury: ParentNode() {
@@ -294,18 +300,26 @@ object ResolveEventsInPushChainStep: Procedure() {
 
     private fun stepContainsTrapdoor(context: ResolvePushChainEventsContext, state: Game, rules: Rules): Boolean {
         if (!stepIsOnPitch(context, rules)) return false
-        // TODO Add support for Trapdoors
-        return false
+        val push = context.currentPushStep
+        if (push != null && push.from == push.to) return false
+        if (push == null && !state.getContext<PushContext>().followsUp) return false
+        val player = context.getCurrentPlayer()
+        val hasTrapdoor = state.pitch[player.coordinates].hasTrapdoor
+        val treacherous = (state.homeTeam.activePrayersToNuffle + state.awayTeam.activePrayersToNuffle)
+            .any { it.procedure == TreacherousTrapdoor }
+        return hasTrapdoor && treacherous
     }
 
     private fun stepIsInTheCrowd(context: ResolvePushChainEventsContext, state: Game, rules: Rules): Boolean {
-        return !stepIsOnPitch(context, rules)
+        return context.currentPushStep?.to?.isOutOfBounds(rules) == true
     }
 
     private fun checkPlayerForTouchdown(player: Player): Boolean {
         val game = player.team.game
         val rules = game.rules
-        return !game.isTurnOver()
+        val block = game.getContextOrNull<BlockContext>()
+        val deferTouchdown = block?.attacker == player && block.policy.deferAttackerTouchdown
+        return !deferTouchdown && !game.isTurnOver()
             && rules.isStanding(player)
             && player.hasBall()
     }

@@ -53,7 +53,13 @@ import com.jervisffb.engine.utils.sum
  */
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<RiskingInjuryContext>()
+        return UpdateContext(context.copy(
+            stunnedCountsAsKnockout = context.player.hasSkill(SkillType.BALL_AND_CHAIN)
+                && context.mode != RiskingInjuryMode.PUSHED_INTO_CROWD,
+        ))
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<RiskingInjuryContext>()
         val commands = mutableListOf<Command?>()
@@ -79,7 +85,11 @@ object RiskingInjuryRoll: Procedure() {
     object DetermineStartingRoll: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             return state.getContext<RiskingInjuryContext>().let { context ->
-                if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
+                val bypassArmour = context.player.hasSkill(SkillType.BALL_AND_CHAIN) && context.mode in listOf(
+                    RiskingInjuryMode.PLACED_PRONE, RiskingInjuryMode.FALLING_OVER,
+                    RiskingInjuryMode.KNOCKED_DOWN, RiskingInjuryMode.BAD_LANDING, RiskingInjuryMode.FIREBALL,
+                )
+                if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD || bypassArmour) {
                     GotoNode(RollForInjury)
                 } else {
                     GotoNode(RollForAmour)
@@ -102,12 +112,12 @@ object RiskingInjuryRoll: Procedure() {
                 //   breaking armour will keep them Stunned.
                 val player = context.player
                 val standOnFailure = (context.mode in listOf(RiskingInjuryMode.STAB, RiskingInjuryMode.PROJECTILE_VOMIT, RiskingInjuryMode.CHAINSAW))
-                val isStunned = (player.state == PlayerPitchState.STUNNED)
+                val isStunned = (player.state == PlayerPitchState.STUNNED || player.state == PlayerPitchState.STUNNED_OWN_TURN)
                 val isFoul = (state.getContextOrNull<FoulContext>()?.victim == context.player)
                 compositeCommandOf(
                     when {
                         context.armourRollAborted -> null // Player remains unaffected
-                        isStunned -> SetPlayerIntermediateState(player, state = null) // Player remains Stunned
+                        isStunned || context.mode == RiskingInjuryMode.HIT_WHILE_PRONE -> SetPlayerIntermediateState(player, state = null) // Player remains Stunned
                         standOnFailure || isFoul -> null // Armour wasn't broken, so just keep the current player state (whatever it was)
                         else -> compositeCommandOf(
                             SetPlayerState(context.player, PlayerPitchState.PRONE, hasTackleZones = false),
@@ -124,7 +134,17 @@ object RiskingInjuryRoll: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = InjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
-            return when (context.injuryResult) {
+            val convertStunned = context.stunnedCountsAsKnockout
+                && context.injuryResult == InjuryResult.STUNNED
+            val injuryResult = when (convertStunned) {
+                true -> InjuryResult.KO
+                false -> context.injuryResult
+            }
+            val updateResult = when (convertStunned) {
+                true -> UpdateContext(context.copy(injuryResult = InjuryResult.KO))
+                false -> null
+            }
+            return when (injuryResult) {
                 InjuryResult.STUNNED -> {
                     // If pushed into the crowed, stunned will move you to Reserves
                     // See page 61 in the rulebook.
@@ -148,8 +168,8 @@ object RiskingInjuryRoll: Procedure() {
                     }
                 }
                 InjuryResult.KO -> {
-                    // TODO Add handling of things that might modify KO results (like thick skull)
                     compositeCommandOf(
+                        updateResult,
                         SetPlayerState(context.player, PlayerDogoutState.KNOCKED_OUT),
                         GotoNode(CheckApothecary),
                     )

@@ -115,7 +115,15 @@ class TeamActions2025 : TeamActions() {
     override val specialActions: Set<PlayerAction> = buildSet {
         PlayerSpecialActionType.entries.forEach {
             val action = when (it) {
-//                PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
+                PlayerSpecialActionType.BALL_AND_CHAIN -> PlayerAction(
+                    name = "Ball & Chain",
+                    type = PlayerSpecialActionType.BALL_AND_CHAIN,
+                    countsAs = null,
+                    availablePrTurn = Int.MAX_VALUE,
+                    worksDuringBlitz = false,
+                    procedure = com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainAction,
+                    compulsory = true,
+                )
 //                PlayerSpecialActionType.BOMBARDIER -> TODO()
                 PlayerSpecialActionType.CHAINSAW -> {
                     PlayerAction(

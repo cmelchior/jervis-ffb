@@ -47,6 +47,8 @@ data class RiskingInjuryContext(
     val injuryRoll: PersistentList<D6Result> = persistentListOf(),
     val injuryModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val injuryResult: InjuryResult? = null,
+    // Ruleset-supplied minimum outcome; also applies to recovery that would leave the player Stunned.
+    val stunnedCountsAsKnockout: Boolean = false,
     val useThickSkullOnInjuryRoll: Boolean = false,
 
     // Casualty roll

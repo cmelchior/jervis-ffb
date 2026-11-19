@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PitchSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectMoveType
@@ -14,6 +15,7 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.bb2025.skills.MonstrousMouth
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.d16
+import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.dblock
@@ -667,10 +669,19 @@ class MonstrousMouthTests: JervisGameBB2025Test() {
         // TODO Waiting for Trickster support
     }
 
-    @Ignore
     @Test
     fun ballAndChainPlayerCanMoveWhenChomped() {
-        // TODO Waiting for Ball and Chain support
+        val player = awayTeam["A1".playerId]
+        val chomper = homeTeam["H1".playerId]
+        player.addSkill(SkillType.BALL_AND_CHAIN)
+        chomper.addSkill(SkillType.MONSTROUS_MOUTH)
+        player.makeChomped(chomper)
+        controller.rollForward(
+            *activatePlayer(player, PlayerSpecialActionType.BALL_AND_CHAIN),
+            DirectionSelected(Direction.RIGHT), 2.d3, NoRerollSelected(), EndAction,
+        )
+        player.assertCoordinates(14, 5)
+        assertFalse(player.hasStatusEffect(PlayerStatusEffectType.CHOMPED))
     }
 
     @Test

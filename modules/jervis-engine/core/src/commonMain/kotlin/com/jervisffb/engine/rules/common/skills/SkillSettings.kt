@@ -48,7 +48,7 @@ abstract class SkillSettings {
     // "Name (42-)" since you cannot roll negative values on a die. Fixed values
     // like "Chance (6)" is also not allowed.
     @Transient
-    private val niceRegex = "(^[a-zA-Z\\- ]+)\\s*(\\(([\\-+]\\d+|\\d+\\+|([a-zA-Z ]+))\\))?$".toRegex()
+    private val niceRegex = "(^[a-zA-Z&\\- ]+)\\s*(\\(([\\-+]\\d+|\\d+\\+|([a-zA-Z ]+))\\))?$".toRegex()
 
     /** Will match strings that return the format exposed by [SkillId.serialize] */
     @Transient

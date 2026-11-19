@@ -374,6 +374,7 @@ object ArmourRoll: Procedure(), ChanceObservationHandler {
                 RiskingInjuryMode.FIREBALL,
                 RiskingInjuryMode.BAD_LANDING,
                 RiskingInjuryMode.HIT_BY_ROCK,
+                RiskingInjuryMode.HIT_WHILE_PRONE,
                 RiskingInjuryMode.PLACED_PRONE,
                 RiskingInjuryMode.PROJECTILE_VOMIT,
                 RiskingInjuryMode.PUSHED_INTO_CROWD,

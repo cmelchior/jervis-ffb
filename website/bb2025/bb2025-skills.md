@@ -69,6 +69,77 @@ intent to Dodge, Jump, or Leap first.
 
     Arm Bar applies to players with the Pogo skill.
 
+## Page 124 - Ball & Chain
+
+### Movement, follow-up, and blocked destinations
+
+The May FAQ clarifies that an occupied destination must be resolved before
+checking whether the player can enter it. If Stand Firm, Rooted, or Chomped
+prevents the target from moving, the Block still happens and one movement is
+spent, but the mover stays at the origin. A Prone or Stunned target is pushed
+before its Armour Roll; if it cannot move, its Armour is still rolled. It
+keeps its original state if Armour holds.
+
+Fend explicitly cannot stop a Ball & Chain follow-up. The May erratum also
+exempts Ball & Chain movement from Chomped. 
+
+The interaction with a Rooted mover is not explicitly exempted, but Jervis 
+assumes this is an oversight (as the combination is not seen on normal rosters) 
+and allows this as well.
+
+### Direction rolls and Rushes
+
+Direction is not a ball Scatter or Throw-in, so Jervis allows an eligible Team
+Re-roll or Pro. Re-rolling keeps the chosen template orientation. 
+
+No limitation on directions are mentioned in the rules, so all four 
+orientations are always available, including those facing into the crowd.
+
+### Blocks within the Special Action
+
+Ball & Chain performs a standard Block inside its own declared Special Action;
+Jervis does not offer Stab, Chainsaw, or other Block replacements. Brawler does
+not apply because it requires declaring a Block Action, as distinguished from
+performing one by the May FAQ. Foul Appearance is ignored.
+
+Normal team relationships determine assists: a player cannot assist
+an attack against their own team. Skills requiring an opposition player,
+including Dauntless, Fend, Taunt, Strip Ball, Pile Driver, and opposing
+Armour/Injury modifiers, do not apply through this action.
+
+### Injury and recovery
+
+Being Knocked Down, Falling Over, or Placed Prone bypasses Armour and goes
+straight to Injury, even during the opponent's turn. This includes Wrestle and
+the Ball & Chain player's own Pile Driver. 
+
+Armour-only attacks such as Stab, Chainsaw, and Projectile Vomit still require
+their normal Armour Roll. A failed attack leaves the player unaffected. On a
+successful attack, Jervis applies the Ball & Chain Stunned-to-KO conversion to
+the Injury result as normal. 
+
+The ordering with Thick Skull and Apothecary recovery is not explicitly
+settled by the FAQ. Jervis chooses to apply injury modifiers first, then 
+converts Stunned to KO. Thick Skull therefore cannot keep the player on the 
+pitch.
+
+Likewise, an Apothecary's KO-to-Stunned recovery converts back to KO. Ordinary
+casualty treatment and Regeneration remain available. 
+
+The May FAQ explicitly preserves normal crowd results: Stunned sends the
+player to Reserves instead of KO. Moving off the pitch counts as being Pushed
+Into the Crowd and causes a turnover during the player's team turn. Normal
+crowd recovery also applies.
+
+### Other events and skill combinations
+
+Charge excludes Ball & Chain players because the event does not allow their 
+compulsory Special Action.
+
+Saboteur is a separate, deferred feature. The May FAQ permits it alongside
+Ball & Chain and Secret Weapon; a successful explosion must remove the player
+as an automatic KO without rolling Injury. 
+
 ## Page 124 - Big Hand
 The rules are unclear if Secure the Ball is a "pickup" or not. By extension,
 this affects Big Hand that works on pickup.

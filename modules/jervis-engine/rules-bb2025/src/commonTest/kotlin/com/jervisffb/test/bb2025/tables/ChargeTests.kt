@@ -50,6 +50,17 @@ import kotlin.test.assertTrue
  */
 class ChargeTests: JervisGameBB2025Test() {
 
+    @Test
+    fun ballAndChainPlayersCannotBeSelected() {
+        val player = homeTeam["H6".playerId]
+        player.addSkill(SkillType.BALL_AND_CHAIN)
+        controller.rollForward(
+            *defaultBB2020Pregame(), *defaultSetup(),
+            *defaultKickOffHomeTeam(kickoffEvent = arrayOf(DiceRollResults(6.d6, 4.d6), 1.d3), bounce = null),
+        )
+        assertTrue(player.id !in controller.getAvailableActions().get<SelectPlayers>().players)
+    }
+
     // Check that all selected players can move during a Charge!
     @Test
     fun charge_moveAction() {

@@ -3,15 +3,18 @@ package com.jervisffb.ui.game.state.decorators
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.PitchCoordinate
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.animations.DirectionSelectedAnimation
 import com.jervisffb.ui.game.animations.JervisAnimation
+import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.model.GuardedAction
 import com.jervisffb.ui.game.model.UiAction
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.view.SimpleContextMenuOption
 
 object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
 
@@ -31,13 +34,32 @@ object SelectDirectionDecorator: PitchActionDecorator<SelectDirection> {
         val outOfBounds = descriptor.directions.firstOrNull {
             origin.move(it, 1).isOutOfBounds(state.rules)
         }
-        if (outOfBounds != null) {
+        if (outOfBounds != null && descriptor.directions.all { origin.move(it, 1).isOutOfBounds(state.rules) }) {
             acc.addUnknownAction(DirectionSelected(outOfBounds))
         } else {
             descriptor.directions.forEach { direction ->
                 val action = DirectionSelected(direction)
                 val uiAction = UiAction(action, GuardedAction(acc) { id -> actionProvider.userActionSelected(id, action) })
-                acc.updateSquare(origin.move(direction, 1)) {
+                val target = origin.move(direction, 1)
+                // Crowd squares have no rendered pitch square. Keep outward template
+                // orientations available through the player's context menu.
+                if (target.isOutOfBounds(state.rules)) {
+                    if (isEnabled) {
+                        acc.updateSquare(descriptor.origin as PitchCoordinate) {
+                            it.copy(contextMenuOptions = it.contextMenuOptions.add(
+                                SimpleContextMenuOption(when (direction) {
+                                    Direction.UP -> "Face Upper Sideline (Crowd)"
+                                    Direction.DOWN -> "Face Lower Sideline (Crowd)"
+                                    Direction.LEFT -> "Face Left End Zone (Crowd)"
+                                    Direction.RIGHT -> "Face Right End Zone (Crowd)"
+                                    else -> "Face Crowd"
+                                }, uiAction, ActionIcon.BALL_AND_CHAIN)
+                            ))
+                        }
+                    }
+                    return@forEach
+                }
+                acc.updateSquare(target) {
                     it.copy(
                         isSelectable = true,
                         selectedAction = uiAction.takeIf { isEnabled },

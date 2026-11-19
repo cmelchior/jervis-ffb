@@ -7,8 +7,10 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.AddContext
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -96,10 +98,10 @@ object MovePlayerIntoSquare : Procedure(), ChanceObservationHandler {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             val playerIsHoldingBall = (context.player.ball?.carriedBy == context.player)
             val ballOnTheGround = (
-                state.balls.size > 1 &&
+                (state.balls.size > 1 || context.bounceLooseBallImmediately) &&
                     state.pitch[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
             )
-            return if (playerIsHoldingBall && ballOnTheGround) {
+            return if ((playerIsHoldingBall || context.bounceLooseBallImmediately) && ballOnTheGround) {
                 GotoNode(ResolveBouncingBall)
             } else {
                 GotoNode(CheckForTrapdoor)
@@ -169,32 +171,40 @@ object MovePlayerIntoSquare : Procedure(), ChanceObservationHandler {
 
     }
 
+
     object ResolveFallingThroughTrapdoor : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
-            return compositeCommandOf(
-                SetPlayerLocation(context.player, Dogout),
-                SetPlayerIntermediateState(context.player, PlayerIntermediateState.KNOCKED_DOWN),
-                AddContext(
-                    RiskingInjuryContext(
-                        player = context.player,
-                        mode = RiskingInjuryMode.PUSHED_INTO_CROWD
+            return buildCompositeCommand {
+                context.player.ball?.let { ball ->
+                    addAll(
+                        SetBallLocation(ball, context.target),
+                        SetBallState.bouncing(ball),
+                        SetCurrentBall(ball),
+                        SetTurnOver(TurnOver.STANDARD),
                     )
-                ),
-                ReportGameProgress("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}")
-            )
+                }
+                add(SetPlayerLocation(context.player, Dogout))
+                getResetChompedStateCommands(context.player, Dogout)?.let { add(it) }
+                addAll(
+                    SetPlayerIntermediateState(context.player, PlayerIntermediateState.KNOCKED_DOWN),
+                    AddContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.PUSHED_INTO_CROWD)),
+                    ReportGameProgress("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}"),
+                )
+            }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<MovePlayerIntoSquareContext>()
-            return compositeCommandOf(
-                RemoveContext<RiskingInjuryContext>(),
-                if (context.player.hasBall()) {
-                    // TODO Should also bounce the ball
-                    SetTurnOver(TurnOver.STANDARD)
-                } else null,
-                ExitProcedure()
-            )
-        }
+        override fun onExitNode(state: Game, rules: Rules): Command = compositeCommandOf(
+            RemoveContext<RiskingInjuryContext>(),
+            when (state.currentBallOrNull()?.state == BallState.BOUNCING) {
+                true -> GotoNode(BounceAfterTrapdoor)
+                false -> ExitProcedure()
+            },
+        )
+    }
+
+    object BounceAfterTrapdoor : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command = compositeCommandOf(SetCurrentBall(null), ExitProcedure())
     }
 }

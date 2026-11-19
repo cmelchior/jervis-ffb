@@ -60,6 +60,14 @@ object PatchUpPlayer: Procedure() {
             val player = context.player
             return buildCompositeCommand {
                 val injuryCommand = when {
+                    context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null
+                        && context.stunnedCountsAsKnockout -> {
+                        compositeCommandOf(
+                            SetPlayerState(player, PlayerDogoutState.KNOCKED_OUT),
+                            getResetChompedStateCommands(player),
+                            SetPlayerLocation(player, Dogout),
+                        )
+                    }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
                         if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
                             compositeCommandOf(

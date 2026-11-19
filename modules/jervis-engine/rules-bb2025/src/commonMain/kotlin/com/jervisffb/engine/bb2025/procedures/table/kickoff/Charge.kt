@@ -56,12 +56,14 @@ import com.jervisffb.engine.fsm.castDiceRoll
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ForegoActivationContext
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -69,6 +71,7 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.statistics.probability.observation.ChanceObservationHandler
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -188,7 +191,7 @@ object Charge : Procedure(), ChanceObservationHandler {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return castDiceRoll<D3Result>(action) { roll ->
                 val maxPlayers = roll.value + getExtraPlayersCount(rules)
-                val availablePlayers = state.kickingTeam.filter { rules.isOpen(it) }
+                val availablePlayers = state.kickingTeam.filter { rules.isOpen(it) && !hasDisallowedCompulsorySkill(it) }
                 val playersToSelect = min(availablePlayers.size, maxPlayers)
                 val chanceObservation = createFinalAtLeastObservation(
                     state = state,
@@ -225,10 +228,7 @@ object Charge : Procedure(), ChanceObservationHandler {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ChargeContext>()
-            val availablePlayers = state.kickingTeam
-                .filter { rules.isOpen(it) }
-                .map { it.id }
-
+            val availablePlayers = getAvailablePlayers(state)
             return when (availablePlayers.isNotEmpty()) {
                 true -> listOf(SelectPlayers(context.playersToSelect, availablePlayers), CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -425,10 +425,11 @@ object Charge : Procedure(), ChanceObservationHandler {
     }
 
     // During a Charge, only Open Players can be selecte
-    private fun getAvailablePlayers(state: Game, rules: Rules): List<Player> {
+    private fun getAvailablePlayers(state: Game): List<PlayerId> {
         return state.kickingTeam
             .filter { it.available == Availability.AVAILABLE } // Players that hasn't already been activated
-            .filter { rules.isOpen(it) }
+            .filter { state.rules.isOpen(it) && !hasDisallowedCompulsorySkill(it) }
+            .map { it.id }
     }
 
     // Reset player stats back to start, this e.g. include moves
@@ -478,5 +479,11 @@ object Charge : Procedure(), ChanceObservationHandler {
             GameType.GUTTER_BOWL -> 3
             GameType.BB7 -> 1
         }
+    }
+
+    // Filter out any players with a compulsory skill that isn't allowed during
+    // Charge!
+    fun hasDisallowedCompulsorySkill(it: Player): Boolean {
+        return it.hasSkill(SkillType.BALL_AND_CHAIN)
     }
 }

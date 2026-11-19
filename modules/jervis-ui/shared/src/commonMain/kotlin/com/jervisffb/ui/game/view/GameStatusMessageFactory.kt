@@ -8,6 +8,8 @@ import com.jervisffb.engine.bb2020.procedures.blitz.BlitzAction
 import com.jervisffb.engine.bb2020.procedures.table.kickoff.CheeringFans2020
 import com.jervisffb.engine.bb2025.procedures.BB7KickOffDeviateRoll
 import com.jervisffb.engine.bb2025.procedures.TakeRootRoll
+import com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainAction
+import com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainDirectionRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.BothDown2025
 import com.jervisffb.engine.bb2025.procedures.actions.block.BreatheFireRoll
 import com.jervisffb.engine.bb2025.procedures.actions.block.ChainsawRoll
@@ -761,6 +763,32 @@ class GameStatusMessageFactory(private val menuViewModel: MenuViewModel, private
                 when {
                     isActiveClient -> "Select Offensive Assists to Foul"
                     else -> "Waiting for Opponent to select Offensive Assists"
+                }
+            },
+            BallAndChainDirectionRoll.RollDie to { isActiveClient, serverDiceRolls, _ ->
+                when {
+                    serverDiceRolls -> "Waiting for Server to Roll D3 for Ball & Chain Direction"
+                    isActiveClient -> "Roll D3 for Ball & Chain Direction"
+                    else -> "Waiting for Opponent to Roll D3 for Ball & Chain Direction"
+                }
+            },
+            BallAndChainDirectionRoll.ReRollDie to { isActiveClient, serverDiceRolls, _ ->
+                when {
+                    serverDiceRolls -> "Waiting for Server to Re-roll D3 for Ball & Chain Direction"
+                    isActiveClient -> "Re-roll D3 for Ball & Chain Direction"
+                    else -> "Waiting for Opponent to Re-roll D3 for Ball & Chain Direction"
+                }
+            },
+            BallAndChainDirectionRoll.ChooseReRollSource to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Accept Ball & Chain Direction Result or Re-roll D3?"
+                    false -> "Waiting for Opponent to Accept or Re-roll Ball & Chain Direction"
+                }
+            },
+            BallAndChainAction.SelectTemplateOrientation to { isActiveClient, _, _ ->
+                when (isActiveClient) {
+                    true -> "Select Ball & Chain Direction or End Action"
+                    false -> "Waiting for Opponent to select Ball & Chain Direction or End Action"
                 }
             },
             PuntStep.SelectTemplateOrientation to { isActiveClient, _, _ ->

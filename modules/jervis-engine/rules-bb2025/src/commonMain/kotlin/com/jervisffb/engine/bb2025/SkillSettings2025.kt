@@ -4,6 +4,7 @@ import com.jervisffb.engine.bb2025.skills.Accurate
 import com.jervisffb.engine.bb2025.skills.AlwaysHungry
 import com.jervisffb.engine.bb2025.skills.AnimalSavagery
 import com.jervisffb.engine.bb2025.skills.ArmBar
+import com.jervisffb.engine.bb2025.skills.BallAndChain
 import com.jervisffb.engine.bb2025.skills.BigHand
 import com.jervisffb.engine.bb2025.skills.Block
 import com.jervisffb.engine.bb2025.skills.BloodLust
@@ -520,9 +521,9 @@ class SkillSettings2025: SkillSettings() {
                     }
                 }
                 SkillType.BALL_AND_CHAIN -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry("Ball & Chain", type, SkillCategory.TRAITS) { player, category, expiresAt ->
+                        BallAndChain(player, category, expiresAt)
+                    }
                 }
                 SkillType.BOMBARDIER -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->

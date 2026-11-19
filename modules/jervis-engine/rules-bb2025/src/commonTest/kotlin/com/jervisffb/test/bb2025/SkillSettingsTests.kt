@@ -65,4 +65,10 @@ class SkillSettingsTests {
     fun getSkillId_unknownSkill_returnsNull() {
         assertNull(rules.skillSettings.getSkillId("NOT_A_SKILL"))
     }
+
+    @Test
+    fun niceDescriptionWithAmpersand() {
+        assertEquals(SkillType.BALL_AND_CHAIN.id(), rules.skillSettings.getSkillIdFromNiceDescription("Ball & Chain"))
+    }
+
 }

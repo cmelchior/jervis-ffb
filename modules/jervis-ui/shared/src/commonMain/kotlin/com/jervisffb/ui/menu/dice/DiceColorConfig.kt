@@ -70,6 +70,7 @@ object DiceColorConfig2025 : DiceColorConfig() {
             DiceRollType.ARGUE_THE_CALL -> DiceRollTypeConfig(rollType, "Argue the Call", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.ARMOUR -> DiceRollTypeConfig(rollType, "Armour", d6, d6Colors, DiceColor.RED)
             DiceRollType.BAD_HABITS -> DiceRollTypeConfig(rollType, "Bad Habits", d3, d6Colors, DiceColor.WHITE)
+            DiceRollType.BALL_AND_CHAIN_DIRECTION -> DiceRollTypeConfig(rollType, "Ball & Chain Direction", d3, d6Colors, DiceColor.DEFAULT)
             DiceRollType.BB7_APOTHECARY -> DiceRollTypeConfig(rollType, "Apothecary (Sevens)", d6, d6Colors, DiceColor.DEFAULT)
             DiceRollType.BLITZ -> DiceRollTypeConfig(rollType, "Blitz", d6, d6Colors, DiceColor.WHITE)
             DiceRollType.BLOCK -> DiceRollTypeConfig(rollType, "Block", block, singleColor, DiceColor.DEFAULT)

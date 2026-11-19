@@ -177,9 +177,11 @@ fresh clone usually resolve after the first successful build.
 
 ## Code Style
 
+
+### `when` over `if`
 Prefer `when` over `if` for two branches:
 
-```adlanguage
+```kotlin
 // Do not do this
 if (booleanValue) {
   handleTrue()
@@ -192,6 +194,41 @@ when (booleanValue) {
   true -> handleTrue()
   false -> handleFalse()
 }
+```
+
+### Single-expression function shorthand
+Do not use single-expression function shorthand, if the expression span multiple
+lines:
+
+```kotlin
+// Do not
+fun myFunction = compositeCommand(
+    ReportSomething(),
+    ExitProcedure(), 
+)
+
+// Do
+fun myFunction() {
+    return compositeCommand(
+        ReportSomething(),
+        ExitProcedure(),
+    )
+}
+```
+
+### Parentheses around boolean expressions
+
+When assigning a boolean expression that uses `==` or `!=`, enclose it in 
+parentheses:
+
+```kotlin
+// Do not
+val value = oneValuer == anotherValue
+val value = oneValuer != anotherValue
+
+// Do
+val value = (oneValue == anotherValue)
+val value = (oneValue != anotherValue)
 ```
 
 ## Conventions

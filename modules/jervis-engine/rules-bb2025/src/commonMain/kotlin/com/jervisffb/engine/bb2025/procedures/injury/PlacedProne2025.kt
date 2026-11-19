@@ -1,5 +1,6 @@
 package com.jervisffb.engine.bb2025.procedures.injury
 
+import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.bb2025.skills.SafePairOfHandsStep
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
@@ -26,7 +27,9 @@ import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Resolve a player being Place Prone.
@@ -61,6 +64,7 @@ object PlacedProne2025: Procedure() {
             val rootedStatus = player.statusEffects.firstOrNull { it.type == PlayerStatusEffectTypeCommon.ROOTED }
             return buildCompositeCommand {
                 add(SetPlayerState(player, PlayerPitchState.PRONE, hasTackleZones = false))
+                getResetChompedStateCommands(player, player.location, forceRemoveChompedByChomper = true)?.let { add(it) }
                 if (rootedStatus != null) {
                     add(RemovePlayerStatusEffect(player, rootedStatus))
                 }
@@ -85,7 +89,7 @@ object PlacedProne2025: Procedure() {
                 if (hasBall) {
                     add(GotoNode(BounceBall))
                 } else {
-                    add(ExitProcedure())
+                    add(GotoNode(ResolveTraitInjury))
                 }
             }
         }
@@ -96,8 +100,18 @@ object PlacedProne2025: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetCurrentBall(null),
-                ExitProcedure()
+                GotoNode(ResolveTraitInjury)
             )
         }
     }
+
+    object ResolveTraitInjury: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? = when (state.getContext<RiskingInjuryContext>().player.hasSkill(SkillType.BALL_AND_CHAIN)) {
+            true -> null
+            false -> ExitProcedureNode
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.riskingInjuryRoll
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+    }
+
 }

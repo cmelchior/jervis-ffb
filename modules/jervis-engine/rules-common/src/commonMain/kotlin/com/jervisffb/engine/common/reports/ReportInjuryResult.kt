@@ -13,16 +13,16 @@ import com.jervisffb.engine.rules.common.tables.InjuryResult
 class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
-        if (!context.armourBroken && context.mode != RiskingInjuryMode.PUSHED_INTO_CROWD) {
+        if (!context.armourBroken && context.injuryResult == null && context.mode != RiskingInjuryMode.PUSHED_INTO_CROWD) {
             append("${context.player.name}'s armour held up.")
         } else {
             when (context.injuryResult!!) {
                 InjuryResult.STUNNED -> append("${context.player.name} was Stunned")
                 InjuryResult.KO -> {
-                    if (context.apothecaryUsed != null) {
+                    if (context.apothecaryUsed != null && !context.stunnedCountsAsKnockout) {
                         append("${context.player.name} was Stunned")
                     } else {
-                        append("${context.player.name}'s was Knocked Out")
+                        append("${context.player.name} was Knocked Out")
                     }
                 }
                 InjuryResult.BADLY_HURT -> {

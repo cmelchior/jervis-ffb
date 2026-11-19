@@ -55,7 +55,7 @@ object SingleStandardBlockDetermineModifiers: Procedure() {
     object ResolveDauntless : ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<BlockContext>()
-            val hasSkill = context.attacker.isSkillAvailable(SkillType.DAUNTLESS)
+            val hasSkill = context.attacker.team != context.defender.team && context.attacker.isSkillAvailable(SkillType.DAUNTLESS)
             val attacker = context.attacker
             val defender = context.defender
             val defenderStrength = defender.strengthModifiers.filter { it.expiresAt == Duration.PERMANENT }.sumOf { it.modifier } + defender.baseStrength

@@ -36,7 +36,7 @@ object PlayerDown2025: Procedure() {
         val context = state.getContext<BlockContext>()
         val injuryContext = RiskingInjuryContext(
             player = context.attacker,
-            causedBy = context.defender,
+            causedBy = context.defender.takeIf { it.team != context.attacker.team },
             isPartOfMultipleBlock = context.isUsingMultiBlock
         )
         return AddContext(injuryContext)

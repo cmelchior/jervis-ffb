@@ -94,7 +94,7 @@ object SingleStandardBlockStep : Procedure() {
     object CheckForFoulAppearance: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<BlockContext>()
-            val hasFoulAppearance = context.defender.isSkillAvailable(SkillType.FOUL_APPEARANCE)
+            val hasFoulAppearance = !context.policy.ignoreFoulAppearance && context.defender.isSkillAvailable(SkillType.FOUL_APPEARANCE)
             return when (hasFoulAppearance) {
                 true -> null
                 false -> DetermineAssists

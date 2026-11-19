@@ -1,7 +1,9 @@
 package com.jervisffb.ui.game.state.actionwheel
 
 import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.bb2025.context.BallAndChainContext
 import com.jervisffb.engine.bb2025.context.SwoopContext
+import com.jervisffb.engine.bb2025.procedures.actions.ballandchain.BallAndChainDirectionRoll
 import com.jervisffb.engine.bb2025.procedures.actions.throwteammate.SwoopDirectionRoll
 import com.jervisffb.engine.bb2025.skills.PuntDirectionRoll
 import com.jervisffb.engine.common.context.PuntContext
@@ -54,4 +56,15 @@ object PuntDirectionWheelController : D3WithRerollWheelController() {
         val context = state.getContext<PuntContext>()
         return context.directionRoll!!.originalRoll
     }
+}
+
+object BallAndChainDirectionWheelController : D3WithRerollWheelController() {
+    override val buttonIdPrefix: String = "ball-and-chain-direction"
+    override val diceRollType: DiceRollType = DiceRollType.BALL_AND_CHAIN_DIRECTION
+    override val rollDiceNode: Node = BallAndChainDirectionRoll.RollDie
+    override val chooseRerollSourceNode: Node = BallAndChainDirectionRoll.ChooseReRollSource
+    override val rerollDiceNode: Node = BallAndChainDirectionRoll.ReRollDie
+
+    override fun getActionWheelCenter(state: Game): PitchCoordinate = state.getContext<BallAndChainContext>().origin
+    override fun getOriginalRoll(state: Game): D3Result = state.getContext<BallAndChainContext>().directionRoll!!.originalRoll
 }

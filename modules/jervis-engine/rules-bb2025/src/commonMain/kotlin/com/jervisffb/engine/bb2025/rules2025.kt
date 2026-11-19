@@ -300,6 +300,12 @@ abstract class Rules2025(
     override fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
         if (player.location !is OnPitchLocation) return emptyList()
+        // Mandatory Special Actions also take precedence for callers outside ActivatePlayer.
+        val compulsoryActions = player.skills.filterIsInstance<SpecialActionProvider>()
+            .filter { it.isActionAvailable(state, this) }
+            .map { teamActions[it.specialAction] }
+            .filter { it.compulsory }
+        if (compulsoryActions.isNotEmpty()) return compulsoryActions
         return buildList {
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let { turnData ->

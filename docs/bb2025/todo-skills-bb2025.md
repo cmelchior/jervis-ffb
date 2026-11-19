@@ -212,7 +212,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Unmodified Strength is ignoring all temporary modifiers.
 - [ ] Fend
     - [x] Prevent follow up
-    - [ ] Does not work against Ball & Chain
+    - [x] Does not work against Ball & Chain
     - [ ] Does not work against Juggernaut
     - [x] Prevent follow up from Frenzy
     - [x] Works on POW
@@ -352,7 +352,7 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
    - [x] Dirty Player
    - [x] Arm Bar
 - [x] Monstrous Mouth
-  - [ ] Ball & Chain can still move when Chomped
+  - [x] Ball & Chain can still move when Chomped
   - [ ] Trickster removes Chomped
   - [x] Distracted Removes Chomped
   - [x] Being Knocked Down does not remove Chomped
@@ -557,10 +557,31 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
   - [x] Eaten (DEAD) if failing to squirm free
   - [x] Regen does not work
   - [x] Apothecary does not work.
-- [ ] Ball & Chain*
-  - [ ] Is stopped if moving into a Stand Firm player, move still used, block still happens (FAQ May 2026)
-  - [ ] Moving off the pitch count as "Pushed into the Crowd" (FAQ May 2026)
-  - [ ] Is not Knocked Out if rolling Stunned after being "Pushed into the Crowd" (FAQ May 2026)
+- [x] Ball & Chain*
+  - [x] Compulsory, unlimited Special Action; leaves standard team allowances unchanged
+  - [x] Direction selection and re-rolls retain the chosen template orientation
+  - [x] Uses MA and normal Rushes, including Sprint; can stop between steps
+  - [x] Ignores Dodge, Tentacles, Shadowing, and Chomped; permits movement while Rooted (Jervis interpretation)
+  - [x] Standing occupants are Blocked, including team-mates; active coach selects the result against team-mates
+  - [x] Ignores Foul Appearance and Fend; compulsory follow-up costs no extra movement
+  - [x] No Block replacements or Brawler; opposition-only skills remain restricted to opponents
+  - [x] Prone/Stunned occupants are pushed before Armour, preserving their state if Armour holds
+  - [x] Is stopped if moving into a Stand Firm player, move still used, block still happens (FAQ May 2026)
+  - [x] Loose balls Bounce without Pickup or a turnover caused by that Bounce
+  - [x] Failed Rushes resolve destination effects before Falling Over, including Blizzard failures
+  - [x] Does not fall/injure twice after removal; cannot score before resolving a failed Rush
+  - [x] Knocked Down, Falling Over, and Placed Prone skip Armour and convert Stunned to KO, including opponent-turn injuries
+  - [x] Wrestle and Pile Driver trigger the trait; Placed Prone does not cause a new turnover without the ball
+  - [x] Armour-gated attacks keep their Armour Roll; Thick Skull and Apothecary recovery cannot evade the Stunned-to-KO conversion
+  - [x] Moving off the pitch counts as "Pushed into the Crowd" (FAQ May 2026)
+  - [x] Is not Knocked Out if rolling Stunned after being "Pushed into the Crowd" (FAQ May 2026)
+  - [x] Trapdoor removal and forced follow-up events resolve once
+  - [x] Quick Snap permits ordinary movement; Charge excludes activation
+  - [x] Skill combination restrictions are left to tournament creators; custom combinations can be loaded or added
+  - [x] Real Fanatic roster traits, nested Block undo/replay, direction chance collection, and UI prompts/controls verified
+  - [x] Website documents unclear interactions and Jervis's choices
+  - [ ] Saboteur automatic KO remains a dependency of Saboteur (not implemented here)
+  - [ ] Fungus/Kreek special abilities remain separate features
 - [ ] Bombardier
   - [ ] Accurate skill works
   - [ ] Cannoneer skill works

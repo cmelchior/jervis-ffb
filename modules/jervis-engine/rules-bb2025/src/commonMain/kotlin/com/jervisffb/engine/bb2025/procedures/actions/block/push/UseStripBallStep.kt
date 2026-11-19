@@ -53,7 +53,7 @@ object UseStripBallStep: Procedure() {
             val pushContext = state.getContext<PushContext>()
             val player = context.attacker
             val defenderHasBall = context.defender.hasBall()
-            val hasStripBall = player.isSkillAvailable(SkillType.STRIP_BALL)
+            val hasStripBall = player.team != context.defender.team && player.isSkillAvailable(SkillType.STRIP_BALL)
             val defenderIsImmovable = pushContext.isDefenderImmovable
             return if (defenderHasBall && hasStripBall && !defenderIsImmovable) {
                 GotoNode(ChooseToUseSureHands)

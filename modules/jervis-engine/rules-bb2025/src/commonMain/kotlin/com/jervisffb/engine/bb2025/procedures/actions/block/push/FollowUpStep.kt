@@ -9,25 +9,31 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.bb2025.modifiers.isChomped
 import com.jervisffb.engine.bb2025.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.bb2025.procedures.actions.block.PushBack2025
+import com.jervisffb.engine.bb2025.procedures.getResetChompedStateCommands
 import com.jervisffb.engine.bb2025.skills.Frenzy
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.context.UpdateContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.common.context.BlockContext
 import com.jervisffb.engine.common.modifiers.isRooted
 import com.jervisffb.engine.common.reports.ReportSkillUsed
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.PushContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.getSkillOrNull
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -67,7 +73,9 @@ object FollowUpStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val isAttackerUsingJuggernaut = context.firstPusher.isSkillAvailable(SkillType.JUGGERNAUT)
-            val defenderHasFend = context.firstPushee.isSkillAvailable(SkillType.FEND)
+            val defenderHasFend = context.firstPusher.team != context.firstPushee.team
+                && !context.firstPusher.hasSkill(SkillType.BALL_AND_CHAIN)
+                && context.firstPushee.isSkillAvailable(SkillType.FEND)
             // If Juggernaut is being used by the attacker, it prevents the use of Fend.
             // See the Juggernaut skill description on page 129 in the BB2025 rulebook.
             return if (defenderHasFend && !isAttackerUsingJuggernaut) {
@@ -96,7 +104,9 @@ object FollowUpStep: Procedure() {
         }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
-            val defenderHasTaunt = context.firstPushee.isSkillAvailable(SkillType.TAUNT)
+            val defenderHasTaunt = context.firstPusher.team != context.firstPushee.team
+                && state.getContextOrNull<BlockContext>()?.policy?.forceFollowUp != true
+                && context.firstPushee.isSkillAvailable(SkillType.TAUNT)
             val attackerHasFrenzy = context.firstPusher.getSkillOrNull<Frenzy>()?.forcesFollowUp(state) == true
             return if (!context.defenderIsUsingFend && !attackerHasFrenzy && defenderHasTaunt) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
@@ -138,7 +148,14 @@ object FollowUpStep: Procedure() {
                     // The pusher is moving in both cases (Frenzy and Taunt force
                     // the follow-up), so the flag must be true whenever we move.
                     add(SetContextProperty(PushContext::followsUp, pushContext, true))
-                    add(SetPlayerLocation(pushContext.firstPusher, pushContext.pushChain.first().from))
+                    val target = pushContext.pushChain.first().from
+                    add(SetPlayerLocation(pushContext.firstPusher, target))
+                    getResetChompedStateCommands(pushContext.firstPusher, target)?.let { add(it) }
+                    if (state.getContextOrNull<BlockContext>()?.policy?.forceFollowUp == true) {
+                        state.pitch[target].balls.filter { it.state == BallState.ON_GROUND }.forEach {
+                            add(SetBallState.bouncing(it))
+                        }
+                    }
                 }
                 // The parent procedure is responsible for delegating to the next
                 // parts of the push chain which should be resolving defender
@@ -162,6 +179,8 @@ object FollowUpStep: Procedure() {
         // - If the defender used Taunt, the attacker must follow up, unless they are Rooted or used Multiple Block.
         // - If the defender is using Fend, the attacker cannot follow up.
         // - If the defender is using Taunt, the attacker must follow up if allowed.
+        val forceFollowUp = state.getContextOrNull<BlockContext>()?.policy?.forceFollowUp == true
+        if (forceFollowUp && !context.isDefenderImmovable) return FollowUpStatus.MUST_FOLLOW_UP
         val isRooted = context.firstPusher.isRooted()
         val isChomped = context.firstPusher.isChomped()
         val cannotFollowUp = context.isMultipleBlock || context.defenderIsUsingFend || context.isDefenderImmovable || isRooted || isChomped

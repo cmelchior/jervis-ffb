@@ -484,6 +484,11 @@ fun swoopDistanceRoll(roll: D6Result, reroll: GameAction? = NoRerollSelected()) 
     reroll,
 )
 
+fun ballAndChainDirectionRoll(roll: D3Result, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun takeRoot(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
