@@ -268,4 +268,26 @@ val value = (oneValue != anotherValue)
   appropriate interface or abstraction. Top-level abstractions must either live
   in the `core` engine module or `shared` UI module.
 
-## 
+## Writing FAQ entries under /website
+
+Write for a Coach who knows the rules and wants to understand what Jervis does
+in a specific situation. Use plain, conversational prose and keep the
+rulebook's terminology and capitalization where they affect the ruling.
+
+- Use `## Page <number> - <rule or skill name>` for each entry and follow
+  rulebook page order. Use `XXX` if the page number is unknown. Keep simple
+  entries short and group complex interactions under descriptive subheadings.
+- Name the exact ambiguity, exception, or change that matters in play. Quote
+  only the rulebook phrase that matters. State what Jervis does, why it takes
+  that approach, and what happens in the relevant edge case. Use numbered steps
+  when the order of rolls, decisions, or effects matters.
+- Attribute rulings to their source. Use `!!! bloodbowl` for official FAQs,
+  errata, or Designer's Commentary, `!!! naf` for NAF rulings, and `!!! fumbbl`
+  for FUMBBL rulings or client behavior. Give the date or edition when known
+  and keep the callout focused on the relevant ruling. When sources differ,
+  explain how and say which interpretation Jervis follows. Use wording like
+  “For now, Jervis assumes…” for unresolved questions, and label behavior
+  that is planned or only partially implemented.
+- For optional skills, explain when the Coach is prompted, when Auto Actions
+  can make the choice, and when Jervis always applies the skill. Mention any
+  exception or setting the Coach can use to change the default.
