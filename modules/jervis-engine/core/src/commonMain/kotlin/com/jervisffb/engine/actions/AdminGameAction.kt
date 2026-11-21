@@ -77,9 +77,8 @@ data class SetPlayerState(
     val playerId: PlayerId,
     val state: PlayerState,
     val location: Location,
-    // Overrides the default "standing players have tackle zones" rule. Tools
-    // that rebuild a game state from a replay need it for players that stand
-    // but are distracted and therefore provide no tackle zones.
+    // Override the default tackle zone behavior. If `null`, a player will have tackle zones enabled
+    // when setting `PlayerState.STANDING` and not in any other state.
     val hasTackleZones: Boolean? = null,
 ) : AdminGameAction {
     constructor(playerId: PlayerId, state: PlayerState, x: Int, y: Int, hasTackleZones: Boolean? = null) : this(playerId, state, PitchCoordinate(x, y), hasTackleZones)
@@ -94,8 +93,7 @@ data class SetPlayerState(
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 
-// Dev Action that adds a status effect to a player, e.g. restoring a treeman
-// that is already rooted at the start of a reconstructed drive.
+// Dev Action that adds a status effect to a player.
 @Serializable
 data class AddPlayerStatusEffect(
     val playerId: PlayerId,
