@@ -13,7 +13,9 @@ import com.jervisffb.fumbbl.net.model.SpecialRule
 import com.jervisffb.fumbbl.net.model.TeamResult
 import com.jervisffb.fumbbl.net.model.TurnData
 import com.jervisffb.fumbbl.net.model.TurnMode
+import com.jervisffb.fumbbl.net.utils.FUMBBL_STAR_PLAYER_ALIASES
 import com.jervisffb.fumbbl.net.utils.fromFumbblState
+import com.jervisffb.fumbbl.net.utils.mapFumbblPositionName
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -63,6 +65,43 @@ class ExtractTeamStarPlayerTests {
         assertEquals("Ripper Bolgrot", star.position.title)
         // The regular lineman still extracts alongside the star.
         assertTrue(result.homeTeam.any { it.name == "Gnoblar One" && it.type == PlayerType.STANDARD })
+    }
+
+    @Test
+    fun `fumbbl-renamed star resolves via the position table`() {
+        val game = fumbblGame(
+            home = fumbblTeam(
+                name = "Human Home",
+                rosterName = "Human",
+                leagueRule = SpecialRule.OLD_WORLD_CLASSIC,
+                positions = listOf(
+                    rosterPosition("blitzer-1", "Human Blitzer"),
+                    rosterPosition("zug-1", "Mighty Zug"),
+                ),
+                players = listOf(
+                    fumbblPlayer("p1", 1, "blitzer-1", "Blitzer One"),
+                    fumbblPlayer("zug", 16, "zug-1", "Zug"),
+                ),
+            ),
+            away = simpleOgreTeam("Ogre Away"),
+        )
+
+        val result = Game.fromFumbblState(rules, game)
+
+        val star = result.homeTeam.firstOrNull { it.name == "Zug" }
+            ?: error("Renamed star hire missing from extracted team")
+        assertEquals(PlayerType.STAR_PLAYER, star.type)
+        assertEquals("The Mighty Zug", star.position.title)
+    }
+
+    @Test
+    fun `every star alias resolves to a ruleset inducement`() {
+        // Guards the exhaustiveness of FUMBBL_STAR_PLAYER_ALIASES: each entry
+        // must map onto a Star Player the BB2025 ruleset actually offers.
+        for ((fumbblName, rulebookTitle) in FUMBBL_STAR_PLAYER_ALIASES) {
+            val star = rules.inducements.findStarPlayer(mapFumbblPositionName(fumbblName))
+            assertEquals(rulebookTitle, star?.title, "alias $fumbblName")
+        }
     }
 
     @Test
