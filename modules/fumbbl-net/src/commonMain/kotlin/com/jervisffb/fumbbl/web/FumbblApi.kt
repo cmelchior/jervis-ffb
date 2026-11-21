@@ -378,9 +378,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             players = team.players.map { player ->
                 val position = jervisRoster.getOrNull(player.positionId.positionId)
                     // A Star Player is not part of a roster, so they are looked up among
-                    // the Star Players the ruleset offers as inducements. FUMBBL star
-                    // names go through the rename table first ("Mighty Zug" vs
-                    // "The Mighty Zug").
+                    // the Star Players the ruleset offers as inducements.
                     ?: rules.inducements.findStarPlayer(mapFumbblPositionName(player.position))
                     ?: error("Could not find a position matching [${player.name} - ${player.position}]: ${player.positionId}")
 

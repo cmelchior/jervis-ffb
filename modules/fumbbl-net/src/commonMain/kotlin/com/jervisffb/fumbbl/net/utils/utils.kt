@@ -272,15 +272,6 @@ internal fun mapFumbblPositionName(positionName: String): String =
     else -> positionName
 }
 
-/**
- * FUMBBL's spellings of Star Players whose names differ from the rulebook.
- *
- * Exhaustive: cross-checked against every Star Player catalog embedded in
- * FUMBBL replay data — the other 63 BB2025 Star Players are spelled
- * identically on both sides (modulo the case/apostrophe normalization in
- * [findStarPlayer]), and every remaining deviation belongs to custom-league
- * content that extraction correctly rejects.
- */
 internal val FUMBBL_STAR_PLAYER_ALIASES = mapOf(
     "'Captain' Karina von Riesz" to "Captain Karina von Riesz",
     "Boa Kon'sstriktr" to "Boa Kon'ssstriktr",
