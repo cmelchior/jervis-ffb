@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnPitchLocation
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.model.modifiers.StatModifier
 import kotlinx.serialization.Serializable
 
@@ -76,8 +77,11 @@ data class SetPlayerState(
     val playerId: PlayerId,
     val state: PlayerState,
     val location: Location,
+    // Override the default tackle zone behavior. If `null`, a player will have tackle zones enabled
+    // when setting `PlayerState.STANDING` and not in any other state.
+    val hasTackleZones: Boolean? = null,
 ) : AdminGameAction {
-    constructor(playerId: PlayerId, state: PlayerState, x: Int, y: Int) : this(playerId, state, PitchCoordinate(x, y))
+    constructor(playerId: PlayerId, state: PlayerState, x: Int, y: Int, hasTackleZones: Boolean? = null) : this(playerId, state, PitchCoordinate(x, y), hasTackleZones)
     // The GameController is responsible for the full validation. Here we just validate the most obvious things
     init {
         if (location is PitchCoordinate) {
@@ -86,6 +90,15 @@ data class SetPlayerState(
         val isDogoutState = (state is PlayerDogoutState)
         if (isDogoutState && location != Dogout) throw IllegalArgumentException("The chosen state is only valid if the location is Dogout: $state")
     }
+    fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
+}
+
+// Dev Action that adds a status effect to a player.
+@Serializable
+data class AddPlayerStatusEffect(
+    val playerId: PlayerId,
+    val effect: PlayerStatusEffect,
+) : AdminGameAction {
     fun getPlayer(state: Game): Player = state.getPlayerById(playerId)
 }
 

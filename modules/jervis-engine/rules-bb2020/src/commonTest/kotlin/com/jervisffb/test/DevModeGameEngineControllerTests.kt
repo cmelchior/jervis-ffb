@@ -1,11 +1,14 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.AddPlayerStatusEffect
 import com.jervisffb.engine.actions.MovePlayer
 import com.jervisffb.engine.actions.SetBallState
 import com.jervisffb.engine.actions.SetPlayerState
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.bb2020.StandardBB2020Rules
+import com.jervisffb.engine.common.modifiers.isRooted
+import com.jervisffb.engine.common.modifiers.rooted
 import com.jervisffb.engine.common.procedures.FullGame
 import com.jervisffb.engine.model.BallId
 import com.jervisffb.engine.model.BallState
@@ -15,6 +18,7 @@ import com.jervisffb.engine.model.PlayerIntermediateState
 import com.jervisffb.engine.model.PlayerPitchState
 import com.jervisffb.engine.model.locations.Dogout
 import com.jervisffb.engine.model.locations.PitchCoordinate
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
@@ -61,6 +65,32 @@ class DevModeGameEngineControllerTests {
         assertEquals(PitchCoordinate(5, 10), player.location)
         val square = controller.state.pitch[PitchCoordinate(5, 10)]
         assertEquals(player, square.player)
+    }
+
+    @Test
+    fun setPlayerStateCanWithholdTackleZones() {
+        val controller = createGameController()
+        val player = controller.state.homeTeam[PlayerId("H1")]
+
+        controller.handleAction(SetPlayerState(PlayerId("H1"), state = PlayerPitchState.STANDING, x = 5, y = 10, hasTackleZones = false))
+
+        assertEquals(PlayerPitchState.STANDING, player.state)
+        assertFalse(player.hasTackleZones, "A distracted standing player keeps its square but no tackle zones")
+
+        // The default stays "standing players have tackle zones"
+        controller.handleAction(SetPlayerState(PlayerId("H1"), state = PlayerPitchState.STANDING, x = 6, y = 10))
+        assertTrue(player.hasTackleZones)
+    }
+
+    @Test
+    fun addPlayerStatusEffectRestoresRooted() {
+        val controller = createGameController()
+        val player = controller.state.homeTeam[PlayerId("H1")]
+
+        controller.handleAction(AddPlayerStatusEffect(PlayerId("H1"), PlayerStatusEffect.rooted()))
+
+        assertTrue(player.isRooted())
+        assertTrue(player.hasTackleZones)
     }
 
     @Test
